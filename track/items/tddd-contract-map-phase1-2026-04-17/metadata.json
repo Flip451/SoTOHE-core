@@ -114,6 +114,57 @@
           "T007"
         ],
         "title": "S007 — Layer-agnostic fixture tests (2 層 / 3 層 / 独自層名)"
+      },
+      {
+        "description": [
+          "libs/domain/src/ids.rs の 6 つの nutype 型を plain struct (単一フィールド wrapper) に書き換える: TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName",
+          "API 互換性を維持する: try_new(impl Into<String>) -> Result<Self, ValidationError> / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord をすべて手動で impl (nutype は内部的に impl Into<String> を受け付けるため、既存の String 渡し call site と互換性を保つにはこのシグネチャが必要)",
+          "sanitize(trim) 相当の挙動を NonEmptyString / ReviewGroupName で明示的に実装する (try_new 内で trim 後に validation)",
+          "Cargo.toml (workspace.dependencies) と libs/domain/Cargo.toml から nutype 依存を削除する",
+          "250+ 箇所の既存 call site は API 互換のためソース無変更で compile 通過する見込み (実測: libs + apps 全体で約 263 箇所)。コード差分は libs/domain/src/ids.rs に閉じるが、Cargo.toml (workspace.dependencies) と libs/domain/Cargo.toml の nutype 削除は各 1 行の manifest 変更を伴う",
+          "動機: schema_export が nutype 由来型を rustdoc JSON から抽出できない (本体 struct が #[doc(hidden)] モジュール内、pub use alias のみ公開) ため TDDD catalogue declare 不可。plain struct 化で T009 の reference declare + Blue 化が可能となり、harness-hardening-nutype-rustdoc-support 別 track 自体が不要化する",
+          "unit tests: 既存 ids.rs tests (NonEmptyString の 5 test) を plain struct 版でそのまま通す。必要に応じて他 5 型についても try_new の validation test を追加"
+        ],
+        "id": "S008",
+        "task_ids": [
+          "T008"
+        ],
+        "title": "S008 — Remove nutype dependency (6 domain ids → plain struct)"
+      },
+      {
+        "description": [
+          "ADR 2026-04-17-1528 §D4 (1) の method-call edge 仕様を 'returns のみ' から 'returns + params' に拡張する",
+          "libs/domain/src/tddd/contract_map_render.rs の methods_of edge 生成ループで method.params() も iterate する",
+          "各 param の ty 文字列から domain-local extract_type_names で参照型名を抽出し、type_index に含まれる型に対して edge を生成する",
+          "edge label は `A -->|method(arg_name)| B` 形式 (arg_name で識別可能にする)",
+          "domain-types.json に T008 の 6 plain struct ids を action=reference で declare 追加: TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName",
+          "期待される新規 edge (dogfood 時): CatalogueLoader -->|load_all(track_id)| TrackId, ContractMapWriter -->|write(content)| ContractMapContent, ContractMapWriter -->|write(track_id)| TrackId, RenderContractMap -->|execute(cmd)| RenderContractMapCommand",
+          "unit tests 追加: 同層内 param edge / 層跨ぎ param edge / declared 型のみ対象 (外部型には edge を出さない) / label 形式 A -->|method(arg)| B の検証",
+          "ADR 本文は §D4 に 'Phase 1.5 拡張' を追記して経緯を残す",
+          "T009 完了時点で `sotp track type-signals` を実行し 6 型が全て Blue (found_type=true) であることを確認する",
+          "T009 完了時点で `sotp track signals` を実行し spec 全項目が Blue を維持することを確認する (strict merge gate 通過)"
+        ],
+        "id": "S009",
+        "task_ids": [
+          "T009"
+        ],
+        "title": "S009 — Contract Map edges extension (params + 6 ids reference declare)"
+      },
+      {
+        "description": [
+          "sotp track contract-map tddd-contract-map-phase1-2026-04-17 --workspace-root . で contract-map.md を再生成する",
+          "新 params-derived edges が期待通り現れることを目視確認する",
+          "verification.md に Phase 1.5 section を追加: T008 / T009 / T010 の scope / verified items / dogfooding 結果",
+          "Contract Map dogfooding subsection を post-Phase-1.5 の node/edge count で更新する",
+          "domain-types.json signals が T008+T009 完了後も引き続き全 Blue であることを `sotp track type-signals` で再確認 (T009 完了時に初回確認済み)",
+          "spec.json の Phase 1.5 関連 in_scope / acceptance_criteria が Blue を維持していることを `sotp track signals` で再確認 (T009 完了時に初回確認済み)",
+          "cargo make ci で regression なしを確認"
+        ],
+        "id": "S010",
+        "task_ids": [
+          "T010"
+        ],
+        "title": "S010 — Phase 1.5 verification + dogfooding regeneration"
       }
     ],
     "summary": [
@@ -121,11 +172,12 @@
       "スコープ: D1 render API / D2 subgraph 配置 / D3 13 kinds shape mapping / D4 method + trait impl edge",
       "除外 (Phase 2/3 送り): action overlay / signal overlay / spec_source edge / baseline diff view / AI briefing 自動添付",
       "usecase 層に orchestration (RenderContractMapInteractor) を置く。既存 type-graph の CLI 直結パターンとは非対称になるが、本 track ではリファクタしない (別 track 扱い)",
-      "layer-agnostic 不変条件 (ADR §4.5) を 2 層 / 3 層 / 独自層名の fixture で機械的に検証する"
+      "layer-agnostic 不変条件 (ADR §4.5) を 2 層 / 3 層 / 独自層名の fixture で機械的に検証する",
+      "Phase 1.5 (S008-S010): Contract Map edges のスカスカ問題を解消する。nutype 依存を domain ids から排除し (6 型 → plain struct、API 互換)、ADR §D4 (1) を 'returns + params' に拡張して method-edge の密度を高める。並行して harness-hardening-nutype-rustdoc-support 別 track 自体を不要化する"
     ]
   },
   "schema_version": 3,
-  "status": "done",
+  "status": "in_progress",
   "tasks": [
     {
       "commit_hash": "9a69df07bd5d98adb3c8d9de935e9527010e9758",
@@ -168,8 +220,23 @@
       "description": "Layer-agnostic fixture tests: libs/infrastructure/tests/fixtures/architecture_rules/ に fixture_2layers.json (core/adapter) / fixture_3layers_default.json (domain/usecase/infrastructure) / fixture_custom_names.json (application/port/gateway) を配置。各 fixture 用の最小カタログサンプルも同梱。render_contract_map 出力を検証: subgraph 数 == tddd.enabled 層数、subgraph ラベル == fixture の crate 名、may_depend_on に沿った左→右配置、他 fixture の層名が出力に混入しないこと。3 fixture × 基本 render = 最低 6 test。",
       "id": "T007",
       "status": "done"
+    },
+    {
+      "description": "Remove nutype dependency from libs/domain/src/ids.rs: rewrite TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName as plain structs (single-field wrappers) preserving the existing public API (try_new(impl Into<String>) -> Result<Self, ValidationError>, AsRef<str>, Display, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord). This signature matches the LayerId precedent and accepts both &str and String, keeping all existing call sites (including those passing format!() or .to_owned() results) unchanged. For NonEmptyString / ReviewGroupName, try_new must trim the input before running validate_non_empty to preserve the existing nutype sanitize(trim) behavior (whitespace-only input rejected as EmptyString, leading/trailing whitespace stripped from stored value). All existing call sites (approximately 250+ across libs and apps) must compile unchanged. Remove `nutype` from workspace dependencies (Cargo.toml + libs/domain/Cargo.toml). Motivation: schema_export cannot extract nutype-generated types from rustdoc JSON (the body struct lives in a #[doc(hidden)] module, only the pub use alias is visible), which blocks TDDD catalogue declaration. Plain struct rewrite makes these 6 ids declarable with action=reference and obsoletes the planned harness-hardening-nutype-rustdoc-support track. Note: nutype also generates into_inner(self) -> String, but this method has zero call sites in the repository (grep confirms no usages on these 6 types) and the LayerId precedent does not implement it; into_inner is therefore explicitly not included in the preserved API surface.",
+      "id": "T008",
+      "status": "todo"
+    },
+    {
+      "description": "Extend ADR 2026-04-17-1528 §D4 (1) from 'method-call edge via returns only' to 'returns + params'. Update libs/domain/src/tddd/contract_map_render.rs so the method-edge loop iterates method.params() in addition to method.returns(), extracting parameter type names via the domain-local extract_type_names and emitting A -->|method(arg_name)| B edges when the param ty matches a declared type in the type_index. Declare the 6 plain-struct ids from T008 in domain-types.json with action=reference (TrackId, TaskId, CommitHash, TrackBranch, NonEmptyString, ReviewGroupName). Add render unit tests covering: param edges within a layer, param edges crossing layers, params referencing declared types only (no edges to external types), and label formatting A -->|method(arg)| B. The expected new edges include CatalogueLoader -->|load_all(track_id)| TrackId, ContractMapWriter -->|write(content)| ContractMapContent, RenderContractMap -->|execute(cmd)| RenderContractMapCommand. At T009 completion, run sotp track type-signals to confirm the 6 ids are all Blue (found_type=true), and run sotp track signals to confirm all spec items remain Blue (strict merge gate).",
+      "id": "T009",
+      "status": "todo"
+    },
+    {
+      "description": "Phase 1.5 finalization: regenerate contract-map.md via `sotp track contract-map tddd-contract-map-phase1-2026-04-17` and verify the new params-derived edges appear. Update track/items/tddd-contract-map-phase1-2026-04-17/verification.md with a Phase 1.5 section covering T008-T010 (scope, verified items, dogfooding results). Update the Contract Map dogfooding subsection of verification.md with the post-Phase-1.5 node/edge counts. Confirm domain-types.json signals are all Blue after T008+T009 implementation (nutype removal makes the 6 ids discoverable by schema_export). Run `cargo make ci` and confirm no regressions. Also re-confirm sotp track signals shows spec items all Blue (strict merge gate re-verification after regeneration).",
+      "id": "T010",
+      "status": "todo"
     }
   ],
   "title": "TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view",
-  "updated_at": "2026-04-17T17:21:50Z"
+  "updated_at": "2026-04-18T10:00:00Z"
 }

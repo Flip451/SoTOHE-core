@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "approved",
-  "version": "1.0",
+  "version": "1.1",
   "title": "TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view",
   "goal": [
     "ADR 2026-04-17-1528 の Phase 1 (MVP) を実装し、全 tddd.enabled 層のカタログを入力とする 1 枚の mermaid 図 (contract-map.md) を生成する",
@@ -145,7 +145,42 @@
           "T004",
           "T005",
           "T006",
-          "T007"
+          "T007",
+          "T008",
+          "T009",
+          "T010"
+        ]
+      },
+      {
+        "text": "Phase 1.5: libs/domain/src/ids.rs の 6 nutype 型 (TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName) を plain struct (単一フィールド wrapper) に書き換え、API 互換性 (try_new(impl Into<String>) / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord — LayerId precedent と同一セット) を維持したまま nutype 依存を削除する。nutype の sanitize(trim) 挙動を持つ NonEmptyString / ReviewGroupName については、try_new 内で validation 前に trim を実行することで既存の whitespace-trimming セマンティクスを完全保持する。nutype が自動生成する into_inner(self) -> String はリポジトリ内でこれら 6 型への呼び出し箇所が 0 件 (grep 確認済み) かつ LayerId precedent にも実装されていないため、preserved API に含めない。動機: schema_export が nutype 由来型を rustdoc JSON から抽出できない制約により TDDD catalogue declare が不可能なため。plain struct 化で 6 型を catalogue 宣言可能にし、harness-hardening-nutype-rustdoc-support 別 track を obsolete 化する",
+        "sources": [
+          "knowledge/strategy/TODO.md §harness-hardening-nutype-rustdoc-support",
+          "track/items/tddd-contract-map-phase1-2026-04-17/verification.md §Implementation deviation: LayerId を素 struct に書き換え",
+          "libs/domain/src/ids.rs"
+        ],
+        "task_refs": [
+          "T008"
+        ]
+      },
+      {
+        "text": "Phase 1.5: ADR 2026-04-17-1528 §D4 (1) の method-call edge 仕様を 'returns のみ' から 'returns + params' に拡張し、libs/domain/src/tddd/contract_map_render.rs の edge 生成ループで method.params() も iterate して declared 型への edge を追加する。edge label は `A -->|method(arg_name)| B` 形式。Phase 1 で未描画だった method 引数参照 (ContractMapContent / RenderContractMapCommand / TrackId 等) が Contract Map 上に現れ、edges スカスカ問題を解消する",
+        "sources": [
+          "knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D4",
+          "track/items/tddd-contract-map-phase1-2026-04-17/contract-map.md",
+          "libs/domain/src/tddd/contract_map_render.rs"
+        ],
+        "task_refs": [
+          "T009"
+        ]
+      },
+      {
+        "text": "Phase 1.5: domain-types.json に T008 の 6 plain-struct ids を action=reference で declare 追加する。reference 宣言は既存型を Contract Map の type_index に取り込むだけで baseline / コード変更を伴わない。T008 後は schema_export が 6 型を認識するため signals は全 Blue を維持する",
+        "sources": [
+          "knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D4",
+          "track/items/tddd-contract-map-phase1-2026-04-17/domain-types.json"
+        ],
+        "task_refs": [
+          "T009"
         ]
       }
     ],
@@ -415,7 +450,50 @@
         "T004",
         "T005",
         "T006",
-        "T007"
+        "T007",
+        "T008",
+        "T009",
+        "T010"
+      ]
+    },
+    {
+      "text": "T008 完了時点で 6 nutype 型が plain struct に書き換わり、Cargo.toml workspace.dependencies と libs/domain/Cargo.toml の両方から nutype が削除されている。NonEmptyString / ReviewGroupName は try_new 内で validation 前に trim を実行し、既存の sanitize(trim) セマンティクスを保持する (whitespace-only 入力は EmptyString エラー、前後空白は自動除去)。既存 250+ call sites は無変更で cargo make ci が通過する (API 互換性の実証。実測: libs + apps 全体で約 263 箇所の try_new 呼び出し)。ids.rs の unit tests が plain struct 版でも全て pass する。preserved API は try_new / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord (LayerId precedent と同一)。nutype が自動生成する into_inner(self) -> String はリポジトリ内でこれら 6 型に対して呼び出し箇所が 0 件 (grep 確認済み) かつ LayerId precedent にも実装されていないため preserved API に含めない",
+      "sources": [
+        "libs/domain/src/ids.rs",
+        "libs/domain/Cargo.toml",
+        "Cargo.toml"
+      ],
+      "task_refs": [
+        "T008"
+      ]
+    },
+    {
+      "text": "T009 完了時点で render_contract_map が method.params() を iterate し、param の ty が type_index 内の declared 型と一致する場合に `A -->|method(arg_name)| B` 形式の edge を emit する。同層内 / 層跨ぎ / declared 型のみ対象 / label 形式の 4 観点の unit test が pass する。ADR 2026-04-17-1528 §D4 (1) が 'returns + params' に更新され、Phase 1.5 拡張注記が記載されている",
+      "sources": [
+        "knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D4",
+        "libs/domain/src/tddd/contract_map_render.rs"
+      ],
+      "task_refs": [
+        "T009"
+      ]
+    },
+    {
+      "text": "T009 完了時点で domain-types.json に TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName が action=reference で declare 追加されている。`sotp track type-signals` で 6 型が全て Blue (found_type=true)。`sotp track signals` でも spec 全項目が Blue を維持し、strict merge gate を通過する",
+      "sources": [
+        "track/items/tddd-contract-map-phase1-2026-04-17/domain-types.json"
+      ],
+      "task_refs": [
+        "T009"
+      ]
+    },
+    {
+      "text": "T010 完了時点で contract-map.md が Phase 1.5 拡張後の内容で再生成され、Phase 1 dogfooding 時より method-edge 数が増加している (期待される新規 edge: 引数 ty 参照に由来するもの)。verification.md に Phase 1.5 section が追加され、T008 / T009 / T010 の検証項目が記録されている。全 signals / type-signals が Blue を維持し、cargo make ci に regression がない",
+      "sources": [
+        "track/items/tddd-contract-map-phase1-2026-04-17/contract-map.md",
+        "track/items/tddd-contract-map-phase1-2026-04-17/verification.md"
+      ],
+      "task_refs": [
+        "T010"
       ]
     }
   ],
@@ -425,10 +503,10 @@
     "knowledge/conventions/security.md"
   ],
   "signals": {
-    "blue": 45,
+    "blue": 52,
     "yellow": 0,
     "red": 0
   },
-  "approved_at": "2026-04-17T17:05:10Z",
-  "content_hash": "sha256:bd25bc0c741cfdcd2e8abda15bde9600bfc2d3e729d55cbb20bd71c0688dfcf8"
+  "approved_at": "2026-04-18T01:46:14Z",
+  "content_hash": "sha256:b04abdf64ba401a70713b460e38fad816c4d9099eaa9555016fc210065830b2e"
 }

@@ -1,54 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ed191bbd9870f3deb26d8ff0386c8e060c9f7e82907b8427e307c50b7fc4d1f",
-          "at": "2026-04-17T15:28:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`total_entry_count` no longer matches the accepted T005 contract when `layer_filter` is set. Lines 164-170 recompute the metric from `active` rendered layers only, so filtering a 3-layer catalogue down to one layer reports that subset's entry count instead of the loader's full catalogue volume. The briefing/spec explicitly fixes `total_entry_count` to the loader-returned entry count, independent of render filtering, so this changes the primary-port semantics.",
-              "severity": "P1",
-              "file": "libs/usecase/src/contract_map_workflow.rs",
-              "line": 164,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:3ed191bbd9870f3deb26d8ff0386c8e060c9f7e82907b8427e307c50b7fc4d1f",
-          "at": "2026-04-17T15:30:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`total_entry_count` changes semantics when `layer_filter` is set. `execute` recomputes the metric from the `active` rendered layers only, so rendering a subset reports that subset's entry count instead of the loader's full catalogue volume. The T005 briefing/spec fixes `total_entry_count` to the loader-returned entry count independent of render filtering, so this violates the primary-port contract.",
-              "severity": "P1",
-              "file": "libs/usecase/src/contract_map_workflow.rs",
-              "line": 165,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:3ed191bbd9870f3deb26d8ff0386c8e060c9f7e82907b8427e307c50b7fc4d1f",
-          "at": "2026-04-17T15:31:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5fc8aeb5262a4d6a71261fe4e62414170e38f888bf6c3e7c3e4bf8c3d40dab9",
-          "at": "2026-04-17T15:35:25Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -138,6 +90,524 @@
           ],
           "hash": "rvw1:sha256:c68502f3ad72de9c45870d7ef39c07fb1c79bd30e5665d29a67d8e4993088e57",
           "at": "2026-04-17T13:02:40Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
+          "at": "2026-04-17T13:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
+          "at": "2026-04-17T13:41:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sanitize_id` is not injective over the allowed `LayerId` space: valid ids such as `my-gateway` and `my_gateway` both collapse to `my_gateway`, so `subgraph`/node IDs can collide and unrelated layers can merge in the Mermaid output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 156,
+              "category": "correctness"
+            },
+            {
+              "message": "Edges are resolved by bare short name (`type_index: BTreeMap<String, ...>`) with first-wins semantics, so when the same type/trait name exists in multiple layers the renderer can point a method/impl edge at the wrong node or skip a legitimate cross-layer edge as a self-edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 83,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:29:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`node_shape` injects `entry.name()` directly into Mermaid shape syntax (`[{name}]`, `({name})`, `[/.../]`, etc.) without escaping. A catalogue entry name containing Mermaid delimiters like `]`, `(`, `/`, or `\\` will therefore produce invalid Mermaid text (for example `Foo]` becomes `id[Foo]]`). This is reachable because the domain entry type only rejects empty names, so the renderer currently violates the Phase 1 requirement that special characters must not break output.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 182,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:36:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`node_id` derives Mermaid IDs by passing the entry name through `sanitize_id`, which replaces every non-ASCII-alnum character with `_`. Because `TypeCatalogueEntry::new` only rejects empty names and the codec feeds JSON names through unchanged, distinct non-ASCII or punctuation-heavy type names in the same layer can collapse to the same node ID (for example two different 2-character Unicode names both become `domain__`). Mermaid will merge those nodes and attach edges to the wrong target, so the renderer is still not safe for the `unicode / 特殊文字` cases called out in the Phase 1 checklist.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
+          "at": "2026-04-17T14:43:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The doc comment links to `crate::tddd::catalogue_ports::ContractMapWriter`, but that module/type does not exist yet. This introduces an unresolved intra-doc link, which violates the briefing's broken-reference bar as soon as rustdoc resolves links for this crate.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_content.rs",
+              "line": 4,
+              "category": "broken reference"
+            },
+            {
+              "message": "Trait-impl edges are resolved by name through `type_index` without checking that the matched entry is actually `TypeDefinitionKind::SecondaryPort`. If a same-named DTO/value object/etc. is present, the renderer will emit `-.impl.->` to a non-port node, which contradicts ADR D4 / the review checklist's requirement that these edges target secondary-port nodes only.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 133,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
+          "at": "2026-04-17T14:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9963f937fc2b91e094328c74e1726443e2eda9977137ebf81a3fe521f7a95579",
+          "at": "2026-04-17T14:51:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackId` is imported from the private `crate::ids` module instead of the public `crate::TrackId` re-export. The briefing explicitly requires the domain port to depend on the re-export, so this violates the domain layering contract.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_ports.rs",
+              "line": 20,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:48b844b9aa0b5ab478b02c3a3b8160dde01490bb5617beb3a347de1a4140a1bb",
+          "at": "2026-04-17T15:00:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0976e7ac112f793bed15ac1cebee1b5fca7761f3dc61be0c01d08be93f2d7f8c",
+          "at": "2026-04-17T15:02:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0976e7ac112f793bed15ac1cebee1b5fca7761f3dc61be0c01d08be93f2d7f8c",
+          "at": "2026-04-17T15:03:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
+          "at": "2026-04-17T16:26:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rewriting `LayerId` as a hand-written newtype drops the inherent `into_inner(self) -> String` method that `#[nutype]` generated unconditionally. That makes this a public API break: any downstream caller consuming a `LayerId` to recover its owned `String` will stop compiling.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/layer_id.rs",
+              "line": 34,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
+          "at": "2026-04-17T16:28:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[nutype]` generated an inherent `into_inner(self) -> String` for `LayerId`, but the handwritten replacement only keeps `try_new`, `AsRef<str>`, and `Display`. That removes a previously public extraction API, so this is a compatibility break for downstream callers even though current in-repo usages still compile.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/layer_id.rs",
+              "line": 34,
+              "category": "api_compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
+          "at": "2026-04-17T16:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
+          "at": "2026-04-17T16:33:07Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SUBAGENT_MODEL_ALLOWLIST` still includes `claude-sonnet-4-6` instead of the intended `claude-sonnet-4-7`, so `verify_env` will reject the new `CLAUDE_CODE_SUBAGENT_MODEL` value from `.claude/settings.json`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 296,
+              "category": "broken reference"
+            },
+            {
+              "message": "The `verify_env` test fixtures at lines 1230 and 1242 still hardcode `claude-sonnet-4-6`, so this scope does not actually exercise the 4-7 cutover and leaves the validation path untested against the new setting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 1230,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:07:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:08:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:09:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
+          "at": "2026-04-17T12:25:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
+          "at": "2026-04-17T12:26:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
+          "at": "2026-04-17T12:28:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
+          "at": "2026-04-17T12:29:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on()` rereads `architecture-rules.json` with plain `read_to_string` instead of going back through `reject_symlinks_below`, so the file is only symlink-checked once. That violates the module's \"all reads are guarded\" invariant and leaves a TOCTOU window between the binding load and the dependency parse.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 172,
+              "category": "security"
+            },
+            {
+              "message": "`topological_sort()` drops every dependency that is not in `enabled_ids`, but `load_all_catalogues()` documents that an unknown `may_depend_on` target must fail. As written, a typo or missing crate in `may_depend_on` is treated the same as a dependency on a disabled layer, so bad rules files can slip through and the layer order is computed from incomplete graph data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 239,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dd63d4c3b429b7f69eee9ef782e0c91e2255803345be992f3123696b6a7aec49",
+          "at": "2026-04-17T13:40:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on()` reopens `architecture-rules.json` with plain `read_to_string()` after the initial guarded load. That second read is outside `reject_symlinks_below`, so a swapped-in symlink can bypass the fail-closed symlink policy on the rules file.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 172,
+              "category": "security"
+            },
+            {
+              "message": "The topological sort counts every `may_depend_on` entry when building `in_degree`, but later collapses duplicate neighbors with `dedup()`. If a layer lists the same dependency twice, its in-degree is decremented only once and the loader will incorrectly report a cycle.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 267,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:dd63d4c3b429b7f69eee9ef782e0c91e2255803345be992f3123696b6a7aec49",
+          "at": "2026-04-17T13:43:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`topological_sort()` treats any dependency that is not present in `enabled_ids` as if it were a disabled layer and drops it. That means a typo or missing crate in `may_depend_on` is accepted instead of failing closed, even though `load_all_catalogues()` documents unknown targets as an error. The loader can therefore compute an order from incomplete graph data and hide bad `architecture-rules.json` input.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 241,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ab3b5c42ed55536d287befb6e58c123f7ce67e3e26cb6e503c98f3dcc631179",
+          "at": "2026-04-17T13:48:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a genuine miss for `architecture-rules.json`, this turns the existing legacy fallback into `Io(NotFound)`, so `load_all_catalogues()` now fails on pre-multilayer tracks even though `load_tddd_layers_from_path()` intentionally returns the synthetic domain binding for the same case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:65ef5fb8509f37414034a1f40d1c5f8b2bc87b23f2ecaf0d8d2f2c0497666452",
+          "at": "2026-04-17T13:51:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`topological_sort()` does not preserve input order for all ties. Nodes that become ready from different predecessors are appended in predecessor-processing order, so a valid DAG like `enabled_ids = [\"B\", \"A\", \"C\", \"D\"]` with deps `B -> D` and `A -> C` is emitted as `[\"B\", \"A\", \"D\", \"C\"]`. That violates the documented stable tie-order guarantee and can reorder dependency groups in the rendered map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 291,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa45748087bacbb4101036a42bb6168e4a39e93b629e445145d7ade4e91b2aac",
+          "at": "2026-04-17T13:54:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on` accepts malformed `architecture-rules.json` entries instead of failing closed: it overwrites duplicate `crate` keys with `BTreeMap::insert` and does not reject empty dependency strings. Because `load_all_catalogues` uses this map to compute ordering, a bad rules file can silently change the returned layer order instead of surfacing an `ArchRulesParse` error, which diverges from the stricter validation already enforced by the existing architecture-rules parser.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 206,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:01d47cc2c7965ee55c198f604ae0f618dac67aabc0e159cee9b4b3e801058e4b",
+          "at": "2026-04-17T13:58:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`topological_sort()` treats every dependency outside `enabled_ids` as ignorable, so a misspelled or missing `may_depend_on` target is silently dropped instead of failing closed. That means `load_all_catalogues()` can return a layer order computed from incomplete graph data, which is inconsistent with `verify/architecture_rules.rs` rejecting unknown dependencies.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 279,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ec8541de24f7f81b372055b10469918c715e759e71d966cf0c8260dc0b2c485d",
+          "at": "2026-04-17T14:02:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Reading the catalogue with `reject_symlinks_below` followed by a separate `std::fs::read_to_string` leaves a TOCTOU window: an attacker can swap the file for a symlink after the check and before the open, bypassing the guard. Use an atomic no-follow open/read path instead.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 159,
+              "category": "security"
+            },
+            {
+              "message": "`parse_may_depend_on` accepts any non-empty `crate` string without validating it, so a malformed disabled layer entry can be added to `all_known` and let an otherwise unknown `may_depend_on` dependency pass as \"known\" instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 229,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
+          "at": "2026-04-17T14:06:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
+          "at": "2026-04-17T14:09:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on()` accepts an empty `layers[].crate` because it only checks `as_str()` here. That malformed layer name is then treated as a known crate, so an enabled layer can list `\"\"` in `may_depend_on` and `load_all_catalogues()` will accept the rules file and silently ignore that dependency during topo sort instead of failing closed, unlike the existing architecture-rules parsers.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 229,
+              "category": "schema_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
+          "at": "2026-04-17T14:11:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
+          "at": "2026-04-17T14:13:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
+          "at": "2026-04-17T14:15:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsContractMapWriter::write` checks `track_dir.exists()` before running the symlink guard, so a broken symlink or any other stat failure on `track_root/<track_id>` is collapsed into `TrackNotFound`. That bypasses the required fail-closed path classification for the track directory and can misreport a symlinked track dir as merely missing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
+              "line": 146,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3b733e8a55eda179e1fec9f319852de222aa5d9a87c788aa1b1d01e5fcb2f1e7",
+          "at": "2026-04-17T15:01:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c87622db9337ae92d7e74f8a6b6e8ccf6d5fd5878ae835edf34f358f03985891",
+          "at": "2026-04-17T15:04:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`map_loader_error()` collapses every `LoadAllCataloguesError::LayerBindings` into `CatalogueLoaderError::LayerDiscoveryFailed`. That means a symlink or other I/O failure while loading `architecture-rules.json` from `load_tddd_layers_from_path()` can never surface as `SymlinkRejected`/`IoError`, even though the T004 briefing explicitly requires the adapter to preserve that classification via `ErrorKind::InvalidInput`. Callers will see the wrong domain error variant for rules-file symlink rejections.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
+              "line": 82,
+              "category": "error handling"
+            },
+            {
+              "message": "The new `FsContractMapWriter` test set never exercises the `IoError` branch of `write()`. The briefing's checklist requires coverage for all three writer error paths (`TrackNotFound`, `SymlinkRejected`, and `IoError`), but the current tests only cover the first two plus overwrite/happy-path cases. A regression in the `atomic_write_file` error mapping would pass this suite unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
+              "line": 310,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:c87622db9337ae92d7e74f8a6b6e8ccf6d5fd5878ae835edf34f358f03985891",
+          "at": "2026-04-17T15:07:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f776ec87cd7915c5c1155b68fff195d6e6998c8291ea34652c6d353f3e084aac",
+          "at": "2026-04-17T15:11:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f776ec87cd7915c5c1155b68fff195d6e6998c8291ea34652c6d353f3e084aac",
+          "at": "2026-04-17T15:13:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:834359f0970d851bc5cd11f2c41b14cce851caedc729d7f0495e510987521eaa",
+          "at": "2026-04-17T16:00:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The three `*_respects_may_depend_on_topological_order` tests do not actually verify that `load_all_catalogues` sorts by `may_depend_on`, because every fixture already lists its layers in topological order in `architecture-rules.json`. If the loader regressed to preserving declaration order, these assertions would still pass for all three fixtures, so the spec's 'topological order' invariant is not mechanically covered.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/contract_map_layer_agnostic.rs",
+              "line": 81,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:834359f0970d851bc5cd11f2c41b14cce851caedc729d7f0495e510987521eaa",
+          "at": "2026-04-17T16:02:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aac1f3adb281fbf87ef6efb746e18e72cdd30e6113216ff0447eb44039475737",
+          "at": "2026-04-17T16:05:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aac1f3adb281fbf87ef6efb746e18e72cdd30e6113216ff0447eb44039475737",
+          "at": "2026-04-17T16:08:19Z"
         }
       ]
     },
@@ -1085,6 +1555,283 @@
           "findings": [],
           "hash": "rvw1:sha256:6d2e2396fc6545b534d335654c52da86259e2ac11c244663fd421f47ef734e1d",
           "at": "2026-04-17T17:24:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T008 scope claim that there are only 74 existing call sites is materially understated. The current Rust tree already contains far more than 74 `::try_new` uses for these ids, so this estimate is not consistent with the repository state.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 223,
+              "category": "factual error"
+            },
+            {
+              "message": "S010 still refers to `track/items/<id>/verification.md`, but `<id>` is not a resolvable path in this track. That makes the verification target a broken reference; it should name the concrete track path instead.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 233,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2806ada8fae62034545b76a170c9476f409cdfb9f753e09e65850281be1aeddf",
+          "at": "2026-04-17T17:57:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 is underspecified/infeasible as written: `try_new(&str)` is too narrow to preserve the current API surface, because unchanged call sites already pass owned `String` values (for example `TaskId::try_new(format!(...))` in `libs/domain/src/track.rs:481` and `TrackId::try_new(slug.to_owned())` in `libs/infrastructure/src/tddd/contract_map_adapter.rs:231`). If the rewrite lands with an exact `&str` signature, those call sites will stop compiling, contradicting the stated \"74 call sites compile unchanged\" goal.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 121,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:2806ada8fae62034545b76a170c9476f409cdfb9f753e09e65850281be1aeddf",
+          "at": "2026-04-17T17:59:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T008 scope claim that there are only 74 existing call sites is materially understated. The current tree already has 249 non-test `::try_new(...)` call sites for these ids, so this estimate is not consistent with the repository state.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 223,
+              "category": "factual error"
+            },
+            {
+              "message": "T010 still refers to `track/items/<id>/verification.md`, but `<id>` is only a placeholder, not a resolvable path. That makes the verification target a broken reference; it should name the concrete track path instead.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 233,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d48ad4c60654e1b14622066867e3d8b836284f039c8fddd3def2c540320de2d9",
+          "at": "2026-04-17T18:02:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008's verification checklist says there are `74` unchanged call sites, but the other Phase 1.5 planning artifacts say roughly `263`, and a repo-wide search currently finds 263 `TrackId`/`TaskId`/`CommitHash`/`TrackBranch`/`NonEmptyString`/`ReviewGroupName` `try_new` call sites. This is a factual mismatch in the verification target for T008.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 150,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:51ce5c2f98083550e0831114c6cdcf5adf323f0fedaf4e16621ec4c787d4b688",
+          "at": "2026-04-17T18:05:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b832d80e877721e9ffb245afc53daba6c28cf7601376186af1ab2c3b8362a4",
+          "at": "2026-04-17T18:08:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` and the new Phase 1.5 verification checklist both require `NonEmptyString` / `ReviewGroupName` to preserve `sanitize(trim)` semantics (`try_new` must trim before validation), but the added T008 spec item and acceptance criterion in `spec.json` omit that behavior entirely. That leaves the SSoT able to accept a plain-struct rewrite that keeps the signature but regresses whitespace-trimming compatibility for those two types.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c0b832d80e877721e9ffb245afc53daba6c28cf7601376186af1ab2c3b8362a4",
+          "at": "2026-04-17T18:14:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` assigns the Phase 1.5 signal-gate checks to S010/T010 (`sotp track type-signals` / `sotp track signals` after T008+T009), but `spec.json` makes those gates part of T009 and the T010 task text drops the `sotp track signals` check entirely. That leaves the Phase 1.5 task boundary inconsistent across the two SSoT files, so it is unclear whether T009 can be considered done before the Blue signal gates pass or only during T010 finalization.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 157,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a69e7f84d65a859887a322940c377783b0395d261cd8a1d0c1eb2304b1331e97",
+          "at": "2026-04-17T18:34:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md`'s T008 checklist omits the explicit `ids.rs` unit-test pass check, even though both the Phase 1.5 plan and the acceptance criteria require those tests to pass. As written, T008 could be marked verified without recording one of its stated completion conditions.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 144,
+              "category": "traceability"
+            },
+            {
+              "message": "`verification.md`'s T010 checklist never re-checks `sotp track type-signals` / `sotp track signals`, but both `metadata.json` and `spec.json` say Phase 1.5 finalization must re-confirm that all type-signals and spec signals remain Blue after regeneration. This leaves two stated T010 completion gates untracked in the verification artifact.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 164,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:21a0bdd5b708bb19042b82c40404d2fd65cbe063a96d90feb2a7414c9f9a0772",
+          "at": "2026-04-17T18:38:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S008 is internally inconsistent about blast radius: it requires removing `nutype` from the workspace-root `Cargo.toml`, but the same section then says the change set is confined to the domain crate. Those two statements cannot both be true, so the plan currently gives implementers conflicting scope guidance.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 124,
+              "category": "contradiction"
+            },
+            {
+              "message": "The T008 verification checklist turns extra validation tests for the other five ID types into a required completion gate (`NonEmptyString` tests and the other 5 types' validation tests), but S008 only says to add those extra tests 'if needed' and the spec acceptance criterion only requires the existing `ids.rs` tests to pass. This adds an orphan mandatory check that is not backed by the SSoT.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 151,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dfe144858ae77e4b2057458d32abdcc3e1e6c59e53701079718cbb335b0d12c4",
+          "at": "2026-04-17T18:42:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008's 'API-compatible' rewrite contract is incomplete. The six current `#[nutype]` IDs in `libs/domain/src/ids.rs` expose an inherent `into_inner(self) -> String`, but the new task/spec/checklist only preserve `try_new`, `AsRef<str>`, `Display`, and derives. As written, Phase 1.5 can be implemented exactly per plan while still dropping an existing public API, so the planning artifacts are overstating compatibility.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 225,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:fae4afd7eda08dece12198df2081f61ef6148476928771b1996e7c41e47edcfb",
+          "at": "2026-04-17T18:46:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008's acceptance criterion no longer requires removing `nutype` from `libs/domain/Cargo.toml`, even though both `metadata.json` S008 and task T008 still say the dependency must be removed from `Cargo.toml` and `libs/domain/Cargo.toml`. As written, the spec would allow a direct `libs/domain` dependency on `nutype` to remain while still passing this check, which contradicts the Phase 1.5 plan.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 460,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c2aef3274b36b609255c4233098fdb412fc6d00ddd64b834c77d6b7028585da9",
+          "at": "2026-04-18T01:42:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tasks[].description` for T009 omits the required signal-gate checks, so it no longer matches the SSoT elsewhere: `plan.sections.S009.description`, `spec.json` in-scope, and `spec.json` acceptance criteria all require running both `sotp track type-signals` and `sotp track signals` at T009 completion.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 230,
+              "category": "contradiction"
+            },
+            {
+              "message": "`tasks[].description` for T010 only mentions re-checking `domain-types.json`/type-signals, but the corresponding SSoT in `plan.sections.S010.description`, `spec.json`, and `verification.md` also requires re-confirming `sotp track signals` for the Phase 1.5 spec items. As written, the task list can be completed without the spec-signal recheck.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 235,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dffa140c132f4b6b7aee26b0fad47112644dfdd64ddf102697d5a164087e3ca8",
+          "at": "2026-04-18T01:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S009 still defines four concrete dogfood edges, including `ContractMapWriter -->|write(track_id)| TrackId`, but the executable T009/T010 checks were weakened to only three examples and no longer require that writer `track_id` edge to appear. As written, Phase 1.5 can be marked complete without verifying one of the explicitly expected params-derived edges.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 169,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:24ea04494bb1289f51aa623b546a07addaabf819e6c266190918fe7d5896fed5",
+          "at": "2026-04-18T01:49:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e4733a157dc45140af270c75f714c7373d6d8e2425d7b4ce36e17097b364db9",
+          "at": "2026-04-18T01:52:40Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ed191bbd9870f3deb26d8ff0386c8e060c9f7e82907b8427e307c50b7fc4d1f",
+          "at": "2026-04-17T15:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`total_entry_count` no longer matches the accepted T005 contract when `layer_filter` is set. Lines 164-170 recompute the metric from `active` rendered layers only, so filtering a 3-layer catalogue down to one layer reports that subset's entry count instead of the loader's full catalogue volume. The briefing/spec explicitly fixes `total_entry_count` to the loader-returned entry count, independent of render filtering, so this changes the primary-port semantics.",
+              "severity": "P1",
+              "file": "libs/usecase/src/contract_map_workflow.rs",
+              "line": 164,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3ed191bbd9870f3deb26d8ff0386c8e060c9f7e82907b8427e307c50b7fc4d1f",
+          "at": "2026-04-17T15:30:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`total_entry_count` changes semantics when `layer_filter` is set. `execute` recomputes the metric from the `active` rendered layers only, so rendering a subset reports that subset's entry count instead of the loader's full catalogue volume. The T005 briefing/spec fixes `total_entry_count` to the loader-returned entry count independent of render filtering, so this violates the primary-port contract.",
+              "severity": "P1",
+              "file": "libs/usecase/src/contract_map_workflow.rs",
+              "line": 165,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3ed191bbd9870f3deb26d8ff0386c8e060c9f7e82907b8427e307c50b7fc4d1f",
+          "at": "2026-04-17T15:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fc8aeb5262a4d6a71261fe4e62414170e38f888bf6c3e7c3e4bf8c3d40dab9",
+          "at": "2026-04-17T15:35:25Z"
         }
       ]
     },
@@ -1103,524 +1850,6 @@
           "findings": [],
           "hash": "rvw1:sha256:7d2b8dd32bc750c88513e46ee4a11b2d5ce68f94df768e0fa562a9edfd5b371b",
           "at": "2026-04-17T15:45:33Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
-          "at": "2026-04-17T13:38:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
-          "at": "2026-04-17T13:41:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sanitize_id` is not injective over the allowed `LayerId` space: valid ids such as `my-gateway` and `my_gateway` both collapse to `my_gateway`, so `subgraph`/node IDs can collide and unrelated layers can merge in the Mermaid output.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
-              "line": 156,
-              "category": "correctness"
-            },
-            {
-              "message": "Edges are resolved by bare short name (`type_index: BTreeMap<String, ...>`) with first-wins semantics, so when the same type/trait name exists in multiple layers the renderer can point a method/impl edge at the wrong node or skip a legitimate cross-layer edge as a self-edge.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
-              "line": 83,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
-          "at": "2026-04-17T14:29:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
-          "at": "2026-04-17T14:33:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`node_shape` injects `entry.name()` directly into Mermaid shape syntax (`[{name}]`, `({name})`, `[/.../]`, etc.) without escaping. A catalogue entry name containing Mermaid delimiters like `]`, `(`, `/`, or `\\` will therefore produce invalid Mermaid text (for example `Foo]` becomes `id[Foo]]`). This is reachable because the domain entry type only rejects empty names, so the renderer currently violates the Phase 1 requirement that special characters must not break output.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 182,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
-          "at": "2026-04-17T14:36:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`node_id` derives Mermaid IDs by passing the entry name through `sanitize_id`, which replaces every non-ASCII-alnum character with `_`. Because `TypeCatalogueEntry::new` only rejects empty names and the codec feeds JSON names through unchanged, distinct non-ASCII or punctuation-heavy type names in the same layer can collapse to the same node ID (for example two different 2-character Unicode names both become `domain__`). Mermaid will merge those nodes and attach edges to the wrong target, so the renderer is still not safe for the `unicode / 特殊文字` cases called out in the Phase 1 checklist.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 166,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
-          "at": "2026-04-17T14:43:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The doc comment links to `crate::tddd::catalogue_ports::ContractMapWriter`, but that module/type does not exist yet. This introduces an unresolved intra-doc link, which violates the briefing's broken-reference bar as soon as rustdoc resolves links for this crate.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_content.rs",
-              "line": 4,
-              "category": "broken reference"
-            },
-            {
-              "message": "Trait-impl edges are resolved by name through `type_index` without checking that the matched entry is actually `TypeDefinitionKind::SecondaryPort`. If a same-named DTO/value object/etc. is present, the renderer will emit `-.impl.->` to a non-port node, which contradicts ADR D4 / the review checklist's requirement that these edges target secondary-port nodes only.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 133,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
-          "at": "2026-04-17T14:47:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9963f937fc2b91e094328c74e1726443e2eda9977137ebf81a3fe521f7a95579",
-          "at": "2026-04-17T14:51:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackId` is imported from the private `crate::ids` module instead of the public `crate::TrackId` re-export. The briefing explicitly requires the domain port to depend on the re-export, so this violates the domain layering contract.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_ports.rs",
-              "line": 20,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:48b844b9aa0b5ab478b02c3a3b8160dde01490bb5617beb3a347de1a4140a1bb",
-          "at": "2026-04-17T15:00:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0976e7ac112f793bed15ac1cebee1b5fca7761f3dc61be0c01d08be93f2d7f8c",
-          "at": "2026-04-17T15:02:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0976e7ac112f793bed15ac1cebee1b5fca7761f3dc61be0c01d08be93f2d7f8c",
-          "at": "2026-04-17T15:03:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
-          "at": "2026-04-17T16:26:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Rewriting `LayerId` as a hand-written newtype drops the inherent `into_inner(self) -> String` method that `#[nutype]` generated unconditionally. That makes this a public API break: any downstream caller consuming a `LayerId` to recover its owned `String` will stop compiling.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/layer_id.rs",
-              "line": 34,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
-          "at": "2026-04-17T16:28:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`#[nutype]` generated an inherent `into_inner(self) -> String` for `LayerId`, but the handwritten replacement only keeps `try_new`, `AsRef<str>`, and `Display`. That removes a previously public extraction API, so this is a compatibility break for downstream callers even though current in-repo usages still compile.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/layer_id.rs",
-              "line": 34,
-              "category": "api_compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
-          "at": "2026-04-17T16:29:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bbed67624163ee5c4182ad984aa2d0edfdc2fad7958ecfdc80ed1a44baf031d",
-          "at": "2026-04-17T16:33:07Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SUBAGENT_MODEL_ALLOWLIST` still includes `claude-sonnet-4-6` instead of the intended `claude-sonnet-4-7`, so `verify_env` will reject the new `CLAUDE_CODE_SUBAGENT_MODEL` value from `.claude/settings.json`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 296,
-              "category": "broken reference"
-            },
-            {
-              "message": "The `verify_env` test fixtures at lines 1230 and 1242 still hardcode `claude-sonnet-4-6`, so this scope does not actually exercise the 4-7 cutover and leaves the validation path untested against the new setting.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 1230,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:07:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:08:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:09:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
-          "at": "2026-04-17T12:25:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
-          "at": "2026-04-17T12:26:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
-          "at": "2026-04-17T12:28:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
-          "at": "2026-04-17T12:29:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`parse_may_depend_on()` rereads `architecture-rules.json` with plain `read_to_string` instead of going back through `reject_symlinks_below`, so the file is only symlink-checked once. That violates the module's \"all reads are guarded\" invariant and leaves a TOCTOU window between the binding load and the dependency parse.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 172,
-              "category": "security"
-            },
-            {
-              "message": "`topological_sort()` drops every dependency that is not in `enabled_ids`, but `load_all_catalogues()` documents that an unknown `may_depend_on` target must fail. As written, a typo or missing crate in `may_depend_on` is treated the same as a dependency on a disabled layer, so bad rules files can slip through and the layer order is computed from incomplete graph data.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 239,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dd63d4c3b429b7f69eee9ef782e0c91e2255803345be992f3123696b6a7aec49",
-          "at": "2026-04-17T13:40:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`parse_may_depend_on()` reopens `architecture-rules.json` with plain `read_to_string()` after the initial guarded load. That second read is outside `reject_symlinks_below`, so a swapped-in symlink can bypass the fail-closed symlink policy on the rules file.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 172,
-              "category": "security"
-            },
-            {
-              "message": "The topological sort counts every `may_depend_on` entry when building `in_degree`, but later collapses duplicate neighbors with `dedup()`. If a layer lists the same dependency twice, its in-degree is decremented only once and the loader will incorrectly report a cycle.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 267,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:dd63d4c3b429b7f69eee9ef782e0c91e2255803345be992f3123696b6a7aec49",
-          "at": "2026-04-17T13:43:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`topological_sort()` treats any dependency that is not present in `enabled_ids` as if it were a disabled layer and drops it. That means a typo or missing crate in `may_depend_on` is accepted instead of failing closed, even though `load_all_catalogues()` documents unknown targets as an error. The loader can therefore compute an order from incomplete graph data and hide bad `architecture-rules.json` input.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 241,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1ab3b5c42ed55536d287befb6e58c123f7ce67e3e26cb6e503c98f3dcc631179",
-          "at": "2026-04-17T13:48:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On a genuine miss for `architecture-rules.json`, this turns the existing legacy fallback into `Io(NotFound)`, so `load_all_catalogues()` now fails on pre-multilayer tracks even though `load_tddd_layers_from_path()` intentionally returns the synthetic domain binding for the same case.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 178,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:65ef5fb8509f37414034a1f40d1c5f8b2bc87b23f2ecaf0d8d2f2c0497666452",
-          "at": "2026-04-17T13:51:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`topological_sort()` does not preserve input order for all ties. Nodes that become ready from different predecessors are appended in predecessor-processing order, so a valid DAG like `enabled_ids = [\"B\", \"A\", \"C\", \"D\"]` with deps `B -> D` and `A -> C` is emitted as `[\"B\", \"A\", \"D\", \"C\"]`. That violates the documented stable tie-order guarantee and can reorder dependency groups in the rendered map.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 291,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:aa45748087bacbb4101036a42bb6168e4a39e93b629e445145d7ade4e91b2aac",
-          "at": "2026-04-17T13:54:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`parse_may_depend_on` accepts malformed `architecture-rules.json` entries instead of failing closed: it overwrites duplicate `crate` keys with `BTreeMap::insert` and does not reject empty dependency strings. Because `load_all_catalogues` uses this map to compute ordering, a bad rules file can silently change the returned layer order instead of surfacing an `ArchRulesParse` error, which diverges from the stricter validation already enforced by the existing architecture-rules parser.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 206,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:01d47cc2c7965ee55c198f604ae0f618dac67aabc0e159cee9b4b3e801058e4b",
-          "at": "2026-04-17T13:58:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`topological_sort()` treats every dependency outside `enabled_ids` as ignorable, so a misspelled or missing `may_depend_on` target is silently dropped instead of failing closed. That means `load_all_catalogues()` can return a layer order computed from incomplete graph data, which is inconsistent with `verify/architecture_rules.rs` rejecting unknown dependencies.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 279,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ec8541de24f7f81b372055b10469918c715e759e71d966cf0c8260dc0b2c485d",
-          "at": "2026-04-17T14:02:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Reading the catalogue with `reject_symlinks_below` followed by a separate `std::fs::read_to_string` leaves a TOCTOU window: an attacker can swap the file for a symlink after the check and before the open, bypassing the guard. Use an atomic no-follow open/read path instead.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 159,
-              "category": "security"
-            },
-            {
-              "message": "`parse_may_depend_on` accepts any non-empty `crate` string without validating it, so a malformed disabled layer entry can be added to `all_known` and let an otherwise unknown `may_depend_on` dependency pass as \"known\" instead of failing closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 229,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
-          "at": "2026-04-17T14:06:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
-          "at": "2026-04-17T14:09:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`parse_may_depend_on()` accepts an empty `layers[].crate` because it only checks `as_str()` here. That malformed layer name is then treated as a known crate, so an enabled layer can list `\"\"` in `may_depend_on` and `load_all_catalogues()` will accept the rules file and silently ignore that dependency during topo sort instead of failing closed, unlike the existing architecture-rules parsers.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
-              "line": 229,
-              "category": "schema_validation"
-            }
-          ],
-          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
-          "at": "2026-04-17T14:11:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
-          "at": "2026-04-17T14:13:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
-          "at": "2026-04-17T14:15:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsContractMapWriter::write` checks `track_dir.exists()` before running the symlink guard, so a broken symlink or any other stat failure on `track_root/<track_id>` is collapsed into `TrackNotFound`. That bypasses the required fail-closed path classification for the track directory and can misreport a symlinked track dir as merely missing.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
-              "line": 146,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3b733e8a55eda179e1fec9f319852de222aa5d9a87c788aa1b1d01e5fcb2f1e7",
-          "at": "2026-04-17T15:01:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c87622db9337ae92d7e74f8a6b6e8ccf6d5fd5878ae835edf34f358f03985891",
-          "at": "2026-04-17T15:04:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`map_loader_error()` collapses every `LoadAllCataloguesError::LayerBindings` into `CatalogueLoaderError::LayerDiscoveryFailed`. That means a symlink or other I/O failure while loading `architecture-rules.json` from `load_tddd_layers_from_path()` can never surface as `SymlinkRejected`/`IoError`, even though the T004 briefing explicitly requires the adapter to preserve that classification via `ErrorKind::InvalidInput`. Callers will see the wrong domain error variant for rules-file symlink rejections.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
-              "line": 82,
-              "category": "error handling"
-            },
-            {
-              "message": "The new `FsContractMapWriter` test set never exercises the `IoError` branch of `write()`. The briefing's checklist requires coverage for all three writer error paths (`TrackNotFound`, `SymlinkRejected`, and `IoError`), but the current tests only cover the first two plus overwrite/happy-path cases. A regression in the `atomic_write_file` error mapping would pass this suite unnoticed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
-              "line": 310,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:c87622db9337ae92d7e74f8a6b6e8ccf6d5fd5878ae835edf34f358f03985891",
-          "at": "2026-04-17T15:07:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f776ec87cd7915c5c1155b68fff195d6e6998c8291ea34652c6d353f3e084aac",
-          "at": "2026-04-17T15:11:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f776ec87cd7915c5c1155b68fff195d6e6998c8291ea34652c6d353f3e084aac",
-          "at": "2026-04-17T15:13:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:834359f0970d851bc5cd11f2c41b14cce851caedc729d7f0495e510987521eaa",
-          "at": "2026-04-17T16:00:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The three `*_respects_may_depend_on_topological_order` tests do not actually verify that `load_all_catalogues` sorts by `may_depend_on`, because every fixture already lists its layers in topological order in `architecture-rules.json`. If the loader regressed to preserving declaration order, these assertions would still pass for all three fixtures, so the spec's 'topological order' invariant is not mechanically covered.",
-              "severity": "P1",
-              "file": "libs/infrastructure/tests/contract_map_layer_agnostic.rs",
-              "line": 81,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:834359f0970d851bc5cd11f2c41b14cce851caedc729d7f0495e510987521eaa",
-          "at": "2026-04-17T16:02:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aac1f3adb281fbf87ef6efb746e18e72cdd30e6113216ff0447eb44039475737",
-          "at": "2026-04-17T16:05:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aac1f3adb281fbf87ef6efb746e18e72cdd30e6113216ff0447eb44039475737",
-          "at": "2026-04-17T16:08:19Z"
         }
       ]
     }

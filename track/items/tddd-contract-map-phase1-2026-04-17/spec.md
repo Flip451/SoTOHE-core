@@ -1,9 +1,9 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 status: approved
-approved_at: "2026-04-17T17:05:10Z"
-version: "1.0"
-signals: { blue: 45, yellow: 0, red: 0 }
+approved_at: "2026-04-18T01:46:14Z"
+version: "1.1"
+signals: { blue: 52, yellow: 0, red: 0 }
 ---
 
 # TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view
@@ -31,7 +31,10 @@ Phase 2 (signal / action overlay) および Phase 3 (spec_source edge / baseline
 - libs/usecase/src/contract_map_workflow.rs を新設し、RenderContractMap trait (application_service primary port、execute(&self, &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>) を定義する。RenderContractMapInteractor<L: CatalogueLoader, W: ContractMapWriter> がこの trait を実装する。フロー: loader.load_all → kind_filter/layer_filter 適用 → domain::tddd::render_contract_map (free function) → writer.write [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D1, convention — knowledge/conventions/hexagonal-architecture.md, knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md §application_service] [tasks: T005]
 - apps/cli/src/commands/track/tddd/contract_map.rs を新設し sotp track contract-map <track-id> [--kind-filter k1,k2] [--layers l1,l2] を実装する。clap の引数定義、parse_kind_filter/parse_layer_filter helper、RenderContractMap trait (application_service primary port) 経由での dispatch (CLI は concrete RenderContractMapInteractor に直接依存しない) [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Implementation Phases Phase 1, apps/cli/src/commands/track/tddd/graph.rs §parse_edge_set] [tasks: T006]
 - libs/infrastructure/tests/fixtures/architecture_rules/ に 3 種類の fixture (fixture_2layers.json / fixture_3layers_default.json / fixture_custom_names.json) を配置し、render_contract_map が layer-agnostic に動作することを機械的に検証する [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §4.5 layer-agnostic 不変条件, §Notes for track planning §5] [tasks: T007]
-- TDD red→green: 各 task で unit tests を先に書き red 確認後に実装で green 化する。各 commit diff は 500 LOC 以下に保つ [source: convention — .claude/rules/05-testing.md §Core Principles, convention — .claude/rules/10-guardrails.md §Small task commits] [tasks: T002, T003, T004, T005, T006, T007]
+- TDD red→green: 各 task で unit tests を先に書き red 確認後に実装で green 化する。各 commit diff は 500 LOC 以下に保つ [source: convention — .claude/rules/05-testing.md §Core Principles, convention — .claude/rules/10-guardrails.md §Small task commits] [tasks: T002, T003, T004, T005, T006, T007, T008, T009, T010]
+- Phase 1.5: libs/domain/src/ids.rs の 6 nutype 型 (TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName) を plain struct (単一フィールド wrapper) に書き換え、API 互換性 (try_new(impl Into<String>) / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord — LayerId precedent と同一セット) を維持したまま nutype 依存を削除する。nutype の sanitize(trim) 挙動を持つ NonEmptyString / ReviewGroupName については、try_new 内で validation 前に trim を実行することで既存の whitespace-trimming セマンティクスを完全保持する。nutype が自動生成する into_inner(self) -> String はリポジトリ内でこれら 6 型への呼び出し箇所が 0 件 (grep 確認済み) かつ LayerId precedent にも実装されていないため、preserved API に含めない。動機: schema_export が nutype 由来型を rustdoc JSON から抽出できない制約により TDDD catalogue declare が不可能なため。plain struct 化で 6 型を catalogue 宣言可能にし、harness-hardening-nutype-rustdoc-support 別 track を obsolete 化する [source: knowledge/strategy/TODO.md §harness-hardening-nutype-rustdoc-support, track/items/tddd-contract-map-phase1-2026-04-17/verification.md §Implementation deviation: LayerId を素 struct に書き換え, libs/domain/src/ids.rs] [tasks: T008]
+- Phase 1.5: ADR 2026-04-17-1528 §D4 (1) の method-call edge 仕様を 'returns のみ' から 'returns + params' に拡張し、libs/domain/src/tddd/contract_map_render.rs の edge 生成ループで method.params() も iterate して declared 型への edge を追加する。edge label は `A -->|method(arg_name)| B` 形式。Phase 1 で未描画だった method 引数参照 (ContractMapContent / RenderContractMapCommand / TrackId 等) が Contract Map 上に現れ、edges スカスカ問題を解消する [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D4, track/items/tddd-contract-map-phase1-2026-04-17/contract-map.md, libs/domain/src/tddd/contract_map_render.rs] [tasks: T009]
+- Phase 1.5: domain-types.json に T008 の 6 plain-struct ids を action=reference で declare 追加する。reference 宣言は既存型を Contract Map の type_index に取り込むだけで baseline / コード変更を伴わない。T008 後は schema_export が 6 型を認識するため signals は全 Blue を維持する [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D4, track/items/tddd-contract-map-phase1-2026-04-17/domain-types.json] [tasks: T009]
 
 ### Out of Scope
 - Action overlay (add/modify/delete/reference の視覚化) は ADR §D5 前半に該当し Phase 2 に送る [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Implementation Phases Phase 2]
@@ -69,7 +72,11 @@ Phase 2 (signal / action overlay) および Phase 3 (spec_source edge / baseline
 - [ ] RenderContractMapError の EmptyCatalogue と LayerNotFound の発火条件が明確に定義されていること: EmptyCatalogue は loader.load_all が空の catalogue set を返した場合 (tddd.enabled 層が 0 件)、LayerNotFound は layer_filter に指定した LayerId が load_all の結果に存在しない場合。それぞれ unit test で検証される [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D1 RenderContractMap::execute の失敗条件] [tasks: T005]
 - [ ] sotp track contract-map <track-id> が track/items/<id>/contract-map.md を生成する。--kind-filter / --layers が反映される。--help が spec と一致する [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Implementation Phases Phase 1] [tasks: T006]
 - [ ] 3 fixture (2層 / 3層デフォルト / 独自層名) に対して render が成功する。subgraph 数と subgraph ラベルが fixture に一致する。subgraph の出現順序が fixture の may_depend_on から算出したトポロジカル順 (may_depend_on なし層が先頭) に一致することを assert する。他 fixture の層名 (例: custom_names の出力に domain が混入) が出現しないことが assert される [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §4.5] [tasks: T007]
-- [ ] cargo make ci が全通過する (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-* 一式)。T001 については verify-doc-links / verify-arch-docs の通過が特に重要 [source: convention — .claude/rules/07-dev-environment.md §Pre-commit Checklist] [tasks: T001, T002, T003, T004, T005, T006, T007]
+- [ ] cargo make ci が全通過する (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-* 一式)。T001 については verify-doc-links / verify-arch-docs の通過が特に重要 [source: convention — .claude/rules/07-dev-environment.md §Pre-commit Checklist] [tasks: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010]
+- [ ] T008 完了時点で 6 nutype 型が plain struct に書き換わり、Cargo.toml workspace.dependencies と libs/domain/Cargo.toml の両方から nutype が削除されている。NonEmptyString / ReviewGroupName は try_new 内で validation 前に trim を実行し、既存の sanitize(trim) セマンティクスを保持する (whitespace-only 入力は EmptyString エラー、前後空白は自動除去)。既存 250+ call sites は無変更で cargo make ci が通過する (API 互換性の実証。実測: libs + apps 全体で約 263 箇所の try_new 呼び出し)。ids.rs の unit tests が plain struct 版でも全て pass する。preserved API は try_new / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord (LayerId precedent と同一)。nutype が自動生成する into_inner(self) -> String はリポジトリ内でこれら 6 型に対して呼び出し箇所が 0 件 (grep 確認済み) かつ LayerId precedent にも実装されていないため preserved API に含めない [source: libs/domain/src/ids.rs, libs/domain/Cargo.toml, Cargo.toml] [tasks: T008]
+- [ ] T009 完了時点で render_contract_map が method.params() を iterate し、param の ty が type_index 内の declared 型と一致する場合に `A -->|method(arg_name)| B` 形式の edge を emit する。同層内 / 層跨ぎ / declared 型のみ対象 / label 形式の 4 観点の unit test が pass する。ADR 2026-04-17-1528 §D4 (1) が 'returns + params' に更新され、Phase 1.5 拡張注記が記載されている [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D4, libs/domain/src/tddd/contract_map_render.rs] [tasks: T009]
+- [ ] T009 完了時点で domain-types.json に TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName が action=reference で declare 追加されている。`sotp track type-signals` で 6 型が全て Blue (found_type=true)。`sotp track signals` でも spec 全項目が Blue を維持し、strict merge gate を通過する [source: track/items/tddd-contract-map-phase1-2026-04-17/domain-types.json] [tasks: T009]
+- [ ] T010 完了時点で contract-map.md が Phase 1.5 拡張後の内容で再生成され、Phase 1 dogfooding 時より method-edge 数が増加している (期待される新規 edge: 引数 ty 参照に由来するもの)。verification.md に Phase 1.5 section が追加され、T008 / T009 / T010 の検証項目が記録されている。全 signals / type-signals が Blue を維持し、cargo make ci に regression がない [source: track/items/tddd-contract-map-phase1-2026-04-17/contract-map.md, track/items/tddd-contract-map-phase1-2026-04-17/verification.md] [tasks: T010]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/source-attribution.md
@@ -79,5 +86,5 @@ Phase 2 (signal / action overlay) および Phase 3 (spec_source edge / baseline
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 45  🟡 0  🔴 0
+🔵 52  🟡 0  🔴 0
 

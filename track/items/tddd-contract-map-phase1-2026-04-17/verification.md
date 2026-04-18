@@ -139,6 +139,40 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 | T006 | Done (in_progress until batch transition) | `c0c97370cc4cb1b3082449d6df9e42018dd9c037` | `apps/cli/src/commands/track/tddd/contract_map.rs` (execute_contract_map + parse_kind_filter + parse_layer_filter + 14 tests) + `tddd/mod.rs` (pub(crate) mod 登録) + `track/mod.rs` (TrackCommand::ContractMap variant + dispatch)。CLI は composition root で concrete interactor を構築し、`&dyn RenderContractMap` trait object 経由で dispatch。nextest 2108 tests all pass |
 | T007 | Implemented (pre-commit, in_progress) |  | `libs/infrastructure/tests/fixtures/architecture_rules/{fixture_2layers,fixture_3layers_default,fixture_custom_names}/` (architecture-rules.json + track_dir/*-types.json) + `libs/infrastructure/tests/contract_map_layer_agnostic.rs` (9 integration tests: subgraph count / topo order / foreign-layer non-leak × 3 fixtures)。layer-agnostic 不変条件を機械的に検証。**追加変更**: LayerId を nutype → 素 struct 書き換え (nutype + rustdoc 検出制約の回避、別 track 計画 TODO 記録)、3 layer の signals 全 Blue 化、contract-map.md dogfood 生成。nextest 2117 tests all pass |
 
+## Phase 1.5 Task Verification (planned)
+
+### T008: Remove nutype dependency (6 domain ids → plain struct)
+
+- [ ] `libs/domain/src/ids.rs` の 6 型 (TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName) が plain struct (単一フィールド wrapper) に書き換えられている
+- [ ] 公開 API (try_new(impl Into<String>) -> Result<Self, ValidationError> / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord) が維持されている (nutype は内部的に impl Into<String> を受け付けるため、既存の String 渡し call site と互換性を保つにはこのシグネチャが必要。LayerId の先行実装パターンに準拠)
+- [ ] NonEmptyString / ReviewGroupName の sanitize(trim) 挙動が try_new 内で明示的に実装されている
+- [ ] `Cargo.toml` workspace.dependencies と `libs/domain/Cargo.toml` から nutype 依存が削除されている
+- [ ] 既存 250+ call sites が無変更で compile 通過する (API 互換性の実証。実測: libs + apps 全体で約 263 箇所の try_new 呼び出し)
+- [ ] `ids.rs` の unit tests (NonEmptyString の 5 test を含む既存テスト) が plain struct 版でも全 pass する
+- [ ] `cargo make ci` が pass する
+
+### T009: Contract Map edges extension (params + 6 ids reference declare)
+
+- [ ] ADR 2026-04-17-1528 §D4 (1) が 'returns only' から 'returns + params' に拡張され、Phase 1.5 拡張注記が記載されている
+- [ ] `libs/domain/src/tddd/contract_map_render.rs` の method-edge 生成ループが method.params() を iterate する
+- [ ] declared 型 (type_index 内) の param に対してのみ edge を emit する (外部型には edge を出さない)
+- [ ] edge label が `A -->|method(arg_name)| B` 形式である
+- [ ] 新規 unit tests 4 件 (同層 param edge / 層跨ぎ param edge / declared 型のみ / label 形式) が追加され pass する
+- [ ] `domain-types.json` に 6 plain-struct ids が action=reference で declare 追加されている
+- [ ] `sotp track type-signals` で 6 型が全 Blue (found_type=true)
+- [ ] `sotp track signals` で spec 全項目が Blue を維持 (strict merge gate 通過)
+
+### T010: Phase 1.5 verification + dogfooding regeneration
+
+- [ ] `sotp track contract-map tddd-contract-map-phase1-2026-04-17 --workspace-root .` で contract-map.md が再生成される
+- [ ] Phase 1 時 (17 nodes / 8 edges) より method-edge 数が増加している
+- [ ] 期待される新規 edge (CatalogueLoader -->|load_all(track_id)| TrackId, ContractMapWriter -->|write(content)| ContractMapContent, ContractMapWriter -->|write(track_id)| TrackId, RenderContractMap -->|execute(cmd)| RenderContractMapCommand) が出力に含まれる
+- [ ] verification.md の Phase 1.5 section が T008-T010 の検証項目で埋まっている
+- [ ] Contract Map dogfooding subsection が post-Phase-1.5 の node/edge count で更新されている
+- [ ] `sotp track type-signals` で 6 plain-struct ids が全 Blue を維持している (T009 で初回確認、T010 で再確認)
+- [ ] `sotp track signals` で spec 全項目が Blue を維持している (strict merge gate 通過。T009 で初回確認、T010 で再確認)
+- [ ] `cargo make ci` で regression なし
+
 ## Open Issues
 
 - (実装中に発覚した論点はここに追記)
