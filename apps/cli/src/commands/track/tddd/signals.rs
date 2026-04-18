@@ -8,12 +8,15 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use domain::TrackStatus;
+use domain::TypeSignalsDocument;
 use domain::schema::{SchemaExportError, SchemaExporter};
 use infrastructure::code_profile_builder::build_type_graph;
 use infrastructure::schema_export::RustdocSchemaExporter;
-use infrastructure::tddd::catalogue_codec;
+use infrastructure::tddd::{catalogue_codec, type_signals_codec};
+use infrastructure::timestamp_now;
 use infrastructure::track::atomic_write::atomic_write_file;
 use infrastructure::track::fs_store::read_track_metadata;
+use infrastructure::track::symlink_guard::reject_symlinks_below;
 use infrastructure::verify::tddd_layers::{
     LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
 };
@@ -241,6 +244,7 @@ fn execute_type_signals_for_layer(
 
     // Delegate to the core evaluator (nightly-free, directly testable).
     let rendered_stem = binding.rendered_file();
+    let signal_file_name = binding.signal_file();
     evaluate_and_write_signals(
         &mut doc,
         &profile,
@@ -248,6 +252,7 @@ fn execute_type_signals_for_layer(
         &catalogue_path,
         &track_dir,
         &rendered_stem,
+        &signal_file_name,
     )
 }
 
@@ -260,7 +265,8 @@ fn execute_type_signals_for_layer(
 /// # Errors
 ///
 /// Returns `CliError` if action diagnostics fail (delete errors), encoding fails,
-/// or either atomic write fails.
+/// either declaration-path / signal-path is a symlink (fail-closed per ADR §D7),
+/// or any atomic write fails.
 pub(crate) fn evaluate_and_write_signals(
     doc: &mut domain::TypeCatalogueDocument,
     profile: &domain::TypeGraph,
@@ -268,6 +274,7 @@ pub(crate) fn evaluate_and_write_signals(
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
     rendered_file_stem: &str,
+    signal_file_name: &str,
 ) -> Result<ExitCode, CliError> {
     // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
     let report = domain::check_consistency(doc.entries(), profile, baseline);
@@ -315,7 +322,24 @@ pub(crate) fn evaluate_and_write_signals(
 
     // Validate action diagnostics, then write only if validation succeeds.
     // This ordering guarantees no files are mutated on delete-error failure.
-    validate_and_write_catalogue(&report, doc, domain_types_path, track_dir, rendered_file_stem)?;
+    //
+    // `validate_and_write_catalogue` returns the declaration-file bytes it just
+    // wrote to disk, so `declaration_hash` in the signal file matches the
+    // on-disk declaration bytes verbatim (ADR §D5: hash is pinned to post-encode
+    // disk bytes, not pre-encode in-memory state).
+    let declaration_bytes = validate_and_write_catalogue(
+        &report,
+        doc,
+        domain_types_path,
+        track_dir,
+        rendered_file_stem,
+    )?;
+
+    // T004: dual-write the signal file alongside the declaration file. Signals
+    // stay co-located in `<layer>-types.json` during this transitional task
+    // (ADR Migration §2); T007 strips them from the declaration codec in the
+    // same commit that wires pre-commit auto-recomputation.
+    write_signal_file(&all_signals, &declaration_bytes, track_dir, signal_file_name)?;
 
     let skipped = report.skipped_count();
     // Extract the catalogue filename from the path so the WARN message names the
@@ -337,17 +361,23 @@ pub(crate) fn evaluate_and_write_signals(
 /// Extracted so that the validate-before-write ordering can be tested without
 /// requiring the nightly toolchain that `execute_type_signals` uses.
 ///
+/// Returns the exact byte vector written to the declaration file (including the
+/// trailing newline). Callers computing `declaration_hash` for the signal file
+/// MUST use this return value so the hash is pinned to post-encode disk bytes
+/// (ADR §D5).
+///
 /// # Errors
 ///
-/// Returns `CliError` if action diagnostics fail, encoding fails, or either
-/// atomic write fails.
+/// Returns `CliError` if action diagnostics fail, encoding fails, the declaration
+/// file path is a symlink (ADR §D7 fail-closed write-path guard), or any atomic
+/// write fails.
 fn validate_and_write_catalogue(
     report: &domain::ConsistencyReport,
     doc: &domain::TypeCatalogueDocument,
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
     rendered_file_stem: &str,
-) -> Result<(), CliError> {
+) -> Result<Vec<u8>, CliError> {
     // Validate first: abort before any writes if delete errors are present.
     print_action_diagnostics(report)?;
 
@@ -355,7 +385,21 @@ fn validate_and_write_catalogue(
     let encoded = catalogue_codec::encode(doc)
         .map_err(|e| CliError::Message(format!("catalogue encode error: {e}")))?;
 
-    atomic_write_file(domain_types_path, format!("{encoded}\n").as_bytes()).map_err(|e| {
+    let declaration_bytes = format!("{encoded}\n").into_bytes();
+
+    // ADR §D7 symlink guard on the write path: reject symlinks at the leaf or
+    // at any ancestor below `track_dir`. `reject_symlinks_below` returns
+    // `Ok(true)` when the target is a regular file, `Ok(false)` when the
+    // target is absent, and `Err(_)` for any symlink or I/O error — both
+    // `Ok` variants are safe to write to.
+    reject_symlinks_below(domain_types_path, track_dir).map_err(|e| {
+        CliError::Message(format!(
+            "refusing to write declaration file {}: {e}",
+            domain_types_path.display()
+        ))
+    })?;
+
+    atomic_write_file(domain_types_path, &declaration_bytes).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", domain_types_path.display()))
     })?;
 
@@ -380,6 +424,49 @@ fn validate_and_write_catalogue(
     atomic_write_file(&rendered_md_path, rendered.as_bytes()).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", rendered_md_path.display()))
     })?;
+
+    Ok(declaration_bytes)
+}
+
+/// Encode and write the per-layer evaluation-result file
+/// (`<layer>-type-signals.json`, schema_version 1) alongside the declaration
+/// file.
+///
+/// `declaration_bytes` MUST be the exact byte sequence just written to the
+/// declaration file. The SHA-256 hash of these bytes is persisted as
+/// `declaration_hash` so that T005's stale detection can compare against the
+/// current on-disk declaration file (ADR §D5).
+///
+/// # Errors
+///
+/// Returns `CliError` when the system timestamp cannot be derived, the signal
+/// file path is a symlink (ADR §D7 fail-closed write-path guard), signal
+/// encoding fails, or the atomic write fails.
+fn write_signal_file(
+    signals: &[domain::TypeSignal],
+    declaration_bytes: &[u8],
+    track_dir: &std::path::Path,
+    signal_file_name: &str,
+) -> Result<(), CliError> {
+    let generated_at = timestamp_now()
+        .map_err(|e| CliError::Message(format!("cannot derive generation timestamp: {e}")))?;
+    let declaration_hash = type_signals_codec::declaration_hash(declaration_bytes);
+    let signals_doc = TypeSignalsDocument::new(generated_at, declaration_hash, signals.to_vec());
+
+    let encoded = type_signals_codec::encode(&signals_doc)
+        .map_err(|e| CliError::Message(format!("signal file encode error: {e}")))?;
+
+    let signal_path = track_dir.join(signal_file_name);
+
+    // ADR §D7 symlink guard on the write path: same policy as the declaration
+    // file. `reject_symlinks_below` returns Ok(true | false) for regular files
+    // and absent paths; any symlink or unexpected I/O error is Err.
+    reject_symlinks_below(&signal_path, track_dir).map_err(|e| {
+        CliError::Message(format!("refusing to write signal file {}: {e}", signal_path.display()))
+    })?;
+
+    atomic_write_file(&signal_path, format!("{encoded}\n").as_bytes())
+        .map_err(|e| CliError::Message(format!("cannot write {}: {e}", signal_path.display())))?;
 
     Ok(())
 }
@@ -886,6 +973,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-types.md",
+            "domain-type-signals.json",
         );
 
         assert!(result.is_err(), "delete error must cause evaluate_and_write_signals to fail");
@@ -897,12 +985,18 @@ mod tests {
             !dir.path().join("domain-types.md").exists(),
             "domain-types.md must NOT be written on delete-error abort"
         );
+        assert!(
+            !dir.path().join("domain-type-signals.json").exists(),
+            "domain-type-signals.json must NOT be written on delete-error abort"
+        );
     }
 
     #[test]
     fn test_evaluate_and_write_signals_with_clean_report_returns_success_and_writes_files() {
         // End-to-end test for the success path via the public core evaluator.
-        // Proves that `execute_type_signals` writes both files on a clean report.
+        // Proves that `execute_type_signals` writes catalogue + rendered view + signal file
+        // on a clean report, and that the signal file declaration_hash matches the
+        // on-disk declaration bytes (ADR §D5 post-encode hash pin).
         let dir = tempfile::tempdir().unwrap();
         let domain_types_path = dir.path().join("domain-types.json");
         let track_dir = dir.path().to_path_buf();
@@ -916,6 +1010,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-types.md",
+            "domain-type-signals.json",
         );
 
         assert!(result.is_ok(), "clean report must succeed: {result:?}");
@@ -924,6 +1019,142 @@ mod tests {
         assert!(
             dir.path().join("domain-types.md").exists(),
             "domain-types.md must be written on success"
+        );
+        // T004: dual-write — signal file must be written alongside the declaration file.
+        let signal_path = dir.path().join("domain-type-signals.json");
+        assert!(signal_path.exists(), "domain-type-signals.json must be written on success");
+
+        // declaration_hash in the signal file must equal SHA-256 of the on-disk
+        // declaration bytes (ADR §D5: hash pinned to post-encode disk bytes).
+        let declaration_bytes = std::fs::read(&domain_types_path).unwrap();
+        let expected_hash =
+            infrastructure::tddd::type_signals_codec::declaration_hash(&declaration_bytes);
+        let signal_json = std::fs::read_to_string(&signal_path).unwrap();
+        let signal_doc = infrastructure::tddd::type_signals_codec::decode(&signal_json).unwrap();
+        assert_eq!(
+            signal_doc.declaration_hash(),
+            expected_hash,
+            "declaration_hash in signal file must match SHA-256 of on-disk declaration bytes"
+        );
+        assert_eq!(signal_doc.schema_version(), 1, "signal file schema_version must be 1");
+        assert!(
+            signal_doc.signals().is_empty(),
+            "empty report must yield empty signals in the signal file"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_and_write_signals_signal_file_includes_forward_signals() {
+        // The signal file must carry the forward-evaluation signals — not just
+        // undeclared/baseline reds. A non-empty declared entry with a Blue
+        // evaluation proves the forward signals are plumbed through.
+        use std::collections::HashMap;
+
+        use domain::schema::{TypeKind, TypeNode};
+
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_path = dir.path().join("domain-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        let entry = make_entry_d("TrackId", domain::TypeAction::Add);
+        let mut doc = domain::TypeCatalogueDocument::new(1, vec![entry]);
+
+        // Graph with TrackId present as a struct → Blue.
+        let mut types = HashMap::new();
+        types.insert(
+            "TrackId".to_owned(),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], std::collections::HashSet::new()),
+        );
+        let profile = domain::TypeGraph::new(types, HashMap::new());
+
+        let result = evaluate_and_write_signals(
+            &mut doc,
+            &profile,
+            &empty_baseline_d(),
+            &domain_types_path,
+            &track_dir,
+            "domain-types.md",
+            "domain-type-signals.json",
+        );
+
+        assert!(result.is_ok(), "clean report must succeed: {result:?}");
+
+        let signal_path = dir.path().join("domain-type-signals.json");
+        let signal_json = std::fs::read_to_string(&signal_path).unwrap();
+        let signal_doc = infrastructure::tddd::type_signals_codec::decode(&signal_json).unwrap();
+        let signals = signal_doc.signals();
+        assert!(!signals.is_empty(), "signal file must carry forward signals, got empty");
+        let blue_track_id = signals
+            .iter()
+            .find(|s| s.type_name() == "TrackId" && s.signal() == domain::ConfidenceSignal::Blue);
+        assert!(blue_track_id.is_some(), "TrackId must appear as Blue in the signal file");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_evaluate_and_write_signals_rejects_signal_file_symlink() {
+        // ADR §D7: writing the signal file to a symlink must fail-closed.
+        // Setup: create a symlink at the signal-file path before invocation.
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_path = dir.path().join("domain-types.json");
+        let signal_path = dir.path().join("domain-type-signals.json");
+        let track_dir = dir.path().to_path_buf();
+
+        // Create a symlink at the signal file path pointing at a non-existent target.
+        std::os::unix::fs::symlink(dir.path().join("nowhere.json"), &signal_path).unwrap();
+
+        let mut doc = domain::TypeCatalogueDocument::new(1, vec![]);
+
+        let result = evaluate_and_write_signals(
+            &mut doc,
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &domain_types_path,
+            &track_dir,
+            "domain-types.md",
+            "domain-type-signals.json",
+        );
+
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(
+            msg.contains("refusing to write signal file"),
+            "error must be from the signal-file symlink guard, got: {msg}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_evaluate_and_write_signals_rejects_declaration_file_symlink() {
+        // ADR §D7: writing the declaration file to a symlink must fail-closed.
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_path = dir.path().join("domain-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        // Create a symlink at the declaration file path pointing nowhere.
+        std::os::unix::fs::symlink(dir.path().join("nowhere.json"), &domain_types_path).unwrap();
+
+        let mut doc = domain::TypeCatalogueDocument::new(1, vec![]);
+
+        let result = evaluate_and_write_signals(
+            &mut doc,
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &domain_types_path,
+            &track_dir,
+            "domain-types.md",
+            "domain-type-signals.json",
+        );
+
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(
+            msg.contains("refusing to write declaration file"),
+            "error must be from the declaration-file symlink guard, got: {msg}"
+        );
+        assert!(
+            !dir.path().join("domain-type-signals.json").exists(),
+            "signal file must NOT be written when declaration-file guard aborts"
         );
     }
 

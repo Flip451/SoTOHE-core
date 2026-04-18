@@ -16,7 +16,7 @@ TdddLayerBinding に signal_file() accessor を追加する (T003)。
 
 - [x] domain: `TypeSignalsDocument` + `TypeSignalsLoadResult` を libs/domain/src/tddd/ に新規追加 + unit tests。TypeSignalsDocument は value_object (schema_version / generated_at / declaration_hash / signals)、TypeSignalsLoadResult は enum (Current / Stale / Missing) で variant-dependent data を持つ (enum-first)。 95bab86b3c5fe348b315bd508f7b31350345d0a7
 - [x] infrastructure: `TypeSignalsCodec` (encode / decode / declaration_hash 計算) + `TypeSignalsCodecError` error type を libs/infrastructure/src/tddd/ に新規追加 + unit tests。schema_version=1 固定、generated_at は ISO 8601 UTC、declaration_hash は宣言ファイルの disk bytes SHA-256 hex。 4f700b0235925826f43b543a8531fae81bd1a7fa
-- [x] infrastructure: `TdddLayerBinding::signal_file()` accessor を libs/infrastructure/src/verify/tddd_layers.rs に追加 + unit tests。`<layer>-type-signals.json` 命名規則で評価結果ファイル名を返す (例: domain-types.json → domain-type-signals.json)。
+- [x] infrastructure: `TdddLayerBinding::signal_file()` accessor を libs/infrastructure/src/verify/tddd_layers.rs に追加 + unit tests。`<layer>-type-signals.json` 命名規則で評価結果ファイル名を返す (例: domain-types.json → domain-type-signals.json)。 31833773dca8ac48e447ef0aff75cfbefac446bc
 
 ## 過渡期: CLI writer の二重書き出し
 
@@ -24,7 +24,7 @@ TdddLayerBinding に signal_file() accessor を追加する (T003)。
 本 section の時点では宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (Migration §2 の二重書き出し過渡期)。
 書き込み前に既存 `reject_symlinks_below` を適用する。
 
-- [ ] cli: `sotp track type-signals` (apps/cli/src/commands/track/tddd/signals.rs) を更新し、評価結果を `<layer>-type-signals.json` にも書き出す。本タスクでは宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (二重書き出し過渡期、Migration §2)。書き込み前に `reject_symlinks_below` を適用。+ unit tests。
+- [x] cli: `sotp track type-signals` (apps/cli/src/commands/track/tddd/signals.rs) を更新し、評価結果を `<layer>-type-signals.json` にも書き出す。本タスクでは宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (二重書き出し過渡期、Migration §2)。書き込み前に `reject_symlinks_below` を適用。+ unit tests。
 
 ## CI / merge gate の stale 検出
 
