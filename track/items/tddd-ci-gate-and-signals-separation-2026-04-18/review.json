@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:24:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:26:33Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -709,24 +727,20 @@
           "findings": [],
           "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
           "at": "2026-04-18T18:48:55Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
-          "at": "2026-04-18T18:24:46Z"
+          "hash": "rvw1:sha256:c86ece03f8d5bed9cc706c2fac006619bd61c36981d987cfc690638ba87bc35d",
+          "at": "2026-04-18T18:59:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
-          "at": "2026-04-18T18:26:33Z"
+          "hash": "rvw1:sha256:c86ece03f8d5bed9cc706c2fac006619bd61c36981d987cfc690638ba87bc35d",
+          "at": "2026-04-18T19:00:34Z"
         }
       ]
     },
@@ -826,6 +840,20 @@
           "findings": [],
           "hash": "rvw1:sha256:44781f27e246d6decf8fe7d9635a90593cd37adebdb821a1c14bc0efb007b65a",
           "at": "2026-04-18T18:54:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
+          "at": "2026-04-18T18:58:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
+          "at": "2026-04-18T18:59:45Z"
         }
       ]
     }

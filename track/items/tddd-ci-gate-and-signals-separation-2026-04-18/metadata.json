@@ -85,6 +85,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "4f700b0235925826f43b543a8531fae81bd1a7fa",
       "description": "infrastructure: `TypeSignalsCodec` (encode / decode / declaration_hash 計算) + `TypeSignalsCodecError` error type を libs/infrastructure/src/tddd/ に新規追加 + unit tests。schema_version=1 固定、generated_at は ISO 8601 UTC、declaration_hash は宣言ファイルの disk bytes SHA-256 hex。",
       "id": "T002",
       "status": "done"
@@ -92,7 +93,7 @@
     {
       "description": "infrastructure: `TdddLayerBinding::signal_file()` accessor を libs/infrastructure/src/verify/tddd_layers.rs に追加 + unit tests。`<layer>-type-signals.json` 命名規則で評価結果ファイル名を返す (例: domain-types.json → domain-type-signals.json)。",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "cli: `sotp track type-signals` (apps/cli/src/commands/track/tddd/signals.rs) を更新し、評価結果を `<layer>-type-signals.json` にも書き出す。本タスクでは宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (二重書き出し過渡期、Migration §2)。書き込み前に `reject_symlinks_below` を適用。+ unit tests。",
@@ -126,5 +127,5 @@
     }
   ],
   "title": "TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離",
-  "updated_at": "2026-04-18T18:37:46Z"
+  "updated_at": "2026-04-18T18:57:29Z"
 }

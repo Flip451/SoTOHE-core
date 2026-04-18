@@ -60,6 +60,35 @@ impl TdddLayerBinding {
         format!("{stem}.md")
     }
 
+    /// Returns the per-layer evaluation-result file name for the TDDD signal split.
+    ///
+    /// The evaluation-result file (`<layer>-type-signals.json`) is introduced by
+    /// ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md`
+    /// §D1 alongside the stripped-down declaration file `<layer>-types.json`.
+    ///
+    /// Naming transformation:
+    ///
+    /// - Strip the `.json` suffix to get the stem.
+    /// - If the stem ends in `s` (the conventional plural in `<layer>-types`),
+    ///   drop the trailing `s` and append `-signals`.
+    ///   `"domain-types.json"` → `"domain-type-signals.json"`.
+    /// - Otherwise, append `-signals` directly.
+    ///   `"custom.json"` → `"custom-signals.json"`.
+    ///
+    /// No I/O — this is a pure string derivation from `catalogue_file`. Callers
+    /// are responsible for applying the `reject_symlinks_below` guard before
+    /// reading or writing the returned path.
+    #[must_use]
+    pub fn signal_file(&self) -> String {
+        let stem = self.catalogue_file.strip_suffix(".json").unwrap_or(&self.catalogue_file);
+        let signal_stem = if let Some(trimmed) = stem.strip_suffix('s') {
+            format!("{trimmed}-signals")
+        } else {
+            format!("{stem}-signals")
+        };
+        format!("{signal_stem}.json")
+    }
+
     /// Returns the crate targets used by `schema_export`.
     #[must_use]
     pub fn targets(&self) -> &[String] {
@@ -339,6 +368,80 @@ mod tests {
         let bindings = parse_tddd_layers(json).unwrap();
         assert_eq!(bindings[0].baseline_file(), "domain-types-baseline.json");
         assert_eq!(bindings[0].rendered_file(), "domain-types.md");
+    }
+
+    // --- signal_file() accessor (ADR 2026-04-18-1400 §D1) ---
+
+    fn binding_with_catalogue(catalogue_file: &str) -> TdddLayerBinding {
+        TdddLayerBinding {
+            layer_id: "test".to_owned(),
+            catalogue_file: catalogue_file.to_owned(),
+            targets: vec!["test".to_owned()],
+        }
+    }
+
+    #[test]
+    fn test_signal_file_domain_types_drops_trailing_s() {
+        let binding = binding_with_catalogue("domain-types.json");
+        assert_eq!(binding.signal_file(), "domain-type-signals.json");
+    }
+
+    #[test]
+    fn test_signal_file_usecase_types_drops_trailing_s() {
+        let binding = binding_with_catalogue("usecase-types.json");
+        assert_eq!(binding.signal_file(), "usecase-type-signals.json");
+    }
+
+    #[test]
+    fn test_signal_file_infrastructure_types_drops_trailing_s() {
+        let binding = binding_with_catalogue("infrastructure-types.json");
+        assert_eq!(binding.signal_file(), "infrastructure-type-signals.json");
+    }
+
+    #[test]
+    fn test_signal_file_non_standard_stem_appends_signals() {
+        let binding = binding_with_catalogue("custom.json");
+        assert_eq!(binding.signal_file(), "custom-signals.json");
+    }
+
+    #[test]
+    fn test_signal_file_stem_without_json_extension_still_appends_signals() {
+        // Defensive: catalogue_file without `.json` suffix — the strip
+        // returns the whole string unchanged. `"no-extension"` ends in `n`,
+        // so the trailing-`s` branch does not fire and `-signals.json` is
+        // appended verbatim.
+        let binding = binding_with_catalogue("no-extension");
+        assert_eq!(binding.signal_file(), "no-extension-signals.json");
+    }
+
+    #[test]
+    fn test_signal_file_stem_ending_in_s_without_json_drops_trailing_s() {
+        // Without `.json`, a stem ending in `s` still has the trailing `s`
+        // dropped before `-signals` is appended. This mirrors the happy
+        // path for `<layer>-types.json` but exercises the code path where
+        // the `.json` strip is a no-op.
+        let binding = binding_with_catalogue("foos");
+        assert_eq!(binding.signal_file(), "foo-signals.json");
+    }
+
+    #[test]
+    fn test_signal_file_is_pure_string_derivation() {
+        // Repeated calls on the same binding must produce identical output
+        // (no I/O, no caching, no side effects).
+        let binding = binding_with_catalogue("domain-types.json");
+        let first = binding.signal_file();
+        let second = binding.signal_file();
+        assert_eq!(first, second);
+    }
+
+    #[test]
+    fn test_signal_file_differs_from_catalogue_and_baseline() {
+        let binding = binding_with_catalogue("domain-types.json");
+        let catalogue = binding.catalogue_file().to_owned();
+        let baseline = binding.baseline_file();
+        let signal = binding.signal_file();
+        assert_ne!(signal, catalogue);
+        assert_ne!(signal, baseline);
     }
 
     #[test]

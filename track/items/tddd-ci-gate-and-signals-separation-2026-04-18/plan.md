@@ -15,8 +15,8 @@ TdddLayerBinding に signal_file() accessor を追加する (T003)。
 本 section は pure Rust 型 + codec の段階で I/O への影響はない。
 
 - [x] domain: `TypeSignalsDocument` + `TypeSignalsLoadResult` を libs/domain/src/tddd/ に新規追加 + unit tests。TypeSignalsDocument は value_object (schema_version / generated_at / declaration_hash / signals)、TypeSignalsLoadResult は enum (Current / Stale / Missing) で variant-dependent data を持つ (enum-first)。 95bab86b3c5fe348b315bd508f7b31350345d0a7
-- [x] infrastructure: `TypeSignalsCodec` (encode / decode / declaration_hash 計算) + `TypeSignalsCodecError` error type を libs/infrastructure/src/tddd/ に新規追加 + unit tests。schema_version=1 固定、generated_at は ISO 8601 UTC、declaration_hash は宣言ファイルの disk bytes SHA-256 hex。
-- [ ] infrastructure: `TdddLayerBinding::signal_file()` accessor を libs/infrastructure/src/verify/tddd_layers.rs に追加 + unit tests。`<layer>-type-signals.json` 命名規則で評価結果ファイル名を返す (例: domain-types.json → domain-type-signals.json)。
+- [x] infrastructure: `TypeSignalsCodec` (encode / decode / declaration_hash 計算) + `TypeSignalsCodecError` error type を libs/infrastructure/src/tddd/ に新規追加 + unit tests。schema_version=1 固定、generated_at は ISO 8601 UTC、declaration_hash は宣言ファイルの disk bytes SHA-256 hex。 4f700b0235925826f43b543a8531fae81bd1a7fa
+- [x] infrastructure: `TdddLayerBinding::signal_file()` accessor を libs/infrastructure/src/verify/tddd_layers.rs に追加 + unit tests。`<layer>-type-signals.json` 命名規則で評価結果ファイル名を返す (例: domain-types.json → domain-type-signals.json)。
 
 ## 過渡期: CLI writer の二重書き出し
 
