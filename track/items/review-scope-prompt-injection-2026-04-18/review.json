@@ -1,0 +1,577 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan-artifacts` will not match current-track files as written: `<track-id>` is only expanded for `review_operational` and `other_track`, while named `groups` patterns are compiled verbatim. As a result, `track/items/<track-id>/**` will never classify real `track/items/<actual-id>/...` paths into `plan-artifacts`.",
+              "severity": "P1",
+              "file": "track/review-scope.json",
+              "line": 18,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:486a2c4f4fa1645c0c3ed705072e3970c36e842099c3fbf234fd62eeae1d4042",
+          "at": "2026-04-18T05:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
+          "at": "2026-04-18T05:57:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
+          "at": "2026-04-18T05:58:01Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
+          "at": "2026-04-18T05:48:56Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section §2 describes `track/review-scope.json` as if it only defined `domain`/`usecase`/`infrastructure`/`cli`/`harness-policy`, but the current file already includes `plan-artifacts`; the later claim that plan artifacts fall into `Other` is therefore stale and contradicts the repo state.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:141bee426b22ff10b9859b0a41f4b21199d2d5de87fc77d55938fe6e76f5fc67",
+          "at": "2026-04-18T05:49:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's bootstrap note is factually wrong: `track/review-scope.json` already classifies `knowledge/research/**` under `plan-artifacts`, so those files are not currently in `Other` and will not 'move' from Other as this task claims. The note should describe only the placeholder-pattern swap.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 155,
+              "category": "factual error"
+            },
+            {
+              "message": "The planned `plan-artifacts.md` body scopes the policy to `track/items/<track-id>/` and `knowledge/adr/**` only, but D3 in the same ADR explicitly adds `knowledge/research/**` to `plan-artifacts`. If this excerpt is copied verbatim, research-note diffs will be reviewed under the wrong severity policy.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md",
+              "line": 144,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc570e0da1f2adcc18a72abfeddbfc21487b4883f2b90924f67907464a6b9440",
+          "at": "2026-04-18T06:00:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:470ddbd091dc0253032ed86017bd1bfa129714cc943bc9a1682799dee662bba2",
+          "at": "2026-04-18T06:05:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` is still marked `approved`, but its stored `content_hash` is stale. Recomputing the hash from the current hashable fields yields `sha256:d187e8b9d61b9d1e9b9670c76a273fd4d6dccaff6b1888c42f06babd95272e28`, not the checked-in `sha256:31d8da95e409f15887fa8d2b10ba3584ccc0f745a4e816ba8a4451cef82dc1f2`. Because approved specs auto-demote on hash mismatch, downstream tooling will treat this plan as draft until the file is re-approved.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 318,
+              "category": "timestamp inconsistency"
+            },
+            {
+              "message": "T007 tells the implementer to copy the severity-policy body from a `plan.md` \"Canonical Block\", but `plan.md` has no such block. The only saved `plan-artifacts.md` block is in the planner research note, and that verbatim block still omits `knowledge/research/**`, so following this task literally can produce a prompt file that contradicts ADR D3’s final scope.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 161,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:470ddbd091dc0253032ed86017bd1bfa129714cc943bc9a1682799dee662bba2",
+          "at": "2026-04-18T06:10:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 says `track/review-prompts/plan-artifacts.md` must be copied from the research note's canonical block and that this block contains `What to report / What NOT to report / Round budget`, but the referenced block in `knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md:234-266` ends after `What NOT to report` and contains no round-budget text. Following this task literally cannot satisfy the accompanying `spec.json` / `verification.md` requirement that the prompt file include a `Round budget` section.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 161,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ec83517a88a8eeb7f70c07abb13e87e43586fb6996916cd76d7b9eb56eb4ce96",
+          "at": "2026-04-18T06:20:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 cites ADR D3 as the source for a three-section `plan-artifacts.md` body that includes `Round budget`, but ADR D3 only contains the excerpt through `What NOT to report`; the `Round budget` section exists only in the planner research canonical block. As written, the approved spec points implementers at a source that cannot satisfy the stated acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 97,
+              "category": "factual error"
+            },
+            {
+              "message": "T003 says the injected prompt format must match the \"Canonical Block in plan.md\", but neither `plan.md` nor any other plan artifact defines such a canonical block. The actual canonical wording lives in ADR D4 / the planner research notes, so this task currently contains a broken reference that can send the implementation to the wrong source.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 137,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:959dab4d689379c5d1e7d13bf4c2ed10014d8b6d238adca49df69837b68f7019",
+          "at": "2026-04-18T06:25:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008’s approved spec never requires dogfooding the `knowledge/research/**` leg of `plan-artifacts`: this task text only checks `track/items/...` and the revised ADR, even though ADR D3, T006, and metadata all define `knowledge/research/**` as part of the new scope. As written, the track can pass its end-to-end verification while research-note diffs are still routed incorrectly.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 107,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ReviewScopeConfig::new` canonical block contradicts the same plan’s T001 requirement to expand `<track-id>` in group patterns. This snippet compiles `patterns` verbatim and never calls `expand_track_id`, so copying it literally would leave `track/items/<track-id>/**` unable to match the current track’s files.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md",
+              "line": 158,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:63dd300b68544fdeea7a20f88369add68daff66d9365b7526a0b95d820a6329b",
+          "at": "2026-04-18T06:29:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json`'s Goal still describes `plan-artifacts` as covering only `track/items/<track-id>/**` and `knowledge/adr/**`, but ADR D3 and this same spec's T006/T008 scope later require `knowledge/research/**` to be classified into `plan-artifacts`. That drift makes the top-level objective understate the approved scope and can cause research-note coverage to be treated as optional.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 9,
+              "category": "contradiction"
+            },
+            {
+              "message": "`verification.md` marks a `research-notes scope` as out of scope, but this track explicitly pulls `knowledge/research/**` into `plan-artifacts` and later verification items require those files to classify into that scope. A verifier following this checklist could incorrectly defer the research-note work that T006/T008 are supposed to prove.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3f22d323e1608d549a97d1124c789482a0edb4bdad2cdf6897343dc52bc97c22",
+          "at": "2026-04-18T06:34:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner research note still says only `track/items/<track-id>/**` and `knowledge/adr/**` currently fall into `Other`, but the current bootstrap `track/review-scope.json` already classifies `knowledge/research/**` into `plan-artifacts`. That stale statement misdescribes the pre-T006 state and the scope boundary change this track is supposed to implement.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md",
+              "line": 67,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:71f45042e4f875b1eb52d54f8b34042b5a8e6edf30668979509054b2d102c764",
+          "at": "2026-04-18T06:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T003 canonical block in the planner research note conflicts with the ADR/spec contract: [knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4] and the T003 acceptance criteria require the injected prompt to match the ADR’s Japanese example block, but this canonical block emits different English wording. An implementer who copies the preserved canonical block will fail the documented acceptance criteria.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md",
+              "line": 216,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005’s source trace points to `.claude/commands/track/review.md §Step 2b`, but that file has no `Step 2b` section heading; the actual heading is `### 2b. Build per-group briefing`. This leaves the spec with a broken source reference for the command-doc change.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 80,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:5984dcdbfc327419217c5edb003e4893f7021e9204daf60b17f540efe38a9a83",
+          "at": "2026-04-18T06:47:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf52ff6fd45be84f45014c66215f36e6b192b8749ec967f62d649393c5e3c51",
+          "at": "2026-04-18T06:59:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md` still says files under `track/items/<track-id>/**`, `knowledge/adr/**`, and `knowledge/research/**` currently fall into `Other`, but the bootstrap `track/review-scope.json` already classifies those patterns into `plan-artifacts`. That contradicts the current bootstrap narrative used elsewhere in this plan (`metadata.json` T006 / `verification.md` Bootstrap 状態) and misstates the scope boundary this track is upgrading.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md",
+              "line": 67,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf52ff6fd45be84f45014c66215f36e6b192b8749ec967f62d649393c5e3c51",
+          "at": "2026-04-18T07:01:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008's dogfooding checklist no longer requires the modified planner research note to classify into `plan-artifacts`. The approved spec still says the end-to-end review must cover `knowledge/research/2026-04-18-0514-*.md` alongside `track/items/...` and the ADR, so this verification step can pass without exercising the new `knowledge/research/**` scope arm.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 74,
+              "category": "contradiction"
+            },
+            {
+              "message": "The spec cites ADR section `§Bad/Risk`, but the ADR heading is `### Bad / Risk`. Because that section label does not exist, the T002 rationale/constraints here have a broken source reference and the traceability check cannot resolve the cited ADR text unambiguously.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 171,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:684fd4c0d3a8ce250f01a65585d57b2112ded8e24300c701536ffa897a0f60ce",
+          "at": "2026-04-18T07:07:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json.updated_at` is still `2026-04-18T06:00:00Z`, but this track contains later artifact updates, including the approved spec timestamp at `2026-04-18T07:08:33Z` in `spec.json`/`spec.md`. Track tooling uses `metadata.json.updated_at` for latest-track ordering, so leaving it older than the later in-scope updates can misorder this track or make consumers read stale state.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 173,
+              "category": "timestamp inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:d2502831978ffe8a3d7bd68025aa684d99d787764ee14a4cd08fb88fe07c38d8",
+          "at": "2026-04-18T07:12:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR's D1 schema example still defines `plan-artifacts` with only `track/items/<track-id>/**` and `knowledge/adr/**`, but D3 and the track spec/verification all require `knowledge/research/**` to be part of that scope. An implementer following the earlier example will omit planner research notes from `plan-artifacts` and miss the approved T006 behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md",
+              "line": 76,
+              "category": "contradiction"
+            },
+            {
+              "message": "T007's acceptance criterion requires `track/review-prompts/plan-artifacts.md` to include a `Round budget` section, but its only cited source is ADR D3. That ADR excerpt does not define any round-budget text; the requirement comes from the planner research note instead. As written, the source attribution for this criterion is broken.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 291,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ed045b9d08aff0c681711127df1ce2dcf9cd0a106e4259cd5f23b299063a1def",
+          "at": "2026-04-18T07:18:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json.updated_at` is stale. It is still `2026-04-18T07:12:22Z`, but the same track already contains a later approved spec timestamp at `2026-04-18T07:18:29Z` in `spec.json`/`spec.md`. That leaves the plan artifacts internally inconsistent about which revision is the latest state.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 173,
+              "category": "timestamp inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:20d189f219cb0f200518b46eb1c71f9af6d8c926bd24e98601a3a07791b54694",
+          "at": "2026-04-18T07:21:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656959b6251717a4b31097cf545cb5f985f38f3877b43cdb28f675293bca583f",
+          "at": "2026-04-18T07:28:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md` still tells the `review-fix-lead` prompt insert to use an \"expected round budget\" for the scope. That contradicts the rest of the track artifacts, which explicitly removed round-budget / round-count targets from the severity policy and agent prompt (`metadata.json` T004/T007 and `spec.json` T004/T007).",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md",
+              "line": 281,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b2f111702259d1e61950ed2232ca810e0f0cab9622282953383d68c2a3ee9c6b",
+          "at": "2026-04-18T07:34:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ADR’s §2 current-state description is stale: it says the review scopes only include `domain`/`usecase`/`infrastructure`/`cli`/`harness-policy`, but the repository already has a `plan-artifacts` entry in `track/review-scope.json`. That makes the “plan artifacts fall to Other” premise contradictory to the actual worktree state.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md",
+              "line": 25,
+              "category": "contradiction"
+            },
+            {
+              "message": "`updated_at` is earlier than the spec approval timestamp for the same revision: `metadata.json` says `2026-04-18T07:30:19Z`, while `spec.json`/`spec.md` are approved at `2026-04-18T07:30:29Z`. The track metadata therefore records an update that predates the approval it depends on.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 173,
+              "category": "timestamp inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cce8585a95012b6a8437b87719f85cb1a286ae53469916ac11a54784d1fc03a3",
+          "at": "2026-04-18T07:38:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e752d5faaa6d2e5a738f17c25b954d9d071e1625d79c41c63cd5e825fd41c93f",
+          "at": "2026-04-18T07:41:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 still cites `knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D3` as the source for the `plan-artifacts.md (initial body)` canonical text and the round-cap exclusion, but ADR D3 only contains a short excerpt and does not define that canonical block or the round-budget rule. The actual canonical block lives in `knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md` (`### plan-artifacts.md (initial body)`), so this requirement is currently backed by a broken/misleading source reference.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 97,
+              "category": "broken reference"
+            },
+            {
+              "message": "T008’s dogfooding requirement is not traceable to its cited sources. `knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Rollout Plan §Phase 3` only says to add the scope and dogfood it; it does not require `zero_findings`, nor recording per-scope file counts / round counts / severity-policy confirmation in `verification.md`. As written, the acceptance criterion asks implementers to satisfy checks that cannot be verified from the attached sources.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 106,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:e752d5faaa6d2e5a738f17c25b954d9d071e1625d79c41c63cd5e825fd41c93f",
+          "at": "2026-04-18T07:46:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007’s approved spec points implementers at “ADR D3’s Canonical Block `plan-artifacts.md (initial body)`” and cites only ADR D3 as the source, but ADR D3 contains only a shortened excerpt and does not include the full four-item `What NOT to report` body that this task requires (`Formatting preferences` exists only in the planner research note’s canonical block). `metadata.json`/`plan.md` already point T007 at the research note instead, so the plan artifacts disagree about the actual source of truth for the file content.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 97,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e752d5faaa6d2e5a738f17c25b954d9d071e1625d79c41c63cd5e825fd41c93f",
+          "at": "2026-04-18T07:51:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S007 still says `track/review-prompts/plan-artifacts.md` should copy the ADR D3 `plan-artifacts.md (initial body)` verbatim, but ADR D3's excerpt only contains three `What NOT to report` bullets and does not include the `formatting preferences` exclusion that the track's own T007 task/spec require. An implementer following this section-level instruction will produce a prompt body that disagrees with T007/spec.json.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 88,
+              "category": "contradiction"
+            },
+            {
+              "message": "The T007 acceptance criterion requires `plan-artifacts.md` to exclude `formatting` findings, but its `sources` list cites only ADR D3. That source does not contain the fourth exclusion item; the only scoped artifact that does is the research note's `plan-artifacts.md (initial body)` canonical block. As written, the spec overstates source support for T007 and can pass signal evaluation with an unsupported blue citation.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 290,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:30ffa3539b454b92a07b46f0e9673e3da14d7b8b6959bf26b12378fc7cad04aa",
+          "at": "2026-04-18T07:57:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008's acceptance criterion requires more than its cited sources support: `§Rollout Plan §Phase 3` only says to add `plan-artifacts` and dogfood it, and `§Pre-commit Checklist` only covers running CI. Neither source defines the added success conditions here (`zero_findings` after severity-policy application, or recording per-scope file counts / round counts / severity-policy confirmation in `verification.md`), so the approved spec currently carries an untraceable acceptance requirement.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 300,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:a888ab09ed752d3dfb5bcbadc9e800f0158f2e2056ce6b45d2879620eeabeccf",
+          "at": "2026-04-18T08:04:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The canonical `ScopeEntry` block omits `Clone` (`#[derive(Debug)]`), but this track simultaneously instructs implementers to make `ReviewScopeConfig` clonable after changing `scopes` to `HashMap<MainScopeName, ScopeEntry>`. Following the canonical block verbatim leaves `ScopeEntry` non-`Clone`, so `ReviewScopeConfig: Clone` cannot compile.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md",
+              "line": 123,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a888ab09ed752d3dfb5bcbadc9e800f0158f2e2056ce6b45d2879620eeabeccf",
+          "at": "2026-04-18T08:08:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007/T008 rely on `verify-doc-links` to prove that the `track/review-prompts/plan-artifacts.md` path referenced from `track/review-scope.json` exists, but `sotp verify doc-links` only validates Markdown links, not JSON string fields. That directly conflicts with this spec's own out-of-scope note that `briefing_file` CI lint is deferred (`spec.json`:147), and it means the track can 'pass' while the runtime Read still fails on a missing briefing file.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 290,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb6e4718d089358d9f137ca1897127076044cb61c69ffe7e31c0e1e738ef224f",
+          "at": "2026-04-18T08:15:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007/T008 claim `verify-doc-links` proves the `briefing_file` target from `track/review-scope.json` exists, but that verifier only scans Markdown `[text](path)` links and the same spec separately says dedicated `briefing_file` CI lint is out of scope. This means the planned gate can pass while `track/review-prompts/plan-artifacts.md` is still missing at runtime.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/spec.json",
+              "line": 290,
+              "category": "contradiction"
+            },
+            {
+              "message": "The planner note preserves two incompatible `ScopeEntry` definitions: the earlier type-design block derives `Clone`, but the later canonical `ScopeEntry` block drops it. Because T001 still allows `ReviewScopeConfig` cloning, copying the canonical block verbatim can leave `ScopeEntry` non-`Clone` and break the implementation guidance.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md",
+              "line": 123,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb6e4718d089358d9f137ca1897127076044cb61c69ffe7e31c0e1e738ef224f",
+          "at": "2026-04-18T08:19:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 still treats `cargo make verify-doc-links` as evidence that the future `track/review-prompts/plan-artifacts.md` target exists, but `spec.json` already says JSON `briefing_file` lint is deferred to Open Question Q3 and must be proven by T008 dogfooding instead. Because `verify-doc-links` does not inspect `review-scope.json`'s `briefing_file` field, this task/verification path can pass without ever validating the referenced prompt file, leaving the plan internally contradictory and the T007/T008 gate unsound.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 161,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:498ba92bf6418ae5f287df52e577013e5bc82ce417bcff2958830823fdf16a99",
+          "at": "2026-04-18T08:26:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007's task definition still says `verify-doc-links` proves the `review-scope.json` reference to `track/review-prompts/plan-artifacts.md` exists, but that reference lives in the JSON `briefing_file` field, not in Markdown. `verify-doc-links` therefore cannot validate the path the task cares about. This contradicts the approved spec's T007 acceptance criteria, which already defer `briefing_file` lint to Open Question Q3 and require T008 dogfooding to prove the reviewer can actually read the file. Leaving `metadata.json` as-is makes the generated plan/plan.md prescribe an unworkable completion check for T007.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 161,
+              "category": "contradiction"
+            },
+            {
+              "message": "The T007 checklist says `cargo make verify-doc-links` confirms the `review-scope.json` target exists, but that command does not inspect JSON `briefing_file` entries. As written, verification.md would let T007 be checked off without ever exercising the only path that matters, and it contradicts spec.json's T007 acceptance criteria that explicitly defer this lint and rely on T008 dogfooding instead.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 69,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:498ba92bf6418ae5f287df52e577013e5bc82ce417bcff2958830823fdf16a99",
+          "at": "2026-04-18T08:30:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still says T007 is verified by `verify-doc-links`, but the detailed T007 task text, `spec.json` acceptance criteria, and `verification.md` all explicitly defer any `briefing_file` CI lint to a later track and use T008 dogfooding as the completion gate instead. That leaves two incompatible completion criteria for the same task and can send the implementer toward a CI check that this plan says is out of scope.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 90,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8c8b09edccca0079129980c61b63657e373e6e02e7590dbf6ef6dc998c76349d",
+          "at": "2026-04-18T08:34:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f5e541154c8685101a26906ca438d93d21a5d7b388a35aee255f7a7e8163687",
+          "at": "2026-04-18T08:39:05Z"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ADR’s premise is stale: `track/review-scope.json` already defines a `plan-artifacts` group for `track/items/<track-id>/**` and `knowledge/adr/**`, so the claim that only `domain`/`usecase`/`infrastructure`/`cli`/`harness-policy` exist is factually wrong and makes the D3 “new scope” section contradictory to the repository state.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:061a29c5934ca0779ba6479dd2318b9c8b718a0403fa8a75dc4a4988ff3316c9",
+          "at": "2026-04-18T05:31:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:061a29c5934ca0779ba6479dd2318b9c8b718a0403fa8a75dc4a4988ff3316c9",
+          "at": "2026-04-18T05:34:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:061a29c5934ca0779ba6479dd2318b9c8b718a0403fa8a75dc4a4988ff3316c9",
+          "at": "2026-04-18T05:38:57Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da7608c5adf96da6f9352faf0c26742d5c6af8d1ae276e369996ee920fe6259d",
+          "at": "2026-04-18T05:30:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da7608c5adf96da6f9352faf0c26742d5c6af8d1ae276e369996ee920fe6259d",
+          "at": "2026-04-18T05:31:18Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65b1636afd967843b973d4cbd462e8cda058af4f2673c861de9d0e0a45c0fb33",
+          "at": "2026-04-18T05:30:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 understates the `ReviewScopeConfig::new` signature blast radius. The task only plans domain-side updates, but `libs/usecase/src/review_v2/tests.rs:155` also constructs `ReviewScopeConfig::new()`. If an implementer follows this task/verification literally, that test module will still call the old signature and the track will fail CI until an unplanned extra edit is discovered.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 125,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:65b1636afd967843b973d4cbd462e8cda058af4f2673c861de9d0e0a45c0fb33",
+          "at": "2026-04-18T05:36:05Z"
+        }
+      ]
+    }
+  }
+}

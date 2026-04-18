@@ -13,6 +13,13 @@
     "cli": {
       "patterns": ["apps/**"]
     },
+    "plan-artifacts": {
+      "patterns": [
+        "track/items/**",
+        "knowledge/adr/**",
+        "knowledge/research/**"
+      ]
+    },
     "harness-policy": {
       "patterns": [
         ".claude/commands/**", ".claude/rules/**", ".claude/agents/**",

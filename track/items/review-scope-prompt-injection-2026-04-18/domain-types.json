@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "MainScopeName",
+      "description": "Existing domain value object (validated non-empty ASCII scope name, rejecting the reserved \"other\"). Declared with action=reference to document that this track's briefing_file_for_scope accessor dispatches on ScopeName::Main(MainScopeName) → Option<&str>. The type itself is not modified; reference declaration keeps the domain catalogue non-empty per Stage 2 TDDD verification requirement without altering the baseline.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "MainScopeName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

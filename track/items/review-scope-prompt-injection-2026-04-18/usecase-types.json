@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ReviewCycle",
+      "description": "Existing usecase orchestrator (struct-only) that drives the review → verdict → hash recording pipeline per scope. It consumes ReviewScopeConfig for file classification; this track changes the config's internal shape (ScopeEntry) but not ReviewCycle itself. Declared with action=reference to document the usecase-layer touchpoint and satisfy the Stage 2 TDDD verification requirement that tddd.enabled layers carry at least one declared type.",
+      "approved": true,
+      "action": "reference",
+      "kind": "use_case"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "ReviewCycle",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
