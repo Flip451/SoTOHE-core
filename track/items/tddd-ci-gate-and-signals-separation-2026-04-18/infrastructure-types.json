@@ -24,8 +24,13 @@
     {
       "type_name": "TypeSignalsCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "InvalidTimestamp"
+      ]
     },
     {
       "type_name": "TdddLayerBinding",

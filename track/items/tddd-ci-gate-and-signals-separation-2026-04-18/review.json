@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
-          "at": "2026-04-18T18:24:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
-          "at": "2026-04-18T18:26:33Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -683,6 +665,167 @@
           "findings": [],
           "hash": "rvw1:sha256:57e7ac58fd5f150f9b9924f42b5cc4b1980835c8b5d9ff0bee803cc15b17760c",
           "at": "2026-04-18T18:33:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:39:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Flipping `TypeSignalsCodecError` to blue (and implicitly treating T002 as complete) is premature: the new codec still does not enforce the ADR/spec requirement that `generated_at` be ISO 8601 UTC. `type_signals_codec::decode` delegates to `Timestamp::new`, whose tests accept offset timestamps such as `2026-03-19T12:00:00+09:00`, and `encode` preserves the raw string, so the implementation currently accepts non-UTC values even though these artifacts say the UTC-only contract is done.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 27,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:44:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Flipping `TypeSignalsCodecError` to `blue` here is premature. T002 is described as finished with `generated_at` constrained to ISO 8601 UTC, but `type_signals_codec::decode` still delegates to `Timestamp::new`, and `Timestamp::new` explicitly accepts offset timestamps such as `2026-03-19T12:00:00+09:00`. These artifacts therefore overstate completion of the UTC-only contract.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 27,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:46:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:48:55Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:24:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:26:33Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalDto` should also use `#[serde(deny_unknown_fields)]`; as written, typos inside individual `signals[]` entries are silently ignored on decode, which contradicts the module’s fail-closed contract and can let malformed evaluation data pass as valid.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 80,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:41:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:42:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsDocDto.signals` is deserialized with `#[serde(default)]`, so a malformed `<layer>-type-signals.json` that omits the required top-level `signals` field is accepted as `[]` instead of being rejected at the codec boundary. ADR D1 defines `signals` as part of the schema, so this should fail closed rather than silently turning a bad file into an empty evaluation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 74,
+              "category": null
+            },
+            {
+              "message": "`decode` validates `generated_at` with `Timestamp::new`, but that parser accepts RFC3339 offsets such as `2026-04-18T12:00:00+09:00`. ADR D1 and this module’s docs require an ISO 8601 UTC timestamp, so non-UTC payloads currently pass validation and are preserved verbatim on re-encode.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 109,
+              "category": null
+            },
+            {
+              "message": "`encode` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is public and can hold values other than `1`, this encoder can emit on-disk signal files that its own `decode` path immediately rejects, even though ADR D1 fixes the file format at `schema_version: 1`. The encoder should pin or validate the version before serializing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 132,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode()` validates `generated_at` with `Timestamp::new`, but that parser accepts offset timestamps like `2026-04-18T12:00:00+09:00`. The ADR/track contract says `<layer>-type-signals.json` stores a UTC timestamp, so this codec currently accepts and round-trips schema-invalid files instead of returning `InvalidTimestamp`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 109,
+              "category": "validation"
+            },
+            {
+              "message": "`encode()` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is a public constructor, callers can serialize a version other than `1`, producing a `<layer>-type-signals.json` file that this same codec will reject on the next read. The on-disk format needs to be pinned to schema version 1 here, the same way `catalogue_codec` pins its schema version during encode.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 132,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:48:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsDocDto` marks the top-level `signals` field with `#[serde(default)]`, so `decode()` accepts a `<layer>-type-signals.json` payload that omits `signals` entirely and silently turns that malformed/truncated file into an empty evaluation result. ADR §D1 defines `signals` as part of the required file shape, so this should fail closed instead of being treated as a valid document.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 74,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0c87c402bfc03180c23e684d53c114b505bc684f5dbcca10090ae9b7396a6c60",
+          "at": "2026-04-18T18:51:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44781f27e246d6decf8fe7d9635a90593cd37adebdb821a1c14bc0efb007b65a",
+          "at": "2026-04-18T18:54:28Z"
         }
       ]
     }

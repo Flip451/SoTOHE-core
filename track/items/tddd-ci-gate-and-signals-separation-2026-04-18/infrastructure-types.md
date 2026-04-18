@@ -10,5 +10,5 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| TypeSignalsCodecError | error_type | — | Json, UnsupportedSchemaVersion, InvalidTimestamp | 🟡 |
+| TypeSignalsCodecError | error_type | — | Json, UnsupportedSchemaVersion, InvalidTimestamp | 🔵 |
 

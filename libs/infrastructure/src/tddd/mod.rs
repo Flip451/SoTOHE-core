@@ -7,3 +7,4 @@ pub mod catalogue_codec;
 pub mod contract_map_adapter;
 pub mod type_graph_cluster;
 pub mod type_graph_render;
+pub mod type_signals_codec;
