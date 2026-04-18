@@ -23,14 +23,19 @@
     {
       "type_name": "TypeSignalsDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeSignalsLoadResult",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Current",
+        "Missing",
+        "Stale"
+      ]
     }
   ]
 }

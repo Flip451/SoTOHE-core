@@ -19,6 +19,7 @@ pub mod contract_map_options;
 pub mod contract_map_render;
 pub mod layer_id;
 pub mod signals;
+pub mod type_signals_doc;
 
 pub use catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,

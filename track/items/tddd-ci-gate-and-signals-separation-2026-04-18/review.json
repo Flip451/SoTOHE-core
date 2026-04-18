@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:24:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:26:33Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -606,6 +624,65 @@
           "findings": [],
           "hash": "rvw1:sha256:f68da3a73df5b80e9e3d91f291774c60608adf0891165d2932bd08de19dfc7b4",
           "at": "2026-04-18T18:07:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The task records no longer include `commit_hash` at all. That contradicts the briefing's stated intermediate state (`commit_hash` stays present as `null` until the post-commit update) and drops the field other track metadata uses to represent pending vs. linked commits.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 80,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:24:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:27:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` no longer records `commit_hash` for T001 (or any other task). In this review state, the documented intermediate state is that T001 has transitioned to `done` while `commit_hash` remains explicitly `null` until `/track:commit`; dropping the field entirely changes the meaning of the transition record and contradicts that workflow.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 84,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` now removes `commit_hash` from every task entry instead of keeping the field and leaving T001 as `null`. That contradicts the documented transition flow for this scope, which expects the task to be marked done first and then have its commit hash filled post-commit; with the field gone, the artifact no longer expresses that state or preserves per-task commit linkage for later steps.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:31:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57e7ac58fd5f150f9b9924f42b5cc4b1980835c8b5d9ff0bee803cc15b17760c",
+          "at": "2026-04-18T18:33:38Z"
         }
       ]
     }
