@@ -1032,3 +1032,45 @@ fn test_is_safe_briefing_path_rejects_c1_control() {
     // U+0085 NEXT LINE — C1 control, also outside ASCII range.
     assert!(!is_safe_briefing_path("path/file.md\u{0085}injected"));
 }
+
+// Path-traversal guard tests (PR #105 P0 follow-up)
+
+#[test]
+fn test_is_safe_briefing_path_rejects_unix_absolute() {
+    assert!(!is_safe_briefing_path("/etc/passwd"));
+    assert!(!is_safe_briefing_path("/track/review-prompts/plan-artifacts.md"));
+}
+
+#[test]
+fn test_is_safe_briefing_path_rejects_windows_root() {
+    assert!(!is_safe_briefing_path("\\Windows\\System32"));
+}
+
+#[test]
+fn test_is_safe_briefing_path_rejects_windows_unc() {
+    assert!(!is_safe_briefing_path("\\\\server\\share\\file.md"));
+}
+
+#[test]
+fn test_is_safe_briefing_path_rejects_windows_drive_letter() {
+    assert!(!is_safe_briefing_path("C:/Windows/System32"));
+    assert!(!is_safe_briefing_path("D:\\secrets.txt"));
+    assert!(!is_safe_briefing_path("c:/etc"));
+}
+
+#[test]
+fn test_is_safe_briefing_path_rejects_parent_dir_component() {
+    assert!(!is_safe_briefing_path("../etc/passwd"));
+    assert!(!is_safe_briefing_path("track/../../etc/passwd"));
+    assert!(!is_safe_briefing_path("track/review-prompts/../../secrets"));
+    // Windows-style separator should also be caught.
+    assert!(!is_safe_briefing_path("track\\..\\..\\secrets"));
+}
+
+#[test]
+fn test_is_safe_briefing_path_accepts_dotdot_inside_filename() {
+    // Only the literal `..` component is disallowed — `..foo` or `foo..bar`
+    // must pass (no traversal semantics).
+    assert!(is_safe_briefing_path("track/..hidden/file.md"));
+    assert!(is_safe_briefing_path("track/review-prompts/v1..2/policy.md"));
+}

@@ -168,25 +168,58 @@ pub(super) fn append_scope_briefing_reference(
     ));
 }
 
-/// Returns `true` if `path` is safe to inject into the markdown prompt as a
-/// backtick-quoted path bullet.
+/// Returns `true` if `path` is safe to reference as a repo-relative briefing
+/// file and to inject into the markdown prompt as a backtick-quoted path bullet.
 ///
-/// Rejects strings that contain:
-/// - Any Unicode control character (`char::is_control`, Unicode category Cc),
-///   which covers ASCII C0 0x00–0x1F (including `\n`, `\r`, `\t`), DEL 0x7F,
+/// Rejects strings that contain **any of the following**:
+///
+/// Prompt-injection class (would break out of the `` `path` `` markdown context
+/// or smuggle additional prompt lines):
+/// - Any Unicode control character (`char::is_control`, Unicode category Cc) —
+///   covers ASCII C0 0x00–0x1F (including `\n`, `\r`, `\t`), DEL 0x7F,
 ///   and C1 controls 0x80–0x9F (including NEL U+0085)
-/// - Line and paragraph separators U+2028 (Zl) and U+2029 (Zp) — these are
-///   not in category Cc and therefore not caught by `is_control`, but both
-///   can smuggle additional prompt lines past an ASCII-only filter
-/// - Backtick (`` ` ``) — would break out of the `` `path` `` markdown context
+/// - Line / paragraph separators U+2028 (Zl) and U+2029 (Zp) — not in category
+///   Cc and therefore not caught by `is_control`, but both act as line breaks
+/// - Backtick (`` ` ``)
+///
+/// Path-traversal class (would point the reviewer at arbitrary workspace-external
+/// or privileged files; the reviewer sandbox's `--sandbox read-only` constrains
+/// writes but does not restrict the paths that can be read):
+/// - Absolute paths starting with `/` or `\`
+/// - Windows UNC and drive-letter prefixes (e.g. `\\server\share`, `C:\...`)
+/// - Any `..` component (e.g. `track/../../etc/passwd`), split on either
+///   `/` or `\`
 ///
 /// Empty paths are also rejected (a misconfigured empty `briefing_file` field
 /// has no meaningful interpretation).
+///
+/// The check is pure string — no filesystem access — so it does not resolve
+/// symlinks. The current threat model (attacker controls `review-scope.json`
+/// in a reviewed working tree) is satisfied by rejecting absolute and
+/// `..`-containing paths at the composer boundary.
 pub(super) fn is_safe_briefing_path(path: &str) -> bool {
     if path.is_empty() {
         return false;
     }
-    !path.chars().any(|c| c == '`' || c.is_control() || matches!(c, '\u{2028}' | '\u{2029}'))
+    // Prompt-injection guard
+    if path.chars().any(|c| c == '`' || c.is_control() || matches!(c, '\u{2028}' | '\u{2029}')) {
+        return false;
+    }
+    // Absolute path (Unix root or Windows root / UNC)
+    if path.starts_with('/') || path.starts_with('\\') {
+        return false;
+    }
+    // Windows drive-letter prefix: `C:` / `c:` etc.
+    if let (Some(first), Some(second)) = (path.as_bytes().first(), path.as_bytes().get(1)) {
+        if *second == b':' && first.is_ascii_alphabetic() {
+            return false;
+        }
+    }
+    // Path-traversal: reject any `..` component (check both separators).
+    if path.split(['/', '\\']).any(|component| component == "..") {
+        return false;
+    }
+    true
 }
 
 /// Maps a group name string to a `ScopeName`.
