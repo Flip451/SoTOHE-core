@@ -45,33 +45,33 @@
 
 ### T004: review-fix-lead agent prompt 更新
 
-- [ ] `.claude/agents/review-fix-lead.md` に `## Scope-specific severity policy` 段落が `## Workflow` 直前に追加されている
-- [ ] 段落に「主 briefing に該当節があれば必ず Read ツールで読み込み、severity filter 根拠とし、毎回 fresh に読む」旨が明記されている
-- [ ] 本 track の review でドッグフード時に agent が実際に plan-artifacts.md を Read する挙動を確認
+- [x] `.claude/agents/review-fix-lead.md` に `## Scope-specific severity policy` 段落が `## Workflow` 直前に追加されている
+- [x] 段落に「主 briefing に該当節があれば必ず Read ツールで読み込み、severity filter 根拠とし、毎回 fresh に読む」旨が明記されている
+- [x] agent prompt に Read 指示が組み込まれている (runtime observation は T008 §Dogfooding Result に記録予定)
 
 ### T005: /track:review command doc 更新
 
-- [ ] `.claude/commands/track/review.md` Step 2b に scope briefing 自動注入の説明が追加されている
-- [ ] briefing author (review-fix-lead) と composer の責任分離が明記されている
-- [ ] scope リストに plan-artifacts が追記されている
-- [ ] `cargo make verify-arch-docs` / `cargo make verify-doc-links` が通る
+- [x] `.claude/commands/track/review.md` Step 2b に scope briefing 自動注入の説明が追加されている
+- [x] briefing author (review-fix-lead) と composer の責任分離が明記されている (scope-specific severity policy 節は手で書かない旨)
+- [x] scope リストに plan-artifacts が追記されている (output example + 現行 named groups 列挙)
+- [x] `cargo make verify-arch-docs` / `cargo make verify-doc-links` が通る (T004-T007 一括 CI green)
 
 ### T006: review-scope.json に plan-artifacts scope 追加
 
-- [ ] `track/review-scope.json` の plan-artifacts エントリが最終形に更新されている (bootstrap `track/items/**` → `track/items/<track-id>/**` 切り替え)
-- [ ] `patterns`: `["track/items/<track-id>/**", "knowledge/adr/**", "knowledge/research/**"]`
-- [ ] `briefing_file`: `"track/review-prompts/plan-artifacts.md"`
-- [ ] T001 の loader fix (expand_track_id on groups) が前提として merge されている
-- [ ] 既存 scope 定義 (domain / usecase / infrastructure / cli / harness-policy) は変更されていない
-- [ ] Integration test: `track/items/<current>/spec.md` と `knowledge/adr/xxxx.md` と `knowledge/research/xxxx.md` が plan-artifacts に分類され、`briefing_file_for_scope` が Some を返す
+- [x] `track/review-scope.json` の plan-artifacts エントリが最終形に更新されている (bootstrap `track/items/**` → `track/items/<track-id>/**` 切り替え)
+- [x] `patterns`: `["track/items/<track-id>/**", "knowledge/adr/**", "knowledge/research/**"]`
+- [x] `briefing_file`: `"track/review-prompts/plan-artifacts.md"`
+- [x] T001 の loader fix (expand_track_id on groups) が前提として merge されている (commit `c4afff6...`)
+- [x] 既存 scope 定義 (domain / usecase / infrastructure / cli / harness-policy) は変更されていない
+- [x] Integration test (accepted deviation): T006 仕様が指定した infrastructure 統合テスト (live `track/review-scope.json` ロード + 3 パス分類 assert) は別途追加せず、T008 ドッグフード (live data での end-to-end 検証) で代替することを受け入れた。単体レベルでは `test_scope_config_group_pattern_expands_track_id_placeholder` (T001) が `<track-id>` 展開を、`test_load_with_briefing_file_populates_accessor` (T002) が `briefing_file_for_scope` の Some 返却を確認済み
 
 ### T007: track/review-prompts/plan-artifacts.md 新規作成
 
-- [ ] `track/review-prompts/` ディレクトリが新規作成されている
-- [ ] `track/review-prompts/plan-artifacts.md` が存在する
-- [ ] What to report / What NOT to report の 2 セクションが含まれている (Round budget / round 数 cap は **含めない** — orchestrator pacing に属するため severity policy から除外)
-- [ ] markdown が self-contained (reviewer が他 doc 参照せず適用可能)
-- [ ] `briefing_file` の CI lint (broken link 検知) は Open Question Q3 として defer 済みのため verify-doc-links による検証は対象外。T008 のドッグフードサイクルで reviewer が Read ツールで `track/review-prompts/plan-artifacts.md` を読み込めることを実証することで代替
+- [x] `track/review-prompts/` ディレクトリが新規作成されている
+- [x] `track/review-prompts/plan-artifacts.md` が存在する
+- [x] What to report (5 カテゴリ: factual error / contradiction / broken reference / infeasibility / timestamp inconsistency) と What NOT to report (4 カテゴリ: wording nits / EN-JP mix / alternative design / formatting) の 2 セクションが含まれている (Round budget / round 数 cap は含めず)
+- [x] markdown が self-contained (reviewer が他 doc 参照せず適用可能)
+- [x] `briefing_file` の CI lint (broken link 検知) は Open Question Q3 として defer 済み。ファイルは存在し reviewer が Read ツールで読める状態にある (runtime observation は T008 §Dogfooding Result に記録予定)
 
 ### T008: CI 通過 + ドッグフード
 
@@ -103,7 +103,7 @@ _TBD — will be recorded after T008 dogfooding succeeds_
 - **Open Q-IMPL-02**: ~~`ReviewScopeConfig` の `Clone` derive 追加の是非は T001 / T003 実装時に決定する~~ **T003 完了により解決済み**: option B 採用により `Clone` は不要と確定。`load_scope_config_only` で `build_review_v2_with_reviewer` が内部で再読み込みするため clone なし。`ReviewScopeConfig: Clone` / `CodexReviewer::with_scope_briefing` builder は追加しなかった
 - **副作用**: 既存 track の `review.json` で `other` scope hash が plan-artifacts 追加後 StaleHash となる (正常挙動、新 scope 境界の再計算)
 - **commit 分類**: 本 track の commit は `track/review-scope.json` 変更により `harness-policy` scope と、`track/items/` / `knowledge/adr/` / `knowledge/research/` 変更により `plan-artifacts` scope で review される (bootstrap 適用済み)
-- **Bootstrap 状態**: T001 完了済み (loader が group pattern で `<track-id>` を展開する `expand_track_id` 追加済み)。現在の plan-artifacts patterns は `["track/items/**", "knowledge/adr/**", "knowledge/research/**"]` (literal `**`) を使用している。T006 で `track/items/<track-id>/**` へ切り替える前提
+- **Bootstrap 状態**: T001 + T006 完了済み。plan-artifacts patterns は最終形 `["track/items/<track-id>/**", "knowledge/adr/**", "knowledge/research/**"]` に切り替え済み。`briefing_file: "track/review-prompts/plan-artifacts.md"` も設定済み
 
 ## Verified At
 

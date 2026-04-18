@@ -15,10 +15,11 @@
     },
     "plan-artifacts": {
       "patterns": [
-        "track/items/**",
+        "track/items/<track-id>/**",
         "knowledge/adr/**",
         "knowledge/research/**"
-      ]
+      ],
+      "briefing_file": "track/review-prompts/plan-artifacts.md"
     },
     "harness-policy": {
       "patterns": [
