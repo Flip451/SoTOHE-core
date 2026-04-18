@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TypeSignalsDocument",
+      "description": "In-memory representation of the per-layer evaluation-result file (`<layer>-type-signals.json`, schema_version 1). Holds schema_version, generated_at timestamp, declaration_hash (SHA-256 hex of the declaration file bytes at evaluation time), and the per-type signals. Pure value type — no state transitions, no variant-dependent data. Introduced by ADR 2026-04-18-1400 §D1 to separate generated evaluation results from authored type declarations.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "TypeSignalsLoadResult",
+      "description": "Outcome of loading a signal document relative to the current declaration file hash. `Current(doc)` when the signal file exists and declaration_hash matches the current declaration bytes. `Stale { doc, expected_hash }` when the signal file exists but declaration_hash differs (fail-closed on both CI and merge gate per §D5). `Missing` when the signal file is absent (fail-closed per opt-in model of §D5). Variant-dependent data → enum-first.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Current",
+        "Stale",
+        "Missing"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "TypeSignalsDocument",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeSignalsLoadResult",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

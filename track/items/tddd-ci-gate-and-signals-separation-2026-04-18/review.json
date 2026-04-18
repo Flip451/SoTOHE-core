@@ -445,6 +445,50 @@
           "findings": [],
           "hash": "rvw1:sha256:129e2c95d7b4302c0cd6235888a7e7ec0d722d48544e95f6bde96bf6e49c65fe",
           "at": "2026-04-18T17:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_file()` is documented as returning `<catalogue-stem>-signals.json`, but this design consistently names the new evaluation-result file `<layer>-type-signals.json`. As written, the accessor would point at the wrong filename and break the declaration/result split.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba97e50511a6b6a3bd9497a040b44126a8c50374d2157b7d3a6471e1a6a7a701",
+          "at": "2026-04-18T17:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_file()` is documented as returning `<catalogue-stem>-signals.json`, but this ADR and the rest of the design define the evaluation-result file as `<layer>-type-signals.json`. As written, the accessor would resolve the wrong path for both the CLI writer and the CI reader.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 17,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ba97e50511a6b6a3bd9497a040b44126a8c50374d2157b7d3a6471e1a6a7a701",
+          "at": "2026-04-18T17:35:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b71a6a7ab4075f64f0017be5091d1104da06898cba33b1b96934a4b0d65674",
+          "at": "2026-04-18T17:37:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b71a6a7ab4075f64f0017be5091d1104da06898cba33b1b96934a4b0d65674",
+          "at": "2026-04-18T17:40:01Z"
         }
       ]
     }

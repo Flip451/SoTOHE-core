@@ -92,9 +92,11 @@ stale (fingerprint 不一致) は **CI interim mode / merge gate のいずれで
 
 ### D6: スキーマ移行
 
-`<layer>-types.json` は track ごとに `track/items/<track-id>/` 以下に格納される per-track ファイルである。現在 active な track は `tddd-ci-gate-and-signals-separation-2026-04-18` の 1 件のみであり、本 ADR は実装前段階のため `track/items/tddd-ci-gate-and-signals-separation-2026-04-18/` 以下に per-track の `<layer>-types.json` はまだ存在しない。したがって旧形式 (signals 埋め込み) から新形式への per-track ファイルのマイグレーションは不要。
+`<layer>-types.json` は track ごとに `track/items/<track-id>/` 以下に格納される per-track ファイルである。現在 active な track は本 track (`tddd-ci-gate-and-signals-separation-2026-04-18`) の 1 件のみで、本 track の `/track:design` 実行時に per-track の `<layer>-types.json` (domain/usecase/infrastructure) が作成される。`/track:design` は本 ADR 実装前に実行されるため、当該ファイルは現行仕様 (signals 同居) で書き込まれる。
 
-なお現在のシステムコーデック (`catalogue_codec.rs`) は `signals` フィールドを `Option` として読み書きしており、系全体としては signals 埋め込み形式が存在する。signals フィールドの除去は Migration 手順 5b (コーデック変更 + 評価結果ファイルの再計算) で行う。
+本 track 自身のマイグレーションは、実装完了後の Migration 手順 5b (コーデック変更 + 評価結果ファイル生成) と `cargo make build-sotp` による新仕様 sotp 切り替え後の初回 `sotp track type-signals` 実行で自動的に行われる。その時点で本 track の `<layer>-types.json` からは signals が剥奪され、`<layer>-type-signals.json` が新規作成される。
+
+なお現在のシステムコーデック (`catalogue_codec.rs`) は `signals` フィールドを `Option` として読み書きしており、系全体としては signals 埋め込み形式が存在する。signals フィールドの除去は Migration 手順 5b で行う。
 
 全 Migration 手順 (1–6) 完了後の定常運用では、新規 track 作成時点から分離された 2 ファイル形式で運用開始する。Migration 手順 2–4 の過渡期 (宣言ファイルと評価結果ファイルの二重書き出し期間) は本 ADR の実装ロールアウト期間中の一時的な状態であり、定常運用の形式ではない。
 
@@ -135,7 +137,7 @@ Done / Archived トラックの既存 `<layer>-types.json` には signals が残
 
 1. 新規 domain 型 + codec の実装 (評価結果ファイルの I/O 層)。
 2. `sotp track type-signals` CLI が評価結果を新規ファイル `<layer>-type-signals.json` に追加書き出しするように更新する。この時点では宣言ファイルコーデックは変更しないため、宣言ファイル `<layer>-types.json` への signals 書き出しは継続する (二重書き出し過渡期)。実行することで `<layer>-type-signals.json` が生成される。
-3. CI 経路 (`verify_from_spec_json` / `evaluate_layer_catalogue`) が評価結果ファイルを読むように更新。評価結果ファイルが存在しない (Missing) は fail-closed error のため、**手順 2 が先行して `<layer>-type-signals.json` を生成した後でなければ merge できない**。本 implementation track (`tddd-ci-gate-and-signals-separation-2026-04-18`) は TDDD 層宣言ファイル (`<layer>-types.json`) を持たないツール実装 track のため、手順 3 の CI チェックはこの track 自体には影響しない。手順 3 の制約は TDDD 宣言ファイルを持つ track (将来の `/track:design` 実行後の track) に対して適用される。
+3. CI 経路 (`verify_from_spec_json` / `evaluate_layer_catalogue`) が評価結果ファイルを読むように更新。評価結果ファイルが存在しない (Missing) は fail-closed error のため、**手順 2 が先行して `<layer>-type-signals.json` を生成した後でなければ merge できない**。本 track 自身も `/track:design` で `<layer>-types.json` を作成済みのため、手順 2 の先行生成制約が本 track にも適用される。
 4. `track/review-scope.json` の `review_operational` を更新し、`<layer>-type-signals.json` を `code_hash` 計算対象外とする。
 5. 以下を**同一 PR/commit** として merge する (ステップ 5a と 5b を分離すると pre-commit が `<layer>-types.json` を書き換え続け `code_hash` が変動する):
    - 5a. `dispatch_track_commit_message()` に pre-commit 自動再計算ステップを追加。

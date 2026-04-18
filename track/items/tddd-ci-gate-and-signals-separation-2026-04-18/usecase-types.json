@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "BlobFetchResult",
+      "description": "Existing usecase enum (Found(T) / NotFound / FetchError(String)) returned by TrackBlobReader when the merge gate fetches a track-level document from a git ref. Referenced here because the new stale/missing detection for `<layer>-type-signals.json` (ADR 2026-04-18-1400 §D5) is a new consumer of this abstraction when invoked through `check_strict_merge_gate`. The new flow reads the evaluation-result blob via the same port and maps NotFound to a Missing signal and declaration_hash mismatch to a Stale signal — both fail-closed. No modifications to the enum itself; reference declaration keeps the usecase catalogue non-empty per Stage 2 TDDD verification requirement.",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "Found",
+        "NotFound",
+        "FetchError"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "BlobFetchResult",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FetchError",
+        "Found",
+        "NotFound"
+      ]
+    }
+  ]
+}
