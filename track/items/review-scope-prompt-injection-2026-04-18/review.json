@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
+          "at": "2026-04-18T09:08:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
+          "at": "2026-04-18T09:08:54Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -19,6 +37,58 @@
         }
       ]
     },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
+          "at": "2026-04-18T05:48:56Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan-artifacts` will not match current-track files as written: `<track-id>` is only expanded for `review_operational` and `other_track`, while named `groups` patterns are compiled verbatim. As a result, `track/items/<track-id>/**` will never classify real `track/items/<actual-id>/...` paths into `plan-artifacts`.",
+              "severity": "P1",
+              "file": "track/review-scope.json",
+              "line": 18,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:486a2c4f4fa1645c0c3ed705072e3970c36e842099c3fbf234fd62eeae1d4042",
+          "at": "2026-04-18T05:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
+          "at": "2026-04-18T05:57:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
+          "at": "2026-04-18T05:58:01Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -34,6 +104,20 @@
           "findings": [],
           "hash": "rvw1:sha256:f36266551afee9b1b6f8e0f17397e9d486a379a5890d8e877626f594f21a8e9d",
           "at": "2026-04-18T09:09:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40ab219259ad7479b867518d513c7bc522d2ea48060d37b43605845d6f4c38ac",
+          "at": "2026-04-18T09:33:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40ab219259ad7479b867518d513c7bc522d2ea48060d37b43605845d6f4c38ac",
+          "at": "2026-04-18T09:34:45Z"
         }
       ]
     },
@@ -672,76 +756,20 @@
           "findings": [],
           "hash": "rvw1:sha256:76c69999c9ca050fa42cc2f602903d2cda75bc92c6453f54420d67a34c7def81",
           "at": "2026-04-18T09:28:08Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
-              "severity": "P1",
-              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
-              "line": 155,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
-          "at": "2026-04-18T05:48:56Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
-          "at": "2026-04-18T09:08:16Z"
+          "hash": "rvw1:sha256:7cb8bad3f963dbb92c54d32b7550c1bec85b3d9c716e5d1cf81e47d24513a6bc",
+          "at": "2026-04-18T09:34:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
-          "at": "2026-04-18T09:08:54Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan-artifacts` will not match current-track files as written: `<track-id>` is only expanded for `review_operational` and `other_track`, while named `groups` patterns are compiled verbatim. As a result, `track/items/<track-id>/**` will never classify real `track/items/<actual-id>/...` paths into `plan-artifacts`.",
-              "severity": "P1",
-              "file": "track/review-scope.json",
-              "line": 18,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:486a2c4f4fa1645c0c3ed705072e3970c36e842099c3fbf234fd62eeae1d4042",
-          "at": "2026-04-18T05:47:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
-          "at": "2026-04-18T05:57:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
-          "at": "2026-04-18T05:58:01Z"
+          "hash": "rvw1:sha256:7cb8bad3f963dbb92c54d32b7550c1bec85b3d9c716e5d1cf81e47d24513a6bc",
+          "at": "2026-04-18T09:35:47Z"
         }
       ]
     }

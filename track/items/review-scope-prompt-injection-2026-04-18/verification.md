@@ -25,10 +25,11 @@
 
 ### T002: GroupEntry に briefing_file 追加 (infrastructure loader)
 
-- [ ] `GroupEntry` に `briefing_file: Option<String>` フィールドが `#[serde(default)]` 付きで追加されている
-- [ ] 既存 review-scope.json (briefing_file なし) が引き続き load できる (後方互換テスト)
-- [ ] briefing_file 付き JSON が正しく parse され `briefing_file_for_scope` が `Some` を返す
-- [ ] typo フィールド (`briefng_file` 等) が Parse エラーで reject される (deny_unknown_fields regression guard)
+- [x] `GroupEntry` に `briefing_file: Option<String>` フィールドが `#[serde(default)]` 付きで追加されている
+- [x] 既存 review-scope.json (briefing_file なし) が引き続き load できる (後方互換テスト — `test_load_without_briefing_file_is_backward_compatible`)
+- [x] briefing_file 付き JSON が正しく parse され `briefing_file_for_scope` が `Some` を返す (`test_load_with_briefing_file_populates_accessor`)
+- [x] typo フィールド (`briefng_file` 等) が Parse エラーで reject される (deny_unknown_fields regression guard — `test_typo_in_briefing_file_field_is_rejected`)
+- [x] `cargo make ci` 全 green (2150 tests passed, T002 で +3 件追加)
 
 ### T003: briefing composer に scope briefing 参照行 append (cli)
 

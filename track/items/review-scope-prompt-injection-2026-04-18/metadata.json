@@ -121,7 +121,7 @@
   "status": "in_progress",
   "tasks": [
     {
-      "commit_hash": null,
+      "commit_hash": "c4afff6e40e657b88941e4cf4ad8ed08ba0b88d9",
       "description": "Add ScopeEntry struct (crate-private) to libs/domain/src/review_v2/scope_config.rs and change ReviewScopeConfig.scopes type from HashMap<MainScopeName, Vec<GlobMatcher>> to HashMap<MainScopeName, ScopeEntry>. Extend ReviewScopeConfig::new signature to accept entries: Vec<(String, Vec<String>, Option<String>)> where the third element is the optional briefing_file path. In the entries loop, expand <track-id> placeholder in each pattern before compiling the glob (per ADR D3: 'patterns は <track-id> placeholder を既存ルール通り展開する (既存 review_operational と同じ挙動)') — currently the entries loop compiles patterns verbatim without expansion, so this expansion must be added in T001. Rewrite internal references in classify / contains_scope / all_scope_names / is_other_track to go through ScopeEntry.matchers. Add briefing_file_for_scope(&self, scope: &ScopeName) -> Option<&str> accessor on ReviewScopeConfig: ScopeName::Other always returns None per ADR D5; ScopeName::Main(name) returns the scope's briefing_file path if configured. #[derive(Clone)] for ReviewScopeConfig: determined not needed at T001 stage since callers do not clone the config; defer to T003 if clone becomes required for append_scope_briefing_reference integration. Update all ReviewScopeConfig::new call sites to the 3-tuple form: libs/domain/src/review_v2/scope_config.rs (implementation + #[cfg(test)] tests), libs/domain/src/review_v2/tests.rs (13+ invocations), libs/usecase/src/review_v2/tests.rs:155 (cross-layer test that also constructs ReviewScopeConfig directly; must be updated in this task to avoid CI failure when the domain signature changes), and libs/infrastructure/src/review_v2/scope_config_loader.rs:119 (loader call site; passes None as briefing_file placeholder until T002 adds GroupEntry.briefing_file serde field). Unit tests: ScopeEntry with briefing_file Some/None, classify() unchanged behavior with ScopeEntry-backed scopes, briefing_file_for_scope returns the correct path for Main scopes with briefing, None for Main scopes without briefing, and None for Other.",
       "id": "T001",
       "status": "done"
@@ -129,7 +129,7 @@
     {
       "description": "Add briefing_file: Option<String> field to GroupEntry in libs/infrastructure/src/review_v2/scope_config_loader.rs with #[serde(default)] so absence is equivalent to None. Update the entries assembly in load_v2_scope_config to produce (name, entry.patterns, entry.briefing_file) 3-tuples, matching the new ReviewScopeConfig::new signature from T001. Preserve deny_unknown_fields at the ReviewScopeJsonV2 top level and at GroupEntry. Unit tests: (1) loading a review-scope.json with a briefing_file entry produces a ReviewScopeConfig where briefing_file_for_scope returns Some(path) for that scope; (2) loading the existing review-scope.json without briefing_file continues to work (backward compatibility); (3) a typo field like briefng_file in a GroupEntry is rejected with a Parse error (deny_unknown_fields regression guard).",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Add append_scope_briefing_reference(prompt: &mut String, scope: &ScopeName, scope_config: &ReviewScopeConfig) pure function to apps/cli/src/commands/review/codex_local.rs. When scope_config.briefing_file_for_scope(scope) returns Some(path), append a `## Scope-specific severity policy` section to prompt that instructs the reviewer to Read the file at path before selecting findings. The appended format must match the example block in ADR D4 (knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4): heading `## Scope-specific severity policy` + Japanese instruction line + bulleted path reference. When None, the function is a no-op. Solve the ordering problem in run_execute_codex_local where base_prompt is currently built in Step 2 before ReviewScopeConfig is loaded in Step 3 (inside build_review_v2_with_reviewer). Implementation options (pick during implementation): (A) add CodexReviewer::with_scope_briefing(briefing_path) builder and chain after composition; (B) pre-load scope_config via a new helper so base_prompt can be augmented before CodexReviewer::new; (C) have ReviewV2CompositionWithCodex retain scope_config and mutate reviewer post-construction via a builder. Record the chosen approach in verification.md. Unit tests: append_scope_briefing_reference with briefing_file Some appends the expected section; with None prompt is unchanged; with ScopeName::Other prompt is unchanged regardless of config; output format exactly matches the ADR D4 example block.",
@@ -163,5 +163,5 @@
     }
   ],
   "title": "review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設",
-  "updated_at": "2026-04-18T09:04:47Z"
+  "updated_at": "2026-04-18T09:32:15Z"
 }

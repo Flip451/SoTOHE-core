@@ -39,6 +39,15 @@ struct ReviewScopeJsonV2 {
 #[serde(deny_unknown_fields)]
 struct GroupEntry {
     patterns: Vec<String>,
+    /// Optional workspace-relative path to a scope-specific briefing file.
+    ///
+    /// When present, the CLI briefing composer appends a reference line so
+    /// the reviewer fetches the file via its Read tool (ADR 2026-04-18-1354
+    /// §D4). When absent, `#[serde(default)]` resolves it to `None`, which
+    /// preserves backward compatibility with review-scope.json files written
+    /// before this field was introduced.
+    #[serde(default)]
+    briefing_file: Option<String>,
 }
 
 /// Loads `review-scope.json` into a v2 `ReviewScopeConfig`.
@@ -113,8 +122,11 @@ pub fn load_v2_scope_config(
         });
     }
 
-    let entries: Vec<(String, Vec<String>, Option<String>)> =
-        doc.groups.into_iter().map(|(name, entry)| (name, entry.patterns, None)).collect();
+    let entries: Vec<(String, Vec<String>, Option<String>)> = doc
+        .groups
+        .into_iter()
+        .map(|(name, entry)| (name, entry.patterns, entry.briefing_file))
+        .collect();
 
     Ok(ReviewScopeConfig::new(track_id, entries, doc.review_operational, doc.other_track)?)
 }
@@ -329,6 +341,84 @@ mod tests {
         assert!(
             matches!(err, ScopeConfigLoadError::InvalidField { .. }),
             "expected InvalidField when symlink is detected, got: {err}"
+        );
+    }
+
+    // ── T002: GroupEntry.briefing_file serde field ────────────────────
+
+    #[test]
+    fn test_load_with_briefing_file_populates_accessor() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "plan-artifacts": {
+                        "patterns": ["track/items/**"],
+                        "briefing_file": "track/review-prompts/plan-artifacts.md"
+                    }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+
+        let scope = domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("plan-artifacts").unwrap(),
+        );
+        assert_eq!(
+            config.briefing_file_for_scope(&scope),
+            Some("track/review-prompts/plan-artifacts.md")
+        );
+    }
+
+    #[test]
+    fn test_load_without_briefing_file_is_backward_compatible() {
+        // A review-scope.json that predates the briefing_file field must continue to
+        // load; briefing_file_for_scope returns None because #[serde(default)] fills
+        // the missing field with None.
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+
+        let scope = domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("domain").unwrap(),
+        );
+        assert!(config.briefing_file_for_scope(&scope).is_none());
+    }
+
+    #[test]
+    fn test_typo_in_briefing_file_field_is_rejected() {
+        // deny_unknown_fields regression guard: a misspelled field name like
+        // `briefng_file` must not silently be ignored.
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "plan-artifacts": {
+                        "patterns": ["track/items/**"],
+                        "briefng_file": "track/review-prompts/plan-artifacts.md"
+                    }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(err, ScopeConfigLoadError::Parse { .. }),
+            "expected Parse error for unknown field, got: {err}"
         );
     }
 }
