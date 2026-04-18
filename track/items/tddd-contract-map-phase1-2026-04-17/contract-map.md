@@ -33,16 +33,16 @@ flowchart LR
         infrastructure_FsContractMapWriter[FsContractMapWriter]:::secondary_adapter
         infrastructure_LoadAllCataloguesError>LoadAllCataloguesError]
     end
-    domain_CatalogueLoader -->|load_all(track_id)| domain_TrackId
-    domain_CatalogueLoader -->|load_all| domain_CatalogueLoaderError
-    domain_CatalogueLoader -->|load_all| domain_LayerId
-    domain_CatalogueLoader -->|load_all| domain_TypeCatalogueDocument
-    domain_ContractMapWriter -->|write(content)| domain_ContractMapContent
-    domain_ContractMapWriter -->|write(track_id)| domain_TrackId
-    domain_ContractMapWriter -->|write| domain_ContractMapWriterError
+    domain_CatalogueLoader -->|"load_all"| domain_CatalogueLoaderError
+    domain_CatalogueLoader -->|"load_all"| domain_LayerId
+    domain_CatalogueLoader -->|"load_all"| domain_TypeCatalogueDocument
+    domain_CatalogueLoader -->|"load_all(track_id)"| domain_TrackId
+    domain_ContractMapWriter -->|"write"| domain_ContractMapWriterError
+    domain_ContractMapWriter -->|"write(content)"| domain_ContractMapContent
+    domain_ContractMapWriter -->|"write(track_id)"| domain_TrackId
     infrastructure_FsCatalogueLoader -.impl.-> domain_CatalogueLoader
     infrastructure_FsContractMapWriter -.impl.-> domain_ContractMapWriter
-    usecase_RenderContractMap -->|execute(cmd)| usecase_RenderContractMapCommand
-    usecase_RenderContractMap -->|execute| usecase_RenderContractMapError
-    usecase_RenderContractMap -->|execute| usecase_RenderContractMapOutput
+    usecase_RenderContractMap -->|"execute"| usecase_RenderContractMapError
+    usecase_RenderContractMap -->|"execute"| usecase_RenderContractMapOutput
+    usecase_RenderContractMap -->|"execute(cmd)"| usecase_RenderContractMapCommand
 ```

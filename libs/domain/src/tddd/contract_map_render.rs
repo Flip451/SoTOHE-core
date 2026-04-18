@@ -205,11 +205,19 @@ fn node_id(layer: &LayerId, name: &str) -> String {
     format!("{}_{}", sanitize_id(layer.as_ref()), sanitize_id(name))
 }
 
-/// Escape pipe characters in edge labels so mermaid does not treat a `|`
-/// inside a method name as a label terminator. Everything else is left
-/// intact so PascalCase method names render verbatim.
+/// Wrap an edge label in double quotes so mermaid does not misinterpret
+/// shape-delimiter characters (`(`, `)`, `[`, `]`, `{`, `}`) that may
+/// appear inside a method-name or param-name fragment. Double quotes and
+/// pipes inside the label are escaped so the wrapping remains balanced
+/// and the label cannot terminate its own `|...|` scope.
+///
+/// Mermaid treats a label bracketed by `"..."` as a literal string
+/// (see <https://mermaid.js.org/syntax/flowchart.html#styling-a-node>),
+/// so quoting is the safest way to carry `method(arg)` labels introduced
+/// by the Phase 1.5 params-edge extension (ADR 2026-04-17-1528 §D4 (1)).
 fn escape_edge_label(raw: &str) -> String {
-    raw.replace('|', "\\|")
+    let escaped = raw.replace('"', "&quot;").replace('|', "&#124;");
+    format!("\"{escaped}\"")
 }
 
 /// Sanitize a catalogue entry name for safe embedding inside any mermaid
@@ -454,17 +462,17 @@ mod tests {
         // still goes through: assert on DomainError only, which is
         // unambiguous.)
         assert!(
-            text.contains("domain_UserRepository -->|save| domain_DomainError"),
+            text.contains("domain_UserRepository -->|\"save\"| domain_DomainError"),
             "method edge to DomainError must appear; output was:\n{text}"
         );
         // `RegisterUser.execute() -> Result<User, DomainError>` spans
         // usecase → domain.
         assert!(
-            text.contains("usecase_RegisterUser -->|execute| domain_User"),
+            text.contains("usecase_RegisterUser -->|\"execute\"| domain_User"),
             "cross-layer method edge to User must appear; output was:\n{text}"
         );
         assert!(
-            text.contains("usecase_RegisterUser -->|execute| domain_DomainError"),
+            text.contains("usecase_RegisterUser -->|\"execute\"| domain_DomainError"),
             "cross-layer method edge to DomainError must appear"
         );
     }
@@ -588,7 +596,7 @@ mod tests {
         let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
         let text = content.as_ref();
         assert!(
-            text.contains("domain_UserRepository -->|save(user)| domain_User"),
+            text.contains("domain_UserRepository -->|\"save(user)\"| domain_User"),
             "param edge to User must appear; output was:\n{text}"
         );
     }
@@ -623,7 +631,7 @@ mod tests {
         let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
         let text = content.as_ref();
         assert!(
-            text.contains("usecase_Greeter -->|execute(subject)| domain_Subject"),
+            text.contains("usecase_Greeter -->|\"execute(subject)\"| domain_Subject"),
             "cross-layer param edge to Subject must appear; output was:\n{text}"
         );
     }
@@ -685,16 +693,46 @@ mod tests {
             &ContractMapRenderOptions::empty(),
         );
         let text = content.as_ref();
-        // Present: exact `configure(settings)` label.
+        // Present: exact `configure(settings)` label, wrapped in the
+        // double-quote fence that isolates shape-delimiter characters
+        // from mermaid's flowchart parser.
         assert!(
-            text.contains("domain_App -->|configure(settings)| domain_Settings"),
-            "label must be 'configure(settings)'; output was:\n{text}"
+            text.contains("domain_App -->|\"configure(settings)\"| domain_Settings"),
+            "label must be quoted 'configure(settings)'; output was:\n{text}"
         );
         // Absent: bare `configure` (would indicate edge was keyed from
         // returns, not params).
         assert!(
-            !text.contains("domain_App -->|configure| domain_Settings"),
+            !text.contains("domain_App -->|\"configure\"| domain_Settings"),
             "bare label must not appear for params-only edge; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_quotes_labels_for_mermaid_safety() {
+        // Regression: before this fix, a `method(arg)` label leaked
+        // literal parentheses into the `|...|` label scope, and mermaid
+        // interpreted `(` as a node-shape opener, breaking rendering.
+        // After the fix, every method edge label is wrapped in `"..."`
+        // so shape delimiters never escape into the flowchart grammar.
+        let (catalogues, order) = simple_3layer_catalogues();
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        // The raw unescaped form must NOT appear anywhere (parse error).
+        assert!(
+            !text.contains("-->|save(user)|"),
+            "unquoted `|save(user)|` must not appear (breaks mermaid); output was:\n{text}"
+        );
+        // The quoted form MUST appear for param edges.
+        assert!(
+            text.contains("-->|\"save(user)\"|"),
+            "quoted `|\"save(user)\"|` must appear; output was:\n{text}"
+        );
+        // Returns-only edges are also quoted, keeping the emission rule
+        // uniform across both code paths.
+        assert!(
+            text.contains("-->|\"save\"|"),
+            "quoted `|\"save\"|` must appear for returns edges; output was:\n{text}"
         );
     }
 }
