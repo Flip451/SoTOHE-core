@@ -234,11 +234,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "1b99e87fc7eb052f8577a1656289138a94806984",
       "description": "Phase 1.5 finalization: regenerate contract-map.md via `sotp track contract-map tddd-contract-map-phase1-2026-04-17` and verify the new params-derived edges appear. Update track/items/tddd-contract-map-phase1-2026-04-17/verification.md with a Phase 1.5 section covering T008-T010 (scope, verified items, dogfooding results). Update the Contract Map dogfooding subsection of verification.md with the post-Phase-1.5 node/edge counts. Confirm domain-types.json signals are all Blue after T008+T009 implementation (nutype removal makes the 6 ids discoverable by schema_export). Run `cargo make ci` and confirm no regressions. Also re-confirm sotp track signals shows spec items all Blue (strict merge gate re-verification after regeneration).",
       "id": "T010",
       "status": "done"
     }
   ],
   "title": "TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view",
-  "updated_at": "2026-04-18T02:20:59Z"
+  "updated_at": "2026-04-18T02:30:36Z"
 }
