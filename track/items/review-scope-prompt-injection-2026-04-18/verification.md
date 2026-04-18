@@ -11,14 +11,17 @@
 
 ### T001: ScopeEntry 追加 + ReviewScopeConfig 内部変更 (domain)
 
-- [ ] `libs/domain/src/review_v2/scope_config.rs` に `ScopeEntry` struct (crate-private) が追加されている
-- [ ] `ReviewScopeConfig.scopes` の型が `HashMap<MainScopeName, ScopeEntry>` に変更されている
-- [ ] `ReviewScopeConfig::new` シグネチャが `entries: Vec<(String, Vec<String>, Option<String>)>` に拡張されている
-- [ ] `ReviewScopeConfig::new` の entries loop で各 pattern に `expand_track_id` が適用されている (group pattern の `<track-id>` placeholder が current track に展開される — ADR D3 の既存ルール準拠、pre-T001 の limitation を解消)
-- [ ] `briefing_file_for_scope(&self, scope: &ScopeName) -> Option<&str>` アクセサが追加され、`ScopeName::Other` で必ず `None` を返す
-- [ ] `classify` / `contains_scope` / `all_scope_names` の既存 unit tests が全 pass
-- [ ] group pattern `track/items/<track-id>/**` が current track の spec.md にマッチする unit test を追加 (placeholder 展開の regression guard)
-- [ ] `libs/usecase/src/review_v2/tests.rs:155` の `ReviewScopeConfig::new` 呼び出しを 3-tuple 形に更新済み (cross-layer call site — 見落とすと CI が break する)
+- [x] `libs/domain/src/review_v2/scope_config.rs` に `ScopeEntry` struct (crate-private) が追加されている
+- [x] `ReviewScopeConfig.scopes` の型が `HashMap<MainScopeName, ScopeEntry>` に変更されている
+- [x] `ReviewScopeConfig::new` シグネチャが `entries: Vec<(String, Vec<String>, Option<String>)>` に拡張されている
+- [x] `ReviewScopeConfig::new` の entries loop で各 pattern に `expand_track_id` が適用されている (group pattern の `<track-id>` placeholder が current track に展開される — ADR D3 の既存ルール準拠、pre-T001 の limitation を解消)
+- [x] `briefing_file_for_scope(&self, scope: &ScopeName) -> Option<&str>` アクセサが追加され、`ScopeName::Other` で必ず `None` を返す
+- [x] `classify` / `contains_scope` / `all_scope_names` の既存 unit tests が全 pass
+- [x] group pattern `track/items/<track-id>/**` が current track の spec.md にマッチする unit test を追加 (placeholder 展開の regression guard — `test_scope_config_group_pattern_expands_track_id_placeholder`)
+- [x] `libs/usecase/src/review_v2/tests.rs:155` の `ReviewScopeConfig::new` 呼び出しを 3-tuple 形に更新済み (cross-layer call site — 見落とすと CI が break する)
+- [x] `libs/infrastructure/src/review_v2/scope_config_loader.rs:119` の `ReviewScopeConfig::new` 呼び出しを 3-tuple 形に更新済み (loader 呼び出し側は briefing_file に暫定 `None` を渡す。T002 で `GroupEntry.briefing_file` の serde field を追加して実値を流す)
+- [x] `ReviewScopeConfig` への `#[derive(Clone)]` 追加: T001 時点で `compose_v2.rs` の呼び出し側が `scope_config` を clone しないため不要と判断し追加しなかった。T003 で `append_scope_briefing_reference` を実装する際に clone が必要になれば追加する (Open Q-IMPL-02 の T001 段階での解答)
+- [x] `cargo make ci` 全 green (T001 の変更のみ、2147 tests passed — T002-T008 未実装時点の中間 CI。全タスク完了後の最終 CI は T008 で確認する)
 
 ### T002: GroupEntry に briefing_file 追加 (infrastructure loader)
 
@@ -90,15 +93,15 @@
 
 ## Result
 
-_TBD — all tasks complete_
+_TBD — will be recorded after T008 dogfooding succeeds_
 
 ## Open Issues
 
 - **Open Q-IMPL-01**: `CodexReviewer::base_prompt` は private。注入方法の最終選択 (A/B/C) は T003 実装時に決定し、本ファイル Implementation Notes に記録する
-- **Open Q-IMPL-02**: `ReviewScopeConfig` の `Clone` derive 追加の是非は T001 / T003 実装時に決定する (`GlobMatcher` が Clone 可能なことは globset crate で確認済み)
+- **Open Q-IMPL-02**: `ReviewScopeConfig` の `Clone` derive 追加の是非は T001 / T003 実装時に決定する (`GlobMatcher` が Clone 可能なことは globset crate で確認済み)。T001 完了時点では `#[derive(Clone)]` は未追加。呼び出し側 (`compose_v2.rs`) で `scope_config` を clone していないため T001 時点では不要と判断した。T003 で `append_scope_briefing_reference` を実装する際に Clone が必要になれば追加する
 - **副作用**: 既存 track の `review.json` で `other` scope hash が plan-artifacts 追加後 StaleHash となる (正常挙動、新 scope 境界の再計算)
 - **commit 分類**: 本 track の commit は `track/review-scope.json` 変更により `harness-policy` scope と、`track/items/` / `knowledge/adr/` / `knowledge/research/` 変更により `plan-artifacts` scope で review される (bootstrap 適用済み)
-- **Bootstrap 状態**: T001 未実装 (loader が group pattern で `<track-id>` を展開しない) の制約下で現在の plan-artifacts patterns は `["track/items/**", "knowledge/adr/**", "knowledge/research/**"]` (literal `**`) を使用している。T006 で T001 完了後に `track/items/<track-id>/**` へ切り替える前提
+- **Bootstrap 状態**: T001 完了済み (loader が group pattern で `<track-id>` を展開する `expand_track_id` 追加済み)。現在の plan-artifacts patterns は `["track/items/**", "knowledge/adr/**", "knowledge/research/**"]` (literal `**`) を使用している。T006 で `track/items/<track-id>/**` へ切り替える前提
 
 ## Verified At
 

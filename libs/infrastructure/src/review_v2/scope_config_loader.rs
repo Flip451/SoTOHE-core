@@ -113,8 +113,8 @@ pub fn load_v2_scope_config(
         });
     }
 
-    let entries: Vec<(String, Vec<String>)> =
-        doc.groups.into_iter().map(|(name, entry)| (name, entry.patterns)).collect();
+    let entries: Vec<(String, Vec<String>, Option<String>)> =
+        doc.groups.into_iter().map(|(name, entry)| (name, entry.patterns, None)).collect();
 
     Ok(ReviewScopeConfig::new(track_id, entries, doc.review_operational, doc.other_track)?)
 }

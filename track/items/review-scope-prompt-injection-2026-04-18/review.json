@@ -1,55 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "domain": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan-artifacts` will not match current-track files as written: `<track-id>` is only expanded for `review_operational` and `other_track`, while named `groups` patterns are compiled verbatim. As a result, `track/items/<track-id>/**` will never classify real `track/items/<actual-id>/...` paths into `plan-artifacts`.",
-              "severity": "P1",
-              "file": "track/review-scope.json",
-              "line": 18,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:486a2c4f4fa1645c0c3ed705072e3970c36e842099c3fbf234fd62eeae1d4042",
-          "at": "2026-04-18T05:47:51Z"
-        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
-          "at": "2026-04-18T05:57:20Z"
+          "hash": "rvw1:sha256:edca1c26b75ea8e66d5b4b126e7ebae64421e583f00462c9cf3baed63923180f",
+          "at": "2026-04-18T09:10:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
-          "at": "2026-04-18T05:58:01Z"
+          "hash": "rvw1:sha256:edca1c26b75ea8e66d5b4b126e7ebae64421e583f00462c9cf3baed63923180f",
+          "at": "2026-04-18T09:11:05Z"
         }
       ]
     },
-    "other": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
-              "severity": "P1",
-              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
-              "line": 155,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
-          "at": "2026-04-18T05:48:56Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f36266551afee9b1b6f8e0f17397e9d486a379a5890d8e877626f594f21a8e9d",
+          "at": "2026-04-18T09:08:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f36266551afee9b1b6f8e0f17397e9d486a379a5890d8e877626f594f21a8e9d",
+          "at": "2026-04-18T09:09:02Z"
         }
       ]
     },
@@ -570,6 +554,194 @@
           "findings": [],
           "hash": "rvw1:sha256:1f5e541154c8685101a26906ca438d93d21a5d7b388a35aee255f7a7e8163687",
           "at": "2026-04-18T08:39:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This bootstrap note is stale: it says T001 is still unimplemented and that plan-artifacts is using the literal `track/items/**` fallback, but T001 is already marked done above in this file and in metadata.json. Either the note needs to be rewritten for the post-T001 state or the T001 completion mark is wrong.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 103,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:19823330d1f784ee6c6d57a90c03502b73f12916ff604ba5d0eee8d6d1d7ad1e",
+          "at": "2026-04-18T09:09:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Result block says \"all tasks complete\", but this file still has T002-T008 marked todo, and the bootstrap note below still says T001 is unimplemented. The verification state is internally inconsistent with the checked T001 status above.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 95,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:19823330d1f784ee6c6d57a90c03502b73f12916ff604ba5d0eee8d6d1d7ad1e",
+          "at": "2026-04-18T09:11:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e209169844b6dd500e845b31a5f7cdf6d9476c94d67e6c4519fbb65aafba8c73",
+          "at": "2026-04-18T09:13:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked `done`, but this edit removes `commit_hash` from the task records instead of leaving `\"commit_hash\": null` until `/track:commit` backfills it. That contradicts this review scope's stated intent for the T001 transition and the documented metadata task shape (`{id, description, status, commit_hash}`), so the artifact no longer reflects the intended done-pending state accurately.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 123,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e209169844b6dd500e845b31a5f7cdf6d9476c94d67e6c4519fbb65aafba8c73",
+          "at": "2026-04-18T09:15:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked `done`, but its own task text still includes adding `#[derive(Clone)]` to `ReviewScopeConfig`, and that work is neither implemented nor closed out elsewhere: `libs/domain/src/review_v2/scope_config.rs` still has only `#[derive(Debug)]`, while `verification.md` still leaves Open Q-IMPL-02 unresolved. Either the task description needs to drop the Clone requirement, or T001 should not be recorded as complete yet.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 127,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5d602706e34a4869853b2eac6298ac78b5705be5f26b12a65ef0c428fa5527bd",
+          "at": "2026-04-18T09:20:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked done, but the new Open Q-IMPL-02 note says the `#[derive(Clone)]` work item from T001 was intentionally left undone and may be deferred to T003. That leaves the plan artifacts inconsistent: `metadata.json`/`plan.md` still define the derive as part of T001, while `verification.md` treats it as unresolved.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 100,
+              "category": "contradiction"
+            },
+            {
+              "message": "`verification.md` now says `cargo make ci` is already fully green in the checked T001 list, but the identical CI gate under T008 remains unchecked. The document currently gives two conflicting answers about whether CI has been verified yet.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 23,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d056230dbcc0eb56c083a55dfb025acaa8cd77f0b1a82aab0e48c0bfa442a1a",
+          "at": "2026-04-18T09:23:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is now marked `done`, but the task definition in `metadata.json`/`plan.md` still requires adding `#[derive(Clone)]` to `ReviewScopeConfig` when it is not already present, while `verification.md` explicitly records that this derive was *not* added and may be deferred to T003. That leaves the completion state internally contradictory: either the T001 requirement needs to be removed/narrowed, or T001 should not be recorded as done yet.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 23,
+              "category": "contradiction"
+            },
+            {
+              "message": "The T001 task text says to update \"all `ReviewScopeConfig::new` call sites\" and enumerates only three files, but `verification.md` now records an additional required call site in `libs/infrastructure/src/review_v2/scope_config_loader.rs:119`. Because the SSoT task description omits a real call site, the generated plan still contains a factual error about the work required for T001.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 125,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ef7a04860c5ef0f3ee6b1582970feec960fde2b4d02a3e30066034734d9449a2",
+          "at": "2026-04-18T09:25:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c69999c9ca050fa42cc2f602903d2cda75bc92c6453f54420d67a34c7def81",
+          "at": "2026-04-18T09:28:08Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
+          "at": "2026-04-18T05:48:56Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
+          "at": "2026-04-18T09:08:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
+          "at": "2026-04-18T09:08:54Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan-artifacts` will not match current-track files as written: `<track-id>` is only expanded for `review_operational` and `other_track`, while named `groups` patterns are compiled verbatim. As a result, `track/items/<track-id>/**` will never classify real `track/items/<actual-id>/...` paths into `plan-artifacts`.",
+              "severity": "P1",
+              "file": "track/review-scope.json",
+              "line": 18,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:486a2c4f4fa1645c0c3ed705072e3970c36e842099c3fbf234fd62eeae1d4042",
+          "at": "2026-04-18T05:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
+          "at": "2026-04-18T05:57:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8528a0ecc1a4c91ddb9b204793388fa01950b8e9c56ee886e7eafabb5482ee4e",
+          "at": "2026-04-18T05:58:01Z"
         }
       ]
     }
