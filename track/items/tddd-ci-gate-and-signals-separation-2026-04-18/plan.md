@@ -24,7 +24,7 @@ TdddLayerBinding に signal_file() accessor を追加する (T003)。
 本 section の時点では宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (Migration §2 の二重書き出し過渡期)。
 書き込み前に既存 `reject_symlinks_below` を適用する。
 
-- [x] cli: `sotp track type-signals` (apps/cli/src/commands/track/tddd/signals.rs) を更新し、評価結果を `<layer>-type-signals.json` にも書き出す。本タスクでは宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (二重書き出し過渡期、Migration §2)。書き込み前に `reject_symlinks_below` を適用。+ unit tests。
+- [x] cli: `sotp track type-signals` (apps/cli/src/commands/track/tddd/signals.rs) を更新し、評価結果を `<layer>-type-signals.json` にも書き出す。本タスクでは宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (二重書き出し過渡期、Migration §2)。書き込み前に `reject_symlinks_below` を適用。+ unit tests。 3ec1c25d99b41595156756568dfacf8dd8e29007
 
 ## CI / merge gate の stale 検出
 
@@ -32,7 +32,7 @@ TdddLayerBinding に signal_file() accessor を追加する (T003)。
 stale と Missing は両経路で fail-closed error。評価結果ファイル読取にも既存 symlink guard を適用する。
 `track/review-scope.json` の `review_operational` に `*-type-signals.json` を追加し、評価結果ファイル変更が review code_hash を変動させないようにする (T006)。
 
-- [ ] infrastructure: `evaluate_layer_catalogue` (libs/infrastructure/src/verify/spec_states.rs) を更新し、`<layer>-type-signals.json` を読んで declaration_hash を現在の宣言ファイル hash と比較する。stale (不一致) と Missing (ファイル不在) を両方とも CI / merge gate で常に `VerifyFinding::error` とする (fail-closed、経路間で対称)。評価結果ファイル読取パスにも既存 `reject_symlinks_below` を適用。+ unit tests (stale / Missing / symlink / decode error 各ケース)。
+- [x] infrastructure: `evaluate_layer_catalogue` (libs/infrastructure/src/verify/spec_states.rs) を更新し、`<layer>-type-signals.json` を読んで declaration_hash を現在の宣言ファイル hash と比較する。stale (不一致) と Missing (ファイル不在) を両方とも CI / merge gate で常に `VerifyFinding::error` とする (fail-closed、経路間で対称)。評価結果ファイル読取パスにも既存 `reject_symlinks_below` を適用。+ unit tests (stale / Missing / symlink / decode error 各ケース)。
 - [ ] harness: `track/review-scope.json` の `review_operational` に `track/items/<track-id>/*-type-signals.json` を追加。評価結果ファイルのみ変更した commit が `SystemReviewHasher` の `code_hash` を変動させないことを確認する回帰テスト相当 (既存 review scope test の拡張)。
 
 ## 切替 (同一 commit) + 本 track 自己 migration

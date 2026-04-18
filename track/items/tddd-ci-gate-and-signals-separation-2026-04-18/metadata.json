@@ -97,6 +97,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "3ec1c25d99b41595156756568dfacf8dd8e29007",
       "description": "cli: `sotp track type-signals` (apps/cli/src/commands/track/tddd/signals.rs) を更新し、評価結果を `<layer>-type-signals.json` にも書き出す。本タスクでは宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (二重書き出し過渡期、Migration §2)。書き込み前に `reject_symlinks_below` を適用。+ unit tests。",
       "id": "T004",
       "status": "done"
@@ -104,7 +105,7 @@
     {
       "description": "infrastructure: `evaluate_layer_catalogue` (libs/infrastructure/src/verify/spec_states.rs) を更新し、`<layer>-type-signals.json` を読んで declaration_hash を現在の宣言ファイル hash と比較する。stale (不一致) と Missing (ファイル不在) を両方とも CI / merge gate で常に `VerifyFinding::error` とする (fail-closed、経路間で対称)。評価結果ファイル読取パスにも既存 `reject_symlinks_below` を適用。+ unit tests (stale / Missing / symlink / decode error 各ケース)。",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "harness: `track/review-scope.json` の `review_operational` に `track/items/<track-id>/*-type-signals.json` を追加。評価結果ファイルのみ変更した commit が `SystemReviewHasher` の `code_hash` を変動させないことを確認する回帰テスト相当 (既存 review scope test の拡張)。",
@@ -128,5 +129,5 @@
     }
   ],
   "title": "TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離",
-  "updated_at": "2026-04-18T19:05:03Z"
+  "updated_at": "2026-04-18T19:21:32Z"
 }

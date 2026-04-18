@@ -10,7 +10,7 @@ use domain::check_type_signals;
 use domain::spec::check_spec_doc_signals;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
-use crate::tddd::catalogue_codec;
+use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::track::symlink_guard;
 
 use super::frontmatter::parse_yaml_frontmatter;
@@ -207,8 +207,11 @@ fn evaluate_layer_catalogue(
         }
     }
 
-    let json = match std::fs::read_to_string(&catalogue_path) {
-        Ok(s) => s,
+    // Read declaration bytes once. `declaration_hash` (below) is pinned to the
+    // post-encode on-disk bytes per ADR 2026-04-18-1400 §D5, so the `[u8]` view
+    // feeding the SHA-256 digest must be exactly what went to disk.
+    let declaration_bytes = match std::fs::read(&catalogue_path) {
+        Ok(b) => b,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
@@ -216,8 +219,16 @@ fn evaluate_layer_catalogue(
             ))]);
         }
     };
-
-    let doc = match catalogue_codec::decode(&json) {
+    let catalogue_str = match std::str::from_utf8(&declaration_bytes) {
+        Ok(s) => s,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "{}: invalid UTF-8: {e}",
+                catalogue_path.display()
+            ))]);
+        }
+    };
+    let mut doc = match catalogue_codec::decode(catalogue_str) {
         Ok(d) => d,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -227,6 +238,67 @@ fn evaluate_layer_catalogue(
             ))]);
         }
     };
+
+    // ADR §D5 + §D7: evaluate the per-layer signal file
+    // (`<layer>-type-signals.json`). Missing / stale / symlink / decode error
+    // all produce fail-closed `VerifyFinding::error` symmetric across CI and
+    // merge gate paths (the `strict` flag does NOT relax these cases).
+    let signal_file_name = binding.signal_file();
+    let signal_path = dir.join(&signal_file_name);
+    match symlink_guard::reject_symlinks_below(&signal_path, trusted_root) {
+        Ok(true) => {
+            // Signal file present and not a symlink — decode, compare hash,
+            // and plumb the signals into the declaration document so that
+            // `check_type_signals` evaluates against the externally-stored
+            // evaluation result rather than any legacy inline signals.
+            let signal_str = match std::fs::read_to_string(&signal_path) {
+                Ok(s) => s,
+                Err(e) => {
+                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "cannot read {}: {e}",
+                        signal_path.display()
+                    ))]);
+                }
+            };
+            let signals_doc = match type_signals_codec::decode(&signal_str) {
+                Ok(d) => d,
+                Err(e) => {
+                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "{}: invalid {}: {e}",
+                        signal_path.display(),
+                        signal_file_name
+                    ))]);
+                }
+            };
+            let current_hash = type_signals_codec::declaration_hash(&declaration_bytes);
+            if signals_doc.declaration_hash() != current_hash {
+                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "{}: declaration_hash mismatch (recorded={}, current={}) — \
+                     re-run `sotp track type-signals` to refresh the evaluation result",
+                    signal_path.display(),
+                    signals_doc.declaration_hash(),
+                    current_hash
+                ))]);
+            }
+            doc.set_signals(signals_doc.signals().to_vec());
+        }
+        Ok(false) => {
+            // Signal file is genuinely absent. ADR §D5: fail-closed symmetric
+            // across CI (strict=false) and merge gate (strict=true) — the
+            // `strict` flag does NOT relax this case. The catalogue has
+            // declared types but no evaluation has been persisted.
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "{} not found — run `sotp track type-signals` to generate the evaluation result",
+                signal_path.display()
+            ))]);
+        }
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "{}: {e}",
+                signal_path.display()
+            ))]);
+        }
+    }
 
     check_type_signals(&doc, strict, binding.catalogue_file())
 }
@@ -428,6 +500,27 @@ mod tests {
         let path = dir.path().join("spec.md");
         std::fs::write(&path, content).unwrap();
         (dir, path)
+    }
+
+    // Helper: write a `<layer>-type-signals.json` (schema_version 1) whose
+    // `declaration_hash` matches the on-disk bytes of the companion
+    // `<layer>-types.json` file. The `signals` field is copied from whatever
+    // the declaration file decodes to (empty when the declaration has no
+    // inline signals). Used by Stage 2 tests that exercise the ADR
+    // 2026-04-18-1400 §D5 signal-file path.
+    fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
+        let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
+        let decl_str = std::str::from_utf8(&decl_bytes).unwrap();
+        let doc = crate::tddd::catalogue_codec::decode(decl_str).unwrap();
+        let signals = doc.signals().map(<[domain::TypeSignal]>::to_vec).unwrap_or_default();
+        let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let signals_doc = domain::TypeSignalsDocument::new(
+            domain::Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
+            hash,
+            signals,
+        );
+        let encoded = crate::tddd::type_signals_codec::encode(&signals_doc).unwrap();
+        std::fs::write(track_dir.join(signal_name), encoded).unwrap();
     }
 
     // --- 1. No Domain States section ---
@@ -686,6 +779,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(
             !outcome.has_errors(),
@@ -752,6 +846,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(!outcome.has_errors(), "all-blue signals should pass: {outcome:?}");
     }
@@ -774,6 +869,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(
             !outcome.has_errors(),
@@ -789,6 +885,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
         assert!(
             outcome.has_errors(),
@@ -806,6 +903,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(
             !outcome.has_errors(),
@@ -821,6 +919,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
         assert!(
             outcome.has_errors(),
@@ -850,6 +949,7 @@ mod tests {
             DOMAIN_TYPES_WITH_UNDECLARED_RED_SIGNAL,
         )
         .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(
             outcome.has_errors(),
@@ -864,6 +964,7 @@ mod tests {
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
     }
@@ -911,6 +1012,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         // Write the catalogue under the override name with a Red signal so Stage 2 fails.
         std::fs::write(dir.path().join("custom-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
+        write_matching_signal_file(dir.path(), "custom-types.json", "custom-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
         assert!(
@@ -929,6 +1031,7 @@ mod tests {
         std::fs::write(dir.path().join("spec.json"), SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         // Write spec.md without ## Domain States (would fail under legacy path)
         std::fs::write(
             dir.path().join("spec.md"),
@@ -1008,6 +1111,13 @@ mod tests {
         std::fs::write(&dt_target, DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS).unwrap();
         let dt_link = dir.path().join("domain-types.json");
         std::os::unix::fs::symlink(&dt_target, &dt_link).unwrap();
+        // Write a matching signal file so the symlink rejection on the declaration
+        // file is the only reason the test fails (isolates the S3 guard under test).
+        write_matching_signal_file(
+            dir.path(),
+            "real-domain-types.json",
+            "domain-type-signals.json",
+        );
 
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(outcome.has_errors(), "symlink domain-types.json must be rejected: {outcome:?}");
@@ -1022,7 +1132,222 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(!outcome.has_errors(), "regular files must pass: {outcome:?}");
+    }
+
+    // --- ADR 2026-04-18-1400 §D5 signal-file evaluation ---
+
+    #[test]
+    fn test_signal_file_missing_returns_error_in_interim_mode() {
+        // Missing signal file is fail-closed in the CI interim path per ADR §D5.
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        // Declaration file present, signal file intentionally absent.
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        assert!(outcome.has_errors(), "missing signal file must be fail-closed: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("domain-type-signals.json")
+                && f.message().contains("not found")),
+            "finding must name the missing signal file: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_signal_file_missing_returns_error_in_strict_mode() {
+        // Symmetric with the interim case: missing signal file is error in both
+        // CI and merge gate (strict=true) paths per ADR §D5.
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
+        assert!(outcome.has_errors(), "missing signal file must block merge gate: {outcome:?}");
+    }
+
+    const DOMAIN_TYPE_SIGNALS_STALE_HASH: &str = r#"{
+  "schema_version": 1,
+  "generated_at": "2026-04-18T12:00:00Z",
+  "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "signals": [
+    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
+  ]
+}"#;
+
+    #[test]
+    fn test_signal_file_stale_hash_returns_error_in_interim_mode() {
+        // Stale (declaration_hash mismatch) is fail-closed in CI per ADR §D5,
+        // symmetric with the merge gate. The `strict` flag does NOT relax it.
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        std::fs::write(dir.path().join("domain-type-signals.json"), DOMAIN_TYPE_SIGNALS_STALE_HASH)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        assert!(outcome.has_errors(), "stale signal file must be fail-closed: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("declaration_hash mismatch")),
+            "finding must mention declaration_hash mismatch: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_signal_file_stale_hash_returns_error_in_strict_mode() {
+        // Symmetric: stale is error in both CI (strict=false) and merge gate
+        // (strict=true) per ADR §D5.
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        std::fs::write(dir.path().join("domain-type-signals.json"), DOMAIN_TYPE_SIGNALS_STALE_HASH)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
+        assert!(outcome.has_errors(), "stale signal file must block merge gate: {outcome:?}");
+    }
+
+    #[test]
+    fn test_signal_file_decode_error_returns_error() {
+        // Malformed signal file JSON is fail-closed per ADR §D7 decode-error row.
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        std::fs::write(dir.path().join("domain-type-signals.json"), "{not valid json").unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        assert!(outcome.has_errors(), "decode error must be fail-closed: {outcome:?}");
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("invalid domain-type-signals.json")),
+            "finding must mention invalid signal file: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_signal_file_wrong_schema_version_returns_error() {
+        // schema_version != 1 hits the codec's UnsupportedSchemaVersion branch,
+        // which bubbles up as a decode error from evaluate_layer_catalogue.
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        let future_schema = r#"{
+          "schema_version": 2,
+          "generated_at": "2026-04-18T12:00:00Z",
+          "declaration_hash": "0000",
+          "signals": []
+        }"#;
+        std::fs::write(dir.path().join("domain-type-signals.json"), future_schema).unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        assert!(outcome.has_errors(), "unknown schema_version must be fail-closed: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_signal_file_symlink_returns_error() {
+        // Symlink at the signal-file path is fail-closed per ADR §D7. Uses the
+        // existing `reject_symlinks_below` guard (no new symlink detection code).
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+
+        // Signal file content exists at a real path but `domain-type-signals.json`
+        // is a symlink to it — the guard rejects the symlink regardless of
+        // target validity.
+        let real = dir.path().join("real-signals.json");
+        write_matching_signal_file(dir.path(), "domain-types.json", "real-signals.json");
+        // `write_matching_signal_file` wrote to `real` via the above call; now
+        // replace the plain path with a symlink pointing at it.
+        std::fs::remove_file(dir.path().join("domain-type-signals.json")).ok();
+        std::os::unix::fs::symlink(&real, dir.path().join("domain-type-signals.json")).unwrap();
+
+        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        assert!(outcome.has_errors(), "symlink signal file must be rejected: {outcome:?}");
+    }
+
+    #[test]
+    fn test_signal_file_matching_hash_and_all_blue_passes_in_both_modes() {
+        // Control: a fresh signal file with matching hash + all Blue signals
+        // passes both CI (strict=false) and merge gate (strict=true) paths.
+        for strict in [false, true] {
+            let dir = tempfile::tempdir().unwrap();
+            write_minimal_arch_rules(dir.path());
+            let spec_json_path = dir.path().join("spec.json");
+            std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+            std::fs::write(
+                dir.path().join("domain-types.json"),
+                DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS,
+            )
+            .unwrap();
+            write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
+            let outcome = verify_from_spec_json(&spec_json_path, strict, dir.path());
+            assert!(
+                !outcome.has_errors(),
+                "matching signal file with Blue entries must pass (strict={strict}): {outcome:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_signal_file_overrides_inline_declaration_signals() {
+        // When the signal file carries Blue signals but the declaration file
+        // has stale Red inline signals, the evaluation result reflects the
+        // signal file (Blue → pass). This proves the signal file is the
+        // authoritative evaluation source (ADR §D1: authored declaration vs
+        // generated evaluation result).
+        let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+
+        // Declaration file has inline Red signals for legacy compatibility.
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
+
+        // Signal file overrides with a Blue signal for the same entry at the
+        // current declaration hash.
+        let decl_bytes = std::fs::read(dir.path().join("domain-types.json")).unwrap();
+        let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let blue_signal_file = format!(
+            r#"{{
+              "schema_version": 1,
+              "generated_at": "2026-04-18T12:00:00Z",
+              "declaration_hash": "{hash}",
+              "signals": [
+                {{
+                  "type_name": "TrackId",
+                  "kind_tag": "value_object",
+                  "signal": "blue",
+                  "found_type": true
+                }}
+              ]
+            }}"#
+        );
+        std::fs::write(dir.path().join("domain-type-signals.json"), blue_signal_file).unwrap();
+
+        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        assert!(
+            !outcome.has_errors(),
+            "signal file (Blue) must override inline declaration signals (Red): {outcome:?}"
+        );
     }
 }

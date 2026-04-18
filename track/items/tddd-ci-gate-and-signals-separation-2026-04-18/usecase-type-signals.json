@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-18T19:21:04Z",
+  "declaration_hash": "9862ee6d78effafc8a33ee6c5a810f89307eaf877b178f135a1010e9df3857ee",
+  "signals": [
+    {
+      "type_name": "BlobFetchResult",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FetchError",
+        "Found",
+        "NotFound"
+      ]
+    }
+  ]
+}
