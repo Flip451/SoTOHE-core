@@ -177,7 +177,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "9a69df07bd5d98adb3c8d9de935e9527010e9758",
@@ -228,6 +228,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "12425f0c6f41e9a658140ddafa1f570a78525bd3",
       "description": "Extend ADR 2026-04-17-1528 §D4 (1) from 'method-call edge via returns only' to 'returns + params'. Update libs/domain/src/tddd/contract_map_render.rs so the method-edge loop iterates method.params() in addition to method.returns(), extracting parameter type names via the domain-local extract_type_names and emitting A -->|method(arg_name)| B edges when the param ty matches a declared type in the type_index. Declare the 6 plain-struct ids from T008 in domain-types.json with action=reference (TrackId, TaskId, CommitHash, TrackBranch, NonEmptyString, ReviewGroupName). Add render unit tests covering: param edges within a layer, param edges crossing layers, params referencing declared types only (no edges to external types), and label formatting A -->|method(arg)| B. The expected new edges include CatalogueLoader -->|load_all(track_id)| TrackId, ContractMapWriter -->|write(content)| ContractMapContent, RenderContractMap -->|execute(cmd)| RenderContractMapCommand. At T009 completion, run sotp track type-signals to confirm the 6 ids are all Blue (found_type=true), and run sotp track signals to confirm all spec items remain Blue (strict merge gate).",
       "id": "T009",
       "status": "done"
@@ -235,9 +236,9 @@
     {
       "description": "Phase 1.5 finalization: regenerate contract-map.md via `sotp track contract-map tddd-contract-map-phase1-2026-04-17` and verify the new params-derived edges appear. Update track/items/tddd-contract-map-phase1-2026-04-17/verification.md with a Phase 1.5 section covering T008-T010 (scope, verified items, dogfooding results). Update the Contract Map dogfooding subsection of verification.md with the post-Phase-1.5 node/edge counts. Confirm domain-types.json signals are all Blue after T008+T009 implementation (nutype removal makes the 6 ids discoverable by schema_export). Run `cargo make ci` and confirm no regressions. Also re-confirm sotp track signals shows spec items all Blue (strict merge gate re-verification after regeneration).",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view",
-  "updated_at": "2026-04-18T02:10:23Z"
+  "updated_at": "2026-04-18T02:20:59Z"
 }

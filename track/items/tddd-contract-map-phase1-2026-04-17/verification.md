@@ -164,14 +164,18 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 
 ### T010: Phase 1.5 verification + dogfooding regeneration
 
-- [ ] `sotp track contract-map tddd-contract-map-phase1-2026-04-17 --workspace-root .` で contract-map.md が再生成される
-- [ ] Phase 1 時 (17 nodes / 8 edges) より method-edge 数が増加している
-- [ ] 期待される新規 edge (CatalogueLoader -->|load_all(track_id)| TrackId, ContractMapWriter -->|write(content)| ContractMapContent, ContractMapWriter -->|write(track_id)| TrackId, RenderContractMap -->|execute(cmd)| RenderContractMapCommand) が出力に含まれる
-- [ ] verification.md の Phase 1.5 section が T008-T010 の検証項目で埋まっている
-- [ ] Contract Map dogfooding subsection が post-Phase-1.5 の node/edge count で更新されている
-- [ ] `sotp track type-signals` で 6 plain-struct ids が全 Blue を維持している (T009 で初回確認、T010 で再確認)
-- [ ] `sotp track signals` で spec 全項目が Blue を維持している (strict merge gate 通過。T009 で初回確認、T010 で再確認)
-- [ ] `cargo make ci` で regression なし
+- [x] `sotp track contract-map tddd-contract-map-phase1-2026-04-17 --workspace-root .` で contract-map.md が再生成される (layers=3, entries=23)
+- [x] Phase 1 時 (17 nodes / 8 edges = 6 method + 2 trait-impl) より method-edge 数が増加している (Phase 1.5: 23 nodes / 12 edges = 10 method + 2 trait-impl、Δmethod=+4)
+- [x] 期待される新規 edge が全て出力に含まれる:
+    - `CatalogueLoader -->|load_all(track_id)| TrackId`
+    - `ContractMapWriter -->|write(content)| ContractMapContent`
+    - `ContractMapWriter -->|write(track_id)| TrackId`
+    - `RenderContractMap -->|execute(cmd)| RenderContractMapCommand`
+- [x] verification.md の Phase 1.5 section が T008-T010 の検証項目で埋まっている (本 section 自体および T008 / T009 の checklist が全て `[x]`)
+- [x] Contract Map dogfooding subsection が post-Phase-1.5 の node/edge count で更新されている (下記 §Contract Map dogfooding (Phase 1.5, post-T010 regenerate) に追記)
+- [x] `sotp track type-signals` で 6 plain-struct ids が全 Blue を維持している (domain: blue=15, usecase: blue=5, infrastructure: blue=3、total 23 Blue / 0 Yellow / 0 Red、T010 再確認時)
+- [x] `sotp track signals` で spec 全項目が Blue を維持している (blue=52 / yellow=0 / red=0、T010 再確認時、strict merge gate 通過)
+- [x] `cargo make ci` で regression なし (T008 / T009 でも確認、T010 最終再確認は本 commit 時に `track-commit-message` wrapper が自動実行)
 
 ## Open Issues
 
@@ -196,6 +200,17 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 - ADR 2026-04-17-1528 §D1 / §D3 / §D4 / §4.5 の Phase 1 MVP スコープを完全実装
 - Phase 2/3 (action overlay / signal overlay / spec_source edge / baseline diff / AI briefing 自動添付) は spec 通り out_of_scope で延期
 
+2026-04-18 (Phase 1.5 完了 — "edges スカスカ" 解消 + nutype 依存排除)
+
+- T008 / T009 実装完了、commit 確定 (hash 記録済み)。T010 は docs-only 完了、commit hash は本 commit 後に metadata.json へ backfill 予定
+- nextest: 2138 tests all pass (Phase 1 の 2117 から +17 ids tests [T008] + 4 param edge tests [T009])
+- clippy `-D warnings` pass
+- ADR 2026-04-17-1528 §D4 (1) を "returns + params" に拡張 (Phase 1.5 背景注記付き)
+- `libs/domain/src/ids.rs` の 6 nutype 型を plain struct に書き換え (API 互換、sanitize(trim) 保持)、`nutype` 依存を workspace から削除
+- `domain-types.json` に 6 plain-struct ids を `action=reference` で declare 追加
+- contract-map.md: 17 nodes / 8 edges → 23 nodes / 12 edges (method +4、trait-impl は不変)
+- `harness-hardening-nutype-rustdoc-support` 別 track は本作業によって obsolete 化 (nutype 依存が完全消滅したため)
+
 ### Stage 1 spec signals (dogfooding, post spec/ADR refinement commit)
 
 🔵 45 / 🟡 0 / 🔴 0 (`sotp track signals <track-id>` で全 blue 達成)。初期 3 yellow (`inference —` source のみの items: `scope.out_of_scope#6 living document`, `constraints#7 type-graph 非変更`, `acceptance_criteria#12 EmptyCatalogue/LayerNotFound 発火条件`) を ADR 2026-04-17-1528 への 3 箇所追記 (§D1 発火条件節 / §Implementation Phases Phase 3 "living document auto-render" / §Notes for track planning §1 type-graph 非対称の明文化) と spec.json sources 差し替えで blue 化 (本改修は T007 split commit 2 で追加、strict merge gate 通過の前提条件)。
@@ -219,6 +234,19 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 - Method edges (ADR §D4 (1)、returns 由来): `CatalogueLoader -->|load_all| LayerId`, **`CatalogueLoader -->|load_all| TypeCatalogueDocument`** (reference 宣言による domain-internal edge; 両型とも domain 層に配置), `CatalogueLoader -->|load_all| CatalogueLoaderError`, `ContractMapWriter -->|write| ContractMapWriterError`, `RenderContractMap -->|execute| RenderContractMapError`, `RenderContractMap -->|execute| RenderContractMapOutput`
 - Trait impl edges (dashed、ADR §D4 (2)、`SecondaryAdapter.implements` 由来): `FsCatalogueLoader -.impl.-> CatalogueLoader`, `FsContractMapWriter -.impl.-> ContractMapWriter`
 - **Phase 1 で描画されない** (設計上の Phase 2+ scope): 引数参照 (`ContractMapContent` / `RenderContractMapCommand` / `TrackId` 等 method 引数に登場する型)、field edge (`RenderContractMapInteractor<L, W>` の generic 抱合)。ADR §D4 初期スコープから除外
+
+### Contract Map dogfooding (Phase 1.5, post-T010 regenerate)
+
+生成先: `track/items/tddd-contract-map-phase1-2026-04-17/contract-map.md` (T010 再生成)
+
+- 3 subgraphs (domain / usecase / infrastructure) — layer 配置は Phase 1 と同一
+- **23 entries** — Phase 1 の 17 entries に T009 で追加した 6 `action=reference` (TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName、全て domain 層) を加算。T008 による nutype → plain struct 書き換えで `schema_export` がこれらを検出可能になった結果、type_index に取り込める
+- **Method edges: 10 件** (Phase 1 の 6 件 + Phase 1.5 で追加された 4 件)
+  - Phase 1 由来 (returns、6 件): `CatalogueLoader -->|load_all| LayerId`, `CatalogueLoader -->|load_all| CatalogueLoaderError`, `CatalogueLoader -->|load_all| TypeCatalogueDocument`, `ContractMapWriter -->|write| ContractMapWriterError`, `RenderContractMap -->|execute| RenderContractMapError`, `RenderContractMap -->|execute| RenderContractMapOutput`
+  - Phase 1.5 由来 (params、4 件): `CatalogueLoader -->|load_all(track_id)| TrackId`, `ContractMapWriter -->|write(content)| ContractMapContent`, `ContractMapWriter -->|write(track_id)| TrackId`, `RenderContractMap -->|execute(cmd)| RenderContractMapCommand`
+- **Trait impl edges: 2 件** (Phase 1 から不変): `FsCatalogueLoader -.impl.-> CatalogueLoader`, `FsContractMapWriter -.impl.-> ContractMapWriter`
+- **合計 12 edges** (Phase 1: 8 → Phase 1.5: 12、Δ=+4 method edges)。Phase 1 dogfood 時に指摘された "edges スカスカ" 現象が解消され、CatalogueLoader / ContractMapWriter の入力側依存 (track_id / content) と RenderContractMap の Command 依存が可視化された
+- **Phase 1.5 でも描画されない** (設計上の Phase 2+ scope): field edge (`RenderContractMapInteractor<L, W>` の generic 抱合、 `RenderContractMapCommand` の field 内型参照)、spec_source edge、signal overlay、action overlay
 
 ### Commit split rationale
 
