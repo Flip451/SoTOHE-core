@@ -224,7 +224,7 @@
     {
       "description": "Remove nutype dependency from libs/domain/src/ids.rs: rewrite TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName as plain structs (single-field wrappers) preserving the existing public API (try_new(impl Into<String>) -> Result<Self, ValidationError>, AsRef<str>, Display, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord). This signature matches the LayerId precedent and accepts both &str and String, keeping all existing call sites (including those passing format!() or .to_owned() results) unchanged. For NonEmptyString / ReviewGroupName, try_new must trim the input before running validate_non_empty to preserve the existing nutype sanitize(trim) behavior (whitespace-only input rejected as EmptyString, leading/trailing whitespace stripped from stored value). All existing call sites (approximately 250+ across libs and apps) must compile unchanged. Remove `nutype` from workspace dependencies (Cargo.toml + libs/domain/Cargo.toml). Motivation: schema_export cannot extract nutype-generated types from rustdoc JSON (the body struct lives in a #[doc(hidden)] module, only the pub use alias is visible), which blocks TDDD catalogue declaration. Plain struct rewrite makes these 6 ids declarable with action=reference and obsoletes the planned harness-hardening-nutype-rustdoc-support track. Note: nutype also generates into_inner(self) -> String, but this method has zero call sites in the repository (grep confirms no usages on these 6 types) and the LayerId precedent does not implement it; into_inner is therefore explicitly not included in the preserved API surface.",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Extend ADR 2026-04-17-1528 §D4 (1) from 'method-call edge via returns only' to 'returns + params'. Update libs/domain/src/tddd/contract_map_render.rs so the method-edge loop iterates method.params() in addition to method.returns(), extracting parameter type names via the domain-local extract_type_names and emitting A -->|method(arg_name)| B edges when the param ty matches a declared type in the type_index. Declare the 6 plain-struct ids from T008 in domain-types.json with action=reference (TrackId, TaskId, CommitHash, TrackBranch, NonEmptyString, ReviewGroupName). Add render unit tests covering: param edges within a layer, param edges crossing layers, params referencing declared types only (no edges to external types), and label formatting A -->|method(arg)| B. The expected new edges include CatalogueLoader -->|load_all(track_id)| TrackId, ContractMapWriter -->|write(content)| ContractMapContent, RenderContractMap -->|execute(cmd)| RenderContractMapCommand. At T009 completion, run sotp track type-signals to confirm the 6 ids are all Blue (found_type=true), and run sotp track signals to confirm all spec items remain Blue (strict merge gate).",
@@ -238,5 +238,5 @@
     }
   ],
   "title": "TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view",
-  "updated_at": "2026-04-18T10:00:00Z"
+  "updated_at": "2026-04-18T01:57:21Z"
 }

@@ -143,13 +143,13 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 
 ### T008: Remove nutype dependency (6 domain ids → plain struct)
 
-- [ ] `libs/domain/src/ids.rs` の 6 型 (TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName) が plain struct (単一フィールド wrapper) に書き換えられている
-- [ ] 公開 API (try_new(impl Into<String>) -> Result<Self, ValidationError> / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord) が維持されている (nutype は内部的に impl Into<String> を受け付けるため、既存の String 渡し call site と互換性を保つにはこのシグネチャが必要。LayerId の先行実装パターンに準拠)
-- [ ] NonEmptyString / ReviewGroupName の sanitize(trim) 挙動が try_new 内で明示的に実装されている
-- [ ] `Cargo.toml` workspace.dependencies と `libs/domain/Cargo.toml` から nutype 依存が削除されている
-- [ ] 既存 250+ call sites が無変更で compile 通過する (API 互換性の実証。実測: libs + apps 全体で約 263 箇所の try_new 呼び出し)
-- [ ] `ids.rs` の unit tests (NonEmptyString の 5 test を含む既存テスト) が plain struct 版でも全 pass する
-- [ ] `cargo make ci` が pass する
+- [x] `libs/domain/src/ids.rs` の 6 型 (TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName) が plain struct (単一フィールド wrapper) に書き換えられている
+- [x] 公開 API (try_new(impl Into<String>) -> Result<Self, ValidationError> / AsRef<str> / Display / Debug / Clone / PartialEq / Eq / Hash / PartialOrd / Ord) が維持されている (nutype は内部的に impl Into<String> を受け付けるため、既存の String 渡し call site と互換性を保つにはこのシグネチャが必要。LayerId の先行実装パターンに準拠)
+- [x] NonEmptyString / ReviewGroupName の sanitize(trim) 挙動が try_new 内で明示的に実装されている (`value.into().trim().to_owned()` 後に空文字列チェック)
+- [x] `Cargo.toml` workspace.dependencies と `libs/domain/Cargo.toml` から nutype 依存が削除されている
+- [x] 既存 250+ call sites が無変更で compile 通過する (`cargo make ci` pass により実証。実測: libs + apps 全体で約 263 箇所の try_new 呼び出し)
+- [x] `ids.rs` の unit tests (NonEmptyString の 5 test を含む既存テスト) が plain struct 版でも全 pass する (追加: TrackId / TaskId / CommitHash / TrackBranch / ReviewGroupName の validation test を新規 17 件追加し合計 22 件、nextest 2134 tests pass)
+- [x] `cargo make ci` が pass する (clippy -D warnings + nextest 2134 + verify-* 全通過)
 
 ### T009: Contract Map edges extension (params + 6 ids reference declare)
 
