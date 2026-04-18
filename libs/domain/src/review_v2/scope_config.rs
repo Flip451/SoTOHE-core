@@ -14,7 +14,7 @@ use crate::TrackId;
 /// ADR: `ReviewScopeConfig` is a domain type (pure classification, no I/O).
 #[derive(Debug)]
 pub struct ReviewScopeConfig {
-    scopes: HashMap<MainScopeName, Vec<GlobMatcher>>,
+    scopes: HashMap<MainScopeName, ScopeEntry>,
     operational: Vec<GlobMatcher>,
     /// Broad glob matchers for other-track exclusion.
     /// `<other-track>` is expanded to `*` (any segment).
@@ -25,35 +25,55 @@ pub struct ReviewScopeConfig {
     current_track_prefix: String,
 }
 
+/// One named scope's classification matchers and optional briefing file.
+///
+/// Crate-private. Access the briefing path externally via
+/// [`ReviewScopeConfig::briefing_file_for_scope`].
+#[derive(Debug)]
+struct ScopeEntry {
+    matchers: Vec<GlobMatcher>,
+    /// Workspace-relative path to a scope-specific briefing markdown file.
+    /// `None` means no scope-specific briefing (the reviewer uses the main briefing only).
+    briefing_file: Option<String>,
+}
+
 impl ReviewScopeConfig {
     /// Builds a scope config from review-scope.json data.
     ///
-    /// Expands placeholders in `operational` and `other_track` patterns:
-    /// - `<track-id>` → current track ID
-    /// - `<other-track>` → `*` (broad wildcard); post-filtered to exclude current track
+    /// Expands `<track-id>` placeholder in group patterns, `operational`
+    /// patterns, and `other_track` patterns before compiling each glob.
+    /// `<other-track>` is expanded to `*` (broad wildcard); post-filtered to
+    /// exclude the current track.
+    ///
+    /// Each entry in `entries` is `(name, patterns, briefing_file)`; the
+    /// optional `briefing_file` is a workspace-relative path to a
+    /// scope-specific severity policy markdown file. The loader does not
+    /// read the file — it is fetched by the reviewer's own Read tool at
+    /// review time (ADR 2026-04-18-1354 §D4).
     ///
     /// # Errors
     /// Returns `ScopeConfigError` on invalid scope names or glob patterns.
     pub fn new(
         track_id: &TrackId,
-        entries: Vec<(String, Vec<String>)>,
+        entries: Vec<(String, Vec<String>, Option<String>)>,
         operational: Vec<String>,
         other_track: Vec<String>,
     ) -> Result<Self, ScopeConfigError> {
         // Build named scopes
         let mut scopes = HashMap::new();
-        for (name, patterns) in entries {
+        for (name, patterns, briefing_file) in entries {
             let scope_name = MainScopeName::new(name)?;
             let matchers = patterns
                 .iter()
                 .map(|pat| {
-                    compile_glob(pat).map_err(|source| ScopeConfigError::InvalidPattern {
-                        pattern: pat.clone(),
+                    let expanded = expand_track_id(pat, track_id);
+                    compile_glob(&expanded).map_err(|source| ScopeConfigError::InvalidPattern {
+                        pattern: expanded,
                         source,
                     })
                 })
                 .collect::<Result<Vec<_>, _>>()?;
-            scopes.insert(scope_name, matchers);
+            scopes.insert(scope_name, ScopeEntry { matchers, briefing_file });
         }
 
         // Compile operational matchers with placeholder expansion
@@ -107,8 +127,8 @@ impl ReviewScopeConfig {
 
             // Match against named scopes
             let mut matched = false;
-            for (name, matchers) in &self.scopes {
-                if matchers.iter().any(|m| m.is_match(s)) {
+            for (name, entry) in &self.scopes {
+                if entry.matchers.iter().any(|m| m.is_match(s)) {
                     result.entry(ScopeName::Main(name.clone())).or_default().push(file.clone());
                     matched = true;
                 }
@@ -147,6 +167,25 @@ impl ReviewScopeConfig {
             self.scopes.keys().map(|k| ScopeName::Main(k.clone())).collect();
         names.insert(ScopeName::Other);
         names
+    }
+
+    /// Returns the workspace-relative path to the scope-specific briefing file,
+    /// or `None` if no briefing is configured for this scope.
+    ///
+    /// Always returns `None` for `ScopeName::Other` — the reserved scope has no
+    /// briefing by design (ADR 2026-04-18-1354 §D5).
+    ///
+    /// The returned path is a raw string; no file I/O or existence check is
+    /// performed here. The reviewer's sandbox Read tool fetches the file at
+    /// review time (ADR §D4).
+    #[must_use]
+    pub fn briefing_file_for_scope(&self, scope: &ScopeName) -> Option<&str> {
+        match scope {
+            ScopeName::Other => None,
+            ScopeName::Main(name) => {
+                self.scopes.get(name).and_then(|entry| entry.briefing_file.as_deref())
+            }
+        }
     }
 
     /// Checks if a path matches other_track patterns AND is not the current track.

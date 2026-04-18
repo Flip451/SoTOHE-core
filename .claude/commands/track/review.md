@@ -56,8 +56,13 @@ Output example:
   [-] domain: required (not started)
   [.] harness-policy: not required (empty)
   [-] other: required (stale hash)
+  [-] plan-artifacts: required (stale hash)
   [.] usecase: not required (empty)
 ```
+
+Current named groups (v2 `track/review-scope.json`): `domain`, `usecase`,
+`infrastructure`, `cli`, `plan-artifacts`, `harness-policy`. The implicit
+`other` group collects everything not matched by a named group.
 
 Use this output to determine which groups need reviewer invocation:
 - `required (not started)` — needs review (new changes, no review yet)
@@ -74,6 +79,20 @@ report `required`.
 
 For each group reporting `required` in Step 2a, build a briefing file at `tmp/reviewer-runtime/briefing-{group}.md`.
 The per-group scope file list is automatically injected by `cargo make track-local-review` (via `CodexReviewer::build_full_prompt`) — the briefing only needs design intent and review checklist.
+
+**Do NOT hand-author the `## Scope-specific severity policy` section.** If the
+group has a `briefing_file` configured in `track/review-scope.json` (currently
+`plan-artifacts` — `track/review-prompts/plan-artifacts.md`), the CLI composer
+automatically appends a `## Scope-specific severity policy` section pointing
+the reviewer at that file. Duplicating the policy in the per-group briefing is
+not just redundant — it creates drift when the severity policy md is updated
+without touching this template. Responsibility split:
+
+- `track/review-prompts/<scope>.md` owns severity policy wording (edited as a
+  standalone file; versioned with the config)
+- `tmp/reviewer-runtime/briefing-{scope}.md` owns per-round design intent and
+  review checklist (authored here, per-round)
+- `sotp review codex-local` owns the wiring between the two (automatic)
 
 ```markdown
 # Review Briefing: {track-id} — {group} layer

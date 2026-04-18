@@ -380,11 +380,11 @@ fn fp(s: &str) -> FilePath {
     FilePath::new(s).unwrap()
 }
 
-fn basic_entries() -> Vec<(String, Vec<String>)> {
+fn basic_entries() -> Vec<(String, Vec<String>, Option<String>)> {
     vec![
-        ("domain".to_owned(), vec!["libs/domain/**".to_owned()]),
-        ("infrastructure".to_owned(), vec!["libs/infrastructure/**".to_owned()]),
-        ("cli".to_owned(), vec!["apps/**".to_owned()]),
+        ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None),
+        ("infrastructure".to_owned(), vec!["libs/infrastructure/**".to_owned()], None),
+        ("cli".to_owned(), vec!["apps/**".to_owned()], None),
     ]
 }
 
@@ -413,8 +413,8 @@ fn test_scope_config_classify_unmatched_goes_to_other() {
 #[test]
 fn test_scope_config_classify_multi_scope_match_includes_both() {
     let entries = vec![
-        ("broad".to_owned(), vec!["libs/**".to_owned()]),
-        ("domain".to_owned(), vec!["libs/domain/**".to_owned()]),
+        ("broad".to_owned(), vec!["libs/**".to_owned()], None),
+        ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None),
     ];
     let config = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![]).unwrap();
     let files = vec![fp("libs/domain/src/lib.rs")];
@@ -490,7 +490,7 @@ fn test_scope_config_get_scope_names() {
 
 #[test]
 fn test_scope_config_rejects_reserved_other_scope_name() {
-    let entries = vec![("other".to_owned(), vec!["**".to_owned()])];
+    let entries = vec![("other".to_owned(), vec!["**".to_owned()], None)];
     let result = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![]);
     assert!(result.is_err());
 }
@@ -510,4 +510,67 @@ fn test_scope_config_empty_files() {
     let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
     let classified = config.classify(&[]);
     assert!(classified.is_empty());
+}
+
+// ── briefing_file_for_scope ───────────────────────────────────────────
+
+#[test]
+fn test_briefing_file_for_scope_returns_some_when_configured() {
+    let entries = vec![(
+        "plan-artifacts".to_owned(),
+        vec!["track/items/**".to_owned()],
+        Some("track/review-prompts/plan-artifacts.md".to_owned()),
+    )];
+    let config = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![]).unwrap();
+    let scope = ScopeName::Main(MainScopeName::new("plan-artifacts").unwrap());
+    assert_eq!(
+        config.briefing_file_for_scope(&scope),
+        Some("track/review-prompts/plan-artifacts.md")
+    );
+}
+
+#[test]
+fn test_briefing_file_for_scope_returns_none_when_not_configured() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    let scope = ScopeName::Main(MainScopeName::new("domain").unwrap());
+    assert!(config.briefing_file_for_scope(&scope).is_none());
+}
+
+#[test]
+fn test_briefing_file_for_scope_returns_none_for_unknown_main_scope() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    let scope = ScopeName::Main(MainScopeName::new("does-not-exist").unwrap());
+    assert!(config.briefing_file_for_scope(&scope).is_none());
+}
+
+#[test]
+fn test_briefing_file_for_scope_always_none_for_other() {
+    // Even if Other were somehow paired with a briefing (impossible via new() because
+    // MainScopeName rejects "other"), the accessor contract must return None.
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    assert!(config.briefing_file_for_scope(&ScopeName::Other).is_none());
+}
+
+// ── group pattern <track-id> expansion (T001 regression) ──────────────
+
+#[test]
+fn test_scope_config_group_pattern_expands_track_id_placeholder() {
+    // Before T001, groups patterns were compiled verbatim and <track-id> would
+    // match only the literal string, catching nothing. After T001, the placeholder
+    // must be expanded just like operational/other_track patterns.
+    let entries =
+        vec![("plan-artifacts".to_owned(), vec!["track/items/<track-id>/**".to_owned()], None)];
+    let config = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![]).unwrap();
+    let files =
+        vec![fp("track/items/my-track-2026-04-05/spec.md"), fp("track/items/other-track/spec.md")];
+    let classified = config.classify(&files);
+
+    let plan_artifacts = ScopeName::Main(MainScopeName::new("plan-artifacts").unwrap());
+    let matched = classified.get(&plan_artifacts).unwrap();
+    assert_eq!(matched.len(), 1);
+    assert_eq!(matched[0].as_str(), "track/items/my-track-2026-04-05/spec.md");
+
+    // The other-track file falls through to Other (no other_track pattern excludes it
+    // here because we did not configure one for this test).
+    assert!(classified.contains_key(&ScopeName::Other));
 }

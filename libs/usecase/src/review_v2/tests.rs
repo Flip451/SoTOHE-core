@@ -154,7 +154,7 @@ fn base_commit() -> CommitHash {
 fn basic_config() -> ReviewScopeConfig {
     ReviewScopeConfig::new(
         &track_id(),
-        vec![("domain".to_owned(), vec!["libs/domain/**".to_owned()])],
+        vec![("domain".to_owned(), vec!["libs/domain/**".to_owned()], None)],
         vec![],
         vec![],
     )

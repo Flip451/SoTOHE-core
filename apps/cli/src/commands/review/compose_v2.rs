@@ -109,6 +109,63 @@ pub(crate) fn build_review_v2(
     Ok(ReviewV2Composition { cycle, review_store, commit_hash_store, base })
 }
 
+/// Loads just the `ReviewScopeConfig` for a given track/items_dir, without
+/// initialising review/hash stores or resolving the diff base.
+///
+/// This is used before `build_review_v2_with_reviewer` when the caller needs
+/// `briefing_file_for_scope` to augment the reviewer prompt (ADR
+/// 2026-04-18-1354 §D4 — the reviewer fetches the briefing file via its own
+/// Read tool, but the composer must know whether a path is configured).
+///
+/// Reads `review-scope.json` under the git repository root and validates
+/// that `items_dir` resolves under that root.
+///
+/// # Errors
+/// Returns a human-readable error string on failure.
+pub(crate) fn load_scope_config_only(
+    track_id: &TrackId,
+    items_dir: &Path,
+) -> Result<ReviewScopeConfig, String> {
+    let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+    let root = git.root().to_path_buf();
+
+    let canonical_root = root
+        .canonicalize()
+        .map_err(|e| format!("failed to canonicalize repo root {}: {e}", root.display()))?;
+    let items_dir_abs =
+        if items_dir.is_absolute() { items_dir.to_path_buf() } else { root.join(items_dir) };
+    let items_dir_resolved = normalize_path_components(&items_dir_abs);
+    let canonical_items_dir = {
+        let mut probe = items_dir_resolved.as_path();
+        loop {
+            match probe.canonicalize() {
+                Ok(canonical) => {
+                    let suffix = items_dir_resolved
+                        .strip_prefix(probe)
+                        .unwrap_or_else(|_| std::path::Path::new(""));
+                    break canonical.join(suffix);
+                }
+                Err(_) => match probe.parent() {
+                    Some(parent) => probe = parent,
+                    None => break items_dir_resolved.clone(),
+                },
+            }
+        }
+    };
+    if !canonical_items_dir.starts_with(&canonical_root) {
+        return Err(format!(
+            "items_dir '{}' is outside the repository root '{}'. \
+             Only paths under the repo are allowed.",
+            items_dir.display(),
+            canonical_root.display()
+        ));
+    }
+
+    let scope_json_path = root.join("track/review-scope.json");
+    load_v2_scope_config(&scope_json_path, track_id, &root)
+        .map_err(|e| format!("load review-scope.json: {e}"))
+}
+
 /// Shared setup logic for both `build_review_v2` and `build_review_v2_with_reviewer`.
 ///
 /// Returns `(scope_config, review_store, commit_hash_store, base)`.

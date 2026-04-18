@@ -38,6 +38,21 @@ Report one of the following statuses:
   Return `blocked_cross_scope` with the file list so the orchestrator can re-partition.
 - Cross-scope edits are fail-closed: silent out-of-scope modifications are prohibited.
 
+## Scope-specific severity policy
+
+If the main briefing contains a `## Scope-specific severity policy` section,
+you MUST read the file listed there using your `Read` tool **before starting
+the review**. That file defines which finding categories to report and which
+to skip for this scope. Applying the wrong severity filter is the primary
+cause of over-long review loops (28-round history).
+
+Do not skip this step even if the briefing path appears to be a known file.
+Always read it fresh — the policy file may have been updated since the last
+review session. The CLI composer (`sotp review codex-local`) appends this
+section automatically for any scope whose `briefing_file` is configured in
+`track/review-scope.json`; treat the appended reference as an authoritative
+severity filter for this round.
+
 ## Workflow
 
 1. **Review**: Run `cargo make track-local-review` with the provided briefing and fast model.

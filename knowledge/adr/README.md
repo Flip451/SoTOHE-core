@@ -119,6 +119,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [review.json 分離 + グループ独立レビュー状態](2026-03-29-0947-review-json-per-group-review-state.md) | Superseded | 2026-03-29 |
 | [Review System v2: frozen scope 廃止とスコープ独立型レビュー](2026-04-04-1456-review-system-v2-redesign.md) | Accepted | 2026-04-04 |
 | [Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing](2026-04-12-1800-reviewstate-v1-decommission.md) | Accepted | 2026-04-12 |
+| [review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設](2026-04-18-1354-review-scope-prompt-injection.md) | Proposed | 2026-04-18 |
 
 ### オーケストレーション・エージェント管理
 

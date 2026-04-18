@@ -1,0 +1,70 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+status: approved
+approved_at: "2026-04-18T08:34:16Z"
+version: "1.0"
+signals: { blue: 33, yellow: 0, red: 0 }
+---
+
+# review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設
+
+## Goal
+
+ADR 2026-04-18-1354-review-scope-prompt-injection の Phase 1-3 を実装し、scope ごとに review briefing を機械的に注入できる機構を導入する
+feedback memory (severity policy / strategy docs quality bar / self-review before codex) として繰り返し手動注入されてきた scope 固有の review 観点を review-scope.json に宣言的に設定可能にする
+plan-artifacts scope を新設し、track/items/<track-id>/** と knowledge/adr/** と knowledge/research/** を専用 severity policy で review できるようにする (28-round loop 防止)
+後方互換を維持する: 既存の review-scope.json (briefing_file なし) は一切挙動変更せずに動作する
+ADR D4 が採用する 'ファイルパス参照方式' を実現する: loader / composer は path 文字列のみを扱い、ファイル内容は reviewer sandbox の Read tool が取得する
+
+## Scope
+
+### In Scope
+- libs/domain/src/review_v2/scope_config.rs に ScopeEntry struct (crate-private) を追加し、ReviewScopeConfig.scopes の型を HashMap<MainScopeName, Vec<GlobMatcher>> から HashMap<MainScopeName, ScopeEntry> に変更する。ReviewScopeConfig::new のシグネチャを entries: Vec<(String, Vec<String>, Option<String>)> に拡張する (第 3 要素が briefing_file パス)。同時に entries loop 内の各 pattern に対して expand_track_id を適用する (現行実装は operational / other_track にのみ適用、groups には未適用 — ADR D3 の『patterns は <track-id> placeholder を既存ルール通り展開する』条件を満たすため)。call site 更新対象は libs/domain/src/review_v2/scope_config.rs / libs/domain/src/review_v2/tests.rs / libs/usecase/src/review_v2/tests.rs の 3 ファイル (usecase 層の tests.rs も ReviewScopeConfig::new を直接構築するため T001 で一括更新する) [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D2, §D3, libs/domain/src/review_v2/scope_config.rs, libs/usecase/src/review_v2/tests.rs] [tasks: T001]
+- ReviewScopeConfig に briefing_file_for_scope(&self, scope: &ScopeName) -> Option<&str> アクセサを追加する。ScopeName::Other は常に None を返す (ADR D5 の予約名制約を明示的に API レベルで保証)。ScopeName::Main(name) は該当 scope の briefing_file (あれば) を返す [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D2, §D5, libs/domain/src/review_v2/types.rs §ScopeName] [tasks: T001]
+- libs/infrastructure/src/review_v2/scope_config_loader.rs の GroupEntry に briefing_file: Option<String> フィールドを追加する (#[serde(default)] 付き)。load_v2_scope_config の entries 組み立て部分を 3-tuple に変更する。deny_unknown_fields は維持する (typo フィールドは reject) [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D1, libs/infrastructure/src/review_v2/scope_config_loader.rs] [tasks: T002]
+- apps/cli/src/commands/review/codex_local.rs に append_scope_briefing_reference(prompt: &mut String, scope: &ScopeName, scope_config: &ReviewScopeConfig) pure 関数を追加する。briefing_file_for_scope が Some を返す場合のみ、`## Scope-specific severity policy` 節を主 prompt に append し、reviewer に Read ツールでファイルを読むよう指示する。ファイル内容は読み込まない (ADR D4) [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4, apps/cli/src/commands/review/codex_local.rs §build_base_prompt] [tasks: T003]
+- run_execute_codex_local の実行フロー順序問題 (base_prompt 生成が ReviewScopeConfig ロード前に行われる) を解決する。実装時に 3 つの選択肢 (builder 追加 / pre-load / composition 保持) から最小侵襲なものを選択し、verification.md に記録する [source: apps/cli/src/commands/review/codex_local.rs §run_execute_codex_local, apps/cli/src/commands/review/compose_v2.rs §build_review_v2_with_reviewer] [tasks: T003]
+- .claude/agents/review-fix-lead.md に `## Scope-specific severity policy` 段落を `## Workflow` 見出し直前に追加する。内容: 主 briefing に該当節があれば必ず Read ツールで先に読み込むこと、severity filter の根拠とすること、セッション間で更新されうるため毎回 fresh に読むこと [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4, .claude/agents/review-fix-lead.md] [tasks: T004]
+- .claude/commands/track/review.md Step 2b の briefing 作成手順を更新する。scope の briefing_file が Some なら CLI が自動で参照行を追加する (手動で briefing に severity policy を書かない) という責任分離を明記する。scope リストに plan-artifacts を追記する [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4, .claude/commands/track/review.md §2b. Build per-group briefing] [tasks: T005]
+- track/review-scope.json の plan-artifacts を最終形に更新する。patterns: ["track/items/<track-id>/**", "knowledge/adr/**", "knowledge/research/**"]、briefing_file: "track/review-prompts/plan-artifacts.md"。bootstrap 期の patterns ("track/items/**" など) から T001 の loader fix を前提とした placeholder パターンへ切り替える。既存 scope 定義 (domain / usecase / infrastructure / cli / harness-policy) は変更しない [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D3, track/review-scope.json] [tasks: T006]
+- track/review-prompts/ ディレクトリを新規作成し plan-artifacts.md を配置する。内容は knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md の Canonical Block 'plan-artifacts.md (initial body)' (What to report / What NOT to report の 2 セクション)。markdown は self-contained で、reviewer が他 doc を参照せず適用できる記述にする。Round budget や review round 数の cap のような instruction は含めない — そうした制約は orchestrator の pacing 判断に属するものであり、severity policy に埋め込むと正当な findings を抑制する圧力になる [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D3, knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md §plan-artifacts.md (initial body)] [tasks: T007]
+- 本 track 自身の review でドッグフードする: track/items/review-scope-prompt-injection-2026-04-18/** と改訂 ADR (knowledge/adr/2026-04-18-1354-*.md) と planner 研究ノート (knowledge/research/2026-04-18-0514-*.md) が plan-artifacts scope に分類され、briefing composer が `## Scope-specific severity policy` 節を追加し、reviewer が Read ツールで track/review-prompts/plan-artifacts.md を読み込み severity policy に従って zero_findings を返すこと。dogfooding 結果 (scope 別ファイル数 / round 数 / severity policy 適用確認) を verification.md に記録する [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Rollout Plan §Phase 3] [tasks: T008]
+- TDD red → green の順序を守る。各 task で unit tests を先に書き red 確認後に実装する。各 commit diff は 500 LOC 未満を目標とする [source: convention — .claude/rules/05-testing.md §Core Principles, convention — .claude/rules/10-guardrails.md §Small task commits] [tasks: T001, T002, T003, T004, T005, T006, T007, T008]
+
+### Out of Scope
+- 他 scope (harness-policy / domain / usecase / infrastructure / cli) への briefing_file 整備は ADR Phase 4 に該当し、本 track では実施しない。後続 track で feedback memory から対応 briefing を抽出してファイル化する [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Rollout Plan §Phase 4]
+- review-scope.json / review-prompts/ の .harness/config/ 配下への集約は別 track で扱う (ADR § Future Migration)。本 track では初期配置を track/review-prompts/ に留める [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Future Migration]
+- briefing_file の CI lint (broken link 検知 / 存在しない scope 名への参照検知) は ADR Open Question Q3 に該当し、本 track では扱わない。後続 track で cargo make verify-* 系の拡張として実施する [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Open Questions §Q3]
+- Empty diff scope への briefing 注入有無 (ADR Open Question Q2) は現行挙動 (変更ファイルなしなら reviewer skip) を維持し、方針転換は行わない [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Open Questions §Q2]
+
+## Constraints
+- hexagonal 原則: ScopeEntry / briefing_file_for_scope は domain 層、serde 構造体変更は infrastructure 層、composer 変更は cli 層に閉じる。I/O (ファイル読み込み) は reviewer sandbox の Read tool のみで行い、loader / domain / cli では一切実施しない (ADR D4) [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4, convention — architecture-rules.json §layers]
+- 後方互換: 既存 review-scope.json (briefing_file なし) は挙動変更なしで動作する。GroupEntry の briefing_file は #[serde(default)] 付き Option<String>、load 時に存在しないフィールドが None に解決される [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D1, §Bad / Risk, libs/infrastructure/src/review_v2/scope_config_loader.rs]
+- deny_unknown_fields 維持: ReviewScopeJsonV2 top level と GroupEntry の両方で deny_unknown_fields を維持する。typo フィールド (briefng_file 等) は Parse エラーで reject されること [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Bad / Risk, libs/infrastructure/src/review_v2/scope_config_loader.rs §ReviewScopeJsonV2]
+- newtype / validation なし: briefing_file は Option<String> のまま保持する。BriefingPath のような newtype 化 / path traversal チェック / canonicalize は一切追加しない (ADR D4 の精神に反する) [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4]
+- Other scope は briefing 対象外: briefing_file_for_scope(ScopeName::Other) は必ず None を返す。review-scope.json の groups に "other" を書くことは既存 MainScopeName::new の Reserved エラーで既に防止されている (ADR D5) [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D5, libs/domain/src/review_v2/types.rs §MainScopeName]
+- 新規 crate 追加は不可。既存の globset / serde / serde_json のみ使用する。unsafe / unwrap / expect / panic (本番コード) は禁止 [source: convention — .claude/rules/04-coding-principles.md §No Panics in Library Code, convention — .claude/rules/07-dev-environment.md]
+- 既存の review_v2 モジュール外 (v1 系 / TDDD 系) への波及禁止。既存の Other scope 挙動は変更しない。planning_only_bypass 等の既存 track workflow は変更しない [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D5, §Notes, libs/domain/src/review_v2/]
+- Enum-first を維持する (ADR の設計判断は struct + Option で済むため typestate 適用対象外)。ScopeEntry は plain struct で OK、状態遷移なし [source: convention — .claude/rules/04-coding-principles.md §Enum-first, §Typestate]
+- TDD red→green の順序を守る。各 task で unit tests を先に書き red 確認後に実装する [source: convention — .claude/rules/05-testing.md §Core Principles]
+- 小さい task commits: 各 task の diff は 500 LOC 未満を目標とする [source: convention — .claude/rules/10-guardrails.md §Small task commits]
+
+## Acceptance Criteria
+- [ ] T001 完了時点で ScopeEntry struct が crate-private として scope_config.rs に定義され、ReviewScopeConfig.scopes が HashMap<MainScopeName, ScopeEntry> に変更されている。ReviewScopeConfig::new のシグネチャが entries: Vec<(String, Vec<String>, Option<String>)> に拡張されている。briefing_file_for_scope アクセサが ScopeName::Other に対して常に None を返し、ScopeName::Main(name) に対しては該当 scope の briefing_file を返す。classify / contains_scope / all_scope_names の既存 unit tests が全 pass する [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D2, §D5, libs/domain/src/review_v2/scope_config.rs] [tasks: T001]
+- [ ] T002 完了時点で GroupEntry に briefing_file: Option<String> が #[serde(default)] 付きで追加されている。新規 unit test: (1) briefing_file 付き JSON が正しく parse され briefing_file_for_scope が Some を返す、(2) briefing_file なし既存 JSON が引き続き動く (後方互換)、(3) typo フィールド (briefng_file) が Parse エラーで reject される (deny_unknown_fields regression guard) — の 3 件が全 pass する [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D1, §Bad / Risk, libs/infrastructure/src/review_v2/scope_config_loader.rs] [tasks: T002]
+- [ ] T003 完了時点で append_scope_briefing_reference pure 関数が codex_local.rs に追加され、出力 format が ADR D4 の Canonical Block (`## Scope-specific severity policy` 見出し + Read 指示 + path) に完全一致する。run_execute_codex_local の実行フロー順序問題が解決され (どの選択肢を採用したかは verification.md に記録)、briefing_file Some/None/Other 3 ケースで append/noop が期待通り動作する unit test が全 pass する [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4, apps/cli/src/commands/review/codex_local.rs] [tasks: T003]
+- [ ] T004 完了時点で .claude/agents/review-fix-lead.md に `## Scope-specific severity policy` 段落が `## Workflow` 見出し直前に追加されている。段落には主 briefing の該当節があれば必ず Read ツールで先に読む旨、severity filter 根拠となる旨、毎回 fresh に読む旨が明記されている [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4, .claude/agents/review-fix-lead.md] [tasks: T004]
+- [ ] T005 完了時点で .claude/commands/track/review.md Step 2b の briefing 作成手順に scope briefing 自動注入の説明が追加されている。scope リストに plan-artifacts が追記されている。verify-arch-docs / verify-doc-links が通ることで doc 整合性が確認される [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4, .claude/commands/track/review.md] [tasks: T005]
+- [ ] T006 完了時点で track/review-scope.json に plan-artifacts エントリが追加されている。patterns と briefing_file の値が ADR D3 Canonical Block と一致する。既存 scope 定義 (domain / usecase / infrastructure / cli / harness-policy) は変更されていない。infrastructure integration test で track/items/<current>/spec.md と knowledge/adr/xxxx.md と knowledge/research/xxxx.md が plan-artifacts scope に分類され、briefing_file_for_scope(plan-artifacts) が Some("track/review-prompts/plan-artifacts.md") を返すことが検証される [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D3, track/review-scope.json] [tasks: T006]
+- [ ] T007 完了時点で track/review-prompts/plan-artifacts.md が存在し、What to report (factual error / contradiction / broken reference / infeasibility / timestamp inconsistency) と What NOT to report (wording nits / en-ja mix / alternative design / formatting) の 2 セクションが含まれている。markdown は self-contained で reviewer が他 doc を参照せず適用可能。briefing_file の CI lint (broken link 検知) は Open Question Q3 として別 track に defer されているため、verify-doc-links ではなく T008 のドッグフードサイクルで reviewer が Read ツールでファイルを読み込めることを実証する。Round budget / round 数 cap は含まれていないこと (orchestrator の pacing に属するため、severity policy から除外) [source: knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D3, knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md §plan-artifacts.md (initial body)] [tasks: T007]
+- [ ] T008 完了時点で cargo make ci が全 green (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-arch-docs + verify-doc-links)。本 track 自身の /track:review でドッグフードし、plan-artifacts scope への自動分類、`## Scope-specific severity policy` 節の自動追加、reviewer の Read ツールによる plan-artifacts.md 読み込み、severity policy 適用後の zero_findings 到達が確認される。結果 (scope 別ファイル数 / round 数 / severity policy 適用確認) が verification.md に記録される [source: convention — .claude/rules/07-dev-environment.md §Pre-commit Checklist, knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §Rollout Plan §Phase 3, track/items/review-scope-prompt-injection-2026-04-18/verification.md §T008] [tasks: T008]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/source-attribution.md
+- knowledge/conventions/hexagonal-architecture.md
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 33  🟡 0  🔴 0
+

@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ScopeConfigLoadError",
+      "description": "Existing error_type returned by load_v2_scope_config when reading and decoding review-scope.json. This track adds a briefing_file field to GroupEntry but does not introduce new error variants; all failure modes (Io / Parse / InvalidField / Config) remain covered, including rejection of unknown fields via serde deny_unknown_fields. Declared with action=reference to document the infrastructure-layer touchpoint and satisfy the Stage 2 TDDD verification requirement that tddd.enabled layers carry at least one declared type.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "Io",
+        "Parse",
+        "InvalidField",
+        "Config"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "ScopeConfigLoadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Io",
+        "Parse",
+        "InvalidField",
+        "Config"
+      ]
+    }
+  ]
+}
