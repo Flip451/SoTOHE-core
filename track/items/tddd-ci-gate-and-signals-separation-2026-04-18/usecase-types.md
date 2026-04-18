@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| BlobFetchResult | enum | reference | Found, NotFound, FetchError | 🔵 |
+| BlobFetchResult | enum | reference | Found, NotFound, FetchError | — |
 

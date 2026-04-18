@@ -76,7 +76,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "95bab86b3c5fe348b315bd508f7b31350345d0a7",
@@ -121,6 +121,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "7f62a5aedbfcc7d3c686bad55b9f7cdf5fdb6cff",
       "description": "build: `cargo make build-sotp` で新仕様 sotp を bin/sotp に配置。初回 `sotp track type-signals tddd-ci-gate-and-signals-separation-2026-04-18` を実行して本 track 自身の catalogue を新仕様 (signals 分離) に自動 migration。`cargo make ci` が通過することを確認。Behavior Truth Table の全セル (3 経路 × 8 状態) の振る舞いを手動検証し verification.md に記録。",
       "id": "T008",
       "status": "done"
@@ -128,9 +129,9 @@
     {
       "description": "docs: ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` の Status を Proposed → Accepted に更新。関連 ADR から本 ADR へのリンクが必要なら追加 (Referenced By セクション等)。",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離",
-  "updated_at": "2026-04-18T20:20:10Z"
+  "updated_at": "2026-04-18T20:42:08Z"
 }
