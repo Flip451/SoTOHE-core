@@ -1013,3 +1013,22 @@ fn test_is_safe_briefing_path_rejects_carriage_return() {
 fn test_is_safe_briefing_path_rejects_tab() {
     assert!(!is_safe_briefing_path("path/file.md\tinjected"));
 }
+
+#[test]
+fn test_is_safe_briefing_path_rejects_unicode_line_separator() {
+    // U+2028 LINE SEPARATOR — not ASCII control, but `char::is_control` rejects it.
+    // Historically `is_ascii_control` let this through and allowed prompt-line smuggling.
+    assert!(!is_safe_briefing_path("path/file.md\u{2028}injected"));
+}
+
+#[test]
+fn test_is_safe_briefing_path_rejects_unicode_paragraph_separator() {
+    // U+2029 PARAGRAPH SEPARATOR — same class of attack as U+2028.
+    assert!(!is_safe_briefing_path("path/file.md\u{2029}injected"));
+}
+
+#[test]
+fn test_is_safe_briefing_path_rejects_c1_control() {
+    // U+0085 NEXT LINE — C1 control, also outside ASCII range.
+    assert!(!is_safe_briefing_path("path/file.md\u{0085}injected"));
+}

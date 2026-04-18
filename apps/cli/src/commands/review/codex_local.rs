@@ -172,8 +172,12 @@ pub(super) fn append_scope_briefing_reference(
 /// backtick-quoted path bullet.
 ///
 /// Rejects strings that contain:
-/// - ASCII control characters (0x00–0x1F, including `\n`, `\r`, `\t`)
-/// - DEL (0x7F)
+/// - Any Unicode control character (`char::is_control`, Unicode category Cc),
+///   which covers ASCII C0 0x00–0x1F (including `\n`, `\r`, `\t`), DEL 0x7F,
+///   and C1 controls 0x80–0x9F (including NEL U+0085)
+/// - Line and paragraph separators U+2028 (Zl) and U+2029 (Zp) — these are
+///   not in category Cc and therefore not caught by `is_control`, but both
+///   can smuggle additional prompt lines past an ASCII-only filter
 /// - Backtick (`` ` ``) — would break out of the `` `path` `` markdown context
 ///
 /// Empty paths are also rejected (a misconfigured empty `briefing_file` field
@@ -182,7 +186,7 @@ pub(super) fn is_safe_briefing_path(path: &str) -> bool {
     if path.is_empty() {
         return false;
     }
-    !path.chars().any(|c| c == '`' || c.is_ascii_control())
+    !path.chars().any(|c| c == '`' || c.is_control() || matches!(c, '\u{2028}' | '\u{2029}'))
 }
 
 /// Maps a group name string to a `ScopeName`.
