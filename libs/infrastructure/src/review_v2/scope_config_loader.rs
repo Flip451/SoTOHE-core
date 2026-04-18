@@ -122,6 +122,33 @@ pub fn load_v2_scope_config(
         });
     }
 
+    // Validate briefing_file paths: each configured briefing_file must resolve to
+    // a non-symlink path under the trusted root. This protects against an attacker
+    // committing `track/review-prompts/policy.md -> /etc/passwd` alongside a
+    // review-scope.json change, which would otherwise smuggle workspace-external
+    // file reads into the reviewer's Read-tool call (threat model: PR author is
+    // the attacker; ADR 2026-04-18-1354 §D4 originally assumed the reviewer
+    // sandbox's `read-only` mode would block this but that is not guaranteed).
+    // Follows knowledge/conventions/security.md §Symlink rejection.
+    for (name, entry) in &doc.groups {
+        if let Some(ref briefing) = entry.briefing_file {
+            let briefing_path = trusted_root.join(briefing);
+            reject_symlinks_below(&briefing_path, trusted_root).map_err(|source| {
+                if source.kind() == std::io::ErrorKind::InvalidInput {
+                    ScopeConfigLoadError::InvalidField {
+                        path: path_display.clone(),
+                        detail: format!(
+                            "symlink detected in briefing_file for group '{name}': '{briefing}' \
+                             (rejected for security)"
+                        ),
+                    }
+                } else {
+                    ScopeConfigLoadError::Io { path: path_display.clone(), source }
+                }
+            })?;
+        }
+    }
+
     let entries: Vec<(String, Vec<String>, Option<String>)> = doc
         .groups
         .into_iter()
@@ -419,6 +446,48 @@ mod tests {
         assert!(
             matches!(err, ScopeConfigLoadError::Parse { .. }),
             "expected Parse error for unknown field, got: {err}"
+        );
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn test_load_rejects_symlink_briefing_file() {
+        // Attack model: PR author commits review-scope.json with a briefing_file
+        // path that is a symlink to a workspace-external secret
+        // (e.g. track/review-prompts/policy.md -> /etc/passwd). The loader must
+        // reject the scope config at load time so the CLI never gets a path that
+        // the reviewer's Read tool could follow outside the workspace.
+        let dir = tempfile::tempdir().unwrap();
+        // Create an in-repo symlink whose target is outside the trusted root.
+        let briefing_dir = dir.path().join("track/review-prompts");
+        std::fs::create_dir_all(&briefing_dir).unwrap();
+        let symlink_path = briefing_dir.join("policy.md");
+        let outside = tempfile::tempdir().unwrap();
+        let outside_file = outside.path().join("secret.md");
+        std::fs::write(&outside_file, "secret").unwrap();
+        std::os::unix::fs::symlink(&outside_file, &symlink_path).unwrap();
+
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "plan-artifacts": {
+                        "patterns": ["track/items/**"],
+                        "briefing_file": "track/review-prompts/policy.md"
+                    }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("briefing_file") && detail.contains("symlink")
+            ),
+            "expected InvalidField with briefing_file symlink detail, got: {err}"
         );
     }
 }
