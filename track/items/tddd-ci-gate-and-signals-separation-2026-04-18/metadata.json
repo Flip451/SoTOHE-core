@@ -103,6 +103,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "6693a574e259373c7694e284c50b114333e9b270",
       "description": "infrastructure: `evaluate_layer_catalogue` (libs/infrastructure/src/verify/spec_states.rs) を更新し、`<layer>-type-signals.json` を読んで declaration_hash を現在の宣言ファイル hash と比較する。stale (不一致) と Missing (ファイル不在) を両方とも CI / merge gate で常に `VerifyFinding::error` とする (fail-closed、経路間で対称)。評価結果ファイル読取パスにも既存 `reject_symlinks_below` を適用。+ unit tests (stale / Missing / symlink / decode error 各ケース)。",
       "id": "T005",
       "status": "done"
@@ -110,7 +111,7 @@
     {
       "description": "harness: `track/review-scope.json` の `review_operational` に `track/items/<track-id>/*-type-signals.json` を追加。評価結果ファイルのみ変更した commit が `SystemReviewHasher` の `code_hash` を変動させないことを確認する回帰テスト相当 (既存 review scope test の拡張)。",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "cli + infrastructure (同一 commit): (a) `dispatch_track_commit_message()` (apps/cli/src/commands/make.rs) に pre-commit 自動再計算を配線。順序は 再計算→CI→review guard→commit。Red 検出で commit ブロック (commit-message.txt 保持)、Yellow で warning + 続行、書き込み前に `reject_symlinks_below` 適用。(b) 宣言ファイルコーデック `catalogue_codec.rs` から signals フィールドを除去 (encode / decode 両方向、schema_version は 2 維持)。ADR Migration §5 の「5a と 5b は同一 commit」制約に従う。+ unit tests。",
@@ -129,5 +130,5 @@
     }
   ],
   "title": "TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離",
-  "updated_at": "2026-04-18T19:21:32Z"
+  "updated_at": "2026-04-18T19:30:33Z"
 }

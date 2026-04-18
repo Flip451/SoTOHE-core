@@ -34,7 +34,8 @@
     }
   },
   "review_operational": [
-    "track/items/<track-id>/review.json"
+    "track/items/<track-id>/review.json",
+    "track/items/<track-id>/*-type-signals.json"
   ],
   "other_track": [
     "track/items/<other-track>/**",
