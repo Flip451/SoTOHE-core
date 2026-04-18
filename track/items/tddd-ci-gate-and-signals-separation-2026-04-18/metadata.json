@@ -1,0 +1,37 @@
+{
+  "schema_version": 3,
+  "id": "tddd-ci-gate-and-signals-separation-2026-04-18",
+  "branch": "track/tddd-ci-gate-and-signals-separation-2026-04-18",
+  "title": "TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離",
+  "status": "planned",
+  "created_at": "2026-04-18T14:39:59Z",
+  "updated_at": "2026-04-18T14:39:59Z",
+  "tasks": [
+    {
+      "id": "T000",
+      "description": "Placeholder task — `/track:design` 完了後に正式なタスク分解で上書きする。本エントリは CI (`verify-latest-track-local`) の plan.md task items 要件を満たすための一時 placeholder であり、タスク分解そのものではない。",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Stage 2 (TDDD) の `<layer>-types.json` を宣言ファイルと評価結果ファイル (`<layer>-type-signals.json`) に物理分離する。",
+      "`dispatch_track_commit_message()` に pre-commit 自動再計算を配線し、Red は commit をブロック、Yellow は warning で許容する。",
+      "評価結果ファイルを review scope の `review_operational` に追加し、`code_hash` 計算の対象外とする。",
+      "評価結果ファイルは宣言ファイルの fingerprint を記録し、stale/未評価は CI / merge gate で常に error とする (fail-closed)。",
+      "タスク分解は `/track:design` で Rust 型の実装詳細 (struct 名 / method signature 等) を確定した後に追加する。評価結果ファイルのワイヤースキーマ (schema_version/generated_at/declaration_hash/signals の 4 フィールド) は ADR D1/D5 の設計決定として既に確定済みであり、型詳細には含まれない。本 metadata.json は spec 系統のみを先行確定した状態。"
+    ],
+    "sections": [
+      {
+        "id": "S0",
+        "title": "Placeholder — タスク分解は /track:design 後に確定",
+        "description": [
+          "本 track は spec 系統 (ADR + spec.json + spec.md + verification.md) を先行確定した状態で commit されている。",
+          "実際のタスク分解は `/track:design` で Rust 型の実装詳細を確定した後に追加する。"
+        ],
+        "task_ids": ["T000"]
+      }
+    ]
+  }
+}

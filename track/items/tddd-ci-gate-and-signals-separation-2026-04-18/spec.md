@@ -1,0 +1,98 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+status: approved
+approved_at: "2026-04-18T17:05:59Z"
+version: "1.0.0"
+signals: { blue: 34, yellow: 0, red: 0 }
+---
+
+# TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離
+
+## Goal
+
+Stage 2 (TDDD) 信号機評価を pre-commit 時に自動再計算し、Red 信号を commit 段階で構造的にブロックする。開発者が `sotp track type-signals` を手動実行する前提を排除する。
+`<layer>-types.json` を宣言ファイルと評価結果ファイル (`<layer>-type-signals.json`) に物理分離し、authored な宣言と generated な評価結果を PR diff / review scope 上で明確に区別する。
+評価結果ファイルを review の `code_hash` 計算から除外し、評価結果のみの更新が不要な再レビューをトリガーしないようにする。
+評価結果ファイルに宣言ファイルの fingerprint を記録し、CI / merge gate で stale / 未評価状態を fail-closed で検出する。
+`strict-signal-gate-v2` の ADR 先行 + fail-closed 真理値表事前確定 + ヘキサゴナル層分離のパターンを踏襲し、レビューラウンドを最小化する。
+
+## Scope
+
+### In Scope
+- `<layer>-types.json` を宣言ファイル (`type_definitions` のみ) と評価結果ファイル (`<layer>-type-signals.json`, 新規) に物理分離する。評価結果ファイルは `schema_version: 1` の新規スキーマとし、宣言ファイルの `schema_version` は bump しない。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D1, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6] [tasks: T000]
+- `dispatch_track_commit_message()` (`apps/cli/src/commands/make.rs`) の guarded commit パスに、評価結果の自動再計算ステップを追加する。順序は 評価結果再計算 → CI → review guard → commit from file → `.commit_hash` 永続化。再計算を CI より前に置くことで、CI 内の stale 検出 (D5) が実行される時点で評価結果ファイルが最新状態となり、CI が stale でブロックされる前に再計算が走れない問題を防ぐ。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D2] [tasks: T000]
+- pre-commit 判定ポリシー: Red → commit をブロック (fail-closed、`tmp/track-commit/commit-message.txt` は保持) / Yellow → stderr に warning を出して commit を許可 / Blue → 全経路通過。merge gate の strict Yellow ブロック挙動は従来通り維持する。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D3] [tasks: T000]
+- `track/review-scope.json` の `review_operational` に `track/items/<track-id>/*-type-signals.json` を追加し、評価結果ファイルを `SystemReviewHasher` の `code_hash` 計算対象外とする。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D4] [tasks: T000]
+- `verify_from_spec_json` (`libs/infrastructure/src/verify/spec_states.rs`) が評価結果ファイルを読み、評価結果ファイルに記録された宣言 fingerprint と現在の宣言ファイルの fingerprint を比較する。CI interim mode / merge gate のいずれでも stale および未評価を常に `VerifyFinding::error` とする (fail-closed、経路間で対称)。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5] [tasks: T000]
+- `evaluate_layer_catalogue` (`libs/infrastructure/src/verify/spec_states.rs`) は評価結果ファイル読取パスにも既存の `reject_symlinks_below` ガードを適用し、symlink を fail-closed で拒否する。さらに、`sotp track type-signals` の書き込みパスでも書き込み前に宣言ファイルおよび評価結果ファイルのターゲットが symlink でないことを同ガードで確認し、symlink 検出時は fail-closed で書き込みをブロックする。新規 symlink 判定コードは書かない。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7] [tasks: T000]
+- 宣言ファイルコーデック (`libs/infrastructure/src/tddd/catalogue_codec.rs`) から `signals` フィールドを除去する。encode / decode の両方向で signals を扱わない。`schema_version` は 2 のまま据え置く。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D1, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6] [tasks: T000]
+- `sotp track type-signals` CLI が評価結果を分離ファイル (`<layer>-type-signals.json`) に書き込み、宣言ファイルからは `signals` を取り除いて再エンコードする。宣言ファイルのバイト列から fingerprint を計算して評価結果ファイルに記録する。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D1, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D2] [tasks: T000]
+- 振る舞い真理値表 (Behavior Truth Table) を spec.md に記述し、pre-commit / Docker 内 CI (`verify-spec-states-current-local`) / merge gate (`check_strict_merge_gate`) の 3 経路 × {Blue / Yellow / Red / Missing / Stale / Decode error / Symlink / TDDD not active} の振る舞いを事前確定する。実装完了時点で全セルを満たしていることを検証する。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D3, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7] [tasks: T000]
+- ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` を実装完了後に Proposed から Accepted へ昇格する。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md] [tasks: T000]
+
+### Out of Scope
+- Stage 1 (spec.json の `signals: {blue, yellow, red}` 同居) の分離は本 track の scope 外とする。spec-approve / content_hash / track-signals / track-sync-views 全体に波及するため、別 ADR + 別 track で扱う。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Rejected Alternatives R3]
+- 既存 active track に対するマイグレーションコマンドの提供は対象外とする。`<layer>-types.json` は track ごとに `track/items/<track-id>/` 以下に格納される per-track ファイルである。本 track は実装前段階であり `track/items/tddd-ci-gate-and-signals-separation-2026-04-18/` 以下に per-track の `<layer>-types.json` はまだ存在しない。現在 active な track はこの 1 件のみ (ADR §D6 参照) であるため、旧形式から新形式へのマイグレーションを必要とする per-track `<layer>-types.json` は存在せず、マイグレーション需要が存在しない。なお現在のシステム全体では `<layer>-types.json` に signals が埋め込まれているが、その変更はコーデック変更 (Migration 手順 5b) で行う。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6]
+- Docker image (tools stage) への nightly toolchain 追加は対象外。pre-commit 自動再計算は `bin/sotp` ホスト直接実行パスで走るため、Docker image の構成は変更しない。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Rejected Alternatives R4]
+- TypeCatalogueDocument を domain 型として 2 aggregate (宣言 / 評価結果) に分離することは対象外。`check_type_signals` は結合ビュー上で判定する純粋関数のため、aggregate 分離は YAGNI。I/O 層 (codec + file layout) のみを分離する。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Rejected Alternatives R5]
+- 宣言ファイルの `schema_version` bump (2 → 3) は対象外。既存 DTO で `signals` は `Option` 扱いのため、コーデック内部の変更のみで分離可能。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Rejected Alternatives R6]
+
+## Constraints
+- pre-commit の自動再計算は Rust 層 (`dispatch_track_commit_message()`) に実装する。Makefile.toml の `ci-local` 依存として実装しない (`ci-local` は Docker 内で走るため nightly toolchain 追加依存が発生する)。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D2, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Rejected Alternatives R4]
+- symlink / decode error は全経路 (pre-commit / CI / merge gate) で fail-closed error とする。Red も全経路でブロック (pre-commit は commit を中断、CI / merge gate は `VerifyFinding::error`)。未評価 (Missing) / stale は CI / merge gate の両経路で fail-closed `VerifyFinding::error` とする (pre-commit 経路では再計算が必ず先行して書き出すため N/A — fail-open ではない)。architecture-rules.json 不在は全経路で fail-closed error (pre-commit では本 ADR の新規決定、CI / merge gate では既存挙動)。architecture-rules.json に `tddd.enabled = true` な layer が定義されているにも関わらず 0 件になっている場合は全経路で fail-closed error (broken config として検出)。per-track に宣言ファイル (`<layer>-types.json`) が存在しない layer は TDDD not active として `[OK] skip` (Behavior Truth Table 参照)。「『わからない』『失敗した』場合は必ずブロックする」原則に従う。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Context, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7]
+- Yellow の扱いは strict-signal-gate-v2 の既存挙動を維持する: pre-commit warning / Docker 内 CI warning / merge gate error。stale の扱い (常に error) と混同しない。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D3, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5, knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md]
+- 評価結果ファイル読取には既存 `reject_symlinks_below` ガードをそのまま再利用する。新規 symlink 判定コードは書かない (既存コード再利用原則)。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7]
+- ヘキサゴナル層分離を守る: 評価結果ファイルの型は domain 層 (純粋) / codec は infrastructure 層 / pre-commit 配線は CLI 層 / オーケストレーションに usecase 層を必要とする場合は usecase 層に配置する。domain ← usecase ← infrastructure ← cli の依存方向を維持する。 [source: convention — knowledge/conventions/hexagonal-architecture.md, convention — knowledge/conventions/impl-delegation-arch-guard.md]
+- 評価結果ファイルの fingerprint は宣言ファイルをディスクに書き出したバイト列 (エンコード後) を対象とする SHA-256。読み直しで fingerprint が安定するようアルゴリズムを固定し、将来の互換変更はスキーマ bump を伴わせる。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §OQ3]
+- 評価結果ファイルは git tracked とする (`.gitignore` しない)。merge gate (`check_strict_merge_gate`) は `git show origin/<branch>:<path>` でコミット済みコンテンツを読むため、ignore すると opt-in 意味論が崩れる。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Rejected Alternatives R2]
+- 本 track 内で `cargo make ci` / `cargo make deny` / `cargo make check-layers` が通ること。層依存ルール (domain ← usecase ← infrastructure ← cli) が守られること。 [source: convention — .claude/rules/07-dev-environment.md, convention — knowledge/conventions/hexagonal-architecture.md]
+
+## Acceptance Criteria
+- [ ] 宣言ファイル `<layer>-types.json` が `signals` フィールドを持たずにエンコード・デコードできること。既存 schema_version=2 のままで encode/decode が成立する。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D1, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6] [tasks: T000]
+- [ ] 評価結果ファイル `<layer>-type-signals.json` が `schema_version: 1` の新規スキーマで encode/decode でき、`generated_at` (ISO 8601 UTC) と `declaration_hash` (SHA-256 hex) と `signals` (配列) を保持していること。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D1, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5] [tasks: T000]
+- [ ] `sotp track type-signals <track-id>` 実行後、宣言ファイルには signals が書き込まれず、評価結果ファイルにのみ signals が書き込まれること。`declaration_hash` が宣言ファイルのエンコード後バイト列の SHA-256 と一致すること。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D1, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5] [tasks: T000]
+- [ ] `verify_from_spec_json` が全 `tddd.enabled` layer について評価結果ファイルを読み、`check_type_signals` に signals を渡して Stage 2 判定を行うこと。評価結果ファイル不在は `[BLOCKED]` (未評価) として扱われること。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5] [tasks: T000]
+- [ ] 評価結果ファイルの `declaration_hash` が現在の宣言ファイル SHA-256 と一致しない場合、CI 経路 (strict=false) / merge gate 経路 (strict=true) のいずれでも `VerifyFinding::error` を返すこと (stale は経路間で対称)。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5] [tasks: T000]
+- [ ] 評価結果ファイルが symlink の場合、CI 経路で `reject_symlinks_below` 由来の `VerifyFinding::error` が emit されること。また、`sotp track type-signals` (pre-commit 再計算を含む) の書き込みパスでも同ガードが適用され、symlink 検出時に書き込みがブロックされること (新規 symlink 判定コードは追加していないこと)。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7] [tasks: T000]
+- [ ] `dispatch_track_commit_message()` が CI 実行前かつ review guard 前に評価結果再計算を実行すること (順序: 評価結果再計算 → CI → review guard → commit)。Red 検出時は非ゼロ終了で commit を中断し、`tmp/track-commit/commit-message.txt` を削除しないこと。Yellow 検出時は stderr に warning を出して commit を続行すること。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D2, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D3] [tasks: T000]
+- [ ] `track/review-scope.json` の `review_operational` に `track/items/<track-id>/*-type-signals.json` が含まれ、評価結果ファイルのみを変更した commit が `SystemReviewHasher` の `code_hash` を変動させないこと。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D4] [tasks: T000]
+- [ ] `cargo make ci` が本 track ブランチで通過すること (`verify-spec-states-current-local` を含む既存ゲートが新ファイル構造で正常動作すること)。 [source: convention — .claude/rules/07-dev-environment.md, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Migration] [tasks: T000]
+- [ ] spec.md の「Behavior Truth Table」の全セル (3 経路 × 8 状態) が実装で満たされており、fail-open が発生しないこと。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D3, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5, knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7] [tasks: T000]
+- [ ] ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` が `Status: Accepted` に昇格していること。 [source: knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md] [tasks: T000]
+
+## Behavior Truth Table
+
+本 track 実装完了時点で、以下の 3 経路 × 8 状態の振る舞いが満たされていることを検証する。fail-open が発生していないこと、経路間の矛盾がないことを確認する。
+
+| 状態 | pre-commit (`dispatch_track_commit_message`, ホスト) | Docker 内 CI (`verify-spec-states-current-local`, strict=false) | merge gate (`check_strict_merge_gate`, strict=true) |
+|---|---|---|---|
+| Blue (全宣言が Blue) | [OK] 通過 | [OK] 通過 | [OK] 通過 |
+| Yellow (宣言に Yellow あり / Red なし) | [WARN] stderr に warning + commit 続行 | [WARN] `VerifyFinding::warning` (CI 通過) | [BLOCKED] `VerifyFinding::error` |
+| Red (forward or reverse に Red あり) | [BLOCKED] commit 中断、`commit-message.txt` 保持 | [BLOCKED] `VerifyFinding::error` | [BLOCKED] `VerifyFinding::error` |
+| Missing (評価結果ファイル不在) | N/A (pre-commit が再計算して書き出す) | [BLOCKED] 未評価は fail-closed | [BLOCKED] 未評価は fail-closed |
+| Stale (declaration_hash 不一致) | N/A (pre-commit が必ず再計算) | [BLOCKED] stale は fail-closed (経路間で対称) | [BLOCKED] stale は fail-closed (経路間で対称) |
+| Decode error (JSON 破損 / unknown field) | [BLOCKED] | [BLOCKED] | [BLOCKED] |
+| Symlink (評価結果 or 宣言が symlink) | [BLOCKED] `reject_symlinks_below` (書き込み前チェック) | [BLOCKED] `reject_symlinks_below` | [BLOCKED] ls-tree mode 120000 拒否 |
+| TDDD not active (`tddd.enabled = false` な layer) | [OK] 当該 layer は skip | [OK] 当該 layer は skip | [OK] opt-in skip (既存挙動) |
+
+注:
+- pre-commit は実行前提として track ブランチにいて `tddd.enabled` layer が存在する場合のみ再計算する。track 以外のブランチでは skip する。
+- Missing / Stale の pre-commit 欄が N/A なのは「pre-commit が到達した時点で評価結果は必ず書き換えられる」ためであり、fail-open ではない。
+- Symlink の pre-commit 欄が [BLOCKED] なのは、`sotp track type-signals` 相当の書き込みステップが書き込み前に `reject_symlinks_below` を適用するためである (D7)。symlink を書き込みターゲットにすることを fail-closed で拒否する。
+- TDDD not active は `architecture-rules.json` の `tddd.enabled` が false な layer を指す (当該 layer の bindings に含まれないため skip)。`tddd.enabled = true` な layer の `<layer>-types.json` が不在の場合は `[BLOCKED]` error (Missing 行を参照)。
+- `architecture-rules.json` 自体の不在は pre-commit 経路でも fail-closed error とする (本 ADR の fail-closed 原則の新規適用)。tddd.enabled layer がゼロは CI / merge gate 経路の既存挙動と同様に fail-closed error とする。
+- 本表は ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` D3 / D5 / D7 を根拠とする。
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/source-attribution.md
+- knowledge/conventions/hexagonal-architecture.md
+- knowledge/conventions/impl-delegation-arch-guard.md
+- knowledge/conventions/filesystem-persistence-guard.md
+- knowledge/conventions/nightly-dev-tool.md
+- knowledge/conventions/review-protocol.md
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 34  🟡 0  🔴 0
+
