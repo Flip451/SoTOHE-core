@@ -369,6 +369,38 @@ fn test_sections_covers_all_kind_tags() {
 }
 ```
 
+### D10: Reality View as drill-down to Contract Map
+
+ADR `2026-04-17-1528-tddd-contract-map.md` の採用 (2026-04-17) 以降、本 ADR の Reality View (`TypeGraph` → mermaid) は **「実装状態の検証ドリルダウン」** として位置付ける。Contract Map (カタログ入力・全層統合、ADR 2026-04-17-1528) が **設計意図の俯瞰 (primary artifact)** を担い、Reality View は per-layer のギャップ検出と archaeology に特化する。
+
+#### 役割分担
+
+両 ADR の役割分担 (ADR 2026-04-17-1528 §D6 の表を本 ADR 側でも参照する):
+
+| 観点 | Contract Map (ADR 2026-04-17-1528) | Reality View (本 ADR) |
+|---|---|---|
+| 入力 | `<catalogue_file>` 全 tddd.enabled 層 | rustdoc JSON per layer |
+| 出力 | `contract-map.md` 1 ファイル | `<layer>-graph/index.md` + cluster files per layer |
+| 粒度 | 全層統合 | per-layer cluster |
+| 主目的 | 設計意図の俯瞰 / SoT chain の表紙 | 実装状態の検証ドリルダウン |
+| 依存 | カタログのみ (コンパイル不要) | rustdoc JSON (`cargo doc` 通過が前提) |
+| 更新頻度 | `/track:design` / カタログ更新時 | 実装進捗に応じて随時 |
+| 想定読者 | planner / reviewer / オンボーディング / 意思決定層 | implementer / レビュー時のギャップ検出 |
+
+両者は **競合しない独立 artifact** であり、Contract Map が設計段階の基盤、Reality View が実装段階の検証という順序で利用される。
+
+#### 本 ADR の Phase 1-3 実装計画への影響
+
+本 ADR の Phase 1-3 実装計画 (§D7) は単独で主 artifact である前提を保ちつつ、SoT chain 全体では Contract Map の下位 artifact として位置付けられる。具体的には:
+
+- **§D6 自動生成タイミング**: `sotp track type-signals` 成功時の Reality View auto-render 戦略は変更なし。ただし Contract Map は別フロー (`sotp track contract-map`, ADR 2026-04-17-1528 Phase 1) で独立生成される。
+- **§Phase 2 Scope Update §S2**: Reality View の auto-render 統合は Phase 2 (K) では延期継続。Contract Map の living document 化戦略 (ADR 2026-04-17-1528 Phase 3) と合わせて別 track で再評価する。
+- **§D7 Phase 3 path query**: `sotp track type-path` は Reality View 側の archaeology 手段として維持される。Contract Map は全層統合の俯瞰であり、経路探索は Reality View の守備範囲のまま。
+
+#### Open Question 解消
+
+本補記により、ADR 2026-04-17-1528 の Open Question §Q6 (既存 Phase 2 の位置付け修正) は解消される。§D7 は既存の「段階的実装」節として使用済みのため §D10 を使用する。
+
 ## Rejected Alternatives
 
 ### A1: GraphViz (DOT) で出力する

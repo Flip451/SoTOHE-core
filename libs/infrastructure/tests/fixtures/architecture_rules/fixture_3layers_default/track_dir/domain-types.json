@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "DomainEntity",
+      "kind": "value_object",
+      "description": "domain-layer value object",
+      "approved": true
+    }
+  ]
+}

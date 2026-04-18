@@ -1,0 +1,12 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "InfraAdapter",
+      "kind": "secondary_adapter",
+      "description": "infrastructure-layer adapter",
+      "approved": true,
+      "implements": []
+    }
+  ]
+}

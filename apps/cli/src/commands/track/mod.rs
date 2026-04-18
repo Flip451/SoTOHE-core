@@ -225,6 +225,38 @@ pub enum TrackCommand {
         edges: String,
     },
 
+    /// Render the catalogue-input contract map for a track
+    /// (ADR 2026-04-17-1528 §D1).
+    ///
+    /// Writes a single `track/items/<track-id>/contract-map.md` file
+    /// containing a mermaid flowchart of every `tddd.enabled` layer's
+    /// declared types, edges between method returns and declared types,
+    /// and trait-impl edges from `SecondaryAdapter` entries.
+    ContractMap {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Workspace root directory (must contain `architecture-rules.json`).
+        /// Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+
+        /// Optional comma-separated `kind_tag` filter (e.g.
+        /// `secondary_port,use_case`). When omitted every kind is rendered.
+        #[arg(long)]
+        kind_filter: Option<String>,
+
+        /// Optional comma-separated layer id filter (e.g.
+        /// `domain,usecase`). When omitted every `tddd.enabled` layer is
+        /// rendered. Unknown layer ids fail closed.
+        #[arg(long)]
+        layers: Option<String>,
+    },
+
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     BaselineCapture {
         /// Path to the track items root directory (e.g., `track/items`).
@@ -388,6 +420,15 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             cluster_depth,
             edges,
         ),
+        TrackCommand::ContractMap { items_dir, track_id, workspace_root, kind_filter, layers } => {
+            tddd::contract_map::execute_contract_map(
+                items_dir,
+                track_id,
+                workspace_root,
+                kind_filter,
+                layers,
+            )
+        }
         TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force, layer } => {
             tddd::baseline::execute_baseline_capture(
                 items_dir,

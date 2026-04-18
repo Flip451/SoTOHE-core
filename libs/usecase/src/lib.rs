@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 //! Use case layer for the SoTOHE-core track state machine.
 
+pub mod contract_map_workflow;
 pub mod git_workflow;
 pub mod hook;
 pub mod merge_gate;

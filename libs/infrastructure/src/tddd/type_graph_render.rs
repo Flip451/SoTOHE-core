@@ -1083,7 +1083,13 @@ fn render_edge_symbol(src: &str, label: &str, tgt: &str, kind: &str) -> String {
 /// Splits on non-alphanumeric/underscore characters and keeps tokens that
 /// start with an uppercase letter. Used to find potential type references
 /// in return type strings like `"Result<Option<User>, DomainError>"`.
-fn extract_type_names(ty: &str) -> Vec<&str> {
+///
+/// Visibility: `pub(crate)` so other modules inside the `infrastructure`
+/// crate (for example `catalogue_bulk_loader` / future contract-map edge
+/// extraction) can reuse this helper without re-implementing the
+/// tokenisation. The function is kept inside `type_graph_render` because
+/// that is where the tokenisation rules originally evolved.
+pub(crate) fn extract_type_names(ty: &str) -> Vec<&str> {
     ty.split(|c: char| !c.is_alphanumeric() && c != '_')
         .filter(|s| !s.is_empty())
         .filter(|s| s.starts_with(char::is_uppercase))

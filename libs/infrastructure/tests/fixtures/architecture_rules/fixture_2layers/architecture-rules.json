@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "adapter",
+      "path": "libs/adapter",
+      "may_depend_on": ["core"],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "adapter-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["adapter"]}
+      }
+    },
+    {
+      "crate": "core",
+      "path": "libs/core",
+      "may_depend_on": [],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "core-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["core"]}
+      }
+    }
+  ]
+}

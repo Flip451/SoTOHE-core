@@ -281,11 +281,11 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("cargo make tools-up", workflow_doc)
         self.assertIn("Cargo.lock", workflow_doc)
 
-        orchestrator_doc = (
-            PROJECT_ROOT / ".claude" / "agents" / "orchestrator.md"
-        ).read_text(encoding="utf-8")
-        self.assertIn("cargo make tools-up", orchestrator_doc)
-        self.assertIn("Cargo.lock", orchestrator_doc)
+        # `.claude/agents/orchestrator.md` was removed in commit f0ae093
+        # (pre-Phase-1.5). The `tools-up` / `Cargo.lock` guardrails are now
+        # covered by `.claude/commands/track/implement.md` (asserted above)
+        # and `knowledge/WORKFLOW.md` (asserted above), so there is no need
+        # to keep an orphan file check here.
 
     def test_rustfmt_config_exposes_overrides_and_default_catalog(self) -> None:
         rustfmt = (PROJECT_ROOT / "rustfmt.toml").read_text(encoding="utf-8")

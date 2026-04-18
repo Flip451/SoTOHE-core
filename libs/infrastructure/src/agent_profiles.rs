@@ -277,8 +277,8 @@ mod tests {
             "gemini": { "label": "Gemini CLI" }
         },
         "capabilities": {
-            "orchestrator": { "provider": "claude", "model": "claude-opus-4-6" },
-            "planner": { "provider": "claude", "model": "claude-opus-4-6" },
+            "orchestrator": { "provider": "claude", "model": "claude-opus-4-7" },
+            "planner": { "provider": "claude", "model": "claude-opus-4-7" },
             "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini" },
             "researcher": { "provider": "gemini" }
         }
@@ -302,7 +302,7 @@ mod tests {
 
         let resolved = profiles.resolve_execution("orchestrator", RoundType::Final).unwrap();
         assert_eq!(resolved.provider, "claude");
-        assert_eq!(resolved.model.as_deref(), Some("claude-opus-4-6"));
+        assert_eq!(resolved.model.as_deref(), Some("claude-opus-4-7"));
     }
 
     #[test]
@@ -328,7 +328,7 @@ mod tests {
             "capabilities": {
                 "reviewer": {
                     "provider": "claude",
-                    "model": "claude-opus-4-6",
+                    "model": "claude-opus-4-7",
                     "fast_provider": "codex",
                     "fast_model": "gpt-5.4-mini"
                 }
@@ -340,7 +340,7 @@ mod tests {
 
         let final_exec = profiles.resolve_execution("reviewer", RoundType::Final).unwrap();
         assert_eq!(final_exec.provider, "claude");
-        assert_eq!(final_exec.model.as_deref(), Some("claude-opus-4-6"));
+        assert_eq!(final_exec.model.as_deref(), Some("claude-opus-4-7"));
 
         let fast_exec = profiles.resolve_execution("reviewer", RoundType::Fast).unwrap();
         assert_eq!(fast_exec.provider, "codex");
@@ -380,7 +380,7 @@ mod tests {
 
         let resolved = profiles.resolve_execution("orchestrator", RoundType::Fast).unwrap();
         assert_eq!(resolved.provider, "claude");
-        assert_eq!(resolved.model.as_deref(), Some("claude-opus-4-6"));
+        assert_eq!(resolved.model.as_deref(), Some("claude-opus-4-7"));
     }
 
     #[test]

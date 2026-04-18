@@ -1,0 +1,12 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "AdapterImpl",
+      "kind": "secondary_adapter",
+      "description": "adapter-layer secondary adapter",
+      "approved": true,
+      "implements": []
+    }
+  ]
+}

@@ -86,6 +86,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Catalogue active-track guard + renderer source-file-name + sync_rendered_views multilayer](2026-04-15-1012-catalogue-active-guard-fix.md) | Accepted | 2026-04-15 |
 | [TDDD-05: Secondary Adapter variant の追加 — infrastructure 層における hexagonal port 実装の検証](2026-04-15-1636-tddd-05-secondary-adapter.md) | Accepted | 2026-04-15 |
 | [TDDD Type Graph View — TypeGraph から mermaid 図をレンダーして型間関係を可視化する](2026-04-16-2200-tddd-type-graph-view.md) | Accepted | 2026-04-16 |
+| [TDDD Contract Map — 全層カタログを入力とする統合 mermaid view](2026-04-17-1528-tddd-contract-map.md) | Accepted | 2026-04-17 |
 
 ### ADR 運用
 

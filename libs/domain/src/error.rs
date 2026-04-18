@@ -66,6 +66,11 @@ pub enum ValidationError {
     TaskDescriptionMutated { task_id: String },
     #[error("task '{task_id}' was removed; existing tasks cannot be deleted via save")]
     TaskRemoved { task_id: String },
+    #[error(
+        "layer id '{0}' must be a non-empty ASCII identifier starting with a letter \
+         (allowed: letters, digits, `_`, `-`)"
+    )]
+    InvalidLayerId(String),
 }
 
 /// Errors from invalid task state transitions.
