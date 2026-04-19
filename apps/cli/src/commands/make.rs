@@ -802,6 +802,19 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
             continue;
         }
 
+        // Skip multi-target layers here so this post-recompute missing-file
+        // gate stays consistent with `execute_type_signals_lenient`, which
+        // intentionally bypasses the strict evaluator for layers whose
+        // `schema_export.targets` has more than one entry. Without this
+        // exemption the "catalogue present but signal file absent" BLOCKED
+        // branch below would fire on every pre-commit for multi-target
+        // tracks even though the lenient executor chose not to write signals
+        // for them. CI / merge-gate detect staleness independently via
+        // `declaration_hash` comparison on the persisted signal file.
+        if binding.targets().len() > 1 {
+            continue;
+        }
+
         let signal_path = track_dir.join(binding.signal_file());
         if !signal_path.is_file() {
             // Catalogue exists but signal file is absent after a successful
