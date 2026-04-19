@@ -2,11 +2,13 @@
 
 use std::path::{Path, PathBuf};
 
-use domain::{TaskStatus, TrackMetadata};
+use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
+use domain::{TaskStatus, TrackId, TrackMetadata};
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
 use crate::spec;
+use crate::tddd::contract_map_adapter::FsCatalogueLoader;
 use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers_from_path};
@@ -688,6 +690,19 @@ pub fn sync_rendered_views(
                     }
                 }
             }
+
+            // Render `contract-map.md` alongside the per-layer views so it
+            // stays fresh on every track-transition / sync-views / pre-commit
+            // run — callers (especially reviewers) never see a stale
+            // declaration relationship diagram.
+            //
+            // Failure modes (loader error, empty catalogues, unknown layer)
+            // are non-fatal for this view: log to stderr and continue without
+            // aborting the wider sync. The authoritative fail-closed path for
+            // TDDD semantic correctness lives in
+            // `spec_states::evaluate_layer_catalogue` (T005) and the
+            // merge-gate adapter (T007 follow-up).
+            render_contract_map_view(root, &track_dir, track_id, &mut changed);
         } // end if !is_done_or_archived
     }
 
@@ -706,6 +721,75 @@ pub fn sync_rendered_views(
     }
 
     Ok(changed)
+}
+
+/// Renders `contract-map.md` for the active track and appends the path to
+/// `changed` when the content actually differs on disk.
+///
+/// Non-fatal by design — all failures (loader error, empty catalogues,
+/// invalid TrackId) produce a stderr warning and leave the existing
+/// `contract-map.md` untouched. The authoritative fail-closed gate for
+/// TDDD correctness lives in `spec_states::evaluate_layer_catalogue` /
+/// the merge-gate adapter; this function just keeps the rendered diagram
+/// in sync with the declarations.
+fn render_contract_map_view(
+    root: &Path,
+    track_dir: &Path,
+    track_id_str: Option<&str>,
+    changed: &mut Vec<PathBuf>,
+) {
+    let Some(track_id_raw) = track_id_str else {
+        return;
+    };
+    let Ok(track_id) = TrackId::try_new(track_id_raw) else {
+        eprintln!(
+            "warning: skipping contract-map.md render for {} (invalid track id)",
+            track_dir.display()
+        );
+        return;
+    };
+
+    let items_dir = root.join(TRACK_ITEMS_DIR);
+    let rules_path = root.join("architecture-rules.json");
+    let loader = FsCatalogueLoader::new(items_dir, rules_path, root.to_path_buf());
+    let (layer_order, catalogues) = match loader.load_all(&track_id) {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!(
+                "warning: skipping contract-map.md render for {} ({})",
+                track_dir.display(),
+                e
+            );
+            return;
+        }
+    };
+    if layer_order.is_empty() {
+        // No TDDD-enabled layers on this track — nothing to render.
+        return;
+    }
+
+    let opts = ContractMapRenderOptions::default();
+    let content = render_contract_map(&catalogues, &layer_order, &opts);
+    let contract_map_path = track_dir.join("contract-map.md");
+    let old = match std::fs::read_to_string(&contract_map_path) {
+        Ok(existing) => Some(existing),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        Err(e) => {
+            eprintln!(
+                "warning: cannot read existing contract-map.md for {}: {e}",
+                track_dir.display()
+            );
+            return;
+        }
+    };
+    let rendered_str: &str = content.as_ref();
+    if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_str)) {
+        if let Err(e) = atomic_write_file(&contract_map_path, rendered_str.as_bytes()) {
+            eprintln!("warning: cannot write contract-map.md for {}: {e}", track_dir.display());
+            return;
+        }
+        changed.push(contract_map_path);
+    }
 }
 
 #[cfg(test)]
