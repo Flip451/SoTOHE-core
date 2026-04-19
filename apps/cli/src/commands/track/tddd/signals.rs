@@ -149,6 +149,64 @@ pub fn execute_type_signals(
     Ok(ExitCode::SUCCESS)
 }
 
+/// Pre-commit-flavored variant of [`execute_type_signals`] that treats a
+/// missing per-layer catalogue file as "layer not yet initialized for this
+/// track" and skips it silently, matching the CI
+/// (`spec_states::evaluate_layer_catalogue`) and merge-gate semantics. This
+/// resolves the asymmetry where the user-invoked `sotp track type-signals`
+/// hard-fails on a missing catalogue (correct UX — the user explicitly asked
+/// to evaluate), but the automated pre-commit hook must behave like the
+/// verification gates (skip inactive layers, pass).
+///
+/// Same guards as `execute_type_signals`: active-track guard, `architecture-rules.json`
+/// fail-closed via `resolve_layers`, empty-bindings fail-closed. Only the
+/// per-layer NotFound handling differs.
+///
+/// # Errors
+///
+/// Returns `CliError` on the same paths as `execute_type_signals` EXCEPT the
+/// per-layer catalogue NotFound, which is silently skipped here.
+pub fn execute_type_signals_lenient(
+    items_dir: PathBuf,
+    track_id: String,
+    workspace_root: PathBuf,
+    layer: Option<String>,
+) -> Result<ExitCode, CliError> {
+    let valid_id = domain::TrackId::try_new(&track_id)
+        .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
+    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+        .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
+    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
+        domain::TrackStatus::Archived
+    } else {
+        metadata.status()
+    };
+    ensure_active_track(effective_status, &track_id)?;
+
+    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
+    if bindings.is_empty() {
+        return Err(CliError::Message(
+            "no tddd.enabled layers found in architecture-rules.json; nothing to evaluate"
+                .to_owned(),
+        ));
+    }
+
+    let track_dir = items_dir.join(&track_id);
+    for binding in &bindings {
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        if !catalogue_path.is_file() {
+            // Missing declaration file → layer is not TDDD-active for this
+            // track (matches `evaluate_layer_catalogue` NotFound-skip in
+            // `spec_states.rs`). Skip silently — pre-commit must not be
+            // stricter than CI / merge gate.
+            continue;
+        }
+        execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
+    }
+
+    Ok(ExitCode::SUCCESS)
+}
+
 /// Evaluate type signals for a single TDDD layer binding and write back to the
 /// configured catalogue file.
 ///

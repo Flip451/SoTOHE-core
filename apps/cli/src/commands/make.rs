@@ -14,7 +14,7 @@ use infrastructure::track::symlink_guard;
 use infrastructure::verify::tddd_layers::parse_tddd_layers;
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::{ensure_active_track, execute_type_signals};
+use crate::commands::track::tddd::signals::{ensure_active_track, execute_type_signals_lenient};
 
 /// Arguments for `sotp make <task> [args...]`.
 #[derive(Args)]
@@ -701,10 +701,17 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
         }
     }
 
-    // Delegate to the CLI execute path so the writer-side symlink guards
-    // (§D7) and error plumbing are shared with the user-invoked command.
-    let exec_result =
-        execute_type_signals(items_dir.clone(), track_id.to_owned(), workspace_root.clone(), None)?;
+    // Delegate to the lenient variant so pre-commit matches CI semantics:
+    // a layer without a declaration file is treated as "TDDD not active for
+    // this layer" and skipped silently, rather than hard-failing the commit.
+    // This keeps pre-commit from being stricter than CI / merge gate (ADR
+    // §D2 / §D5 symmetry).
+    let exec_result = execute_type_signals_lenient(
+        items_dir.clone(),
+        track_id.to_owned(),
+        workspace_root.clone(),
+        None,
+    )?;
     if exec_result != ExitCode::SUCCESS {
         eprintln!("[track-commit-message] BLOCKED: type-signals recomputation returned non-zero");
         return Ok(exec_result);
