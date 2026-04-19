@@ -166,11 +166,37 @@ pub fn execute_type_signals(
 ///
 /// Returns `CliError` on the same paths as `execute_type_signals` EXCEPT the
 /// per-layer catalogue NotFound, which is silently skipped here.
+#[allow(dead_code)]
 pub fn execute_type_signals_lenient(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
     layer: Option<String>,
+) -> Result<ExitCode, CliError> {
+    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
+    execute_type_signals_lenient_with_bindings(items_dir, track_id, workspace_root, &bindings)
+}
+
+/// Same semantics as [`execute_type_signals_lenient`] but accepts a
+/// caller-supplied `bindings` snapshot so the caller can run its own
+/// validation + classification against exactly the same binding set that
+/// was processed here. Closes the TOCTOU window where
+/// `architecture-rules.json` could be edited between a caller's pre-flight
+/// parse and the internal `resolve_layers` read.
+///
+/// The pre-commit wiring in `dispatch_track_commit_message` uses this
+/// variant to share one parsed binding snapshot across pre-flight
+/// validation, recompute, and the post-recompute signal classification
+/// loop.
+///
+/// # Errors
+///
+/// Same as [`execute_type_signals_lenient`].
+pub fn execute_type_signals_lenient_with_bindings(
+    items_dir: PathBuf,
+    track_id: String,
+    workspace_root: PathBuf,
+    bindings: &[TdddLayerBinding],
 ) -> Result<ExitCode, CliError> {
     let valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
@@ -183,7 +209,6 @@ pub fn execute_type_signals_lenient(
     };
     ensure_active_track(effective_status, &track_id)?;
 
-    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
     if bindings.is_empty() {
         return Err(CliError::Message(
             "no tddd.enabled layers found in architecture-rules.json; nothing to evaluate"
@@ -192,7 +217,7 @@ pub fn execute_type_signals_lenient(
     }
 
     let track_dir = items_dir.join(&track_id);
-    for binding in &bindings {
+    for binding in bindings {
         // Skip layers with multi-target `schema_export.targets`:
         // `execute_type_signals_for_layer` hard-fails on that configuration
         // (multi-target rustdoc merge is not implemented yet). The CI /

@@ -14,7 +14,9 @@ use infrastructure::track::symlink_guard;
 use infrastructure::verify::tddd_layers::parse_tddd_layers;
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::{ensure_active_track, execute_type_signals_lenient};
+use crate::commands::track::tddd::signals::{
+    ensure_active_track, execute_type_signals_lenient_with_bindings,
+};
 
 /// Arguments for `sotp make <task> [args...]`.
 #[derive(Args)]
@@ -627,11 +629,14 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
     // pre-commit path does NOT fall back to a synthetic domain binding.
     let rules_path = workspace_root.join("architecture-rules.json");
 
-    // Pre-flight check: architecture-rules.json must exist and be parseable
-    // before calling execute_type_signals. This is the ADR §D2 fail-closed
-    // requirement: the pre-commit path does NOT fall back to the legacy
-    // synthetic domain binding.
-    match symlink_guard::reject_symlinks_below(&rules_path, &workspace_root) {
+    // Pre-flight snapshot: read + parse `architecture-rules.json` exactly
+    // once. The same parsed binding set drives recompute (via
+    // `execute_type_signals_lenient_with_bindings`) AND the post-recompute
+    // classification loop below, eliminating the TOCTOU window where
+    // `architecture-rules.json` could be edited between separate reads and
+    // allow stale signals through pre-commit (PR #106 TOCTOU P1 finding).
+    let bindings_snapshot = match symlink_guard::reject_symlinks_below(&rules_path, &workspace_root)
+    {
         Ok(true) => {
             let content = std::fs::read_to_string(&rules_path).map_err(|e| {
                 CliError::Message(format!(
@@ -639,13 +644,11 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
                     rules_path.display()
                 ))
             })?;
-            // Validate parseability. execute_type_signals will re-read
-            // the file; this guard ensures it was valid before delegation.
             parse_tddd_layers(&content).map_err(|e| {
                 CliError::Message(format!(
                     "[track-commit-message] BLOCKED: architecture-rules.json parse error: {e}"
                 ))
-            })?;
+            })?
         }
         Ok(false) => {
             eprintln!(
@@ -705,52 +708,25 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
     // a layer without a declaration file is treated as "TDDD not active for
     // this layer" and skipped silently, rather than hard-failing the commit.
     // This keeps pre-commit from being stricter than CI / merge gate (ADR
-    // §D2 / §D5 symmetry).
-    let exec_result = execute_type_signals_lenient(
+    // §D2 / §D5 symmetry). Pass the pre-flight `bindings_snapshot` so the
+    // recompute runs against exactly the same binding set the classification
+    // loop below will use — no TOCTOU gap.
+    let exec_result = execute_type_signals_lenient_with_bindings(
         items_dir.clone(),
         track_id.to_owned(),
         workspace_root.clone(),
-        None,
+        &bindings_snapshot,
     )?;
     if exec_result != ExitCode::SUCCESS {
         eprintln!("[track-commit-message] BLOCKED: type-signals recomputation returned non-zero");
         return Ok(exec_result);
     }
 
-    // Re-read architecture-rules.json after recomputation to obtain the
-    // binding set that execute_type_signals actually used for classification.
-    // This eliminates the TOCTOU window where a layer could be added between
-    // the initial read and execute_type_signals's internal read. If the file
-    // is now absent or unparseable, block the commit fail-closed.
-    let bindings_post = match symlink_guard::reject_symlinks_below(&rules_path, &workspace_root) {
-        Ok(true) => {
-            let content_post = std::fs::read_to_string(&rules_path).map_err(|e| {
-                CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: cannot re-read {}: {e}",
-                    rules_path.display()
-                ))
-            })?;
-            parse_tddd_layers(&content_post).map_err(|e| {
-                CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: architecture-rules.json re-parse error: {e}"
-                ))
-            })?
-        }
-        Ok(false) => {
-            eprintln!(
-                "[track-commit-message] BLOCKED: architecture-rules.json disappeared after \
-                 recomputation. Cannot classify type signals."
-            );
-            return Ok(ExitCode::from(1));
-        }
-        Err(e) => {
-            eprintln!(
-                "[track-commit-message] BLOCKED: architecture-rules.json symlink detected after \
-                 recomputation: {e}"
-            );
-            return Ok(ExitCode::from(1));
-        }
-    };
+    // Classify against the same `bindings_snapshot` the recompute saw.
+    // Re-reading `architecture-rules.json` here would re-open the TOCTOU
+    // window called out by the PR #106 review; keep a single source of
+    // truth for the entire pre-commit critical section.
+    let bindings_post = &bindings_snapshot;
 
     let track_dir = items_dir.join(track_id);
 
@@ -762,7 +738,7 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
     // content), causing CI to validate a different tree than what gets recorded.
     // Use `bindings_post` (post-recompute re-read) so we stage exactly the files
     // that execute_type_signals processed.
-    for binding in &bindings_post {
+    for binding in bindings_post {
         let catalogue_path = track_dir.join(binding.catalogue_file());
         if !catalogue_path.is_file() {
             continue; // no catalogue → nothing was written → nothing to stage
@@ -800,7 +776,7 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
     }
     let mut red_names: Vec<String> = Vec::new();
     let mut yellow_names: Vec<String> = Vec::new();
-    for binding in &bindings_post {
+    for binding in bindings_post {
         // Skip layers whose declaration file is absent on this track —
         // matches the CI / merge-gate semantics (`evaluate_layer_catalogue`
         // treats a missing catalogue as "TDDD not active for this layer"
