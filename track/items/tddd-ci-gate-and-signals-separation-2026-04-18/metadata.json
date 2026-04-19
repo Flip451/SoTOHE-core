@@ -127,11 +127,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "ecf48f0b1db4e0f7ce30ca04d07655fbb6bf9de9",
       "description": "docs: ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` の Status を Proposed → Accepted に更新。関連 ADR から本 ADR へのリンクが必要なら追加 (Referenced By セクション等)。",
       "id": "T009",
       "status": "done"
     }
   ],
   "title": "TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離",
-  "updated_at": "2026-04-18T20:42:08Z"
+  "updated_at": "2026-04-18T20:45:53Z"
 }

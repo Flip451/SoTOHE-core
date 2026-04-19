@@ -166,197 +166,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
-          "at": "2026-04-18T19:32:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
-          "at": "2026-04-18T19:34:02Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
-          "at": "2026-04-18T18:24:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
-          "at": "2026-04-18T18:26:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
-          "at": "2026-04-18T19:32:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
-          "at": "2026-04-18T19:33:06Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeSignalDto` should also use `#[serde(deny_unknown_fields)]`; as written, typos inside individual `signals[]` entries are silently ignored on decode, which contradicts the module’s fail-closed contract and can let malformed evaluation data pass as valid.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 80,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
-          "at": "2026-04-18T18:41:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
-          "at": "2026-04-18T18:42:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeSignalsDocDto.signals` is deserialized with `#[serde(default)]`, so a malformed `<layer>-type-signals.json` that omits the required top-level `signals` field is accepted as `[]` instead of being rejected at the codec boundary. ADR D1 defines `signals` as part of the schema, so this should fail closed rather than silently turning a bad file into an empty evaluation.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 74,
-              "category": null
-            },
-            {
-              "message": "`decode` validates `generated_at` with `Timestamp::new`, but that parser accepts RFC3339 offsets such as `2026-04-18T12:00:00+09:00`. ADR D1 and this module’s docs require an ISO 8601 UTC timestamp, so non-UTC payloads currently pass validation and are preserved verbatim on re-encode.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 109,
-              "category": null
-            },
-            {
-              "message": "`encode` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is public and can hold values other than `1`, this encoder can emit on-disk signal files that its own `decode` path immediately rejects, even though ADR D1 fixes the file format at `schema_version: 1`. The encoder should pin or validate the version before serializing.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 132,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
-          "at": "2026-04-18T18:45:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`decode()` validates `generated_at` with `Timestamp::new`, but that parser accepts offset timestamps like `2026-04-18T12:00:00+09:00`. The ADR/track contract says `<layer>-type-signals.json` stores a UTC timestamp, so this codec currently accepts and round-trips schema-invalid files instead of returning `InvalidTimestamp`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 109,
-              "category": "validation"
-            },
-            {
-              "message": "`encode()` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is a public constructor, callers can serialize a version other than `1`, producing a `<layer>-type-signals.json` file that this same codec will reject on the next read. The on-disk format needs to be pinned to schema version 1 here, the same way `catalogue_codec` pins its schema version during encode.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 132,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
-          "at": "2026-04-18T18:48:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeSignalsDocDto` marks the top-level `signals` field with `#[serde(default)]`, so `decode()` accepts a `<layer>-type-signals.json` payload that omits `signals` entirely and silently turns that malformed/truncated file into an empty evaluation result. ADR §D1 defines `signals` as part of the required file shape, so this should fail closed instead of being treated as a valid document.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 74,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:0c87c402bfc03180c23e684d53c114b505bc684f5dbcca10090ae9b7396a6c60",
-          "at": "2026-04-18T18:51:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:44781f27e246d6decf8fe7d9635a90593cd37adebdb821a1c14bc0efb007b65a",
-          "at": "2026-04-18T18:54:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
-          "at": "2026-04-18T18:58:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
-          "at": "2026-04-18T18:59:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:522432f903ee4dfcf3ace6362d2adad492ae1a13c0ae0bfbef0827d370058d12",
-          "at": "2026-04-18T19:24:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:522432f903ee4dfcf3ace6362d2adad492ae1a13c0ae0bfbef0827d370058d12",
-          "at": "2026-04-18T19:27:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
-          "at": "2026-04-18T19:47:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
-          "at": "2026-04-18T19:49:41Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -1229,6 +1038,254 @@
           "findings": [],
           "hash": "rvw1:sha256:c58d9f2c71a856caf27697b377f11f0af5ba359c69ee460c2dfe735963a32c3a",
           "at": "2026-04-18T20:44:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9e1c29f77c972560dc9f006625c9fc9f9d7be1685fb3ede5520b9b246ca7d0",
+          "at": "2026-04-19T00:32:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9e1c29f77c972560dc9f006625c9fc9f9d7be1685fb3ede5520b9b246ca7d0",
+          "at": "2026-04-19T00:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df2ef1f709643d71ecc3c35b6215e3eef1c31db19043713609fb2830e6df95d3",
+          "at": "2026-04-19T00:42:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df2ef1f709643d71ecc3c35b6215e3eef1c31db19043713609fb2830e6df95d3",
+          "at": "2026-04-19T00:43:48Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:32:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:34:02Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalDto` should also use `#[serde(deny_unknown_fields)]`; as written, typos inside individual `signals[]` entries are silently ignored on decode, which contradicts the module’s fail-closed contract and can let malformed evaluation data pass as valid.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 80,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:41:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:42:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsDocDto.signals` is deserialized with `#[serde(default)]`, so a malformed `<layer>-type-signals.json` that omits the required top-level `signals` field is accepted as `[]` instead of being rejected at the codec boundary. ADR D1 defines `signals` as part of the schema, so this should fail closed rather than silently turning a bad file into an empty evaluation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 74,
+              "category": null
+            },
+            {
+              "message": "`decode` validates `generated_at` with `Timestamp::new`, but that parser accepts RFC3339 offsets such as `2026-04-18T12:00:00+09:00`. ADR D1 and this module’s docs require an ISO 8601 UTC timestamp, so non-UTC payloads currently pass validation and are preserved verbatim on re-encode.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 109,
+              "category": null
+            },
+            {
+              "message": "`encode` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is public and can hold values other than `1`, this encoder can emit on-disk signal files that its own `decode` path immediately rejects, even though ADR D1 fixes the file format at `schema_version: 1`. The encoder should pin or validate the version before serializing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 132,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode()` validates `generated_at` with `Timestamp::new`, but that parser accepts offset timestamps like `2026-04-18T12:00:00+09:00`. The ADR/track contract says `<layer>-type-signals.json` stores a UTC timestamp, so this codec currently accepts and round-trips schema-invalid files instead of returning `InvalidTimestamp`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 109,
+              "category": "validation"
+            },
+            {
+              "message": "`encode()` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is a public constructor, callers can serialize a version other than `1`, producing a `<layer>-type-signals.json` file that this same codec will reject on the next read. The on-disk format needs to be pinned to schema version 1 here, the same way `catalogue_codec` pins its schema version during encode.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 132,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:48:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsDocDto` marks the top-level `signals` field with `#[serde(default)]`, so `decode()` accepts a `<layer>-type-signals.json` payload that omits `signals` entirely and silently turns that malformed/truncated file into an empty evaluation result. ADR §D1 defines `signals` as part of the required file shape, so this should fail closed instead of being treated as a valid document.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 74,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0c87c402bfc03180c23e684d53c114b505bc684f5dbcca10090ae9b7396a6c60",
+          "at": "2026-04-18T18:51:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44781f27e246d6decf8fe7d9635a90593cd37adebdb821a1c14bc0efb007b65a",
+          "at": "2026-04-18T18:54:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
+          "at": "2026-04-18T18:58:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
+          "at": "2026-04-18T18:59:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:522432f903ee4dfcf3ace6362d2adad492ae1a13c0ae0bfbef0827d370058d12",
+          "at": "2026-04-18T19:24:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:522432f903ee4dfcf3ace6362d2adad492ae1a13c0ae0bfbef0827d370058d12",
+          "at": "2026-04-18T19:27:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
+          "at": "2026-04-18T19:47:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
+          "at": "2026-04-18T19:49:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new signal-file read follows symlinks (`is_file()` + `read_to_string`) and will use the symlink target's contents to populate the markdown, rather than treating symlinked `<layer>-type-signals.json` as a non-fatal miss that falls back to `—`. That breaks the intended view-only symlink handling and allows a crafted symlink to inject arbitrary external file contents into the renderer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 642,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:1ae6cf9520db16a50a4cb8560e5299b208719b3cf37c4bee6b4f31807003d341",
+          "at": "2026-04-19T00:33:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fffcacd6e8b2c27666be12dc6585676d3377c5e4c28c16b7e2a963c3b8a9632",
+          "at": "2026-04-19T00:38:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fffcacd6e8b2c27666be12dc6585676d3377c5e4c28c16b7e2a963c3b8a9632",
+          "at": "2026-04-19T00:40:34Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:24:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:26:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
+          "at": "2026-04-18T19:32:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
+          "at": "2026-04-18T19:33:06Z"
         }
       ]
     }

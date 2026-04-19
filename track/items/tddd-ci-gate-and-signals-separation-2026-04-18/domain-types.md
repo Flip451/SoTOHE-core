@@ -4,11 +4,11 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| TypeSignalsLoadResult | enum | — | Current, Stale, Missing | — |
+| TypeSignalsLoadResult | enum | — | Current, Stale, Missing | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| TypeSignalsDocument | value_object | — | — | — |
+| TypeSignalsDocument | value_object | — | — | 🔵 |
 

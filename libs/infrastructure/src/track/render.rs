@@ -7,7 +7,7 @@ use domain::{TaskStatus, TrackMetadata};
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
 use crate::spec;
-use crate::tddd::catalogue_codec;
+use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers_from_path};
 
@@ -623,7 +623,38 @@ pub fn sync_rendered_views(
                 }
                 let catalogue_content = std::fs::read_to_string(&catalogue_path)?;
                 match catalogue_codec::decode(&catalogue_content) {
-                    Ok(doc) => {
+                    Ok(mut doc) => {
+                        // Populate signals from the external `<layer>-type-signals.json`
+                        // file so the rendered markdown shows the evaluated Blue/Yellow/Red
+                        // emojis instead of `—` placeholders. ADR 2026-04-18-1400 §D1
+                        // moved signals out of the declaration file into the signal file;
+                        // the declaration codec (post-T007) returns `doc.signals() = None`,
+                        // so we have to read the signal file here and call `set_signals`
+                        // before rendering.
+                        //
+                        // Failure modes (missing / malformed / symlinked signal file) are
+                        // non-fatal for view rendering — the resulting markdown just
+                        // falls back to `—` placeholders, consistent with the pre-T008
+                        // transitional state. The authoritative fail-closed path for
+                        // Missing/Stale lives in `spec_states::evaluate_layer_catalogue`
+                        // (T005), which is the verification gate, not the view renderer.
+                        let signal_path = track_dir.join(binding.signal_file());
+                        // Use `symlink_metadata()` to detect symlinks: `is_file()` follows
+                        // symlinks, which would allow a crafted symlink to inject arbitrary
+                        // file contents. For the view renderer, symlinks fall back to `—`
+                        // (non-fatal miss). Only read the signal file when the path exists
+                        // and is a plain file (not a symlink).
+                        let is_plain_file = signal_path
+                            .symlink_metadata()
+                            .map(|m| m.file_type().is_file())
+                            .unwrap_or(false);
+                        if is_plain_file {
+                            if let Ok(signal_json) = std::fs::read_to_string(&signal_path) {
+                                if let Ok(signals_doc) = type_signals_codec::decode(&signal_json) {
+                                    doc.set_signals(signals_doc.signals().to_vec());
+                                }
+                            }
+                        }
                         let rendered =
                             type_catalogue_render::render_type_catalogue(&doc, catalogue_file);
                         let rendered_md_path = track_dir.join(binding.rendered_file());
@@ -2018,6 +2049,61 @@ mod tests {
         let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
         assert!(md.contains("<!-- Generated from domain-types.json"), "must have generated header");
         assert!(md.contains("TrackId"), "must include declared type name");
+    }
+
+    #[test]
+    fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
+        // Regression guard for the T007 codec-strip follow-up: after the
+        // declaration codec stopped surfacing inline signals, the rendered
+        // `<layer>-types.md` lost its signal-column emojis and fell back to
+        // `—`. `sync_rendered_views` must read the companion
+        // `<layer>-type-signals.json` file and populate `doc.signals()`
+        // before rendering so the markdown reflects the evaluated state.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Companion signal file with a Blue signal for the declared TrackId.
+        let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
+        let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let signal_file = serde_json::json!({
+            "schema_version": 1,
+            "generated_at": "2026-04-19T00:00:00Z",
+            "declaration_hash": hash,
+            "signals": [
+                {
+                    "type_name": "TrackId",
+                    "kind_tag": "value_object",
+                    "signal": "blue",
+                    "found_type": true
+                }
+            ],
+        });
+        std::fs::write(
+            track_dir.join("domain-type-signals.json"),
+            serde_json::to_string_pretty(&signal_file).unwrap(),
+        )
+        .unwrap();
+
+        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(
+            md.contains('\u{1f535}'),
+            "rendered markdown must include the Blue emoji populated from the signal file, got:\n{md}"
+        );
     }
 
     #[test]
