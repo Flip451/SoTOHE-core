@@ -653,7 +653,30 @@ pub fn sync_rendered_views(
                         if is_plain_file {
                             if let Ok(signal_json) = std::fs::read_to_string(&signal_path) {
                                 if let Ok(signals_doc) = type_signals_codec::decode(&signal_json) {
-                                    doc.set_signals(signals_doc.signals().to_vec());
+                                    // Validate `declaration_hash` before adopting
+                                    // signals. Stale signal files (declaration
+                                    // changed, signals not regenerated) would
+                                    // otherwise paint misleading Blue/Yellow/Red
+                                    // emojis in `<layer>-types.md` from an old
+                                    // evaluation. Fall back to `—` placeholders
+                                    // on mismatch — the authoritative fail-closed
+                                    // response to stale signals lives in
+                                    // `spec_states::evaluate_layer_catalogue`
+                                    // (T005).
+                                    let current_hash = type_signals_codec::declaration_hash(
+                                        catalogue_content.as_bytes(),
+                                    );
+                                    if signals_doc.declaration_hash() == current_hash {
+                                        doc.set_signals(signals_doc.signals().to_vec());
+                                    } else {
+                                        eprintln!(
+                                            "warning: ignoring stale {} for {} \
+                                             (declaration_hash mismatch) — rendered signal \
+                                             column will fall back to `—`",
+                                            binding.signal_file(),
+                                            track_dir.display()
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -2187,6 +2210,65 @@ mod tests {
         assert!(
             md.contains('\u{1f535}'),
             "rendered markdown must include the Blue emoji populated from the signal file, got:\n{md}"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_ignores_stale_signal_file_when_hash_mismatches() {
+        // Regression guard for the stale-hash view-render bug: if the
+        // declaration changes without regenerating signals, the rendered
+        // `<layer>-types.md` must NOT paint misleading Blue emojis from the
+        // old evaluation. Fall back to `—` placeholders instead. The
+        // authoritative fail-closed behavior for stale signals lives in
+        // `spec_states::evaluate_layer_catalogue` (T005); the renderer
+        // just avoids misrepresenting the state to a reviewer.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Stale signal file — `declaration_hash` does NOT match the on-disk
+        // declaration bytes.
+        let stale_signal = serde_json::json!({
+            "schema_version": 1,
+            "generated_at": "2026-04-19T00:00:00Z",
+            "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "signals": [
+                {
+                    "type_name": "TrackId",
+                    "kind_tag": "value_object",
+                    "signal": "blue",
+                    "found_type": true
+                }
+            ],
+        });
+        std::fs::write(
+            track_dir.join("domain-type-signals.json"),
+            serde_json::to_string_pretty(&stale_signal).unwrap(),
+        )
+        .unwrap();
+
+        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(
+            !md.contains('\u{1f535}'),
+            "stale signal file must NOT produce a Blue emoji in the rendered markdown, got:\n{md}"
+        );
+        assert!(
+            md.contains('—'),
+            "rendered markdown must fall back to `—` placeholder on stale signal file, got:\n{md}"
         );
     }
 
