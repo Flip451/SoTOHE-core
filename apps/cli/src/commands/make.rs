@@ -790,29 +790,33 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
     let mut red_names: Vec<String> = Vec::new();
     let mut yellow_names: Vec<String> = Vec::new();
     for binding in &bindings_post {
+        // Skip layers whose declaration file is absent on this track —
+        // matches the CI / merge-gate semantics (`evaluate_layer_catalogue`
+        // treats a missing catalogue as "TDDD not active for this layer"
+        // and returns `VerifyOutcome::pass()`). Reading an orphan signal
+        // file (declaration deleted but signals left behind) would block
+        // commits on stale Red signals that the downstream gates silently
+        // skip, producing a pre-commit vs CI divergence.
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        if !catalogue_path.is_file() {
+            continue;
+        }
+
         let signal_path = track_dir.join(binding.signal_file());
         if !signal_path.is_file() {
-            // Check whether the catalogue file exists for this layer.
-            // If it does but the signal file is absent after a successful
-            // recompute, something went wrong (e.g. execute_type_signals used
-            // fewer bindings than we expect). Treat this as BLOCKED to avoid
-            // silently skipping a layer that could contain Red signals.
-            let catalogue_path = track_dir.join(binding.catalogue_file());
-            if catalogue_path.is_file() {
-                eprintln!(
-                    "[track-commit-message] BLOCKED: {} has a catalogue ({}) but no signal file \
-                     ({}) after recomputation. This may indicate a TOCTOU race on \
-                     architecture-rules.json.",
-                    binding.layer_id(),
-                    binding.catalogue_file(),
-                    binding.signal_file(),
-                );
-                return Ok(ExitCode::from(1));
-            }
-            // No catalogue for this layer → no signal file written →
-            // nothing to classify. Layers without catalogues (e.g. not yet
-            // set up for TDDD) are intentionally skipped.
-            continue;
+            // Catalogue exists but signal file is absent after a successful
+            // recompute — something went wrong (e.g. execute_type_signals
+            // used fewer bindings than we expect). Treat this as BLOCKED to
+            // avoid silently skipping a layer that could contain Red signals.
+            eprintln!(
+                "[track-commit-message] BLOCKED: {} has a catalogue ({}) but no signal file \
+                 ({}) after recomputation. This may indicate a TOCTOU race on \
+                 architecture-rules.json.",
+                binding.layer_id(),
+                binding.catalogue_file(),
+                binding.signal_file(),
+            );
+            return Ok(ExitCode::from(1));
         }
         // ADR §D7 read-path symlink guard: reject symlinks on the signal file
         // before reading so that a symlink-swap after recomputation cannot
@@ -821,17 +825,14 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
             Ok(true) => {}
             Ok(false) => {
                 // File vanished between the is_file() check and this guard.
-                // Treat as missing-after-recompute (BLOCKED if catalogue present).
-                let catalogue_path = track_dir.join(binding.catalogue_file());
-                if catalogue_path.is_file() {
-                    eprintln!(
-                        "[track-commit-message] BLOCKED: {} disappeared between existence check \
-                         and read.",
-                        signal_path.display()
-                    );
-                    return Ok(ExitCode::from(1));
-                }
-                continue;
+                // The catalogue presence was already verified above, so this
+                // is a missing-after-recompute race — BLOCKED.
+                eprintln!(
+                    "[track-commit-message] BLOCKED: {} disappeared between existence check \
+                     and read.",
+                    signal_path.display()
+                );
+                return Ok(ExitCode::from(1));
             }
             Err(e) => {
                 return Err(CliError::Message(format!(
