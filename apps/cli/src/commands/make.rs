@@ -8,8 +8,15 @@
 use std::process::ExitCode;
 
 use clap::{Args, ValueEnum};
+use domain::ConfidenceSignal;
+use infrastructure::tddd::type_signals_codec;
+use infrastructure::track::symlink_guard;
+use infrastructure::verify::tddd_layers::parse_tddd_layers;
 
 use crate::CliError;
+use crate::commands::track::tddd::signals::{
+    ensure_active_track, execute_type_signals_lenient_with_bindings,
+};
 
 /// Arguments for `sotp make <task> [args...]`.
 #[derive(Args)]
@@ -491,6 +498,21 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
     std::fs::create_dir_all("tmp")
         .map_err(|e| CliError::Message(format!("mkdir tmp failed: {e}")))?;
 
+    // ADR 2026-04-18-1400 §D2: pre-commit auto-recomputation of TDDD type
+    // signals runs BEFORE CI so the stale-detection pass in CI
+    // (`verify-spec-states-current-local`) always sees a fresh evaluation
+    // result. Red signals block the commit here (§D3) with an actionable
+    // message, and the commit-message.txt scratch file is preserved.
+    if let Some(track_id) = current_branch_track_id_strict()? {
+        eprintln!(
+            "[track-commit-message] Pre-commit: recomputing type signals for '{track_id}'..."
+        );
+        let signals_result = run_pre_commit_type_signals(&track_id)?;
+        if signals_result != ExitCode::SUCCESS {
+            return Ok(signals_result);
+        }
+    }
+
     eprintln!("[track-commit-message] Running CI...");
     let log_file = std::fs::File::create("tmp/ci-output.log")
         .map_err(|e| CliError::Message(format!("failed to create tmp/ci-output.log: {e}")))?;
@@ -563,6 +585,315 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
         eprintln!("[track-commit-message] COMMIT_OK but post-commit steps failed (see above)");
         return Ok(ExitCode::from(3));
     }
+    Ok(ExitCode::SUCCESS)
+}
+
+/// Runs the ADR 2026-04-18-1400 §D2 pre-commit type-signal recomputation
+/// step.
+///
+/// Steps per ADR §D2 / §D3 / §D7:
+/// 1. Fail-closed on missing `architecture-rules.json` (the new pre-commit
+///    path explicitly does NOT inherit the legacy synthetic-domain fallback
+///    that `sotp track type-signals` uses — see §D2 last paragraph).
+/// 2. Delegate the recomputation itself to `execute_type_signals`, which
+///    writes `<layer>-type-signals.json` and re-encodes declaration files
+///    via the T007 codec (which omits the `signals` field). Symlink guards
+///    (§D7) are applied inside `execute_type_signals` on both write paths.
+/// 3. After recomputation, read each generated signal file and classify the
+///    result: Red → BLOCKED (exit 1, commit-message.txt preserved), Yellow
+///    → warning on stderr + proceed, Blue → silent pass.
+///
+/// The Red / Yellow classification mirrors the spec.md Behavior Truth Table
+/// for the pre-commit column. Full-route CI verification still runs after
+/// this step (§D2 ordering: recompute → CI → review guard → commit).
+#[allow(clippy::too_many_lines)]
+fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
+    // Resolve the workspace root from the git discovery result, not from the
+    // current working directory. Running `/track:commit` (which invokes
+    // `bin/sotp make track-commit-message`) from a nested subdirectory must
+    // still locate `architecture-rules.json` and `track/items/` at the repo
+    // root. `PathBuf::from(".")` would introduce CWD-dependent behavior that
+    // silently fail-closes commits launched from subdirectories.
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    let workspace_root = SystemGitRepo::discover()
+        .map_err(|e| {
+            CliError::Message(format!(
+                "[track-commit-message] BLOCKED: unable to discover git repository root: {e}"
+            ))
+        })?
+        .root()
+        .to_path_buf();
+
+    // ADR §D2 fail-closed: architecture-rules.json must be present and
+    // readable. Unlike the legacy `sotp track type-signals` CLI, the
+    // pre-commit path does NOT fall back to a synthetic domain binding.
+    let rules_path = workspace_root.join("architecture-rules.json");
+
+    // Pre-flight snapshot: read + parse `architecture-rules.json` exactly
+    // once. The same parsed binding set drives recompute (via
+    // `execute_type_signals_lenient_with_bindings`) AND the post-recompute
+    // classification loop below, eliminating the TOCTOU window where
+    // `architecture-rules.json` could be edited between separate reads and
+    // allow stale signals through pre-commit (PR #106 TOCTOU P1 finding).
+    let bindings_snapshot = match symlink_guard::reject_symlinks_below(&rules_path, &workspace_root)
+    {
+        Ok(true) => {
+            let content = std::fs::read_to_string(&rules_path).map_err(|e| {
+                CliError::Message(format!(
+                    "[track-commit-message] BLOCKED: cannot read {}: {e}",
+                    rules_path.display()
+                ))
+            })?;
+            parse_tddd_layers(&content).map_err(|e| {
+                CliError::Message(format!(
+                    "[track-commit-message] BLOCKED: architecture-rules.json parse error: {e}"
+                ))
+            })?
+        }
+        Ok(false) => {
+            eprintln!(
+                "[track-commit-message] BLOCKED: architecture-rules.json not found. \
+                 Pre-commit type-signal recomputation cannot enumerate TDDD layers."
+            );
+            return Ok(ExitCode::from(1));
+        }
+        Err(e) => {
+            eprintln!(
+                "[track-commit-message] BLOCKED: architecture-rules.json symlink rejected: {e}"
+            );
+            return Ok(ExitCode::from(1));
+        }
+    };
+
+    let items_dir = workspace_root.join("track").join("items");
+
+    // Active-track guard: Done/Archived tracks have frozen type declarations;
+    // there is nothing to recompute. Skip the pre-commit step gracefully rather
+    // than delegating to `execute_type_signals`, which correctly rejects Done/Archived
+    // tracks with a user-visible error (protecting immutability). The pre-commit path
+    // reaching a Done track is valid during the final done-metadata commit (all tasks
+    // transitioned to done, metadata written, then committed).
+    {
+        let valid_id = domain::TrackId::try_new(track_id).map_err(|e| {
+            CliError::Message(format!("[track-commit-message] invalid track ID '{track_id}': {e}"))
+        })?;
+        match infrastructure::track::fs_store::read_track_metadata(&items_dir, &valid_id) {
+            Ok((metadata, doc_meta)) => {
+                let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
+                    domain::TrackStatus::Archived
+                } else {
+                    metadata.status()
+                };
+                if ensure_active_track(effective_status, track_id).is_err() {
+                    // Track is Done or Archived — skip pre-commit type-signal recomputation.
+                    // The frozen track's signal files are already correct from when it was active.
+                    eprintln!(
+                        "[track-commit-message] Pre-commit type signals: skipped \
+                         (track '{track_id}' is {effective_status} — declarations are frozen)."
+                    );
+                    return Ok(ExitCode::SUCCESS);
+                }
+            }
+            Err(e) => {
+                // Metadata read failure is fail-closed: block the commit rather than
+                // silently skipping the pre-commit gate.
+                return Err(CliError::Message(format!(
+                    "[track-commit-message] BLOCKED: cannot read metadata for '{track_id}': {e}"
+                )));
+            }
+        }
+    }
+
+    // Delegate to the lenient variant so pre-commit matches CI semantics:
+    // a layer without a declaration file is treated as "TDDD not active for
+    // this layer" and skipped silently, rather than hard-failing the commit.
+    // This keeps pre-commit from being stricter than CI / merge gate (ADR
+    // §D2 / §D5 symmetry). Pass the pre-flight `bindings_snapshot` so the
+    // recompute runs against exactly the same binding set the classification
+    // loop below will use — no TOCTOU gap.
+    let exec_result = execute_type_signals_lenient_with_bindings(
+        items_dir.clone(),
+        track_id.to_owned(),
+        workspace_root.clone(),
+        &bindings_snapshot,
+    )?;
+    if exec_result != ExitCode::SUCCESS {
+        eprintln!("[track-commit-message] BLOCKED: type-signals recomputation returned non-zero");
+        return Ok(exec_result);
+    }
+
+    // Classify against the same `bindings_snapshot` the recompute saw.
+    // Re-reading `architecture-rules.json` here would re-open the TOCTOU
+    // window called out by the PR #106 review; keep a single source of
+    // truth for the entire pre-commit critical section.
+    let bindings_post = &bindings_snapshot;
+
+    let track_dir = items_dir.join(track_id);
+
+    // Stage the regenerated files so they are included in the subsequent
+    // `git commit-from-file`. `execute_type_signals` writes the declaration
+    // file, rendered Markdown, and signal file for each layer that has a
+    // catalogue. Without this step the regenerated working-tree files would
+    // be left out of the commit (the index still reflects pre-recomputation
+    // content), causing CI to validate a different tree than what gets recorded.
+    // Use `bindings_post` (post-recompute re-read) so we stage exactly the files
+    // that execute_type_signals processed.
+    for binding in bindings_post {
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        if !catalogue_path.is_file() {
+            continue; // no catalogue → nothing was written → nothing to stage
+        }
+        // Mirror the lenient executor's multi-target skip: for layers with
+        // multiple `schema_export.targets`, `execute_type_signals_lenient`
+        // did NOT regenerate catalogue / rendered / signal files, so
+        // `git add` here would stage pre-existing working-tree content
+        // (including any unrelated unstaged edits) rather than recomputed
+        // outputs. Skip staging entirely for those layers — CI / merge-gate
+        // still detect staleness via `declaration_hash` comparison on the
+        // already-committed signal file.
+        if binding.targets().len() > 1 {
+            continue;
+        }
+        // Stage all three files written by execute_type_signals for this layer.
+        for rel_path in &[
+            track_dir.join(binding.catalogue_file()),
+            track_dir.join(binding.rendered_file()),
+            track_dir.join(binding.signal_file()),
+        ] {
+            if rel_path.is_file() {
+                let status = std::process::Command::new("git")
+                    .args(["add", "--", &rel_path.display().to_string()])
+                    .status()
+                    .map_err(|e| CliError::Message(format!("pre-commit: git add failed: {e}")))?;
+                if !status.success() {
+                    return Err(CliError::Message(format!(
+                        "pre-commit: git add {} returned non-zero",
+                        rel_path.display()
+                    )));
+                }
+            }
+        }
+    }
+    let mut red_names: Vec<String> = Vec::new();
+    let mut yellow_names: Vec<String> = Vec::new();
+    for binding in bindings_post {
+        // Skip layers whose declaration file is absent on this track —
+        // matches the CI / merge-gate semantics (`evaluate_layer_catalogue`
+        // treats a missing catalogue as "TDDD not active for this layer"
+        // and returns `VerifyOutcome::pass()`). Reading an orphan signal
+        // file (declaration deleted but signals left behind) would block
+        // commits on stale Red signals that the downstream gates silently
+        // skip, producing a pre-commit vs CI divergence.
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        if !catalogue_path.is_file() {
+            continue;
+        }
+
+        // Skip multi-target layers here so this post-recompute missing-file
+        // gate stays consistent with `execute_type_signals_lenient`, which
+        // intentionally bypasses the strict evaluator for layers whose
+        // `schema_export.targets` has more than one entry. Without this
+        // exemption the "catalogue present but signal file absent" BLOCKED
+        // branch below would fire on every pre-commit for multi-target
+        // tracks even though the lenient executor chose not to write signals
+        // for them. CI / merge-gate detect staleness independently via
+        // `declaration_hash` comparison on the persisted signal file.
+        if binding.targets().len() > 1 {
+            continue;
+        }
+
+        let signal_path = track_dir.join(binding.signal_file());
+        if !signal_path.is_file() {
+            // Catalogue exists but signal file is absent after a successful
+            // recompute — something went wrong (e.g. execute_type_signals
+            // used fewer bindings than we expect). Treat this as BLOCKED to
+            // avoid silently skipping a layer that could contain Red signals.
+            eprintln!(
+                "[track-commit-message] BLOCKED: {} has a catalogue ({}) but no signal file \
+                 ({}) after recomputation. This may indicate a TOCTOU race on \
+                 architecture-rules.json.",
+                binding.layer_id(),
+                binding.catalogue_file(),
+                binding.signal_file(),
+            );
+            return Ok(ExitCode::from(1));
+        }
+        // ADR §D7 read-path symlink guard: reject symlinks on the signal file
+        // before reading so that a symlink-swap after recomputation cannot
+        // cause the gate to evaluate attacker-chosen content.
+        match symlink_guard::reject_symlinks_below(&signal_path, &track_dir) {
+            Ok(true) => {}
+            Ok(false) => {
+                // File vanished between the is_file() check and this guard.
+                // The catalogue presence was already verified above, so this
+                // is a missing-after-recompute race — BLOCKED.
+                eprintln!(
+                    "[track-commit-message] BLOCKED: {} disappeared between existence check \
+                     and read.",
+                    signal_path.display()
+                );
+                return Ok(ExitCode::from(1));
+            }
+            Err(e) => {
+                return Err(CliError::Message(format!(
+                    "pre-commit: symlink rejected on {}: {e}",
+                    signal_path.display()
+                )));
+            }
+        }
+        let content = std::fs::read_to_string(&signal_path).map_err(|e| {
+            CliError::Message(format!(
+                "pre-commit: cannot read {} after recompute: {e}",
+                signal_path.display()
+            ))
+        })?;
+        let doc = type_signals_codec::decode(&content).map_err(|e| {
+            CliError::Message(format!("pre-commit: decode error on {}: {e}", signal_path.display()))
+        })?;
+        for signal in doc.signals() {
+            match signal.signal() {
+                ConfidenceSignal::Red => {
+                    red_names.push(format!(
+                        "{}: {} ({})",
+                        binding.layer_id(),
+                        signal.type_name(),
+                        signal.kind_tag()
+                    ));
+                }
+                ConfidenceSignal::Yellow => {
+                    yellow_names.push(format!(
+                        "{}: {} ({})",
+                        binding.layer_id(),
+                        signal.type_name(),
+                        signal.kind_tag()
+                    ));
+                }
+                _ => {}
+            }
+        }
+    }
+
+    if !red_names.is_empty() {
+        eprintln!("[track-commit-message] BLOCKED: type-signals Red detected");
+        for name in &red_names {
+            eprintln!("  Red: {name}");
+        }
+        eprintln!(
+            "[track-commit-message] Fix: run /track:design to update type declarations, \
+             then re-run /track:commit"
+        );
+        eprintln!("[track-commit-message] commit-message.txt is preserved for your next attempt.");
+        return Ok(ExitCode::from(1));
+    }
+
+    if !yellow_names.is_empty() {
+        eprintln!("[track-commit-message] WARN: Yellow type-signals detected (commit proceeds):");
+        for name in &yellow_names {
+            eprintln!("  Yellow: {name}");
+        }
+    }
+
+    eprintln!("[track-commit-message] Pre-commit type signals: OK");
     Ok(ExitCode::SUCCESS)
 }
 

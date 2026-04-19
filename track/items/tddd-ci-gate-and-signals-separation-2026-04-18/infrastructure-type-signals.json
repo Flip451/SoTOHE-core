@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-18T20:41:13Z",
+  "declaration_hash": "5e6e3cafeef3e41acad3a0298ec9c8c3f0fc94b0768c7b2a7cc2977051501ddf",
+  "signals": [
+    {
+      "type_name": "TypeSignalsCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "InvalidTimestamp"
+      ]
+    },
+    {
+      "type_name": "TdddLayerBinding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -21,7 +21,7 @@
 use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration, TraitImplDecl};
 use domain::{
     ConfidenceSignal, SpecValidationError, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry,
-    TypeDefinitionKind, TypeSignal, TypestateTransitions,
+    TypeDefinitionKind, TypestateTransitions,
 };
 use serde::{Deserialize, Serialize};
 
@@ -64,8 +64,15 @@ struct TypeCatalogueDocDto {
     pub schema_version: u32,
     #[serde(default)]
     pub type_definitions: Vec<TypeCatalogueEntryDto>,
+    /// Backward-compat decode slot for legacy files that still carry inline
+    /// `signals`. T007 (ADR 2026-04-18-1400 §D1 / §D6) moved signals out of
+    /// the declaration file into `<layer>-type-signals.json`. The DTO
+    /// accepts (and discards) any inline signals blob so that decoding a
+    /// legacy catalogue file does not fail `deny_unknown_fields`, but the
+    /// encoder always emits `None` so freshly-written declaration files
+    /// never carry signals again.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub signals: Option<Vec<TypeSignalDto>>,
+    pub signals: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -180,20 +187,9 @@ struct TraitImplDeclDto {
     expected_methods: Vec<MethodDto>,
 }
 
-/// DTO for a per-type signal evaluation result.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct TypeSignalDto {
-    pub type_name: String,
-    pub kind_tag: String,
-    pub signal: String,
-    pub found_type: bool,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub found_items: Vec<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub missing_items: Vec<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub extra_items: Vec<String>,
-}
+// NOTE: T007 removed the `TypeSignalDto` struct — signal payloads live in
+// `<layer>-type-signals.json` (see `type_signals_codec`), not in the
+// declaration file.
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -412,13 +408,15 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         }
     }
 
-    let mut doc = TypeCatalogueDocument::new(dto.schema_version, entries);
+    let doc = TypeCatalogueDocument::new(dto.schema_version, entries);
 
-    if let Some(signal_dtos) = dto.signals {
-        let signals =
-            signal_dtos.iter().map(type_signal_from_dto).collect::<Result<Vec<_>, _>>()?;
-        doc.set_signals(signals);
-    }
+    // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file no longer
+    // carries signals. The DTO still accepts the field for backward-compatible
+    // decode of legacy files written before the split, but the values are
+    // discarded — the authoritative signals live in `<layer>-type-signals.json`
+    // (read by `evaluate_layer_catalogue`, T005). This is the read-side half of
+    // the declaration/evaluation split; the write-side half is `encode` below.
+    let _legacy_inline_signals = dto.signals;
 
     Ok(doc)
 }
@@ -588,24 +586,7 @@ fn method_from_dto(
     ))
 }
 
-fn type_signal_from_dto(dto: &TypeSignalDto) -> Result<TypeSignal, TypeCatalogueCodecError> {
-    let signal = confidence_signal_from_str(&dto.signal).ok_or_else(|| {
-        TypeCatalogueCodecError::InvalidEntry {
-            name: dto.type_name.clone(),
-            reason: format!("unknown signal value '{}'", dto.signal),
-        }
-    })?;
-    Ok(TypeSignal::new(
-        &dto.type_name,
-        &dto.kind_tag,
-        signal,
-        dto.found_type,
-        dto.found_items.clone(),
-        dto.missing_items.clone(),
-        dto.extra_items.clone(),
-    ))
-}
-
+#[allow(dead_code)] // retained behind `#[allow]` for potential legacy-decode hook restoration.
 fn confidence_signal_from_str(s: &str) -> Option<ConfidenceSignal> {
     match s {
         "blue" => Some(ConfidenceSignal::Blue),
@@ -624,7 +605,14 @@ fn type_catalogue_doc_to_dto(
 ) -> Result<TypeCatalogueDocDto, TypeCatalogueCodecError> {
     let type_definitions =
         doc.entries().iter().map(type_catalogue_entry_to_dto).collect::<Result<Vec<_>, _>>()?;
-    let signals = doc.signals().map(|sigs| sigs.iter().map(type_signal_to_dto).collect());
+    // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file is authored
+    // content; evaluation results live in `<layer>-type-signals.json`. Emit
+    // `signals: None` so the DTO's `skip_serializing_if = "Option::is_none"`
+    // elides the field entirely from the on-disk JSON. `doc.signals()` is
+    // intentionally ignored here — the in-memory aggregate still holds the
+    // evaluated signals for the CLI writer / CI reader to pass around, but
+    // the declaration file never carries them again.
+    let signals = None;
     // Always emit schema_version 2, regardless of the in-memory value, so that
     // encode→decode round-trips correctly. The in-memory schema_version field is
     // an informational tag; v2 is the only version the current codec can decode.
@@ -757,26 +745,10 @@ fn method_to_dto(
     })
 }
 
-fn type_signal_to_dto(sig: &TypeSignal) -> TypeSignalDto {
-    TypeSignalDto {
-        type_name: sig.type_name().to_owned(),
-        kind_tag: sig.kind_tag().to_owned(),
-        signal: confidence_signal_to_str(sig.signal()).to_owned(),
-        found_type: sig.found_type(),
-        found_items: sig.found_items().to_vec(),
-        missing_items: sig.missing_items().to_vec(),
-        extra_items: sig.extra_items().to_vec(),
-    }
-}
-
-fn confidence_signal_to_str(signal: ConfidenceSignal) -> &'static str {
-    match signal {
-        ConfidenceSignal::Blue => "blue",
-        ConfidenceSignal::Yellow => "yellow",
-        ConfidenceSignal::Red => "red",
-        _ => "unknown",
-    }
-}
+// NOTE: T007 removed `type_signal_to_dto`, `confidence_signal_to_str`, and
+// `type_signal_from_dto` helpers — signals now live in
+// `<layer>-type-signals.json` via `type_signals_codec`, not in the
+// declaration file.
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -1058,7 +1030,12 @@ mod tests {
     }
 
     #[test]
-    fn test_round_trip_with_signals() {
+    fn test_decode_silently_drops_legacy_inline_signals() {
+        // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file no longer
+        // carries signals. Legacy declaration files that still have an inline
+        // `signals` blob must be decodable (backward compat), but the value
+        // is discarded — the authoritative signals live in
+        // `<layer>-type-signals.json`.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -1069,10 +1046,21 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(doc.signals().is_some());
+        assert!(
+            doc.signals().is_none(),
+            "legacy inline signals must be dropped after T007 codec strip"
+        );
+
         let encoded = encode(&doc).unwrap();
+        assert!(
+            !encoded.contains("\"signals\""),
+            "encode must not emit a `signals` field, got:\n{encoded}"
+        );
+
+        // Decode→encode→decode round-trip is stable (both times: signals=None).
         let doc2 = decode(&encoded).unwrap();
-        assert_eq!(doc.signals().unwrap().len(), doc2.signals().unwrap().len());
+        assert!(doc2.signals().is_none());
+        assert_eq!(doc.entries().len(), doc2.entries().len());
     }
 
     #[test]
@@ -1257,7 +1245,12 @@ mod tests {
     }
 
     #[test]
-    fn test_round_trip_signals_with_items() {
+    fn test_encode_never_emits_signals_even_with_inline_red_input() {
+        // T007: even when the legacy declaration file has rich inline signals
+        // (Red + missing_items), the decoder drops them and the encoder emits
+        // a clean declaration with no `signals` field. This closes the
+        // Migration §5b write-side contract: after T007 lands, every written
+        // declaration file is authored-only.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -1274,15 +1267,17 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        let sigs = doc.signals().unwrap();
-        assert_eq!(sigs[0].signal(), ConfidenceSignal::Red);
-        assert_eq!(sigs[0].missing_items(), &["Draft"]);
+        assert!(doc.signals().is_none(), "legacy inline signals must be dropped");
 
         let encoded = encode(&doc).unwrap();
-        let doc2 = decode(&encoded).unwrap();
-        let sigs2 = doc2.signals().unwrap();
-        assert_eq!(sigs2[0].signal(), ConfidenceSignal::Red);
-        assert_eq!(sigs2[0].missing_items(), &["Draft"]);
+        assert!(
+            !encoded.contains("\"signals\""),
+            "encoded output must not contain a `signals` field, got:\n{encoded}"
+        );
+        assert!(
+            !encoded.contains("\"missing_items\""),
+            "encoded output must not contain `missing_items` (signal-only key), got:\n{encoded}"
+        );
     }
 
     // --- T002: new variant decode tests ---

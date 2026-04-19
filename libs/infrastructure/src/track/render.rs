@@ -2,12 +2,14 @@
 
 use std::path::{Path, PathBuf};
 
-use domain::{TaskStatus, TrackMetadata};
+use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
+use domain::{TaskStatus, TrackId, TrackMetadata};
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
 use crate::spec;
-use crate::tddd::catalogue_codec;
+use crate::tddd::contract_map_adapter::FsCatalogueLoader;
+use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers_from_path};
 
@@ -623,7 +625,61 @@ pub fn sync_rendered_views(
                 }
                 let catalogue_content = std::fs::read_to_string(&catalogue_path)?;
                 match catalogue_codec::decode(&catalogue_content) {
-                    Ok(doc) => {
+                    Ok(mut doc) => {
+                        // Populate signals from the external `<layer>-type-signals.json`
+                        // file so the rendered markdown shows the evaluated Blue/Yellow/Red
+                        // emojis instead of `—` placeholders. ADR 2026-04-18-1400 §D1
+                        // moved signals out of the declaration file into the signal file;
+                        // the declaration codec (post-T007) returns `doc.signals() = None`,
+                        // so we have to read the signal file here and call `set_signals`
+                        // before rendering.
+                        //
+                        // Failure modes (missing / malformed / symlinked signal file) are
+                        // non-fatal for view rendering — the resulting markdown just
+                        // falls back to `—` placeholders, consistent with the pre-T008
+                        // transitional state. The authoritative fail-closed path for
+                        // Missing/Stale lives in `spec_states::evaluate_layer_catalogue`
+                        // (T005), which is the verification gate, not the view renderer.
+                        let signal_path = track_dir.join(binding.signal_file());
+                        // Use `symlink_metadata()` to detect symlinks: `is_file()` follows
+                        // symlinks, which would allow a crafted symlink to inject arbitrary
+                        // file contents. For the view renderer, symlinks fall back to `—`
+                        // (non-fatal miss). Only read the signal file when the path exists
+                        // and is a plain file (not a symlink).
+                        let is_plain_file = signal_path
+                            .symlink_metadata()
+                            .map(|m| m.file_type().is_file())
+                            .unwrap_or(false);
+                        if is_plain_file {
+                            if let Ok(signal_json) = std::fs::read_to_string(&signal_path) {
+                                if let Ok(signals_doc) = type_signals_codec::decode(&signal_json) {
+                                    // Validate `declaration_hash` before adopting
+                                    // signals. Stale signal files (declaration
+                                    // changed, signals not regenerated) would
+                                    // otherwise paint misleading Blue/Yellow/Red
+                                    // emojis in `<layer>-types.md` from an old
+                                    // evaluation. Fall back to `—` placeholders
+                                    // on mismatch — the authoritative fail-closed
+                                    // response to stale signals lives in
+                                    // `spec_states::evaluate_layer_catalogue`
+                                    // (T005).
+                                    let current_hash = type_signals_codec::declaration_hash(
+                                        catalogue_content.as_bytes(),
+                                    );
+                                    if signals_doc.declaration_hash() == current_hash {
+                                        doc.set_signals(signals_doc.signals().to_vec());
+                                    } else {
+                                        eprintln!(
+                                            "warning: ignoring stale {} for {} \
+                                             (declaration_hash mismatch) — rendered signal \
+                                             column will fall back to `—`",
+                                            binding.signal_file(),
+                                            track_dir.display()
+                                        );
+                                    }
+                                }
+                            }
+                        }
                         let rendered =
                             type_catalogue_render::render_type_catalogue(&doc, catalogue_file);
                         let rendered_md_path = track_dir.join(binding.rendered_file());
@@ -657,6 +713,19 @@ pub fn sync_rendered_views(
                     }
                 }
             }
+
+            // Render `contract-map.md` alongside the per-layer views so it
+            // stays fresh on every track-transition / sync-views / pre-commit
+            // run — callers (especially reviewers) never see a stale
+            // declaration relationship diagram.
+            //
+            // Failure modes (loader error, empty catalogues, unknown layer)
+            // are non-fatal for this view: log to stderr and continue without
+            // aborting the wider sync. The authoritative fail-closed path for
+            // TDDD semantic correctness lives in
+            // `spec_states::evaluate_layer_catalogue` (T005) and the
+            // merge-gate adapter (T007 follow-up).
+            render_contract_map_view(root, &track_dir, track_id, &mut changed);
         } // end if !is_done_or_archived
     }
 
@@ -675,6 +744,75 @@ pub fn sync_rendered_views(
     }
 
     Ok(changed)
+}
+
+/// Renders `contract-map.md` for the active track and appends the path to
+/// `changed` when the content actually differs on disk.
+///
+/// Non-fatal by design — all failures (loader error, empty catalogues,
+/// invalid TrackId) produce a stderr warning and leave the existing
+/// `contract-map.md` untouched. The authoritative fail-closed gate for
+/// TDDD correctness lives in `spec_states::evaluate_layer_catalogue` /
+/// the merge-gate adapter; this function just keeps the rendered diagram
+/// in sync with the declarations.
+fn render_contract_map_view(
+    root: &Path,
+    track_dir: &Path,
+    track_id_str: Option<&str>,
+    changed: &mut Vec<PathBuf>,
+) {
+    let Some(track_id_raw) = track_id_str else {
+        return;
+    };
+    let Ok(track_id) = TrackId::try_new(track_id_raw) else {
+        eprintln!(
+            "warning: skipping contract-map.md render for {} (invalid track id)",
+            track_dir.display()
+        );
+        return;
+    };
+
+    let items_dir = root.join(TRACK_ITEMS_DIR);
+    let rules_path = root.join("architecture-rules.json");
+    let loader = FsCatalogueLoader::new(items_dir, rules_path, root.to_path_buf());
+    let (layer_order, catalogues) = match loader.load_all(&track_id) {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!(
+                "warning: skipping contract-map.md render for {} ({})",
+                track_dir.display(),
+                e
+            );
+            return;
+        }
+    };
+    if layer_order.is_empty() {
+        // No TDDD-enabled layers on this track — nothing to render.
+        return;
+    }
+
+    let opts = ContractMapRenderOptions::default();
+    let content = render_contract_map(&catalogues, &layer_order, &opts);
+    let contract_map_path = track_dir.join("contract-map.md");
+    let old = match std::fs::read_to_string(&contract_map_path) {
+        Ok(existing) => Some(existing),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        Err(e) => {
+            eprintln!(
+                "warning: cannot read existing contract-map.md for {}: {e}",
+                track_dir.display()
+            );
+            return;
+        }
+    };
+    let rendered_str: &str = content.as_ref();
+    if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_str)) {
+        if let Err(e) = atomic_write_file(&contract_map_path, rendered_str.as_bytes()) {
+            eprintln!("warning: cannot write contract-map.md for {}: {e}", track_dir.display());
+            return;
+        }
+        changed.push(contract_map_path);
+    }
 }
 
 #[cfg(test)]
@@ -2018,6 +2156,120 @@ mod tests {
         let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
         assert!(md.contains("<!-- Generated from domain-types.json"), "must have generated header");
         assert!(md.contains("TrackId"), "must include declared type name");
+    }
+
+    #[test]
+    fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
+        // Regression guard for the T007 codec-strip follow-up: after the
+        // declaration codec stopped surfacing inline signals, the rendered
+        // `<layer>-types.md` lost its signal-column emojis and fell back to
+        // `—`. `sync_rendered_views` must read the companion
+        // `<layer>-type-signals.json` file and populate `doc.signals()`
+        // before rendering so the markdown reflects the evaluated state.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Companion signal file with a Blue signal for the declared TrackId.
+        let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
+        let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let signal_file = serde_json::json!({
+            "schema_version": 1,
+            "generated_at": "2026-04-19T00:00:00Z",
+            "declaration_hash": hash,
+            "signals": [
+                {
+                    "type_name": "TrackId",
+                    "kind_tag": "value_object",
+                    "signal": "blue",
+                    "found_type": true
+                }
+            ],
+        });
+        std::fs::write(
+            track_dir.join("domain-type-signals.json"),
+            serde_json::to_string_pretty(&signal_file).unwrap(),
+        )
+        .unwrap();
+
+        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(
+            md.contains('\u{1f535}'),
+            "rendered markdown must include the Blue emoji populated from the signal file, got:\n{md}"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_ignores_stale_signal_file_when_hash_mismatches() {
+        // Regression guard for the stale-hash view-render bug: if the
+        // declaration changes without regenerating signals, the rendered
+        // `<layer>-types.md` must NOT paint misleading Blue emojis from the
+        // old evaluation. Fall back to `—` placeholders instead. The
+        // authoritative fail-closed behavior for stale signals lives in
+        // `spec_states::evaluate_layer_catalogue` (T005); the renderer
+        // just avoids misrepresenting the state to a reviewer.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Stale signal file — `declaration_hash` does NOT match the on-disk
+        // declaration bytes.
+        let stale_signal = serde_json::json!({
+            "schema_version": 1,
+            "generated_at": "2026-04-19T00:00:00Z",
+            "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "signals": [
+                {
+                    "type_name": "TrackId",
+                    "kind_tag": "value_object",
+                    "signal": "blue",
+                    "found_type": true
+                }
+            ],
+        });
+        std::fs::write(
+            track_dir.join("domain-type-signals.json"),
+            serde_json::to_string_pretty(&stale_signal).unwrap(),
+        )
+        .unwrap();
+
+        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(
+            !md.contains('\u{1f535}'),
+            "stale signal file must NOT produce a Blue emoji in the rendered markdown, got:\n{md}"
+        );
+        assert!(
+            md.contains('—'),
+            "rendered markdown must fall back to `—` placeholder on stale signal file, got:\n{md}"
+        );
     }
 
     #[test]

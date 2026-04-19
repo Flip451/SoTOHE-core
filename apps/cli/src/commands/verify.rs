@@ -830,6 +830,27 @@ mod tests {
         std::fs::write(dir.join("architecture-rules.json"), content).unwrap();
     }
 
+    /// Writes `<dir>/<signal_name>` with a matching `declaration_hash` so the
+    /// ADR 2026-04-18-1400 §D5 signal-file evaluation path accepts it.
+    /// `signals` is copied verbatim from the declaration file's legacy
+    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`
+    /// which, after T007, drops inline signals during decode.
+    fn write_matching_signal_file(dir: &std::path::Path, catalogue_name: &str, signal_name: &str) {
+        let decl_bytes = std::fs::read(dir.join(catalogue_name)).unwrap();
+        let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
+        let signals_array =
+            value.get("signals").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+        let hash = infrastructure::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let signal_file = serde_json::json!({
+            "schema_version": 1,
+            "generated_at": "2026-04-18T12:00:00Z",
+            "declaration_hash": hash,
+            "signals": signals_array,
+        });
+        let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
+        std::fs::write(dir.join(signal_name), encoded).unwrap();
+    }
+
     #[test]
     fn test_spec_states_strict_false_passes_with_yellow_signal() {
         let tmp = TempDir::new().unwrap();
@@ -849,6 +870,7 @@ mod tests {
             r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
+        write_matching_signal_file(tmp.path(), "domain-types.json", "domain-type-signals.json");
         let exit =
             execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
         assert_eq!(exit, ExitCode::SUCCESS, "yellow signal must pass in default (non-strict) mode");
@@ -873,6 +895,7 @@ mod tests {
             r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
+        write_matching_signal_file(tmp.path(), "domain-types.json", "domain-type-signals.json");
         let exit =
             execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: true }));
         assert_eq!(exit, ExitCode::FAILURE, "yellow signal must fail in strict (merge-gate) mode");

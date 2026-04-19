@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TypeSignalsCodecError",
+      "description": "Error type for encoding and decoding `<layer>-type-signals.json`. Introduced by ADR 2026-04-18-1400 §D1 alongside the new evaluation-result file. Variants: `Json` (serde failure), `UnsupportedSchemaVersion` (schema_version != 1), `InvalidTimestamp` (generated_at cannot be parsed as ISO 8601 UTC).",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "InvalidTimestamp"
+      ]
+    },
+    {
+      "name": "TdddLayerBinding",
+      "description": "Existing infrastructure value object that pairs an architecture layer id with its TDDD catalogue configuration (catalogue_file, schema_export targets). Modified by this track to add a `signal_file() -> String` accessor that returns the per-layer evaluation-result file name (`<layer>-type-signals.json`, e.g., `domain-type-signals.json` for `domain-types.json`). No public field changes; the accessor is a thin derivation from catalogue_file. Used by `evaluate_layer_catalogue` (ADR §D5) and by the CLI writer path (ADR §D2) to locate the signal file per layer.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
+    }
+  ]
+}

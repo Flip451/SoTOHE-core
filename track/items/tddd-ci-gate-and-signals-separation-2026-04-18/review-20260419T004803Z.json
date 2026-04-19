@@ -1,0 +1,1293 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f87a6da38ad404daca988c346c7175e92a69a6627ecb01889c1e246300277f48",
+          "at": "2026-04-18T19:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f87a6da38ad404daca988c346c7175e92a69a6627ecb01889c1e246300277f48",
+          "at": "2026-04-18T19:10:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db8ee6b2a97285089dd19b97bbabe6f266dd6279bd0934da75afcb630c0c4ce8",
+          "at": "2026-04-18T19:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db8ee6b2a97285089dd19b97bbabe6f266dd6279bd0934da75afcb630c0c4ce8",
+          "at": "2026-04-18T19:25:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Re-reading `architecture-rules.json` here makes the pre-commit gate fail-open: `load_tddd_layers_from_path()` falls back to the synthetic `domain` binding if the file disappears between the initial existence check and this reload, and the loop then silently `continue`s when a layer's signal file is missing. Either race lets red layers be skipped and the commit proceed instead of blocking.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 644,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:905e13828cc859e5b84d68ae195f7ce7b19b36d23e7c03ec658e2ecfbb04b703",
+          "at": "2026-04-18T19:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_pre_commit_type_signals()` reads `architecture-rules.json` and then delegates to `execute_type_signals()`, which re-opens the file and still falls back to the synthetic `domain` binding if the rules file disappears or is swapped in the TOCTOU window. That reintroduces the legacy fail-open path the ADR says to reject, and the wrapper can then skip the bindings it just parsed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 651,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:3c830ea6a8312a67bb186034a56d0bb4730f2c9ea3a5e0b768a8e505330fa9e4",
+          "at": "2026-04-18T19:50:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This pre-commit path reads `architecture-rules.json` twice through different code paths: once here with `parse_tddd_layers`, and again inside `execute_type_signals`. If the file changes between those reads, the recomputation and the post-check loop can see different layer sets, so a newly enabled Red layer can be recomputed but never inspected. That makes the gate TOCTOU-prone.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 620,
+              "category": "correctness"
+            },
+            {
+              "message": "The generated signal file is read with `read_to_string` after only `is_file()`, so a symlink swap after recomputation will be followed and the gate will classify attacker-chosen content. Other loaders in this repo reject symlinks before reading; this path should do the same to avoid bypassing or spuriously blocking the commit gate.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 691,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:073d8626a66326708e450a0e42345521a3b50adfeac05b5bcf682acfac9ee875",
+          "at": "2026-04-18T19:54:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-commit recomputation mutates the tracked catalogue/signal files in the working tree, but the later `git commit-from-file` call still commits the existing index without re-staging those changes. As a result, the regenerated type-signal artifacts can be left out of the commit, so CI may validate a different tree than the one that gets recorded.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 563,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b45367b1eb5bf4bc55687dab976c728e9eb2877595b2d26c6d54535a59fc3a55",
+          "at": "2026-04-18T19:57:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_pre_commit_type_signals()` snapshots `architecture-rules.json` into `bindings` before calling `execute_type_signals()`, but `execute_type_signals()` re-reads the file. If the rules file changes in between, the recomputation can write a different layer set while the staging/classification loop still inspects the stale snapshot, so a newly enabled layer with Red signals is never checked and the commit can be allowed incorrectly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 620,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:a7b5fddb6207155281aa7783b220215a163499bb08660ac6e6f00cc6b73aaa2e",
+          "at": "2026-04-18T20:01:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_signals()` still re-reads `architecture-rules.json` on its own, so the preflight snapshot here is not the one that drives recomputation and staging. If the file changes between the preflight and the delegate call, a newly enabled Red layer can be recomputed without being inspected here, or the hook can stage the wrong layer set. This leaves the pre-commit gate TOCTOU-prone instead of fail-closed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 655,
+              "category": "correctness"
+            },
+            {
+              "message": "The symlink check on the generated signal file is not atomic with the later `read_to_string()`. A symlink swap after `reject_symlinks_below()` but before the read will still be followed, so the gate can classify attacker-chosen content instead of the file that was just validated.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 761,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:2529eac108969d14af129c1cad7084e3fe62f7249b454758572f4bab2fdf5f31",
+          "at": "2026-04-18T20:04:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2529eac108969d14af129c1cad7084e3fe62f7249b454758572f4bab2fdf5f31",
+          "at": "2026-04-18T20:08:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-commit path delegates normal `/track:commit` execution to `execute_type_signals`, but that command rejects tracks whose working-tree metadata derives `status=done` via its active-track guard. The documented completion flow marks all tasks `done` and then runs `/track:commit` to commit the metadata transition and optional hash backfills, so as soon as the last task is marked done this hook will block the completion commit before CI/review can run, making finished TDDD tracks uncommittable. The commit-path recomputation needs a path that still permits the pre-merge done-state metadata commit, or it needs to skip/handle frozen tracks in a way that does not break the normal completion workflow.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 655,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2529eac108969d14af129c1cad7084e3fe62f7249b454758572f4bab2fdf5f31",
+          "at": "2026-04-18T20:11:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99ae58aabb02778b687a6056dba1bf92f9a62c6b6fa3edf24cef8526bbc56446",
+          "at": "2026-04-18T20:16:01Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dispatch_track_commit_message()` is specified to run CI before the new auto-recalculation step, but CI is also defined to fail-closed on missing/stale/decode-error evaluation files. As written, `/track:commit` will abort before it can regenerate the very `<layer>-type-signals.json` states that the truth table describes as self-healed/N/A, so the pre-commit auto-fix path cannot actually recover those cases.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 23,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7055aa6c944fafd2344fbbbc30dd0a5c4e0e88bb8d5e18b0b2c8586a573dedcd",
+          "at": "2026-04-18T14:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:commit` is ordered as `CI → evaluation-result recalc` here, but the same plan makes stale / missing / decode failures fatal in CI. That means a commit that only needs the new recalc step to repair `<layer>-type-signals.json` will be rejected before the repair runs, so the pre-commit automation cannot actually recover from the states it is supposed to fix. Reorder the recalc step before any stale-sensitive CI gate, or exempt this path from those checks.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 23,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7055aa6c944fafd2344fbbbc30dd0a5c4e0e88bb8d5e18b0b2c8586a573dedcd",
+          "at": "2026-04-18T14:55:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "pre-commit の symlink 行を `N/A` にしているため、`<layer>-types.json` や `<layer>-type-signals.json` が symlink でも `/track:commit` が先に書き込みを実行できてしまいます。これは、この scope 全体で要求している symlink fail-closed と矛盾します。CI/merge gate で拒否できても、前段の書き換え自体は防げません。",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.md",
+              "line": 75,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:06e661f7a5fa911a3fdf0ef58e848eacb59e3f95b66a6fa4c3fee5f931b1a60e",
+          "at": "2026-04-18T14:58:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8045c38ff761f2b3cf8657e8385707fb59d1fbab9528a56bb6ace1c82572bc8f",
+          "at": "2026-04-18T15:00:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Migration § says implementers should follow `plan.md`'s task ordering, but the current `plan.md` explicitly defers task decomposition and contains no ordering at all. That leaves the only documented safeguard for keeping declaration-codec removal after the CI reader update dangling, so the plan does not currently provide an executable sequencing source for the CI-break window it is trying to avoid.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 138,
+              "category": "broken reference"
+            },
+            {
+              "message": "`OQ2` reopens 'nightly toolchain missing' as something to confirm later, but the same ADR already treats missing pre-commit prerequisites as fail-closed and the rest of the plan/spec assumes commit blocking in that case. This makes a core gate policy simultaneously decided and undecided, which is ambiguous for implementers.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 174,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:da6c0fdb639e69c42c885ae38177427ba16e8fb39c0c880eaf3ab0840a60b221",
+          "at": "2026-04-18T15:04:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The constraints section says `未評価` and `stale` must be `VerifyFinding::error` on \"全経路\", but the same spec’s Behavior Truth Table marks both states as `N/A` for pre-commit because the recompute step runs first. Those two instructions imply different pre-commit behavior, so an implementer cannot tell whether `/track:commit` should fail before recomputing or always rewrite first.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 123,
+              "category": "contradiction"
+            },
+            {
+              "message": "D6 justifies skipping migration work by claiming \"現時点で active track は存在しない\", but this repository already has an active track (`tddd-ci-gate-and-signals-separation-2026-04-18`). That makes the stated rationale for \"migration unnecessary\" false as written, and the same incorrect rationale is propagated into the generated spec artifacts.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 93,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:da6c0fdb639e69c42c885ae38177427ba16e8fb39c0c880eaf3ab0840a60b221",
+          "at": "2026-04-18T15:08:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR's Migration section says rollout order should follow \"plan.md の task ordering\", but the scoped plan artifact currently has no task ordering at all and explicitly says task breakdown will only be added after `/track:design`. As written, the document that is supposed to define merge sequencing does not actually define one, so this cross-document reference leaves the rollout order underspecified.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 138,
+              "category": "broken reference"
+            },
+            {
+              "message": "V1 says it verifies that `<layer>-types.json` no longer has a `signals` field by checking whether `jq '.signals'` returns `null`, but that command also returns `null` when the file still contains an explicit `\"signals\": null`. This means the verification can pass even while violating the acceptance criterion that the declaration file must not contain the field at all.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1d3866145934821b87958b475f61ca1d08db79886ee9e8badd5369e6d4663440",
+          "at": "2026-04-18T15:12:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` V4 cannot validate merge-gate stale/missing handling as written. The procedure only mutates the working-tree signal file, but this plan also defines `check_strict_merge_gate` as reading committed blobs (`git show origin/<branch>:<path>`), so the merge gate would not observe the edited/deleted file unless the verification flow adds a commit/push step.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 33,
+              "category": "infeasibility"
+            },
+            {
+              "message": "OQ2 reopens the nightly-missing policy after the ADR has already fixed it elsewhere. The same document says missing pre-commit prerequisites must fail closed and block commit, and lists that block as an accepted cost, but OQ2 says this behavior still needs final user confirmation. That leaves a core `/track:commit` rule unresolved in an otherwise approved plan.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 172,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e04eaaa6000c16b36e8e8546eda9220b009fae23f11e3e7c4334f30f3d24ba0f",
+          "at": "2026-04-18T15:17:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migration order is not executable as written. Step 2 makes CI read the new `<layer>-type-signals.json`, while D5 says a missing result file is a hard error and D6 says no track has written the new file yet. Following the stated 1→7 order therefore introduces a CI-break window before steps 3/4 can generate the result files, so this rollout needs either a compatibility phase or a different dependency order.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 138,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:9101ab385a8ef62de0e29315be806d4cf43bb1bcbd0359cb96a93a69b2f62148",
+          "at": "2026-04-18T15:21:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migration order is internally inconsistent: step 4 adds pre-commit auto-recomputation before step 5 excludes `*-type-signals.json` from `code_hash`. Because `/track:commit` runs the review guard after recomputation, the regenerated signal file would still perturb `code_hash` during that window and `sotp review check-approved` would block otherwise-approved commits. Step 5 needs to land before, or together with, step 4.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 133,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:02755c1f9462635b8871629833563be9547e81c10e7a2aa031c9e1bf0f47907f",
+          "at": "2026-04-18T15:24:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OQ1` requires validating the `review_operational` `<track-id>` placeholder \"before T008 implementation,\" but this track intentionally has no task breakdown yet (`metadata.json` has `tasks: []` and `plan.sections: []`). With no `T008` defined anywhere in the current plan artifacts, that sequencing dependency is dangling and not actionable for implementers.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 170,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:3821841142255ce242b829e8b86365245ac6c9fae2b95e25547184cc9ac0a23c",
+          "at": "2026-04-18T15:26:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` says type details are intentionally deferred until `/track:design`, but the approved spec already hard-codes the result-file wire schema (`schema_version: 1`, `generated_at`, `declaration_hash`, `signals`). That closes the design space this track claims is still open, so the planning artifacts are internally inconsistent about whether schema details have already been decided.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 181,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a52796b4dd42d542deea5f021c7b8988c8c437057ea86051c21c979212bcd99",
+          "at": "2026-04-18T15:30:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migration order is not executable as written: step 2 says `sotp track type-signals` will rewrite `<layer>-types.json` without `signals`, but step 6 explicitly postpones removing `signals` from the declaration-file codec until after the CLI and CI work. Unless the CLI bypasses the shared codec, step 2 cannot produce the new declaration-file layout before step 6 lands.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 131,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:073f772ad4c5c98c2016c788f03081ff61efa79380c123d987e4c0c303b69d9d",
+          "at": "2026-04-18T15:33:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Migration step 2 keeps writing `signals` into `<layer>-types.json` during a dual-write phase, but `declaration_hash` is defined elsewhere in this ADR/spec as the SHA-256 of the declaration file bytes and step 6 later removes `signals` from that file. The rollout never includes a regeneration/backfill step for already-written `<layer>-type-signals.json`, so once any track has generated signal files, step 6 will make them all stale and CI/merge-gate will hard-fail on the next read.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 131,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:630f4645f5c04385a55a86d6ab4b7b994d2f65a63766abd796fba57848991aa6",
+          "at": "2026-04-18T15:37:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` marks the pre-commit result for `TDDD not active (<layer>-types.json 不在)` as `[OK]`/skip, but ADR D2 defines pre-commit as running `sotp track type-signals`-equivalent logic on every `tddd.enabled` layer. That command’s contract is to fail when the catalogue file is missing and tell the user to run `/track:design` first, so the plan currently gives two incompatible behaviors for an enabled layer without `<layer>-types.json`. This needs to be resolved before implementation and verification can be derived consistently.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 262,
+              "category": "contradiction"
+            },
+            {
+              "message": "The constraints assert that missing `architecture-rules.json` is a fail-closed error on every route, and the truth-table note even calls that '既存挙動'. That is not true for the referenced pre-commit path today: `sotp track type-signals` still uses the legacy fallback when `architecture-rules.json` is absent. As written, the artifacts either misstate current semantics or silently expand the track to remove that fallback, but ADR D1-D7 never records that compatibility change.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 123,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:d241a530449d2ea8b6ec0f78a8688fce65bb19fd0f99a286c387f46e3a328f09",
+          "at": "2026-04-18T15:42:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D6 says there is no migration to perform and that new tracks will start directly in the separated two-file format, but the Migration section later introduces a dual-write transitional step where `sotp track type-signals` continues writing `signals` back into `<layer>-types.json` until step 6. Those are incompatible rollout stories, so the plan does not currently define whether tracks created during the rollout are supposed to be split-only or dual-written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 95,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e5896895787b4e741dd0e8afef956f8b03dd7dd877c7ed5f792091be4f3be58d",
+          "at": "2026-04-18T15:47:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Migration step 6 says to merge the declaration-codec change first and only rerun `sotp track type-signals` afterward, but by this point D2/D5 already make stale `declaration_hash` values a CI-blocking error. Changing the declaration-file encoding invalidates every existing `*-type-signals.json` immediately, so that PR cannot merge unless regeneration happens in the same changeset. As written, the rollout order is not executable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 137,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:102f6f614514dc8c515c4c9c0fb3f1ca2df27a0a61e7dc0adc55d202cc21f34b",
+          "at": "2026-04-18T15:51:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`scope.out_of_scope` now justifies skipping any migration path by asserting that active tracks' `<layer>-types.json` do not contain embedded `signals`, but the ADR still describes embedded `signals` in `<layer>-types.json` as the current Stage 2 representation and the rollout plan still treats that embedded form as the starting state until step 6. That leaves the migration rationale internally inconsistent: either embedded signals are still the status quo, or they are already absent from active tracks, but the plan currently says both.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 89,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a7a30a12f1a39e0ab2b2b0366565b6e6d9a87660ece776a7f493501a42ae7a50",
+          "at": "2026-04-18T15:54:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` asks the reviewer to push stale/missing signal files to exercise `check_strict_merge_gate`, but ADR D2 makes `/track:commit` recompute those files before every commit. Without an explicit bypass path (for example a direct `git commit`/fixture branch workflow), the merge-gate checks in V4 are not executable once the feature is implemented.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 37,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:59cd612b68070d1a0bf46f51844ad68098c74baa06590f250bec3eb198f2f3a3",
+          "at": "2026-04-18T15:58:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`out_of_scope` says there is no migration demand because the only active track does not yet contain any per-track `<layer>-types.json`, but the same plan later says a `tddd.enabled = true` layer with missing `<layer>-types.json`/`<layer>-type-signals.json` must hard-fail CI and merge, and Migration step 3 may only merge after the signal files have been generated. Since step 2 only adds `<layer>-type-signals.json` output and no step creates the missing declaration files for this active track, the rollout cannot reach a passing state as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 89,
+              "category": "infeasibility"
+            },
+            {
+              "message": "This acceptance criterion requires `<layer>-type-signals.json` to contain `generated_at` and cites ADR D1/D5 as its source, but those ADR sections only commit to a separate signal file plus declaration fingerprint checking; they do not define `generated_at` or the exact four-field wire schema. That leaves the requirement unsupported by the cited design source.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 181,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:1e1c1702166713bc699c3dfefd801973721655c8827daa98cdc2db42d9757005",
+          "at": "2026-04-18T16:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` assumes this implementation track already has per-track TDDD declaration files to mutate and re-evaluate (`<layer>-types.json` / `<layer>-type-signals.json`), but the ADR/spec explicitly say the current active track `tddd-ci-gate-and-signals-separation-2026-04-18` has no such per-track files yet. As written, V1/V2/V5 cannot be executed on the reviewed track unless the plan also introduces a fixture or another track for verification.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 17,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d09e241fe17bffbb001831163a7f133f8c44536053b622b305c208641d9b9299",
+          "at": "2026-04-18T16:06:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Migration step 4 says `review_operational` must land before pre-commit auto-recalc so `code_hash` will stop changing, but step 2 explicitly keeps dual-writing `signals` back into `<layer>-types.json` until step 6. That means once step 5 lands, auto-recalc can still mutate the declaration file and still churn `code_hash`, so the stated rollout ordering does not actually avoid review-guard reblocks during the step-5-to-step-6 window.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 139,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4a0e2f08fa1d9e4a873e270f93b41154e218db8e42c05cb9d2dd70e771c36ac1",
+          "at": "2026-04-18T16:09:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D6's migration references are stale after the rollout was renumbered: it says the `signals` removal happens in \"Migration 手順 6\" and then refers to \"全 Migration 手順 (1–7)\", but the Migration section now has only steps 1–6 and moves the codec removal into step 5b. That leaves the ADR's own rollout narrative self-contradictory.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+              "line": 97,
+              "category": "broken reference"
+            },
+            {
+              "message": "The approved spec still says the system-wide `signals` change happens in \"Migration 手順 6\", but the ADR's migration plan now puts that work in step 5b and reserves step 6 for accepting the ADR. Because this scope text points readers to the wrong rollout step, the spec no longer lines up with the migration plan it cites.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 89,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:1f55e4df62418de61416306e6f0d5d5bdd61299d147a1790abbe9e9760b3d03e",
+          "at": "2026-04-18T16:12:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` says V4 is executable in this implementation track's CI environment even though the same note says this track has no per-track `<layer>-types.json`. V4 then asks the reviewer to corrupt or delete an existing `<layer>-type-signals.json`, which cannot exist on this track as described, so the verification procedure is not executable without switching to a different track or fixture branch.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 15,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The plan simultaneously declares `tddd.enabled` layer count zero to be a fail-closed error in the new gates and requires `cargo make ci` to pass on this tool-only track, which is also described elsewhere as having no per-track TDDD declarations. As written, a zero-layer implementation track would block its own CI/pre-commit path, so the rollout and acceptance criteria are internally inconsistent unless such tracks are explicitly skipped.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 123,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:171e6884b4952d03dfa9141169f6aa52b1785ef05675e880acaba9d01c0bd5b9",
+          "at": "2026-04-18T16:15:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e580df9459a970c3ec1ec48e024777eb5b13ed1b0a7a87323c6dc261372d8ebe",
+          "at": "2026-04-18T16:21:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff116977bd3c3372c7bf4cf929d73139b11d8ab7f9a313a76ae437e602ad1455",
+          "at": "2026-04-18T17:00:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff116977bd3c3372c7bf4cf929d73139b11d8ab7f9a313a76ae437e602ad1455",
+          "at": "2026-04-18T17:01:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:129e2c95d7b4302c0cd6235888a7e7ec0d722d48544e95f6bde96bf6e49c65fe",
+          "at": "2026-04-18T17:07:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:129e2c95d7b4302c0cd6235888a7e7ec0d722d48544e95f6bde96bf6e49c65fe",
+          "at": "2026-04-18T17:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_file()` is documented as returning `<catalogue-stem>-signals.json`, but this design consistently names the new evaluation-result file `<layer>-type-signals.json`. As written, the accessor would point at the wrong filename and break the declaration/result split.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba97e50511a6b6a3bd9497a040b44126a8c50374d2157b7d3a6471e1a6a7a701",
+          "at": "2026-04-18T17:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`signal_file()` is documented as returning `<catalogue-stem>-signals.json`, but this ADR and the rest of the design define the evaluation-result file as `<layer>-type-signals.json`. As written, the accessor would resolve the wrong path for both the CLI writer and the CI reader.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 17,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ba97e50511a6b6a3bd9497a040b44126a8c50374d2157b7d3a6471e1a6a7a701",
+          "at": "2026-04-18T17:35:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b71a6a7ab4075f64f0017be5091d1104da06898cba33b1b96934a4b0d65674",
+          "at": "2026-04-18T17:37:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b71a6a7ab4075f64f0017be5091d1104da06898cba33b1b96934a4b0d65674",
+          "at": "2026-04-18T17:40:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edd74d86f91ba7a88f650d29f90f3dfa52ba3559dea62c9b03683ad028a156cd",
+          "at": "2026-04-18T17:49:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's filename rule is self-contradictory: it says `signal_file()` should use `<catalogue-stem>-signals.json`, but the example and every scoped requirement use `<layer>-type-signals.json`. For `domain-types.json`, the written rule would produce `domain-types-signals.json`, not the required `domain-type-signals.json`, so this task currently points implementers at the wrong target filename.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:edd74d86f91ba7a88f650d29f90f3dfa52ba3559dea62c9b03683ad028a156cd",
+          "at": "2026-04-18T17:51:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`[tasks: T007, T008]` does not cover the full requirement here: `T004` is the task that actually makes `sotp track type-signals` write `<layer>-type-signals.json`. Without `T004`, this acceptance criterion cannot be satisfied even if the build/self-migration pieces land.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.md",
+              "line": 53,
+              "category": "logic gap"
+            }
+          ],
+          "hash": "rvw1:sha256:951c4247e842f4d746ba5848ec72fed6e227ae789af30f8ebe066565ed21331f",
+          "at": "2026-04-18T17:54:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:951c4247e842f4d746ba5848ec72fed6e227ae789af30f8ebe066565ed21331f",
+          "at": "2026-04-18T17:55:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` is scheduled before the first self-migration run in `T008`, but ADR Migration step 3 explicitly says the CI reader must only land after step 2 has already generated `<layer>-type-signals.json`. As written, the `T005` commit would make the current active track fail on Missing signal files until `T008` lands, so this task order is not executable as a per-task rollout.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/plan.md",
+              "line": 31,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The acceptance criterion for '`cargo make ci` passes with the new file structure' is mapped only to `T007`/`T008`, but the gate named in that criterion (`verify-spec-states-current-local`) is actually updated in `T005`. With the current `task_refs`, the spec under-assigns CI readiness and suggests the criterion can be satisfied without the task that teaches CI to read `*-type-signals.json`.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 293,
+              "category": "logic_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:951c4247e842f4d746ba5848ec72fed6e227ae789af30f8ebe066565ed21331f",
+          "at": "2026-04-18T17:58:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:913d02afe449030f9ad5a6be14edb8b569a071c5ee905bfccdae2ef276476eb1",
+          "at": "2026-04-18T18:00:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The acceptance criterion for final `sotp track type-signals` behavior is under-assigned: it only references `T007`/`T008`, but the actual writer behavior it asserts (`<layer>-type-signals.json` output plus `declaration_hash` emission) is introduced in `T004`. `T007` only performs the cutover/removal of legacy embedded `signals`, and `T008` is build/self-migration verification, so the requirement is no longer fully traceable to the task that implements it.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 233,
+              "category": "logic gap"
+            }
+          ],
+          "hash": "rvw1:sha256:913d02afe449030f9ad5a6be14edb8b569a071c5ee905bfccdae2ef276476eb1",
+          "at": "2026-04-18T18:01:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 is internally inconsistent about the required atomicity: the surrounding plan text says the pre-commit wiring and codec removal must land in the same commit, but the task body only requires them to be in the same PR. That weakens the commit-level constraint the rest of the plan depends on.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:508d6471e6efd6799f2472e05277049d355d0a72d13c1cae4be8085f308006ab",
+          "at": "2026-04-18T18:03:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f68da3a73df5b80e9e3d91f291774c60608adf0891165d2932bd08de19dfc7b4",
+          "at": "2026-04-18T18:05:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f68da3a73df5b80e9e3d91f291774c60608adf0891165d2932bd08de19dfc7b4",
+          "at": "2026-04-18T18:07:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The task records no longer include `commit_hash` at all. That contradicts the briefing's stated intermediate state (`commit_hash` stays present as `null` until the post-commit update) and drops the field other track metadata uses to represent pending vs. linked commits.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 80,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:24:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:27:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` no longer records `commit_hash` for T001 (or any other task). In this review state, the documented intermediate state is that T001 has transitioned to `done` while `commit_hash` remains explicitly `null` until `/track:commit`; dropping the field entirely changes the meaning of the transition record and contradicts that workflow.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 84,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` now removes `commit_hash` from every task entry instead of keeping the field and leaving T001 as `null`. That contradicts the documented transition flow for this scope, which expects the task to be marked done first and then have its commit hash filled post-commit; with the field gone, the artifact no longer expresses that state or preserves per-task commit linkage for later steps.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d27f351e5efbf77839b70380d882a744f5e45ef7f79dea1c1898015e8159a181",
+          "at": "2026-04-18T18:31:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57e7ac58fd5f150f9b9924f42b5cc4b1980835c8b5d9ff0bee803cc15b17760c",
+          "at": "2026-04-18T18:33:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:39:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Flipping `TypeSignalsCodecError` to blue (and implicitly treating T002 as complete) is premature: the new codec still does not enforce the ADR/spec requirement that `generated_at` be ISO 8601 UTC. `type_signals_codec::decode` delegates to `Timestamp::new`, whose tests accept offset timestamps such as `2026-03-19T12:00:00+09:00`, and `encode` preserves the raw string, so the implementation currently accepts non-UTC values even though these artifacts say the UTC-only contract is done.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 27,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:44:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Flipping `TypeSignalsCodecError` to `blue` here is premature. T002 is described as finished with `generated_at` constrained to ISO 8601 UTC, but `type_signals_codec::decode` still delegates to `Timestamp::new`, and `Timestamp::new` explicitly accepts offset timestamps such as `2026-03-19T12:00:00+09:00`. These artifacts therefore overstate completion of the UTC-only contract.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "line": 27,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:46:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0abe5466ea44e420c556996210e99149ac46d68267190cc9d9270d0a9515351",
+          "at": "2026-04-18T18:48:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c86ece03f8d5bed9cc706c2fac006619bd61c36981d987cfc690638ba87bc35d",
+          "at": "2026-04-18T18:59:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c86ece03f8d5bed9cc706c2fac006619bd61c36981d987cfc690638ba87bc35d",
+          "at": "2026-04-18T19:00:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f311690fd504b07df5980561f8ffb978e8b65fb5e21a7191d7fda948f9f6b56",
+          "at": "2026-04-18T19:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f311690fd504b07df5980561f8ffb978e8b65fb5e21a7191d7fda948f9f6b56",
+          "at": "2026-04-18T19:08:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4be1cf8bac535c3373966b34addc4935c8192a1b425bcda12a04d5d9a6283b3c",
+          "at": "2026-04-18T19:24:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4be1cf8bac535c3373966b34addc4935c8192a1b425bcda12a04d5d9a6283b3c",
+          "at": "2026-04-18T19:26:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f25764442eeacbb65c13ab26f89cb49c23a746e158aa352353ff216d910f2037",
+          "at": "2026-04-18T19:32:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f25764442eeacbb65c13ab26f89cb49c23a746e158aa352353ff216d910f2037",
+          "at": "2026-04-18T19:33:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88403e86a5a8b023a81661e771b6b0e8bd64534e7236639c72b3b92763d9e790",
+          "at": "2026-04-18T19:45:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88403e86a5a8b023a81661e771b6b0e8bd64534e7236639c72b3b92763d9e790",
+          "at": "2026-04-18T19:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Scope Verified` says ADR D1–D7 is already complete and the ADR has been promoted to `Accepted`, but the tracked state still leaves T009 todo in `metadata.json`, and the ADR itself remains `Proposed`. That makes the verification report overstate completion.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:22:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:24:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The truth-table verification maps the \"TDDD not active\" case to a missing declaration file and a pass/skip outcome (`declaration file absent -> VerifyOutcome::pass()`), but `spec.md` defines TDDD-not-active as `tddd.enabled = false` and explicitly says a `tddd.enabled = true` layer with a missing `<layer>-types.json` belongs to the blocked Missing case. As written, this PASS evidence would allow an enabled layer with no declaration file to be treated as verified skip instead of a fail-closed error.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 108,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:27:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new V1 result says T008 successfully migrated this track's own domain/usecase/infrastructure `<layer>-types.json` files, but the same verification document still says this track has no per-track TDDD declaration files and that V1-V6 must be run against another track. Those statements cannot both be true, so the artifact is unclear about what was actually verified for T008 self-migration.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 64,
+              "category": "contradiction"
+            },
+            {
+              "message": "The truth-table mapping describes `TDDD not active` as a missing declaration-file case and even cites `if !signal_path.is_file()`, but spec.md defines `TDDD not active` as a `tddd.enabled = false` layer; a missing evaluation file is the separate `Missing` row and must fail closed for enabled layers. This misclassifies one of the 24 behavior-table cells in the verification result.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 108,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd8dd5a59770789a76f54e0d6bb4348ab25ccb2d03eff25c76077f09c6d6c97e",
+          "at": "2026-04-18T20:35:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bf4744a81b814a86aab21a59da70a411aa4bc0b5891deefee631798b0e991d9",
+          "at": "2026-04-18T20:38:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bf4744a81b814a86aab21a59da70a411aa4bc0b5891deefee631798b0e991d9",
+          "at": "2026-04-18T20:40:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c58d9f2c71a856caf27697b377f11f0af5ba359c69ee460c2dfe735963a32c3a",
+          "at": "2026-04-18T20:43:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c58d9f2c71a856caf27697b377f11f0af5ba359c69ee460c2dfe735963a32c3a",
+          "at": "2026-04-18T20:44:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9e1c29f77c972560dc9f006625c9fc9f9d7be1685fb3ede5520b9b246ca7d0",
+          "at": "2026-04-19T00:32:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9e1c29f77c972560dc9f006625c9fc9f9d7be1685fb3ede5520b9b246ca7d0",
+          "at": "2026-04-19T00:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df2ef1f709643d71ecc3c35b6215e3eef1c31db19043713609fb2830e6df95d3",
+          "at": "2026-04-19T00:42:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df2ef1f709643d71ecc3c35b6215e3eef1c31db19043713609fb2830e6df95d3",
+          "at": "2026-04-19T00:43:48Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:32:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:34:02Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalDto` should also use `#[serde(deny_unknown_fields)]`; as written, typos inside individual `signals[]` entries are silently ignored on decode, which contradicts the module’s fail-closed contract and can let malformed evaluation data pass as valid.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 80,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:41:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:42:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsDocDto.signals` is deserialized with `#[serde(default)]`, so a malformed `<layer>-type-signals.json` that omits the required top-level `signals` field is accepted as `[]` instead of being rejected at the codec boundary. ADR D1 defines `signals` as part of the schema, so this should fail closed rather than silently turning a bad file into an empty evaluation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 74,
+              "category": null
+            },
+            {
+              "message": "`decode` validates `generated_at` with `Timestamp::new`, but that parser accepts RFC3339 offsets such as `2026-04-18T12:00:00+09:00`. ADR D1 and this module’s docs require an ISO 8601 UTC timestamp, so non-UTC payloads currently pass validation and are preserved verbatim on re-encode.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 109,
+              "category": null
+            },
+            {
+              "message": "`encode` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is public and can hold values other than `1`, this encoder can emit on-disk signal files that its own `decode` path immediately rejects, even though ADR D1 fixes the file format at `schema_version: 1`. The encoder should pin or validate the version before serializing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 132,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode()` validates `generated_at` with `Timestamp::new`, but that parser accepts offset timestamps like `2026-04-18T12:00:00+09:00`. The ADR/track contract says `<layer>-type-signals.json` stores a UTC timestamp, so this codec currently accepts and round-trips schema-invalid files instead of returning `InvalidTimestamp`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 109,
+              "category": "validation"
+            },
+            {
+              "message": "`encode()` writes `doc.schema_version()` verbatim. Because `TypeSignalsDocument::with_schema_version` is a public constructor, callers can serialize a version other than `1`, producing a `<layer>-type-signals.json` file that this same codec will reject on the next read. The on-disk format needs to be pinned to schema version 1 here, the same way `catalogue_codec` pins its schema version during encode.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 132,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:da96ce19ac3e1fc9e8d99f9951e7d7b4f102369e282898b0a5a98968cd384b87",
+          "at": "2026-04-18T18:48:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsDocDto` marks the top-level `signals` field with `#[serde(default)]`, so `decode()` accepts a `<layer>-type-signals.json` payload that omits `signals` entirely and silently turns that malformed/truncated file into an empty evaluation result. ADR §D1 defines `signals` as part of the required file shape, so this should fail closed instead of being treated as a valid document.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 74,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0c87c402bfc03180c23e684d53c114b505bc684f5dbcca10090ae9b7396a6c60",
+          "at": "2026-04-18T18:51:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44781f27e246d6decf8fe7d9635a90593cd37adebdb821a1c14bc0efb007b65a",
+          "at": "2026-04-18T18:54:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
+          "at": "2026-04-18T18:58:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a903a4e8e3ab51fe1a55b39ac8342b120228ca46c0aaf84fa6deee438dfae74",
+          "at": "2026-04-18T18:59:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:522432f903ee4dfcf3ace6362d2adad492ae1a13c0ae0bfbef0827d370058d12",
+          "at": "2026-04-18T19:24:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:522432f903ee4dfcf3ace6362d2adad492ae1a13c0ae0bfbef0827d370058d12",
+          "at": "2026-04-18T19:27:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
+          "at": "2026-04-18T19:47:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
+          "at": "2026-04-18T19:49:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new signal-file read follows symlinks (`is_file()` + `read_to_string`) and will use the symlink target's contents to populate the markdown, rather than treating symlinked `<layer>-type-signals.json` as a non-fatal miss that falls back to `—`. That breaks the intended view-only symlink handling and allows a crafted symlink to inject arbitrary external file contents into the renderer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 642,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:1ae6cf9520db16a50a4cb8560e5299b208719b3cf37c4bee6b4f31807003d341",
+          "at": "2026-04-19T00:33:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fffcacd6e8b2c27666be12dc6585676d3377c5e4c28c16b7e2a963c3b8a9632",
+          "at": "2026-04-19T00:38:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fffcacd6e8b2c27666be12dc6585676d3377c5e4c28c16b7e2a963c3b8a9632",
+          "at": "2026-04-19T00:40:34Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:24:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ecc5f7102d1ab052d11ff73607288210e1eae99cf42fa7b39a9100e68352410",
+          "at": "2026-04-18T18:26:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
+          "at": "2026-04-18T19:32:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
+          "at": "2026-04-18T19:33:06Z"
+        }
+      ]
+    }
+  }
+}

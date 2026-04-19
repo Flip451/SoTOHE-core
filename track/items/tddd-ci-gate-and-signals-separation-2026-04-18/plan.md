@@ -1,0 +1,50 @@
+<!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
+# TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離
+
+Stage 2 (TDDD) の `<layer>-types.json` を宣言ファイルと評価結果ファイル (`<layer>-type-signals.json`) に物理分離する。
+`dispatch_track_commit_message()` に pre-commit 自動再計算を配線し、Red は commit をブロック、Yellow は warning で許容する。
+評価結果ファイルを review scope の `review_operational` に追加し、`code_hash` 計算の対象外とする。
+評価結果ファイルに宣言ファイルの fingerprint (declaration_hash) を記録し、stale/Missing は CI / merge gate で常に error とする (fail-closed、経路間で対称)。
+実装順は TDD (型 → codec → accessor → CLI writer → CI reader → review scope → 切替 → build-sotp + 自己 migration → ADR Accepted) で、Migration §5a+5b は同一 commit (T007) で実施する。
+
+## 基本型 + codec
+
+評価結果ファイルの in-memory 表現 (TypeSignalsDocument) と load 結果 enum (TypeSignalsLoadResult) を domain 層に追加する (T001)。
+評価結果ファイルの codec (encode / decode / declaration_hash 計算) と codec error を infrastructure 層に追加する (T002)。
+TdddLayerBinding に signal_file() accessor を追加する (T003)。
+本 section は pure Rust 型 + codec の段階で I/O への影響はない。
+
+- [x] domain: `TypeSignalsDocument` + `TypeSignalsLoadResult` を libs/domain/src/tddd/ に新規追加 + unit tests。TypeSignalsDocument は value_object (schema_version / generated_at / declaration_hash / signals)、TypeSignalsLoadResult は enum (Current / Stale / Missing) で variant-dependent data を持つ (enum-first)。 95bab86b3c5fe348b315bd508f7b31350345d0a7
+- [x] infrastructure: `TypeSignalsCodec` (encode / decode / declaration_hash 計算) + `TypeSignalsCodecError` error type を libs/infrastructure/src/tddd/ に新規追加 + unit tests。schema_version=1 固定、generated_at は ISO 8601 UTC、declaration_hash は宣言ファイルの disk bytes SHA-256 hex。 4f700b0235925826f43b543a8531fae81bd1a7fa
+- [x] infrastructure: `TdddLayerBinding::signal_file()` accessor を libs/infrastructure/src/verify/tddd_layers.rs に追加 + unit tests。`<layer>-type-signals.json` 命名規則で評価結果ファイル名を返す (例: domain-types.json → domain-type-signals.json)。 31833773dca8ac48e447ef0aff75cfbefac446bc
+
+## 過渡期: CLI writer の二重書き出し
+
+`sotp track type-signals` CLI を更新し、評価結果を `<layer>-type-signals.json` にも書き出すようにする (T004)。
+本 section の時点では宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (Migration §2 の二重書き出し過渡期)。
+書き込み前に既存 `reject_symlinks_below` を適用する。
+
+- [x] cli: `sotp track type-signals` (apps/cli/src/commands/track/tddd/signals.rs) を更新し、評価結果を `<layer>-type-signals.json` にも書き出す。本タスクでは宣言ファイル `<layer>-types.json` の signals 同居書き出しを継続する (二重書き出し過渡期、Migration §2)。書き込み前に `reject_symlinks_below` を適用。+ unit tests。 3ec1c25d99b41595156756568dfacf8dd8e29007
+
+## CI / merge gate の stale 検出
+
+`evaluate_layer_catalogue` を更新し、評価結果ファイルを読んで declaration_hash を比較する (T005)。
+stale と Missing は両経路で fail-closed error。評価結果ファイル読取にも既存 symlink guard を適用する。
+`track/review-scope.json` の `review_operational` に `*-type-signals.json` を追加し、評価結果ファイル変更が review code_hash を変動させないようにする (T006)。
+
+- [x] infrastructure: `evaluate_layer_catalogue` (libs/infrastructure/src/verify/spec_states.rs) を更新し、`<layer>-type-signals.json` を読んで declaration_hash を現在の宣言ファイル hash と比較する。stale (不一致) と Missing (ファイル不在) を両方とも CI / merge gate で常に `VerifyFinding::error` とする (fail-closed、経路間で対称)。評価結果ファイル読取パスにも既存 `reject_symlinks_below` を適用。+ unit tests (stale / Missing / symlink / decode error 各ケース)。 6693a574e259373c7694e284c50b114333e9b270
+- [x] harness: `track/review-scope.json` の `review_operational` に `track/items/<track-id>/*-type-signals.json` を追加。評価結果ファイルのみ変更した commit が `SystemReviewHasher` の `code_hash` を変動させないことを確認する回帰テスト相当 (既存 review scope test の拡張)。 45cf39d57cf1401ce20bdcccea15758e60fbb7bd
+
+## 切替 (同一 commit) + 本 track 自己 migration
+
+同一 commit で pre-commit 自動再計算配線 (`dispatch_track_commit_message()`) と宣言ファイル codec から signals 除去を適用する (T007)。
+`cargo make build-sotp` で新仕様 sotp を配置し、初回 `sotp track type-signals` 実行で本 track 自身の catalogue を新仕様に自動 migration する (T008)。Behavior Truth Table の全セルを手動検証する。
+
+- [x] cli + infrastructure (同一 commit): (a) `dispatch_track_commit_message()` (apps/cli/src/commands/make.rs) に pre-commit 自動再計算を配線。順序は 再計算→CI→review guard→commit。Red 検出で commit ブロック (commit-message.txt 保持)、Yellow で warning + 続行、書き込み前に `reject_symlinks_below` 適用。(b) 宣言ファイルコーデック `catalogue_codec.rs` から signals フィールドを除去 (encode / decode 両方向、schema_version は 2 維持)。ADR Migration §5 の「5a と 5b は同一 commit」制約に従う。+ unit tests。 df18d2bc5c5efb07fe2a4875c50dcbfc21af0acd
+- [x] build: `cargo make build-sotp` で新仕様 sotp を bin/sotp に配置。初回 `sotp track type-signals tddd-ci-gate-and-signals-separation-2026-04-18` を実行して本 track 自身の catalogue を新仕様 (signals 分離) に自動 migration。`cargo make ci` が通過することを確認。Behavior Truth Table の全セル (3 経路 × 8 状態) の振る舞いを手動検証し verification.md に記録。 7f62a5aedbfcc7d3c686bad55b9f7cdf5fdb6cff
+
+## 完了
+
+ADR の Status を Proposed → Accepted に昇格する (T009)。
+
+- [x] docs: ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` の Status を Proposed → Accepted に更新。関連 ADR から本 ADR へのリンクが必要なら追加 (Referenced By セクション等)。 ecf48f0b1db4e0f7ce30ca04d07655fbb6bf9de9

@@ -440,6 +440,102 @@ fn test_scope_config_classify_operational_excluded() {
 }
 
 #[test]
+fn test_scope_config_classify_operational_excludes_type_signals_for_current_track() {
+    // T006: the `track/items/<track-id>/*-type-signals.json` glob added to
+    // `review_operational` must exclude every per-layer evaluation-result
+    // file for the current track from scope classification. The ADR
+    // 2026-04-18-1400 §D4 contract says signal-file-only diffs do not change
+    // `code_hash`; this test proves the classifier-layer precondition for
+    // that property (hash stability is proven at the `SystemReviewHasher`
+    // level — see the hasher tests).
+    let operational = vec![
+        "track/items/<track-id>/review.json".to_owned(),
+        "track/items/<track-id>/*-type-signals.json".to_owned(),
+    ];
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), operational, vec![]).unwrap();
+
+    // Mix of code + operational + all three layer signal files.
+    let files = vec![
+        fp("libs/domain/src/lib.rs"),
+        fp("track/items/my-track-2026-04-05/review.json"),
+        fp("track/items/my-track-2026-04-05/domain-type-signals.json"),
+        fp("track/items/my-track-2026-04-05/usecase-type-signals.json"),
+        fp("track/items/my-track-2026-04-05/infrastructure-type-signals.json"),
+    ];
+    let classified = config.classify(&files);
+
+    // Only the lib.rs code file should survive classification; all operational
+    // exclusions (review.json + 3 signal files) are dropped.
+    let all_files: Vec<&FilePath> = classified.values().flatten().collect();
+    assert_eq!(all_files.len(), 1, "expected only lib.rs to survive, got: {all_files:?}");
+    assert_eq!(all_files[0].as_str(), "libs/domain/src/lib.rs");
+}
+
+#[test]
+fn test_scope_config_operational_type_signals_does_not_match_other_tracks() {
+    // The `<track-id>` placeholder is expanded to the CURRENT track id only,
+    // so a signal file under a different track directory must NOT be
+    // excluded by this operational pattern. (Other-track suppression is the
+    // responsibility of `other_track`, not `review_operational`.)
+    let operational = vec!["track/items/<track-id>/*-type-signals.json".to_owned()];
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), operational, vec![]).unwrap();
+
+    // Signal file under a different track directory (not the current one).
+    let files = vec![fp("track/items/other-track-2026-03-01/domain-type-signals.json")];
+    let classified = config.classify(&files);
+
+    // The other-track signal file must survive as `Other` (unclassified),
+    // not be dropped by our operational glob.
+    let other_files =
+        classified.get(&ScopeName::Other).map(std::vec::Vec::as_slice).unwrap_or_default();
+    assert_eq!(other_files.len(), 1);
+    assert_eq!(
+        other_files[0].as_str(),
+        "track/items/other-track-2026-03-01/domain-type-signals.json"
+    );
+}
+
+#[test]
+fn test_scope_config_operational_type_signals_does_not_match_baseline_or_declaration() {
+    // The `*-type-signals.json` glob must match ONLY the evaluation-result
+    // files, not the companion declaration (`<layer>-types.json`) or
+    // baseline (`<layer>-types-baseline.json`) files. A false match on
+    // declaration/baseline would silently break the authored-review gate.
+    let operational = vec!["track/items/<track-id>/*-type-signals.json".to_owned()];
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), operational, vec![]).unwrap();
+
+    let files = vec![
+        fp("track/items/my-track-2026-04-05/domain-types.json"),
+        fp("track/items/my-track-2026-04-05/domain-types-baseline.json"),
+        fp("track/items/my-track-2026-04-05/domain-types.md"),
+        fp("track/items/my-track-2026-04-05/domain-type-signals.json"),
+    ];
+    let classified = config.classify(&files);
+
+    // Declaration + baseline + markdown render → Other (not operational).
+    // Signal file → excluded (operational).
+    let other_files =
+        classified.get(&ScopeName::Other).map(std::vec::Vec::as_slice).unwrap_or_default();
+    let survivors: Vec<&str> = other_files.iter().map(FilePath::as_str).collect();
+    assert!(
+        survivors.contains(&"track/items/my-track-2026-04-05/domain-types.json"),
+        "declaration file must survive classification, got: {survivors:?}"
+    );
+    assert!(
+        survivors.contains(&"track/items/my-track-2026-04-05/domain-types-baseline.json"),
+        "baseline file must survive classification, got: {survivors:?}"
+    );
+    assert!(
+        survivors.contains(&"track/items/my-track-2026-04-05/domain-types.md"),
+        "rendered markdown must survive classification, got: {survivors:?}"
+    );
+    assert!(
+        !survivors.contains(&"track/items/my-track-2026-04-05/domain-type-signals.json"),
+        "signal file must be operational-excluded, got: {survivors:?}"
+    );
+}
+
+#[test]
 fn test_scope_config_classify_other_track_excluded() {
     let other_track = vec!["track/items/<other-track>/**".to_owned()];
     let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], other_track).unwrap();
