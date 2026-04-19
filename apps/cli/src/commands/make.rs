@@ -767,6 +767,17 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
         if !catalogue_path.is_file() {
             continue; // no catalogue → nothing was written → nothing to stage
         }
+        // Mirror the lenient executor's multi-target skip: for layers with
+        // multiple `schema_export.targets`, `execute_type_signals_lenient`
+        // did NOT regenerate catalogue / rendered / signal files, so
+        // `git add` here would stage pre-existing working-tree content
+        // (including any unrelated unstaged edits) rather than recomputed
+        // outputs. Skip staging entirely for those layers — CI / merge-gate
+        // still detect staleness via `declaration_hash` comparison on the
+        // already-committed signal file.
+        if binding.targets().len() > 1 {
+            continue;
+        }
         // Stage all three files written by execute_type_signals for this layer.
         for rel_path in &[
             track_dir.join(binding.catalogue_file()),
