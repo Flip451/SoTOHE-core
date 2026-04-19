@@ -113,6 +113,23 @@ impl GitShowTrackBlobReader {
     }
 }
 
+/// Derives the signal filename for a declaration filename by the same rule
+/// as `TdddLayerBinding::signal_file()` (infrastructure/verify/tddd_layers,
+/// T003): strip `.json`, drop a trailing `s` if present, append
+/// `-signals.json`. Mirrored here so the merge-gate adapter can compute the
+/// signal path without constructing a full `TdddLayerBinding` (which would
+/// require re-parsing `architecture-rules.json` after `resolve_catalogue_filename`
+/// already did so).
+fn signal_file_name_for(catalogue_filename: &str) -> String {
+    let stem = catalogue_filename.strip_suffix(".json").unwrap_or(catalogue_filename);
+    let signal_stem = if let Some(trimmed) = stem.strip_suffix('s') {
+        format!("{trimmed}-signals")
+    } else {
+        format!("{stem}-signals")
+    };
+    format!("{signal_stem}.json")
+}
+
 impl TrackBlobReader for GitShowTrackBlobReader {
     fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument> {
         let path = Self::blob_path(track_id, "spec.json");
@@ -148,10 +165,59 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Ok(s) => s,
             Err(result) => return result,
         };
-        match crate::tddd::catalogue_codec::decode(&text) {
-            Ok(doc) => BlobFetchResult::Found((doc, filename)),
-            Err(e) => BlobFetchResult::FetchError(format!("{path}: {filename} decode error: {e}")),
+        let mut doc = match crate::tddd::catalogue_codec::decode(&text) {
+            Ok(doc) => doc,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "{path}: {filename} decode error: {e}"
+                ));
+            }
+        };
+
+        // ADR 2026-04-18-1400 §D5: Stage 2 signal data lives in the companion
+        // `<layer>-type-signals.json` (T001–T007). Merge gate must hydrate
+        // `doc.signals()` from that file before calling `check_type_signals`
+        // — otherwise every migrated track would fail-closed with
+        // "type signals not yet evaluated". Fail-closed when:
+        // - signal file is absent (T005-equivalent Missing, symmetric on
+        //   both CI and merge gate paths per §D5),
+        // - signal file is present but `declaration_hash` does not match
+        //   the declaration blob bytes (stale),
+        // - signal file decode error.
+        let signal_filename = signal_file_name_for(&filename);
+        let signal_path = Self::blob_path(track_id, &signal_filename);
+        let signal_text =
+            match self.fetch_string::<(TypeCatalogueDocument, String)>(branch, &signal_path) {
+                Ok(s) => s,
+                Err(BlobFetchResult::NotFound) => {
+                    return BlobFetchResult::FetchError(format!(
+                        "{signal_path} not found on origin/{branch} — \
+                     run `sotp track type-signals` and commit the generated \
+                     `{signal_filename}` so the merge gate can evaluate Stage 2"
+                    ));
+                }
+                Err(result) => return result,
+            };
+        let signals_doc = match crate::tddd::type_signals_codec::decode(&signal_text) {
+            Ok(d) => d,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "{signal_path}: {signal_filename} decode error: {e}"
+                ));
+            }
+        };
+        let current_hash = crate::tddd::type_signals_codec::declaration_hash(text.as_bytes());
+        if signals_doc.declaration_hash() != current_hash {
+            return BlobFetchResult::FetchError(format!(
+                "{signal_path}: declaration_hash mismatch (recorded={}, current={}) — \
+                 re-run `sotp track type-signals` and commit the refreshed evaluation \
+                 result",
+                signals_doc.declaration_hash(),
+                current_hash
+            ));
         }
+        doc.set_signals(signals_doc.signals().to_vec());
+        BlobFetchResult::Found((doc, filename))
     }
 
     fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>> {
@@ -277,6 +343,27 @@ mod tests {
   ]
 }"#;
 
+    /// Builds a `<layer>-type-signals.json` payload whose `declaration_hash`
+    /// matches the SHA-256 of the given declaration file bytes and whose
+    /// `signals` mirrors the legacy inline payload in
+    /// [`DOMAIN_TYPES_MINIMAL`]. Used by adapter tests to construct the
+    /// companion signal blob the T007 codec strip made mandatory.
+    fn signal_file_matching(declaration_bytes: &[u8]) -> Vec<u8> {
+        let hash = crate::tddd::type_signals_codec::declaration_hash(declaration_bytes);
+        let body = format!(
+            r#"{{
+  "schema_version": 1,
+  "generated_at": "2026-04-18T12:00:00Z",
+  "declaration_hash": "{hash}",
+  "signals": [
+    {{ "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }}
+  ]
+}}
+"#
+        );
+        body.into_bytes()
+    }
+
     fn metadata_json_minimal(track_id: &str) -> String {
         format!(
             r#"{{
@@ -360,15 +447,79 @@ mod tests {
 
     #[test]
     fn test_read_type_catalogue_found() {
-        let dir =
-            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        let signal_blob = signal_file_matching(DOMAIN_TYPES_MINIMAL.as_bytes());
+        let dir = setup_repo_with_track(
+            "foo",
+            &[
+                ("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes()),
+                ("domain-type-signals.json", signal_blob.as_slice()),
+            ],
+        );
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         match reader.read_type_catalogue("main", "foo", "domain") {
             BlobFetchResult::Found((doc, filename)) => {
                 assert_eq!(doc.entries().len(), 1);
                 assert_eq!(filename, "domain-types.json");
+                // T007 post-merge: the adapter must hydrate `doc.signals()`
+                // from the companion signal file so the downstream
+                // `check_type_signals` call in `check_strict_merge_gate`
+                // sees the evaluated Blue signal instead of `None`.
+                let signals = doc.signals().expect("signals must be hydrated from signal file");
+                assert_eq!(signals.len(), 1);
+                assert_eq!(signals[0].type_name(), "TrackId");
             }
             other => panic!("expected Found, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_type_catalogue_missing_signal_file_fails_closed() {
+        // Migrated track: declaration file exists but no companion signal
+        // file. Per ADR §D5 the merge gate must fail closed symmetric with
+        // the CI path.
+        let dir =
+            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_catalogue("main", "foo", "domain") {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(
+                    msg.contains("domain-type-signals.json") && msg.contains("not found"),
+                    "missing-signal error must mention the signal path, got: {msg}"
+                );
+            }
+            other => panic!("expected FetchError for missing signal file, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_type_catalogue_stale_signal_hash_fails_closed() {
+        // Stale signal file (declaration_hash does not match declaration
+        // bytes). ADR §D5 requires fail-closed on both CI and merge gate.
+        let stale_signal = br#"{
+  "schema_version": 1,
+  "generated_at": "2026-04-18T12:00:00Z",
+  "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "signals": [
+    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
+  ]
+}
+"#;
+        let dir = setup_repo_with_track(
+            "foo",
+            &[
+                ("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes()),
+                ("domain-type-signals.json", stale_signal.as_slice()),
+            ],
+        );
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_catalogue("main", "foo", "domain") {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(
+                    msg.contains("declaration_hash mismatch"),
+                    "stale-signal error must mention declaration_hash mismatch, got: {msg}"
+                );
+            }
+            other => panic!("expected FetchError for stale signal, got {other:?}"),
         }
     }
 
@@ -406,6 +557,13 @@ mod tests {
         let track_dir = repo.join("track/items/foo");
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("custom-domain-types.json"), DOMAIN_TYPES_MINIMAL).unwrap();
+        // Companion signal file: `custom-domain-types.json` → strip trailing
+        // `s` and append `-signals.json` → `custom-domain-type-signals.json`.
+        std::fs::write(
+            track_dir.join("custom-domain-type-signals.json"),
+            signal_file_matching(DOMAIN_TYPES_MINIMAL.as_bytes()),
+        )
+        .unwrap();
         git(repo, &["add", "."]);
         git(repo, &["commit", "--quiet", "-m", "initial"]);
         git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);

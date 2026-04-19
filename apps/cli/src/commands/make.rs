@@ -5,7 +5,6 @@
 //! arguments: some tasks treat them as a single value, others split into multiple
 //! positional arguments.
 
-use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, ValueEnum};
@@ -607,10 +606,25 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
 /// this step (§D2 ordering: recompute → CI → review guard → commit).
 #[allow(clippy::too_many_lines)]
 fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
+    // Resolve the workspace root from the git discovery result, not from the
+    // current working directory. Running `/track:commit` (which invokes
+    // `bin/sotp make track-commit-message`) from a nested subdirectory must
+    // still locate `architecture-rules.json` and `track/items/` at the repo
+    // root. `PathBuf::from(".")` would introduce CWD-dependent behavior that
+    // silently fail-closes commits launched from subdirectories.
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    let workspace_root = SystemGitRepo::discover()
+        .map_err(|e| {
+            CliError::Message(format!(
+                "[track-commit-message] BLOCKED: unable to discover git repository root: {e}"
+            ))
+        })?
+        .root()
+        .to_path_buf();
+
     // ADR §D2 fail-closed: architecture-rules.json must be present and
     // readable. Unlike the legacy `sotp track type-signals` CLI, the
     // pre-commit path does NOT fall back to a synthetic domain binding.
-    let workspace_root = PathBuf::from(".");
     let rules_path = workspace_root.join("architecture-rules.json");
 
     // Pre-flight check: architecture-rules.json must exist and be parseable
@@ -648,7 +662,7 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
         }
     };
 
-    let items_dir = PathBuf::from("track/items");
+    let items_dir = workspace_root.join("track").join("items");
 
     // Active-track guard: Done/Archived tracks have frozen type declarations;
     // there is nothing to recompute. Skip the pre-commit step gracefully rather
