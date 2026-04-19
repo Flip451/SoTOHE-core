@@ -194,14 +194,36 @@ pub fn execute_type_signals_lenient(
     let track_dir = items_dir.join(&track_id);
     for binding in &bindings {
         let catalogue_path = track_dir.join(binding.catalogue_file());
-        if !catalogue_path.is_file() {
-            // Missing declaration file → layer is not TDDD-active for this
-            // track (matches `evaluate_layer_catalogue` NotFound-skip in
-            // `spec_states.rs`). Skip silently — pre-commit must not be
-            // stricter than CI / merge gate.
-            continue;
+        // Use `symlink_metadata` + explicit NotFound match so only a truly
+        // absent declaration file is treated as "layer inactive". Symlinks,
+        // directories, permission errors, and other `std::fs` failures
+        // propagate as errors — matching the CI
+        // (`evaluate_layer_catalogue`) fail-closed posture and preventing
+        // the "pre-commit passes, verification fails later" divergence
+        // called out in the PR #106 P1 review finding.
+        match std::fs::symlink_metadata(&catalogue_path) {
+            Ok(meta) if meta.file_type().is_file() => {
+                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
+            }
+            Ok(_) => {
+                // Regular-file check failed: symlink, directory, block
+                // device, etc. Delegate to the strict evaluator so the
+                // caller sees the same error as the CI / merge-gate path
+                // (`reject_symlinks_below` / non-regular-file rejection).
+                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                // Declaration file is genuinely absent — layer not
+                // TDDD-active for this track. Skip silently (symmetric with
+                // `spec_states::evaluate_layer_catalogue` NotFound branch).
+            }
+            Err(e) => {
+                return Err(CliError::Message(format!(
+                    "pre-commit: cannot stat {}: {e}",
+                    catalogue_path.display()
+                )));
+            }
         }
-        execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
     }
 
     Ok(ExitCode::SUCCESS)
