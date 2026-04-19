@@ -199,10 +199,20 @@ pub fn execute_type_signals_lenient(
         // directories, permission errors, and other `std::fs` failures
         // propagate as errors — matching the CI
         // (`evaluate_layer_catalogue`) fail-closed posture and preventing
-        // the "pre-commit passes, verification fails later" divergence
-        // called out in the PR #106 P1 review finding.
+        // the "pre-commit passes, verification fails later" divergence.
         match std::fs::symlink_metadata(&catalogue_path) {
             Ok(meta) if meta.file_type().is_file() => {
+                // Skip recompute when the companion signal file is already
+                // current for this layer. This matters for layers whose
+                // `schema_export.targets` has more than one entry — the
+                // strict `execute_type_signals_for_layer` hard-fails on
+                // multi-target configs, but the merge gate / CI paths
+                // already validate the signal file's `declaration_hash`
+                // directly, so no recompute is needed when the signals
+                // are already fresh.
+                if signal_file_is_current(&track_dir, binding, &catalogue_path) {
+                    continue;
+                }
                 execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
             }
             Ok(_) => {
@@ -227,6 +237,43 @@ pub fn execute_type_signals_lenient(
     }
 
     Ok(ExitCode::SUCCESS)
+}
+
+/// Returns `true` when the companion `<layer>-type-signals.json` exists as a
+/// regular file and its `declaration_hash` matches the current declaration
+/// file bytes — i.e. the evaluation result is already fresh and no
+/// `execute_type_signals_for_layer` recompute is needed.
+///
+/// Returns `false` on any missing / stale / unreadable / symlinked / decode
+/// failure so the caller falls through to the strict recompute path (which
+/// will emit a helpful diagnostic).
+///
+/// Used by [`execute_type_signals_lenient`] to avoid unnecessary recomputes
+/// on the pre-commit path — especially for layers with multi-target
+/// `schema_export.targets`, where the strict evaluator hard-fails but the
+/// signal file may already be current from a prior run.
+fn signal_file_is_current(
+    track_dir: &std::path::Path,
+    binding: &TdddLayerBinding,
+    catalogue_path: &std::path::Path,
+) -> bool {
+    let signal_path = track_dir.join(binding.signal_file());
+    let signal_is_file =
+        signal_path.symlink_metadata().map(|m| m.file_type().is_file()).unwrap_or(false);
+    if !signal_is_file {
+        return false;
+    }
+    let Ok(signal_text) = std::fs::read_to_string(&signal_path) else {
+        return false;
+    };
+    let Ok(signals_doc) = type_signals_codec::decode(&signal_text) else {
+        return false;
+    };
+    let Ok(decl_bytes) = std::fs::read(catalogue_path) else {
+        return false;
+    };
+    let current_hash = type_signals_codec::declaration_hash(&decl_bytes);
+    signals_doc.declaration_hash() == current_hash
 }
 
 /// Evaluate type signals for a single TDDD layer binding and write back to the
