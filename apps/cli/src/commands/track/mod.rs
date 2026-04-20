@@ -258,6 +258,12 @@ pub enum TrackCommand {
     },
 
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
+    ///
+    /// Idempotent: if the baseline file already exists it is kept as-is. Re-capturing
+    /// the baseline after implementation has started pollutes the pre-implementation
+    /// snapshot, so the `--force` knob has been removed. If a genuine re-capture is
+    /// required, delete the stale `<layer>-types-baseline.json` file manually before
+    /// re-running.
     BaselineCapture {
         /// Path to the track items root directory (e.g., `track/items`).
         #[arg(long, default_value = "track/items")]
@@ -269,10 +275,6 @@ pub enum TrackCommand {
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
-
-        /// Force regeneration even if baseline already exists.
-        #[arg(long, default_value_t = false)]
-        force: bool,
 
         /// Optional layer id filter. When omitted all `tddd.enabled` layers
         /// are processed in `architecture-rules.json` order. When supplied,
@@ -429,14 +431,8 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 layers,
             )
         }
-        TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force, layer } => {
-            tddd::baseline::execute_baseline_capture(
-                items_dir,
-                track_id,
-                workspace_root,
-                force,
-                layer,
-            )
+        TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, layer } => {
+            tddd::baseline::execute_baseline_capture(items_dir, track_id, workspace_root, layer)
         }
     };
     match result {

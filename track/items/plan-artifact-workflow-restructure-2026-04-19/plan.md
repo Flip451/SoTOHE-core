@@ -14,7 +14,7 @@ CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md に track 前段階 + 3
 SKILL / command / agent (planner, designer) から approved 廃止 + ADR 事前確認 + D1.6 research 配置 convention を反映する
 adr-editor capability の新設は本 track 範囲外 (T7.5 別 track)
 
-- [x] convention 新設 (knowledge/conventions/workflow-ceremony-minimization.md, knowledge/conventions/pre-track-adr-authoring.md) + CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md に track 前段階 + 3 フェーズ明記 + .claude/skills/track-plan/SKILL.md / .claude/commands/track/plan.md / .claude/commands/track/design.md / .claude/agents/planner.md / .claude/agents/designer.md から approved 廃止 + ADR 事前確認追加 + D1.6 research note 配置 convention を適用
+- [x] convention 新設 (knowledge/conventions/workflow-ceremony-minimization.md, knowledge/conventions/pre-track-adr-authoring.md) + CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md に track 前段階 + 3 フェーズ明記 + .claude/skills/track-plan/SKILL.md / .claude/commands/track/plan.md / .claude/commands/track/design.md / .claude/agents/planner.md / .claude/agents/designer.md から approved 廃止 + ADR 事前確認追加 + D1.6 research note 配置 convention を適用 999e954a86e8fb5d95f6b090c9b8c52b52b581f8
 
 ## S2 — 新 domain 型の導入 (T2 相当)
 
@@ -25,7 +25,7 @@ libs/domain/src/plan_ref/ 新モジュール (ref 種別ごとに 1 ファイル
 role 文字列タグ・discriminated union・共通 trait 抽象化は導入しない (独立 4 構造体の原則)
 InformalGroundRef は file 対象を持たず、未永続化根拠 (議論 / feedback / memory / user directive) を構造化して citing 可能にし、signal 評価で 🟡 を発火する
 
-- [ ] libs/domain/src/plan_ref/ 新モジュールを導入 (ref 種別ごとに 1 ファイル構成: mod.rs + adr_ref.rs + convention_ref.rs + spec_ref.rs + informal_ground_ref.rs)。値オブジェクト newtype 6 種 (SpecElementId / AdrAnchor / ConventionAnchor / ContentHash / InformalGroundKind / InformalGroundSummary) と 4 独立 ref 構造体 (AdrRef / ConventionRef / SpecRef / InformalGroundRef) を追加する。SpecElementId は非空文字列 + ID 命名規則 (例: IN-\d+, AC-\d+ 等) で validation、AdrAnchor / ConventionAnchor は非空文字列のみ (loose、Q15 で厳密化)、ContentHash は SHA-256 形式 (32 バイト) で validation、InformalGroundKind は 4 variant enum (Discussion / Feedback / Memory / UserDirective)、InformalGroundSummary は非空一行要約で validation。各コンストラクタに validation を閉じ込める。既存の libs/domain/src/ids.rs (entity identity 専用) とは分離する (NonEmptyString の流用はしない)。unit tests 付与
+- [~] libs/domain/src/plan_ref/ 新モジュールを導入 (ref 種別ごとに 1 ファイル構成: mod.rs + adr_ref.rs + convention_ref.rs + spec_ref.rs + informal_ground_ref.rs)。値オブジェクト newtype 6 種 (SpecElementId / AdrAnchor / ConventionAnchor / ContentHash / InformalGroundKind / InformalGroundSummary) と 4 独立 ref 構造体 (AdrRef / ConventionRef / SpecRef / InformalGroundRef) を追加する。SpecElementId は非空文字列 + ID 命名規則 (例: IN-\d+, AC-\d+ 等) で validation、AdrAnchor / ConventionAnchor は非空文字列のみ (loose、Q15 で厳密化)、ContentHash は SHA-256 形式 (32 バイト) で validation、InformalGroundKind は 4 variant enum (Discussion / Feedback / Memory / UserDirective)、InformalGroundSummary は非空一行要約で validation。各コンストラクタに validation を閉じ込める。既存の libs/domain/src/ids.rs (entity identity 専用) とは分離する (NonEmptyString の流用はしない)。unit tests 付与
 
 ## S3 — スキーマ再構成 (T2 相当)
 

@@ -67,16 +67,13 @@ pub enum BaselineCodecError {
     Json(#[from] serde_json::Error),
 
     /// The `schema_version` field is not `2`. The body contains a re-run
-    /// hint directing the caller to `sotp track baseline-capture --force`
-    /// because `baseline-capture` normally skips existing baseline files
-    /// unless `--force` is supplied — that skip-on-exists behavior would
-    /// otherwise trap callers on an outdated v1 file.
+    /// hint directing the caller to delete the stale baseline file, since
+    /// `baseline-capture` is unconditionally idempotent and skips on
+    /// existence — it would otherwise trap callers on an outdated v1 file.
     #[error(
         "unsupported baseline schema_version: expected 2, got {0}. \
-         Regenerate the baseline at v2 with \
-         `sotp track baseline-capture <track-id> --force` \
-         (the `--force` flag is required because `baseline-capture` skips an \
-         existing baseline by default)."
+         Delete the stale `<layer>-types-baseline.json` file, then \
+         re-run `sotp track baseline-capture <track-id>` to regenerate at v2."
     )]
     UnsupportedSchemaVersion(u32),
 

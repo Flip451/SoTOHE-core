@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "captured_at": "2026-04-20T11:27:19Z",
+  "captured_at": "2026-04-20T16:15:54Z",
   "types": {
     "AgentProfiles": {
       "kind": "struct",

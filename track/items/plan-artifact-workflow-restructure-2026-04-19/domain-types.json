@@ -108,6 +108,21 @@
       ]
     },
     {
+      "name": "ValidationError",
+      "description": "Shared domain validation error enum. Modified by T002: add six new variants surfacing the plan_ref module's validation failures (InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary). Pre-existing variants (TrackId / TaskId / CommitHash / etc.) are preserved.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidSpecElementId",
+        "EmptyAdrAnchor",
+        "EmptyConventionAnchor",
+        "InvalidContentHash",
+        "EmptyInformalGroundSummary",
+        "MultiLineInformalGroundSummary"
+      ]
+    },
+    {
       "name": "TrackMetadata",
       "description": "Track identity aggregate in `libs/domain/src/track.rs`. Reduced to identity-only per ADR 2026-04-19-1242 §D1.4: `tasks: Vec<TrackTask>` and `plan: PlanView` fields move to the new ImplPlanDocument. Retained fields per ADR D1.4 §metadata.json: `id`, `branch`, `title`, and `status` (now stored explicitly rather than task-derived, updated on status transitions). `status_override` from the current implementation is absorbed into the explicit `status` field per the ADR's simplified field list (`schema_version, id, branch, title, status, created_at, updated_at`); the implementer determines whether to keep `status_override` as a sub-mechanism or merge it into a single stored status. Timestamps (`created_at`, `updated_at`) are handled at the DTO layer (DocumentMeta). `PlanView` / `PlanSection` remain in domain and are reused by ImplPlanDocument.",
       "approved": true,

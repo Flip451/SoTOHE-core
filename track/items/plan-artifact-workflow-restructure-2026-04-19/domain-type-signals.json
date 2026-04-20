@@ -1,67 +1,73 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-20T16:09:08Z",
-  "declaration_hash": "3cfb61daca29ea0c4b062b43baa6b63f085b9edd2ca303100fada98428d31176",
+  "generated_at": "2026-04-20T16:33:46Z",
+  "declaration_hash": "79ab4a1090cd5af5fa70294b9ac088db3335cab71a69f4f4bb948de69a5cb6c7",
   "signals": [
     {
       "type_name": "SpecElementId",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AdrAnchor",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ConventionAnchor",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ContentHash",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "InformalGroundKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Discussion",
+        "Feedback",
+        "Memory",
+        "UserDirective"
+      ]
     },
     {
       "type_name": "InformalGroundSummary",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AdrRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ConventionRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SpecRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "InformalGroundRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ImplPlanDocument",
@@ -98,6 +104,20 @@
         "EmptyRequirementText",
         "EmptyDomainStateName",
         "EmptySectionTitle"
+      ]
+    },
+    {
+      "type_name": "ValidationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidSpecElementId",
+        "EmptyAdrAnchor",
+        "EmptyConventionAnchor",
+        "InvalidContentHash",
+        "EmptyInformalGroundSummary",
+        "MultiLineInformalGroundSummary"
       ]
     },
     {

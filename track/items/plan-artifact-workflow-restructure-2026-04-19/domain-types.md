@@ -4,22 +4,22 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| InformalGroundKind | enum | — | Discussion, Feedback, Memory, UserDirective | 🟡 |
+| InformalGroundKind | enum | — | Discussion, Feedback, Memory, UserDirective | 🔵 |
 | SpecStatus | enum | delete | Draft, Approved | 🟡 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| SpecElementId | value_object | — | — | 🟡 |
-| AdrAnchor | value_object | — | — | 🟡 |
-| ConventionAnchor | value_object | — | — | 🟡 |
-| ContentHash | value_object | — | — | 🟡 |
-| InformalGroundSummary | value_object | — | — | 🟡 |
-| AdrRef | value_object | — | — | 🟡 |
-| ConventionRef | value_object | — | — | 🟡 |
-| SpecRef | value_object | — | — | 🟡 |
-| InformalGroundRef | value_object | — | — | 🟡 |
+| SpecElementId | value_object | — | — | 🔵 |
+| AdrAnchor | value_object | — | — | 🔵 |
+| ConventionAnchor | value_object | — | — | 🔵 |
+| ContentHash | value_object | — | — | 🔵 |
+| InformalGroundSummary | value_object | — | — | 🔵 |
+| AdrRef | value_object | — | — | 🔵 |
+| ConventionRef | value_object | — | — | 🔵 |
+| SpecRef | value_object | — | — | 🔵 |
+| InformalGroundRef | value_object | — | — | 🔵 |
 | ImplPlanDocument | value_object | — | — | 🟡 |
 | TaskCoverageDocument | value_object | — | — | 🟡 |
 | SpecDocument | value_object | modify | — | 🔵 |
@@ -33,4 +33,5 @@
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
 | SpecValidationError | error_type | modify | EmptyTitle, EmptyVersion, EmptyRequirementText, EmptyDomainStateName, EmptySectionTitle | 🔵 |
+| ValidationError | error_type | modify | InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary | 🔵 |
 

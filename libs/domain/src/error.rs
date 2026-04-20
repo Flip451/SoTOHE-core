@@ -71,6 +71,21 @@ pub enum ValidationError {
          (allowed: letters, digits, `_`, `-`)"
     )]
     InvalidLayerId(String),
+    #[error(
+        "spec element id '{0}' must match the pattern <UPPER>{{2,}}-<digits>+ \
+         (e.g. IN-01, AC-02, CO-03)"
+    )]
+    InvalidSpecElementId(String),
+    #[error("ADR anchor must not be empty")]
+    EmptyAdrAnchor,
+    #[error("convention anchor must not be empty")]
+    EmptyConventionAnchor,
+    #[error("content hash '{0}' must be 64 lowercase hex characters (SHA-256)")]
+    InvalidContentHash(String),
+    #[error("informal ground summary must not be empty")]
+    EmptyInformalGroundSummary,
+    #[error("informal ground summary must be a single line (no line breaks)")]
+    MultiLineInformalGroundSummary,
 }
 
 /// Errors from invalid task state transitions.

@@ -9,6 +9,7 @@ pub mod guard;
 pub mod hook;
 mod ids;
 mod plan;
+pub mod plan_ref;
 mod repository;
 pub mod review_v2;
 pub mod schema;
@@ -29,6 +30,10 @@ pub use error::{
 pub use git_ref::{RefValidationError, validate_branch_ref};
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
+pub use plan_ref::{
+    AdrAnchor, AdrRef, ContentHash, ConventionAnchor, ConventionRef, InformalGroundKind,
+    InformalGroundRef, InformalGroundSummary, SpecElementId, SpecRef,
+};
 pub use repository::{TrackReader, TrackWriter, WorktreeReader};
 pub use review_v2::RoundType;
 pub use schema::{TraitImplEntry, TraitNode, TypeGraph, TypeNode};

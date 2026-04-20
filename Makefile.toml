@@ -884,7 +884,7 @@ script_runner = "@shell"
 script = ['bin/sotp track signals "$@"']
 
 [tasks.track-baseline-capture]
-description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filtering. Usage: cargo make track-baseline-capture -- <track-id> [--force]"
+description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filtering. Always idempotent (existing baseline is preserved). Usage: cargo make track-baseline-capture -- <track-id> [--layer <id>]"
 script_runner = "@shell"
 script = ['bin/sotp track baseline-capture "$@"']
 
