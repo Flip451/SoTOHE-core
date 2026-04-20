@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ImplPlanDocumentDto",
+      "description": "Infrastructure serde DTO for `impl-plan.json`. Mirrors domain::ImplPlanDocument (`schema_version + tasks + plan`) with 1:1 field naming, following the same pattern as track/codec.rs::TrackDocumentV2. Existing `PlanDocument`, `PlanSectionDocument`, and `TrackTaskDocument` DTOs from track/codec.rs are reused for the `plan` / `tasks` fields. Introduced by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "ImplPlanCodecError",
+      "description": "Public error enum for the impl-plan.json codec. Variants follow existing codec conventions (Json for serde failures; UnsupportedSchemaVersion for version mismatches; Validation for domain construction errors). Introduced alongside the new codec by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ]
+    },
+    {
+      "name": "TaskCoverageDocumentDto",
+      "description": "Infrastructure serde DTO for `task-coverage.json`. Holds four per-section maps (in_scope / out_of_scope / constraints / acceptance_criteria) from SpecElementId to Vec<TaskId>. Mirrors domain::TaskCoverageDocument. Introduced by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "TaskCoverageCodecError",
+      "description": "Public error enum for the task-coverage.json codec. Variants follow existing codec conventions. Introduced alongside the new codec by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ]
+    },
+    {
+      "name": "PlanArtifactRefsError",
+      "description": "Public error enum for the `sotp verify plan-artifact-refs` CLI verifier (libs/infrastructure/src/verify/plan_artifact_refs.rs). Surfaces ref-field schema / file-existence / anchor-resolution / hash-mismatch / and task-coverage failures as fatal error variants that cause CI failure. Canonical-block suspicion is warning-only per ADR 2026-04-19-1242 §D2.3 (details deferred to Q14): it is reported as a `VerifyFinding` (warning-level output), not as an error variant in this enum, so the CLI does not fail on canonical-block suspicion alone. Introduced by ADR 2026-04-19-1242 §D2.3 / T010 / T011.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "Io",
+        "UnresolvedSpecRef",
+        "SpecHashMismatch",
+        "InvalidAnchor",
+        "CoverageViolation"
+      ]
+    },
+    {
+      "name": "TrackDocumentV2",
+      "description": "Infrastructure serde DTO for `metadata.json` (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005: drop `tasks` and `plan` fields (they move to ImplPlanDocumentDto) so the DTO mirrors the new identity-only structure. ADR D1.4 defines the retained fields as `schema_version, id, branch, title, status, created_at, updated_at`; `status` is now stored explicitly rather than task-derived. Whether `status_override` is kept as a separate JSON field or merged into a single `status` value is left to the implementer. `DocumentMeta` fields (`schema_version`, `created_at`, `updated_at`) are retained. Schema version bump is at the implementer's discretion per the no-backward-compat rule.",
+      "approved": true,
+      "action": "modify",
+      "kind": "dto"
+    }
+  ]
+}

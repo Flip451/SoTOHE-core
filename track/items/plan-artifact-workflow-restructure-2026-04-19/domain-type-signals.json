@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-20T12:57:34Z",
+  "declaration_hash": "3cfb61daca29ea0c4b062b43baa6b63f085b9edd2ca303100fada98428d31176",
+  "signals": [
+    {
+      "type_name": "SpecElementId",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrAnchor",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ConventionAnchor",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ContentHash",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "InformalGroundKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "InformalGroundSummary",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrRef",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ConventionRef",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecRef",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "InformalGroundRef",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ImplPlanDocument",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskCoverageDocument",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecRequirement",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecValidationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyTitle",
+        "EmptyVersion",
+        "EmptyRequirementText",
+        "EmptyDomainStateName",
+        "EmptySectionTitle"
+      ]
+    },
+    {
+      "type_name": "TrackMetadata",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecStatus",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CoverageResult",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

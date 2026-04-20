@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-20T12:57:36Z",
+  "declaration_hash": "3f5eabfa38c7eba2a348d67da412a549e0eba00cd5ea329b69c21ffd40916153",
+  "signals": [
+    {
+      "type_name": "ImplPlanDocumentDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ImplPlanCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskCoverageDocumentDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskCoverageCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PlanArtifactRefsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackDocumentV2",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

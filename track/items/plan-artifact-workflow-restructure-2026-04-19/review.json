@@ -161,6 +161,124 @@
           "findings": [],
           "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
           "at": "2026-04-20T11:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered graph still presents the approval/coverage model as live (`approved_at`, `effective_status`/`status`, `evaluate_coverage`, `task_refs`, `SpecStatus`, `CoverageResult`) even though the plan catalog deletes those concepts. That makes the plan-artifact set internally contradictory about the post-migration spec model; the graph and contract-map need to match the deleted-state intent or be explicitly marked legacy-only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/domain-graph.md",
+              "line": 97,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
+          "at": "2026-04-20T11:55:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader` is declared with four methods in the usecase catalogue, but this contract map only renders two edges (`read_spec_document` and `read_track_metadata`). As written, the rendered map no longer describes the full port boundary and misstates the current contract surface.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 39,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ContentHash` entry describes the type as holding either a raw 32-byte buffer or a 64-character hex string. The ADR models `ContentHash` as a single normalized `[u8; 32]` value object, so this wording conflates constructor input formats with the stored domain representation.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 24,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
+          "at": "2026-04-20T12:01:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
+          "at": "2026-04-20T12:05:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanArtifactRefsError` declares canonical-block suspicion as part of a public error enum, but the ADR/T011 design says canonical-block detection is warning-only. Implementing from this catalogue would turn an advisory warning into a fatal verifier error/CI failure, contradicting the planned gate semantics; canonical-block suspicion should be modeled as a warning finding instead of an error variant.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
+          "at": "2026-04-20T12:08:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecDocument` says every requirement, including `goal`, gains `id: SpecElementId` and the new ref fields, but the only modified requirement item contract (`SpecRequirement`) is documented as used only for `scope / constraints / acceptance_criteria`, and this catalogue declares no separate goal item type. That leaves the target representation for `goal[]` ambiguous and can let an implementation keep goals as bare strings while still following the `SpecRequirement` entry.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 90,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
+          "at": "2026-04-20T12:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `AdrRef` catalogue entry says ADR references are used in type catalogue entries, but the same plan’s SoT direction forbids type catalogue -> ADR direct references and `TypeCatalogueEntry` only adds `spec_refs` plus `informal_grounds`. Leaving this text in place gives implementers a contradictory schema target for catalogue entries.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ConventionRef` entry also claims use in type catalogue entries, while `TypeCatalogueEntry` explicitly says catalogue-level `convention_refs[]` is deferred to Q8 / a follow-up ADR. That contradicts the current-track scope, where catalogue entries should not gain convention reference fields yet.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
+          "at": "2026-04-20T12:24:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1.4 defines identity-only metadata as retaining the track `status` field while moving only `tasks` and `plan` into `impl-plan.json`. This catalogue entry instead says TrackMetadata retains `status_override` and omits `status`; the matching TrackDocumentV2 entry repeats the same retained-field set. That gives implementers the wrong schema contract for metadata.json after task-derived status is removed, so the plan artifacts are internally inconsistent with the authoritative ADR.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 112,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7892b83742bdc18ac1cee2ceb9abf9e604e04490cb8417167113651f876e577",
+          "at": "2026-04-20T12:29:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb5f5e79cae4d15ad26f942d3d804af71293449bd8e28e9c62a5fb939154da93",
+          "at": "2026-04-20T12:34:16Z"
         }
       ]
     },

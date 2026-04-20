@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-20T12:57:35Z",
+  "declaration_hash": "54dcaa31ac9a84feff732ed7b73ec50224ffaf1e647f91dde8f8b366e589b7b0",
+  "signals": [
+    {
+      "type_name": "TrackBlobReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>",
+        "fn read_type_catalogue(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata>",
+        "fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>>"
+      ]
+    }
+  ]
+}

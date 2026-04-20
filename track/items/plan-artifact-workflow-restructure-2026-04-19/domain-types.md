@@ -1,0 +1,36 @@
+<!-- Generated from domain-types.json — DO NOT EDIT DIRECTLY -->
+
+## Enums
+
+| Name | Kind | Action | Details | Signal |
+|------|------|--------|---------|--------|
+| InformalGroundKind | enum | — | Discussion, Feedback, Memory, UserDirective | 🟡 |
+| SpecStatus | enum | delete | Draft, Approved | 🟡 |
+
+## Value Objects
+
+| Name | Kind | Action | Details | Signal |
+|------|------|--------|---------|--------|
+| SpecElementId | value_object | — | — | 🟡 |
+| AdrAnchor | value_object | — | — | 🟡 |
+| ConventionAnchor | value_object | — | — | 🟡 |
+| ContentHash | value_object | — | — | 🟡 |
+| InformalGroundSummary | value_object | — | — | 🟡 |
+| AdrRef | value_object | — | — | 🟡 |
+| ConventionRef | value_object | — | — | 🟡 |
+| SpecRef | value_object | — | — | 🟡 |
+| InformalGroundRef | value_object | — | — | 🟡 |
+| ImplPlanDocument | value_object | — | — | 🟡 |
+| TaskCoverageDocument | value_object | — | — | 🟡 |
+| SpecDocument | value_object | modify | — | 🔵 |
+| SpecRequirement | value_object | modify | — | 🔵 |
+| TrackMetadata | value_object | modify | — | 🔵 |
+| TypeCatalogueEntry | value_object | modify | — | 🔵 |
+| CoverageResult | value_object | delete | — | 🟡 |
+
+## Error Types
+
+| Name | Kind | Action | Details | Signal |
+|------|------|--------|---------|--------|
+| SpecValidationError | error_type | modify | EmptyTitle, EmptyVersion, EmptyRequirementText, EmptyDomainStateName, EmptySectionTitle | 🔵 |
+

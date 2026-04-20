@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackBlobReader",
+      "description": "Usecase-layer secondary port that reads PR branch blobs (spec.json / <layer>-types.json / impl-plan.json / architecture-rules.json) and decodes them into domain aggregates. Modified per ADR 2026-04-19-1242 §D6.2 / T007: the historical `read_track_metadata` method is renamed to `read_impl_plan` and its return type switches from `BlobFetchResult<TrackMetadata>` to `BlobFetchResult<ImplPlanDocument>` so the task-completion merge gate can drive off the new impl-plan.json file instead of the identity-only metadata.json. `expected_methods` below intentionally reflects the **current** trait shape so the design commit stays Blue; T007's implementation commit replaces the `read_track_metadata` entry with `read_impl_plan` (catalogue updated in lockstep with the rust rename) and the `GitShowTrackBlobReader` adapter is adjusted the same way.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<SpecDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_track_metadata",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<TrackMetadata>",
+          "is_async": false
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false
+        }
+      ]
+    }
+  ]
+}
