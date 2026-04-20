@@ -110,14 +110,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "015dd1374a18eac9967c0975c4148448e2671a8e",
       "description": "libs/domain/src/plan_ref/ 新モジュールを導入 (ref 種別ごとに 1 ファイル構成: mod.rs + adr_ref.rs + convention_ref.rs + spec_ref.rs + informal_ground_ref.rs)。値オブジェクト newtype 6 種 (SpecElementId / AdrAnchor / ConventionAnchor / ContentHash / InformalGroundKind / InformalGroundSummary) と 4 独立 ref 構造体 (AdrRef / ConventionRef / SpecRef / InformalGroundRef) を追加する。SpecElementId は非空文字列 + ID 命名規則 (例: IN-\\d+, AC-\\d+ 等) で validation、AdrAnchor / ConventionAnchor は非空文字列のみ (loose、Q15 で厳密化)、ContentHash は SHA-256 形式 (32 バイト) で validation、InformalGroundKind は 4 variant enum (Discussion / Feedback / Memory / UserDirective)、InformalGroundSummary は非空一行要約で validation。各コンストラクタに validation を閉じ込める。既存の libs/domain/src/ids.rs (entity identity 専用) とは分離する (NonEmptyString の流用はしない)。unit tests 付与",
       "id": "T002",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "libs/domain/src/spec.rs を刷新 (status / approved_at / トップレベル content_hash / 各要素 task_refs を削除、各要素に id: SpecElementId 必須化、現行の sources を adr_refs: Vec<AdrRef> + convention_refs: Vec<ConventionRef> + informal_grounds: Vec<InformalGroundRef> の 3 分割、top-level related_conventions を Vec<ConventionRef> に)。libs/infrastructure/src/spec/codec.rs の serde 更新。spec-signals ツールの入力抽出経路も新 field に合わせて更新 (adr_refs と informal_grounds の signal 合成も含む)。domain + infra の既存 tests を新 schema で書き換え",
       "id": "T003",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "libs/domain/ に ImplPlanDocument (schema_version + tasks + plan) と TaskCoverageDocument (4 セクション: in_scope / out_of_scope / constraints / acceptance_criteria の要素ごとの task_refs) を新設。既存 TrackTask / PlanView / PlanSection を流用。libs/infrastructure/ に両 document の codec 新設。unit tests",
@@ -166,5 +167,5 @@
     }
   ],
   "title": "計画成果物ワークフローの再構築 (Scope D: T1 + T2 + T3)",
-  "updated_at": "2026-04-20T16:10:57Z"
+  "updated_at": "2026-04-20T16:34:33Z"
 }

@@ -5,7 +5,7 @@
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
 | InformalGroundKind | enum | — | Discussion, Feedback, Memory, UserDirective | 🔵 |
-| SpecStatus | enum | delete | Draft, Approved | 🟡 |
+| SpecStatus | enum | delete | Draft, Approved | 🔵 |
 
 ## Value Objects
 

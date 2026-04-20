@@ -244,7 +244,7 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
 mod tests {
     use std::cell::RefCell;
 
-    use domain::spec::{SpecScope, SpecStatus};
+    use domain::spec::SpecScope;
     use domain::tddd::catalogue::{TypeAction, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal};
     use domain::{ConfidenceSignal, SignalCounts};
 
@@ -379,16 +379,13 @@ mod tests {
     fn spec_doc_with_signals(signals: Option<SignalCounts>) -> SpecDocument {
         let mut doc = SpecDocument::new(
             "Feature",
-            SpecStatus::Draft,
             "1.0",
-            vec!["Goal".to_owned()],
+            vec![],
             SpecScope::new(Vec::new(), Vec::new()),
             Vec::new(),
             Vec::new(),
             Vec::new(),
             Vec::new(),
-            None,
-            None,
             None,
         )
         .unwrap();

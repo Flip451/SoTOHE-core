@@ -549,13 +549,26 @@ pub fn sync_rendered_views(
                         changed.push(spec_md_path);
                     }
                 }
-                Err(spec::codec::SpecCodecError::Json(_)) => {
-                    // Warn and continue only on JSON parse errors — file may be mid-edit.
-                    // Schema version and validation errors are hard failures that should surface.
+                Err(spec::codec::SpecCodecError::Json(ref json_err))
+                    if json_err.classify() == serde_json::error::Category::Syntax
+                        || json_err.classify() == serde_json::error::Category::Eof =>
+                {
+                    // Warn and continue only on JSON SYNTAX errors — file may be mid-edit.
+                    // Data errors (unknown field, wrong type, deny_unknown_fields violations)
+                    // are schema failures and must surface as hard errors. A v1 spec.json
+                    // with legacy fields like `status` now produces a Data error here.
                     eprintln!(
-                        "warning: skipping spec.md render for {} (malformed JSON)",
+                        "warning: skipping spec.md render for {} (malformed JSON syntax)",
                         track_dir.display()
                     );
+                }
+                Err(spec::codec::SpecCodecError::Json(_)) => {
+                    // JSON data/type error (unknown field, deny_unknown_fields, wrong type) —
+                    // this is a schema failure, not a syntax issue. Propagate as a hard error.
+                    return Err(RenderError::Io(std::io::Error::other(format!(
+                        "spec.json schema error at {}: JSON data error (v1 fields or unknown schema elements present)",
+                        track_dir.display()
+                    ))));
                 }
                 Err(e) => {
                     // Unsupported schema version or domain validation failure — propagate as I/O error
@@ -1969,12 +1982,11 @@ mod tests {
         )
         .unwrap();
 
-        // Write a minimal spec.json
+        // Write a minimal spec.json (schema v2: no status field)
         std::fs::write(
             track_dir.join("spec.json"),
             r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Alpha",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -2041,8 +2053,7 @@ mod tests {
         .unwrap();
 
         let spec_json = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Beta",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -2106,10 +2117,12 @@ mod tests {
         )
         .unwrap();
 
-        // Valid JSON but unsupported schema version — must propagate as an error
+        // Valid JSON but unsupported schema version — must propagate as an error.
+        // Note: no legacy fields (e.g. "status") here; deny_unknown_fields would turn those
+        // into a Json error, which is warn-and-continue. This tests the version gate path.
         std::fs::write(
             track_dir.join("spec.json"),
-            r#"{"schema_version":99,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+            r#"{"schema_version":99,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
         )
         .unwrap();
 

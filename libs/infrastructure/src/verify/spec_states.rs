@@ -725,8 +725,7 @@ mod tests {
     }
 
     const SPEC_JSON_MINIMAL: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },
@@ -734,8 +733,7 @@ mod tests {
 }"#;
 
     const SPEC_JSON_WITH_YELLOW_SIGNALS: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },

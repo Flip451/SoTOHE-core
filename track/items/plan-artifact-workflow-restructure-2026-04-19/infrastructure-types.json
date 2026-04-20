@@ -55,6 +55,20 @@
       "approved": true,
       "action": "modify",
       "kind": "dto"
+    },
+    {
+      "name": "SpecCodecError",
+      "description": "Public error enum for the spec.json codec (libs/infrastructure/src/spec/codec.rs). Modified by T003 to add `DomainValidation` variant that surfaces `domain::ValidationError` failures produced when plan_ref newtypes (SpecElementId / AdrAnchor / ConventionAnchor / ContentHash / InformalGroundSummary) reject their input during DTO-to-domain conversion. Pre-existing variants (Json / Validation / UnsupportedSchemaVersion / InvalidField) are preserved.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "Validation",
+        "UnsupportedSchemaVersion",
+        "InvalidField",
+        "DomainValidation"
+      ]
     }
   ]
 }

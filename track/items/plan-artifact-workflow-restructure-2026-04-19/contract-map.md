@@ -20,6 +20,7 @@ flowchart LR
         L6_domain_SpecDocument(SpecDocument)
         L6_domain_SpecRequirement(SpecRequirement)
         L6_domain_SpecValidationError>SpecValidationError]
+        L6_domain_ValidationError>ValidationError]
         L6_domain_TrackMetadata(TrackMetadata)
         L6_domain_TypeCatalogueEntry(TypeCatalogueEntry)
         L6_domain_SpecStatus{{SpecStatus}}
@@ -35,6 +36,7 @@ flowchart LR
         L14_infrastructure_TaskCoverageCodecError>TaskCoverageCodecError]
         L14_infrastructure_PlanArtifactRefsError>PlanArtifactRefsError]
         L14_infrastructure_TrackDocumentV2[TrackDocumentV2]
+        L14_infrastructure_SpecCodecError>SpecCodecError]
     end
     L7_usecase_TrackBlobReader -->|"read_spec_document"| L6_domain_SpecDocument
     L7_usecase_TrackBlobReader -->|"read_track_metadata"| L6_domain_TrackMetadata

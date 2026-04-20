@@ -1,315 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1.1 says the ADR must not contain full trait/struct/method specifications, but D2.1 immediately embeds concrete Rust struct definitions for `SpecElementId`, `AdrAnchor`, `ConventionAnchor`, `ContentHash`, and the three ref types. That makes the ADR internally inconsistent about how much type detail it is allowed to spell out.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 243,
-              "category": "contradiction"
-            },
-            {
-              "message": "`SpecElementId` is only validated as a non-empty string in the task/verification text, but the ADR already fixes an ID naming convention (`IN-\\d+`, `AC-\\d+`, etc.). As written, the implementation can accept arbitrary ids, which weakens `SpecRef.anchor` and the new spec-element identity scheme.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/metadata.json",
-              "line": 18,
-              "category": "factual error"
-            },
-            {
-              "message": "The scope for T001/verification includes `track/workflow.md`, but the ADR rollout section only names `CLAUDE.md` and `DEVELOPER_AI_WORKFLOW.md`. That leaves one of the declared in-scope docs outside the ADR's own migration plan, so the file set is inconsistent across the documents.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
-              "line": 27,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8abadeeaa232f4220d6d16d5e33bc6a94feedb03fd197d93cf22ccecddb89390",
-          "at": "2026-04-20T09:05:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
-          "at": "2026-04-20T09:09:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1.5 permits type catalogues to reference conventions, but the concrete ref schema only places `ConventionRef` on spec.json fields and D3.2 later says catalogues have no convention reference field at all. That gives implementers conflicting requirements: either catalogue entries need a `convention_refs` field and validator coverage, or the D1.5 permission must be removed.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 322,
-              "category": "contradiction"
-            },
-            {
-              "message": "The ADR lists `track/items/review-scope-prompt-injection-2026-04-18/review.json` as an observed-data reference, while the same ADR later forbids ADRs and new tracks from directly referencing track-internal artifacts to preserve lifecycle boundaries. The document should either move/summarize that evidence into a track-crossing artifact or define an explicit exception for historical observation data.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 40,
-              "category": "contradiction"
-            },
-            {
-              "message": "D2.3 says canonical-block detection implementation details are in Q15, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields; Q14 is the canonical-block section. This broken reference points the T011/CLI implementation at the wrong design question.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 426,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
-          "at": "2026-04-20T09:13:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D0.1 says any 🔴/🟡 SoT signal must trigger repair of the next upstream layer, but D3.1 and the /track:plan flow later define 🟡 as allowable and continue to the next phase. Implementers cannot satisfy both semantics: the orchestrator either loops on yellow or records a warning and proceeds.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 196,
-              "category": "contradiction"
-            },
-            {
-              "message": "The merge gate only requires task-coverage.json to cover all acceptance_criteria, while D1.4 defines coverage enforcement as covering both in_scope and acceptance_criteria. This weakens the final PR requirement relative to the task-coverage gate and leaves two conflicting definitions of what coverage is required for merge.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 535,
-              "category": "contradiction"
-            },
-            {
-              "message": "D4 says writers/capabilities must not span multiple phases, but the ownership table assigns the planner to both Phase 1 (/track:spec) and Phase 3 (/track:impl-plan). Since D1.4 also says the planner writes spec in Phase 1 and impl-plan/task-coverage in Phase 3, the writer-boundary rule cannot be enforced as written.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 487,
-              "category": "contradiction"
-            },
-            {
-              "message": "The canonical-block warning bullet points implementers to Q15 for details, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields. The canonical-block unresolved decision is Q14, so this is a self-evidently wrong cross-reference.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 426,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
-          "at": "2026-04-20T09:17:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1.5 allows type catalog entries to reference conventions, but D3.2 says type catalogs have no convention reference field at all. D2.2 also lists `ConventionRef` use sites only for spec.json, so implementers cannot tell whether catalog `convention_refs` must exist and be verified or whether type-catalog-to-convention references are actually forbidden. This is a schema-level contradiction in the SoT reference policy.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 455,
-              "category": "contradiction"
-            },
-            {
-              "message": "The phase matrix still defines `Phase 3 完了` as `task-coverage.json` covering only all acceptance criteria and says merge is OK when SoT signals are blue. That conflicts with the stricter gate defined earlier: task coverage must cover both `in_scope` and `acceptance_criteria` with referential integrity, and final merge also requires every impl-plan task to be resolved. As written, this table can drive an implementation that permits a final merge with uncovered in-scope items or unresolved tasks.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 550,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0774f414a2616b26e59c28730480b536a14773ad27a110a642b0a7a1d3c69e92",
-          "at": "2026-04-20T09:22:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a155cc1561bd4e9e586e9acd3bf717214e1991ea7d1840587d7b7049d24ecd94",
-          "at": "2026-04-20T09:27:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This acceptance criterion is not satisfiable as written: it requires `informal_grounds[]` on type-catalogue entries to emit 🟡, but ADR D3.2 explicitly defers catalogue-side signal evaluation to a later ADR and only keeps the schema presence check in this scope. With only T003/T005 in scope, the track cannot meet this criterion unless you either narrow it to spec-side only or add a follow-on task for catalogue-side signal implementation.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
-              "line": 330,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:79a678b08fa4600d451ea7c05b4a123f1a02d3a23af5340fa4dd4f8d5e752272",
-          "at": "2026-04-20T10:57:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
-          "at": "2026-04-20T11:01:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
-          "at": "2026-04-20T11:04:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The rendered graph still presents the approval/coverage model as live (`approved_at`, `effective_status`/`status`, `evaluate_coverage`, `task_refs`, `SpecStatus`, `CoverageResult`) even though the plan catalog deletes those concepts. That makes the plan-artifact set internally contradictory about the post-migration spec model; the graph and contract-map need to match the deleted-state intent or be explicitly marked legacy-only.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/domain-graph.md",
-              "line": 97,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
-          "at": "2026-04-20T11:55:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackBlobReader` is declared with four methods in the usecase catalogue, but this contract map only renders two edges (`read_spec_document` and `read_track_metadata`). As written, the rendered map no longer describes the full port boundary and misstates the current contract surface.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 39,
-              "category": "contradiction"
-            },
-            {
-              "message": "The `ContentHash` entry describes the type as holding either a raw 32-byte buffer or a 64-character hex string. The ADR models `ContentHash` as a single normalized `[u8; 32]` value object, so this wording conflates constructor input formats with the stored domain representation.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 24,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
-          "at": "2026-04-20T12:01:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
-          "at": "2026-04-20T12:05:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PlanArtifactRefsError` declares canonical-block suspicion as part of a public error enum, but the ADR/T011 design says canonical-block detection is warning-only. Implementing from this catalogue would turn an advisory warning into a fatal verifier error/CI failure, contradicting the planned gate semantics; canonical-block suspicion should be modeled as a warning finding instead of an error variant.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 40,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
-          "at": "2026-04-20T12:08:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecDocument` says every requirement, including `goal`, gains `id: SpecElementId` and the new ref fields, but the only modified requirement item contract (`SpecRequirement`) is documented as used only for `scope / constraints / acceptance_criteria`, and this catalogue declares no separate goal item type. That leaves the target representation for `goal[]` ambiguous and can let an implementation keep goals as bare strings while still following the `SpecRequirement` entry.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 90,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
-          "at": "2026-04-20T12:18:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `AdrRef` catalogue entry says ADR references are used in type catalogue entries, but the same plan’s SoT direction forbids type catalogue -> ADR direct references and `TypeCatalogueEntry` only adds `spec_refs` plus `informal_grounds`. Leaving this text in place gives implementers a contradictory schema target for catalogue entries.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 48,
-              "category": "contradiction"
-            },
-            {
-              "message": "The `ConventionRef` entry also claims use in type catalogue entries, while `TypeCatalogueEntry` explicitly says catalogue-level `convention_refs[]` is deferred to Q8 / a follow-up ADR. That contradicts the current-track scope, where catalogue entries should not gain convention reference fields yet.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 54,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
-          "at": "2026-04-20T12:24:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR D1.4 defines identity-only metadata as retaining the track `status` field while moving only `tasks` and `plan` into `impl-plan.json`. This catalogue entry instead says TrackMetadata retains `status_override` and omits `status`; the matching TrackDocumentV2 entry repeats the same retained-field set. That gives implementers the wrong schema contract for metadata.json after task-derived status is removed, so the plan artifacts are internally inconsistent with the authoritative ADR.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 112,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7892b83742bdc18ac1cee2ceb9abf9e604e04490cb8417167113651f876e577",
-          "at": "2026-04-20T12:29:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb5f5e79cae4d15ad26f942d3d804af71293449bd8e28e9c62a5fb939154da93",
-          "at": "2026-04-20T12:34:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
-          "at": "2026-04-20T14:29:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
-          "at": "2026-04-20T14:31:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
-          "at": "2026-04-20T16:30:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
-          "at": "2026-04-20T16:32:05Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -325,6 +16,133 @@
           "findings": [],
           "hash": "rvw1:sha256:bf354193648cbf5c3f0a3ed8984485d449c46ca3e36d68638b88b4d34f117df7",
           "at": "2026-04-20T16:31:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5a86eca144c4ed06aeb0dcdcbb77f50cb658eb53759b573d068b934132ac904",
+          "at": "2026-04-20T17:04:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5a86eca144c4ed06aeb0dcdcbb77f50cb658eb53759b573d068b934132ac904",
+          "at": "2026-04-20T17:07:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This success fixture no longer exercises the spec-coverage pass path: because `task-coverage.json` is absent, `VerifyCommand::SpecCoverage` returns via the new skip guard before any coverage evaluation runs. The test will still pass if `evaluate_coverage()` regresses, so it no longer protects the covered-track CLI behavior.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 907,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:652596769968fcba3378eb7fdb576279ddc6ec4ba9632d865a89ac440c65e60e",
+          "at": "2026-04-20T18:09:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:652596769968fcba3378eb7fdb576279ddc6ec4ba9632d865a89ac440c65e60e",
+          "at": "2026-04-20T18:12:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:652596769968fcba3378eb7fdb576279ddc6ec4ba9632d865a89ac440c65e60e",
+          "at": "2026-04-20T18:14:03Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
+          "at": "2026-04-20T16:31:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
+          "at": "2026-04-20T16:33:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T17:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`convention_refs` should not participate in phase-1 signal evaluation per ADR 2026-04-19-1242 §D3.1. As written, a requirement with only `convention_refs` is classified as Blue, which suppresses the Red finding that `check_spec_doc_signals()` is meant to surface for missing ADR grounding.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 384,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T18:09:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`convention_refs` are treated as a Blue signal here, but ADR 2026-04-19-1242 D3.1 says the spec signal must depend only on `adr_refs` and `informal_grounds`; `convention_refs` are excluded. As written, a requirement with only convention refs will be classified as Blue instead of Red, which weakens the gate.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 384,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T18:11:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_spec_doc_signals()` tells callers to upgrade Yellow by referencing either `adr_refs[]` or `convention_refs[]`, but convention refs are explicitly outside signal evaluation and do not change a requirement from Yellow to Blue. A requirement with only convention refs still evaluates Red, so this guidance is functionally wrong and will mislead users of the gate output.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 447,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97d34f43ea2cddeb065b926d5b8fb741fd82ba42b61140d1d49d8004c30e7332",
+          "at": "2026-04-20T18:16:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
+          "at": "2026-04-20T18:17:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
+          "at": "2026-04-20T18:18:50Z"
         }
       ]
     },
@@ -482,24 +300,6 @@
           "findings": [],
           "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
           "at": "2026-04-20T16:31:49Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
-          "at": "2026-04-20T16:31:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
-          "at": "2026-04-20T16:33:07Z"
         }
       ]
     },
@@ -1038,6 +838,729 @@
           "findings": [],
           "hash": "rvw1:sha256:00f1d771cd76e8bad96134325e5631bf552eef42464e0c9cde3d62699c90a872",
           "at": "2026-04-20T16:31:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `spec.md` frontmatter no longer matches the legacy markdown validators that are still reachable through the CLI and these modules' fallback paths. `verify_spec_schema` handles `spec.json`, but `spec_frontmatter`, `spec_signals`, and `spec_attribution` still expect the old markdown format (`status` plus `[source: ...]` tags) when no sibling `spec.json` exists, so a rendered spec.md from this change will now fail direct verification.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/render.rs",
+              "line": 65,
+              "category": "correctness"
+            },
+            {
+              "message": "Placeholder scanning now drops the `file` half of every structured reference. `adr_refs`, `convention_refs`, and top-level `related_conventions` only contribute anchors to `all_texts`, so a placeholder in a path like `knowledge/adr/{{date}}.md` will no longer be detected even though the comment says the pass scans all text-bearing strings.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 699,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:69503e23f3f364ef22b50c9f693a4e8ccec0e2356adbeb5b4befbb5e877e1427",
+          "at": "2026-04-20T17:05:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Schema-v2 decode defaults `goal`/`constraints`/`acceptance_criteria` to empty, but `encode()` always writes them back out because these fields are missing `skip_serializing_if`. That makes `encode(decode(json))` add empty arrays to minimal spec files and breaks the round-trip/idempotence expected by the migration.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 53,
+              "category": "correctness"
+            },
+            {
+              "message": "The attribution verifier no longer checks `goal` items at all. Since `goal` is now a `Vec<SpecRequirement>`, a goal requirement with no typed refs will pass this gate even though the same requirement would be flagged in scope/constraints/AC.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 65,
+              "category": "correctness"
+            },
+            {
+              "message": "The legacy YAML fallback still requires `status`, but schema v2 `spec.md` no longer emits that field. If `verify()` runs on a `spec.md` without a sibling `spec.json`, a valid v2 frontmatter will be rejected as missing `status`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 31,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:31cf79d4aa168cc3fa9fbf0d1e567b351d231b10e625f064cadcaf8c1b73288e",
+          "at": "2026-04-20T17:12:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DTO deserialization still accepts unknown fields, so schema-v2 `spec.json` files that keep removed v1 fields (`status`, `approved_at`, `content_hash`, `sources`, `task_refs`) will decode successfully instead of failing validation. `verify_spec_schema()` therefore does not actually enforce the new schema unless unknown-field rejection or explicit checks are added.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 48,
+              "category": "validation"
+            },
+            {
+              "message": "The legacy markdown fallback still requires `status`, but `render_spec()` no longer emits it. Any rendered `spec.md` that is verified without a sibling `spec.json` will now fail the fallback path even though it was produced by this code.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 79,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1fb262d70bfba3ed3e90943ba5b913ea19089a7fa95d910272b4d74b73e6df20",
+          "at": "2026-04-20T17:16:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The markdown fallbacks in `spec_signals.rs` and `spec_attribution.rs` still parse legacy `### S-/REQ-` headings and `[source: ...]` tags. `render_spec()` now emits bullet requirements with `adr_refs`/`convention_refs`/`informal_grounds`, so a v2 `spec.md` without sibling `spec.json` will be misvalidated: `spec_signals` rejects it as all-red, while `spec_attribution` silently sees no requirements at all.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "correctness"
+            },
+            {
+              "message": "Placeholder scanning in `validate_spec_json_file()` never inspects `SpecRequirement.id()`. Because `SpecElementId` still accepts valid-looking placeholders like `TBD-01`, the latest-track gate can miss stub IDs on goal/scope/constraint/AC items.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 693,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:f655e3632fce5629b8d9c90dac7fba69731a3ed6196387d98e7d1c3c91d733ec",
+          "at": "2026-04-20T17:23:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several nested DTOs here still deserialize permissively (`SpecScopeDto`, `SignalCountsDto`, `AdrRefDto`, `ConventionRefDto`, `InformalGroundRefDto`), so stray keys inside `scope`, `signals`, or typed refs are silently dropped instead of being rejected by the v2 schema. That breaks the validation contract and the encode -> decode -> encode round-trip guarantee. The same `SignalCountsDto` omission exists in `libs/infrastructure/src/verify/spec_frontmatter.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 75,
+              "category": "validation"
+            },
+            {
+              "message": "This `pass` shortcut trusts a spoofable comment string instead of validating the v2 markdown body. Any hand-authored or stale `spec.md` can evade signal verification by prepending the generated header, and the same pattern in `spec_attribution.rs` bypasses attribution checks as well. If `spec.json` is absent, this should fail closed or still parse the document rather than returning success.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_signals.rs",
+              "line": 266,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:74283c553d5be1a5f4fcd191061b7cb64485df522ecf386609392b0d11ce536e",
+          "at": "2026-04-20T17:30:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated-v2 guard only checks `content.starts_with(\"<!-- Generated from spec.json\")`, so a `spec.md` with a UTF-8 BOM or even a leading blank line bypasses the fail-closed path and falls back to the legacy heading scan. That lets a generated v2 `spec.md` without a sibling `spec.json` pass attribution verification instead of being rejected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 143,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b3b6bb8918f7a53e8bc82872dcd690d89f12a083ec092ed39c05bc2a9ceee09",
+          "at": "2026-04-20T17:38:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Serializing `AdrRef`/`ConventionRef` with `to_string_lossy()` makes `spec.json` silently corrupt any non-UTF-8 `PathBuf`, so encode->decode is no longer lossless and a document can come back pointing at a different file. Either reject non-UTF-8 paths or serialize them losslessly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 399,
+              "category": "correctness"
+            },
+            {
+              "message": "The new v2 guard only trips when the generated header is present. A migrated `spec.md` that has the new bullet/typed-ref layout but is missing that header still falls through to the old `### S-/REQ-` scanner, which ignores the new requirement lines entirely, so an unattributed v2 spec can pass when `spec.json` is absent.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 143,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b3b6bb8918f7a53e8bc82872dcd690d89f12a083ec092ed39c05bc2a9ceee09",
+          "at": "2026-04-20T17:42:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fail-closed branch only triggers when a parsed frontmatter block is present and it does not contain `status:`. A stale or hand-edited v2 `spec.md` that still has `status:` and no `### S-`/`### REQ-` headings will return `pass` here instead of forcing a `spec.json`-backed attribution check, so the attribution gate can be bypassed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 202,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:dec464b9e243c843b66dbb544e5016ab171f2914e6e97b197b96c32b60554fcd",
+          "at": "2026-04-20T17:46:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30fbca0e79478c1d8dbe307e7508cf7c46886cb82b522b2d35702bee706f097d",
+          "at": "2026-04-20T17:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec_frontmatter` still accepts legacy lifecycle frontmatter: `status` is explicitly allowed and any other unknown key is flattened/ignored, so a `spec.md` containing removed v2 fields such as `status`, `approved_at`, or `content_hash` can pass this verifier whenever there is no sibling `spec.json`. The briefing requires the frontmatter/schema check to enforce the new schema with the approved-lifecycle fields removed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 35,
+              "category": "schema-validation"
+            }
+          ],
+          "hash": "rvw1:sha256:30fbca0e79478c1d8dbe307e7508cf7c46886cb82b522b2d35702bee706f097d",
+          "at": "2026-04-20T17:53:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fallback frontmatter verifier still accepts the removed v1 lifecycle fields: `status` is explicitly allowed and all other unknown fields are flattened/ignored, so a `spec.md` with `approved_at` or `content_hash` passes whenever no sibling `spec.json` exists. That violates the v2 validation requirement that removed approved-lifecycle fields be rejected rather than silently accepted.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 39,
+              "category": null
+            },
+            {
+              "message": "`sync_rendered_views` still treats every `SpecCodecError::Json` as a recoverable malformed-JSON warning. With the new `deny_unknown_fields` DTOs, a well-formed legacy/v1 `spec.json` containing removed fields like `status` now surfaces as this Json error, so the renderer silently skips it instead of failing the unsupported schema. This masks the no-longer-supported v1 path and can leave stale or missing `spec.md` output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 552,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2f44f6e4f6810f7b0c8bd5de73b4cd315367e7aecceb9969918ad35d28e9d2e5",
+          "at": "2026-04-20T18:01:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The markdown fallback path still accepts removed schema-v1 frontmatter fields when no sibling spec.json exists. SpecFrontmatterDto keeps status optional and flattens all unknown fields into _extra, so frontmatter containing approved_at or content_hash deserializes successfully and verify() returns pass. The briefing requires spec_frontmatter to validate the new schema and reject the removed approved fields; this leaves direct spec.md verification unable to catch stale v1 lifecycle metadata.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 45,
+              "category": "schema_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
+          "at": "2026-04-20T18:04:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
+          "at": "2026-04-20T18:10:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
+          "at": "2026-04-20T18:13:48Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:04:20Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.1 says the ADR must not contain full trait/struct/method specifications, but D2.1 immediately embeds concrete Rust struct definitions for `SpecElementId`, `AdrAnchor`, `ConventionAnchor`, `ContentHash`, and the three ref types. That makes the ADR internally inconsistent about how much type detail it is allowed to spell out.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 243,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SpecElementId` is only validated as a non-empty string in the task/verification text, but the ADR already fixes an ID naming convention (`IN-\\d+`, `AC-\\d+`, etc.). As written, the implementation can accept arbitrary ids, which weakens `SpecRef.anchor` and the new spec-element identity scheme.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/metadata.json",
+              "line": 18,
+              "category": "factual error"
+            },
+            {
+              "message": "The scope for T001/verification includes `track/workflow.md`, but the ADR rollout section only names `CLAUDE.md` and `DEVELOPER_AI_WORKFLOW.md`. That leaves one of the declared in-scope docs outside the ADR's own migration plan, so the file set is inconsistent across the documents.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8abadeeaa232f4220d6d16d5e33bc6a94feedb03fd197d93cf22ccecddb89390",
+          "at": "2026-04-20T09:05:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:09:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.5 permits type catalogues to reference conventions, but the concrete ref schema only places `ConventionRef` on spec.json fields and D3.2 later says catalogues have no convention reference field at all. That gives implementers conflicting requirements: either catalogue entries need a `convention_refs` field and validator coverage, or the D1.5 permission must be removed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 322,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR lists `track/items/review-scope-prompt-injection-2026-04-18/review.json` as an observed-data reference, while the same ADR later forbids ADRs and new tracks from directly referencing track-internal artifacts to preserve lifecycle boundaries. The document should either move/summarize that evidence into a track-crossing artifact or define an explicit exception for historical observation data.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 40,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2.3 says canonical-block detection implementation details are in Q15, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields; Q14 is the canonical-block section. This broken reference points the T011/CLI implementation at the wrong design question.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 426,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:13:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D0.1 says any 🔴/🟡 SoT signal must trigger repair of the next upstream layer, but D3.1 and the /track:plan flow later define 🟡 as allowable and continue to the next phase. Implementers cannot satisfy both semantics: the orchestrator either loops on yellow or records a warning and proceeds.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 196,
+              "category": "contradiction"
+            },
+            {
+              "message": "The merge gate only requires task-coverage.json to cover all acceptance_criteria, while D1.4 defines coverage enforcement as covering both in_scope and acceptance_criteria. This weakens the final PR requirement relative to the task-coverage gate and leaves two conflicting definitions of what coverage is required for merge.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 535,
+              "category": "contradiction"
+            },
+            {
+              "message": "D4 says writers/capabilities must not span multiple phases, but the ownership table assigns the planner to both Phase 1 (/track:spec) and Phase 3 (/track:impl-plan). Since D1.4 also says the planner writes spec in Phase 1 and impl-plan/task-coverage in Phase 3, the writer-boundary rule cannot be enforced as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 487,
+              "category": "contradiction"
+            },
+            {
+              "message": "The canonical-block warning bullet points implementers to Q15 for details, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields. The canonical-block unresolved decision is Q14, so this is a self-evidently wrong cross-reference.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 426,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.5 allows type catalog entries to reference conventions, but D3.2 says type catalogs have no convention reference field at all. D2.2 also lists `ConventionRef` use sites only for spec.json, so implementers cannot tell whether catalog `convention_refs` must exist and be verified or whether type-catalog-to-convention references are actually forbidden. This is a schema-level contradiction in the SoT reference policy.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 455,
+              "category": "contradiction"
+            },
+            {
+              "message": "The phase matrix still defines `Phase 3 完了` as `task-coverage.json` covering only all acceptance criteria and says merge is OK when SoT signals are blue. That conflicts with the stricter gate defined earlier: task coverage must cover both `in_scope` and `acceptance_criteria` with referential integrity, and final merge also requires every impl-plan task to be resolved. As written, this table can drive an implementation that permits a final merge with uncovered in-scope items or unresolved tasks.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 550,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0774f414a2616b26e59c28730480b536a14773ad27a110a642b0a7a1d3c69e92",
+          "at": "2026-04-20T09:22:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a155cc1561bd4e9e586e9acd3bf717214e1991ea7d1840587d7b7049d24ecd94",
+          "at": "2026-04-20T09:27:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This acceptance criterion is not satisfiable as written: it requires `informal_grounds[]` on type-catalogue entries to emit 🟡, but ADR D3.2 explicitly defers catalogue-side signal evaluation to a later ADR and only keeps the schema presence check in this scope. With only T003/T005 in scope, the track cannot meet this criterion unless you either narrow it to spec-side only or add a follow-on task for catalogue-side signal implementation.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+              "line": 330,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:79a678b08fa4600d451ea7c05b4a123f1a02d3a23af5340fa4dd4f8d5e752272",
+          "at": "2026-04-20T10:57:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
+          "at": "2026-04-20T11:01:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
+          "at": "2026-04-20T11:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered graph still presents the approval/coverage model as live (`approved_at`, `effective_status`/`status`, `evaluate_coverage`, `task_refs`, `SpecStatus`, `CoverageResult`) even though the plan catalog deletes those concepts. That makes the plan-artifact set internally contradictory about the post-migration spec model; the graph and contract-map need to match the deleted-state intent or be explicitly marked legacy-only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/domain-graph.md",
+              "line": 97,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
+          "at": "2026-04-20T11:55:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader` is declared with four methods in the usecase catalogue, but this contract map only renders two edges (`read_spec_document` and `read_track_metadata`). As written, the rendered map no longer describes the full port boundary and misstates the current contract surface.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 39,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ContentHash` entry describes the type as holding either a raw 32-byte buffer or a 64-character hex string. The ADR models `ContentHash` as a single normalized `[u8; 32]` value object, so this wording conflates constructor input formats with the stored domain representation.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 24,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
+          "at": "2026-04-20T12:01:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
+          "at": "2026-04-20T12:05:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanArtifactRefsError` declares canonical-block suspicion as part of a public error enum, but the ADR/T011 design says canonical-block detection is warning-only. Implementing from this catalogue would turn an advisory warning into a fatal verifier error/CI failure, contradicting the planned gate semantics; canonical-block suspicion should be modeled as a warning finding instead of an error variant.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
+          "at": "2026-04-20T12:08:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecDocument` says every requirement, including `goal`, gains `id: SpecElementId` and the new ref fields, but the only modified requirement item contract (`SpecRequirement`) is documented as used only for `scope / constraints / acceptance_criteria`, and this catalogue declares no separate goal item type. That leaves the target representation for `goal[]` ambiguous and can let an implementation keep goals as bare strings while still following the `SpecRequirement` entry.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 90,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
+          "at": "2026-04-20T12:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `AdrRef` catalogue entry says ADR references are used in type catalogue entries, but the same plan’s SoT direction forbids type catalogue -> ADR direct references and `TypeCatalogueEntry` only adds `spec_refs` plus `informal_grounds`. Leaving this text in place gives implementers a contradictory schema target for catalogue entries.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ConventionRef` entry also claims use in type catalogue entries, while `TypeCatalogueEntry` explicitly says catalogue-level `convention_refs[]` is deferred to Q8 / a follow-up ADR. That contradicts the current-track scope, where catalogue entries should not gain convention reference fields yet.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
+          "at": "2026-04-20T12:24:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1.4 defines identity-only metadata as retaining the track `status` field while moving only `tasks` and `plan` into `impl-plan.json`. This catalogue entry instead says TrackMetadata retains `status_override` and omits `status`; the matching TrackDocumentV2 entry repeats the same retained-field set. That gives implementers the wrong schema contract for metadata.json after task-derived status is removed, so the plan artifacts are internally inconsistent with the authoritative ADR.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 112,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7892b83742bdc18ac1cee2ceb9abf9e604e04490cb8417167113651f876e577",
+          "at": "2026-04-20T12:29:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb5f5e79cae4d15ad26f942d3d804af71293449bd8e28e9c62a5fb939154da93",
+          "at": "2026-04-20T12:34:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
+          "at": "2026-04-20T14:29:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
+          "at": "2026-04-20T14:31:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
+          "at": "2026-04-20T16:30:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
+          "at": "2026-04-20T16:32:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `TrackBlobReader` boundary is rendered with only two operations here (`read_spec_document` and `read_track_metadata`), but the same plan set still treats that port as the task-completion boundary and the surrounding contract files describe a fuller port surface. As rendered, this map is a partial view of the port contract and no longer matches the rest of the plan artifact set.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
+          "at": "2026-04-20T17:06:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
+          "at": "2026-04-20T17:07:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
+          "at": "2026-04-20T17:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Stage 1 signal summary is still `0` yellow, but this spec now introduces `informal_grounds` entries and AC-05 explicitly says those inputs should fire yellow signals. The rendered summary is inconsistent with the document's own signal rules.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
+              "line": 4,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:09:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` now contains two `informal_grounds` entries (CN-02 and CN-03), but the generated `spec.md` still reports `signals: { blue: 44, yellow: 0, red: 0 }`. That contradicts the new schema/AC-05 semantics, where informal grounds are supposed to contribute a yellow signal, so the rendered artifact is stale or the signal aggregation is missing the new field.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
+              "line": 4,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:11:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 says every `spec.json` element must have a non-empty `informal_grounds[]`, but this migrated spec only attaches `informal_grounds` to `CN-02` and `CN-03` and leaves the rest of the requirements without that field. As written, the acceptance criterion and the instance shape disagree, so the artifact cannot satisfy the schema story it is documenting.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:14:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:16:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered contract map does not include the new `SpecCodecError` infrastructure type, even though `infrastructure-types.json` and `infrastructure-types.md` add it as part of the spec codec boundary. That leaves the contract map out of sync with the rest of the plan-artifact artifacts and hides the new domain-validation error surface.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ef7e2c93895ec457de8db095949dfdb265dee6cced3c471a51c9d321290f8a86",
+          "at": "2026-04-20T18:22:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecCodecError` is added to the infrastructure type catalog, but the rendered contract map never adds a corresponding infrastructure node. That leaves the cross-artifact inventory inconsistent and omits the new spec codec error from the map view.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ef7e2c93895ec457de8db095949dfdb265dee6cced3c471a51c9d321290f8a86",
+          "at": "2026-04-20T18:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93cf54cc1caa316fe54a779b235e3ae0aea8bba416d4c63b9eca67a271318bed",
+          "at": "2026-04-20T18:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecCodecError` says the existing `Json`, `Validation`, `UnsupportedSchemaVersion`, and `InvalidField` variants are preserved, but `expected_variants` lists only `DomainValidation`. The rendered infrastructure type table therefore advertises an incomplete error contract, which contradicts the description and can mislead the T003 codec contract review.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:93cf54cc1caa316fe54a779b235e3ae0aea8bba416d4c63b9eca67a271318bed",
+          "at": "2026-04-20T18:28:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c362b604dfbe5aeda9eb52aab321db7e42bf2780e3fac025ed23f148b6aa8c5b",
+          "at": "2026-04-20T18:30:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c362b604dfbe5aeda9eb52aab321db7e42bf2780e3fac025ed23f148b6aa8c5b",
+          "at": "2026-04-20T18:33:12Z"
         }
       ]
     }

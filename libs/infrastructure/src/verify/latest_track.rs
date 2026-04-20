@@ -684,8 +684,28 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
     };
 
     // Collect ALL text-bearing strings from the document for placeholder scanning.
-    let mut all_texts: Vec<&str> = vec![doc.title(), doc.status().as_str(), doc.version()];
-    all_texts.extend(doc.goal().iter().map(|s| s.as_str()));
+    // `all_texts` holds borrowed slices; `owned_file_paths` holds String copies
+    // of PathBuf file paths (whose Cow temporaries do not live long enough to
+    // borrow into all_texts directly).
+    let mut all_texts: Vec<&str> = vec![doc.title(), doc.version()];
+    let mut owned_file_paths: Vec<String> = Vec::new();
+
+    // goal is now Vec<SpecRequirement>; scan id, text, and all typed ref strings.
+    for req in doc.goal() {
+        all_texts.push(req.id().as_ref());
+        all_texts.push(req.text());
+        for adr_ref in req.adr_refs() {
+            owned_file_paths.push(adr_ref.file.to_string_lossy().into_owned());
+            all_texts.push(adr_ref.anchor.as_ref());
+        }
+        for conv_ref in req.convention_refs() {
+            owned_file_paths.push(conv_ref.file.to_string_lossy().into_owned());
+            all_texts.push(conv_ref.anchor.as_ref());
+        }
+        for informal in req.informal_grounds() {
+            all_texts.push(informal.summary.as_ref());
+        }
+    }
     let all_reqs = doc
         .scope()
         .in_scope()
@@ -694,9 +714,20 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
         .chain(doc.constraints().iter())
         .chain(doc.acceptance_criteria().iter());
     for req in all_reqs {
+        // Scan id alongside text and typed refs.
+        all_texts.push(req.id().as_ref());
         all_texts.push(req.text());
-        for src in req.sources() {
-            all_texts.push(src.as_str());
+        // Typed refs: scan both file path and anchor for placeholders.
+        for adr_ref in req.adr_refs() {
+            owned_file_paths.push(adr_ref.file.to_string_lossy().into_owned());
+            all_texts.push(adr_ref.anchor.as_ref());
+        }
+        for conv_ref in req.convention_refs() {
+            owned_file_paths.push(conv_ref.file.to_string_lossy().into_owned());
+            all_texts.push(conv_ref.anchor.as_ref());
+        }
+        for informal in req.informal_grounds() {
+            all_texts.push(informal.summary.as_ref());
         }
     }
     for section in doc.additional_sections() {
@@ -705,9 +736,14 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
             all_texts.push(line.as_str());
         }
     }
+    // related_conventions is now Vec<ConventionRef>; scan both file path and anchor.
     for conv in doc.related_conventions() {
-        all_texts.push(conv.as_str());
+        owned_file_paths.push(conv.file.to_string_lossy().into_owned());
+        all_texts.push(conv.anchor.as_ref());
     }
+    // Append owned file path strings so they are scanned alongside the borrowed slices.
+    let file_path_refs: Vec<&str> = owned_file_paths.iter().map(String::as_str).collect();
+    let all_texts: Vec<&str> = all_texts.into_iter().chain(file_path_refs).collect();
 
     let mut findings = Vec::new();
     let placeholder_patterns = ["TODO:", "TEMPLATE STUB", "TBD"];
@@ -1133,8 +1169,7 @@ mod tests {
     // ---- spec.json artifact tests ----
 
     const VALID_SPEC_JSON: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-20T16:33:48Z",
-  "declaration_hash": "3f5eabfa38c7eba2a348d67da412a549e0eba00cd5ea329b69c21ffd40916153",
+  "generated_at": "2026-04-20T18:33:25Z",
+  "declaration_hash": "d933b12a3b4e57e3470036f8972550d7f01344531b23743e86ca3bafba1fc6f5",
   "signals": [
     {
       "type_name": "ImplPlanDocumentDto",
@@ -38,6 +38,19 @@
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "SpecCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "Validation",
+        "UnsupportedSchemaVersion",
+        "InvalidField",
+        "DomainValidation"
+      ]
     }
   ]
 }

@@ -262,15 +262,15 @@ mod tests {
     #[test]
     fn test_execute_signals_via_spec_json_writes_signals_into_spec_json() {
         let dir = tempfile::tempdir().unwrap();
+        // Schema v2: two in-scope requirements — one Blue (adr_ref), one Yellow (informal)
         let spec_json = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature X",
   "scope": {
     "in_scope": [
-      {"text": "Req A", "sources": ["PRD §1"]},
-      {"text": "Req B", "sources": ["inference — guess"]}
+      {"id": "IN-01", "text": "Req A", "adr_refs": [{"file": "adr/x.md", "anchor": "D1"}]},
+      {"id": "IN-02", "text": "Req B", "informal_grounds": [{"kind": "discussion", "summary": "agreed"}]}
     ],
     "out_of_scope": []
   }
@@ -285,8 +285,8 @@ mod tests {
             std::fs::read_to_string(items_dir.join(&track_id).join("spec.json")).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&updated_json).unwrap();
         let signals = &parsed["signals"];
-        assert_eq!(signals["blue"], 1, "PRD §1 should be blue");
-        assert_eq!(signals["yellow"], 1, "inference should be yellow");
+        assert_eq!(signals["blue"], 1, "adr_ref should be blue");
+        assert_eq!(signals["yellow"], 1, "informal should be yellow");
         assert_eq!(signals["red"], 0);
     }
 
@@ -294,8 +294,7 @@ mod tests {
     fn test_execute_signals_via_spec_json_also_generates_spec_md() {
         let dir = tempfile::tempdir().unwrap();
         let spec_json = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Y",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -316,8 +315,7 @@ mod tests {
     fn test_execute_signals_prefers_spec_json_over_spec_md_when_both_exist() {
         let dir = tempfile::tempdir().unwrap();
         let spec_json = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Z",
   "scope": { "in_scope": [], "out_of_scope": [] }

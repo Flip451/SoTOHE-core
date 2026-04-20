@@ -42,8 +42,8 @@ pub use signal::{
 };
 pub use spec::{
     CoverageResult, HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot,
-    SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError,
-    evaluate_requirement_signal,
+    SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecValidationError,
+    check_spec_doc_signals, evaluate_requirement_signal,
 };
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{

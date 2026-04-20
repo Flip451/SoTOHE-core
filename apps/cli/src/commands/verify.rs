@@ -629,7 +629,7 @@ mod tests {
     fn test_spec_frontmatter_subcommand_returns_success_for_valid_spec() {
         let tmp = TempDir::new().unwrap();
         let spec = tmp.path().join("spec.md");
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Spec\n").unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Spec\n").unwrap();
         let exit = execute(VerifyCommand::SpecFrontmatter(SpecVerifyArgs { spec_path: spec }));
         assert_eq!(exit, ExitCode::SUCCESS);
     }
@@ -755,11 +755,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let spec = tmp.path().join("spec.md");
         // Spec with valid frontmatter, a Scope section, and a blue-signal item — no red items.
-        std::fs::write(
-            &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n",
-        )
-        .unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n")
+            .unwrap();
         let exit = execute(VerifyCommand::SpecSignals(SpecVerifyArgs { spec_path: spec }));
         assert_eq!(exit, ExitCode::SUCCESS);
     }
@@ -781,7 +778,7 @@ mod tests {
         // Spec with a ## Domain States section containing a table with data rows.
         std::fs::write(
             &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Domain States\n\n\
+            "---\nversion: \"1.0\"\n---\n## Domain States\n\n\
              | State | Description |\n\
              |-------|-------------|\n\
              | Draft | Initial state |\n",
@@ -797,11 +794,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let spec = tmp.path().join("spec.md");
         // Spec with frontmatter but no ## Domain States section.
-        std::fs::write(
-            &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n\nNo states here.\n",
-        )
-        .unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Overview\n\nNo states here.\n")
+            .unwrap();
         let exit =
             execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
         assert_eq!(exit, ExitCode::FAILURE);
@@ -857,11 +851,11 @@ mod tests {
         write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
         // spec.json: signals have yellow=1, red=0 (Stage 1 prerequisite satisfied).
         std::fs::write(
             tmp.path().join("spec.json"),
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
+            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
         )
         .unwrap();
         // domain-types.json: one entry with a yellow signal.
@@ -882,11 +876,11 @@ mod tests {
         write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
         // spec.json: signals have yellow=1, red=0 (Stage 1 prerequisite satisfied).
         std::fs::write(
             tmp.path().join("spec.json"),
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
+            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
         )
         .unwrap();
         // domain-types.json: one entry with a yellow signal.
@@ -919,10 +913,11 @@ mod tests {
             "track/items/test-track/metadata.json",
             r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
         );
+        // schema v2: no task_refs / sources; empty in_scope so evaluate_coverage stub returns pass.
         write_file(
             tmp.path(),
             "track/items/test-track/spec.json",
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"item","sources":["PRD"],"task_refs":["T001"]}],"out_of_scope":[]}}"#,
+            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
         );
         let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
         assert_eq!(exit, ExitCode::SUCCESS);
@@ -938,11 +933,14 @@ mod tests {
             "track/items/test-track/metadata.json",
             r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
         );
+        // schema v2: in_scope item with no task_refs → evaluate_coverage stub reports uncovered → fail.
         write_file(
             tmp.path(),
             "track/items/test-track/spec.json",
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"uncovered","sources":["PRD"]}],"out_of_scope":[]}}"#,
+            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[{"id":"IN-01","text":"uncovered"}],"out_of_scope":[]}}"#,
         );
+        // task-coverage.json must exist to trigger coverage check (T003 transition guard).
+        write_file(tmp.path(), "track/items/test-track/task-coverage.json", "{}");
         let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
         assert_eq!(exit, ExitCode::FAILURE);
     }

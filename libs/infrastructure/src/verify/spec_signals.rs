@@ -258,6 +258,22 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
         }
     };
 
+    // Schema v2 spec.md files are generated from spec.json and carry a
+    // machine-readable header comment. The legacy `[source: ...]` evaluator
+    // cannot process v2 content (typed adr_refs / convention_refs instead of
+    // [source: ...] tags); running it would produce false all-red results.
+    //
+    // Fail closed: if the generated header is present but spec.json is absent
+    // (e.g. manual deletion or spoofed header), return an error rather than a
+    // silent pass. Verification must be performed against spec.json.
+    if content.starts_with("<!-- Generated from spec.json") {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{}: generated v2 spec.md requires a sibling spec.json for signal verification \
+             (spec.json is absent — restore it or re-generate spec.md from spec.json)",
+            spec_path.display()
+        ))]);
+    }
+
     let Some(fm) = parse_yaml_frontmatter(&content) else {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: missing or invalid YAML frontmatter (expected '---' delimiters)",
@@ -530,31 +546,28 @@ mod tests {
     // --- verify_from_spec_json() tests ---
 
     const MINIMAL_SPEC_JSON: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Title",
   "scope": { "in_scope": [], "out_of_scope": [] }
 }"#;
 
     const SPEC_JSON_WITH_BLUE_SOURCE: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Title",
   "scope": {
-    "in_scope": [{ "text": "In scope item", "sources": ["PRD §1"] }],
+    "in_scope": [{ "id": "IN-01", "text": "In scope item", "adr_refs": [{"file": "knowledge/adr/x.md", "anchor": "D1"}] }],
     "out_of_scope": []
   }
 }"#;
 
     const SPEC_JSON_WITH_RED_SOURCE: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Title",
   "scope": {
-    "in_scope": [{ "text": "Missing source item", "sources": [] }],
+    "in_scope": [{ "id": "IN-01", "text": "Missing attribution item" }],
     "out_of_scope": []
   }
 }"#;

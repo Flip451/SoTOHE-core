@@ -25,7 +25,7 @@ libs/domain/src/plan_ref/ 新モジュール (ref 種別ごとに 1 ファイル
 role 文字列タグ・discriminated union・共通 trait 抽象化は導入しない (独立 4 構造体の原則)
 InformalGroundRef は file 対象を持たず、未永続化根拠 (議論 / feedback / memory / user directive) を構造化して citing 可能にし、signal 評価で 🟡 を発火する
 
-- [~] libs/domain/src/plan_ref/ 新モジュールを導入 (ref 種別ごとに 1 ファイル構成: mod.rs + adr_ref.rs + convention_ref.rs + spec_ref.rs + informal_ground_ref.rs)。値オブジェクト newtype 6 種 (SpecElementId / AdrAnchor / ConventionAnchor / ContentHash / InformalGroundKind / InformalGroundSummary) と 4 独立 ref 構造体 (AdrRef / ConventionRef / SpecRef / InformalGroundRef) を追加する。SpecElementId は非空文字列 + ID 命名規則 (例: IN-\d+, AC-\d+ 等) で validation、AdrAnchor / ConventionAnchor は非空文字列のみ (loose、Q15 で厳密化)、ContentHash は SHA-256 形式 (32 バイト) で validation、InformalGroundKind は 4 variant enum (Discussion / Feedback / Memory / UserDirective)、InformalGroundSummary は非空一行要約で validation。各コンストラクタに validation を閉じ込める。既存の libs/domain/src/ids.rs (entity identity 専用) とは分離する (NonEmptyString の流用はしない)。unit tests 付与
+- [x] libs/domain/src/plan_ref/ 新モジュールを導入 (ref 種別ごとに 1 ファイル構成: mod.rs + adr_ref.rs + convention_ref.rs + spec_ref.rs + informal_ground_ref.rs)。値オブジェクト newtype 6 種 (SpecElementId / AdrAnchor / ConventionAnchor / ContentHash / InformalGroundKind / InformalGroundSummary) と 4 独立 ref 構造体 (AdrRef / ConventionRef / SpecRef / InformalGroundRef) を追加する。SpecElementId は非空文字列 + ID 命名規則 (例: IN-\d+, AC-\d+ 等) で validation、AdrAnchor / ConventionAnchor は非空文字列のみ (loose、Q15 で厳密化)、ContentHash は SHA-256 形式 (32 バイト) で validation、InformalGroundKind は 4 variant enum (Discussion / Feedback / Memory / UserDirective)、InformalGroundSummary は非空一行要約で validation。各コンストラクタに validation を閉じ込める。既存の libs/domain/src/ids.rs (entity identity 専用) とは分離する (NonEmptyString の流用はしない)。unit tests 付与 015dd1374a18eac9967c0975c4148448e2671a8e
 
 ## S3 — スキーマ再構成 (T2 相当)
 
@@ -36,7 +36,7 @@ task-coverage.json: spec 4 セクションごとの task_refs を保持する新
 metadata.json: identity-only に縮小 (tasks / plan を削除)
 schema_version 移行戦略は実装者判断 (既存 track 互換対応を含む)
 
-- [ ] libs/domain/src/spec.rs を刷新 (status / approved_at / トップレベル content_hash / 各要素 task_refs を削除、各要素に id: SpecElementId 必須化、現行の sources を adr_refs: Vec<AdrRef> + convention_refs: Vec<ConventionRef> + informal_grounds: Vec<InformalGroundRef> の 3 分割、top-level related_conventions を Vec<ConventionRef> に)。libs/infrastructure/src/spec/codec.rs の serde 更新。spec-signals ツールの入力抽出経路も新 field に合わせて更新 (adr_refs と informal_grounds の signal 合成も含む)。domain + infra の既存 tests を新 schema で書き換え
+- [~] libs/domain/src/spec.rs を刷新 (status / approved_at / トップレベル content_hash / 各要素 task_refs を削除、各要素に id: SpecElementId 必須化、現行の sources を adr_refs: Vec<AdrRef> + convention_refs: Vec<ConventionRef> + informal_grounds: Vec<InformalGroundRef> の 3 分割、top-level related_conventions を Vec<ConventionRef> に)。libs/infrastructure/src/spec/codec.rs の serde 更新。spec-signals ツールの入力抽出経路も新 field に合わせて更新 (adr_refs と informal_grounds の signal 合成も含む)。domain + infra の既存 tests を新 schema で書き換え
 - [ ] libs/domain/ に ImplPlanDocument (schema_version + tasks + plan) と TaskCoverageDocument (4 セクション: in_scope / out_of_scope / constraints / acceptance_criteria の要素ごとの task_refs) を新設。既存 TrackTask / PlanView / PlanSection を流用。libs/infrastructure/ に両 document の codec 新設。unit tests
 - [ ] 型カタログドキュメントに spec_refs: Vec<SpecRef> + informal_grounds: Vec<InformalGroundRef> field を追加。libs/domain/src/track.rs の TrackMetadata から tasks / plan を削除し identity-only 化 (schema migration 戦略は実装者判断、既存 v3 との並立対応を含む)。両方の codec 更新 + tests
 

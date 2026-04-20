@@ -62,22 +62,27 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
 
     let mut findings = Vec::new();
 
+    // goal is now Vec<SpecRequirement>; include goal items alongside scope/constraints/AC.
     let all_reqs = doc
-        .scope()
-        .in_scope()
+        .goal()
         .iter()
+        .chain(doc.scope().in_scope().iter())
         .chain(doc.scope().out_of_scope().iter())
         .chain(doc.constraints().iter())
         .chain(doc.acceptance_criteria().iter());
 
     for req in all_reqs {
-        let has_valid_source =
-            !req.sources().is_empty() && req.sources().iter().any(|s| !s.trim().is_empty());
-        if !has_valid_source {
+        // A requirement is attributed when it carries at least one typed ref
+        // (adr_refs, convention_refs, or informal_grounds per ADR 2026-04-19-1242 §D2.1).
+        let has_attribution = !req.adr_refs().is_empty()
+            || !req.convention_refs().is_empty()
+            || !req.informal_grounds().is_empty();
+        if !has_attribution {
             findings.push(VerifyFinding::error(format!(
-                "{}: requirement missing attribution: \"{}\"",
+                "{}: requirement missing attribution: \"{}\" ({})",
                 spec_json_path.display(),
-                req.text()
+                req.text(),
+                req.id()
             )));
         }
     }
@@ -127,6 +132,21 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
             ))]);
         }
     };
+
+    // Schema v2 spec.md is generated from spec.json and uses typed refs
+    // (adr_refs / convention_refs) instead of [source: ...] tags.
+    // The legacy `### S-` / `### REQ-` heading scan cannot process v2 content.
+    //
+    // Fail closed: if the generated header is present but spec.json is absent
+    // (e.g. manual deletion or spoofed header), return an error rather than a
+    // silent pass. Verification must be performed against spec.json.
+    if content.starts_with("<!-- Generated from spec.json") {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{}: generated v2 spec.md requires a sibling spec.json for attribution verification \
+             (spec.json is absent — restore it or re-generate spec.md from spec.json)",
+            spec_path.display()
+        ))]);
+    }
 
     let mut findings = Vec::new();
     // (fence_char, min_count) — closing fence must use same char, at least as many
@@ -345,32 +365,29 @@ mod tests {
     // --- verify_from_spec_json() tests ---
 
     const SPEC_JSON_ALL_SOURCED: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": {
-    "in_scope": [{ "text": "In scope req", "sources": ["PRD §1"] }],
-    "out_of_scope": [{ "text": "Out of scope req", "sources": ["inference — not needed"] }]
+    "in_scope": [{"id": "IN-01", "text": "In scope req", "adr_refs": [{"file": "adr/x.md", "anchor": "D1"}]}],
+    "out_of_scope": [{"id": "OS-01", "text": "Out of scope req", "informal_grounds": [{"kind": "discussion", "summary": "agreed"}]}]
   },
-  "constraints": [{ "text": "Constraint", "sources": ["convention — hex.md"] }],
-  "acceptance_criteria": [{ "text": "AC item", "sources": ["PRD §4"] }]
+  "constraints": [{"id": "CO-01", "text": "Constraint", "convention_refs": [{"file": "conv/y.md", "anchor": "s1"}]}],
+  "acceptance_criteria": [{"id": "AC-01", "text": "AC item", "adr_refs": [{"file": "adr/x.md", "anchor": "D2"}]}]
 }"#;
 
     const SPEC_JSON_UNSOURCED_REQUIREMENT: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": {
-    "in_scope": [{ "text": "Missing source req", "sources": [] }],
+    "in_scope": [{"id": "IN-01", "text": "Missing attribution req"}],
     "out_of_scope": []
   }
 }"#;
 
     const SPEC_JSON_NO_REQUIREMENTS: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -407,18 +424,17 @@ mod tests {
     fn test_verify_from_spec_json_reports_one_finding_per_unsourced_requirement() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("spec.json");
-        // Two requirements with empty sources
+        // Two requirements with no typed refs (no attribution)
         std::fs::write(
             &path,
             r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": {
     "in_scope": [
-      { "text": "Req A", "sources": [] },
-      { "text": "Req B", "sources": [] }
+      {"id": "IN-01", "text": "Req A"},
+      {"id": "IN-02", "text": "Req B"}
     ],
     "out_of_scope": []
   }
@@ -452,9 +468,9 @@ mod tests {
     #[test]
     fn test_verify_delegates_to_spec_json_when_sibling_exists() {
         let dir = tempfile::tempdir().unwrap();
-        // spec.json with all sourced requirements (passes)
+        // spec.json with all attributed requirements (passes)
         std::fs::write(dir.path().join("spec.json"), SPEC_JSON_ALL_SOURCED).unwrap();
-        // spec.md with unsourced requirement headings (would fail under legacy path)
+        // spec.md with unattributed requirement headings (would fail under legacy path)
         std::fs::write(dir.path().join("spec.md"), "### S-AUTH-01\n### REQ-DATA-01\n").unwrap();
         let outcome = verify(&dir.path().join("spec.md"));
         assert!(
