@@ -14,7 +14,7 @@ CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md に track 前段階 + 3
 SKILL / command / agent (planner, designer) から approved 廃止 + ADR 事前確認 + D1.6 research 配置 convention を反映する
 adr-editor capability の新設は本 track 範囲外 (T7.5 別 track)
 
-- [ ] convention 新設 (knowledge/conventions/workflow-ceremony-minimization.md, knowledge/conventions/pre-track-adr-authoring.md) + CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md に track 前段階 + 3 フェーズ明記 + .claude/skills/track-plan/SKILL.md / .claude/commands/track/plan.md / .claude/commands/track/design.md / .claude/agents/planner.md / .claude/agents/designer.md から approved 廃止 + ADR 事前確認追加 + D1.6 research note 配置 convention を適用
+- [x] convention 新設 (knowledge/conventions/workflow-ceremony-minimization.md, knowledge/conventions/pre-track-adr-authoring.md) + CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md に track 前段階 + 3 フェーズ明記 + .claude/skills/track-plan/SKILL.md / .claude/commands/track/plan.md / .claude/commands/track/design.md / .claude/agents/planner.md / .claude/agents/designer.md から approved 廃止 + ADR 事前確認追加 + D1.6 research note 配置 convention を適用
 
 ## S2 — 新 domain 型の導入 (T2 相当)
 

@@ -19,7 +19,13 @@ const SETTINGS_LOCAL_PATH: &str = ".claude/settings.local.json";
 const PERMISSION_EXTENSIONS_PATH: &str = ".claude/permission-extensions.json";
 const AGENTS_DIR: &str = ".claude/agents";
 
-const REQUIRED_AGENT_FILES: &[&str] = &["review-fix-lead.md", "planner.md", "designer.md"];
+const REQUIRED_AGENT_FILES: &[&str] = &[
+    "review-fix-lead.md",
+    "spec-designer.md",
+    "impl-planner.md",
+    "type-designer.md",
+    "adr-editor.md",
+];
 
 // ---------------------------------------------------------------------------
 // Static regexes (known-valid patterns compiled once)
@@ -318,7 +324,7 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        ".claude/skills/track-plan/SKILL.md",
+        ".claude/commands/track/plan.md",
         "track-plan provider-specific invocation",
         &["Agent tool", "cargo make track-local-plan"],
         &["codex exec --model gpt-5.3-codex --sandbox read-only --full-auto \""],

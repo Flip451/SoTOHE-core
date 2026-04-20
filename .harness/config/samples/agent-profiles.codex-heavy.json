@@ -16,11 +16,19 @@
       "provider": "claude",
       "model": "claude-opus-4-7"
     },
-    "planner": {
+    "spec-designer": {
       "provider": "codex",
       "model": "gpt-5.4"
     },
-    "designer": {
+    "impl-planner": {
+      "provider": "codex",
+      "model": "gpt-5.4"
+    },
+    "type-designer": {
+      "provider": "claude",
+      "model": "claude-opus-4-7"
+    },
+    "adr-editor": {
       "provider": "claude",
       "model": "claude-opus-4-7"
     },

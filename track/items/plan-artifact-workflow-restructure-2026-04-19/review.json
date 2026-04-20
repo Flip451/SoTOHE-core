@@ -1,6 +1,659 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a829f8b452bc4195baca6f168b49d6ab0cb081d2441290b2fa40d697e186bf68",
+          "at": "2026-04-20T14:29:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a829f8b452bc4195baca6f168b49d6ab0cb081d2441290b2fa40d697e186bf68",
+          "at": "2026-04-20T14:32:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
+          "at": "2026-04-20T14:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor.md` is added to `REQUIRED_AGENT_FILES`, but `.claude/agents/adr-editor.md` is not tracked in the diff/index (it only appears as an untracked working-tree file). On a clean checkout of the committed changes, `verify_agent_definitions` will require this file and fail `verify-orchestra-local` unless the agent file is added to the tracked changes or removed from the required list.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 27,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
+          "at": "2026-04-20T14:59:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
+          "at": "2026-04-20T15:02:04Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::render_track_views` would move Markdown/view rendering and file I/O into the usecase layer, which is the wrong boundary for this repository's hexagonal split. The validation step can be shared, but the render pipeline should stay infrastructure-owned; otherwise this TODO would invert the dependency direction instead of just extracting the stale-signal check.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:95d0c68702d8fa4626d6c868b51bac1f460775f0126a396badf0d3abad9c59c1",
+          "at": "2026-04-20T09:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new parenthetical still says the workflow's actual Markdown generation and file write happen \"via infra port\", which is inconsistent with the pure-orchestrator boundary described here and with the existing `contract_map_workflow.rs` pattern. As written, it can mislead implementers into reintroducing the same layer-boundary leak this TODO is trying to remove.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2274103460420d28d54a43cc111c0034f7aa5e00312795467d752db7794a17ed",
+          "at": "2026-04-20T09:07:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:09:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:10:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` now says the default profile assigns `adr-editor` to Claude Code, but the sample profiles in this change only define `orchestrator`, `spec-designer`, `impl-planner`, `type-designer`, `implementer`, `reviewer`, and `researcher`. That leaves the workflow pointing at a capability users cannot select from the documented profiles, so the ADR back-and-forth path is unusable as written.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 40,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
+          "at": "2026-04-20T14:30:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor` is referenced by the new workflow, but this source-of-truth capability map never defines it. On a red Phase 1 signal the orchestrator will try to re-invoke `adr-editor`, and capability resolution will fail before the ADR edit loop can start. The same omission also exists in the three sample profile files.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while many existing docs still point at `.claude/skills/track-plan/SKILL.md`. That turns the documented skill path into a dead link and breaks any workflow that still relies on the skill loader instead of the new command docs.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 1,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
+          "at": "2026-04-20T14:33:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b571d7db40a6245e2d0958e9264a8cc4877622e2a7ba7b88c7f77267b1dc39e5",
+          "at": "2026-04-20T14:38:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:43:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new phased workflow says `/track:plan` now orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. Those are incompatible contracts for the canonical planning command, so agents following this user-facing workflow can execute the obsolete artifact flow instead of the new phased one.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 33,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while live guidance still references `track-plan` as a skill workflow. That turns the documented skill path into a dead link and breaks any workflow that relies on skill discovery instead of only the command docs.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 1,
+              "category": "correctness"
+            },
+            {
+              "message": "The new phased workflow says `/track:plan` orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. These are incompatible contracts for the canonical planning command, so agents can follow the obsolete artifact flow instead of the new phased one.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 33,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:51:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:551d8d1d524282f305fdba449f7fdfe17fcdc4acdc3debde02b821f2bc42c7a9",
+          "at": "2026-04-20T14:55:02Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor` is referenced in the new `/track:plan` back-and-forth flow, but `.harness/config/agent-profiles.json` never declares that capability, so the routing target cannot be resolved.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 14,
+              "category": null
+            },
+            {
+              "message": "`/adr:add` still templates `## Status` with `Accepted | Proposed`, but `knowledge/conventions/pre-track-adr-authoring.md` explicitly forbids `Status`/`approved` fields. The command will generate ADRs that violate the convention it is meant to enforce.",
+              "severity": "P1",
+              "file": ".claude/commands/adr/add.md",
+              "line": 62,
+              "category": null
+            },
+            {
+              "message": "`type-designer.md` still requires `approved: true` on every type entry, which keeps an approval state in the catalogue schema even though the new workflow convention removes ceremonial approval/status fields.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 66,
+              "category": null
+            },
+            {
+              "message": "`/track:design` still lists only 12 `TypeDefinitionKind` variants and omits `secondary_adapter`, while `type-designer.md` now treats the taxonomy as 13 variants. The command and writer no longer agree on the accepted catalogue schema.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 9,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:5c8175ffed0d2aea7ec63f05f97efa239cacaca74728b7a4955f41592491ce39",
+          "at": "2026-04-20T14:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` now routes ADR back-and-forth to `capabilities.adr-editor`, but this repo's capability map does not define an `adr-editor` entry. As written, the new ADR escalation path cannot be resolved, so Phase 1 🔴 cannot actually re-invoke the writer it names.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 151,
+              "category": "consistency"
+            },
+            {
+              "message": "`/adr:add` still requires a `## Status` section with `Accepted` / `Proposed`, but the new pre-track ADR convention explicitly forbids ADR status fields and the ceremony-minimization convention removes artificial `Status` / `approved` state. ADRs created by this command would violate the policy the rest of the refactor is introducing.",
+              "severity": "P1",
+              "file": ".claude/commands/adr/add.md",
+              "line": 33,
+              "category": "consistency"
+            },
+            {
+              "message": "`/track:design` still hard-codes 12 `TypeDefinitionKind` variants and never mentions `secondary_adapter`, while the new `type-designer` agent treats the taxonomy as 13 variants. Phase 2 will not be able to describe or validate `secondary_adapter` entries, so the command and writer now disagree on the accepted catalogue schema.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 9,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:5c8175ffed0d2aea7ec63f05f97efa239cacaca74728b7a4955f41592491ce39",
+          "at": "2026-04-20T14:34:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor` is now part of the orchestration flow, but the agent index never adds an `adr-editor` entry or file the way it does for `spec-designer`, `impl-planner`, and `type-designer`. That leaves the ADR repair loop in `track/plan.md` and `08-orchestration.md` without a custom prompt contract or model pin, so the new back-and-forth path is under-specified.",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 7,
+              "category": "architecture"
+            },
+            {
+              "message": "The language-convention paragraph still cites `## Status` as an example of a valid English section header, but this file and `pre-track-adr-authoring.md` now explicitly remove ADR status fields. That stale example conflicts with the new no-`Status` workflow and can cause freshly authored ADRs to reintroduce the forbidden section.",
+              "severity": "P1",
+              "file": ".claude/commands/adr/add.md",
+              "line": 7,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9b9d7f28770e4eba51bfbc210984599706c182f9de8433e6401078ebec595921",
+          "at": "2026-04-20T14:42:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new 13-kind list includes `secondary_adapter`, but the context step still tells readers to find the taxonomy by grepping `tddd-taxonomy`. That grep only surfaces the older 12-kind ADR, so the instructions for the new kind are never actually loaded.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 37,
+              "category": "consistency"
+            },
+            {
+              "message": "This command now says new ADRs must omit `## Status`, but it still tells the agent to read `knowledge/adr/README.md` as the ADR template. The README template still requires `Status`, so a straightforward read/clone path produces ADRs that violate this command's own convention.",
+              "severity": "P1",
+              "file": ".claude/commands/adr/add.md",
+              "line": 21,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e9dfcceeee8172bdd4cf1a3ca1d8015bfd53bb6edcbae79063b53273be2e2ee1",
+          "at": "2026-04-20T14:45:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `secondary_adapter` kind is introduced earlier in the command, but the canonical declaration checklist still only enumerates `expected_variants`, `transitions_to`, and `expected_methods`, and it explicitly says struct-only variants carry no extra fields. That omits `implements`, so `/track:design` can produce incomplete `secondary_adapter` entries that fail downstream validation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 90,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:f12807adbc01712071e1a692de3d2633e4f641f707ee9b66c9fbbfd4d34aa444",
+          "at": "2026-04-20T14:47:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9855563c34f89f48f5dedc48ec253cb9cb8c2dad9821690e52b6875b500eb265",
+          "at": "2026-04-20T14:50:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new workflow policy says artificial approval state is removed, but `/track:design` still instructs the type-designer to emit `approved: true`, preserve existing `approved` status, and iterate until approved. That keeps generating the approval field this change says is no longer part of track artifacts, leaving the harness-policy docs internally inconsistent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 89,
+              "category": "policy_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9855563c34f89f48f5dedc48ec253cb9cb8c2dad9821690e52b6875b500eb265",
+          "at": "2026-04-20T14:52:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2 is now documented elsewhere as consuming the Phase 1 `spec.json`, and `type-designer.md` declares `track/items/<id>/spec.json` as an input, but `/track:design` still tells the command to read `spec.md` or fall back to `plan.md` instead. That fallback allows type catalogue authoring to proceed without the spec SSoT and can produce entries without reliable `SpecRef` coverage, contradicting the new SoT Chain.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 20,
+              "category": "consistency"
+            },
+            {
+              "message": "The custom Opus-pinned agent list omits the new `.claude/agents/adr-editor.md` even though `agent-profiles.json`, `/track:plan`, and the agent README register `adr-editor` as a Claude subagent. This leaves the ADR back-and-forth capability out of the documented model override path and makes the capability mapping inconsistent.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 8,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:534835765751873e474a9cad11f5c89f871b049633d7cc9e9188aaa02b1ddef9",
+          "at": "2026-04-20T14:58:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 now prefers `spec.json`, but still instructs the agent to read a Markdown `## Related Conventions (Required Reading)` section from the selected artifact. `spec.json` stores this data as `related_conventions[]`, so the preferred path has no such section and can cause the type-design flow to miss required convention inputs unless it falls back to the rendered view despite declaring JSON authoritative. Specify `related_conventions[]` handling for `spec.json`, and use the Markdown heading only for `spec.md` / `plan.md`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 32,
+              "category": "workflow-consistency"
+            },
+            {
+              "message": "The design command still requires presenting the type design to the user for review before writing artifacts. That conflicts with the newly added ceremony-minimization policy and `/track:plan` gate policy, which say artifact generation should use post-hoc review and pre-approval is reserved for irreversible actions. Keeping this pre-write acceptance loop preserves the old approval ceremony for a reversible generated artifact.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 168,
+              "category": "workflow-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:576dc64d1025a1c004b2a7d59812fc1b8382e528f4b61af27c3365ad211c5e61",
+          "at": "2026-04-20T15:05:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` now prefers `spec.json`, but this step still tells the agent to read conventions from a Markdown `## Related Conventions (Required Reading)` section. `spec.json` has a `related_conventions[]` field rather than Markdown headings, so the preferred path can fail to load required conventions whenever `spec.json` exists. The instruction should branch on artifact type and read `related_conventions[]` from JSON.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 32,
+              "category": "infeasible_instruction"
+            },
+            {
+              "message": "The default capability assignment omits `adr-editor` even though the new profile defines it as a Claude capability and the same rule file later includes it in provider resolution. This leaves the top-level routing summary inconsistent with the registry and the new back-and-forth ADR flow.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 9,
+              "category": "capability_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:576dc64d1025a1c004b2a7d59812fc1b8382e528f4b61af27c3365ad211c5e61",
+          "at": "2026-04-20T15:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` now prefers `spec.json`, but this step still instructs the command to read a Markdown `## Related Conventions (Required Reading)` section from the selected artifact. Existing `spec.json` stores this as the `related_conventions` field, so when the preferred JSON SSoT exists the command cannot follow its own convention-loading instruction and may skip required conventions.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 32,
+              "category": "infeasible-instruction"
+            },
+            {
+              "message": "The staged diff adds references to `adr-editor.md`, but `.claude/agents/adr-editor.md` is untracked and absent from `git diff --cached`. If the current patch is committed as staged, these references and the new `adr-editor` capability point at a missing subagent definition.",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 10,
+              "category": "broken-cross-reference"
+            },
+            {
+              "message": "The user workflow still describes `/track:plan` as doing approval confirmation and creating track artifacts only after user approval, which contradicts the new ceremony-minimization convention and the rewritten `/track:plan` post-hoc artifact review flow. This leaves the public guide telling users to follow the removed approval ceremony.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 190,
+              "category": "workflow-inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:576dc64d1025a1c004b2a7d59812fc1b8382e528f4b61af27c3365ad211c5e61",
+          "at": "2026-04-20T15:11:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This convention says `spec.json / 型カタログ / impl-plan` should all cite ADRs directly via `AdrRef`, but the new SoT Chain in `/track:plan` only allows the spec layer to reference ADRs and explicitly forbids `type catalogue → ADR` layer skips. If agents follow this, type catalogues or implementation plans can be authored with forbidden direct ADR references instead of routing through spec/type refs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 19,
+              "category": "consistency"
+            },
+            {
+              "message": "`/track:design` still instructs design-phase artifacts to cite ADRs via `AdrRef`. That conflicts with the Phase 2 contract described in `/track:plan`, where type catalogue entries are evaluated through `spec_refs[]` and direct ADR references are a layer skip.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 39,
+              "category": "consistency"
+            },
+            {
+              "message": "The type-designer output contract allows catalogue `informal_grounds[]` to be promoted to `AdrRef`, which again permits type catalogue entries to bypass the spec layer. Under the new SoT Chain this should be limited to `SpecRef` / appropriate convention refs, with ADR rationale propagated through `spec_refs[]`.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 68,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:3da41075d6a4d49bad15ca0c4580de90ae76c65c9ea470ab94a1de88ab4d4acd",
+          "at": "2026-04-20T15:16:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This convention says `spec.json`, type catalogues, and `impl-plan` all cite ADRs directly through `AdrRef`. That conflicts with the SoT Chain in `/track:plan`, where Phase 2 catalogue entries reference the spec via `spec_refs[]` and `type catalogue → ADR` is explicitly a forbidden layer skip. Agents following this convention can author downstream artifacts with direct ADR refs that the Phase 2 contract does not allow.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 19,
+              "category": "consistency"
+            },
+            {
+              "message": "`/track:design` repeats the forbidden direct ADR path by telling design-phase artifacts to cite an ADR via `SpecRef` / `AdrRef`. The rest of the new plan says the type-contract gate evaluates `spec_refs[]` only and forbids `type catalogue → ADR`, so this command can instruct the type-designer/orchestrator to produce invalid SoT-chain references.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 39,
+              "category": "consistency"
+            },
+            {
+              "message": "The type-designer output contract allows catalogue `informal_grounds[]` to be promoted to `AdrRef`, which lets type catalogue entries bypass the spec layer. Under the new Phase 2 contract, catalogue entries should resolve informal grounds to `SpecRef` or leave them informal until the spec/ADR is updated upstream; otherwise the agent can emit references that `/track:plan` defines as layer skips.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 68,
+              "category": "consistency"
+            },
+            {
+              "message": "The standard flow still starts users at `/track:plan <feature>` and describes the old pre-artifact approval flow, but the new strict workflow requires a pre-track ADR before `/track:plan` and uses post-hoc artifact review. Following this section skips the required ADR authoring/selection step and can hit the new `/track:plan` pre-flight stop.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 189,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:3da41075d6a4d49bad15ca0c4580de90ae76c65c9ea470ab94a1de88ab4d4acd",
+          "at": "2026-04-20T15:22:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor` is added to the documented capability table, but `.claude/agents/adr-editor.md` is untracked and absent from `git diff HEAD` (`git status` shows `??`). If this patch is committed as-is, the new `subagent_type: \"adr-editor\"` references a missing agent definition.",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 10,
+              "category": "consistency"
+            },
+            {
+              "message": "The default capability assignment omits `adr-editor`, even though the same rule later routes `adr-editor` to Claude Code and the profile config defines it. This leaves the agent-facing routing guidance internally inconsistent for the new auto-invoked ADR editor capability.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 9,
+              "category": "consistency"
+            },
+            {
+              "message": "The inserted `## 1.2 Track 前段階 + 3 フェーズ構成` section did not renumber the existing `## 1.2 Project Conventions` section. Later references such as `§1.2` are now ambiguous, so users can be sent to the wrong workflow section.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 152,
+              "category": "cross-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:faf97717dee58a9147aadf88d52566bbdba016aa785d735a6df4f1584df2f095",
+          "at": "2026-04-20T15:27:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` forbids the main orchestrator from directly editing `spec.json` or any type catalogue during back-and-forth and says to re-invoke the original writer, but the new writer agents are explicitly read-only/advisory and state that the orchestrator performs the actual writes (`spec-designer` lines 28 and 89-90, `type-designer` lines 120-123). That leaves no actor authorized to persist Phase 1/2 fixes after a red signal, making the documented loop infeasible. Align the ownership model so either the orchestrator is allowed to apply writer output, or the specialist agents are actual file writers.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 103,
+              "category": "workflow-consistency"
+            },
+            {
+              "message": "The quickstart command table still documents the old flow: `/track:plan` is described as planning only with domain type declaration left to `/track:design`, and as creating track artifacts after approval. The note at line 112 also shows `/track:plan -> approval -> /track:design -> /track:implement`, while the updated workflow later in the same file says `/track:plan` runs ADR pre-check plus Phase 0-3 including `/track:design`, and uses post-hoc artifact review rather than pre-approval. This user-facing guide now gives contradictory instructions for the primary planning path.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 94,
+              "category": "workflow-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:63badd057b2928128b6bfed55a5676bd143749fe902d85830f622e8c05427b6e",
+          "at": "2026-04-20T15:31:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The default profile declares an `adr-editor` Claude capability and the docs route to `subagent_type: \"adr-editor\"`, but `.claude/agents/adr-editor.md` is not tracked by git (`git ls-files` omits it; it is only untracked in this worktree). A committed PR from this diff would leave the runnable profile pointing at a missing custom agent definition.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 31,
+              "category": "broken-reference"
+            },
+            {
+              "message": "This says the main orchestrator re-invokes the writer and then applies the proposal to `knowledge/adr/`, `spec.json`, or catalogues. That contradicts the new ADR convention and `adr-editor` contract, which require `adr-editor` itself to edit ADR files and explicitly forbid main from directly editing `knowledge/adr/*.md`; following this text would violate the writer boundary.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 103,
+              "category": "workflow-inconsistency"
+            },
+            {
+              "message": "The example says a Phase 2 design red signal directly invokes `adr-editor`, while `/track:plan`'s back-and-forth table routes Phase 2 red to `spec-designer` and only escalates to ADR editing if the mismatch propagates upstream. The two instructions give conflicting writer choices for the same failure mode.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 29,
+              "category": "workflow-inconsistency"
+            },
+            {
+              "message": "`/track:design` still instructs agents to read `metadata.json` for task definitions, but the refactor makes Phase 0 metadata identity-only and moves tasks to Phase 3 `impl-plan.json`, which does not exist yet when Phase 2 design runs. This leaves the command asking for unavailable/stale data.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 21,
+              "category": "stale-artifact-model"
+            },
+            {
+              "message": "The orchestration rule's source-of-truth section still models a track around `metadata.json` plus rendered `spec.md`/`plan.md`, omitting the new authoritative artifacts (`spec.json`, `<layer>-types.json`, `impl-plan.json`, and `task-coverage.json`). Agents following this mandatory read list can skip the JSON SSoTs introduced by the refactor.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 18,
+              "category": "stale-artifact-model"
+            }
+          ],
+          "hash": "rvw1:sha256:74e6c4094e9d338ab1c68bfd5ea58ec1e434f814681ad56205b6519734d4565f",
+          "at": "2026-04-20T15:37:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` still requires a pre-write user review loop for generated type catalogues: it says to present the design before writing and iterate until the user accepts it. This contradicts the new ceremony-minimization policy and `/track:plan` gate policy, which restrict pre-approval to irreversible actions and require artifact generation to use post-hoc review of the actual files. Because `/track:plan` routes Phase 2 through `/track:design`, following this command preserves the obsolete pre-approval ceremony for a reversible track artifact.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 171,
+              "category": "workflow_policy"
+            },
+            {
+              "message": "The orchestration rule now defines `spec.json`, `<layer>-types.json`, `impl-plan.json`, and `task-coverage.json` as the Phase 1-3 SSoTs, but the mandatory “Read these first” source-of-truth list still only includes `metadata.json`, rendered `spec.md`/`plan.md`, and `verification.md`. Agents following this rule before planning or implementation can skip the new authoritative JSON artifacts and work from rendered views, undermining the refactor’s SSoT chain.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 28,
+              "category": "workflow_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:0e399c2d1c7b7b82ea88e52fd0f6b34b562f36f229fc805e28c2b68cf143c3a3",
+          "at": "2026-04-20T15:44:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The default capability list omits `adr-editor`, even though this same refactor adds `capabilities.adr-editor` to `.harness/config/agent-profiles.json` and later sections describe `adr-editor` as a default Claude Code capability. This leaves the top-level user guide internally inconsistent about the available/default specialist capabilities for the new back-and-forth ADR workflow.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 26,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b766f858b8ae241cda6f9d2f546215128f80f27db0824a8e42b2d8273a48104c",
+          "at": "2026-04-20T15:48:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DEVELOPER_AI_WORKFLOW.md still describes `/track:design` as declaring only `domain-types.json`/domain types, while the refactored command and new Phase 2 flow now process every TDDD-enabled layer and produce `<layer>-types.json` catalogues. The same domain-only wording is repeated later in the standard flow, so the user-facing workflow remains inconsistent with the new multi-layer type-designer contract.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 95,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:ef038fcb257193688029294b8c30b03c81771bae6e3a7f17518a4ef62b8b59d5",
+          "at": "2026-04-20T15:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8385a2e08c4db896a6f26f5ed0442f2efdba6d2da0fd796c175e2d6137f7e320",
+          "at": "2026-04-20T15:58:42Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -279,54 +932,20 @@
           "findings": [],
           "hash": "rvw1:sha256:eb5f5e79cae4d15ad26f942d3d804af71293449bd8e28e9c62a5fb939154da93",
           "at": "2026-04-20T12:34:16Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::render_track_views` would move Markdown/view rendering and file I/O into the usecase layer, which is the wrong boundary for this repository's hexagonal split. The validation step can be shared, but the render pipeline should stay infrastructure-owned; otherwise this TODO would invert the dependency direction instead of just extracting the stale-signal check.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 856,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:95d0c68702d8fa4626d6c868b51bac1f460775f0126a396badf0d3abad9c59c1",
-          "at": "2026-04-20T09:03:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new parenthetical still says the workflow's actual Markdown generation and file write happen \"via infra port\", which is inconsistent with the pure-orchestrator boundary described here and with the existing `contract_map_workflow.rs` pattern. As written, it can mislead implementers into reintroducing the same layer-boundary leak this TODO is trying to remove.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 856,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:2274103460420d28d54a43cc111c0034f7aa5e00312795467d752db7794a17ed",
-          "at": "2026-04-20T09:07:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
-          "at": "2026-04-20T09:09:20Z"
+          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
+          "at": "2026-04-20T14:29:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
-          "at": "2026-04-20T09:10:53Z"
+          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
+          "at": "2026-04-20T14:31:47Z"
         }
       ]
     }

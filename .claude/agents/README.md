@@ -1,22 +1,26 @@
 # Agent Definitions
 
-`.claude/agents/` には、Claude Code Orchestra で subagent 経由で呼び出される custom agent 定義を置きます。各 agent は `model: opus` frontmatter で Opus を固定し、`CLAUDE_CODE_SUBAGENT_MODEL` env (default: Sonnet) による意図しない Sonnet フォールバックを防ぎます。
+`.claude/agents/` holds the custom subagent definitions that Claude Code Orchestra invokes through `subagent_type`. Each agent pins Opus via `model: opus` frontmatter so that an unintended Sonnet fallback (driven by `CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) never happens.
 
 ## Included Agents
 
-- `planner.md`: architecture design、trait/module planning、trade-off evaluation (`/track:plan` Phase 1.5 / Phase 2)
-- `designer.md`: TDDD catalogue editing — `TypeDefinitionKind` variant 選択と kind-specific fields の author (`/track:design`)
-- `review-fix-lead.md`: スコープ所有型の自律 fix+review ループ実行 (`/track:review`)
+- `spec-designer.md`: authors the behavioral contract (`spec.json`) (`/track:spec` = Phase 1)
+- `impl-planner.md`: authors the implementation plan (`impl-plan.json` + `task-coverage.json`) (`/track:impl-plan` = Phase 3)
+- `type-designer.md`: authors TDDD catalogue entries — picks `TypeDefinitionKind` variants and kind-specific fields (`/track:design` = Phase 2)
+- `adr-editor.md`: edits existing ADRs in the working tree when a downstream SoT Chain signal turns 🔴 (back-and-forth escalation invoked by `/track:plan`; write scope limited to `knowledge/adr/`)
+- `review-fix-lead.md`: runs the autonomous fix+review loop owned by a single review scope (`/track:review`)
 
 ## Capability correspondence
 
-`.harness/config/agent-profiles.json` の各 Claude-provider capability に対応する subagent:
+Subagents aligned with the Claude-provider capabilities in `.harness/config/agent-profiles.json`:
 
 | capability | agent file | invocation |
 |---|---|---|
-| planner | `planner.md` | `subagent_type: "planner"` |
-| designer | `designer.md` | `subagent_type: "designer"` (subagent 化時、通常は main session inline) |
-| orchestrator | — | Claude Code main session 自身が担う (subagent 不要) |
+| spec-designer | `spec-designer.md` | `subagent_type: "spec-designer"` |
+| impl-planner | `impl-planner.md` | `subagent_type: "impl-planner"` |
+| type-designer | `type-designer.md` | `subagent_type: "type-designer"` (available as a subagent; typically runs inline in the main session) |
+| adr-editor | `adr-editor.md` | `subagent_type: "adr-editor"` (auto-invoked by `/track:plan` on 🔴 escalation) |
+| orchestrator | — | handled directly by the Claude Code main session (no subagent needed) |
 | implementer | — | main session or ad-hoc delegation |
-| reviewer | — (provider は codex) | `review-fix-lead.md` がループを所有し Codex CLI を呼ぶ |
-| researcher | — (provider は gemini) | Gemini CLI を main session が直接呼ぶ
+| reviewer | — (provider: codex) | `review-fix-lead.md` owns the loop and invokes Codex CLI |
+| researcher | — (provider: gemini) | Gemini CLI is invoked directly from the main session |

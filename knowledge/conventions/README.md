@@ -62,6 +62,7 @@
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `language-policy.md`: Language Policy Convention
 - `nightly-dev-tool.md`: Nightly Toolchain Dev-Tool Convention
+- `pre-track-adr-authoring.md`: Pre-Track ADR Authoring Convention
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
 - `review-protocol.md`: Review Protocol Convention
 - `security.md`: Security Convention
@@ -69,4 +70,5 @@
 - `source-attribution.md`: Source Attribution Convention
 - `task-completion-flow.md`: Task Completion Flow
 - `typed-deserialization.md`: Typed Deserialization Convention
+- `workflow-ceremony-minimization.md`: Workflow Ceremony Minimization Convention
 <!-- convention-docs:end -->
