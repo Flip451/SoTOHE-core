@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-20T18:33:24Z",
+  "generated_at": "2026-04-20T23:40:35Z",
   "declaration_hash": "79ab4a1090cd5af5fa70294b9ac088db3335cab71a69f4f4bb948de69a5cb6c7",
   "signals": [
     {
@@ -72,14 +72,14 @@
     {
       "type_name": "ImplPlanDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TaskCoverageDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SpecDocument",

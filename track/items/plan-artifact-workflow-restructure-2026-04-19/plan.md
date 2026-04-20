@@ -36,8 +36,8 @@ task-coverage.json: spec 4 セクションごとの task_refs を保持する新
 metadata.json: identity-only に縮小 (tasks / plan を削除)
 schema_version 移行戦略は実装者判断 (既存 track 互換対応を含む)
 
-- [~] libs/domain/src/spec.rs を刷新 (status / approved_at / トップレベル content_hash / 各要素 task_refs を削除、各要素に id: SpecElementId 必須化、現行の sources を adr_refs: Vec<AdrRef> + convention_refs: Vec<ConventionRef> + informal_grounds: Vec<InformalGroundRef> の 3 分割、top-level related_conventions を Vec<ConventionRef> に)。libs/infrastructure/src/spec/codec.rs の serde 更新。spec-signals ツールの入力抽出経路も新 field に合わせて更新 (adr_refs と informal_grounds の signal 合成も含む)。domain + infra の既存 tests を新 schema で書き換え
-- [ ] libs/domain/ に ImplPlanDocument (schema_version + tasks + plan) と TaskCoverageDocument (4 セクション: in_scope / out_of_scope / constraints / acceptance_criteria の要素ごとの task_refs) を新設。既存 TrackTask / PlanView / PlanSection を流用。libs/infrastructure/ に両 document の codec 新設。unit tests
+- [x] libs/domain/src/spec.rs を刷新 (status / approved_at / トップレベル content_hash / 各要素 task_refs を削除、各要素に id: SpecElementId 必須化、現行の sources を adr_refs: Vec<AdrRef> + convention_refs: Vec<ConventionRef> + informal_grounds: Vec<InformalGroundRef> の 3 分割、top-level related_conventions を Vec<ConventionRef> に)。libs/infrastructure/src/spec/codec.rs の serde 更新。spec-signals ツールの入力抽出経路も新 field に合わせて更新 (adr_refs と informal_grounds の signal 合成も含む)。domain + infra の既存 tests を新 schema で書き換え 6774e9f587e4d48df8a38e611027431c7c828bb7
+- [~] libs/domain/ に ImplPlanDocument (schema_version + tasks + plan) と TaskCoverageDocument (4 セクション: in_scope / out_of_scope / constraints / acceptance_criteria の要素ごとの task_refs) を新設。既存 TrackTask / PlanView / PlanSection を流用。libs/infrastructure/ に両 document の codec 新設。unit tests
 - [ ] 型カタログドキュメントに spec_refs: Vec<SpecRef> + informal_grounds: Vec<InformalGroundRef> field を追加。libs/domain/src/track.rs の TrackMetadata から tasks / plan を削除し identity-only 化 (schema migration 戦略は実装者判断、既存 v3 との並立対応を含む)。両方の codec 更新 + tests
 
 ## S4 — verify / gate 移行 (T2 相当)

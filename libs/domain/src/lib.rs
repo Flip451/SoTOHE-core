@@ -8,6 +8,7 @@ pub mod git_ref;
 pub mod guard;
 pub mod hook;
 mod ids;
+pub mod impl_plan;
 mod plan;
 pub mod plan_ref;
 mod repository;
@@ -16,6 +17,7 @@ pub mod schema;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
+pub mod task_coverage;
 pub mod tddd;
 mod timestamp;
 mod track;
@@ -29,6 +31,7 @@ pub use error::{
 };
 pub use git_ref::{RefValidationError, validate_branch_ref};
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
+pub use impl_plan::{IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument};
 pub use plan::{PlanSection, PlanView};
 pub use plan_ref::{
     AdrAnchor, AdrRef, ContentHash, ConventionAnchor, ConventionRef, InformalGroundKind,
@@ -45,6 +48,7 @@ pub use spec::{
     SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecValidationError,
     check_spec_doc_signals, evaluate_requirement_signal,
 };
+pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
     MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,

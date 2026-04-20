@@ -20,8 +20,8 @@
 | ConventionRef | value_object | — | — | 🔵 |
 | SpecRef | value_object | — | — | 🔵 |
 | InformalGroundRef | value_object | — | — | 🔵 |
-| ImplPlanDocument | value_object | — | — | 🟡 |
-| TaskCoverageDocument | value_object | — | — | 🟡 |
+| ImplPlanDocument | value_object | — | — | 🔵 |
+| TaskCoverageDocument | value_object | — | — | 🔵 |
 | SpecDocument | value_object | modify | — | 🔵 |
 | SpecRequirement | value_object | modify | — | 🔵 |
 | TrackMetadata | value_object | modify | — | 🔵 |

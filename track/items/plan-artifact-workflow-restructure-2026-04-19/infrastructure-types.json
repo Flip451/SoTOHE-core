@@ -3,7 +3,7 @@
   "type_definitions": [
     {
       "name": "ImplPlanDocumentDto",
-      "description": "Infrastructure serde DTO for `impl-plan.json`. Mirrors domain::ImplPlanDocument (`schema_version + tasks + plan`) with 1:1 field naming, following the same pattern as track/codec.rs::TrackDocumentV2. Existing `PlanDocument`, `PlanSectionDocument`, and `TrackTaskDocument` DTOs from track/codec.rs are reused for the `plan` / `tasks` fields. Introduced by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "description": "Infrastructure serde DTO for `impl-plan.json`. Mirrors domain::ImplPlanDocument (`schema_version + tasks + plan`) with 1:1 field naming, following the same pattern as track/codec.rs::TrackDocumentV2. The `tasks` field uses `Vec<ImplPlanTaskDto>` and the `plan` field uses `ImplPlanPlanDto` (which wraps `Vec<ImplPlanSectionDto>`); these codec-local DTOs are introduced alongside this type rather than reusing `PlanDocument`/`PlanSectionDocument`/`TrackTaskDocument` from track/codec.rs, so that `deny_unknown_fields` is enforced at every nesting level. Introduced by ADR 2026-04-19-1242 §D1.4 / T004.",
       "approved": true,
       "kind": "dto"
     },
@@ -69,6 +69,24 @@
         "InvalidField",
         "DomainValidation"
       ]
+    },
+    {
+      "name": "ImplPlanTaskDto",
+      "description": "Nested DTO representing a single task inside `impl-plan.json`. Introduced by T004 (alongside ImplPlanDocumentDto) as a codec-local type rather than reusing `track::codec::TrackTaskDocument` so that `deny_unknown_fields` is enforced at this nesting level. Mirrors the domain `TrackTask` shape (id, description, status, optional commit_hash).",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "ImplPlanPlanDto",
+      "description": "Nested DTO for the `plan` field of `impl-plan.json`. Introduced by T004 alongside ImplPlanDocumentDto to obtain a codec-local `deny_unknown_fields` contract that the track codec's `PlanDocument` does not provide. Wraps an optional summary list and a section vector of ImplPlanSectionDto.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "ImplPlanSectionDto",
+      "description": "Nested DTO for a single plan section inside `impl-plan.json`. Introduced by T004 alongside ImplPlanDocumentDto / ImplPlanPlanDto to propagate `deny_unknown_fields` through the whole impl-plan object tree. Mirrors `domain::PlanSection` (id, title, optional description bullets, task ids).",
+      "approved": true,
+      "kind": "dto"
     }
   ]
 }

@@ -1,31 +1,41 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-20T18:33:25Z",
-  "declaration_hash": "d933b12a3b4e57e3470036f8972550d7f01344531b23743e86ca3bafba1fc6f5",
+  "generated_at": "2026-04-20T23:40:36Z",
+  "declaration_hash": "8fedf64bc8318737befbd109be3d44624198353847caeccf6a410752c0b9e53e",
   "signals": [
     {
       "type_name": "ImplPlanDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ImplPlanCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ]
     },
     {
       "type_name": "TaskCoverageDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TaskCoverageCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ]
     },
     {
       "type_name": "PlanArtifactRefsError",
@@ -51,6 +61,24 @@
         "InvalidField",
         "DomainValidation"
       ]
+    },
+    {
+      "type_name": "ImplPlanTaskDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplPlanPlanDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplPlanSectionDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

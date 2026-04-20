@@ -66,6 +66,8 @@ pub enum ValidationError {
     TaskDescriptionMutated { task_id: String },
     #[error("task '{task_id}' was removed; existing tasks cannot be deleted via save")]
     TaskRemoved { task_id: String },
+    #[error("duplicate spec element id '{0}' — ids must be unique across all sections")]
+    DuplicateElementId(String),
     #[error(
         "layer id '{0}' must be a non-empty ASCII identifier starting with a letter \
          (allowed: letters, digits, `_`, `-`)"

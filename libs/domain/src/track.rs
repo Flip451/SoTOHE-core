@@ -569,7 +569,10 @@ impl TrackMetadata {
     }
 }
 
-fn validate_plan_invariants(tasks: &[TrackTask], plan: &PlanView) -> Result<(), ValidationError> {
+pub(crate) fn validate_plan_invariants(
+    tasks: &[TrackTask],
+    plan: &PlanView,
+) -> Result<(), ValidationError> {
     let mut task_ids = HashSet::new();
     for task in tasks {
         if !task_ids.insert(task.id().clone()) {
