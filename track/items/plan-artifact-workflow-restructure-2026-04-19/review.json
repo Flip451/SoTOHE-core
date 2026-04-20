@@ -1,0 +1,216 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.1 says the ADR must not contain full trait/struct/method specifications, but D2.1 immediately embeds concrete Rust struct definitions for `SpecElementId`, `AdrAnchor`, `ConventionAnchor`, `ContentHash`, and the three ref types. That makes the ADR internally inconsistent about how much type detail it is allowed to spell out.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 243,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SpecElementId` is only validated as a non-empty string in the task/verification text, but the ADR already fixes an ID naming convention (`IN-\\d+`, `AC-\\d+`, etc.). As written, the implementation can accept arbitrary ids, which weakens `SpecRef.anchor` and the new spec-element identity scheme.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/metadata.json",
+              "line": 18,
+              "category": "factual error"
+            },
+            {
+              "message": "The scope for T001/verification includes `track/workflow.md`, but the ADR rollout section only names `CLAUDE.md` and `DEVELOPER_AI_WORKFLOW.md`. That leaves one of the declared in-scope docs outside the ADR's own migration plan, so the file set is inconsistent across the documents.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8abadeeaa232f4220d6d16d5e33bc6a94feedb03fd197d93cf22ccecddb89390",
+          "at": "2026-04-20T09:05:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:09:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.5 permits type catalogues to reference conventions, but the concrete ref schema only places `ConventionRef` on spec.json fields and D3.2 later says catalogues have no convention reference field at all. That gives implementers conflicting requirements: either catalogue entries need a `convention_refs` field and validator coverage, or the D1.5 permission must be removed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 322,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR lists `track/items/review-scope-prompt-injection-2026-04-18/review.json` as an observed-data reference, while the same ADR later forbids ADRs and new tracks from directly referencing track-internal artifacts to preserve lifecycle boundaries. The document should either move/summarize that evidence into a track-crossing artifact or define an explicit exception for historical observation data.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 40,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2.3 says canonical-block detection implementation details are in Q15, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields; Q14 is the canonical-block section. This broken reference points the T011/CLI implementation at the wrong design question.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 426,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:13:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D0.1 says any 🔴/🟡 SoT signal must trigger repair of the next upstream layer, but D3.1 and the /track:plan flow later define 🟡 as allowable and continue to the next phase. Implementers cannot satisfy both semantics: the orchestrator either loops on yellow or records a warning and proceeds.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 196,
+              "category": "contradiction"
+            },
+            {
+              "message": "The merge gate only requires task-coverage.json to cover all acceptance_criteria, while D1.4 defines coverage enforcement as covering both in_scope and acceptance_criteria. This weakens the final PR requirement relative to the task-coverage gate and leaves two conflicting definitions of what coverage is required for merge.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 535,
+              "category": "contradiction"
+            },
+            {
+              "message": "D4 says writers/capabilities must not span multiple phases, but the ownership table assigns the planner to both Phase 1 (/track:spec) and Phase 3 (/track:impl-plan). Since D1.4 also says the planner writes spec in Phase 1 and impl-plan/task-coverage in Phase 3, the writer-boundary rule cannot be enforced as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 487,
+              "category": "contradiction"
+            },
+            {
+              "message": "The canonical-block warning bullet points implementers to Q15 for details, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields. The canonical-block unresolved decision is Q14, so this is a self-evidently wrong cross-reference.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 426,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.5 allows type catalog entries to reference conventions, but D3.2 says type catalogs have no convention reference field at all. D2.2 also lists `ConventionRef` use sites only for spec.json, so implementers cannot tell whether catalog `convention_refs` must exist and be verified or whether type-catalog-to-convention references are actually forbidden. This is a schema-level contradiction in the SoT reference policy.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 455,
+              "category": "contradiction"
+            },
+            {
+              "message": "The phase matrix still defines `Phase 3 完了` as `task-coverage.json` covering only all acceptance criteria and says merge is OK when SoT signals are blue. That conflicts with the stricter gate defined earlier: task coverage must cover both `in_scope` and `acceptance_criteria` with referential integrity, and final merge also requires every impl-plan task to be resolved. As written, this table can drive an implementation that permits a final merge with uncovered in-scope items or unresolved tasks.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 550,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0774f414a2616b26e59c28730480b536a14773ad27a110a642b0a7a1d3c69e92",
+          "at": "2026-04-20T09:22:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a155cc1561bd4e9e586e9acd3bf717214e1991ea7d1840587d7b7049d24ecd94",
+          "at": "2026-04-20T09:27:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This acceptance criterion is not satisfiable as written: it requires `informal_grounds[]` on type-catalogue entries to emit 🟡, but ADR D3.2 explicitly defers catalogue-side signal evaluation to a later ADR and only keeps the schema presence check in this scope. With only T003/T005 in scope, the track cannot meet this criterion unless you either narrow it to spec-side only or add a follow-on task for catalogue-side signal implementation.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+              "line": 330,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:79a678b08fa4600d451ea7c05b4a123f1a02d3a23af5340fa4dd4f8d5e752272",
+          "at": "2026-04-20T10:57:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
+          "at": "2026-04-20T11:01:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
+          "at": "2026-04-20T11:04:38Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::render_track_views` would move Markdown/view rendering and file I/O into the usecase layer, which is the wrong boundary for this repository's hexagonal split. The validation step can be shared, but the render pipeline should stay infrastructure-owned; otherwise this TODO would invert the dependency direction instead of just extracting the stale-signal check.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:95d0c68702d8fa4626d6c868b51bac1f460775f0126a396badf0d3abad9c59c1",
+          "at": "2026-04-20T09:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new parenthetical still says the workflow's actual Markdown generation and file write happen \"via infra port\", which is inconsistent with the pure-orchestrator boundary described here and with the existing `contract_map_workflow.rs` pattern. As written, it can mislead implementers into reintroducing the same layer-boundary leak this TODO is trying to remove.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2274103460420d28d54a43cc111c0034f7aa5e00312795467d752db7794a17ed",
+          "at": "2026-04-20T09:07:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:09:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:10:53Z"
+        }
+      ]
+    }
+  }
+}
