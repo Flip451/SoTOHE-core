@@ -612,14 +612,14 @@ fn activation_rejects_invalid_source_branch(
     }
 }
 
-pub(super) fn uses_legacy_branch_mode(mode: BranchMode, schema_version: u32) -> bool {
-    // Only v4 (identity-only, post-T005) is a supported first-class schema
-    // for new activation flows. Any earlier schema (v1 / v2 / v3) is
-    // frozen history — no backward-compat path exists for them. A non-v4
-    // schema with a non-Auto branch mode falls through to the legacy
-    // branch-mode handler, which reports the unsupported schema rather
-    // than silently materializing metadata for an obsolete shape.
-    schema_version != 4 && !matches!(mode, BranchMode::Auto)
+pub(super) fn uses_legacy_branch_mode(_mode: BranchMode, _schema_version: u32) -> bool {
+    // The legacy branch-mode path is retired. Post-T005 the only supported
+    // metadata schema is v4 (identity-only); legacy schemas (v1 / v2 / v3)
+    // are frozen history and have no backward-compat route. All branch ops
+    // — regardless of mode or schema — flow through the full activation
+    // path, which materializes metadata properly and fails explicitly on an
+    // unsupported schema rather than silently succeeding with stale state.
+    false
 }
 
 /// Fetches dirty worktree paths via git, delegating parsing to the usecase layer.
@@ -1007,21 +1007,19 @@ mod tests {
     }
 
     #[rstest]
-    #[case::create_v2(BranchMode::Create, 2, true)]
-    #[case::switch_v2(BranchMode::Switch, 2, true)]
-    #[case::auto_v2(BranchMode::Auto, 2, false)]
-    #[case::create_v3(BranchMode::Create, 3, true)]
-    #[case::switch_v3(BranchMode::Switch, 3, true)]
-    #[case::auto_v3(BranchMode::Auto, 3, false)]
-    #[case::create_v4(BranchMode::Create, 4, false)]
-    #[case::switch_v4(BranchMode::Switch, 4, false)]
-    #[case::auto_v4(BranchMode::Auto, 4, false)]
-    fn uses_legacy_branch_mode_only_for_non_auto_non_v4_paths(
-        #[case] mode: BranchMode,
-        #[case] schema_version: u32,
-        #[case] expected: bool,
-    ) {
-        assert_eq!(uses_legacy_branch_mode(mode, schema_version), expected);
+    #[case::create_v2(BranchMode::Create, 2)]
+    #[case::switch_v2(BranchMode::Switch, 2)]
+    #[case::auto_v2(BranchMode::Auto, 2)]
+    #[case::create_v3(BranchMode::Create, 3)]
+    #[case::switch_v3(BranchMode::Switch, 3)]
+    #[case::create_v4(BranchMode::Create, 4)]
+    #[case::switch_v4(BranchMode::Switch, 4)]
+    #[case::auto_v4(BranchMode::Auto, 4)]
+    fn uses_legacy_branch_mode_is_retired(#[case] mode: BranchMode, #[case] schema_version: u32) {
+        assert!(
+            !uses_legacy_branch_mode(mode, schema_version),
+            "legacy branch-mode dispatch is retired; all ops must flow through the activation path"
+        );
     }
 
     #[rstest]

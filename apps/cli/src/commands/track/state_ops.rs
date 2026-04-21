@@ -139,14 +139,23 @@ pub(super) fn execute_next_task(
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     // Validate the track exists before proceeding; propagate read/not-found errors.
-    read_track_metadata(&items_dir, &valid_id)
+    let (track, _meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|err| CliError::Message(format!("next-task failed: {err}")))?;
 
-    // Load impl-plan.json. When absent (planning-only track), report no open tasks.
+    // Load impl-plan.json. Missing on an activated track is a corruption
+    // state — fail closed. Missing on a planning-only track is valid and
+    // reports "no open task".
     let store = FsTrackStore::new(items_dir);
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|err| CliError::Message(format!("next-task failed reading impl-plan: {err}")))?;
+
+    if impl_plan.is_none() && (track.branch().is_some() || track.status() != TrackStatus::Planned) {
+        return Err(CliError::Message(format!(
+            "next-task: activated track '{valid_id}' is missing impl-plan.json; \
+             refusing to report no-open-task for a potentially corrupt track state"
+        )));
+    }
 
     match impl_plan.as_ref().and_then(|doc| doc.next_open_task()) {
         Some(task) => {
@@ -178,10 +187,10 @@ pub(super) fn execute_task_counts(
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     // Validate the track exists before proceeding; propagate read/not-found errors.
-    read_track_metadata(&items_dir, &valid_id)
+    let (track, _meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|err| CliError::Message(format!("task-counts failed: {err}")))?;
 
-    // Load impl-plan.json. When absent, all counts are zero (planning-only track).
+    // Load impl-plan.json.
     let store = FsTrackStore::new(items_dir);
     let impl_plan = store
         .load_impl_plan(&valid_id)
@@ -203,7 +212,20 @@ pub(super) fn execute_task_counts(
                 doc.tasks().iter().filter(|t| t.status().kind() == TaskStatusKind::Skipped).count();
             (total, todo, in_progress, done, skipped)
         }
-        None => (0, 0, 0, 0, 0),
+        None => {
+            // Only planning-only tracks (no branch, status still Planned) may
+            // have no impl-plan.json. An activated track (branch is Some, or
+            // status has moved past Planned) missing its impl-plan is a
+            // corruption state — fail closed so automation / operators are
+            // not told "0 tasks" when work may actually be outstanding.
+            if track.branch().is_some() || track.status() != TrackStatus::Planned {
+                return Err(CliError::Message(format!(
+                    "task-counts: activated track '{valid_id}' is missing impl-plan.json; \
+                     refusing to report zero counts for a potentially corrupt track state"
+                )));
+            }
+            (0, 0, 0, 0, 0)
+        }
     };
 
     println!(
@@ -322,13 +344,17 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_next_task_with_no_impl_plan() {
-        // When impl-plan.json is absent, next-task outputs JSON null payload and succeeds.
+    fn test_execute_next_task_with_no_impl_plan_on_activated_track_errors() {
+        // An activated track (branch set, status != planned) missing impl-plan.json is a
+        // corruption state. The command fails closed rather than reporting no-open-task.
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         let result = execute_next_task(items_dir, "test-track".to_string());
-        assert!(result.is_ok(), "expected Ok when no impl-plan.json: {result:?}");
+        assert!(result.is_err(), "expected Err on activated track without impl-plan.json");
+        if let Err(CliError::Message(msg)) = result {
+            assert!(msg.contains("missing impl-plan.json"), "message: {msg}");
+        }
     }
 
     #[test]
@@ -342,13 +368,45 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_task_counts_with_no_impl_plan() {
-        // When impl-plan.json is absent, task-counts prints zeros and succeeds.
+    fn test_execute_task_counts_with_no_impl_plan_on_activated_track_errors() {
+        // Same fail-closed behavior as next-task: activated track missing impl-plan.json
+        // → error rather than silently reporting zero counts.
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         let result = execute_task_counts(items_dir, "test-track".to_string());
-        assert!(result.is_ok(), "expected Ok when no impl-plan.json: {result:?}");
+        assert!(result.is_err(), "expected Err on activated track without impl-plan.json");
+        if let Err(CliError::Message(msg)) = result {
+            assert!(msg.contains("missing impl-plan.json"), "message: {msg}");
+        }
+    }
+
+    #[test]
+    fn test_execute_task_counts_with_no_impl_plan_on_planning_only_track_succeeds() {
+        // A planning-only track (no branch, status: planned) legitimately has no
+        // impl-plan.json; the command reports zeros without erroring.
+        let tmp = tempfile::tempdir().unwrap();
+        let track_id = "planning-only";
+        let track_dir = tmp.path().join("track").join("items").join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        let metadata = format!(
+            r#"{{
+  "schema_version": 4,
+  "id": "{track_id}",
+  "title": "Planning Only",
+  "status": "planned",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z"
+}}"#
+        );
+        fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
+        let items_dir = tmp.path().join("track").join("items");
+
+        let result = execute_task_counts(items_dir, track_id.to_string());
+        assert!(
+            result.is_ok(),
+            "planning-only track without impl-plan.json must succeed with zero counts: {result:?}"
+        );
     }
 
     #[test]
