@@ -52,12 +52,13 @@
     {
       "id": "T009",
       "description": "Makefile.toml から cargo make spec-approve タスクを削除し、関連する apps/cli/src/commands/ の spec approve コマンドを廃止。spec-signals ツールおよび spec schema 参照コードから status / approved_at / content_hash 関連の依存を除去。tests 整理",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "93a3cc429b42e67055246dc521f465dd8c51d22a"
     },
     {
       "id": "T010",
       "description": "apps/cli/src/commands/verify/plan_artifact_refs.rs を新設し sotp verify plan-artifact-refs subcommand として公開。各 ref field (adr_refs / convention_refs / spec_refs / related_conventions / informal_grounds) の走査、schema validation、file 存在チェック (file ベース ref のみ)、SpecRef.anchor 解決 (spec 要素 id lookup)、SpecRef.hash 照合 (canonical JSON subtree SHA-256)、AdrAnchor / ConventionAnchor の newtype loose validation、InformalGroundRef の newtype validation (kind variant / summary 非空、file resolution なし) を実装。unit + integration tests",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T011",

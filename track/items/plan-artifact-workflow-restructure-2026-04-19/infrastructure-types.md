@@ -6,7 +6,7 @@
 |------|------|--------|---------|--------|
 | ImplPlanCodecError | error_type | — | Json, UnsupportedSchemaVersion, Validation | 🔵 |
 | TaskCoverageCodecError | error_type | — | Json, UnsupportedSchemaVersion, Validation | 🔵 |
-| PlanArtifactRefsError | error_type | — | Json, Io, UnresolvedSpecRef, SpecHashMismatch, InvalidAnchor, CoverageViolation | 🟡 |
+| PlanArtifactRefsError | error_type | — | Json, Io, UnresolvedSpecRef, SpecHashMismatch, InvalidAnchor, CoverageViolation | 🔵 |
 | SpecCodecError | error_type | modify | Json, Validation, UnsupportedSchemaVersion, InvalidField, DomainValidation | 🔵 |
 
 ## DTOs

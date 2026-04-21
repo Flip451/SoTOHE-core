@@ -16,6 +16,7 @@ pub mod layers;
 pub mod merge_gate_adapter;
 pub mod module_size;
 pub mod orchestra;
+pub mod plan_artifact_refs;
 pub mod spec_attribution;
 pub mod spec_coverage;
 pub mod spec_frontmatter;

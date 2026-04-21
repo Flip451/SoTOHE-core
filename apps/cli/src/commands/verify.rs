@@ -65,6 +65,9 @@ pub enum VerifyCommand {
     SpecCoverage(SpecCoverageArgs),
     /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
     SpecCodeConsistency(SpecCodeConsistencyArgs),
+    /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
+    /// introduced in T002 / T003 / T005 per ADR 2026-04-19-1242 §D2.3.
+    PlanArtifactRefs(PlanArtifactRefsArgs),
 }
 
 /// Arguments for spec-coverage verify subcommand.
@@ -72,6 +75,15 @@ pub enum VerifyCommand {
 pub struct SpecCoverageArgs {
     /// Path to the track directory (e.g., track/items/<id>).
     /// If not provided, the command is a no-op (pass).
+    #[arg(long)]
+    track_dir: Option<PathBuf>,
+}
+
+/// Arguments for plan-artifact-refs verify subcommand.
+#[derive(Args)]
+pub struct PlanArtifactRefsArgs {
+    /// Path to the track directory (e.g., track/items/<id>).
+    /// When omitted, the active track is resolved from the current branch name.
     #[arg(long)]
     track_dir: Option<PathBuf>,
 }
@@ -192,6 +204,9 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         }
         VerifyCommand::SpecCodeConsistency(args) => {
             ("verify spec-code consistency", execute_spec_code_consistency(args))
+        }
+        VerifyCommand::PlanArtifactRefs(args) => {
+            ("verify plan artifact refs", execute_plan_artifact_refs(args))
         }
     };
 
@@ -442,6 +457,52 @@ fn print_consistency_report_json(report: &domain::ConsistencyReport) {
         "delete_errors": report.delete_errors(),
     });
     println!("{output}");
+}
+
+/// Execute plan-artifact-refs verification.
+///
+/// Resolves the track directory from args or falls back to the active branch.
+/// When neither `--track-dir` is given nor an active track branch can be
+/// detected, surfaces a finding rather than silently passing, so that CI
+/// invocations on unexpected branches fail closed instead of hiding missing
+/// plan-artifact coverage.
+fn execute_plan_artifact_refs(args: PlanArtifactRefsArgs) -> VerifyOutcome {
+    match &args.track_dir {
+        Some(dir) if dir.is_dir() => infrastructure::verify::plan_artifact_refs::verify(dir),
+        Some(dir) => VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+            format!("Track directory does not exist: {}", dir.display()),
+        )]),
+        None => match resolve_active_track_dir() {
+            Some(dir) => infrastructure::verify::plan_artifact_refs::verify(&dir),
+            None => VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                "Cannot resolve active track directory: not on a track/* branch or directory does \
+                 not exist. Use --track-dir <PATH> to specify the track directory explicitly."
+                    .to_owned(),
+            )]),
+        },
+    }
+}
+
+/// Resolve the active track directory from the current git branch name.
+///
+/// Accepts both `track/<id>` and `plan/<id>` branches (the canonical
+/// `resolve_track_or_plan_id_from_branch` helper is reused so the branch
+/// detection logic stays in one place). The returned path is anchored to the
+/// repo root discovered via `SystemGitRepo::discover`, so this function works
+/// correctly regardless of which subdirectory the process is invoked from.
+///
+/// Returns `None` when:
+/// - Not inside a git repository
+/// - Not on a `track/*` or `plan/*` branch (including detached HEAD / main)
+/// - The resolved `track/items/<id>` directory does not exist on disk
+fn resolve_active_track_dir() -> Option<std::path::PathBuf> {
+    use infrastructure::git_cli::GitRepository as _;
+    let repo = infrastructure::git_cli::SystemGitRepo::discover().ok()?;
+    let branch = repo.current_branch().ok()??;
+    let track_id =
+        usecase::track_resolution::resolve_track_or_plan_id_from_branch(Some(&branch)).ok()?;
+    let track_dir = repo.root().join("track/items").join(&track_id);
+    if track_dir.is_dir() { Some(track_dir) } else { None }
 }
 
 /// Combine architecture_rules + doc_patterns + convention_docs checks.
@@ -1161,5 +1222,83 @@ mod tests {
         assert!(outcome.findings().is_empty(), "empty report must produce zero findings");
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::SUCCESS, "empty report must exit 0");
+    }
+
+    // --- plan-artifact-refs CLI wiring ---
+
+    #[test]
+    fn test_plan_artifact_refs_clap_parses_track_dir_flag() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "plan-artifact-refs",
+            "--track-dir",
+            "track/items/my-track",
+        ])
+        .unwrap();
+        match cli.cmd {
+            VerifyCommand::PlanArtifactRefs(args) => {
+                assert_eq!(
+                    args.track_dir.as_deref(),
+                    Some(std::path::Path::new("track/items/my-track")),
+                    "--track-dir must be parsed correctly"
+                );
+            }
+            _ => panic!("expected PlanArtifactRefs variant"),
+        }
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_clap_omitted_track_dir_is_none() {
+        let cli = TestCli::try_parse_from(["sotp", "plan-artifact-refs"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::PlanArtifactRefs(args) => {
+                assert!(args.track_dir.is_none(), "--track-dir must default to None");
+            }
+            _ => panic!("expected PlanArtifactRefs variant"),
+        }
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_explicit_valid_dir_with_no_spec_json_returns_success() {
+        // A track directory without spec.json is a valid pre-Phase-1 track;
+        // plan_artifact_refs::verify treats it as a no-op pass.
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join("track/items/test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        // No spec.json → verify passes immediately.
+        let exit = execute(VerifyCommand::PlanArtifactRefs(PlanArtifactRefsArgs {
+            track_dir: Some(track_dir),
+        }));
+        assert_eq!(exit, ExitCode::SUCCESS, "track dir without spec.json must pass");
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_explicit_missing_dir_returns_failure() {
+        // An explicitly supplied --track-dir that does not exist on disk must
+        // produce an error finding and exit with failure.
+        let tmp = TempDir::new().unwrap();
+        let missing_dir = tmp.path().join("track/items/nonexistent");
+        // Do NOT create the directory.
+        let exit = execute(VerifyCommand::PlanArtifactRefs(PlanArtifactRefsArgs {
+            track_dir: Some(missing_dir),
+        }));
+        assert_eq!(exit, ExitCode::FAILURE, "missing track dir must fail");
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_omitted_track_dir_returns_non_panic_outcome() {
+        // With `--track-dir` omitted, `resolve_active_track_dir` runs.
+        // This test exercises the branch-resolution path:
+        // - On a `track/*` or `plan/*` branch with an existing items dir → runs verify (may pass
+        //   or fail based on the real repo state, but must not panic).
+        // - On any other branch / git failure → returns an error finding with ExitCode::FAILURE.
+        // The important invariant is that NO panic occurs and the exit code is deterministic.
+        let exit =
+            execute(VerifyCommand::PlanArtifactRefs(PlanArtifactRefsArgs { track_dir: None }));
+        // We accept either outcome; the key contract is no panic.
+        assert!(
+            exit == ExitCode::SUCCESS || exit == ExitCode::FAILURE,
+            "omitted track_dir must produce a deterministic exit code without panicking"
+        );
     }
 }

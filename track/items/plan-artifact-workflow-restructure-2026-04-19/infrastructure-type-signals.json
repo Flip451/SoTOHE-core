@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-21T07:02:01Z",
+  "generated_at": "2026-04-21T08:40:53Z",
   "declaration_hash": "bd73daf845dc9fe896deaf4bdc04ed502e255007bc4e9e64ba8e023ac28a7e6d",
   "signals": [
     {
@@ -40,8 +40,16 @@
     {
       "type_name": "PlanArtifactRefsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "Io",
+        "UnresolvedSpecRef",
+        "SpecHashMismatch",
+        "InvalidAnchor",
+        "CoverageViolation"
+      ]
     },
     {
       "type_name": "TrackDocumentV2",
