@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-21T12:31:32Z",
-  "declaration_hash": "2c31ff374e523a59004d643fdf431f0ec45bb7b5e86f08e9618498640ed1ab47",
+  "generated_at": "2026-04-21T23:52:58Z",
+  "declaration_hash": "3bd21c2eaf99d0b76f3538dd5ccd3b3f19dc062b7badd1e5dfb7d5c2faaab909",
   "signals": [
     {
       "type_name": "SpecElementId",
@@ -143,6 +143,15 @@
       "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "ImplPlanPresenceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "MissingForActivatedTrack"
+      ]
     },
     {
       "type_name": "TypeCatalogueEntry",

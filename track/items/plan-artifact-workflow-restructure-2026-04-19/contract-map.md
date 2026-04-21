@@ -24,6 +24,7 @@ flowchart LR
         L6_domain_ImplPlanReader[[ImplPlanReader]]
         L6_domain_ImplPlanWriter[[ImplPlanWriter]]
         L6_domain_TrackMetadata(TrackMetadata)
+        L6_domain_ImplPlanPresenceError>ImplPlanPresenceError]
         L6_domain_TypeCatalogueEntry(TypeCatalogueEntry)
         L6_domain_SpecStatus{{SpecStatus}}
         L6_domain_CoverageResult(CoverageResult)
@@ -31,6 +32,7 @@ flowchart LR
     subgraph usecase [usecase]
         L7_usecase_AddTaskUseCase[/AddTaskUseCase/]
         L7_usecase_TransitionTaskUseCase[/TransitionTaskUseCase/]
+        L7_usecase_SetOverrideUseCase[/SetOverrideUseCase/]
         L7_usecase_TrackBlobReader[[TrackBlobReader]]
     end
     subgraph infrastructure [infrastructure]
@@ -48,6 +50,7 @@ flowchart LR
         L14_infrastructure_ImplPlanTaskDto[ImplPlanTaskDto]
         L14_infrastructure_ImplPlanPlanDto[ImplPlanPlanDto]
         L14_infrastructure_ImplPlanSectionDto[ImplPlanSectionDto]
+        L14_infrastructure_TrackSnapshot[TrackSnapshot]
     end
     L6_domain_ImplPlanReader -->|"load_impl_plan"| L6_domain_ImplPlanDocument
     L6_domain_ImplPlanWriter -->|"save_impl_plan(doc)"| L6_domain_ImplPlanDocument

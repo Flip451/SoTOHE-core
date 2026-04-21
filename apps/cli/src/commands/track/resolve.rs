@@ -42,17 +42,12 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
         .load_impl_plan(&track_id)
         .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
 
-    // Fail-closed: an activated track (branch set, or non-Planned override) with no
-    // impl-plan is potentially corrupt — reject rather than reporting a misleading phase.
-    let derived_status = domain::derive_track_status(impl_plan.as_ref(), track.status_override());
-    if impl_plan.is_none()
-        && (track.branch().is_some() || derived_status != domain::TrackStatus::Planned)
-    {
-        return Err(CliError::Message(format!(
-            "resolve failed: track '{track_id}' has no impl-plan.json but is not \
-             in planning state (derived_status={derived_status}); track may be corrupt"
-        )));
-    }
+    // Fail-closed: route through the domain API so the activation invariant
+    // (`is_activated() ↔ impl-plan.json present`) has a single source of truth.
+    // Activation is identified by branch materialization only; an override on
+    // a branchless planning track does not imply activation.
+    domain::check_impl_plan_presence(&track, impl_plan.as_ref())
+        .map_err(|e| CliError::Message(format!("resolve failed: {e}")))?;
 
     // Note: TrackStatus::Archived is not reachable from derive_track_status();
     // archived tracks live under track/archive/ and are not resolved by this command.

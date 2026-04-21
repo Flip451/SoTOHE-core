@@ -23,4 +23,5 @@
 | ImplPlanTaskDto | dto | — | — | 🔵 |
 | ImplPlanPlanDto | dto | — | — | 🔵 |
 | ImplPlanSectionDto | dto | — | — | 🔵 |
+| TrackSnapshot | dto | modify | — | 🔵 |
 

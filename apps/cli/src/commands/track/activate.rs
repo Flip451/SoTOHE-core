@@ -93,18 +93,12 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
             impl_plan_for_status.as_ref(),
             track_meta.status_override(),
         );
-        // Fail-closed: an already-materialized track (branch set, or non-Planned derived
-        // status) with no impl-plan is potentially corrupt. Reject rather than defaulting
-        // to Planned and allowing activation_resume_allowed to proceed on a corrupt state.
-        if impl_plan_for_status.is_none()
-            && (track_meta.branch().is_some() || derived_status != domain::TrackStatus::Planned)
-        {
-            return Err(CliError::Message(format!(
-                "activation preflight failed: track '{track_id}' has no impl-plan.json but \
-                 is not in planning state (derived_status={derived_status}); \
-                 track may be corrupt"
-            )));
-        }
+        // Fail-closed: route through the domain API so the activation invariant
+        // has a single source of truth. Activation is identified by branch
+        // materialization only; an override on a branchless planning track
+        // does not imply activation.
+        domain::check_impl_plan_presence(&track_meta, impl_plan_for_status.as_ref())
+            .map_err(|e| CliError::Message(format!("activation preflight failed: {e}")))?;
         let status_str = derived_status.to_string();
         activation_resume_allowed(
             &repo,

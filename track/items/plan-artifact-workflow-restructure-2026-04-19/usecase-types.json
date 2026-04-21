@@ -16,6 +16,20 @@
       "kind": "use_case"
     },
     {
+      "name": "SetOverrideUseCase",
+      "description": "Simplified in T013 (status removal): execute now only mutates status_override on TrackMetadata and returns the updated metadata; it no longer writes a derived status field (status was removed from metadata.json per IN-09).",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case",
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "eed4c9cb026146fd2f5b7c7a7ec2cd212833de5700858431d4b089b4680a46fc"
+        }
+      ]
+    },
+    {
       "name": "TrackBlobReader",
       "description": "Usecase-layer secondary port that reads PR branch blobs (spec.json / <layer>-types.json / impl-plan.json / architecture-rules.json) and decodes them into domain aggregates. Modified per ADR 2026-04-19-1242 §D6.2 / T007: `read_track_metadata` is replaced by `read_impl_plan` returning `BlobFetchResult<ImplPlanDocument>` so the task-completion merge gate drives off impl-plan.json instead of the identity-only metadata.json.",
       "approved": true,

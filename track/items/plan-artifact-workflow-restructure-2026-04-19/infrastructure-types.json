@@ -51,7 +51,7 @@
     },
     {
       "name": "TrackDocumentV2",
-      "description": "Infrastructure serde DTO for `metadata.json` (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005: drop `tasks` and `plan` fields (they move to ImplPlanDocumentDto). The v4 shape carries: `schema_version` (int), `id` (string), `branch` (string), `title` (string), `status` (string, explicit — not task-derived), `created_at` / `updated_at` (strings via `DocumentMeta`), and `status_override` (optional sub-object, skipped when absent, for Blocked/Cancelled reason — identity metadata, not Phase 3 plan data). Schema version bump is at the implementer's discretion per the no-backward-compat rule.",
+      "description": "Infrastructure serde DTO for `metadata.json` (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005 + T013: drop `tasks`, `plan`, and `status` fields. The v5 (identity-only) shape carries: `schema_version` (int, = 5), `id` (string), `branch` (Option<string>), `title` (string), `created_at` / `updated_at` (strings via `DocumentMeta`), and `status_override` (optional sub-object, skipped when absent, for Blocked/Cancelled reason — identity metadata, not Phase 3 plan data). `status` is absent from v5; track status is derived on demand via `domain::derive_track_status`. `codec::decode` requires schema_version = 5 and rejects legacy v4 (which still carried an explicit `status` field).",
       "approved": true,
       "action": "modify",
       "kind": "dto"
@@ -115,6 +115,25 @@
       "description": "Nested DTO for a single plan section inside `impl-plan.json`. Introduced by T004 alongside ImplPlanDocumentDto / ImplPlanPlanDto to propagate `deny_unknown_fields` through the whole impl-plan object tree. Mirrors `domain::PlanSection` (id, title, optional description bullets, task ids).",
       "approved": true,
       "kind": "dto"
+    },
+    {
+      "name": "TrackSnapshot",
+      "description": "Render-layer aggregate that bundles TrackMetadata, DocumentMeta, and a pre-computed derived_status string. The derived_status field was added in T005+T007+T008: it is computed at snapshot construction time from impl-plan.json task state + status_override via domain::derive_track_status, replacing the explicit status field that metadata.json v5 no longer persists. For the registry/plan.md display path only: legacy v2/v3/v4 tracks that still carry an explicit status field fall back to reading the stored value directly from raw JSON (bypassing codec::decode, which rejects v4; the ADR migration policy skips v4 in verify-track-metadata-local but allows the render path to display them read-only).",
+      "approved": true,
+      "action": "modify",
+      "kind": "dto",
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "eed4c9cb026146fd2f5b7c7a7ec2cd212833de5700858431d4b089b4680a46fc"
+        },
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-13",
+          "hash": "2fae03dfc82a31a8c4b135b96034eeed492d200249195ef8acd32e26d3178051"
+        }
+      ]
     }
   ]
 }

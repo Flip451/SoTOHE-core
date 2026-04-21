@@ -131,7 +131,7 @@ If the file already exists, merge new types with existing ones:
   - Cross-partition migration (non-trait ↔ trait): if the type pre-exists, REPLACE the old single entry with a `delete` + `add` pair (one entry with `action: "delete"` for the old kind, one with `action: "add"` for the new kind). The old entry must not be preserved alongside the pair — the codec rejects any duplicate name that is not exactly one delete + one add pair. If the type does NOT pre-exist, update the entry in place (new `kind`, keep `action: "add"`).
   - Same-partition migration (within non-trait kinds or within trait kinds): update `kind` in place and set `action: "modify"` only if the type pre-exists; otherwise keep `action: "add"` (omitted). Do NOT use a delete+add pair. Also remove any kind-specific fields that no longer apply (e.g., remove `transitions_to` when changing from `typestate` to `enum`).
 - Add new entries for types not yet declared
-- Remove entries for types no longer in the plan (with user confirmation)
+- Remove entries for types no longer in the plan (drift from the spec is surfaced later via the SoT Chain signals rather than gated by a pre-write prompt)
 - Do not modify the `approved` field of existing entries (it is a schema discriminant set at authoring time)
 - Clear the `signals` field (omit or set to `null`) — Step 4 runs `type-signals` which always does a full rebuild
 
@@ -168,8 +168,7 @@ After design completion, inform the user:
 
 ## Behavior
 
-- Present the type design to the user for review before writing — per layer when multiple layers are being processed.
-- If the user requests changes, iterate until the user accepts the design.
+- The `type-designer` subagent writes each layer's catalogue directly; no pre-write user-approval gate (per `knowledge/conventions/workflow-ceremony-minimization.md` — unnecessary approval gates are eliminated, verification is post-hoc via the SoT Chain signals).
 - All type names and descriptions must be in English.
 - Keep the design minimal — only declare types that the plan requires.
-- When processing multiple layers in one invocation, stop at the first layer that the user rejects and wait for guidance before continuing.
+- Post-hoc verification: `sotp track type-signals <id>` + `sotp verify spec-states` flag drift / Red signals. The user reviews the resulting signals / rendered markdown rather than the unwritten catalogue diff.

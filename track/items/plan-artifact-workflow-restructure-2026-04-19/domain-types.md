@@ -34,6 +34,7 @@
 |------|------|--------|---------|--------|
 | SpecValidationError | error_type | modify | EmptyTitle, EmptyVersion, EmptyRequirementText, EmptyDomainStateName, EmptySectionTitle | 🔵 |
 | ValidationError | error_type | modify | InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary | 🔵 |
+| ImplPlanPresenceError | error_type | — | MissingForActivatedTrack | 🔵 |
 
 ## Secondary Ports
 

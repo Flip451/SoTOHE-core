@@ -329,6 +329,20 @@ impl TrackMetadata {
         self.branch.as_ref()
     }
 
+    /// Returns `true` iff the track has been activated (its branch has been
+    /// materialized). Activation is identified by branch materialization
+    /// ONLY — `status_override`, derived status, and schema version are
+    /// explicitly NOT part of the activation predicate. A branchless
+    /// planning track carrying `status_override = blocked / cancelled` is
+    /// NOT activated.
+    ///
+    /// Use together with [`crate::check_impl_plan_presence`] to enforce the
+    /// invariant "activated track ↔ impl-plan.json present".
+    #[must_use]
+    pub fn is_activated(&self) -> bool {
+        self.branch.is_some()
+    }
+
     /// Sets or clears the branch field, enforcing branch-id consistency.
     ///
     /// When `branch` is `Some`, its slug (the portion after `"track/"`) must

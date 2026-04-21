@@ -147,21 +147,22 @@ pub(super) fn execute_next_task(
     // Load impl-plan.json. Missing on an activated track is a corruption
     // state — fail closed. Missing on a planning-only track is valid and
     // reports "no open task".
+    //
+    // Activation is identified by branch materialization (`branch.is_some()`)
+    // — NOT by the derived status. A planning-only track may legitimately
+    // carry a `status_override = blocked / cancelled` and no impl-plan.json;
+    // using `derive_track_status != Planned` as the activation proxy would
+    // misclassify that state as corruption.
     let store = FsTrackStore::new(items_dir);
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|err| CliError::Message(format!("next-task failed reading impl-plan: {err}")))?;
 
-    // Derive status on demand to check if track is "activated" (past Planned).
-    let derived_status = derive_track_status(impl_plan.as_ref(), track.status_override());
-    if impl_plan.is_none()
-        && (track.branch().is_some() || derived_status != domain::TrackStatus::Planned)
-    {
-        return Err(CliError::Message(format!(
-            "next-task: activated track '{valid_id}' is missing impl-plan.json; \
-             refusing to report no-open-task for a potentially corrupt track state"
-        )));
-    }
+    domain::check_impl_plan_presence(&track, impl_plan.as_ref()).map_err(|e| {
+        CliError::Message(format!(
+            "next-task: {e}; refusing to report no-open-task for a potentially corrupt track state"
+        ))
+    })?;
 
     match impl_plan.as_ref().and_then(|doc| doc.next_open_task()) {
         Some(task) => {
@@ -219,14 +220,13 @@ pub(super) fn execute_task_counts(
             (total, todo, in_progress, done, skipped)
         }
         None => {
-            // Derive status on demand to check if track is "activated".
-            let derived_status = derive_track_status(None, track.status_override());
-            if track.branch().is_some() || derived_status != domain::TrackStatus::Planned {
-                return Err(CliError::Message(format!(
-                    "task-counts: activated track '{valid_id}' is missing impl-plan.json; \
-                     refusing to report zero counts for a potentially corrupt track state"
-                )));
-            }
+            // Route through the domain API: activation is identified by branch
+            // materialization only. An override on a branchless planning track
+            // does not imply activation; impl-plan.json is legitimately absent
+            // in that case. The domain API is the single source of truth.
+            domain::check_impl_plan_presence(&track, None).map_err(|e| {
+                CliError::Message(format!("task-counts: {e}; refusing to report zero counts for a potentially corrupt track state"))
+            })?;
             (0, 0, 0, 0, 0)
         }
     };

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-21T12:31:33Z",
-  "declaration_hash": "bd73daf845dc9fe896deaf4bdc04ed502e255007bc4e9e64ba8e023ac28a7e6d",
+  "generated_at": "2026-04-21T23:52:59Z",
+  "declaration_hash": "d37854c753ec3f4d2232fca00116fee955b2985b555a4ec6e9d5fe08594b524f",
   "signals": [
     {
       "type_name": "ImplPlanDocumentDto",
@@ -108,6 +108,12 @@
     },
     {
       "type_name": "ImplPlanSectionDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackSnapshot",
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": true

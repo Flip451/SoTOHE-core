@@ -12,4 +12,5 @@
 |------|------|--------|---------|--------|
 | AddTaskUseCase | use_case | modify | — | 🔵 |
 | TransitionTaskUseCase | use_case | modify | — | 🔵 |
+| SetOverrideUseCase | use_case | modify | — | 🔵 |
 

@@ -681,20 +681,15 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
                          '{track_id}': {e}"
                     ))
                 })?;
-                // Fail-closed: a track with no impl-plan but non-Planned status (branch set
-                // or non-Planned override) is potentially corrupt — block the commit.
+                // Fail-closed: a track with no impl-plan.json but with a
+                // materialized branch is potentially corrupt — block the
+                // commit. Route through the domain API so the activation
+                // invariant has a single source of truth.
                 let effective_status =
                     domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-                if impl_plan.is_none()
-                    && (metadata.branch().is_some()
-                        || effective_status != domain::TrackStatus::Planned)
-                {
-                    return Err(CliError::Message(format!(
-                        "[track-commit-message] BLOCKED: track '{track_id}' has no \
-                         impl-plan.json but is not in planning state \
-                         (derived_status={effective_status}); track may be corrupt"
-                    )));
-                }
+                domain::check_impl_plan_presence(&metadata, impl_plan.as_ref()).map_err(|e| {
+                    CliError::Message(format!("[track-commit-message] BLOCKED: {e}"))
+                })?;
                 if ensure_active_track(effective_status, track_id).is_err() {
                     // Track is Done or Archived — skip pre-commit type-signal recomputation.
                     // The frozen track's signal files are already correct from when it was active.

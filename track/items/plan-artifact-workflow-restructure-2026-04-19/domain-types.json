@@ -168,10 +168,26 @@
     },
     {
       "name": "TrackMetadata",
-      "description": "Track identity aggregate in `libs/domain/src/track.rs`. Reduced to identity-only per ADR 2026-04-19-1242 §D1.4: `tasks: Vec<TrackTask>` and `plan: PlanView` fields move to the new ImplPlanDocument. Retained fields per ADR D1.4 §metadata.json: `id`, `branch`, `title`, and `status` (now stored explicitly rather than task-derived, updated on status transitions). `status_override` is kept as an optional sub-mechanism for Blocked/Cancelled semantics (it records the reason a track is blocked, which is identity information); it does not carry Phase 3 plan data and is absent from normal in-progress/done tracks. Timestamps (`created_at`, `updated_at`) are handled at the DTO layer (DocumentMeta). `PlanView` / `PlanSection` remain in domain and are reused by ImplPlanDocument.",
+      "description": "Track identity aggregate in `libs/domain/src/track.rs`. Reduced to pure identity per ADR 2026-04-19-1242 §D1.4 + follow-up invariant codification: retained domain fields are `id`, `branch`, `title`, `status_override` (optional — Blocked/Cancelled reason). `created_at` / `updated_at` are persistence timestamps handled at the DTO layer (`DocumentMeta`), not stored in the domain aggregate. The prior `status` field is removed; track status is now DERIVED on demand from `ImplPlanDocument` via `derive_track_status`. Exposes `is_activated(&self) -> bool` (= `branch().is_some()`) as the single source of truth for the activation predicate — `status_override`, derived status, and schema version are explicitly NOT part of activation. `PlanView` / `PlanSection` remain in domain and are reused by ImplPlanDocument.",
       "approved": true,
       "action": "modify",
       "kind": "value_object"
+    },
+    {
+      "name": "ImplPlanPresenceError",
+      "description": "Domain error emitted by `check_impl_plan_presence(track, impl_plan)` when an activated track (branch materialized) is missing `impl-plan.json`. Enforces the forward implication `is_activated() → impl-plan.json present`: planning-only tracks (no branch) legitimately have no impl-plan, so `impl_plan == None` without branch is OK; branch materialized + `impl_plan == None` is a corruption state. Single variant `MissingForActivatedTrack { track_id: String }` lets callers format the error consistently. Introduced to give every CLI corruption-check call site one authoritative validator so activation cannot be heuristically re-derived (override-sensitive) at each call site.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "MissingForActivatedTrack"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "eed4c9cb026146fd2f5b7c7a7ec2cd212833de5700858431d4b089b4680a46fc"
+        }
+      ]
     },
     {
       "name": "TypeCatalogueEntry",

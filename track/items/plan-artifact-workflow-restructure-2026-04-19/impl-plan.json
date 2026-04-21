@@ -72,6 +72,11 @@
       "description": "既存 libs/infrastructure/src/verify/spec_coverage.rs の spec_coverage::verify を新 CLI (plan-artifact-refs) に統合し、旧呼び出し経路 (Makefile.toml / scripts/ / 関連 verify-*) を新 CLI 経由に切り替え、不要コードを削除。tests 整理",
       "status": "done",
       "commit_hash": "70fb44ee5f3a72683c77e032ddb112566b9a5412"
+    },
+    {
+      "id": "T013",
+      "description": "PR-review cycle fix: metadata.json から status 除去し、track status は impl-plan.json + status_override から derive する domain::derive_track_status に一本化。activation 不変条件を domain::TrackMetadata::is_activated() + domain::check_impl_plan_presence() で codify し、全 CLI 呼び出し側の ad-hoc 判定 (branch.is_some() || derived_status != Planned) をこの single source of truth に置き換え。schema_version を v4 → v5 に bump (identity-only)。ADR 2026-04-19-1242 §D1.4 Follow-up で経緯を記録。Codex Cloud PR #107 の atomic-write P0 findings に構造的対応",
+      "status": "in_progress"
     }
   ],
   "plan": {
@@ -168,6 +173,21 @@
           "T010",
           "T011",
           "T012"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "S7 — PR-review cycle fix: status 単一 SSoT 化 + activation 不変条件",
+        "description": [
+          "metadata.json から status field を除去し identity-only 化 (schema_version v4 → v5)",
+          "track status は domain::derive_track_status(impl_plan, status_override) で都度導出する single SSoT に統一",
+          "activation 不変条件を domain::TrackMetadata::is_activated() ≡ branch.is_some() で codify",
+          "impl-plan.json 存在条件を domain::check_impl_plan_presence(track, impl_plan) で検証 (is_activated → impl-plan 存在、一方向: ブランチ有りのとき impl-plan が必ず存在する)",
+          "全 CLI 呼び出し側 (make.rs / state_ops.rs / activate.rs / resolve.rs / tddd/graph.rs / tddd/signals.rs x2 / tddd/contract_map.rs) を新 API に置き換え ad-hoc 判定を削除",
+          "ADR 2026-04-19-1242 §D1.4 Follow-up に経緯を記録 (PR #107 の atomic-write P0 findings 由来)"
+        ],
+        "task_ids": [
+          "T013"
         ]
       }
     ]

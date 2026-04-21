@@ -7,7 +7,7 @@
 use crate::track::validate_plan_invariants;
 use crate::{
     DomainError, PlanSection, PlanView, TaskId, TaskStatus, TaskStatusKind, TaskTransition,
-    TrackTask, TransitionError, ValidationError,
+    TrackMetadata, TrackTask, TransitionError, ValidationError,
 };
 
 /// The current schema version for `impl-plan.json`.
@@ -309,6 +309,50 @@ fn resolve_transition(
         ))
         .into()),
     }
+}
+
+// ---------------------------------------------------------------------------
+// Impl-plan presence invariant
+// ---------------------------------------------------------------------------
+
+/// Error emitted by [`check_impl_plan_presence`] when an activated track is
+/// missing `impl-plan.json`. Encodes the invariant `is_activated() ↔
+/// impl-plan.json present`.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum ImplPlanPresenceError {
+    #[error("activated track '{track_id}' is missing impl-plan.json")]
+    MissingForActivatedTrack { track_id: String },
+}
+
+/// Enforces the invariant `is_activated() ↔ impl-plan.json present`:
+///
+/// - Planning-only track (`!is_activated()`): `impl_plan` may be `None`
+///   (planning-only tracks legitimately have no tasks yet) → `Ok(())`.
+/// - Planning-only track with `impl_plan = Some(...)` → `Ok(())` (harmless
+///   over-presence; planning track may have pre-allocated tasks).
+/// - Activated track (`is_activated()`) with `impl_plan = Some(...)` →
+///   `Ok(())`.
+/// - Activated track with `impl_plan = None` → `Err(MissingForActivatedTrack)`.
+///
+/// Every CLI / usecase call site that reads `impl-plan.json` alongside
+/// `metadata.json` must route through this validator. Do not derive
+/// activation from `status_override` or the computed status — those are
+/// independent of branch materialization.
+///
+/// # Errors
+///
+/// Returns [`ImplPlanPresenceError::MissingForActivatedTrack`] when the
+/// track is activated but no impl-plan.json was loaded.
+pub fn check_impl_plan_presence(
+    track: &TrackMetadata,
+    impl_plan: Option<&ImplPlanDocument>,
+) -> Result<(), ImplPlanPresenceError> {
+    if track.is_activated() && impl_plan.is_none() {
+        return Err(ImplPlanPresenceError::MissingForActivatedTrack {
+            track_id: track.id().to_string(),
+        });
+    }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -809,5 +853,70 @@ mod tests {
         let task_ids: Vec<&str> =
             doc.plan().sections()[0].task_ids().iter().map(|id| id.as_ref()).collect();
         assert_eq!(task_ids, vec!["T001", new_id.as_ref(), "T002"]);
+    }
+
+    // -----------------------------------------------------------------------
+    // check_impl_plan_presence
+    // -----------------------------------------------------------------------
+
+    use super::{ImplPlanPresenceError, check_impl_plan_presence};
+    use crate::{StatusOverride, TrackBranch, TrackId, TrackMetadata};
+
+    fn branchless_planning_track(id: &str) -> TrackMetadata {
+        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Planning-only", None).unwrap()
+    }
+
+    fn activated_track(id: &str) -> TrackMetadata {
+        TrackMetadata::with_branch(
+            TrackId::try_new(id).unwrap(),
+            Some(TrackBranch::try_new(format!("track/{id}")).unwrap()),
+            "Activated",
+            None,
+        )
+        .unwrap()
+    }
+
+    fn empty_impl_plan() -> ImplPlanDocument {
+        ImplPlanDocument::new(vec![], PlanView::new(vec![], vec![])).unwrap()
+    }
+
+    #[test]
+    fn planning_only_without_impl_plan_is_ok() {
+        let track = branchless_planning_track("example");
+        assert!(check_impl_plan_presence(&track, None).is_ok());
+    }
+
+    #[test]
+    fn planning_only_with_override_without_impl_plan_is_ok() {
+        let mut track = branchless_planning_track("example");
+        track.set_status_override(Some(StatusOverride::blocked("waiting").unwrap()));
+        assert!(
+            check_impl_plan_presence(&track, None).is_ok(),
+            "override does not imply activation"
+        );
+    }
+
+    #[test]
+    fn planning_only_with_impl_plan_is_ok() {
+        let track = branchless_planning_track("example");
+        let plan = empty_impl_plan();
+        assert!(check_impl_plan_presence(&track, Some(&plan)).is_ok());
+    }
+
+    #[test]
+    fn activated_with_impl_plan_is_ok() {
+        let track = activated_track("example");
+        let plan = empty_impl_plan();
+        assert!(check_impl_plan_presence(&track, Some(&plan)).is_ok());
+    }
+
+    #[test]
+    fn activated_without_impl_plan_is_corruption() {
+        let track = activated_track("example");
+        let err = check_impl_plan_presence(&track, None).unwrap_err();
+        assert_eq!(
+            err,
+            ImplPlanPresenceError::MissingForActivatedTrack { track_id: "example".to_owned() }
+        );
     }
 }
