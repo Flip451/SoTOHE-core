@@ -123,8 +123,52 @@
       ]
     },
     {
+      "name": "ImplPlanReader",
+      "description": "Domain port trait (`libs/domain/src/repository.rs`) for loading `impl-plan.json` from the local track store (filesystem). Single method: `load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError>`. Returns `None` for planning-only tracks that have not yet produced an impl-plan. Introduced by T007 (ADR 2026-04-19-1242 §D1.4) to allow `TransitionTaskUseCase` and `AddTaskUseCase` to read task state from the local store without directly accessing the filesystem. Note: the PR-branch task-completion gate (`check_tasks_resolved_from_git_ref`) uses the separate `TrackBlobReader` port (git-ref-based, usecase layer), not this domain port.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "load_impl_plan",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<Option<ImplPlanDocument>, RepositoryError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "ImplPlanWriter",
+      "description": "Domain port trait (`libs/domain/src/repository.rs`) for persisting an updated `impl-plan.json` to the track store. Single method: `save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError>`. Paired with `ImplPlanReader`; both are implemented by `FsTrackStore` in the infrastructure layer. Introduced by T007 (ADR 2026-04-19-1242 §D1.4) to allow `TransitionTaskUseCase` and `AddTaskUseCase` to mutate and persist task state without directly accessing the filesystem.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "save_impl_plan",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "doc",
+              "ty": "&ImplPlanDocument"
+            }
+          ],
+          "returns": "Result<(), RepositoryError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
       "name": "TrackMetadata",
-      "description": "Track identity aggregate in `libs/domain/src/track.rs`. Reduced to identity-only per ADR 2026-04-19-1242 §D1.4: `tasks: Vec<TrackTask>` and `plan: PlanView` fields move to the new ImplPlanDocument. Retained fields per ADR D1.4 §metadata.json: `id`, `branch`, `title`, and `status` (now stored explicitly rather than task-derived, updated on status transitions). `status_override` from the current implementation is absorbed into the explicit `status` field per the ADR's simplified field list (`schema_version, id, branch, title, status, created_at, updated_at`); the implementer determines whether to keep `status_override` as a sub-mechanism or merge it into a single stored status. Timestamps (`created_at`, `updated_at`) are handled at the DTO layer (DocumentMeta). `PlanView` / `PlanSection` remain in domain and are reused by ImplPlanDocument.",
+      "description": "Track identity aggregate in `libs/domain/src/track.rs`. Reduced to identity-only per ADR 2026-04-19-1242 §D1.4: `tasks: Vec<TrackTask>` and `plan: PlanView` fields move to the new ImplPlanDocument. Retained fields per ADR D1.4 §metadata.json: `id`, `branch`, `title`, and `status` (now stored explicitly rather than task-derived, updated on status transitions). `status_override` is kept as an optional sub-mechanism for Blocked/Cancelled semantics (it records the reason a track is blocked, which is identity information); it does not carry Phase 3 plan data and is absent from normal in-progress/done tracks. Timestamps (`created_at`, `updated_at`) are handled at the DTO layer (DocumentMeta). `PlanView` / `PlanSection` remain in domain and are reused by ImplPlanDocument.",
       "approved": true,
       "action": "modify",
       "kind": "value_object"

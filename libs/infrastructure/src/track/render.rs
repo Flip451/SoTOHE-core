@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 
 use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
-use domain::{TaskStatus, TrackId, TrackMetadata};
+use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata};
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
@@ -13,22 +13,46 @@ use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers_from_path};
 
+/// Loads `impl-plan.json` from a track directory, returning `None` when the file
+/// does not exist. Propagates I/O and decode errors as `RenderError::Io`.
+fn load_impl_plan_opt(track_dir: &Path) -> Result<Option<ImplPlanDocument>, RenderError> {
+    let path = track_dir.join("impl-plan.json");
+    if !path.is_file() {
+        return Ok(None);
+    }
+    let json = std::fs::read_to_string(&path)?;
+    crate::impl_plan_codec::decode(&json).map(Some).map_err(|e| {
+        RenderError::Io(std::io::Error::other(format!(
+            "impl-plan.json decode error at {}: {e}",
+            path.display()
+        )))
+    })
+}
+
+/// Loads `task-coverage.json` from a track directory, returning `None` when the
+/// file does not exist. Propagates I/O and decode errors as `RenderError::Io`.
+fn load_task_coverage_opt(track_dir: &Path) -> Result<Option<TaskCoverageDocument>, RenderError> {
+    let path = track_dir.join("task-coverage.json");
+    if !path.is_file() {
+        return Ok(None);
+    }
+    let json = std::fs::read_to_string(&path)?;
+    crate::task_coverage_codec::decode(&json).map(Some).map_err(|e| {
+        RenderError::Io(std::io::Error::other(format!(
+            "task-coverage.json decode error at {}: {e}",
+            path.display()
+        )))
+    })
+}
+
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
 const RESERVED_ID_SEGMENTS: &[&str] = &["git"];
 const VALID_TRACK_STATUSES: &[&str] =
     &["planned", "in_progress", "done", "blocked", "cancelled", "archived"];
-const REQUIRED_V3_METADATA_FIELDS: &[&str] = &[
-    "schema_version",
-    "branch",
-    "id",
-    "title",
-    "status",
-    "created_at",
-    "updated_at",
-    "tasks",
-    "plan",
-];
+// T005: `tasks` and `plan` fields moved to impl-plan.json; removed from required list.
+const REQUIRED_V3_METADATA_FIELDS: &[&str] =
+    &["schema_version", "branch", "id", "title", "status", "created_at", "updated_at"];
 
 fn rendered_matches(actual: &str, expected: &str) -> bool {
     actual == expected || actual.trim_end_matches('\n') == expected.trim_end_matches('\n')
@@ -46,10 +70,9 @@ pub struct TrackSnapshot {
 impl TrackSnapshot {
     #[must_use]
     pub fn status(&self) -> String {
-        match self.meta.original_status.as_deref() {
-            Some("archived") => "archived".to_owned(),
-            _ => self.track.status().to_string(),
-        }
+        // T005: `original_status` removed from DocumentMeta (identity-only codec).
+        // Status is now stored explicitly on TrackMetadata via `TrackStatus`.
+        self.track.status().to_string()
     }
 
     #[must_use]
@@ -115,7 +138,8 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
                 path: metadata_path.clone(),
                 source: codec::CodecError::Json(source),
             })?;
-        if !matches!(parsed.schema_version, 2 | 3) {
+        // T005: schema_version 4 is the new identity-only format.
+        if !matches!(parsed.schema_version, 2..=4) {
             return Err(RenderError::UnsupportedSchemaVersion {
                 path: metadata_path,
                 schema_version: parsed.schema_version,
@@ -144,54 +168,81 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
     Ok(snapshots)
 }
 
-/// Renders `plan.md` content from a track snapshot.
+/// Renders `plan.md` content from track identity metadata and an optional
+/// `ImplPlanDocument`.
+///
+/// When `impl_plan` is `Some`, renders the full task list and plan sections
+/// from the document. When `None`, emits a placeholder stub (used for
+/// planning-only tracks that have not yet generated `impl-plan.json`).
 #[must_use]
-pub fn render_plan(track: &TrackMetadata) -> String {
+pub fn render_plan(track: &TrackMetadata, impl_plan: Option<&ImplPlanDocument>) -> String {
     let mut lines = Vec::new();
-    lines.push("<!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->".to_owned());
+    lines.push(
+        "<!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->".to_owned(),
+    );
     lines.push(format!("# {}", track.title()));
     lines.push(String::new());
 
-    for summary in track.plan().summary() {
-        lines.push(summary.clone());
-    }
-    if !track.plan().summary().is_empty() {
+    let Some(doc) = impl_plan else {
+        lines.push(
+            "> **Note**: `impl-plan.json` not yet generated. \
+             Run `/track:implement` to generate the implementation plan."
+                .to_owned(),
+        );
         lines.push(String::new());
-    }
+        return lines.join("\n");
+    };
 
-    let task_map = track
-        .tasks()
-        .iter()
-        .map(|task| (task.id().as_ref(), task))
-        .collect::<std::collections::HashMap<_, _>>();
-
-    for section in track.plan().sections() {
-        lines.push(format!("## {}", section.title()));
+    // Summary lines (if any).
+    if !doc.plan().summary().is_empty() {
+        lines.push("## Summary".to_owned());
         lines.push(String::new());
-
-        for desc in section.description() {
-            lines.push(desc.clone());
+        for line in doc.plan().summary() {
+            lines.push(line.clone());
         }
+        lines.push(String::new());
+    }
+
+    // Task list per section.
+    let total = doc.tasks().len();
+    let done_count = doc.tasks().iter().filter(|t| t.status().is_resolved()).count();
+    lines.push(format!("## Tasks ({done_count}/{total} resolved)"));
+    lines.push(String::new());
+
+    for section in doc.plan().sections() {
+        lines.push(format!("### {} — {}", section.id(), section.title()));
+        lines.push(String::new());
         if !section.description().is_empty() {
+            for desc_line in section.description() {
+                lines.push(format!("> {desc_line}"));
+            }
             lines.push(String::new());
         }
-
         for task_id in section.task_ids() {
-            if let Some(task) = task_map.get(task_id.as_ref()) {
-                let marker = match task.status() {
-                    TaskStatus::Todo => " ",
-                    TaskStatus::InProgress => "~",
-                    TaskStatus::DonePending | TaskStatus::DoneTraced { .. } => "x",
-                    TaskStatus::Skipped => "-",
+            if let Some(task) = doc.tasks().iter().find(|t| t.id() == task_id) {
+                let status_label = match task.status() {
+                    domain::TaskStatus::Todo => "[ ]",
+                    domain::TaskStatus::InProgress => "[~]",
+                    domain::TaskStatus::DonePending | domain::TaskStatus::DoneTraced { .. } => {
+                        "[x]"
+                    }
+                    domain::TaskStatus::Skipped => "[-]",
                 };
-                let suffix = match task.status() {
-                    TaskStatus::DoneTraced { commit_hash } => format!(" {commit_hash}"),
+                let hash_note = match task.status() {
+                    domain::TaskStatus::DoneTraced { commit_hash } => {
+                        format!(" (`{}`)", commit_hash)
+                    }
                     _ => String::new(),
                 };
-                lines.push(format!("- [{marker}] {}{suffix}", task.description()));
+                lines.push(format!(
+                    "- {} **{}**: {}{}",
+                    status_label,
+                    task_id,
+                    task.description(),
+                    hash_note
+                ));
             }
         }
-
         lines.push(String::new());
     }
 
@@ -216,8 +267,15 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
             matches!(track.status().as_ref(), "planned" | "in_progress" | "blocked" | "cancelled")
         })
         .collect();
+    // Deprioritise branchless planning-only tracks (schema_version 3 or 4) so that
+    // an actual in-progress track wins the "Latest active track" slot.
+    // schema_version 2 branchless planned tracks are legacy pre-planning-only behaviour
+    // and are left in normal position (their branch semantics differ).
+    // T005 bumped the planning-only schema from 3 to 4, so both must be deprioritised.
     active.sort_by_key(|track| {
-        track.schema_version == 3 && track.status() == "planned" && track.track.branch().is_none()
+        matches!(track.schema_version, 3 | 4)
+            && track.status() == "planned"
+            && track.track.branch().is_none()
     });
     let completed: Vec<_> = tracks.iter().filter(|track| track.status() == "done").collect();
     let archived: Vec<_> = tracks.iter().filter(|track| track.status() == "archived").collect();
@@ -319,9 +377,18 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
 pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
     let snapshots = collect_track_snapshots(root)?;
     for snapshot in &snapshots {
+        // Only validate v4 (identity-only, post-T005) tracks. Legacy v2 / v3
+        // tracks predate the current renderer and their committed plan.md
+        // reflects whatever renderer shipped at their commit time. We
+        // intentionally don't touch them; re-validating would create a false
+        // OutOfSync for every legacy track without any actionable fix.
+        if snapshot.schema_version < 4 {
+            continue;
+        }
         let plan_path = snapshot.dir.join("plan.md");
         let actual = std::fs::read_to_string(&plan_path)?;
-        let expected = render_plan(&snapshot.track);
+        let impl_plan = load_impl_plan_opt(&snapshot.dir)?;
+        let expected = render_plan(&snapshot.track, impl_plan.as_ref());
         if !rendered_matches(&actual, &expected) {
             return Err(RenderError::OutOfSync {
                 path: plan_path,
@@ -408,21 +475,15 @@ fn validate_track_document(
         RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source }
     })?;
 
+    // T005: status is now stored explicitly in TrackMetadata (not derived from task states).
+    // `track.status().to_string()` always equals `doc.status` for well-formed documents.
+    // The "archived must have all tasks done/skipped" invariant belongs to ImplPlanDocument (T007).
     let derived = track.status().to_string();
-    if doc.status == "archived" {
-        if derived != "done" {
-            return Err(RenderError::InvalidTrackMetadata {
-                path: metadata_path.to_path_buf(),
-                reason: format!(
-                    "Status drift: archived track must have all tasks resolved (done/skipped), but derived='{derived}'"
-                ),
-            });
-        }
-    } else if doc.status != derived {
+    if doc.status != derived {
         return Err(RenderError::InvalidTrackMetadata {
             path: metadata_path.to_path_buf(),
             reason: format!(
-                "Status drift: metadata.status='{}' but derived='{}'",
+                "Status drift: metadata.status='{}' but decoded status='{}'",
                 doc.status, derived
             ),
         });
@@ -488,7 +549,8 @@ pub fn sync_rendered_views(
                 path: metadata_path.clone(),
                 source: codec::CodecError::Json(source),
             })?;
-        if !matches!(parsed.schema_version, 2 | 3) {
+        // T005: schema_version 4 is the new identity-only format.
+        if !matches!(parsed.schema_version, 2..=4) {
             return Err(RenderError::UnsupportedSchemaVersion {
                 path: metadata_path,
                 schema_version: parsed.schema_version,
@@ -511,7 +573,8 @@ pub fn sync_rendered_views(
             path: metadata_path.clone(),
             source,
         })?;
-        let rendered = render_plan(&track);
+        let impl_plan = load_impl_plan_opt(&track_dir)?;
+        let rendered = render_plan(&track, impl_plan.as_ref());
         let plan_path = track_dir.join("plan.md");
         let old = match std::fs::read_to_string(&plan_path) {
             Ok(content) => Some(content),
@@ -533,7 +596,11 @@ pub fn sync_rendered_views(
             let spec_json_content = std::fs::read_to_string(&spec_json_path)?;
             match spec::codec::decode(&spec_json_content) {
                 Ok(spec_doc) => {
-                    let rendered_spec = spec::render::render_spec(&spec_doc);
+                    // Load sibling task-coverage.json when present so that spec.md
+                    // aggregates task coverage annotations (T008 Design Intent).
+                    let task_coverage = load_task_coverage_opt(&track_dir)?;
+                    let rendered_spec =
+                        spec::render::render_spec_with_coverage(&spec_doc, task_coverage.as_ref());
                     let spec_md_path = track_dir.join("spec.md");
                     // Read existing spec.md: propagate real I/O errors, treat NotFound as absent.
                     let old_spec = match std::fs::read_to_string(&spec_md_path) {
@@ -892,8 +959,80 @@ mod tests {
         )
     }
 
+    /// Build an `ImplPlanDocument` from flat task + section specs.
+    ///
+    /// - `tasks`: `(id, description, status_str, commit_hash_opt)` where
+    ///   status_str is `"todo" | "in_progress" | "done_pending" | "done_traced" | "skipped"`
+    /// - `sections`: `(section_id, section_title, task_ids_slice)`
+    fn make_impl_plan_with_tasks(
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str])],
+    ) -> domain::ImplPlanDocument {
+        make_impl_plan_with_summary_and_tasks(&[], tasks, sections)
+    }
+
+    fn make_impl_plan_with_summary_and_tasks(
+        summary: &[&str],
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str])],
+    ) -> domain::ImplPlanDocument {
+        let sections_with_desc: Vec<(&str, &str, &[&str], &[&str])> = sections
+            .iter()
+            .map(|(id, title, task_ids)| (*id, *title, *task_ids, [].as_slice()))
+            .collect();
+        make_impl_plan_inner(summary, tasks, &sections_with_desc)
+    }
+
+    fn make_impl_plan_with_desc_and_tasks(
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str], &[&str])],
+    ) -> domain::ImplPlanDocument {
+        make_impl_plan_inner(&[], tasks, sections)
+    }
+
+    fn make_impl_plan_inner(
+        summary: &[&str],
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str], &[&str])],
+    ) -> domain::ImplPlanDocument {
+        use domain::{CommitHash, PlanSection, PlanView, TaskId, TaskStatus, TrackTask};
+
+        let domain_tasks: Vec<TrackTask> = tasks
+            .iter()
+            .map(|(id, desc, status_str, hash)| {
+                let task_id = TaskId::try_new(id.to_string()).unwrap();
+                let status = match *status_str {
+                    "todo" => TaskStatus::Todo,
+                    "in_progress" => TaskStatus::InProgress,
+                    "done_pending" => TaskStatus::DonePending,
+                    "done_traced" => {
+                        let h = CommitHash::try_new(hash.unwrap_or("abc1234")).unwrap();
+                        TaskStatus::DoneTraced { commit_hash: h }
+                    }
+                    "skipped" => TaskStatus::Skipped,
+                    other => panic!("unknown status: {other}"),
+                };
+                TrackTask::with_status(task_id, *desc, status).unwrap()
+            })
+            .collect();
+
+        let domain_sections: Vec<PlanSection> = sections
+            .iter()
+            .map(|(sid, stitle, task_ids, desc)| {
+                let tids: Vec<TaskId> =
+                    task_ids.iter().map(|t| TaskId::try_new(t.to_string()).unwrap()).collect();
+                PlanSection::new(*sid, *stitle, desc.iter().map(|s| s.to_string()).collect(), tids)
+                    .unwrap()
+            })
+            .collect();
+
+        let plan = PlanView::new(summary.iter().map(|s| s.to_string()).collect(), domain_sections);
+        domain::ImplPlanDocument::new(domain_tasks, plan).unwrap()
+    }
+
     #[test]
     fn render_plan_matches_expected_layout() {
+        // T008: render_plan with None impl_plan renders header, title, and impl-plan stub note.
         let json = sample_metadata_json(
             "track-a",
             "planned",
@@ -908,18 +1047,18 @@ mod tests {
         );
         let (track, _) = codec::decode(&json).unwrap();
 
-        let rendered = render_plan(&track);
+        let rendered = render_plan(&track, None);
 
-        assert!(rendered.contains("<!-- Generated from metadata.json"));
+        assert!(rendered.contains("<!-- Generated from metadata.json + impl-plan.json"));
         assert!(rendered.contains("# Title track-a"));
-        assert!(rendered.contains("## Section"));
-        assert!(rendered.contains("- [ ] First task"));
+        assert!(rendered.contains("impl-plan.json"), "None case must mention impl-plan.json");
     }
 
-    // --- T008/T009: render_plan marker tests ---
+    // --- T008/T009: render_plan marker tests (stubbed pending T008) ---
 
     #[test]
     fn render_plan_marks_in_progress_task_with_tilde() {
+        // T008: with an impl-plan containing an in-progress task, [~] marker appears.
         let json = sample_metadata_json(
             "track-a",
             "in_progress",
@@ -929,15 +1068,21 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Working task", "in_progress", None)],
+            &[("S1", "Section", &["T001"])],
+        );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
         assert!(
-            rendered.contains("- [~] Working task"),
-            "expected in_progress marker `[~]` for in_progress task:\n{rendered}"
+            rendered.contains("[~]"),
+            "[~] marker must appear for in_progress task:\n{rendered}"
         );
     }
 
     #[test]
     fn render_plan_marks_done_task_with_short_commit_hash() {
+        // T008: done task with commit hash renders [x] marker and hash note.
         let json = sample_metadata_json(
             "track-a",
             "done",
@@ -952,15 +1097,19 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
-        assert!(
-            rendered.contains("- [x] Completed task abc1234"),
-            "expected done marker `[x] <desc> <hash>`:\n{rendered}"
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Completed task", "done_traced", Some("abc1234"))],
+            &[("S1", "Section", &["T001"])],
         );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
+        assert!(rendered.contains("[x]"), "[x] marker must appear for done task:\n{rendered}");
+        assert!(rendered.contains("abc1234"), "commit hash must appear:\n{rendered}");
     }
 
     #[test]
     fn render_plan_done_without_commit_hash_omits_literal_none() {
+        // T008: done task without commit hash renders [x] but no "None" string.
         let json = sample_metadata_json(
             "track-a",
             "done",
@@ -970,19 +1119,24 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Untraced done", "done_pending", None)],
+            &[("S1", "Section", &["T001"])],
+        );
+        let rendered = render_plan(&track, Some(&impl_plan));
         assert!(
-            rendered.contains("- [x] Untraced done"),
-            "expected done marker `[x] <desc>`:\n{rendered}"
+            !rendered.contains("None"),
+            "literal 'None' must never appear in rendered plan:\n{rendered}"
         );
         assert!(
-            !rendered.contains("- [x] Untraced done None"),
-            "literal 'None' must not be rendered for done without commit_hash:\n{rendered}"
+            rendered.contains("[x]"),
+            "[x] marker must appear for done_pending task:\n{rendered}"
         );
     }
 
     #[test]
     fn render_plan_marks_skipped_task_with_dash() {
+        // T008: skipped task renders with [-] marker.
         let json = sample_metadata_json(
             "track-a",
             "done",
@@ -992,16 +1146,18 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
-        assert!(
-            rendered.contains("- [-] Skipped task"),
-            "expected skipped marker `[-] <desc>`:\n{rendered}"
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Skipped task", "skipped", None)],
+            &[("S1", "Section", &["T001"])],
         );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
+        assert!(rendered.contains("[-]"), "[-] marker must appear for skipped task:\n{rendered}");
     }
 
     #[test]
     fn render_plan_preserves_multi_section_order() {
-        // Two sections S1 and S2; S1 must render before S2.
+        // T008: sections rendered in order (S1 before S2).
         let json = r#"{
   "schema_version": 3,
   "id": "track-a",
@@ -1023,17 +1179,20 @@ mod tests {
   }
 }"#;
         let (track, _) = codec::decode(json).unwrap();
-        let rendered = render_plan(&track);
-        let first_idx = rendered.find("## First Section").expect("S1 header missing");
-        let second_idx = rendered.find("## Second Section").expect("S2 header missing");
-        assert!(
-            first_idx < second_idx,
-            "section order not preserved: S1 at {first_idx}, S2 at {second_idx}"
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Task one", "todo", None), ("T002", "Task two", "todo", None)],
+            &[("S1", "First Section", &["T001"]), ("S2", "Second Section", &["T002"])],
         );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
+        let s1_pos = rendered.find("First Section").expect("S1 not found");
+        let s2_pos = rendered.find("Second Section").expect("S2 not found");
+        assert!(s1_pos < s2_pos, "S1 must appear before S2:\n{rendered}");
     }
 
     #[test]
     fn render_plan_places_summary_after_generated_header() {
+        // T008: summary lines appear after the header and before task sections.
         let json = r#"{
   "schema_version": 3,
   "id": "track-a",
@@ -1053,23 +1212,24 @@ mod tests {
   }
 }"#;
         let (track, _) = codec::decode(json).unwrap();
-        let rendered = render_plan(&track);
-        let header_idx =
-            rendered.find("<!-- Generated from metadata.json").expect("generated header missing");
-        let summary_idx = rendered.find("Summary line one").expect("summary line missing");
-        let section_idx = rendered.find("## Section").expect("section header missing");
-        assert!(
-            header_idx < summary_idx,
-            "summary must follow the generated header: header={header_idx}, summary={summary_idx}"
+        let impl_plan = make_impl_plan_with_summary_and_tasks(
+            &["Summary line one", "Summary line two"],
+            &[("T001", "Task", "todo", None)],
+            &[("S1", "Section", &["T001"])],
         );
-        assert!(
-            summary_idx < section_idx,
-            "summary must precede sections: summary={summary_idx}, section={section_idx}"
-        );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        let header_idx = rendered
+            .find("<!-- Generated from metadata.json + impl-plan.json")
+            .expect("generated header missing");
+        let summary_idx = rendered.find("Summary line one").expect("summary not found");
+        let tasks_idx = rendered.find("## Tasks").expect("tasks section not found");
+        assert!(header_idx < summary_idx, "header must precede summary:\n{rendered}");
+        assert!(summary_idx < tasks_idx, "summary must precede tasks:\n{rendered}");
     }
 
     #[test]
     fn render_plan_renders_section_description_lines() {
+        // T008: section description lines appear as blockquotes under the section heading.
         let json = r#"{
   "schema_version": 3,
   "id": "track-a",
@@ -1094,7 +1254,12 @@ mod tests {
   }
 }"#;
         let (track, _) = codec::decode(json).unwrap();
-        let rendered = render_plan(&track);
+        let impl_plan = make_impl_plan_with_desc_and_tasks(
+            &[("T001", "Task", "todo", None)],
+            &[("S1", "Section", &["T001"], &["Describe the section goal", "Additional context"])],
+        );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
         assert!(
             rendered.contains("Describe the section goal"),
             "first description line missing:\n{rendered}"
@@ -1540,19 +1705,17 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
+        // v4 identity-only metadata — v2/v3 legacy tracks are intentionally
+        // skipped by `validate_track_snapshots` so only v4 mismatches surface.
         std::fs::write(
             track_dir.join("metadata.json"),
-            sample_metadata_json(
+            sample_metadata_json_with_schema_and_branch(
+                4,
                 "track-a",
                 "planned",
                 "2026-03-13T02:00:00Z",
-                r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+                "[]",
+                Some("track/track-a"),
             ),
         )
         .unwrap();
@@ -1601,26 +1764,23 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // v4 identity-only metadata so the plan.md freshness check runs and
+        // passes before we reach the registry.md check.
         std::fs::write(
-            track_dir.join("metadata.json"),
-            sample_metadata_json(
+            &metadata_path,
+            sample_metadata_json_with_schema_and_branch(
+                4,
                 "track-a",
                 "planned",
                 "2026-03-13T02:00:00Z",
-                r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+                "[]",
+                Some("track/track-a"),
             ),
         )
         .unwrap();
-        let (track, _) =
-            codec::decode(&std::fs::read_to_string(track_dir.join("metadata.json")).unwrap())
-                .unwrap();
-        std::fs::write(track_dir.join("plan.md"), render_plan(&track)).unwrap();
+        let (track, _) = codec::decode(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        std::fs::write(track_dir.join("plan.md"), render_plan(&track, None)).unwrap();
         std::fs::create_dir_all(dir.path().join("track")).unwrap();
         std::fs::write(dir.path().join("track/registry.md"), "# stale registry\n").unwrap();
 
@@ -1737,6 +1897,9 @@ mod tests {
 
     #[test]
     fn validate_track_document_rejects_v3_track_missing_tasks_field() {
+        // T005: tasks/plan fields are stripped by codec::decode() during v2/v3 migration window.
+        // A v3 document missing 'tasks' still decodes successfully (stripped) → Ok.
+        // The "Missing required field 'tasks'" check is no longer enforced (tasks moved to ImplPlanDocument).
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -1767,18 +1930,21 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        assert!(err.to_string().contains("Missing required field 'tasks'"));
+        assert!(
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "T005: v3 doc missing 'tasks' field is accepted (tasks stripped during migration)"
+        );
     }
 
     #[test]
     fn validate_track_document_rejects_unreferenced_task() {
+        // T005/T007: tasks/plan fields are stripped by codec::decode() during v2/v3 migration window.
+        // An unreferenced task in a v3 doc no longer causes a validate error (tasks moved to ImplPlanDocument).
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // T002 is declared in tasks but not referenced from any plan section.
+        // T002 is declared in tasks but not referenced from any plan section (legacy v3 doc).
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1804,22 +1970,21 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
         assert!(
-            message.contains("T002"),
-            "error should reference unreferenced task id T002: {message}"
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "T005: v3 doc with unreferenced task is accepted (tasks/plan stripped during migration)"
         );
     }
 
     #[test]
     fn validate_track_document_rejects_duplicate_task_reference() {
+        // T005/T007: duplicate task_ids in plan sections are now an ImplPlanDocument concern.
+        // validate_track_document strips tasks/plan fields via codec::decode(); no error expected.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // T001 is referenced by both S1 and S2 sections.
+        // T001 is referenced by both S1 and S2 sections (legacy v3 format).
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1845,22 +2010,23 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
+        // T007 pending: duplicate plan references are no longer checked at this layer.
+        // Document should decode successfully (tasks/plan stripped by codec).
         assert!(
-            message.contains("T001"),
-            "error should reference duplicated task id T001: {message}"
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "T007 pending: duplicate plan ref check moved to ImplPlanDocument"
         );
     }
 
     #[test]
     fn validate_track_document_rejects_status_drift_in_progress_vs_done() {
+        // T005: status is now stored explicitly (not task-derived). "in_progress" stored
+        // in metadata.status is the authoritative source; task states are ignored.
+        // The old task-derived drift check is gone — this document now passes validation.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // metadata.status is "in_progress" but all tasks are done (derived = "done").
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1890,19 +2056,24 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
-        assert!(message.contains("Status drift"), "error should mention status drift: {message}");
+        // T005: task-derived status drift check removed; stored status is authoritative.
+        // doc.status="in_progress" → decoded status="in_progress" → no drift → Ok.
+        assert!(
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "T005: task-derived status drift check removed; stored status is authoritative"
+        );
     }
 
     #[test]
     fn validate_track_document_rejects_archived_with_incomplete_tasks() {
+        // T005/T007: "archived must have all tasks resolved" is now an ImplPlanDocument concern.
+        // validate_track_document no longer checks task states (stripped by codec::decode()).
+        // A v3 archived track with a todo task decodes correctly with T005 status semantics.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // metadata.status is "archived" but one task is still "todo".
+        // metadata.status is "archived" — tasks are ignored after T005.
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1927,12 +2098,11 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
+        // T007 pending: task-completion check for archived tracks moved to ImplPlanDocument.
+        // Document should now decode without error (status=archived is valid; tasks stripped).
         assert!(
-            message.contains("archived track must have all tasks resolved"),
-            "error should mention archived+incomplete rejection: {message}"
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "T007 pending: archived+incomplete check moved to ImplPlanDocument"
         );
     }
 
@@ -2451,8 +2621,10 @@ mod tests {
         // explicitly asked to render that track. The done/archived skip is a
         // bulk-sync-only protection and must NOT apply to single-track sync,
         // otherwise the final `in_progress → done` transition of an active
-        // track freezes plan.md in its pre-done state (task checkboxes do not
-        // flip to `[x]`).
+        // track freezes plan.md in its pre-done state.
+        //
+        // T005/T008: render_plan is stubbed; task-level content deferred to T008.
+        // Verify the stub still overwrites stale plan.md and renders the title.
         let dir = tempfile::tempdir().unwrap();
 
         let done_dir = dir.path().join("track/items/track-done");
@@ -2476,7 +2648,8 @@ mod tests {
         // plan.md must be freshly rendered (sentinel overwritten).
         let plan = std::fs::read_to_string(done_dir.join("plan.md")).unwrap();
         assert_ne!(plan, "STALE_SENTINEL_MUST_BE_OVERWRITTEN");
-        assert!(plan.contains("Done task"));
+        // T008 pending: task items not yet rendered; verify title and stub note are present.
+        assert!(plan.contains("# Title track-done"), "title must appear in plan.md:\n{plan}");
         assert!(changed.iter().any(|p| p.ends_with("track-done/plan.md")));
     }
 

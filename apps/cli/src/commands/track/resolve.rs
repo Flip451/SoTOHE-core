@@ -32,21 +32,16 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
         .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
 
     // Fail-closed: reject branchless v3 tracks that violate planning-only invariants.
-    // Both raw status (from JSON) and domain-derived status (from tasks) must be planned.
+    // T005: `original_status` was removed from `DocumentMeta`; `TrackMetadata::status()` now
+    // reads the explicit `status` field directly from the JSON (not derived from task states).
+    // A branchless v3 track whose `status` field is anything other than `planned` is corrupt
+    // or was activated without the branch being recorded — reject it.
     if meta.schema_version == 3 && track.branch().is_none() {
-        let raw = meta.original_status.as_deref();
-        let derived = track.status();
-        if raw != Some("planned") {
+        let explicit_status = track.status();
+        if explicit_status != domain::TrackStatus::Planned {
             return Err(CliError::Message(format!(
-                "resolve failed: track '{track_id}' is branchless v3 but raw status is '{}', \
-                 not planned; metadata may be corrupt",
-                raw.unwrap_or("(missing)")
-            )));
-        }
-        if derived != domain::TrackStatus::Planned {
-            return Err(CliError::Message(format!(
-                "resolve failed: track '{track_id}' is branchless v3 but derived status is \
-                 '{derived}', not planned; metadata may be corrupt"
+                "resolve failed: track '{track_id}' is branchless v3 but status is \
+                 '{explicit_status}', not planned; metadata may be corrupt"
             )));
         }
     }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-20T23:40:35Z",
-  "declaration_hash": "79ab4a1090cd5af5fa70294b9ac088db3335cab71a69f4f4bb948de69a5cb6c7",
+  "generated_at": "2026-04-21T06:08:05Z",
+  "declaration_hash": "b51fe7997c881f9b5b3ceee8a28d3f30757a5aed93fe1bd2963d014ef9fb04cb",
   "signals": [
     {
       "type_name": "SpecElementId",
@@ -118,6 +118,24 @@
         "InvalidContentHash",
         "EmptyInformalGroundSummary",
         "MultiLineInformalGroundSummary"
+      ]
+    },
+    {
+      "type_name": "ImplPlanReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError>"
+      ]
+    },
+    {
+      "type_name": "ImplPlanWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError>"
       ]
     },
     {

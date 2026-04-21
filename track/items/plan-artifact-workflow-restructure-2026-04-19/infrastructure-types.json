@@ -51,9 +51,37 @@
     },
     {
       "name": "TrackDocumentV2",
-      "description": "Infrastructure serde DTO for `metadata.json` (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005: drop `tasks` and `plan` fields (they move to ImplPlanDocumentDto) so the DTO mirrors the new identity-only structure. ADR D1.4 defines the retained fields as `schema_version, id, branch, title, status, created_at, updated_at`; `status` is now stored explicitly rather than task-derived. Whether `status_override` is kept as a separate JSON field or merged into a single `status` value is left to the implementer. `DocumentMeta` fields (`schema_version`, `created_at`, `updated_at`) are retained. Schema version bump is at the implementer's discretion per the no-backward-compat rule.",
+      "description": "Infrastructure serde DTO for `metadata.json` (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005: drop `tasks` and `plan` fields (they move to ImplPlanDocumentDto). The v4 shape carries: `schema_version` (int), `id` (string), `branch` (string), `title` (string), `status` (string, explicit — not task-derived), `created_at` / `updated_at` (strings via `DocumentMeta`), and `status_override` (optional sub-object, skipped when absent, for Blocked/Cancelled reason — identity metadata, not Phase 3 plan data). Schema version bump is at the implementer's discretion per the no-backward-compat rule.",
       "approved": true,
       "action": "modify",
+      "kind": "dto"
+    },
+    {
+      "name": "DocumentMeta",
+      "description": "Infrastructure-layer codec metadata struct (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005: `original_status: Option<String>` and `extra: serde_json::Map<...>` fields removed; retained fields are `schema_version`, `created_at`, `updated_at` only.",
+      "approved": true,
+      "action": "modify",
+      "kind": "dto"
+    },
+    {
+      "name": "PlanDocument",
+      "description": "Infrastructure serde DTO for the `plan` field inside the old metadata.json shape (track/codec.rs). Deleted per ADR 2026-04-19-1242 §D1.4 / T005: plan data moves to `impl-plan.json` (ImplPlanPlanDto). This type is no longer present in codec.rs.",
+      "approved": true,
+      "action": "delete",
+      "kind": "dto"
+    },
+    {
+      "name": "PlanSectionDocument",
+      "description": "Infrastructure serde DTO for a single plan section inside the old metadata.json shape (track/codec.rs). Deleted per ADR 2026-04-19-1242 §D1.4 / T005: section data moves to `impl-plan.json` (ImplPlanSectionDto). This type is no longer present in codec.rs.",
+      "approved": true,
+      "action": "delete",
+      "kind": "dto"
+    },
+    {
+      "name": "TrackTaskDocument",
+      "description": "Infrastructure serde DTO for a single task inside the old metadata.json shape (track/codec.rs). Deleted per ADR 2026-04-19-1242 §D1.4 / T005: task data moves to `impl-plan.json` (ImplPlanTaskDto). This type is no longer present in codec.rs.",
+      "approved": true,
+      "action": "delete",
       "kind": "dto"
     },
     {

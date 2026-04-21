@@ -4,11 +4,9 @@ use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Parser, Subcommand};
-use domain::{
-    DomainError, PlanSection, PlanView, TaskId, TaskTransition, TrackId, TrackMetadata, TrackTask,
-};
+use domain::{DomainError, TrackId, TrackMetadata, TrackStatus};
 use infrastructure::InMemoryTrackStore;
-use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
+use usecase::SaveTrackUseCase;
 
 mod commands;
 mod error;
@@ -115,38 +113,23 @@ fn main() -> ExitCode {
 fn run_demo() -> Result<ExitCode, CliError> {
     let store = Arc::new(InMemoryTrackStore::new());
     let save = SaveTrackUseCase::new(Arc::clone(&store));
-    let transition = TransitionTaskUseCase::new(Arc::clone(&store));
 
     let track = example_track()
         .map_err(|e| CliError::Message(format!("failed to build example track: {e}")))?;
-    let track_id = track.id().clone();
 
     save.execute(&track)
         .map_err(|e| CliError::Message(format!("failed to save example track: {e}")))?;
 
-    let task_id = TaskId::try_new("T1")
-        .map_err(|e| CliError::Message(format!("failed to build example task id: {e}")))?;
-
-    let updated = transition
-        .execute(&track_id, &task_id, TaskTransition::Start)
-        .map_err(|e| CliError::Message(format!("failed to transition example task: {e}")))?;
-
-    println!("SoTOHE-core CLI stub: '{}' is {}", updated.id(), updated.status());
+    println!("SoTOHE-core CLI stub: '{}' is {}", track.id(), track.status());
     Ok(ExitCode::SUCCESS)
 }
 
 fn example_track() -> Result<TrackMetadata, DomainError> {
-    let task_id = TaskId::try_new("T1")?;
-    let task = TrackTask::new(task_id.clone(), "Implement the track aggregate")?;
-    let section = PlanSection::new("S1", "Domain model", Vec::new(), vec![task_id])?;
-    let plan =
-        PlanView::new(vec!["Track status is derived from task state.".to_owned()], vec![section]);
-
+    // T005: TrackMetadata is identity-only; no tasks/plan fields.
     TrackMetadata::new(
         TrackId::try_new("track-state-machine")?,
         "Track state machine",
-        vec![task],
-        plan,
+        TrackStatus::Planned,
         None,
     )
 }
@@ -156,23 +139,22 @@ fn example_track() -> Result<TrackMetadata, DomainError> {
 mod tests {
     use std::sync::Arc;
 
-    use domain::{TaskId, TaskTransition, TrackStatus};
+    use domain::TrackStatus;
     use infrastructure::InMemoryTrackStore;
-    use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
+    use usecase::SaveTrackUseCase;
 
     use super::example_track;
 
     #[test]
-    fn example_cli_flow_moves_track_into_in_progress() {
+    fn example_cli_flow_saves_track_successfully() {
+        // T005: TransitionTaskUseCase is stubbed pending T007 (impl-plan.json task transitions).
+        // Verify the identity-only track can be saved and loaded.
         let store = Arc::new(InMemoryTrackStore::new());
         let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = example_track().unwrap();
-        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
-        let updated = transition.execute(track.id(), &task_id, TaskTransition::Start).unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::InProgress);
+        assert_eq!(track.status(), TrackStatus::Planned);
     }
 }

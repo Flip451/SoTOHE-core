@@ -1,10 +1,14 @@
-//! Serde types for metadata.json (TrackDocumentV2) matching Python track_schema.py.
+//! Serde types for metadata.json (TrackDocumentV2) — identity-only shape.
+//!
+//! T005 (ADR 2026-04-19-1242 §D1.4): `tasks` and `plan` fields removed from
+//! `TrackDocumentV2`; they now live in `impl-plan.json` (ImplPlanDocument).
+//! `status` is now stored explicitly rather than task-derived.
+//! Schema version bumped to 4 (no backward-compat per the ADR no-backward-compat rule).
+//!
+//! Legacy fields `tasks`/`plan` in old metadata.json files will cause a decode
+//! error — migration to the new shape is the caller's responsibility.
 
-use domain::{
-    CommitHash, DomainError, PlanSection, PlanView, StatusOverride, TaskId, TaskStatus,
-    TrackBranch, TrackId, TrackMetadata, TrackTask,
-};
-use serde::{Deserialize, Deserializer};
+use domain::{DomainError, StatusOverride, TrackBranch, TrackId, TrackMetadata, TrackStatus};
 
 /// Codec error for metadata.json serialization/deserialization.
 #[derive(Debug, thiserror::Error)]
@@ -22,6 +26,12 @@ pub enum CodecError {
     Validation(String),
 }
 
+/// Identity-only DTO for `metadata.json` (schema_version = 4).
+///
+/// Per ADR 2026-04-19-1242 §D1.4: retained fields are
+/// `schema_version, id, branch, title, status, created_at, updated_at`.
+/// Optional `status_override` is kept for Blocked/Cancelled semantics.
+/// `tasks` and `plan` are removed — they now live in `impl-plan.json`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TrackDocumentV2 {
     pub schema_version: u32,
@@ -32,42 +42,8 @@ pub struct TrackDocumentV2 {
     pub status: String,
     pub created_at: String,
     pub updated_at: String,
-    #[serde(default)]
-    pub tasks: Vec<TrackTaskDocument>,
-    pub plan: PlanDocument,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status_override: Option<TrackStatusOverrideDocument>,
-    /// Unknown fields captured during deserialization and preserved on re-serialization.
-    #[serde(flatten)]
-    #[serde(default)]
-    pub extra: serde_json::Map<String, serde_json::Value>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct TrackTaskDocument {
-    pub id: String,
-    pub description: String,
-    pub status: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub commit_hash: Option<String>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PlanDocument {
-    #[serde(default, deserialize_with = "deserialize_string_vec_relaxed")]
-    pub summary: Vec<String>,
-    #[serde(default)]
-    pub sections: Vec<PlanSectionDocument>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PlanSectionDocument {
-    pub id: String,
-    pub title: String,
-    #[serde(default, deserialize_with = "deserialize_string_vec_relaxed")]
-    pub description: Vec<String>,
-    #[serde(default)]
-    pub task_ids: Vec<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -82,60 +58,61 @@ pub struct DocumentMeta {
     pub schema_version: u32,
     pub created_at: String,
     pub updated_at: String,
-    /// Original JSON status string, preserved for values the domain model
-    /// cannot compute (e.g., "archived" which is a workflow-level state).
-    pub original_status: Option<String>,
-    /// Unknown fields captured from the original JSON and preserved on re-serialization.
-    pub extra: serde_json::Map<String, serde_json::Value>,
-}
-
-fn deserialize_string_vec_relaxed<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let value = serde_json::Value::deserialize(deserializer)?;
-    match value {
-        serde_json::Value::Null => Ok(Vec::new()),
-        serde_json::Value::String(s) => Ok(vec![s]),
-        serde_json::Value::Array(values) => values
-            .into_iter()
-            .map(|value| match value {
-                serde_json::Value::String(s) => Ok(s),
-                other => {
-                    Err(serde::de::Error::custom(format!("expected string item, got {other}")))
-                }
-            })
-            .collect(),
-        other => Err(serde::de::Error::custom(format!("expected string or sequence, got {other}"))),
-    }
 }
 
 /// Decodes a JSON string into a domain `TrackMetadata` and infrastructure `DocumentMeta`.
 ///
+/// Accepts both `schema_version = 4` (identity-only, new shape) and
+/// `schema_version = 2` / `schema_version = 3` (legacy shape — `tasks`/`plan`
+/// fields are silently ignored via serde's `#[serde(default)]`-style lenient
+/// parsing so that existing metadata.json files can still be read during the
+/// migration window, even though the tasks/plan data is not loaded here).
+///
 /// # Errors
 /// Returns `CodecError` on JSON parse failure or domain validation failure.
 pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
-    let doc: TrackDocumentV2 = serde_json::from_str(json)?;
+    // Lenient decode: unknown fields (tasks, plan) are silently ignored so
+    // legacy v2/v3 files round-trip without error during the migration window.
+    // We use serde_json::Value first to strip any unknown keys before feeding
+    // into the strict TrackDocumentV2 DTO.
+    let raw: serde_json::Value = serde_json::from_str(json)?;
+    let stripped = strip_legacy_fields(raw);
+    let doc: TrackDocumentV2 = serde_json::from_value(stripped)?;
+
     let meta = DocumentMeta {
         schema_version: doc.schema_version,
         created_at: doc.created_at.clone(),
         updated_at: doc.updated_at.clone(),
-        original_status: Some(doc.status.clone()),
-        extra: doc.extra.clone(),
     };
     let track = track_metadata_from_document(doc)?;
     Ok((track, meta))
 }
 
+/// Removes legacy fields (`tasks`, `plan`) from a JSON value so that
+/// `TrackDocumentV2` can be deserialized without unknown-field errors
+/// during the migration window.
+fn strip_legacy_fields(mut value: serde_json::Value) -> serde_json::Value {
+    if let serde_json::Value::Object(ref mut map) = value {
+        map.remove("tasks");
+        map.remove("plan");
+        map.remove("extra");
+        // Remove any other unknown fields that old versions may have written.
+    }
+    value
+}
+
 /// Encodes a domain `TrackMetadata` and infrastructure `DocumentMeta` into a JSON string.
+///
+/// Always writes `schema_version = 4` (the identity-only shape).
 ///
 /// # Errors
 /// Returns `CodecError` on JSON serialization failure.
 pub fn encode(track: &TrackMetadata, meta: &DocumentMeta) -> Result<String, CodecError> {
     let doc = document_from_track_metadata(track, meta);
     let mut value = serde_json::to_value(&doc)?;
-    if meta.schema_version == 3 && track.branch().is_none() {
-        if let serde_json::Value::Object(object) = &mut value {
+    // Preserve `branch: null` for planning-only tracks (schema_version 3/4 + no branch).
+    if track.branch().is_none() {
+        if let serde_json::Value::Object(ref mut object) = value {
             object.insert("branch".to_owned(), serde_json::Value::Null);
         }
     }
@@ -152,65 +129,40 @@ fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, C
         .transpose()
         .map_err(|e| CodecError::Domain(e.into()))?;
 
-    let tasks: Vec<TrackTask> = doc
-        .tasks
-        .into_iter()
-        .map(|t| {
-            let task_id = TaskId::try_new(&t.id).map_err(DomainError::from)?;
-            let status = parse_task_status(&t.status, t.commit_hash.as_deref())?;
-            TrackTask::with_status(task_id, t.description, status)
-                .map_err(|e| CodecError::Domain(e.into()))
-        })
-        .collect::<Result<Vec<_>, CodecError>>()?;
-
-    let plan = plan_from_document(doc.plan)?;
+    let status = parse_track_status(&doc.status)?;
 
     let status_override =
         doc.status_override.map(|o| parse_status_override(&o.status, o.reason)).transpose()?;
 
-    let track = TrackMetadata::with_branch(id, branch, doc.title, tasks, plan, status_override)?;
+    let track = TrackMetadata::with_branch(id, branch, doc.title, status, status_override)?;
 
     Ok(track)
 }
 
 fn document_from_track_metadata(track: &TrackMetadata, meta: &DocumentMeta) -> TrackDocumentV2 {
-    // Preserve "archived" status from the original JSON when the domain model
-    // cannot compute it (archived is a workflow-level state, not task-derived).
-    let status = match meta.original_status.as_deref() {
-        Some("archived") => "archived".to_owned(),
-        _ => track.status().to_string(),
-    };
-
     TrackDocumentV2 {
-        schema_version: meta.schema_version,
+        schema_version: 4,
         id: track.id().to_string(),
         branch: track.branch().map(|b| b.to_string()),
         title: track.title().to_string(),
-        status,
+        status: track.status().to_string(),
         created_at: meta.created_at.clone(),
         updated_at: meta.updated_at.clone(),
-        tasks: track.tasks().iter().map(task_to_document).collect(),
-        plan: plan_to_document(track.plan()),
         status_override: track.status_override().map(override_to_document),
-        extra: meta.extra.clone(),
     }
 }
 
-fn parse_task_status(status: &str, commit_hash: Option<&str>) -> Result<TaskStatus, CodecError> {
+fn parse_track_status(status: &str) -> Result<TrackStatus, CodecError> {
     match status {
-        "todo" => Ok(TaskStatus::Todo),
-        "in_progress" => Ok(TaskStatus::InProgress),
-        "done" => match commit_hash {
-            Some(h) => {
-                let hash = CommitHash::try_new(h).map_err(|e| CodecError::Domain(e.into()))?;
-                Ok(TaskStatus::DoneTraced { commit_hash: hash })
-            }
-            None => Ok(TaskStatus::DonePending),
-        },
-        "skipped" => Ok(TaskStatus::Skipped),
+        "planned" => Ok(TrackStatus::Planned),
+        "in_progress" => Ok(TrackStatus::InProgress),
+        "done" => Ok(TrackStatus::Done),
+        "blocked" => Ok(TrackStatus::Blocked),
+        "cancelled" => Ok(TrackStatus::Cancelled),
+        "archived" => Ok(TrackStatus::Archived),
         other => Err(CodecError::InvalidField {
             field: "status".into(),
-            reason: format!("unknown task status: {other}"),
+            reason: format!("unknown track status: {other}"),
         }),
     }
 }
@@ -223,59 +175,6 @@ fn parse_status_override(status: &str, reason: String) -> Result<StatusOverride,
             field: "status_override.status".into(),
             reason: format!("unknown override status: {other}"),
         }),
-    }
-}
-
-fn plan_from_document(doc: PlanDocument) -> Result<PlanView, CodecError> {
-    let sections = doc
-        .sections
-        .into_iter()
-        .map(|s| {
-            let task_ids = s
-                .task_ids
-                .into_iter()
-                .map(|id| TaskId::try_new(id).map_err(|e| CodecError::Domain(e.into())))
-                .collect::<Result<Vec<_>, _>>()?;
-            PlanSection::new(s.id, s.title, s.description, task_ids)
-                .map_err(|e| CodecError::Domain(e.into()))
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-
-    Ok(PlanView::new(doc.summary, sections))
-}
-
-fn task_to_document(task: &TrackTask) -> TrackTaskDocument {
-    let (status, commit_hash) = match task.status() {
-        TaskStatus::Todo => ("todo".to_owned(), None),
-        TaskStatus::InProgress => ("in_progress".to_owned(), None),
-        TaskStatus::DonePending => ("done".to_owned(), None),
-        TaskStatus::DoneTraced { commit_hash } => {
-            ("done".to_owned(), Some(commit_hash.to_string()))
-        }
-        TaskStatus::Skipped => ("skipped".to_owned(), None),
-    };
-
-    TrackTaskDocument {
-        id: task.id().to_string(),
-        description: task.description().to_owned(),
-        status,
-        commit_hash,
-    }
-}
-
-fn plan_to_document(plan: &PlanView) -> PlanDocument {
-    PlanDocument {
-        summary: plan.summary().to_vec(),
-        sections: plan
-            .sections()
-            .iter()
-            .map(|s| PlanSectionDocument {
-                id: s.id().to_owned(),
-                title: s.title().to_owned(),
-                description: s.description().to_vec(),
-                task_ids: s.task_ids().iter().map(|id| id.to_string()).collect(),
-            })
-            .collect(),
     }
 }
 
@@ -292,7 +191,21 @@ mod tests {
     use super::*;
     use domain::TrackStatus;
 
-    fn sample_json() -> &'static str {
+    /// Minimal identity-only metadata.json (schema_version = 4).
+    fn sample_json_v4() -> &'static str {
+        r#"{
+  "schema_version": 4,
+  "id": "test-track",
+  "title": "Test Track",
+  "status": "planned",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z"
+}"#
+    }
+
+    /// Legacy metadata.json (schema_version = 2 with tasks/plan).
+    /// The codec must accept this during the migration window (tasks/plan silently ignored).
+    fn sample_json_legacy_v2() -> &'static str {
         r#"{
   "schema_version": 2,
   "id": "test-track",
@@ -301,17 +214,8 @@ mod tests {
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
   "tasks": [
-    {
-      "id": "T1",
-      "description": "First task",
-      "status": "todo"
-    },
-    {
-      "id": "T2",
-      "description": "Second task",
-      "status": "done",
-      "commit_hash": "abc1234"
-    }
+    {"id": "T1", "description": "First task", "status": "todo"},
+    {"id": "T2", "description": "Second task", "status": "done", "commit_hash": "abc1234"}
   ],
   "plan": {
     "summary": ["Test plan summary"],
@@ -328,18 +232,35 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_valid_json_returns_track_metadata() {
-        let (track, meta) = decode(sample_json()).unwrap();
+    fn test_decode_v4_identity_only_json_returns_track_metadata() {
+        let (track, meta) = decode(sample_json_v4()).unwrap();
         assert_eq!(track.id().as_ref(), "test-track");
         assert_eq!(track.title(), "Test Track");
-        assert_eq!(track.tasks().len(), 2);
-        assert_eq!(meta.schema_version, 2);
+        assert_eq!(track.status(), TrackStatus::Planned);
+        assert_eq!(meta.schema_version, 4);
         assert_eq!(meta.created_at, "2026-03-11T00:00:00Z");
     }
 
     #[test]
-    fn test_encode_then_decode_round_trip() {
-        let (track, meta) = decode(sample_json()).unwrap();
+    fn test_decode_legacy_v2_succeeds_ignoring_tasks_and_plan() {
+        // Migration window: legacy v2 files can be read; tasks/plan are dropped.
+        let (track, meta) = decode(sample_json_legacy_v2()).unwrap();
+        assert_eq!(track.id().as_ref(), "test-track");
+        assert_eq!(track.status(), TrackStatus::Planned);
+        assert_eq!(meta.schema_version, 2);
+    }
+
+    #[test]
+    fn test_encode_always_writes_schema_version_4() {
+        let (track, meta) = decode(sample_json_legacy_v2()).unwrap();
+        let json = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc["schema_version"].as_u64().unwrap(), 4);
+    }
+
+    #[test]
+    fn test_encode_v4_then_decode_round_trip() {
+        let (track, meta) = decode(sample_json_v4()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let (track2, meta2) = decode(&json).unwrap();
         assert_eq!(track, track2);
@@ -347,143 +268,49 @@ mod tests {
     }
 
     #[test]
-    fn test_done_pending_round_trips_without_commit_hash() {
+    fn test_decode_with_status_override_blocked() {
         let json = r#"{
-  "schema_version": 2,
-  "id": "pending-track",
-  "title": "Pending Test",
-  "status": "in_progress",
-  "created_at": "2026-03-20T00:00:00Z",
-  "updated_at": "2026-03-20T00:00:00Z",
-  "tasks": [
-    {"id": "T1", "description": "Done without hash", "status": "done"}
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T1"]}]
-  }
-}"#;
-        let (track, meta) = decode(json).unwrap();
-        assert!(matches!(track.tasks()[0].status(), TaskStatus::DonePending));
-
-        let re_encoded = encode(&track, &meta).unwrap();
-        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
-        let task = &doc["tasks"][0];
-        assert_eq!(task["status"], "done");
-        assert!(task.get("commit_hash").is_none() || task["commit_hash"].is_null());
-
-        let (track2, _) = decode(&re_encoded).unwrap();
-        assert_eq!(track, track2);
-    }
-
-    #[test]
-    fn test_decode_with_status_override() {
-        let json = r#"{
-  "schema_version": 2,
+  "schema_version": 4,
   "id": "blocked-track",
   "title": "Blocked Track",
   "status": "blocked",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
-  "tasks": [
-    {"id": "T1", "description": "Task", "status": "todo"}
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
-    ]
-  },
   "status_override": {"status": "blocked", "reason": "waiting on review"}
 }"#;
         let (track, _meta) = decode(json).unwrap();
         assert_eq!(track.status(), TrackStatus::Blocked);
         assert!(track.status_override().is_some());
+        assert_eq!(track.status_override().unwrap().reason(), "waiting on review");
     }
 
     #[test]
-    fn test_decode_accepts_missing_section_description() {
+    fn test_decode_archived_status_round_trips() {
         let json = r#"{
-  "schema_version": 3,
-  "id": "compat-track",
-  "branch": "track/compat-track",
-  "title": "Compat Track",
-  "status": "planned",
+  "schema_version": 4,
+  "id": "archived-track",
+  "title": "Archived Track",
+  "status": "archived",
   "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z",
-  "tasks": [
-    {
-      "id": "T1",
-      "description": "First task",
-      "status": "todo"
-    }
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      {
-        "id": "S1",
-        "title": "Section 1",
-        "task_ids": ["T1"]
-      }
-    ]
-  }
-        }"#;
-
-        let (track, _) = decode(json).unwrap();
-        assert!(track.plan().sections()[0].description().is_empty());
-    }
-
-    #[test]
-    fn test_decode_accepts_string_summary() {
-        let json = r#"{
-  "schema_version": 2,
-  "id": "string-summary-track",
-  "title": "String Summary Track",
-  "status": "planned",
-  "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z",
-  "tasks": [
-    {
-      "id": "T1",
-      "description": "First task",
-      "status": "todo"
-    }
-  ],
-  "plan": {
-    "summary": "single summary line",
-    "sections": [
-      {
-        "id": "S1",
-        "title": "Section 1",
-        "task_ids": ["T1"]
-      }
-    ]
-  }
+  "updated_at": "2026-03-11T00:00:00Z"
 }"#;
+        let (track, meta) = decode(json).unwrap();
+        assert_eq!(track.status(), TrackStatus::Archived);
 
-        let (track, _) = decode(json).unwrap();
-        assert_eq!(track.plan().summary(), &["single summary line".to_owned()]);
+        let re_encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
+        assert_eq!(doc["status"].as_str().unwrap(), "archived");
     }
 
     #[test]
-    fn test_decode_invalid_task_status_returns_error() {
+    fn test_decode_invalid_status_returns_error() {
         let json = r#"{
-  "schema_version": 2,
+  "schema_version": 4,
   "id": "bad-track",
   "title": "Bad Track",
-  "status": "planned",
+  "status": "unknown_status",
   "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z",
-  "tasks": [
-    {"id": "T1", "description": "Task", "status": "unknown_status"}
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
-    ]
-  }
+  "updated_at": "2026-03-11T00:00:00Z"
 }"#;
         let result = decode(json);
         assert!(result.is_err());
@@ -496,102 +323,49 @@ mod tests {
     }
 
     #[test]
-    fn test_archived_status_preserved_through_round_trip() {
+    fn test_encode_branchless_track_has_null_branch_field() {
+        let (track, meta) = decode(sample_json_v4()).unwrap();
+        let json = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        // Branchless track must emit `"branch": null`
+        assert!(doc.get("branch").is_some(), "branch field must be present");
+        assert!(doc["branch"].is_null(), "branch must be null for branchless track");
+    }
+
+    #[test]
+    fn test_encode_with_branch_emits_branch_string() {
         let json = r#"{
-  "schema_version": 2,
-  "id": "archived-track",
-  "title": "Archived Track",
-  "status": "archived",
+  "schema_version": 4,
+  "id": "branched-track",
+  "branch": "track/branched-track",
+  "title": "Branched Track",
+  "status": "in_progress",
   "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z",
-  "tasks": [
-    {"id": "T1", "description": "Done task", "status": "done", "commit_hash": "abc1234"}
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
-    ]
-  }
+  "updated_at": "2026-03-11T00:00:00Z"
 }"#;
         let (track, meta) = decode(json).unwrap();
         let re_encoded = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
-
-        // "archived" must be preserved, not rewritten to "done".
-        assert_eq!(doc["status"].as_str().unwrap(), "archived");
+        assert_eq!(doc["branch"].as_str().unwrap(), "track/branched-track");
     }
 
     #[test]
-    fn test_decode_encode_preserves_unknown_fields() {
-        let json = r#"{
-  "schema_version": 2,
-  "id": "test-track",
-  "title": "Test Track",
-  "status": "planned",
-  "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z",
-  "custom_field": "preserved_value",
-  "tasks": [
-    {"id": "T1", "description": "First task", "status": "todo"}
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      {"id": "S1", "title": "Section 1", "description": [], "task_ids": ["T1"]}
-    ]
-  }
-}"#;
-        let (track, meta) = decode(json).unwrap();
-        let re_encoded = encode(&track, &meta).unwrap();
-        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
-        assert_eq!(doc["custom_field"].as_str().unwrap(), "preserved_value");
+    fn test_decode_no_tasks_or_plan_fields_in_v4_output() {
+        let (track, meta) = decode(sample_json_v4()).unwrap();
+        let json = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        // Identity-only: tasks and plan must NOT appear in the encoded output.
+        assert!(doc.get("tasks").is_none(), "tasks must not be emitted in v4 output");
+        assert!(doc.get("plan").is_none(), "plan must not be emitted in v4 output");
     }
 
     #[test]
-    fn test_decode_encode_without_extra_fields_round_trips_correctly() {
-        let (track, meta) = decode(sample_json()).unwrap();
-        let re_encoded = encode(&track, &meta).unwrap();
-        let (track2, _) = decode(&re_encoded).unwrap();
-        assert_eq!(track, track2);
-    }
-
-    #[test]
-    fn test_known_fields_are_not_in_extra_map() {
-        let json = sample_json();
-        let doc: TrackDocumentV2 = serde_json::from_str(json).unwrap();
-        // Known fields like "id", "title", "tasks" should NOT appear in the extra map
-        assert!(!doc.extra.contains_key("id"));
-        assert!(!doc.extra.contains_key("title"));
-        assert!(!doc.extra.contains_key("tasks"));
-        assert!(!doc.extra.contains_key("schema_version"));
-    }
-
-    #[test]
-    fn test_encode_v3_branchless_track_preserves_null_branch_field() {
-        let json = r#"{
-  "schema_version": 3,
-  "id": "plan-only-track",
-  "branch": null,
-  "title": "Plan Only Track",
-  "status": "planned",
-  "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z",
-  "tasks": [
-    {"id": "T1", "description": "Todo task", "status": "todo"}
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
-    ]
-  }
-}"#;
-        let (track, meta) = decode(json).unwrap();
-        let re_encoded = encode(&track, &meta).unwrap();
-        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
-
-        assert!(doc.get("branch").is_some());
-        assert!(doc["branch"].is_null());
+    fn test_decode_legacy_v2_encodes_to_v4_without_tasks_or_plan() {
+        let (track, meta) = decode(sample_json_legacy_v2()).unwrap();
+        let json = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc["schema_version"].as_u64().unwrap(), 4);
+        assert!(doc.get("tasks").is_none());
+        assert!(doc.get("plan").is_none());
     }
 }

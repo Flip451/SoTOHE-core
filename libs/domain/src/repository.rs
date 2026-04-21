@@ -1,4 +1,7 @@
-use crate::{DomainError, TrackId, TrackMetadata, TrackReadError, TrackWriteError, WorktreeError};
+use crate::{
+    DomainError, ImplPlanDocument, RepositoryError, TrackId, TrackMetadata, TrackReadError,
+    TrackWriteError, WorktreeError,
+};
 
 /// Read-only port for track retrieval.
 pub trait TrackReader: Send + Sync {
@@ -7,6 +10,25 @@ pub trait TrackReader: Send + Sync {
     /// # Errors
     /// Returns `TrackReadError` on I/O or internal failure.
     fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError>;
+}
+
+/// Read port for `impl-plan.json` persistence.
+pub trait ImplPlanReader: Send + Sync {
+    /// Loads `impl-plan.json` for the given track, returning `None` when
+    /// the file does not yet exist.
+    ///
+    /// # Errors
+    /// Returns `RepositoryError` on I/O or decode failure.
+    fn load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError>;
+}
+
+/// Write port for `impl-plan.json` persistence.
+pub trait ImplPlanWriter: Send + Sync {
+    /// Atomically persists `impl-plan.json` for the given track.
+    ///
+    /// # Errors
+    /// Returns `RepositoryError` on I/O or encode failure.
+    fn save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError>;
 }
 
 /// Port for inspecting worktree cleanliness.

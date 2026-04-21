@@ -1,5 +1,8 @@
 //! CLI handlers for add-task, set-override, clear-override, next-task, and task-counts.
 
+use domain::{ImplPlanReader, TaskStatusKind, TrackId, TrackStatus, TrackWriter};
+use infrastructure::track::fs_store::read_track_metadata;
+
 use crate::CliError;
 
 use super::*;
@@ -102,9 +105,24 @@ pub(super) fn execute_clear_override(
             .map_err(|msg| CliError::Message(format!("branch guard: {msg}")))?;
     }
 
-    let set_override = usecase::SetOverrideUseCase::new(Arc::clone(&store));
-    let track = set_override
-        .execute(&track_id, None)
+    // T007: Re-derive status from impl-plan before clearing the override so both mutations
+    // happen in a single atomic `store.update()` call. This avoids partial-write state if
+    // the impl-plan read fails (the override is only cleared if the status is derivable).
+    let restored_status = store
+        .load_impl_plan(&track_id)
+        .map_err(|err| {
+            CliError::Message(format!("clear-override failed reading impl-plan: {err}"))
+        })?
+        .map(|doc| derive_track_status_from_tasks(doc.tasks()))
+        .unwrap_or(TrackStatus::Planned);
+
+    // Single atomic write: clear override and restore derived status together.
+    let track = store
+        .update(&track_id, |t| {
+            t.set_status_override(None);
+            t.set_status(restored_status);
+            Ok(())
+        })
         .map_err(|err| CliError::Message(format!("clear-override failed: {err}")))?;
 
     println!("[OK] Override cleared (track status: {})", track.status());
@@ -117,72 +135,105 @@ pub(super) fn execute_next_task(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::try_new(&track_id)
+    let valid_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
-    let track = read_track_metadata_simple(&items_dir, &track_id)?;
+    // Validate the track exists before proceeding; propagate read/not-found errors.
+    read_track_metadata(&items_dir, &valid_id)
+        .map_err(|err| CliError::Message(format!("next-task failed: {err}")))?;
 
-    match track.next_open_task() {
+    // Load impl-plan.json. When absent (planning-only track), report no open tasks.
+    let store = FsTrackStore::new(items_dir);
+    let impl_plan = store
+        .load_impl_plan(&valid_id)
+        .map_err(|err| CliError::Message(format!("next-task failed reading impl-plan: {err}")))?;
+
+    match impl_plan.as_ref().and_then(|doc| doc.next_open_task()) {
         Some(task) => {
-            let obj = serde_json::json!({
+            let payload = serde_json::json!({
                 "task_id": task.id().as_ref(),
                 "description": task.description(),
                 "status": task.status().kind().to_string(),
             });
-            println!("{obj}");
+            println!("{payload}");
+            Ok(ExitCode::SUCCESS)
         }
         None => {
-            let obj = serde_json::json!({
+            let payload = serde_json::json!({
                 "task_id": null,
                 "description": null,
                 "status": null,
             });
-            println!("{obj}");
+            println!("{payload}");
+            Ok(ExitCode::SUCCESS)
         }
     }
-    Ok(ExitCode::SUCCESS)
 }
 
 pub(super) fn execute_task_counts(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::try_new(&track_id)
+    let valid_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
-    let track = read_track_metadata_simple(&items_dir, &track_id)?;
+    // Validate the track exists before proceeding; propagate read/not-found errors.
+    read_track_metadata(&items_dir, &valid_id)
+        .map_err(|err| CliError::Message(format!("task-counts failed: {err}")))?;
 
-    let (mut total, mut todo, mut in_progress, mut done, mut skipped) =
-        (0u32, 0u32, 0u32, 0u32, 0u32);
-    for task in track.tasks() {
-        total += 1;
-        match task.status().kind() {
-            domain::TaskStatusKind::Todo => todo += 1,
-            domain::TaskStatusKind::InProgress => in_progress += 1,
-            domain::TaskStatusKind::Done => done += 1,
-            domain::TaskStatusKind::Skipped => skipped += 1,
+    // Load impl-plan.json. When absent, all counts are zero (planning-only track).
+    let store = FsTrackStore::new(items_dir);
+    let impl_plan = store
+        .load_impl_plan(&valid_id)
+        .map_err(|err| CliError::Message(format!("task-counts failed reading impl-plan: {err}")))?;
+
+    let (total, todo, in_progress, done, skipped) = match &impl_plan {
+        Some(doc) => {
+            let total = doc.tasks().len();
+            let todo =
+                doc.tasks().iter().filter(|t| t.status().kind() == TaskStatusKind::Todo).count();
+            let in_progress = doc
+                .tasks()
+                .iter()
+                .filter(|t| t.status().kind() == TaskStatusKind::InProgress)
+                .count();
+            let done =
+                doc.tasks().iter().filter(|t| t.status().kind() == TaskStatusKind::Done).count();
+            let skipped =
+                doc.tasks().iter().filter(|t| t.status().kind() == TaskStatusKind::Skipped).count();
+            (total, todo, in_progress, done, skipped)
         }
-    }
+        None => (0, 0, 0, 0, 0),
+    };
 
-    let obj = serde_json::json!({
-        "total": total,
-        "todo": todo,
-        "in_progress": in_progress,
-        "done": done,
-        "skipped": skipped,
-    });
-    println!("{obj}");
+    println!(
+        r#"{{"total":{total},"todo":{todo},"in_progress":{in_progress},"done":{done},"skipped":{skipped}}}"#
+    );
     Ok(ExitCode::SUCCESS)
 }
 
-/// Read track metadata without locking (read-only queries).
-fn read_track_metadata_simple(
-    items_dir: &std::path::Path,
-    track_id: &TrackId,
-) -> Result<domain::TrackMetadata, CliError> {
-    let (track, _meta) = infrastructure::track::fs_store::read_track_metadata(items_dir, track_id)
-        .map_err(|err| CliError::Message(format!("failed to read track: {err}")))?;
-    Ok(track)
+/// Derives the track-level `TrackStatus` from a task slice.
+///
+/// Mirrors the logic in `usecase::derive_track_status_from_impl_plan`:
+/// - Empty → `Planned`
+/// - All resolved (done/skipped) → `Done`
+/// - Any `InProgress`, OR mix of at least one resolved + at least one unresolved → `InProgress`
+/// - All `Todo` → `Planned`
+fn derive_track_status_from_tasks(tasks: &[domain::TrackTask]) -> TrackStatus {
+    if tasks.is_empty() {
+        return TrackStatus::Planned;
+    }
+    let all_resolved = tasks
+        .iter()
+        .all(|t| matches!(t.status().kind(), TaskStatusKind::Done | TaskStatusKind::Skipped));
+    if all_resolved {
+        return TrackStatus::Done;
+    }
+    let any_in_progress = tasks.iter().any(|t| t.status().kind() == TaskStatusKind::InProgress);
+    let any_resolved = tasks
+        .iter()
+        .any(|t| matches!(t.status().kind(), TaskStatusKind::Done | TaskStatusKind::Skipped));
+    if any_in_progress || any_resolved { TrackStatus::InProgress } else { TrackStatus::Planned }
 }
 
 /// Sync rendered views, printing results. Non-fatal on failure.
@@ -208,165 +259,96 @@ mod tests {
     use super::*;
     use std::fs;
 
-    /// Create a minimal valid metadata.json in a temp directory structure.
-    /// Returns (project_root, items_dir, track_dir).
-    fn setup_test_track(
-        tmp: &std::path::Path,
-        track_id: &str,
-        tasks_json: &str,
-    ) -> (PathBuf, PathBuf, PathBuf) {
-        let track_dir = tmp.join("track").join("items").join(track_id);
-        fs::create_dir_all(&track_dir).unwrap();
+    /// Write a minimal valid v4 (identity-only) metadata.json.
+    fn write_metadata_v4(track_dir: &std::path::Path, track_id: &str) {
         let metadata = format!(
             r#"{{
-  "schema_version": 3,
+  "schema_version": 4,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Test Track",
   "status": "in_progress",
   "created_at": "2026-01-01T00:00:00Z",
-  "updated_at": "2026-01-01T00:00:00Z",
-  "tasks": {tasks_json},
-  "plan": {{
-    "summary": [],
-    "sections": [{{
-      "id": "S1",
-      "title": "Section 1",
-      "description": [],
-      "task_ids": ["T001"]
-    }}]
-  }},
-  "status_override": null
+  "updated_at": "2026-01-01T00:00:00Z"
 }}"#
         );
         fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
+    }
+
+    /// Write a minimal valid impl-plan.json with a single task T001.
+    fn write_impl_plan(track_dir: &std::path::Path) {
+        let impl_plan = r#"{
+  "schema_version": 1,
+  "tasks": [
+    {"id": "T001", "description": "First task", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section 1", "description": [], "task_ids": ["T001"]}
+    ]
+  }
+}"#;
+        fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
+    }
+
+    /// Create a minimal track setup. Returns (project_root, items_dir, track_dir).
+    fn setup_test_track(tmp: &std::path::Path, track_id: &str) -> (PathBuf, PathBuf, PathBuf) {
+        let track_dir = tmp.join("track").join("items").join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        write_metadata_v4(&track_dir, track_id);
         let items_dir = tmp.join("track").join("items");
         (tmp.to_path_buf(), items_dir, track_dir)
     }
 
+    /// Create a track with both metadata.json and impl-plan.json.
+    fn setup_test_track_with_impl_plan(
+        tmp: &std::path::Path,
+        track_id: &str,
+    ) -> (PathBuf, PathBuf, PathBuf) {
+        let (root, items_dir, track_dir) = setup_test_track(tmp, track_id);
+        write_impl_plan(&track_dir);
+        (root, items_dir, track_dir)
+    }
+
     #[test]
-    fn test_execute_next_task_returns_json() {
+    fn test_execute_next_task_with_open_task() {
         let tmp = tempfile::tempdir().unwrap();
-        let tasks =
-            r#"[{"id":"T001","description":"First task","status":"todo","commit_hash":null}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
+        let (_root, items_dir, _track_dir) =
+            setup_test_track_with_impl_plan(tmp.path(), "test-track");
 
         let result = execute_next_task(items_dir, "test-track".to_string());
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "expected Ok from next-task: {result:?}");
     }
 
     #[test]
-    fn test_next_task_json_schema_has_required_fields() {
+    fn test_execute_next_task_with_no_impl_plan() {
+        // When impl-plan.json is absent, next-task outputs JSON null payload and succeeds.
         let tmp = tempfile::tempdir().unwrap();
-        let tasks =
-            r#"[{"id":"T001","description":"First task","status":"todo","commit_hash":null}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
-
-        let track_id = TrackId::try_new("test-track").unwrap();
-        let track = read_track_metadata_simple(&items_dir, &track_id).unwrap();
-        let task = track.next_open_task().unwrap();
-
-        let obj = serde_json::json!({
-            "task_id": task.id().as_ref(),
-            "description": task.description(),
-            "status": task.status().kind().to_string(),
-        });
-        let json_str = obj.to_string();
-        let parsed: serde_json::Value = serde_json::from_str(&json_str).unwrap();
-        assert_eq!(parsed["task_id"], "T001");
-        assert_eq!(parsed["description"], "First task");
-        assert_eq!(parsed["status"], "todo");
-    }
-
-    #[test]
-    fn test_next_task_prefers_in_progress_over_todo() {
-        let tmp = tempfile::tempdir().unwrap();
-        // T001 is todo, T002 is in_progress — should return T002 (in_progress first)
-        let track_dir = tmp.path().join("track").join("items").join("test-track");
-        fs::create_dir_all(&track_dir).unwrap();
-        let metadata = r#"{
-  "schema_version": 3, "id": "test-track", "branch": "track/test-track",
-  "title": "Test", "status": "in_progress",
-  "created_at": "2026-01-01T00:00:00Z", "updated_at": "2026-01-01T00:00:00Z",
-  "tasks": [
-    {"id":"T001","description":"Todo task","status":"todo","commit_hash":null},
-    {"id":"T002","description":"Active task","status":"in_progress","commit_hash":null}
-  ],
-  "plan": {"summary":[],"sections":[{"id":"S1","title":"S1","description":[],"task_ids":["T001","T002"]}]},
-  "status_override": null
-}"#;
-        fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-        let items_dir = tmp.path().join("track").join("items");
-
-        let track_id = TrackId::try_new("test-track").unwrap();
-        let track = read_track_metadata_simple(&items_dir, &track_id).unwrap();
-        let task = track.next_open_task().unwrap();
-        assert_eq!(task.id().as_ref(), "T002");
-        assert_eq!(task.status().kind().to_string(), "in_progress");
-    }
-
-    #[test]
-    fn test_execute_next_task_with_no_open_tasks() {
-        let tmp = tempfile::tempdir().unwrap();
-        let tasks =
-            r#"[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234"}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
+        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         let result = execute_next_task(items_dir, "test-track".to_string());
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "expected Ok when no impl-plan.json: {result:?}");
     }
 
     #[test]
-    fn test_task_counts_json_schema() {
+    fn test_execute_task_counts_with_impl_plan() {
         let tmp = tempfile::tempdir().unwrap();
-        let track_dir = tmp.path().join("track").join("items").join("test-track");
-        fs::create_dir_all(&track_dir).unwrap();
-        let metadata = r#"{
-  "schema_version": 3, "id": "test-track", "branch": "track/test-track",
-  "title": "Test", "status": "in_progress",
-  "created_at": "2026-01-01T00:00:00Z", "updated_at": "2026-01-01T00:00:00Z",
-  "tasks": [
-    {"id":"T001","description":"A","status":"todo","commit_hash":null},
-    {"id":"T002","description":"B","status":"in_progress","commit_hash":null},
-    {"id":"T003","description":"C","status":"done","commit_hash":"abc1234"},
-    {"id":"T004","description":"D","status":"skipped","commit_hash":null}
-  ],
-  "plan": {"summary":[],"sections":[{"id":"S1","title":"S1","description":[],"task_ids":["T001","T002","T003","T004"]}]},
-  "status_override": null
-}"#;
-        fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-        let items_dir = tmp.path().join("track").join("items");
-
-        let track_id = TrackId::try_new("test-track").unwrap();
-        let track = read_track_metadata_simple(&items_dir, &track_id).unwrap();
-
-        let (mut total, mut todo, mut in_progress, mut done, mut skipped) =
-            (0u32, 0u32, 0u32, 0u32, 0u32);
-        for task in track.tasks() {
-            total += 1;
-            match task.status().kind() {
-                domain::TaskStatusKind::Todo => todo += 1,
-                domain::TaskStatusKind::InProgress => in_progress += 1,
-                domain::TaskStatusKind::Done => done += 1,
-                domain::TaskStatusKind::Skipped => skipped += 1,
-            }
-        }
-        assert_eq!(total, 4);
-        assert_eq!(todo, 1);
-        assert_eq!(in_progress, 1);
-        assert_eq!(done, 1);
-        assert_eq!(skipped, 1);
-    }
-
-    #[test]
-    fn test_execute_task_counts_returns_json() {
-        let tmp = tempfile::tempdir().unwrap();
-        let tasks =
-            r#"[{"id":"T001","description":"First task","status":"todo","commit_hash":null}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
+        let (_root, items_dir, _track_dir) =
+            setup_test_track_with_impl_plan(tmp.path(), "test-track");
 
         let result = execute_task_counts(items_dir, "test-track".to_string());
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "expected Ok from task-counts: {result:?}");
+    }
+
+    #[test]
+    fn test_execute_task_counts_with_no_impl_plan() {
+        // When impl-plan.json is absent, task-counts prints zeros and succeeds.
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
+
+        let result = execute_task_counts(items_dir, "test-track".to_string());
+        assert!(result.is_ok(), "expected Ok when no impl-plan.json: {result:?}");
     }
 
     #[test]
@@ -380,12 +362,12 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_task_counts_missing_track() {
+    fn test_execute_task_counts_invalid_track_id() {
         let tmp = tempfile::tempdir().unwrap();
         let items_dir = tmp.path().join("track").join("items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let result = execute_task_counts(items_dir, "nonexistent".to_string());
+        let result = execute_task_counts(items_dir, "INVALID ID".to_string());
         assert!(result.is_err());
     }
 
@@ -409,8 +391,7 @@ mod tests {
     #[test]
     fn test_execute_set_override_invalid_status() {
         let tmp = tempfile::tempdir().unwrap();
-        let tasks = r#"[{"id":"T001","description":"Task","status":"todo","commit_hash":null}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
+        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         let result = execute_set_override(
             items_dir,
@@ -425,9 +406,8 @@ mod tests {
     #[test]
     fn test_execute_add_task_happy_path() {
         let tmp = tempfile::tempdir().unwrap();
-        let tasks =
-            r#"[{"id":"T001","description":"First task","status":"todo","commit_hash":null}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
+        let (_root, items_dir, _track_dir) =
+            setup_test_track_with_impl_plan(tmp.path(), "test-track");
 
         let result = execute_add_task(
             items_dir.clone(),
@@ -437,19 +417,30 @@ mod tests {
             None,
             true, // skip branch check for test
         );
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "add-task must succeed: {result:?}");
+    }
 
-        // Verify the task was added
-        let metadata_path = items_dir.join("test-track").join("metadata.json");
-        let content = fs::read_to_string(metadata_path).unwrap();
-        assert!(content.contains("New task"));
+    #[test]
+    fn test_execute_add_task_without_impl_plan_fails() {
+        // Without impl-plan.json, add-task should fail (can't add to missing plan).
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
+
+        let result = execute_add_task(
+            items_dir.clone(),
+            "test-track".to_string(),
+            "New task".to_string(),
+            None,
+            None,
+            true,
+        );
+        assert!(result.is_err(), "add-task without impl-plan.json must fail");
     }
 
     #[test]
     fn test_execute_set_override_happy_path() {
         let tmp = tempfile::tempdir().unwrap();
-        let tasks = r#"[{"id":"T001","description":"Task","status":"todo","commit_hash":null}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
+        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         let result = execute_set_override(
             items_dir.clone(),
@@ -468,8 +459,7 @@ mod tests {
     #[test]
     fn test_execute_clear_override_happy_path() {
         let tmp = tempfile::tempdir().unwrap();
-        let tasks = r#"[{"id":"T001","description":"Task","status":"todo","commit_hash":null}]"#;
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
+        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         // First set an override
         execute_set_override(

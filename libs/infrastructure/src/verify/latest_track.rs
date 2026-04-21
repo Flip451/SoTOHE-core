@@ -346,18 +346,23 @@ fn parse_updated_at(raw: &str) -> Result<i64, String> {
 /// Compute track selection priority.
 ///
 /// Returns:
-/// - `2` when the track has a branch and is not done, or is a legacy branchless
-///   track (schema_version != 3) with an active status.
-/// - `1` when the track is branchless v3 and `planned` (planning-only).
-/// - `0` otherwise (done, or unrecognized).
+/// - `2` when the track has a branch and is not done, or is branchless but
+///   actively in-progress (status is active and not `planned`).
+/// - `1` when the track is branchless v3/v4 and `planned` (planning-only).
+///   These are deprioritised so that a branchful active track always wins.
+/// - `0` otherwise (done, archived, or unrecognized).
 fn selection_priority(status: &str, branch: Option<&str>, schema_version: u32) -> u32 {
     let branch_name = branch.map(|b| b.trim()).unwrap_or("");
     let has_branch = !branch_name.is_empty();
+    let is_active = status != "done" && status != "archived";
 
-    if has_branch && status != "done" {
+    if has_branch && is_active {
         return 2;
     }
-    if !has_branch && schema_version != 3 && status != "done" && status != "archived" {
+    // Branchless track with active status that is NOT a planning-only placeholder.
+    // v3/v4 tracks in "planned" state are planning-only (priority 1).
+    // All other branchless active tracks get priority 2.
+    if !has_branch && is_active && !(matches!(schema_version, 3 | 4) && status == "planned") {
         return 2;
     }
     if !has_branch && status == "planned" {
@@ -829,7 +834,34 @@ fn validate_plan_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
             findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
         }
     }
-    if !has_task_items(&text) {
+    // T005/T008: Skip the task-items check when:
+    //   (a) impl-plan.json is absent AND the plan.md carries both the machine-generated
+    //       header and the stub Note — this is the transition stub emitted by
+    //       `render_plan(_, None)`.  Requiring both markers makes the bypass much harder
+    //       to trigger accidentally via a hand-written plan.  Requiring the file to be
+    //       absent prevents a copied stub header from bypassing the check when a real
+    //       impl-plan.json already exists.
+    //   (b) impl-plan.json is present, has zero tasks, and the plan.md does NOT carry the
+    //       stub Note — render_plan(Some(empty_doc)) produces the "Tasks (0/0 resolved)"
+    //       header but no task-item lines, which is correct.  If the stub Note is still
+    //       present, the plan.md is stale (view_freshness will catch it, and we treat
+    //       it as an error here too rather than silently skipping the check).
+    let impl_plan_path = path.parent().map(|d| d.join("impl-plan.json"));
+    let impl_plan_absent = !impl_plan_path.as_ref().is_some_and(|p| p.is_file());
+    let has_stub_note = text.contains("> **Note**: `impl-plan.json` not yet generated.");
+    let impl_plan_empty_and_fresh = impl_plan_path.as_ref().is_some_and(|p| {
+        !has_stub_note
+            && p.is_file()
+            && std::fs::read_to_string(p).ok().and_then(|json| {
+                crate::impl_plan_codec::decode(&json).ok().map(|doc| doc.tasks().is_empty())
+            }) == Some(true)
+    });
+    let is_t005_stub = impl_plan_absent
+        && text.contains(
+            "<!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->",
+        )
+        && has_stub_note;
+    if !is_t005_stub && !impl_plan_empty_and_fresh && !has_task_items(&text) {
         findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track plan.md does not contain any task items: {}",
             display_path(path, root)
@@ -1080,6 +1112,19 @@ mod tests {
         assert!(
             selection_priority("in_progress", Some("track/feat"), 3)
                 > selection_priority("planned", None, 3)
+        );
+    }
+
+    #[test]
+    fn test_selection_priority_v4_branchless_planned_deprioritised() {
+        // v4 identity-only branchless planned tracks must be treated like v3
+        // planning-only tracks: priority 1, not 2.
+        assert_eq!(selection_priority("planned", None, 4), 1);
+        // A branchful active v4 track (priority 2) still beats a branchless
+        // planned v4 track (priority 1).
+        assert!(
+            selection_priority("in_progress", Some("track/feat"), 4)
+                > selection_priority("planned", None, 4)
         );
     }
 

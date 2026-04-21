@@ -2,8 +2,22 @@
   "schema_version": 2,
   "type_definitions": [
     {
+      "name": "AddTaskUseCase",
+      "description": "Usecase-layer struct that adds a new task to a track's impl-plan.json. Implemented per ADR 2026-04-19-1242 §D1.4 / T007: reads ImplPlanDocument via ImplPlanReader, delegates to ImplPlanDocument::add_task, persists via ImplPlanWriter, then returns the current TrackMetadata and the newly-allocated TaskId.",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case"
+    },
+    {
+      "name": "TransitionTaskUseCase",
+      "description": "Usecase-layer struct that applies a state transition to a task in impl-plan.json. Implemented per ADR 2026-04-19-1242 §D1.4 / T007: reads ImplPlanDocument via ImplPlanReader, delegates to ImplPlanDocument::apply_transition_by_status, persists via ImplPlanWriter, then returns the current TrackMetadata.",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case"
+    },
+    {
       "name": "TrackBlobReader",
-      "description": "Usecase-layer secondary port that reads PR branch blobs (spec.json / <layer>-types.json / impl-plan.json / architecture-rules.json) and decodes them into domain aggregates. Modified per ADR 2026-04-19-1242 §D6.2 / T007: the historical `read_track_metadata` method is renamed to `read_impl_plan` and its return type switches from `BlobFetchResult<TrackMetadata>` to `BlobFetchResult<ImplPlanDocument>` so the task-completion merge gate can drive off the new impl-plan.json file instead of the identity-only metadata.json. `expected_methods` below intentionally reflects the **current** trait shape so the design commit stays Blue; T007's implementation commit replaces the `read_track_metadata` entry with `read_impl_plan` (catalogue updated in lockstep with the rust rename) and the `GitShowTrackBlobReader` adapter is adjusted the same way.",
+      "description": "Usecase-layer secondary port that reads PR branch blobs (spec.json / <layer>-types.json / impl-plan.json / architecture-rules.json) and decodes them into domain aggregates. Modified per ADR 2026-04-19-1242 §D6.2 / T007: `read_track_metadata` is replaced by `read_impl_plan` returning `BlobFetchResult<ImplPlanDocument>` so the task-completion merge gate drives off impl-plan.json instead of the identity-only metadata.json.",
       "approved": true,
       "action": "modify",
       "kind": "secondary_port",
@@ -45,7 +59,7 @@
           "is_async": false
         },
         {
-          "name": "read_track_metadata",
+          "name": "read_impl_plan",
           "receiver": "&self",
           "params": [
             {
@@ -57,7 +71,7 @@
               "ty": "&str"
             }
           ],
-          "returns": "BlobFetchResult<TrackMetadata>",
+          "returns": "BlobFetchResult<ImplPlanDocument>",
           "is_async": false
         },
         {

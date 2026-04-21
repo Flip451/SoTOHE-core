@@ -9,13 +9,32 @@
 //! structured refs; requirement annotations show typed refs (adr_refs /
 //! convention_refs / informal_grounds) instead of the legacy `sources: Vec<String>`.
 
-use domain::{SpecDocument, SpecRequirement};
+use domain::{SpecDocument, SpecRequirement, TaskCoverageDocument, TaskId};
 
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
 /// Renders the contents of `spec.md` from a [`SpecDocument`].
+///
+/// This is the backward-compatible entry point: requirements are rendered
+/// without task-coverage annotations. Use [`render_spec_with_coverage`] when
+/// a sibling `task-coverage.json` is available.
+///
+/// The output always ends with a trailing newline.
+#[must_use]
+pub fn render_spec(doc: &SpecDocument) -> String {
+    render_spec_with_coverage(doc, None)
+}
+
+/// Renders the contents of `spec.md` from a [`SpecDocument`] and an optional
+/// [`TaskCoverageDocument`].
+///
+/// When `coverage` is `Some`, each requirement in the `in_scope`,
+/// `out_of_scope`, `constraints`, and `acceptance_criteria` sections is
+/// annotated with its implementing task IDs from `task-coverage.json`.
+/// When `coverage` is `None`, requirements are rendered without coverage
+/// annotations (backward-compatible with pre-T004 tracks).
 ///
 /// The output always ends with a trailing newline.
 ///
@@ -37,16 +56,16 @@ use domain::{SpecDocument, SpecRequirement};
 /// ## Scope
 ///
 /// ### In Scope
-/// - Requirement text [adr: knowledge/adr/x.md#D1.2]
+/// - [IN-01] Requirement text [adr: knowledge/adr/x.md#D1.2] [tasks: T001, T002]
 ///
 /// ### Out of Scope
-/// - Excluded item [informal: discussion — agreed out of scope]
+/// - [OO-01] Excluded item [informal: discussion — agreed out of scope]
 ///
 /// ## Constraints
-/// - Constraint 1 [conv: .claude/rules/04-coding-principles.md#newtype-pattern]
+/// - [CN-01] Constraint 1 [conv: .claude/rules/04-coding-principles.md#newtype-pattern]
 ///
 /// ## Acceptance Criteria
-/// - [ ] AC text [adr: knowledge/adr/x.md#D3.1]
+/// - [ ] [AC-01] AC text [adr: knowledge/adr/x.md#D3.1] [tasks: T003]
 ///
 /// ## Custom Section Title
 ///
@@ -56,7 +75,10 @@ use domain::{SpecDocument, SpecRequirement};
 /// - knowledge/conventions/source-attribution.md#intro
 /// ```
 #[must_use]
-pub fn render_spec(doc: &SpecDocument) -> String {
+pub fn render_spec_with_coverage(
+    doc: &SpecDocument,
+    coverage: Option<&TaskCoverageDocument>,
+) -> String {
     let mut out = String::new();
 
     // Header comment
@@ -86,7 +108,7 @@ pub fn render_spec(doc: &SpecDocument) -> String {
         out.push_str("## Goal\n");
         out.push('\n');
         for req in goal {
-            out.push_str(&render_requirement(req));
+            out.push_str(&render_requirement_with_tasks(req, None));
         }
         out.push('\n');
     }
@@ -99,14 +121,16 @@ pub fn render_spec(doc: &SpecDocument) -> String {
 
         out.push_str("### In Scope\n");
         for req in scope.in_scope() {
-            out.push_str(&render_requirement(req));
+            let task_refs = coverage.and_then(|c| c.in_scope().get(req.id()));
+            out.push_str(&render_requirement_with_tasks(req, task_refs));
         }
         out.push('\n');
 
         if !scope.out_of_scope().is_empty() {
             out.push_str("### Out of Scope\n");
             for req in scope.out_of_scope() {
-                out.push_str(&render_requirement(req));
+                let task_refs = coverage.and_then(|c| c.out_of_scope().get(req.id()));
+                out.push_str(&render_requirement_with_tasks(req, task_refs));
             }
             out.push('\n');
         }
@@ -117,7 +141,8 @@ pub fn render_spec(doc: &SpecDocument) -> String {
     if !constraints.is_empty() {
         out.push_str("## Constraints\n");
         for req in constraints {
-            out.push_str(&render_requirement(req));
+            let task_refs = coverage.and_then(|c| c.constraints().get(req.id()));
+            out.push_str(&render_requirement_with_tasks(req, task_refs));
         }
         out.push('\n');
     }
@@ -127,7 +152,8 @@ pub fn render_spec(doc: &SpecDocument) -> String {
     if !ac.is_empty() {
         out.push_str("## Acceptance Criteria\n");
         for req in ac {
-            out.push_str(&render_acceptance_criterion(req));
+            let task_refs = coverage.and_then(|c| c.acceptance_criteria().get(req.id()));
+            out.push_str(&render_acceptance_criterion_with_tasks(req, task_refs));
         }
         out.push('\n');
     }
@@ -185,26 +211,42 @@ pub fn render_spec(doc: &SpecDocument) -> String {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-/// Renders a requirement as a bullet item with typed ref annotations.
+/// Renders a requirement as a bullet item with typed ref annotations and optional
+/// task coverage tags.
 ///
 /// Format:
-/// - `- [id] text [adr: file#anchor, ...] [conv: file#anchor, ...] [informal: kind — summary, ...]`
-/// - When no refs: `- [id] text`
-fn render_requirement(req: &SpecRequirement) -> String {
+/// - `- [id] text [adr: file#anchor, ...] [conv: file#anchor, ...] [informal: kind — summary, ...] [tasks: T001, T002]`
+/// - When `task_refs` is `None` or empty: no `[tasks: ...]` tag.
+fn render_requirement_with_tasks(req: &SpecRequirement, task_refs: Option<&Vec<TaskId>>) -> String {
     let mut line = format!("- [{}] {}", req.id(), req.text());
     append_typed_refs(&mut line, req);
+    append_task_refs(&mut line, task_refs);
     line.push('\n');
     line
 }
 
-/// Renders an acceptance criterion as a checkbox bullet item.
+/// Renders an acceptance criterion as a checkbox bullet item with optional task coverage.
 ///
-/// Format: `- [ ] [id] text [adr: file#anchor]`
-fn render_acceptance_criterion(req: &SpecRequirement) -> String {
+/// Format: `- [ ] [id] text [adr: file#anchor] [tasks: T001]`
+fn render_acceptance_criterion_with_tasks(
+    req: &SpecRequirement,
+    task_refs: Option<&Vec<TaskId>>,
+) -> String {
     let mut line = format!("- [ ] [{}] {}", req.id(), req.text());
     append_typed_refs(&mut line, req);
+    append_task_refs(&mut line, task_refs);
     line.push('\n');
     line
+}
+
+/// Appends `[tasks: T001, T002]` to `line` when `task_refs` is non-empty.
+fn append_task_refs(line: &mut String, task_refs: Option<&Vec<TaskId>>) {
+    if let Some(refs) = task_refs {
+        if !refs.is_empty() {
+            let tags: Vec<String> = refs.iter().map(|t| t.to_string()).collect();
+            line.push_str(&format!(" [tasks: {}]", tags.join(", ")));
+        }
+    }
 }
 
 fn append_typed_refs(line: &mut String, req: &SpecRequirement) {
@@ -745,7 +787,7 @@ version: \"1.0\"
             vec![],
         )
         .unwrap();
-        let line = render_requirement(&req);
+        let line = render_requirement_with_tasks(&req, None);
         assert_eq!(line, "- [IN-01] multi-ref req [adr: adr/a.md#D1, adr/b.md#D2]\n");
     }
 
@@ -759,7 +801,7 @@ version: \"1.0\"
             vec![informal(InformalGroundKind::UserDirective, "user asked for it")],
         )
         .unwrap();
-        let line = render_requirement(&req);
+        let line = render_requirement_with_tasks(&req, None);
         assert!(line.contains("[adr: adr/x.md#D1]"));
         assert!(line.contains("[informal: user_directive — user asked for it]"));
     }

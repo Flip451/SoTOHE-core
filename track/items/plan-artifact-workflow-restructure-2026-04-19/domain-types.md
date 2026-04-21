@@ -35,3 +35,10 @@
 | SpecValidationError | error_type | modify | EmptyTitle, EmptyVersion, EmptyRequirementText, EmptyDomainStateName, EmptySectionTitle | 🔵 |
 | ValidationError | error_type | modify | InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary | 🔵 |
 
+## Secondary Ports
+
+| Name | Kind | Action | Details | Signal |
+|------|------|--------|---------|--------|
+| ImplPlanReader | secondary_port | — | fn load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError> | 🔵 |
+| ImplPlanWriter | secondary_port | — | fn save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError> | 🔵 |
+

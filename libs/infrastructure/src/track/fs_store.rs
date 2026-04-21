@@ -3,9 +3,13 @@
 use std::path::{Path, PathBuf};
 
 use domain::{
-    DomainError, RepositoryError, TrackId, TrackMetadata, TrackReadError, TrackReader,
-    TrackWriteError, TrackWriter,
+    DomainError, ImplPlanDocument, ImplPlanReader, ImplPlanWriter, RepositoryError, TrackId,
+    TrackMetadata, TrackReadError, TrackReader, TrackWriteError, TrackWriter,
 };
+
+// NOTE (T007): FsTrackStore no longer validates task descriptions or task
+// removal on save — those invariants are now enforced on ImplPlanDocument
+// (impl-plan.json). The identity-only TrackMetadata has no tasks/plan.
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
@@ -131,25 +135,19 @@ impl TrackWriter for FsTrackStore {
         }
 
         // Read existing meta to preserve created_at, or create new meta.
-        let mut meta = match self.read_track(track.id()).map_err(TrackWriteError::from)? {
-            Some((existing, mut meta)) => {
-                track.validate_descriptions_unchanged(&existing).map_err(DomainError::from)?;
-                track.validate_no_tasks_removed(&existing).map_err(DomainError::from)?;
+        let meta = match self.read_track(track.id()).map_err(TrackWriteError::from)? {
+            Some((_existing, mut meta)) => {
+                // NOTE (T007): task description / removal validation removed —
+                // those invariants now belong to ImplPlanDocument (impl-plan.json).
                 meta.updated_at = Self::now_iso8601().map_err(TrackWriteError::from)?;
                 meta
             }
             None => DocumentMeta {
-                schema_version: 2,
+                schema_version: 4,
                 created_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
                 updated_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
-                original_status: None,
-                extra: serde_json::Map::new(),
             },
         };
-
-        // Clear original_status so encode() recomputes status from the domain
-        // model rather than preserving a stale value like "archived".
-        meta.original_status = None;
 
         self.write_track(track, &meta).map_err(TrackWriteError::from)?;
 
@@ -178,11 +176,8 @@ impl TrackWriter for FsTrackStore {
         // Apply mutation (domain logic only, no I/O).
         mutate(&mut track).map_err(TrackWriteError::from)?;
 
-        // Update timestamp and clear original_status so encode() recomputes
-        // the status from the (possibly mutated) domain model instead of
-        // preserving a stale value like "archived".
+        // Update timestamp.
         meta.updated_at = Self::now_iso8601().map_err(TrackWriteError::from)?;
-        meta.original_status = None;
         self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
 
         Ok(track)
@@ -252,14 +247,49 @@ impl FsTrackStore {
         let result = f(&mut track, &mut meta).map_err(TrackWriteError::from);
 
         if result.is_ok() {
-            // Write the final state; `original_status` is cleared so encode()
-            // recomputes the status from the domain model.
-            meta.original_status = None;
+            // Write the final state atomically.
             self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
         }
 
         // Lock is released when `lock_file` is dropped (end of scope).
         result.map(|()| track)
+    }
+}
+
+impl ImplPlanReader for FsTrackStore {
+    fn load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError> {
+        let path = self.root.join(id.as_ref()).join("impl-plan.json");
+        if !path.exists() {
+            return Ok(None);
+        }
+        let json = std::fs::read_to_string(&path).map_err(|e| {
+            RepositoryError::Message(format!("failed to read {}: {e}", path.display()))
+        })?;
+        let doc = crate::impl_plan_codec::decode(&json).map_err(|e| {
+            RepositoryError::Message(format!("failed to decode {}: {e}", path.display()))
+        })?;
+        Ok(Some(doc))
+    }
+}
+
+impl ImplPlanWriter for FsTrackStore {
+    fn save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError> {
+        let path = self.root.join(id.as_ref()).join("impl-plan.json");
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                RepositoryError::Message(format!(
+                    "failed to create directory {}: {e}",
+                    parent.display()
+                ))
+            })?;
+        }
+        let json = crate::impl_plan_codec::encode(doc)
+            .map_err(|e| RepositoryError::Message(format!("failed to encode impl-plan: {e}")))?;
+        let content = format!("{json}\n");
+        super::atomic_write::atomic_write_file(&path, content.as_bytes()).map_err(|e| {
+            RepositoryError::Message(format!("failed to write {}: {e}", path.display()))
+        })?;
+        Ok(())
     }
 }
 
@@ -295,15 +325,10 @@ pub fn read_track_metadata(
 mod tests {
     use super::*;
 
-    use domain::{PlanSection, PlanView, TaskId, TrackId, TrackMetadata, TrackStatus, TrackTask};
+    use domain::{TrackId, TrackMetadata, TrackStatus};
 
     fn sample_track(id: &str) -> TrackMetadata {
-        let task_id = TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Implement feature").unwrap();
-        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-
-        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", vec![task], plan, None)
+        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", TrackStatus::Planned, None)
             .unwrap()
     }
 
@@ -336,10 +361,9 @@ mod tests {
 
         store.save(&track).unwrap();
 
-        let task_id = TaskId::try_new("T1").unwrap();
         let updated = store
             .update(track.id(), |t| {
-                t.transition_task(&task_id, domain::TaskTransition::Start)?;
+                t.set_status(TrackStatus::InProgress);
                 Ok(())
             })
             .unwrap();
@@ -365,8 +389,7 @@ mod tests {
     }
 
     #[test]
-    fn test_save_new_track_succeeds_without_validation() {
-        // A brand-new track (no previous on disk) should succeed regardless of descriptions.
+    fn test_save_new_track_succeeds() {
         let dir = tempfile::tempdir().unwrap();
         let store = FsTrackStore::new(dir.path());
         let track = sample_track("new-track");
@@ -376,109 +399,14 @@ mod tests {
     }
 
     #[test]
-    fn test_save_with_unchanged_descriptions_succeeds() {
-        // Re-saving with identical task descriptions should succeed.
+    fn test_save_twice_with_same_data_succeeds() {
         let dir = tempfile::tempdir().unwrap();
         let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
 
         store.save(&track).unwrap();
-
-        // Save again with the exact same data — should succeed.
         let result = store.save(&track);
         assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_save_with_mutated_description_returns_error() {
-        // Saving with a changed task description on an existing track should fail.
-        let dir = tempfile::tempdir().unwrap();
-        let store = FsTrackStore::new(dir.path());
-        let track = sample_track("test-track");
-
-        store.save(&track).unwrap();
-
-        // Build a track with the same ID but a different task description.
-        let task_id = TaskId::try_new("T1").unwrap();
-        let mutated_task = TrackTask::new(task_id.clone(), "MUTATED description").unwrap();
-        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-        let mutated_track = TrackMetadata::new(
-            TrackId::try_new("test-track").unwrap(),
-            "Test Track",
-            vec![mutated_task],
-            plan,
-            None,
-        )
-        .unwrap();
-
-        let result = store.save(&mutated_track);
-        assert!(matches!(
-            result,
-            Err(TrackWriteError::Domain(DomainError::Validation(
-                domain::ValidationError::TaskDescriptionMutated { .. }
-            )))
-        ));
-    }
-
-    #[test]
-    fn test_save_adding_new_task_to_existing_track_succeeds() {
-        // Adding a brand-new task ID (not present in the previous version) should succeed.
-        let dir = tempfile::tempdir().unwrap();
-        let store = FsTrackStore::new(dir.path());
-        let track = sample_track("test-track");
-
-        store.save(&track).unwrap();
-
-        // Build a new version that keeps T1 unchanged and adds T2.
-        let task_id_t1 = TaskId::try_new("T1").unwrap();
-        let task_id_t2 = TaskId::try_new("T2").unwrap();
-        let task_t1 = TrackTask::new(task_id_t1.clone(), "Implement feature").unwrap();
-        let task_t2 = TrackTask::new(task_id_t2.clone(), "New task").unwrap();
-        let section =
-            PlanSection::new("S1", "Build", Vec::new(), vec![task_id_t1, task_id_t2]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-        let extended_track = TrackMetadata::new(
-            TrackId::try_new("test-track").unwrap(),
-            "Test Track",
-            vec![task_t1, task_t2],
-            plan,
-            None,
-        )
-        .unwrap();
-
-        let result = store.save(&extended_track);
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_save_with_removed_task_returns_error() {
-        // Removing a task that existed in the previous version must fail.
-        let dir = tempfile::tempdir().unwrap();
-        let store = FsTrackStore::new(dir.path());
-        let track = sample_track("test-track"); // has T1
-
-        store.save(&track).unwrap();
-
-        // Build a new version with no tasks (T1 removed).
-        let section = PlanSection::new("S1", "Build", Vec::new(), Vec::new()).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-        let empty_track = TrackMetadata::new(
-            TrackId::try_new("test-track").unwrap(),
-            "Test Track",
-            Vec::new(),
-            plan,
-            None,
-        )
-        .unwrap();
-
-        let result = store.save(&empty_track);
-        assert!(matches!(
-            result,
-            Err(TrackWriteError::Domain(DomainError::Validation(
-                domain::ValidationError::TaskRemoved { .. }
-            )))
-        ));
     }
 
     #[test]
@@ -525,10 +453,9 @@ mod tests {
         let track = sample_track("test-track");
         store.save(&track).unwrap();
 
-        let task_id = TaskId::try_new("T1").unwrap();
         let updated = store
             .with_locked_document(track.id(), |t, _meta| {
-                t.transition_task(&task_id, domain::TaskTransition::Start)?;
+                t.set_status(TrackStatus::InProgress);
                 Ok(())
             })
             .unwrap();
@@ -571,7 +498,7 @@ mod tests {
         let track = sample_track("test-track");
         store.save(&track).unwrap();
 
-        // Record the updated_at before the failed call.
+        // Record the content before the failed call.
         let path = dir.path().join("test-track").join("metadata.json");
         let json_before = std::fs::read_to_string(&path).unwrap();
 

@@ -10,7 +10,6 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use domain::TrackStatus;
 use domain::schema::{SchemaExportError, SchemaExporter};
 use infrastructure::code_profile_builder::build_type_graph;
 use infrastructure::schema_export::RustdocSchemaExporter;
@@ -65,13 +64,10 @@ pub fn execute_type_graph(
 
     // Active-track guard (mirrors type-signals).
     // Symlink protection for metadata read is handled inside `read_track_metadata`.
-    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-        TrackStatus::Archived
-    } else {
-        metadata.status()
-    };
+    // T005: schema_version 4 stores status directly; no original_status fallback needed.
+    let effective_status = metadata.status();
     ensure_active_track(effective_status, &track_id)?;
 
     let edge_set = parse_edge_set(&edges)?;

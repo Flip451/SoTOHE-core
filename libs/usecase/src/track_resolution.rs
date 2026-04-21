@@ -121,8 +121,11 @@ pub fn resolve_transition(
 /// Rejects implementation-phase task transitions on branchless (planning-only) tracks.
 ///
 /// If the target status is an implementation status (`in_progress`, `done`, `skipped`)
-/// and the track is a v3 track without an activated branch, this returns an error
-/// directing the user to activate the track first.
+/// and the track is a v3 or v4 (or newer) track without an activated branch, this
+/// returns an error directing the user to activate the track first.
+///
+/// Schema versions 1 and 2 predate the activation workflow and are allowed through
+/// unconditionally (legacy compatibility).
 ///
 /// # Errors
 /// Returns an error message if the transition is blocked by the activation guard.
@@ -136,7 +139,7 @@ pub fn reject_branchless_implementation_transition(
         return Ok(());
     }
 
-    if schema_version == 3 && branch.is_none() {
+    if schema_version >= 3 && branch.is_none() {
         return Err(TrackResolutionError::NotActivated(track_id.to_string()));
     }
 
@@ -326,10 +329,14 @@ mod tests {
     #[rstest]
     #[case::todo_target_is_allowed(3, None, "todo", true)]
     #[case::in_progress_on_branchless_v3_is_rejected(3, None, "in_progress", false)]
+    #[case::in_progress_on_branchless_v4_is_rejected(4, None, "in_progress", false)]
     #[case::in_progress_with_branch_is_allowed(3, Some("track/test"), "in_progress", true)]
+    #[case::in_progress_on_v4_with_branch_is_allowed(4, Some("track/test"), "in_progress", true)]
     #[case::in_progress_on_v2_is_allowed(2, None, "in_progress", true)]
     #[case::done_on_branchless_v3_is_rejected(3, None, "done", false)]
+    #[case::done_on_branchless_v4_is_rejected(4, None, "done", false)]
     #[case::skipped_on_branchless_v3_is_rejected(3, None, "skipped", false)]
+    #[case::skipped_on_branchless_v4_is_rejected(4, None, "skipped", false)]
     fn test_reject_branchless_implementation_transition(
         #[case] schema_version: u32,
         #[case] branch: Option<&str>,
@@ -352,8 +359,8 @@ mod tests {
     use std::sync::Mutex;
 
     use domain::{
-        PlanSection, PlanView, RepositoryError, TrackBranch, TrackMetadata, TrackReadError,
-        TrackReader, TrackTask,
+        RepositoryError, TrackBranch, TrackId, TrackMetadata, TrackReadError, TrackReader,
+        TrackStatus,
     };
 
     #[derive(Default)]
@@ -372,16 +379,12 @@ mod tests {
     }
 
     fn sample_track(id: &str, branch: Option<&str>) -> TrackMetadata {
-        let task_id = domain::TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Implement feature").unwrap();
-        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
+        // T005: identity-only TrackMetadata
         TrackMetadata::with_branch(
             TrackId::try_new(id).unwrap(),
             branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
-            vec![task],
-            plan,
+            TrackStatus::Planned,
             None,
         )
         .unwrap()

@@ -11,7 +11,6 @@ use std::process::ExitCode;
 
 use infrastructure::spec::codec as spec_codec;
 use infrastructure::track::atomic_write::atomic_write_file;
-use infrastructure::track::codec;
 use infrastructure::verify::frontmatter::parse_yaml_frontmatter;
 use infrastructure::verify::spec_signals::evaluate;
 
@@ -97,30 +96,8 @@ fn execute_signals_legacy(track_dir: &std::path::Path) -> Result<ExitCode, CliEr
     let body = body_lines.join("\n");
     let counts = evaluate(&body);
 
-    // Read metadata.json, update spec_signals, write back
-    let metadata_path = track_dir.join("metadata.json");
-    let json_content = std::fs::read_to_string(&metadata_path)
-        .map_err(|e| CliError::Message(format!("cannot read {}: {e}", metadata_path.display())))?;
-
-    let (track, mut meta) =
-        codec::decode(&json_content).map_err(|e| CliError::Message(format!("{e}")))?;
-
-    // Update timestamp
-    meta.updated_at = chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string();
-
-    // Store spec_signals in the extra map (backward-compatible, no schema bump)
-    let signals_value = serde_json::json!({
-        "blue": counts.blue(),
-        "yellow": counts.yellow(),
-        "red": counts.red()
-    });
-    meta.extra.insert("spec_signals".to_owned(), signals_value);
-
-    let encoded = codec::encode(&track, &meta).map_err(|e| CliError::Message(format!("{e}")))?;
-
-    atomic_write_file(&metadata_path, format!("{encoded}\n").as_bytes())
-        .map_err(|e| CliError::Message(format!("cannot write {}: {e}", metadata_path.display())))?;
-
+    // T005: DocumentMeta.extra removed (schema_version 4 is identity-only).
+    // Spec signals are no longer stored in metadata.json; they are computed on demand.
     let total = counts.total();
     println!(
         "[OK] Signals (legacy): blue={} yellow={} red={} (total={total})",
@@ -195,6 +172,8 @@ mod tests {
 
     #[test]
     fn test_execute_signals_writes_spec_signals_to_metadata() {
+        // T005: DocumentMeta.extra removed; spec_signals are no longer written to metadata.json.
+        // The legacy path now only prints signals to stdout.
         let dir = tempfile::tempdir().unwrap();
         let (items_dir, track_id) = setup_track(
             dir.path(),
@@ -209,14 +188,14 @@ mod tests {
         let result = execute_signals(items_dir.clone(), track_id.clone());
         assert!(result.is_ok());
 
-        // Verify metadata.json contains spec_signals
+        // T005: spec_signals are computed and printed but no longer persisted to metadata.json.
         let metadata_content =
             std::fs::read_to_string(items_dir.join(&track_id).join("metadata.json")).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&metadata_content).unwrap();
-        let signals = &doc["spec_signals"];
-        assert_eq!(signals["blue"], 1);
-        assert_eq!(signals["yellow"], 1);
-        assert_eq!(signals["red"], 0);
+        assert!(
+            doc.get("spec_signals").is_none(),
+            "spec_signals must not be written to metadata.json in schema_version 4"
+        );
     }
 
     #[test]

@@ -54,6 +54,8 @@ pub(super) fn execute_transition(
     }
 
     // Delegate task-lookup → resolve-transition → transition-task to usecase.
+    // T005: `TransitionTaskUseCase::execute_by_status` persists `impl-plan.json` and
+    // syncs `metadata.json` status in one atomic sequence, returning the updated metadata.
     let transition = usecase::TransitionTaskUseCase::new(Arc::clone(&store));
     let track = transition
         .execute_by_status(&track_id, &task_id, &target_status, parsed_hash)
@@ -154,10 +156,7 @@ mod tests {
     use std::collections::HashMap;
     use std::sync::Mutex;
 
-    use domain::{
-        PlanSection, PlanView, RepositoryError, TrackBranch, TrackMetadata, TrackReadError,
-        TrackTask,
-    };
+    use domain::{RepositoryError, TrackBranch, TrackMetadata, TrackReadError, TrackStatus};
 
     use super::*;
 
@@ -190,16 +189,12 @@ mod tests {
     }
 
     fn sample_track(id: &str, branch: Option<&str>) -> TrackMetadata {
-        let task_id = TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Test task").unwrap();
-        let section = PlanSection::new("S1", "Test", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
+        // T005: TrackMetadata is identity-only; no tasks/plan fields.
         TrackMetadata::with_branch(
             TrackId::try_new(id).unwrap(),
             branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
-            vec![task],
-            plan,
+            TrackStatus::Planned,
             None,
         )
         .unwrap()

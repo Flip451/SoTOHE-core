@@ -17,7 +17,7 @@
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::validate_branch_ref;
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{TrackId, TrackMetadata};
+use domain::{ImplPlanDocument, TrackId};
 use domain::{TypeCatalogueDocument, check_type_signals};
 
 /// Result of a port-level blob fetch.
@@ -77,12 +77,15 @@ pub trait TrackBlobReader {
         layer_id: &str,
     ) -> BlobFetchResult<(TypeCatalogueDocument, String)>;
 
-    /// Reads and decodes `track/items/<track_id>/metadata.json` into a
-    /// [`TrackMetadata`] aggregate.
+    /// Reads and decodes `track/items/<track_id>/impl-plan.json` for the given
+    /// `branch`. Returns `NotFound` when the file does not exist on the target
+    /// ref — this corresponds to "impl-plan.json not yet generated" and the
+    /// caller must decide whether this is a fatal condition.
     ///
-    /// Used by the task-completion gate (see `usecase::task_completion`)
-    /// which checks that all tasks are resolved before merge.
-    fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata>;
+    /// A default implementation panics so existing mocks that do not override
+    /// it surface the gap explicitly. Mocks used by task-completion tests must
+    /// override this method.
+    fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument>;
 
     /// Returns the list of TDDD-enabled layer ids on the given branch.
     ///
@@ -308,14 +311,12 @@ mod tests {
             }
         }
 
-        fn read_track_metadata(
+        fn read_impl_plan(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<TrackMetadata> {
-            // merge_gate tests don't exercise this port method;
-            // task_completion tests (T007) use a separate mock.
-            panic!("read_track_metadata must not be called by merge_gate tests")
+        ) -> BlobFetchResult<ImplPlanDocument> {
+            panic!("read_impl_plan must not be called by merge_gate tests")
         }
     }
 
@@ -365,12 +366,12 @@ mod tests {
             BlobFetchResult::NotFound
         }
 
-        fn read_track_metadata(
+        fn read_impl_plan(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<TrackMetadata> {
-            panic!("read_track_metadata must not be called by merge_gate tests")
+        ) -> BlobFetchResult<ImplPlanDocument> {
+            panic!("read_impl_plan must not be called by merge_gate tests")
         }
     }
 
@@ -796,12 +797,12 @@ mod tests {
             }
         }
 
-        fn read_track_metadata(
+        fn read_impl_plan(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<TrackMetadata> {
-            panic!("read_track_metadata must not be called by merge_gate tests")
+        ) -> BlobFetchResult<ImplPlanDocument> {
+            panic!("read_impl_plan must not be called by merge_gate tests")
         }
 
         fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {

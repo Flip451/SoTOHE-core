@@ -17,7 +17,7 @@
 
 use std::path::PathBuf;
 
-use domain::TrackMetadata;
+use domain::ImplPlanDocument;
 use domain::TypeCatalogueDocument;
 use domain::spec::SpecDocument;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
@@ -242,16 +242,16 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         BlobFetchResult::Found(bindings.iter().map(|b| b.layer_id().to_owned()).collect())
     }
 
-    fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata> {
-        let path = Self::blob_path(track_id, "metadata.json");
-        let text = match self.fetch_string::<TrackMetadata>(branch, &path) {
+    fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument> {
+        let path = Self::blob_path(track_id, "impl-plan.json");
+        let text = match self.fetch_string::<ImplPlanDocument>(branch, &path) {
             Ok(s) => s,
             Err(result) => return result,
         };
-        match crate::track::codec::decode(&text) {
-            Ok((track, _meta)) => BlobFetchResult::Found(track),
+        match crate::impl_plan_codec::decode(&text) {
+            Ok(doc) => BlobFetchResult::Found(doc),
             Err(e) => {
-                BlobFetchResult::FetchError(format!("{path}: metadata.json decode error: {e}"))
+                BlobFetchResult::FetchError(format!("{path}: impl-plan.json decode error: {e}"))
             }
         }
     }
@@ -363,27 +363,21 @@ mod tests {
         body.into_bytes()
     }
 
-    fn metadata_json_minimal(track_id: &str) -> String {
-        format!(
-            r#"{{
-  "schema_version": 3,
-  "id": "{track_id}",
-  "branch": "track/{track_id}",
-  "title": "Test",
-  "status": "planned",
-  "created_at": "2026-04-12T00:00:00Z",
-  "updated_at": "2026-04-12T00:00:00Z",
+    fn impl_plan_json_minimal() -> String {
+        // schema_version 1: minimal impl-plan with one todo task
+        r#"{
+  "schema_version": 1,
   "tasks": [
-    {{"id": "T001", "description": "Test task", "status": "todo", "commit_hash": null}}
+    { "id": "T001", "description": "Test task", "status": "todo" }
   ],
-  "plan": {{
-    "summary": ["Test plan"],
+  "plan": {
+    "summary": [],
     "sections": [
-      {{"id": "S1", "title": "Section", "description": ["D"], "task_ids": ["T001"]}}
+      { "id": "S1", "title": "Section", "description": [], "task_ids": ["T001"] }
     ]
-  }}
-}}"#
-        )
+  }
+}"#
+        .to_owned()
     }
 
     // --- read_spec_document ---
@@ -603,33 +597,34 @@ mod tests {
         }
     }
 
-    // --- read_track_metadata ---
+    // --- read_impl_plan ---
 
     #[test]
-    fn test_read_track_metadata_found() {
-        let metadata = metadata_json_minimal("foo");
-        let dir = setup_repo_with_track("foo", &[("metadata.json", metadata.as_bytes())]);
+    fn test_read_impl_plan_found() {
+        let impl_plan = impl_plan_json_minimal();
+        let dir = setup_repo_with_track("foo", &[("impl-plan.json", impl_plan.as_bytes())]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_track_metadata("main", "foo") {
-            BlobFetchResult::Found(track) => {
-                assert_eq!(track.tasks().len(), 1);
+        match reader.read_impl_plan("main", "foo") {
+            BlobFetchResult::Found(doc) => {
+                assert_eq!(doc.tasks().len(), 1);
+                assert_eq!(doc.tasks()[0].id().to_string(), "T001");
             }
             other => panic!("expected Found, got {other:?}"),
         }
     }
 
     #[test]
-    fn test_read_track_metadata_not_found() {
+    fn test_read_impl_plan_not_found() {
         let dir = setup_repo_with_track("foo", &[]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        assert!(matches!(reader.read_track_metadata("main", "foo"), BlobFetchResult::NotFound));
+        assert!(matches!(reader.read_impl_plan("main", "foo"), BlobFetchResult::NotFound));
     }
 
     #[test]
-    fn test_read_track_metadata_decode_error() {
-        let dir = setup_repo_with_track("foo", &[("metadata.json", b"not json")]);
+    fn test_read_impl_plan_decode_error() {
+        let dir = setup_repo_with_track("foo", &[("impl-plan.json", b"not json")]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_track_metadata("main", "foo") {
+        match reader.read_impl_plan("main", "foo") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("decode error"), "{msg}");
             }
@@ -690,22 +685,22 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_read_track_metadata_rejects_symlink() {
+    fn test_read_impl_plan_rejects_symlink() {
         let dir = tempfile::tempdir().unwrap();
         let repo = dir.path();
         git(repo, &["init", "--quiet", "--initial-branch=main"]);
         let track_dir = repo.join("track/items/foo");
         std::fs::create_dir_all(&track_dir).unwrap();
-        let metadata = metadata_json_minimal("foo");
-        std::fs::write(track_dir.join("target.json"), metadata).unwrap();
-        std::os::unix::fs::symlink("target.json", track_dir.join("metadata.json")).unwrap();
+        let impl_plan = impl_plan_json_minimal();
+        std::fs::write(track_dir.join("target.json"), impl_plan).unwrap();
+        std::os::unix::fs::symlink("target.json", track_dir.join("impl-plan.json")).unwrap();
         git(repo, &["add", "track"]);
         git(repo, &["commit", "--quiet", "-m", "add symlink"]);
         git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
         git(repo, &["fetch", "--quiet", "origin"]);
 
         let reader = GitShowTrackBlobReader::new(repo.to_path_buf());
-        match reader.read_track_metadata("main", "foo") {
+        match reader.read_impl_plan("main", "foo") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("symlink"), "{msg}");
             }

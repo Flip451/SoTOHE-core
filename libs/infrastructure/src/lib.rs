@@ -97,24 +97,16 @@ impl TrackWriter for InMemoryTrackStore {
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
-    use domain::{
-        PlanSection, PlanView, TaskId, TaskTransition, TrackId, TrackMetadata, TrackReader,
-        TrackStatus, TrackTask, TrackWriter,
-    };
+    use domain::{TrackId, TrackMetadata, TrackReader, TrackStatus, TrackWriter};
 
     use super::InMemoryTrackStore;
 
     fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Persist the track aggregate").unwrap();
-        let section = PlanSection::new("S1", "Persistence", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-
+        // T005: TrackMetadata is identity-only; no tasks/plan fields.
         TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            vec![task],
-            plan,
+            TrackStatus::Planned,
             None,
         )
         .unwrap()
@@ -135,13 +127,12 @@ mod tests {
     fn update_atomically_mutates_and_persists() {
         let store = InMemoryTrackStore::new();
         let track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
 
         store.save(&track).unwrap();
 
         let updated = store
             .update(track.id(), |t| {
-                t.transition_task(&task_id, TaskTransition::Start)?;
+                t.set_status(TrackStatus::InProgress);
                 Ok(())
             })
             .unwrap();

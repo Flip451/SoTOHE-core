@@ -111,18 +111,10 @@ pub fn execute_type_signals(
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
     // Active-track guard: reject type-signals on completed/archived tracks.
-    // `metadata.status()` is derived from task states and can never return
-    // `TrackStatus::Archived` (archived is a workflow-level state stored only in
-    // `DocumentMeta::original_status`). Check `original_status` first so that an
-    // archived track with unresolved tasks is not misclassified as `InProgress` and
-    // allowed through.
-    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+    // T005: schema_version 4 stores status directly in TrackMetadata; no original_status fallback.
+    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-        domain::TrackStatus::Archived
-    } else {
-        metadata.status()
-    };
+    let effective_status = metadata.status();
     ensure_active_track(effective_status, &track_id)?;
 
     // Resolve the set of TDDD-enabled layers to process. When
@@ -200,13 +192,10 @@ pub fn execute_type_signals_lenient_with_bindings(
 ) -> Result<ExitCode, CliError> {
     let valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
-    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-        domain::TrackStatus::Archived
-    } else {
-        metadata.status()
-    };
+    // T005: schema_version 4 stores status directly; no original_status fallback needed.
+    let effective_status = metadata.status();
     ensure_active_track(effective_status, &track_id)?;
 
     if bindings.is_empty() {
@@ -1511,16 +1500,17 @@ mod tests {
     #[test]
     fn test_execute_type_signals_rejects_archived_track_with_incomplete_tasks() {
         // Regression guard: archived tracks with unresolved tasks must still be
-        // rejected. `metadata.status()` derives from task states and would return
-        // `InProgress` for such a track (which `ensure_active_track` allows). The
-        // guard must consult `DocumentMeta::original_status` to catch this case.
+        // rejected. T005: `metadata.status()` now reads the explicit `status` field
+        // from the JSON directly (not derived from task states), so an archived v3
+        // track with in-progress tasks correctly returns `TrackStatus::Archived`.
+        // `ensure_active_track` must reject it.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-archived-track");
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // status="archived" in JSON, but task T001 is still "in_progress" →
-        // metadata.status() would return InProgress (not Archived).
+        // status="archived" in JSON; task T001 is still "in_progress" but that
+        // does NOT affect metadata.status() after T005 — status is explicit.
         let archived_incomplete_metadata = r#"{
   "schema_version": 3,
   "id": "test-archived-track",

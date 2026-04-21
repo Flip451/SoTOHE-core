@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-20T23:40:36Z",
-  "declaration_hash": "8fedf64bc8318737befbd109be3d44624198353847caeccf6a410752c0b9e53e",
+  "generated_at": "2026-04-21T06:08:06Z",
+  "declaration_hash": "bd73daf845dc9fe896deaf4bdc04ed502e255007bc4e9e64ba8e023ac28a7e6d",
   "signals": [
     {
       "type_name": "ImplPlanDocumentDto",
@@ -48,6 +48,30 @@
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "DocumentMeta",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanDocument",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "PlanSectionDocument",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackTaskDocument",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "SpecCodecError",

@@ -1,20 +1,19 @@
 //! Task-completion gate orchestration (hexagonal usecase layer).
 //!
 //! This module implements the pre-merge task-completion check that ensures
-//! all declared tasks in `metadata.json` are `done` or `skipped` before the
-//! merge proceeds. It consolidates the previous CLI-layer `check_tasks_resolved`
-//! logic from `apps/cli/src/commands/pr.rs` into a pure usecase workflow that
-//! goes through the same [`TrackBlobReader`] port used by the strict merge gate.
+//! all declared tasks in `impl-plan.json` are `done` or `skipped` before the
+//! merge proceeds. It reads from the same [`TrackBlobReader`] port used by the
+//! strict merge gate.
 //!
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D9, §D9.1.
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{TaskStatus, TrackId, validate_branch_ref};
+use domain::{TrackId, validate_branch_ref};
 
 use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
 
-/// Checks that all tasks in the track's `metadata.json` are resolved
+/// Checks that all tasks in the track's `impl-plan.json` are resolved
 /// (either `done`, `done-traced`, `done-pending`, or `skipped`) before the
 /// merge proceeds.
 ///
@@ -23,14 +22,14 @@ use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
 /// 1. `plan/` branches → PASS (plan-only branches carry no implementation tasks)
 /// 2. `validate_branch_ref` → fail-closed on dangerous characters
 /// 3. `track/` prefix stripped and validated via `TrackId::try_new`
-/// 4. `reader.read_track_metadata(branch, track_id)`:
-///    - `Found(track)` → check `all_tasks_resolved()`; report unresolved task IDs
-///    - `NotFound` → BLOCKED (metadata.json is required for every track)
+/// 4. `reader.read_impl_plan(branch, track_id)`:
+///    - `Found(doc)` → check `all_tasks_resolved()`; report unresolved task IDs
+///    - `NotFound` → PASS (impl-plan.json is optional for planning-only tracks)
 ///    - `FetchError` → BLOCKED
 ///
 /// This function is a thin orchestration that delegates all I/O to the
-/// [`TrackBlobReader`] port. Tests use `MockTrackBlobReader` to exercise
-/// every branch without a real git repository.
+/// [`TrackBlobReader`] port. Tests use `MockReader` to exercise every branch
+/// without a real git repository.
 ///
 /// Reference: ADR §D9.
 #[must_use]
@@ -60,40 +59,31 @@ pub fn check_tasks_resolved_from_git_ref(
         }
     }
 
-    // 4. Fetch and inspect metadata
-    let track = match reader.read_track_metadata(branch, track_id_str) {
-        BlobFetchResult::Found(t) => t,
+    // 4. Fetch and inspect impl-plan.json
+    let impl_plan = match reader.read_impl_plan(branch, track_id_str) {
+        BlobFetchResult::Found(doc) => doc,
         BlobFetchResult::NotFound => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "metadata.json not found on origin/{branch} — every track must have a metadata.json"
-            ))]);
+            // impl-plan.json is optional (planning-only tracks have no tasks).
+            return VerifyOutcome::pass();
         }
         BlobFetchResult::FetchError(msg) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "failed to read metadata.json on origin/{branch}: {msg}"
+                "failed to read impl-plan.json on origin/{branch}: {msg}"
             ))]);
         }
     };
 
-    if !track.all_tasks_resolved() {
-        let unresolved: Vec<String> = track
-            .tasks()
-            .iter()
-            .filter(|t| {
-                !matches!(
-                    t.status(),
-                    TaskStatus::DonePending | TaskStatus::DoneTraced { .. } | TaskStatus::Skipped
-                )
-            })
-            .map(|t| format!("{} ({})", t.id(), t.status().kind()))
-            .collect();
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "track has unresolved tasks: {} — run track-transition to mark tasks as done before merging",
-            unresolved.join(", ")
-        ))]);
+    // 5. All tasks must be resolved.
+    if impl_plan.all_tasks_resolved() {
+        return VerifyOutcome::pass();
     }
 
-    VerifyOutcome::pass()
+    let unresolved: Vec<String> =
+        impl_plan.unresolved_task_ids().iter().map(|id| id.to_string()).collect();
+    VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+        "track '{track_id_str}' has unresolved tasks on origin/{branch}: {}",
+        unresolved.join(", ")
+    ))])
 }
 
 #[cfg(test)]
@@ -103,23 +93,24 @@ mod tests {
 
     use domain::spec::SpecDocument;
     use domain::{
-        PlanSection, PlanView, TaskId, TaskStatus, TrackMetadata, TrackTask, TypeCatalogueDocument,
+        ImplPlanDocument, PlanSection, PlanView, TaskId, TaskStatus, TrackTask,
+        TypeCatalogueDocument,
     };
 
     use super::*;
 
     /// Mock reader dedicated to task_completion tests.
     struct MockReader {
-        metadata: RefCell<Option<BlobFetchResult<TrackMetadata>>>,
+        impl_plan: RefCell<Option<BlobFetchResult<ImplPlanDocument>>>,
     }
 
     impl MockReader {
-        fn new(metadata: BlobFetchResult<TrackMetadata>) -> Self {
-            Self { metadata: RefCell::new(Some(metadata)) }
+        fn new(impl_plan: BlobFetchResult<ImplPlanDocument>) -> Self {
+            Self { impl_plan: RefCell::new(Some(impl_plan)) }
         }
 
         fn unreachable() -> Self {
-            Self { metadata: RefCell::new(None) }
+            Self { impl_plan: RefCell::new(None) }
         }
     }
 
@@ -141,34 +132,48 @@ mod tests {
             panic!("read_type_catalogue must not be called by task_completion tests")
         }
 
-        fn read_track_metadata(
+        fn read_impl_plan(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<TrackMetadata> {
-            self.metadata.borrow_mut().take().expect(
-                "read_track_metadata called twice or not configured (use ::unreachable() for short-circuit tests)",
+        ) -> BlobFetchResult<ImplPlanDocument> {
+            self.impl_plan.borrow_mut().take().expect(
+                "read_impl_plan called twice or not configured (use ::unreachable() for short-circuit tests)",
             )
         }
     }
 
-    // --- Helpers to construct TrackMetadata aggregates ---
+    // --- Helpers ---
 
-    fn task_with(id: &str, status: TaskStatus) -> TrackTask {
-        let task_id = TaskId::try_new(id).unwrap();
-        TrackTask::with_status(task_id, "test task", status).unwrap()
+    fn task_with_status(id: &str, desc: &str, status: TaskStatus) -> TrackTask {
+        TrackTask::with_status(TaskId::try_new(id).unwrap(), desc, status).unwrap()
     }
 
-    fn track_metadata_with_tasks(id: &str, tasks: Vec<TrackTask>) -> TrackMetadata {
-        let section = PlanSection::new(
-            "S1",
-            "Section 1",
-            Vec::new(),
-            tasks.iter().map(|t| t.id().clone()).collect(),
+    fn section_with_ids(id: &str, task_ids: &[&str]) -> PlanSection {
+        PlanSection::new(
+            id,
+            "Section",
+            vec![],
+            task_ids.iter().map(|t| TaskId::try_new(*t).unwrap()).collect(),
         )
-        .unwrap();
-        let plan = PlanView::new(vec![], vec![section]);
-        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test track", tasks, plan, None).unwrap()
+        .unwrap()
+    }
+
+    fn impl_plan_all_resolved() -> ImplPlanDocument {
+        let t = task_with_status("T001", "done task", TaskStatus::DonePending);
+        let s = section_with_ids("S1", &["T001"]);
+        ImplPlanDocument::new(vec![t], PlanView::new(vec![], vec![s])).unwrap()
+    }
+
+    fn impl_plan_with_unresolved() -> ImplPlanDocument {
+        let t1 = task_with_status("T001", "done task", TaskStatus::DonePending);
+        let t2 = task_with_status("T002", "open task", TaskStatus::Todo);
+        let s = section_with_ids("S1", &["T001", "T002"]);
+        ImplPlanDocument::new(vec![t1, t2], PlanView::new(vec![], vec![s])).unwrap()
+    }
+
+    fn impl_plan_empty() -> ImplPlanDocument {
+        ImplPlanDocument::new(vec![], PlanView::new(vec![], vec![])).unwrap()
     }
 
     // --- K1–K7 test matrix ---
@@ -183,46 +188,32 @@ mod tests {
     }
 
     #[test]
-    fn test_k2_all_tasks_done_passes() {
-        // K2: metadata with all done tasks → PASS
-        let tasks = vec![
-            task_with("T001", TaskStatus::DonePending),
-            task_with("T002", TaskStatus::DonePending),
-        ];
-        let metadata = track_metadata_with_tasks("foo", tasks);
-        let reader = MockReader::new(BlobFetchResult::Found(metadata));
+    fn test_k2_impl_plan_all_resolved_passes() {
+        // K2: Found(all resolved) → PASS
+        let reader = MockReader::new(BlobFetchResult::Found(impl_plan_all_resolved()));
         let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
         assert!(!outcome.has_errors(), "{outcome:?}");
     }
 
     #[test]
-    fn test_k3_unresolved_task_blocks_with_list() {
-        // K3: one task still todo → BLOCKED with unresolved list in finding
-        let tasks = vec![
-            task_with("T001", TaskStatus::DonePending),
-            task_with("T002", TaskStatus::Todo),
-            task_with("T003", TaskStatus::InProgress),
-        ];
-        let metadata = track_metadata_with_tasks("foo", tasks);
-        let reader = MockReader::new(BlobFetchResult::Found(metadata));
-        let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
-        assert!(outcome.has_errors());
-        let msg = outcome.findings()[0].message();
-        assert!(msg.contains("T002"), "unresolved T002 in finding: {msg}");
-        assert!(msg.contains("T003"), "unresolved T003 in finding: {msg}");
-    }
-
-    #[test]
-    fn test_k4_metadata_not_found_blocks() {
-        // K4: metadata.json NotFound → BLOCKED
-        let reader = MockReader::new(BlobFetchResult::NotFound);
+    fn test_k3_impl_plan_with_unresolved_tasks_blocks() {
+        // K3: Found(has unresolved tasks) → BLOCKED, mentions task IDs
+        let reader = MockReader::new(BlobFetchResult::Found(impl_plan_with_unresolved()));
         let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
         assert!(outcome.has_errors());
         assert!(
-            outcome.findings()[0].message().contains("metadata.json"),
-            "finding must mention metadata.json: {}",
+            outcome.findings()[0].message().contains("T002"),
+            "finding must mention unresolved task id: {}",
             outcome.findings()[0].message()
         );
+    }
+
+    #[test]
+    fn test_k4_impl_plan_not_found_passes() {
+        // K4: impl-plan.json NotFound → PASS (planning-only track is OK)
+        let reader = MockReader::new(BlobFetchResult::NotFound);
+        let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
+        assert!(!outcome.has_errors(), "{outcome:?}");
     }
 
     #[test]
@@ -261,5 +252,23 @@ mod tests {
             outcome.findings()[0].message().contains("invalid track id")
                 || outcome.findings()[0].message().contains("invalid branch ref")
         );
+    }
+
+    #[test]
+    fn test_empty_impl_plan_passes() {
+        // Extra: impl-plan.json with zero tasks → all_tasks_resolved() = true → PASS
+        let reader = MockReader::new(BlobFetchResult::Found(impl_plan_empty()));
+        let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
+        assert!(!outcome.has_errors(), "{outcome:?}");
+    }
+
+    #[test]
+    fn test_unresolved_tasks_error_mentions_track_id() {
+        // Extra: error message must include track_id for diagnostics
+        let reader = MockReader::new(BlobFetchResult::Found(impl_plan_with_unresolved()));
+        let outcome = check_tasks_resolved_from_git_ref("track/my-feature", &reader);
+        assert!(outcome.has_errors());
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("my-feature"), "error must mention track id: {msg}");
     }
 }

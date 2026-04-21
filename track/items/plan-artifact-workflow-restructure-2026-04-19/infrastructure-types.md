@@ -16,6 +16,10 @@
 | ImplPlanDocumentDto | dto | — | — | 🔵 |
 | TaskCoverageDocumentDto | dto | — | — | 🔵 |
 | TrackDocumentV2 | dto | modify | — | 🔵 |
+| DocumentMeta | dto | modify | — | 🔵 |
+| PlanDocument | dto | delete | — | 🔵 |
+| PlanSectionDocument | dto | delete | — | 🔵 |
+| TrackTaskDocument | dto | delete | — | 🔵 |
 | ImplPlanTaskDto | dto | — | — | 🔵 |
 | ImplPlanPlanDto | dto | — | — | 🔵 |
 | ImplPlanSectionDto | dto | — | — | 🔵 |

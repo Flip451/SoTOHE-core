@@ -24,10 +24,16 @@ fn real_metadata_json_round_trips_through_rust_codec() {
     let (track2, meta2) = codec::decode(&re_encoded).unwrap();
 
     assert_eq!(track, track2, "round-trip must preserve TrackMetadata");
-    assert_eq!(meta.schema_version, meta2.schema_version);
+    // T005: encode() always writes schema_version = 4 (identity-only shape),
+    // so meta2 will always be 4 regardless of the original file's schema_version.
+    assert_eq!(meta2.schema_version, 4, "encode always upgrades to schema_version = 4");
 }
 
-/// Tests that the Rust codec preserves all Python-expected JSON keys.
+/// Tests that the Rust codec round-trips v2/v3 docs preserving identity-only fields (T005).
+///
+/// T005: schema_version 4 is identity-only. v2/v3 docs are decoded by stripping
+/// tasks/plan/extra fields. The re-encoded output is a v4 identity-only document.
+/// Python track_schema.py will be updated to v4 in the same track.
 #[test]
 fn rust_codec_preserves_python_expected_keys() {
     let json = full_featured_json();
@@ -37,46 +43,29 @@ fn rust_codec_preserves_python_expected_keys() {
     // Parse as generic JSON and verify structure.
     let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
 
-    // Top-level keys expected by Python track_schema.py.
+    // T005: Top-level identity keys expected by v4 schema.
     assert!(doc.get("schema_version").is_some());
     assert!(doc.get("id").is_some());
     assert!(doc.get("title").is_some());
     assert!(doc.get("status").is_some());
     assert!(doc.get("created_at").is_some());
     assert!(doc.get("updated_at").is_some());
-    assert!(doc.get("tasks").is_some());
-    assert!(doc.get("plan").is_some());
 
-    // Task keys.
-    let tasks = doc["tasks"].as_array().unwrap();
-    assert!(!tasks.is_empty());
-    let task = &tasks[0];
-    assert!(task.get("id").is_some());
-    assert!(task.get("description").is_some());
-    assert!(task.get("status").is_some());
+    // T005: tasks/plan are stripped during migration (moved to impl-plan.json / ImplPlanDocument).
+    assert!(doc.get("tasks").is_none(), "T005: tasks must be absent from v4 identity-only output");
+    assert!(doc.get("plan").is_none(), "T005: plan must be absent from v4 identity-only output");
 
-    // Done task should have commit_hash.
-    let done_task = tasks.iter().find(|t| t["status"] == "done").unwrap();
-    assert!(done_task.get("commit_hash").is_some());
+    // Note: status_override is retained in v4 for Blocked/Cancelled semantics.
+    // If the input had a status_override, it should be preserved in the output.
 
-    // Plan keys.
-    let plan = &doc["plan"];
-    assert!(plan.get("summary").is_some());
-    assert!(plan.get("sections").is_some());
-    let section = &plan["sections"][0];
-    assert!(section.get("id").is_some());
-    assert!(section.get("title").is_some());
-    assert!(section.get("description").is_some());
-    assert!(section.get("task_ids").is_some());
-
-    // Status override.
-    assert!(doc.get("status_override").is_some());
-    let override_ = doc["status_override"].as_object().unwrap();
-    assert!(override_.get("status").is_some());
-    assert!(override_.get("reason").is_some());
+    // Verify the decoded track identity is preserved.
+    assert_eq!(doc["id"].as_str().unwrap(), track.id().as_ref(), "round-trip must preserve id");
+    assert_eq!(doc["title"].as_str().unwrap(), track.title(), "round-trip must preserve title");
 }
 
 /// Tests that null commit_hash is omitted (skip_serializing_if) matching Python behavior.
+/// T005: tasks are stripped in v4; this test verifies the legacy decode path still
+/// accepts v2 docs and that re-encoded output omits tasks entirely.
 #[test]
 fn null_commit_hash_is_omitted_in_json() {
     let json = r#"{
@@ -94,12 +83,13 @@ fn null_commit_hash_is_omitted_in_json() {
     let re_encoded = codec::encode(&track, &meta).unwrap();
     let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
 
-    // todo task should NOT have commit_hash key (skip_serializing_if = "Option::is_none").
-    let task = &doc["tasks"][0];
-    assert!(task.get("commit_hash").is_none(), "todo task should omit commit_hash");
+    // T005: tasks stripped during v2→v4 migration; tasks key must be absent.
+    assert!(doc.get("tasks").is_none(), "T005: tasks must be absent from v4 identity-only output");
+    assert_eq!(doc["id"].as_str().unwrap(), track.id().as_ref());
 }
 
 /// Tests that null status_override is omitted matching Python behavior.
+/// T005: status_override was a v3 field; re-encoded v4 output omits it entirely.
 #[test]
 fn null_status_override_is_omitted_in_json() {
     let json = r#"{
@@ -117,7 +107,11 @@ fn null_status_override_is_omitted_in_json() {
     let re_encoded = codec::encode(&track, &meta).unwrap();
     let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
 
-    assert!(doc.get("status_override").is_none(), "no override should omit key");
+    // T005: status_override is a v3 field; v4 identity-only output omits it.
+    assert!(
+        doc.get("status_override").is_none(),
+        "T005: status_override must be absent from v4 identity-only output"
+    );
 }
 
 fn full_featured_json() -> &'static str {

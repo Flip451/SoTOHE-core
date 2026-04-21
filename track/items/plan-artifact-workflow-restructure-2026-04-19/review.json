@@ -158,24 +158,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
-          "at": "2026-04-20T17:03:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
-          "at": "2026-04-20T17:04:20Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -286,6 +268,479 @@
           "findings": [],
           "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
           "at": "2026-04-20T23:20:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackMetadata::with_branch` now only validates the title; it no longer checks that a provided branch matches the track id, and `set_branch` can later introduce the same mismatch. That allows persisted states like `id = my-track` with `branch = track/other-track`, which violates the branch-id consistency required by the new identity-only metadata model and can misroute branch-based readers/activation logic.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/track.rs",
+              "line": 300,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:9b07da54fc4423102751c166ded489b8277a7972f4883a15bd03700065d2d706",
+          "at": "2026-04-21T00:45:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set_branch` bypasses the new branch/id invariant enforced in `TrackMetadata::with_branch`. A caller can mutate an already-validated track into a mismatched `track/<other>` branch, and `ActivateTrackUseCase` uses this setter directly, so the domain can persist an invalid branch/id pair without any error.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 337,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:168ba683894d8aa7326203724f818ce860eb0bdd7615f5e49ff0a2c42c3ec9f2",
+          "at": "2026-04-21T00:50:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackMetadata` no longer enforces coherence between `status` and `status_override`. `new`/`with_branch` accept any combination, and `set_status`/`set_status_override` can mutate a track into `status = Planned` while keeping a blocked/cancelled override. `resolve_phase()` only consults `status`, so the override is then silently ignored and the track is misclassified. The previous implementation prevented impossible states here.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 307,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3a5efea3b1688def811484ea70d487b7b3ea9eab26a2d872cd5d91bda5c7800c",
+          "at": "2026-04-21T00:55:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` is not fail-safe: it appends the new task before validating the target section, and it `mem::take`s `self.plan` before the same validation. Any `SectionNotFound`/`NoSectionsAvailable` error leaves the aggregate mutated and the plan dropped, so a failed call corrupts in-memory state.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 173,
+              "category": "safety"
+            },
+            {
+              "message": "`next_num + 1` overflows when the highest existing task suffix is `u64::MAX`. That is a reachable `TaskId` value, so `add_task` can panic in debug builds or wrap to a duplicate `T000` in release builds.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 168,
+              "category": "safety"
+            },
+            {
+              "message": "`resolve_transition` only looks at `TaskStatusKind::Done`, so it cannot distinguish `DonePending` from `DoneTraced`. A traced task given target `done` plus a commit hash is mapped to `BackfillHash` and then rejected by `TrackTask::transition`, instead of being classified as an unsupported target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 239,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
+          "at": "2026-04-21T03:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` mutates `self.tasks` and `self.plan` before validating `section_id`. If the section is missing or there are no sections, the method returns an error after the new task has already been pushed and `mem::take(&mut self.plan)` has already cleared the plan, leaving the document corrupted on a recoverable error.",
+              "severity": "P0",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 173,
+              "category": "correctness"
+            },
+            {
+              "message": "The next task ID is computed with `+ 1` on the maximum numeric suffix. When the highest existing task is `T18446744073709551615`, this overflows and panics in library code instead of returning a validation error, regressing the previous checked-add behavior.",
+              "severity": "P0",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 169,
+              "category": "panic"
+            },
+            {
+              "message": "`next_open_task` now scans `self.tasks` in storage order and returns the first Todo/InProgress task it encounters. The previous implementation walked plan order and preferred InProgress over Todo, so a task list that is not aligned with the plan can now report the wrong \"next\" task.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 80,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
+          "at": "2026-04-21T03:44:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`apply_transition_by_status` collapses `DonePending` and `DoneTraced` into `TaskStatusKind::Done` before resolving `done`. That means a `done` request with a commit hash is always mapped to `BackfillHash`, which `TrackTask::transition` rejects for already-traced tasks. The status-based API therefore cannot distinguish the two done states and fails on an already-traced task instead of choosing the correct transition.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 148,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:76e182d450f25d2ef8a454702a1c4dfcd4d726872a4fdfac148cc670d4968420",
+          "at": "2026-04-21T03:51:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_phase` and `resolve_phase_from_record` still treat only `schema_version == 3` as branchless/activatable. That means v4 identity-only tracks are classified as `Planning` and the CLI will suggest `/track:implement` instead of `/track:activate`, even though the activation use case already accepts schema v4.",
+              "severity": "P1",
+              "file": "libs/domain/src/track_phase.rs",
+              "line": 82,
+              "category": "correctness"
+            },
+            {
+              "message": "`next_open_task` looks for any `InProgress` task using `self.tasks.iter().find(...)`, so the chosen task depends on storage order rather than plan order. If more than one task is open, `track next-task` can return a later task instead of the earliest one in the plan, which contradicts the method's own ordering contract.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 84,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:22c223c1b32f8b54b8167f40e8b26f076509c5f09db66a357ec04f750b28b7d1",
+          "at": "2026-04-21T03:56:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanSection` is used in `add_task` but never imported into this module, so the new `ImplPlanDocument::add_task` implementation does not compile.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 245,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
+          "at": "2026-04-21T04:05:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` now maps task-id overflow to `ValidationError::DuplicateTaskId(\"task id counter overflow\")`. That is the wrong error class for an arithmetic overflow and is a behavioral regression from the previous `InvalidTaskId` boundary handling, so callers can no longer distinguish overflow from a real duplicate-id case.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 203,
+              "category": "validation"
+            },
+            {
+              "message": "`with_refs` stores `spec_refs` verbatim and never checks whether the same `SpecRef.anchor` appears more than once in a single catalogue entry. That leaves the new structured-ref model able to encode duplicate `SpecElementId` citations without any domain validation, which is the invariant the briefing calls out as needing a new error path.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 490,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
+          "at": "2026-04-21T04:10:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`all_tasks_resolved()` is vacuously true for an empty `ImplPlanDocument`, so a zero-task `impl-plan.json` is treated as fully complete by downstream checks. That lets an empty implementation-plan file satisfy the completion gate instead of being rejected as missing/incomplete work.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 68,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19226f4e039523bca95924b238af6bdc0ef04d76488e6e2538fe3daf52365823",
+          "at": "2026-04-21T04:15:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
+          "at": "2026-04-21T04:25:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
+          "at": "2026-04-21T04:29:01Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:04:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:45:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Schema 4 tracks cannot be activated: T005 now writes identity-only metadata with schema_version 4, and execute_activate passes that DocumentMeta schema_version into ActivateTrackUseCase, but this guard still rejects anything other than 3 before materializing the branch. New branchless schema 4 tracks will fail /track:activate with TrackActivationRequiresSchemaV3 even though schema 4 is the new metadata shape.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_activation.rs",
+              "line": 46,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:48:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ActivateTrackUseCase::execute` still rejects every schema version except 3, but T005 now writes identity-only metadata as schema_version 4. A newly created branchless v4 track that is otherwise planned will fail activation with `TrackActivationRequiresSchemaV3`, so the non-task activation path is broken by this update.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_activation.rs",
+              "line": 46,
+              "category": null
+            },
+            {
+              "message": "Clearing an override always writes `TrackStatus::Planned`. Because T005 makes track status an explicitly persisted field, clearing a blocked/cancelled override on an active or done track rewrites the stored workflow status to planned instead of restoring or preserving the underlying status, corrupting the track phase for non-task override flows.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 197,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:50:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new transition/add-task path performs a separate `find` / `load_impl_plan` / `save_impl_plan` read-modify-write without the per-track lock that `TrackWriter::update` used to provide. Two concurrent `track-add-task` or `track-transition` calls can read the same snapshot, compute the same next `TaskId`, and then the last save wins, dropping one update. This is a data-loss regression and needs a serialized update boundary around the impl-plan mutation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 100,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6ecd6db28f4028ab6674601372ed56e9d27c214cf4243b6b32d3c5b3a453c260",
+          "at": "2026-04-21T03:41:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
+          "at": "2026-04-21T03:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a `track/` branch, `BlobFetchResult::NotFound` means the PR head does not contain `impl-plan.json`; `plan/` branches already short-circuit before this point. Returning `VerifyOutcome::pass()` here fail-opens the merge-time task-completion gate when there is no implementation plan to inspect, even though final merge requires `impl-plan.json` task state to be present and resolved.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_completion.rs",
+              "line": 65,
+              "category": "merge-gate"
+            },
+            {
+              "message": "An empty `ImplPlanDocument` is accepted because `all_tasks_resolved()` is vacuously true, so a PR can pass the merge task-completion gate with `impl-plan.json` present but containing zero tasks. The workflow requirement explicitly blocks empty task sets to avoid this nullable bypass; this use case needs to reject `impl_plan.tasks().is_empty()` before returning pass.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_completion.rs",
+              "line": 77,
+              "category": "merge-gate"
+            },
+            {
+              "message": "The branchless implementation-transition guard still only rejects `schema_version == 3`. New identity-only tracks are saved as schema version 4 and activation was updated to accept v4, so a branchless v4 planned track can run an implementation transition (`in_progress`, `done`, or `skipped`) without going through activation or materializing a track branch.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_resolution.rs",
+              "line": 139,
+              "category": "activation-guard"
+            },
+            {
+              "message": "`execute_by_status` mutates and saves only `impl-plan.json`, then returns the `TrackMetadata` read before the transition. Since `metadata.json` still carries the explicit persisted track status and no other task-transition path updates it, moving tasks to `in_progress` or `done` leaves `metadata.status` stuck at its old value, so resolve/registry/CLI status consumers continue to treat the track as planned after task state changed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 169,
+              "category": "state-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
+          "at": "2026-04-21T03:55:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase::execute` never re-derives or persists `TrackMetadata.status` after appending a new Todo task. If the track was previously `Done`, `metadata.json` stays `done` even though `impl-plan.json` now contains unresolved work, so `resolve_phase()`/CLI status reporting will keep treating the track as ready to ship.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 283,
+              "category": "correctness"
+            },
+            {
+              "message": "The transition paths write `impl-plan.json` first and then perform a second `metadata.json` update. If that second write fails, the task transition is already committed but the use case returns an error, leaving the two persisted documents out of sync and making retries non-idempotent. The same pattern exists in both `execute` and `execute_by_status`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase` mutates `impl-plan.json` but never re-syncs `TrackMetadata.status` after inserting a new task. That leaves the persisted metadata and the returned `TrackMetadata` stale for any track that was already `Done` or otherwise not `Planned`: adding a new `Todo` task will still report the old phase, so CLI output and stored metadata can become inconsistent with the updated task list.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:07:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AddTaskUseCase::execute persists `impl-plan.json` but never re-derives or writes `metadata.status`. Adding a task to a completed or in-progress track leaves `metadata.json` stale, so later phase checks and CLI output keep reporting the old status even though the track now has an unresolved task.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 278,
+              "category": "correctness"
+            },
+            {
+              "message": "TransitionTaskUseCase::execute and execute_by_status now save `impl-plan.json` and then update `metadata.json` in a second step. If the metadata update fails after the plan save succeeds, the method returns an error but the repository is left half-updated (impl-plan changed, metadata stale), which reintroduces a data-consistency failure mode the old single-write path avoided.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:11:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase` persists the new `impl-plan.json` entry but never re-derives or writes back `metadata.json.status`. Adding a Todo task to a completed track can therefore leave the track marked `done` even though the aggregate is no longer fully resolved.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 284,
+              "category": "correctness"
+            },
+            {
+              "message": "Both transition paths save `impl-plan.json` before syncing `metadata.json`. If the later `TrackWriter::update` fails, the method returns an error after already mutating the plan, leaving `impl-plan.json` and `metadata.json` out of sync.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_impl_plan` only promotes a track to `InProgress` when a task is already `InProgress`. That leaves partially completed plans with only `done` + `todo` tasks classified as `Planned`, so the transition/add-task use cases can write back the wrong phase and `track_phase` will report Planning even though work is still open. The sync should treat any unresolved task mix as `InProgress`, not just explicit in-progress tasks.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:23:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:26:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The read-only sandbox prevents me from inspecting `tmp/reviewer-runtime/briefing-usecase.md` or running `git diff`, so I cannot perform an evidence-based review in this environment.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "environment"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:26:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_impl_plan` classifies a mixed plan such as `[done, todo]` as `Planned` because it only returns `InProgress` when a task is explicitly `InProgress`, and otherwise falls through unless all tasks are resolved. That regresses the previous track-status semantics where any non-empty plan with some progress but unresolved work is active; after completing one task in a multi-task track, the use case can write `metadata.status = planned`, causing phase/status consumers to misreport active implementation work.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:28:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
+          "at": "2026-04-21T04:46:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
+          "at": "2026-04-21T04:48:36Z"
         }
       ]
     },
@@ -829,6 +1284,829 @@
           "findings": [],
           "hash": "rvw1:sha256:d12f87233a16a7a146649e60b240d884a45394df06a9e12074dc3a8da20754d7",
           "at": "2026-04-20T23:40:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c26619137f789db8c19d0b2b9906f6764e0f3577d3808bef689547322f98bfe2",
+          "at": "2026-04-21T00:44:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c26619137f789db8c19d0b2b9906f6764e0f3577d3808bef689547322f98bfe2",
+          "at": "2026-04-21T00:46:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This description contradicts the v4 identity-only metadata contract: it says `metadata.json` drops task/plan fields, but then leaves `status_override` as a separate JSON field option. That would reintroduce a legacy field into the supposedly identity-only shape.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e0724dd36f7b46af07ca9e4b936b795ee8c7a4ddec327faade1e608183524c2",
+          "at": "2026-04-21T03:40:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The contract map no longer reflects the full port surface: it renders `TrackBlobReader` only with `read_spec_document` and `read_impl_plan`, but `usecase-types.json` still declares `read_type_catalogue` and `read_enabled_layers` as part of the same contract, and the task use cases are left disconnected from `ImplPlanReader`/`ImplPlanWriter`. That makes the diagram semantically incomplete relative to the other catalog files.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 52,
+              "category": "factual error"
+            },
+            {
+              "message": "`TrackDocumentV2` still claims an optional `status_override` field is retained, but `metadata.json` has been reduced to an identity-only shape and the briefing explicitly says the metadata file should not carry legacy fields. Keeping that field in the codec description contradicts the new metadata schema.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6a631c164326d9226bdce824ba204951363d890b823fdb991ac564fe470db008",
+          "at": "2026-04-21T03:44:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated contract map only wires `TrackBlobReader` to `read_spec_document` and `read_impl_plan`, but `usecase-types.md` still defines the same port with four methods (`read_spec_document`, `read_type_catalogue`, `read_impl_plan`, `read_enabled_layers`). As rendered, the map understates the port boundary and conflicts with the catalog.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 52,
+              "category": "contradiction"
+            },
+            {
+              "message": "The graph adds `AddTaskUseCase` and `TransitionTaskUseCase`, but it does not draw any dependency edges from those use cases to `ImplPlanReader`/`ImplPlanWriter`, even though `domain-types.json` says those ports were introduced specifically so those use cases can mutate and persist impl-plan state. That makes the new use-case nodes misleadingly disconnected from the ports that justify them.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
+          "at": "2026-04-21T03:49:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
+          "at": "2026-04-21T03:56:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This entry assigns the task-completion gate (`check_tasks_resolved_from_git_ref`) to the domain `ImplPlanReader` port, but the same plan artifacts describe T007 as changing the usecase `TrackBlobReader` port to `read_impl_plan` for PR-branch blob reads. `ImplPlanReader` loads by `TrackId` from the track store and cannot represent the branch/ref-based merge-gate input, so the catalogue now gives that gate the wrong port/layer responsibility.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 127,
+              "category": "contradiction"
+            },
+            {
+              "message": "The DTO description first states that v4 `metadata.json` has the canonical retained fields `schema_version, id, branch, title, status, created_at, updated_at`, then keeps an additional optional `status_override` field. That contradicts the identity-only/no-legacy-fields v4 shape described for this migration, leaving consumers unable to tell whether `status_override` is valid in v4 metadata.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
+          "at": "2026-04-21T03:59:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:347c171a8c0fb3ff76622f63da2d4dafb67f657c3779e25d6a8b2cdc52c0d4fe",
+          "at": "2026-04-21T04:02:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:347c171a8c0fb3ff76622f63da2d4dafb67f657c3779e25d6a8b2cdc52c0d4fe",
+          "at": "2026-04-21T04:08:15Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a829f8b452bc4195baca6f168b49d6ab0cb081d2441290b2fa40d697e186bf68",
+          "at": "2026-04-20T14:29:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a829f8b452bc4195baca6f168b49d6ab0cb081d2441290b2fa40d697e186bf68",
+          "at": "2026-04-20T14:32:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
+          "at": "2026-04-20T14:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor.md` is added to `REQUIRED_AGENT_FILES`, but `.claude/agents/adr-editor.md` is not tracked in the diff/index (it only appears as an untracked working-tree file). On a clean checkout of the committed changes, `verify_agent_definitions` will require this file and fail `verify-orchestra-local` unless the agent file is added to the tracked changes or removed from the required list.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 27,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
+          "at": "2026-04-20T14:59:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
+          "at": "2026-04-20T15:02:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00f1d771cd76e8bad96134325e5631bf552eef42464e0c9cde3d62699c90a872",
+          "at": "2026-04-20T16:30:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00f1d771cd76e8bad96134325e5631bf552eef42464e0c9cde3d62699c90a872",
+          "at": "2026-04-20T16:31:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `spec.md` frontmatter no longer matches the legacy markdown validators that are still reachable through the CLI and these modules' fallback paths. `verify_spec_schema` handles `spec.json`, but `spec_frontmatter`, `spec_signals`, and `spec_attribution` still expect the old markdown format (`status` plus `[source: ...]` tags) when no sibling `spec.json` exists, so a rendered spec.md from this change will now fail direct verification.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/render.rs",
+              "line": 65,
+              "category": "correctness"
+            },
+            {
+              "message": "Placeholder scanning now drops the `file` half of every structured reference. `adr_refs`, `convention_refs`, and top-level `related_conventions` only contribute anchors to `all_texts`, so a placeholder in a path like `knowledge/adr/{{date}}.md` will no longer be detected even though the comment says the pass scans all text-bearing strings.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 699,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:69503e23f3f364ef22b50c9f693a4e8ccec0e2356adbeb5b4befbb5e877e1427",
+          "at": "2026-04-20T17:05:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Schema-v2 decode defaults `goal`/`constraints`/`acceptance_criteria` to empty, but `encode()` always writes them back out because these fields are missing `skip_serializing_if`. That makes `encode(decode(json))` add empty arrays to minimal spec files and breaks the round-trip/idempotence expected by the migration.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 53,
+              "category": "correctness"
+            },
+            {
+              "message": "The attribution verifier no longer checks `goal` items at all. Since `goal` is now a `Vec<SpecRequirement>`, a goal requirement with no typed refs will pass this gate even though the same requirement would be flagged in scope/constraints/AC.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 65,
+              "category": "correctness"
+            },
+            {
+              "message": "The legacy YAML fallback still requires `status`, but schema v2 `spec.md` no longer emits that field. If `verify()` runs on a `spec.md` without a sibling `spec.json`, a valid v2 frontmatter will be rejected as missing `status`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 31,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:31cf79d4aa168cc3fa9fbf0d1e567b351d231b10e625f064cadcaf8c1b73288e",
+          "at": "2026-04-20T17:12:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DTO deserialization still accepts unknown fields, so schema-v2 `spec.json` files that keep removed v1 fields (`status`, `approved_at`, `content_hash`, `sources`, `task_refs`) will decode successfully instead of failing validation. `verify_spec_schema()` therefore does not actually enforce the new schema unless unknown-field rejection or explicit checks are added.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 48,
+              "category": "validation"
+            },
+            {
+              "message": "The legacy markdown fallback still requires `status`, but `render_spec()` no longer emits it. Any rendered `spec.md` that is verified without a sibling `spec.json` will now fail the fallback path even though it was produced by this code.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 79,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1fb262d70bfba3ed3e90943ba5b913ea19089a7fa95d910272b4d74b73e6df20",
+          "at": "2026-04-20T17:16:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The markdown fallbacks in `spec_signals.rs` and `spec_attribution.rs` still parse legacy `### S-/REQ-` headings and `[source: ...]` tags. `render_spec()` now emits bullet requirements with `adr_refs`/`convention_refs`/`informal_grounds`, so a v2 `spec.md` without sibling `spec.json` will be misvalidated: `spec_signals` rejects it as all-red, while `spec_attribution` silently sees no requirements at all.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "correctness"
+            },
+            {
+              "message": "Placeholder scanning in `validate_spec_json_file()` never inspects `SpecRequirement.id()`. Because `SpecElementId` still accepts valid-looking placeholders like `TBD-01`, the latest-track gate can miss stub IDs on goal/scope/constraint/AC items.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 693,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:f655e3632fce5629b8d9c90dac7fba69731a3ed6196387d98e7d1c3c91d733ec",
+          "at": "2026-04-20T17:23:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several nested DTOs here still deserialize permissively (`SpecScopeDto`, `SignalCountsDto`, `AdrRefDto`, `ConventionRefDto`, `InformalGroundRefDto`), so stray keys inside `scope`, `signals`, or typed refs are silently dropped instead of being rejected by the v2 schema. That breaks the validation contract and the encode -> decode -> encode round-trip guarantee. The same `SignalCountsDto` omission exists in `libs/infrastructure/src/verify/spec_frontmatter.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 75,
+              "category": "validation"
+            },
+            {
+              "message": "This `pass` shortcut trusts a spoofable comment string instead of validating the v2 markdown body. Any hand-authored or stale `spec.md` can evade signal verification by prepending the generated header, and the same pattern in `spec_attribution.rs` bypasses attribution checks as well. If `spec.json` is absent, this should fail closed or still parse the document rather than returning success.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_signals.rs",
+              "line": 266,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:74283c553d5be1a5f4fcd191061b7cb64485df522ecf386609392b0d11ce536e",
+          "at": "2026-04-20T17:30:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated-v2 guard only checks `content.starts_with(\"<!-- Generated from spec.json\")`, so a `spec.md` with a UTF-8 BOM or even a leading blank line bypasses the fail-closed path and falls back to the legacy heading scan. That lets a generated v2 `spec.md` without a sibling `spec.json` pass attribution verification instead of being rejected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 143,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b3b6bb8918f7a53e8bc82872dcd690d89f12a083ec092ed39c05bc2a9ceee09",
+          "at": "2026-04-20T17:38:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Serializing `AdrRef`/`ConventionRef` with `to_string_lossy()` makes `spec.json` silently corrupt any non-UTF-8 `PathBuf`, so encode->decode is no longer lossless and a document can come back pointing at a different file. Either reject non-UTF-8 paths or serialize them losslessly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/spec/codec.rs",
+              "line": 399,
+              "category": "correctness"
+            },
+            {
+              "message": "The new v2 guard only trips when the generated header is present. A migrated `spec.md` that has the new bullet/typed-ref layout but is missing that header still falls through to the old `### S-/REQ-` scanner, which ignores the new requirement lines entirely, so an unattributed v2 spec can pass when `spec.json` is absent.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 143,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b3b6bb8918f7a53e8bc82872dcd690d89f12a083ec092ed39c05bc2a9ceee09",
+          "at": "2026-04-20T17:42:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fail-closed branch only triggers when a parsed frontmatter block is present and it does not contain `status:`. A stale or hand-edited v2 `spec.md` that still has `status:` and no `### S-`/`### REQ-` headings will return `pass` here instead of forcing a `spec.json`-backed attribution check, so the attribution gate can be bypassed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_attribution.rs",
+              "line": 202,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:dec464b9e243c843b66dbb544e5016ab171f2914e6e97b197b96c32b60554fcd",
+          "at": "2026-04-20T17:46:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30fbca0e79478c1d8dbe307e7508cf7c46886cb82b522b2d35702bee706f097d",
+          "at": "2026-04-20T17:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec_frontmatter` still accepts legacy lifecycle frontmatter: `status` is explicitly allowed and any other unknown key is flattened/ignored, so a `spec.md` containing removed v2 fields such as `status`, `approved_at`, or `content_hash` can pass this verifier whenever there is no sibling `spec.json`. The briefing requires the frontmatter/schema check to enforce the new schema with the approved-lifecycle fields removed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 35,
+              "category": "schema-validation"
+            }
+          ],
+          "hash": "rvw1:sha256:30fbca0e79478c1d8dbe307e7508cf7c46886cb82b522b2d35702bee706f097d",
+          "at": "2026-04-20T17:53:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fallback frontmatter verifier still accepts the removed v1 lifecycle fields: `status` is explicitly allowed and all other unknown fields are flattened/ignored, so a `spec.md` with `approved_at` or `content_hash` passes whenever no sibling `spec.json` exists. That violates the v2 validation requirement that removed approved-lifecycle fields be rejected rather than silently accepted.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 39,
+              "category": null
+            },
+            {
+              "message": "`sync_rendered_views` still treats every `SpecCodecError::Json` as a recoverable malformed-JSON warning. With the new `deny_unknown_fields` DTOs, a well-formed legacy/v1 `spec.json` containing removed fields like `status` now surfaces as this Json error, so the renderer silently skips it instead of failing the unsupported schema. This masks the no-longer-supported v1 path and can leave stale or missing `spec.md` output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 552,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2f44f6e4f6810f7b0c8bd5de73b4cd315367e7aecceb9969918ad35d28e9d2e5",
+          "at": "2026-04-20T18:01:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The markdown fallback path still accepts removed schema-v1 frontmatter fields when no sibling spec.json exists. SpecFrontmatterDto keeps status optional and flattens all unknown fields into _extra, so frontmatter containing approved_at or content_hash deserializes successfully and verify() returns pass. The briefing requires spec_frontmatter to validate the new schema and reject the removed approved fields; this leaves direct spec.md verification unable to catch stale v1 lifecycle metadata.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
+              "line": 45,
+              "category": "schema_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
+          "at": "2026-04-20T18:04:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
+          "at": "2026-04-20T18:10:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
+          "at": "2026-04-20T18:13:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplPlanDocumentDto` only applies `deny_unknown_fields` at the top level. Because it reuses `PlanDocument`, `PlanSectionDocument`, and `TrackTaskDocument` from `track::codec`, unknown fields nested under `plan`, `sections`, or `tasks` are still accepted and silently dropped, so this codec does not fully enforce the strict schema boundary described in the briefing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/impl_plan_codec.rs",
+              "line": 13,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:bc542b52c2ceac058426c7ac079d230be90bf2cb0f33c41b0c26fdf50fbd3314",
+          "at": "2026-04-20T23:16:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskCoverageDocumentDto` deserializes each section into a `BTreeMap`, so repeated JSON object keys are silently overwritten by serde instead of being rejected. A malformed `task-coverage.json` can therefore drop earlier refs from the same section and change coverage semantics without failing validation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/task_coverage_codec.rs",
+              "line": 52,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:db594bcaca7c7c375064acfcd16b7251ec98b35ff327bdd950aca53b1ea276c4",
+          "at": "2026-04-20T23:20:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_task_status()` accepts a `commit_hash` on any task status but silently drops it unless `status == \"done\"`. A malformed record like `{\"status\":\"todo\",\"commit_hash\":\"abc1234\"}` is therefore accepted and re-encoded without the hash, which is silent data loss instead of a validation failure. Reject non-`done` tasks that carry a non-null `commit_hash`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/impl_plan_codec.rs",
+              "line": 135,
+              "category": "Validation"
+            }
+          ],
+          "hash": "rvw1:sha256:87e196a91cd5143f548bb7ebe5d1f1ce96ce3911bc2dbc513ea3b8d5183f0e80",
+          "at": "2026-04-20T23:25:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3e2d41214d13034217035a2936f70960634288d7b771acfb28f510895f2b5f7",
+          "at": "2026-04-20T23:29:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3e2d41214d13034217035a2936f70960634288d7b771acfb28f510895f2b5f7",
+          "at": "2026-04-20T23:30:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_plan_file` now skips the task-item check whenever the rendered text merely contains `impl-plan.json`. That is a content-based bypass: any hand-edited `plan.md` that mentions the filename will pass even if it has no task list, so the latest-track gate no longer enforces the rule it claims to.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 835,
+              "category": "correctness"
+            },
+            {
+              "message": "`codec::encode()` now always emits `schema_version = 4`, but this round-trip test still asserts that the version survives encode/decode unchanged. The archived fixture at `track/archive/filelock-migration-2026-03-11/metadata.json` is schema_version 2, so this test will fail in CI until the assertion is updated to expect the version bump.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/schema_compat.rs",
+              "line": 27,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:c43ea6c1139576abd0320d10c79b9bd90c47725c8533615e378506dae0d886a8",
+          "at": "2026-04-21T00:47:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`text.contains(\"impl-plan.json\")` matches every new `plan.md` because the generated header already contains that substring. `validate_plan_file` therefore stops enforcing that the latest track has any task items.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 835,
+              "category": "correctness"
+            },
+            {
+              "message": "`load_impl_plan_task_ids` collapses read/decode failures into an empty set, and the `!valid_task_ids.is_empty()` guard then skips referential validation entirely. A present-but-empty or malformed `impl-plan.json` can therefore let arbitrary `task_ref`s pass.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_coverage.rs",
+              "line": 92,
+              "category": "correctness"
+            },
+            {
+              "message": "A `metadata.json` that parses but omits or garbles `schema_version` is treated as `0` and skipped as a legacy track. That hides malformed v4 metadata from the freshness verifier instead of reporting it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bee8130d8febf57d4e8450970139885862fd9d0b459a0fe247bccce4a739786e",
+          "at": "2026-04-21T03:41:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_plan_file` skips the task-item requirement whenever the rendered text merely contains `impl-plan.json`. That is a content-based bypass: a hand-edited `plan.md` can include that substring and still pass even if it has no task list.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 835,
+              "category": "validation"
+            },
+            {
+              "message": "`load_impl_plan_task_ids` collapses read/decode failures into `None`, and the caller turns that into an empty set. A present-but-malformed `impl-plan.json` therefore disables referential validation entirely and can let bad `task_ref`s pass.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_coverage.rs",
+              "line": 92,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:bee8130d8febf57d4e8450970139885862fd9d0b459a0fe247bccce4a739786e",
+          "at": "2026-04-21T04:48:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_impl_plan_task_ids` treats any read/decode failure in `impl-plan.json` as `None`, so `spec_coverage::verify` silently skips referential-integrity checks when the companion file exists but is malformed. That can let bad `task_ref`s pass CI instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_coverage.rs",
+              "line": 163,
+              "category": "correctness"
+            },
+            {
+              "message": "The legacy-track skip is keyed off `schema_version < 4`, but a metadata file with a missing or non-numeric `schema_version` is converted to `0` and skipped as if it were legacy. That means a corrupted v4 `metadata.json` can bypass freshness verification entirely instead of surfacing an error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 66,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bee8130d8febf57d4e8450970139885862fd9d0b459a0fe247bccce4a739786e",
+          "at": "2026-04-21T04:49:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` referential checks are skipped whenever `valid_task_ids` is empty, so a present-but-empty implementation plan is treated the same as “no plan” and `task-coverage.json` task_refs are never validated. That lets coverage reference non-existent tasks without failing CI.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_coverage.rs",
+              "line": 119,
+              "category": null
+            },
+            {
+              "message": "The latest-track plan validator uses `text.contains(\"impl-plan.json\")` to detect the transitional stub. Any plan.md that merely mentions that filename now bypasses the task-item check, so a malformed latest plan with no checklist can pass verification.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 835,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:5c615d3072aa14aad084ab86a57607d540c6bc5bda8d983b09b459a720275970",
+          "at": "2026-04-21T04:54:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_registry` still special-cases only `schema_version == 3` branchless planned tracks. After this migration, new plan-only tracks are written as schema_version 4, and `domain::track_phase::resolve_phase` already treats v4 branchless planned tracks as activatable. As a result, a newer plan-only track can incorrectly win the \"Latest active track\" slot and drive the wrong next command in `registry.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 255,
+              "category": "correctness"
+            },
+            {
+              "message": "The new stub detection skips the task-items check whenever `plan.md` merely contains the stub sentence. That sentence is not unique to machine-generated output, so a handwritten plan can include it and bypass validation even if it has no task items. This weakens the latest-track gate into a string-match that is easy to spoof.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 836,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c05f90d2d81ed6ae124c054bdb58e64192083b9a0099cfdcb4ba79fce32e963f",
+          "at": "2026-04-21T05:00:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode()` strips `tasks`/`plan` before deserializing, and `TrackDocumentV2` does not reject unknown fields. As a result, a schema_version 4 `metadata.json` that still contains legacy `tasks`/`plan` is accepted instead of being rejected, so the new identity-only schema is not actually enforced for v4 files.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 73,
+              "category": "schema"
+            },
+            {
+              "message": "Referential-integrity checks only cover `in_scope` and `acceptance_criteria`. Any `task_ref` placed under `constraints` or `out_of_scope` is never compared against `impl-plan.json`, so invalid references in those sections slip through even when an impl-plan is present.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_coverage.rs",
+              "line": 111,
+              "category": "validation"
+            },
+            {
+              "message": "`spec.md` is still rendered from `spec.json` alone. The new sibling `task-coverage.json` is never loaded here, so coverage edits cannot affect the generated spec view and freshness checks stay blind to the new coverage document.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 573,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:38aeac26d277c9dbd97bbd9cd50ada0fcec2085b195d0cc23e5f3bcf9e8d7743",
+          "at": "2026-04-21T05:05:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode()` strips `tasks`/`plan` before it checks `schema_version`, so a malformed v4 `metadata.json` that still carries legacy fields is silently accepted and those fields are discarded instead of being rejected. That weakens the identity-only contract and can hide corrupt metadata.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 74,
+              "category": "validation"
+            },
+            {
+              "message": "The stub exemption for latest-track validation is based only on the two marker strings. It never checks whether sibling `impl-plan.json` is actually absent, so a hand-edited `plan.md` that copies the stub header/note will bypass the task-item check even when a real implementation plan exists.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 832,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3283d5661ff5351e26ea4a46a92dbf62036ce9b4880345e3f602b33bfaf0f244",
+          "at": "2026-04-21T05:15:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sync_rendered_views(root, Some(id))` still calls `collect_track_snapshots(root)` before it narrows to the requested track, so a malformed sibling `metadata.json` aborts a targeted sync and the single-track path is no longer isolated from unrelated tracks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 520,
+              "category": "correctness"
+            },
+            {
+              "message": "`selection_priority` still treats `schema_version != 3` as a high-priority branchless active track. With the new v4 planning-only schema, a branchless planned track now gets priority 2 instead of being deprioritized, so `latest_track` can pick a planning-only track as the latest active track ahead of a real active branch track.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 360,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4611ebf2bcb37a809cbcfd77c06487ef837610291807c2b8f749006e6f7d74de",
+          "at": "2026-04-21T05:22:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`selection_priority` still treats only `schema_version == 3` as the planning-only case. With the new v4 identity-only tracks, a branchless planned v4 track is scored as priority 2, so `latest_track_dir` can pick it over a newer branchful active track and validate the wrong track. The v4 deprioritization added in `render_registry` needs to be mirrored here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 353,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:4611ebf2bcb37a809cbcfd77c06487ef837610291807c2b8f749006e6f7d74de",
+          "at": "2026-04-21T05:25:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode()` strips `tasks` and `plan` before it ever inspects `schema_version`, so a malformed v4 `metadata.json` that still carries legacy fields is silently accepted and normalized instead of being rejected. That lets stale identity-only files slip through validation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 74,
+              "category": "correctness"
+            },
+            {
+              "message": "The new referential-integrity pass only checks `in_scope` and `acceptance_criteria`, but the task-coverage schema also carries `out_of_scope` and `constraints`. Invalid task IDs in those sections are never validated, even though the surrounding comment says all `task_refs` should be checked against `impl-plan.json`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_coverage.rs",
+              "line": 111,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:40bfe0bdb167d9738b4ae36c630a5bb82e012b8815b450958e3f71957937139a",
+          "at": "2026-04-21T05:30:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stub note points users to `/track:impl-plan`, but the repo's actual workflow command is `/track:implement` (see `track_phase::NextCommand::Implement`). This generated fallback currently directs users to a non-existent command.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "`impl-plan.json` and `metadata.json` are now persisted through separate writes with no shared transaction or lock. A crash or I/O failure after `save_impl_plan` but before the metadata update leaves task state and track status out of sync, so readers can observe inconsistent SSoT files.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 276,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a05f750d8a4fcb097d6b484820e6c725d5cd56e6c04ce9a2f824a115d3c76885",
+          "at": "2026-04-21T05:36:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This still rejects a legitimate `impl-plan.json` with zero tasks: `render_plan(Some(doc))` emits no task items for an empty document, but this check only exempts the stub when `impl-plan.json` is absent. Because empty impl-plans are valid elsewhere in the codebase, latest-track verification will now fail on an otherwise valid track.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 844,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:28276392923c615e39874816035b96f0ad1bc92ab2fef92587382488d08b2763",
+          "at": "2026-04-21T05:43:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_plan_file` now skips the task-item check whenever `impl-plan.json` exists and decodes to zero tasks. That lets a stale transition stub (`metadata.json + impl-plan.json` header plus the `impl-plan.json not yet generated` note) pass validation after an empty impl-plan is committed, even though the renderer should emit the generated empty-plan layout instead of the stub.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 855,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:4c7d7dafe45454c718dcdf36d506aec0013259e077691173f9c306d03fabaf6d",
+          "at": "2026-04-21T05:47:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This rule now returns priority 0 for branchless v4 tracks unless they are `planned`, so a valid v4 track in `in_progress`/`blocked`/`cancelled` can be ranked below an older branchless planned track. `latest_track_dir()` will then select the wrong track.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 360,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:da8379bc58878693ea489937a4de1a3269f9a980d9c0dfad53c478194a5d91da",
+          "at": "2026-04-21T05:52:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6401d769b1429a05fc5000696cb6eed9ce4220a3bb69fffc751af53b7a6b03e3",
+          "at": "2026-04-21T05:58:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Referential integrity for `in_scope` and `acceptance_criteria` task refs is only checked while iterating requirements that still exist in `spec.json`. Extra or stale keys in those two `task-coverage.json` sections are never visited, so a file can contain `in_scope: {\"ZZ-01\": [\"T999\"]}` with an `impl-plan.json` that lacks `T999` and still pass as long as `ZZ-01` is not in the spec. The new contract says task refs in all four coverage sections must be validated against `impl-plan.json`; iterate the coverage maps for `in_scope` and `acceptance_criteria` as well, not only the spec requirements.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_coverage.rs",
+              "line": 116,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6401d769b1429a05fc5000696cb6eed9ce4220a3bb69fffc751af53b7a6b03e3",
+          "at": "2026-04-21T06:02:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16d62f20cd27b18704d50ce0d27ef8b17ef6c4729db54b0e60c241fb4d6599d7",
+          "at": "2026-04-21T06:07:12Z"
         }
       ]
     },
@@ -890,6 +2168,350 @@
           "findings": [],
           "hash": "rvw1:sha256:652596769968fcba3378eb7fdb576279ddc6ec4ba9632d865a89ac440c65e60e",
           "at": "2026-04-20T18:14:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_next_task` and `execute_task_counts` now bypass the track store entirely and return success with `null`/`0` payloads for any syntactically valid track id. That makes a missing or corrupt track indistinguishable from a real empty track, so `sotp track next-task` and `task-counts` will silently report 'no work' instead of failing closed while T007 is pending.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "line": 116,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:70361d357848c0094750660b55260085a987d1b3600cbdf689280f5740d5e727",
+          "at": "2026-04-21T00:46:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70361d357848c0094750660b55260085a987d1b3600cbdf689280f5740d5e727",
+          "at": "2026-04-21T00:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_next_task` and `execute_task_counts` now ignore `items_dir` entirely and return success for any syntactically valid track id, including tracks that do not exist. That is not a fail-safe T007 stub: callers of `sotp track next-task` get a null task and callers of `sotp track task-counts` get all zeros instead of the previous metadata-read error, which can silently hide a bad `--items-dir` or missing/corrupt track in automation. Keep the TODO stubbed task data if needed, but still load/validate the track metadata first and propagate read/not-found errors.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 116,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:70361d357848c0094750660b55260085a987d1b3600cbdf689280f5740d5e727",
+          "at": "2026-04-21T00:49:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`next-task` and `task-counts` now return successful, schema-valid empty results while the real task data is unavailable pending T007. A caller cannot distinguish this stub from a track with no open tasks or zero tasks, so automation can silently make decisions from false data. Since the briefing requires T007 stubs to be fail-safe, these commands should either read `impl-plan.json` or fail closed with a clear T007-pending error instead of printing null/zero JSON with `ExitCode::SUCCESS`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 132,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b68ae6a7398d0ea4b6f90b737231ec610a6cbfec56aff4a83ffd0cd879ad98ce",
+          "at": "2026-04-21T00:53:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `next-task` and `task-counts` have changed from the documented JSON payloads to ad hoc text output (`\"<id> — <description>\"` and `total=... resolved=... unresolved=...`). That breaks the machine-readable CLI contract consumed by the existing wrappers/specs and removes the per-status counts callers expect.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 136,
+              "category": "behavior"
+            },
+            {
+              "message": "The integration tests still miss the required `done -> in_progress` leg of the transition round-trip. `transition_subcommand_persists_commit_hash_on_done_transition` only covers `todo -> in_progress -> done`, so a regression in reopening a completed task would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/tests/transition_integration.rs",
+              "line": 150,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:4810fb2140709912e6b8dc78f9ab735edaf615f28ab60ddd88eafbc62dbe644b",
+          "at": "2026-04-21T03:40:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bin/sotp track next-task` now formats the JSON payload with raw string interpolation instead of serializing it. A task description containing `\"`, `\\`, or a newline will emit invalid JSON and break the command's documented machine-readable contract.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 138,
+              "category": "correctness"
+            },
+            {
+              "message": "`bin/sotp track resolve` still special-cases branchless schema v3 tracks, but dropping the raw `status == planned` check means a corrupted archived track whose task list still looks planned will now pass as `Planned` and be told to activate. That removes the fail-closed guard for frozen v3 metadata.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 36,
+              "category": "correctness"
+            },
+            {
+              "message": "Using `metadata.status()` alone here lets schema v3 archived tracks with unresolved tasks be misclassified as active, so the pre-commit hook can recompute TDDD outputs on frozen content instead of skipping it. The same regression is also present in the sibling `graph.rs`, `contract_map.rs`, and `tddd/signals.rs` guards.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 683,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b3b0c690200e8106466b738241de76d8e13d976609d7d75c75e387dc002c093b",
+          "at": "2026-04-21T03:45:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "For branchless schema_version 3 tracks, this guard now trusts `TrackMetadata::status()` only. Legacy task state is no longer consulted, so a v3 document that still decodes as `planned` can now pass `resolve` even if its old task state would have been rejected as corrupted. That weakens the fail-closed behavior this command documents.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 36,
+              "category": "correctness"
+            },
+            {
+              "message": "The rejected-transition case no longer asserts that `impl-plan.json` stays unchanged after a failure. With task state now persisted in a separate file, a partial-write regression on an invalid transition would slip through this test.",
+              "severity": "P1",
+              "file": "apps/cli/tests/transition_integration.rs",
+              "line": 125,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:3c28fe184eb7d71b38ebf7231efd136b3264b6942017851185897f7a48a5d9ae",
+          "at": "2026-04-21T03:51:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_transition` only persists `impl-plan.json` and prints the `TrackMetadata` returned by the use case, but it never writes the new status back to `metadata.json`. After any todo→in_progress/done transition, the explicit status readers added in this change (`resolve`, `type-signals`, `type-graph`, `contract-map`, and the pre-commit hook) will keep seeing the old `planned` value, so active/frozen-track checks and phase resolution become stale.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/transition.rs",
+              "line": 57,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ed4133ce55ae207c9f02a9e76f2411707034ba0e75bc576375405f5acd78c477",
+          "at": "2026-04-21T03:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_transition` never rejects `TrackStatus::Archived`, so a frozen archived track under `track/items` can still be transitioned and have `metadata.json` rewritten. That bypasses the frozen-track invariant enforced elsewhere and can silently unarchive archived tracks.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/transition.rs",
+              "line": 56,
+              "category": "correctness"
+            },
+            {
+              "message": "The branchless-v3 guard now only inspects the explicit `status` field. Legacy v3 metadata whose raw status is `planned` but whose task state is already non-planned will now pass `resolve`, whereas the previous derived-status check failed closed on that corruption.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 39,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ca1e0f25ead1801326cff240f1d3e506f4df3201e42a5918746279decf742f77",
+          "at": "2026-04-21T04:05:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_impl_plan` does not match the status-sync logic used by `TransitionTaskUseCase`: this helper returns `InProgress` whenever any task is done/skipped, while the use case treats a mixed `todo` + `done/skipped` plan as `Planned` unless some task is actually `in_progress`. After a transition on a multi-task track, the CLI will overwrite `metadata.json` with the wrong track status, which then affects resolve/phase checks.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/transition.rs",
+              "line": 175,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ca1e0f25ead1801326cff240f1d3e506f4df3201e42a5918746279decf742f77",
+          "at": "2026-04-21T04:08:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31d21d572b3ecb6a11eb9dca72e28c1f25b2659f74d8b65b337f1ad4f7e5abe6",
+          "at": "2026-04-21T04:13:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Clearing an override still delegates to the override use case without loading impl-plan.json to restore the underlying task-derived status. With status now stored explicitly in metadata.json, `bin/sotp track clear-override` on a blocked/cancelled in-progress or done track will persist the track as planned instead of deriving in_progress/done from impl-plan.json, so resolve/registry output reports the wrong phase after the override is cleared.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 110,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:31d21d572b3ecb6a11eb9dca72e28c1f25b2659f74d8b65b337f1ad4f7e5abe6",
+          "at": "2026-04-21T04:18:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`clear-override` now performs two separate metadata writes: `SetOverrideUseCase::execute(&track_id, None)` clears the override and sets status to `Planned`, then a second `store.update(...)` re-derives the real status from `impl-plan.json`. If the impl-plan read or the second update fails, the command returns an error after already mutating `metadata.json`, leaving the track in a partially-updated state instead of rolling back or updating atomically.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 109,
+              "category": "atomicity"
+            }
+          ],
+          "hash": "rvw1:sha256:b784f6e223b212f01e7aa0e9e077b053240d8fb69d1a4fbe3592c08bc42851b7",
+          "at": "2026-04-21T04:23:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This branchless-v3 guard no longer consults task state, so a legacy or corrupted `metadata.json` whose explicit `status` is still `planned` but whose tasks are already in progress/done will now resolve instead of being rejected. That drops the old fail-closed check for this code path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 39,
+              "category": "correctness"
+            },
+            {
+              "message": "The same explicit-status-only guard now lets `type-signals` run on a frozen legacy track if the stored status is stale `planned`; the previous task-derived check is gone here, and the same pattern is repeated in `contract_map.rs` and `graph.rs`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The tests split the required round-trip across two cases instead of running `todo -> in_progress -> done --commit-hash -> in_progress` end to end. That means a regression that loses or corrupts the traced commit hash on reopen would still pass this suite.",
+              "severity": "P1",
+              "file": "apps/cli/tests/transition_integration.rs",
+              "line": 175,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:5451d2459e70ef8f9f951d2586923b203a8cf3dede868ef9b8c99fdb99b08429",
+          "at": "2026-04-21T04:27:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`next-task` and `task-counts` now treat any missing `impl-plan.json` as an empty/planning-only track. On a migrated `in_progress`/`done` track whose plan file is missing or unreadable, the CLI will silently print null/zero results instead of failing, which masks corruption and can mislead automation into thinking there is no work.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "`transition_subcommand_full_round_trip_with_commit_hash_and_reopen` never asserts the post-reopen `commit_hash` state. A regression that incorrectly preserves or drops the hash on `DoneTraced -> InProgress` would still pass because the only post-reopen check is that the file contains `in_progress`.",
+              "severity": "P1",
+              "file": "apps/cli/tests/transition_integration.rs",
+              "line": 370,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:31816343db54ef26071881f0ebd81138282f7dd8f90d4967283102f7506df2ad",
+          "at": "2026-04-21T04:33:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41e5ec552360204fb460c76ab9871440b1754e79eab5e04a11f4c925ef03e052",
+          "at": "2026-04-21T04:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41e5ec552360204fb460c76ab9871440b1754e79eab5e04a11f4c925ef03e052",
+          "at": "2026-04-21T04:40:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f21d30fbc5e42964f4884b1fd649c1a64c43ac1db852513ff243b3f4d40142ce",
+          "at": "2026-04-21T04:47:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shared test fixture still writes schema_version 3 metadata with embedded tasks/plan and no impl-plan.json, while the updated test is meant to verify the schema_version 4 identity-only behavior. This leaves the T005 fixture migration untested for `track signals` and can mask regressions in the new metadata shape.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/signals.rs",
+              "line": 123,
+              "category": "testing"
+            },
+            {
+              "message": "These contract-map tests still use inline schema_version 3 metadata with embedded tasks/plan and no separate impl-plan.json. The review brief requires in-scope fixtures to use v4 identity-only metadata plus impl-plan.json, so these tests continue exercising legacy metadata instead of the migrated CLI shape.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 241,
+              "category": "testing"
+            },
+            {
+              "message": "The type-graph test fixtures still embed tasks/plan in schema_version 3 metadata instead of using v4 identity-only metadata with a separate impl-plan.json. That misses the required fixture migration and leaves this CLI path covered only through the legacy decoder shape.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 215,
+              "category": "testing"
+            },
+            {
+              "message": "The type-signals fixture helper still emits schema_version 3 metadata containing tasks/plan and no impl-plan.json. Because many tests use this helper, the updated active-track guard is not being exercised against the required v4 identity-only metadata plus impl-plan fixture shape.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 672,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f21d30fbc5e42964f4884b1fd649c1a64c43ac1db852513ff243b3f4d40142ce",
+          "at": "2026-04-21T04:51:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`next-task` and `task-counts` treat a missing `impl-plan.json` as a successful empty plan for every track. The code only comments that this is for a planning-only track, but it never checks the loaded metadata's branch/status before returning null/zero counts. On an activated or in-progress track with a missing/corrupt task store, `bin/sotp track next-task` will incorrectly report no open task and `bin/sotp track task-counts` will report all zeros, silently hiding the task data loss instead of failing closed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 145,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f21d30fbc5e42964f4884b1fd649c1a64c43ac1db852513ff243b3f4d40142ce",
+          "at": "2026-04-21T04:55:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f21d30fbc5e42964f4884b1fd649c1a64c43ac1db852513ff243b3f4d40142ce",
+          "at": "2026-04-21T04:59:49Z"
         }
       ]
     },
@@ -1367,368 +2989,6 @@
           "findings": [],
           "hash": "rvw1:sha256:9339bc4c829a71f14af7e3f3b4e8107f9ec6ad33588d066065edadde44e0e9e5",
           "at": "2026-04-20T16:31:03Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a829f8b452bc4195baca6f168b49d6ab0cb081d2441290b2fa40d697e186bf68",
-          "at": "2026-04-20T14:29:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a829f8b452bc4195baca6f168b49d6ab0cb081d2441290b2fa40d697e186bf68",
-          "at": "2026-04-20T14:32:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
-          "at": "2026-04-20T14:57:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr-editor.md` is added to `REQUIRED_AGENT_FILES`, but `.claude/agents/adr-editor.md` is not tracked in the diff/index (it only appears as an untracked working-tree file). On a clean checkout of the committed changes, `verify_agent_definitions` will require this file and fail `verify-orchestra-local` unless the agent file is added to the tracked changes or removed from the required list.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 27,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
-          "at": "2026-04-20T14:59:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53fb017b9c4bc350c20654249167ed3d686b784925a852f13c811a47f5981cd2",
-          "at": "2026-04-20T15:02:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00f1d771cd76e8bad96134325e5631bf552eef42464e0c9cde3d62699c90a872",
-          "at": "2026-04-20T16:30:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00f1d771cd76e8bad96134325e5631bf552eef42464e0c9cde3d62699c90a872",
-          "at": "2026-04-20T16:31:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `spec.md` frontmatter no longer matches the legacy markdown validators that are still reachable through the CLI and these modules' fallback paths. `verify_spec_schema` handles `spec.json`, but `spec_frontmatter`, `spec_signals`, and `spec_attribution` still expect the old markdown format (`status` plus `[source: ...]` tags) when no sibling `spec.json` exists, so a rendered spec.md from this change will now fail direct verification.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/spec/render.rs",
-              "line": 65,
-              "category": "correctness"
-            },
-            {
-              "message": "Placeholder scanning now drops the `file` half of every structured reference. `adr_refs`, `convention_refs`, and top-level `related_conventions` only contribute anchors to `all_texts`, so a placeholder in a path like `knowledge/adr/{{date}}.md` will no longer be detected even though the comment says the pass scans all text-bearing strings.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/latest_track.rs",
-              "line": 699,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:69503e23f3f364ef22b50c9f693a4e8ccec0e2356adbeb5b4befbb5e877e1427",
-          "at": "2026-04-20T17:05:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Schema-v2 decode defaults `goal`/`constraints`/`acceptance_criteria` to empty, but `encode()` always writes them back out because these fields are missing `skip_serializing_if`. That makes `encode(decode(json))` add empty arrays to minimal spec files and breaks the round-trip/idempotence expected by the migration.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/spec/codec.rs",
-              "line": 53,
-              "category": "correctness"
-            },
-            {
-              "message": "The attribution verifier no longer checks `goal` items at all. Since `goal` is now a `Vec<SpecRequirement>`, a goal requirement with no typed refs will pass this gate even though the same requirement would be flagged in scope/constraints/AC.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
-              "line": 65,
-              "category": "correctness"
-            },
-            {
-              "message": "The legacy YAML fallback still requires `status`, but schema v2 `spec.md` no longer emits that field. If `verify()` runs on a `spec.md` without a sibling `spec.json`, a valid v2 frontmatter will be rejected as missing `status`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
-              "line": 31,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:31cf79d4aa168cc3fa9fbf0d1e567b351d231b10e625f064cadcaf8c1b73288e",
-          "at": "2026-04-20T17:12:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DTO deserialization still accepts unknown fields, so schema-v2 `spec.json` files that keep removed v1 fields (`status`, `approved_at`, `content_hash`, `sources`, `task_refs`) will decode successfully instead of failing validation. `verify_spec_schema()` therefore does not actually enforce the new schema unless unknown-field rejection or explicit checks are added.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/spec/codec.rs",
-              "line": 48,
-              "category": "validation"
-            },
-            {
-              "message": "The legacy markdown fallback still requires `status`, but `render_spec()` no longer emits it. Any rendered `spec.md` that is verified without a sibling `spec.json` will now fail the fallback path even though it was produced by this code.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
-              "line": 79,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:1fb262d70bfba3ed3e90943ba5b913ea19089a7fa95d910272b4d74b73e6df20",
-          "at": "2026-04-20T17:16:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The markdown fallbacks in `spec_signals.rs` and `spec_attribution.rs` still parse legacy `### S-/REQ-` headings and `[source: ...]` tags. `render_spec()` now emits bullet requirements with `adr_refs`/`convention_refs`/`informal_grounds`, so a v2 `spec.md` without sibling `spec.json` will be misvalidated: `spec_signals` rejects it as all-red, while `spec_attribution` silently sees no requirements at all.",
-              "severity": "P1",
-              "file": null,
-              "line": null,
-              "category": "correctness"
-            },
-            {
-              "message": "Placeholder scanning in `validate_spec_json_file()` never inspects `SpecRequirement.id()`. Because `SpecElementId` still accepts valid-looking placeholders like `TBD-01`, the latest-track gate can miss stub IDs on goal/scope/constraint/AC items.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/latest_track.rs",
-              "line": 693,
-              "category": "verification"
-            }
-          ],
-          "hash": "rvw1:sha256:f655e3632fce5629b8d9c90dac7fba69731a3ed6196387d98e7d1c3c91d733ec",
-          "at": "2026-04-20T17:23:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Several nested DTOs here still deserialize permissively (`SpecScopeDto`, `SignalCountsDto`, `AdrRefDto`, `ConventionRefDto`, `InformalGroundRefDto`), so stray keys inside `scope`, `signals`, or typed refs are silently dropped instead of being rejected by the v2 schema. That breaks the validation contract and the encode -> decode -> encode round-trip guarantee. The same `SignalCountsDto` omission exists in `libs/infrastructure/src/verify/spec_frontmatter.rs`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/spec/codec.rs",
-              "line": 75,
-              "category": "validation"
-            },
-            {
-              "message": "This `pass` shortcut trusts a spoofable comment string instead of validating the v2 markdown body. Any hand-authored or stale `spec.md` can evade signal verification by prepending the generated header, and the same pattern in `spec_attribution.rs` bypasses attribution checks as well. If `spec.json` is absent, this should fail closed or still parse the document rather than returning success.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_signals.rs",
-              "line": 266,
-              "category": "verification"
-            }
-          ],
-          "hash": "rvw1:sha256:74283c553d5be1a5f4fcd191061b7cb64485df522ecf386609392b0d11ce536e",
-          "at": "2026-04-20T17:30:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The generated-v2 guard only checks `content.starts_with(\"<!-- Generated from spec.json\")`, so a `spec.md` with a UTF-8 BOM or even a leading blank line bypasses the fail-closed path and falls back to the legacy heading scan. That lets a generated v2 `spec.md` without a sibling `spec.json` pass attribution verification instead of being rejected.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
-              "line": 143,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1b3b6bb8918f7a53e8bc82872dcd690d89f12a083ec092ed39c05bc2a9ceee09",
-          "at": "2026-04-20T17:38:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Serializing `AdrRef`/`ConventionRef` with `to_string_lossy()` makes `spec.json` silently corrupt any non-UTF-8 `PathBuf`, so encode->decode is no longer lossless and a document can come back pointing at a different file. Either reject non-UTF-8 paths or serialize them losslessly.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/spec/codec.rs",
-              "line": 399,
-              "category": "correctness"
-            },
-            {
-              "message": "The new v2 guard only trips when the generated header is present. A migrated `spec.md` that has the new bullet/typed-ref layout but is missing that header still falls through to the old `### S-/REQ-` scanner, which ignores the new requirement lines entirely, so an unattributed v2 spec can pass when `spec.json` is absent.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
-              "line": 143,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1b3b6bb8918f7a53e8bc82872dcd690d89f12a083ec092ed39c05bc2a9ceee09",
-          "at": "2026-04-20T17:42:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new fail-closed branch only triggers when a parsed frontmatter block is present and it does not contain `status:`. A stale or hand-edited v2 `spec.md` that still has `status:` and no `### S-`/`### REQ-` headings will return `pass` here instead of forcing a `spec.json`-backed attribution check, so the attribution gate can be bypassed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_attribution.rs",
-              "line": 202,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:dec464b9e243c843b66dbb544e5016ab171f2914e6e97b197b96c32b60554fcd",
-          "at": "2026-04-20T17:46:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30fbca0e79478c1d8dbe307e7508cf7c46886cb82b522b2d35702bee706f097d",
-          "at": "2026-04-20T17:50:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`spec_frontmatter` still accepts legacy lifecycle frontmatter: `status` is explicitly allowed and any other unknown key is flattened/ignored, so a `spec.md` containing removed v2 fields such as `status`, `approved_at`, or `content_hash` can pass this verifier whenever there is no sibling `spec.json`. The briefing requires the frontmatter/schema check to enforce the new schema with the approved-lifecycle fields removed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
-              "line": 35,
-              "category": "schema-validation"
-            }
-          ],
-          "hash": "rvw1:sha256:30fbca0e79478c1d8dbe307e7508cf7c46886cb82b522b2d35702bee706f097d",
-          "at": "2026-04-20T17:53:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The fallback frontmatter verifier still accepts the removed v1 lifecycle fields: `status` is explicitly allowed and all other unknown fields are flattened/ignored, so a `spec.md` with `approved_at` or `content_hash` passes whenever no sibling `spec.json` exists. That violates the v2 validation requirement that removed approved-lifecycle fields be rejected rather than silently accepted.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
-              "line": 39,
-              "category": null
-            },
-            {
-              "message": "`sync_rendered_views` still treats every `SpecCodecError::Json` as a recoverable malformed-JSON warning. With the new `deny_unknown_fields` DTOs, a well-formed legacy/v1 `spec.json` containing removed fields like `status` now surfaces as this Json error, so the renderer silently skips it instead of failing the unsupported schema. This masks the no-longer-supported v1 path and can leave stale or missing `spec.md` output.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 552,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:2f44f6e4f6810f7b0c8bd5de73b4cd315367e7aecceb9969918ad35d28e9d2e5",
-          "at": "2026-04-20T18:01:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The markdown fallback path still accepts removed schema-v1 frontmatter fields when no sibling spec.json exists. SpecFrontmatterDto keeps status optional and flattens all unknown fields into _extra, so frontmatter containing approved_at or content_hash deserializes successfully and verify() returns pass. The briefing requires spec_frontmatter to validate the new schema and reject the removed approved fields; this leaves direct spec.md verification unable to catch stale v1 lifecycle metadata.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_frontmatter.rs",
-              "line": 45,
-              "category": "schema_validation"
-            }
-          ],
-          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
-          "at": "2026-04-20T18:04:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
-          "at": "2026-04-20T18:10:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26869d001136762c1da26e9a5fc2c6c719c564afe189cf78865dccee3abb778b",
-          "at": "2026-04-20T18:13:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ImplPlanDocumentDto` only applies `deny_unknown_fields` at the top level. Because it reuses `PlanDocument`, `PlanSectionDocument`, and `TrackTaskDocument` from `track::codec`, unknown fields nested under `plan`, `sections`, or `tasks` are still accepted and silently dropped, so this codec does not fully enforce the strict schema boundary described in the briefing.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/impl_plan_codec.rs",
-              "line": 13,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:bc542b52c2ceac058426c7ac079d230be90bf2cb0f33c41b0c26fdf50fbd3314",
-          "at": "2026-04-20T23:16:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TaskCoverageDocumentDto` deserializes each section into a `BTreeMap`, so repeated JSON object keys are silently overwritten by serde instead of being rejected. A malformed `task-coverage.json` can therefore drop earlier refs from the same section and change coverage semantics without failing validation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/task_coverage_codec.rs",
-              "line": 52,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:db594bcaca7c7c375064acfcd16b7251ec98b35ff327bdd950aca53b1ea276c4",
-          "at": "2026-04-20T23:20:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`parse_task_status()` accepts a `commit_hash` on any task status but silently drops it unless `status == \"done\"`. A malformed record like `{\"status\":\"todo\",\"commit_hash\":\"abc1234\"}` is therefore accepted and re-encoded without the hash, which is silent data loss instead of a validation failure. Reject non-`done` tasks that carry a non-null `commit_hash`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/impl_plan_codec.rs",
-              "line": 135,
-              "category": "Validation"
-            }
-          ],
-          "hash": "rvw1:sha256:87e196a91cd5143f548bb7ebe5d1f1ce96ce3911bc2dbc513ea3b8d5183f0e80",
-          "at": "2026-04-20T23:25:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3e2d41214d13034217035a2936f70960634288d7b771acfb28f510895f2b5f7",
-          "at": "2026-04-20T23:29:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3e2d41214d13034217035a2936f70960634288d7b771acfb28f510895f2b5f7",
-          "at": "2026-04-20T23:30:59Z"
         }
       ]
     }

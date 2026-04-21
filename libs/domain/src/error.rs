@@ -26,6 +26,13 @@ pub enum ValidationError {
     InvalidTimestamp(String),
     #[error("track branch '{0}' must match the pattern track/<slug>")]
     InvalidTrackBranch(String),
+    #[error("branch '{branch}' slug does not match track id '{id}'")]
+    BranchIdMismatch { id: String, branch: String },
+    #[error(
+        "status_override kind '{override_kind}' requires status '{required}', \
+         but status is '{actual}'"
+    )]
+    StatusOverrideMismatch { override_kind: String, required: String, actual: String },
     #[error("track title must not be empty")]
     EmptyTrackTitle,
     #[error("task description must not be empty")]
@@ -123,6 +130,14 @@ pub enum TrackWriteError {
 
     #[error(transparent)]
     Repository(#[from] RepositoryError),
+}
+
+impl From<TrackReadError> for TrackWriteError {
+    fn from(e: TrackReadError) -> Self {
+        match e {
+            TrackReadError::Repository(repo_err) => TrackWriteError::Repository(repo_err),
+        }
+    }
 }
 
 /// Error type for `WorktreeReader` port operations.

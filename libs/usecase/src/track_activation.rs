@@ -43,7 +43,10 @@ impl<W: TrackWriter> ActivateTrackUseCase<W> {
                 .into());
             }
 
-            if schema_version != 3 {
+            // T005: schema_version 4 is the new identity-only shape. Accept both 3 and 4.
+            // The error variant name is kept as-is for compatibility; the display message
+            // covers both versions.
+            if !matches!(schema_version, 3 | 4) {
                 return Err(ValidationError::TrackActivationRequiresSchemaV3 {
                     track_id: track.id().to_string(),
                     schema_version,
@@ -59,7 +62,7 @@ impl<W: TrackWriter> ActivateTrackUseCase<W> {
                 .into());
             }
 
-            track.set_branch(Some(branch.clone()));
+            track.set_branch(Some(branch.clone()))?;
             Ok(())
         })?;
 
@@ -74,8 +77,8 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use domain::{
-        DomainError, PlanSection, PlanView, RepositoryError, TaskId, TrackBranch, TrackId,
-        TrackMetadata, TrackReader, TrackTask, TrackWriteError, TrackWriter, ValidationError,
+        DomainError, RepositoryError, TrackBranch, TrackId, TrackMetadata, TrackReader,
+        TrackStatus, TrackWriteError, TrackWriter, ValidationError,
     };
 
     use super::{ActivateTrackOutcome, ActivateTrackUseCase};
@@ -121,16 +124,11 @@ mod tests {
     }
 
     fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Implement activation").unwrap();
-        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-
+        // T005: TrackMetadata is identity-only; tasks/plan live in impl-plan.json.
         TrackMetadata::new(
             TrackId::try_new("activation-track").unwrap(),
             "Activation Track",
-            vec![task],
-            plan,
+            TrackStatus::Planned,
             None,
         )
         .unwrap()
@@ -156,7 +154,7 @@ mod tests {
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let branch = TrackBranch::try_new("track/activation-track").unwrap();
         let mut track = sample_track();
-        track.set_branch(Some(branch.clone()));
+        track.set_branch(Some(branch.clone())).unwrap();
 
         store.save(&track).unwrap();
         let err = usecase.execute(track.id(), &branch, 3).unwrap_err();
@@ -175,10 +173,11 @@ mod tests {
         let store = Arc::new(StubTrackStore::default());
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let mut track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
         let branch = TrackBranch::try_new("track/activation-track").unwrap();
 
-        track.transition_task(&task_id, domain::TaskTransition::Start).unwrap();
+        // T005: status is now explicitly stored; set it to InProgress to simulate
+        // a track that is not planning-only.
+        track.set_status(TrackStatus::InProgress);
         store.save(&track).unwrap();
         let err = usecase.execute(track.id(), &branch, 3).unwrap_err();
 
@@ -208,5 +207,21 @@ mod tests {
             ))
         ));
         assert!(err.to_string().contains("schema_version"));
+    }
+
+    #[test]
+    fn activation_accepts_schema_version_4_identity_only_track() {
+        // T005: schema_version 4 is the new identity-only shape. Activation must
+        // accept v4 tracks so that /track:activate works for newly created tracks.
+        let store = Arc::new(StubTrackStore::default());
+        let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
+
+        store.save(&track).unwrap();
+        let outcome = usecase.execute(track.id(), &branch, 4).unwrap();
+
+        assert!(matches!(outcome, ActivateTrackOutcome::Materialized(_)));
+        assert_eq!(outcome.track().branch().unwrap(), &branch);
     }
 }

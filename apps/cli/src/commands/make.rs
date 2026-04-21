@@ -678,12 +678,9 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
             CliError::Message(format!("[track-commit-message] invalid track ID '{track_id}': {e}"))
         })?;
         match infrastructure::track::fs_store::read_track_metadata(&items_dir, &valid_id) {
-            Ok((metadata, doc_meta)) => {
-                let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-                    domain::TrackStatus::Archived
-                } else {
-                    metadata.status()
-                };
+            Ok((metadata, _doc_meta)) => {
+                // T005: schema_version 4 stores status directly in TrackMetadata (no original_status).
+                let effective_status = metadata.status();
                 if ensure_active_track(effective_status, track_id).is_err() {
                     // Track is Done or Archived — skip pre-commit type-signal recomputation.
                     // The frozen track's signal files are already correct from when it was active.
