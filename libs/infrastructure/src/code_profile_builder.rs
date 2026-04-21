@@ -5,10 +5,9 @@
 //! flat serializable export into the pre-indexed query structure used by domain
 //! evaluation logic.
 //!
-//! T005 (TDDD-01 Phase 1 Task 5): `TypeNode::new` no longer takes a
-//! `method_return_types: HashSet<String>` argument — the legacy bridge is
-//! gone. `outgoing` is still computed here from `FunctionInfo::return_type_names`
-//! ∩ typestate_names.
+//! `TypeNode::new` no longer takes a `method_return_types: HashSet<String>`
+//! argument — the legacy bridge is gone. `outgoing` is computed here from
+//! `FunctionInfo::return_type_names` ∩ typestate_names.
 
 use std::collections::{HashMap, HashSet};
 

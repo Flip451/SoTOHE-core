@@ -6,7 +6,7 @@
 //! ADR 2026-04-19-1242 §D1.2 / §D2.1: the approved-lifecycle (`status` /
 //! `approved_at` / `content_hash`) is removed; each requirement gains a
 //! required `id: SpecElementId`; `sources: Vec<String>` is replaced by three
-//! typed ref fields; `task_refs` moves to `task-coverage.json` (T004/T005).
+//! typed ref fields; `task_refs` moves to `task-coverage.json`.
 
 use std::collections::HashSet;
 use std::fmt;

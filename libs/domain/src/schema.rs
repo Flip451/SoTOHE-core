@@ -399,12 +399,11 @@ impl TypeGraph {
 
 /// A public type in the crate, as indexed for TDDD evaluation.
 ///
-/// T005 (Phase 1 Task 5): the legacy `method_return_types: HashSet<String>`
-/// bridge field is removed. `outgoing` is passed in directly from
-/// `build_type_graph`, which derives it by filtering self-receiver method
-/// return types against the set of typestate-declared type names
-/// (ADR 0002 Q4). Callers that need the full set of return type names
-/// should walk `methods().iter().flat_map(|m| ...)` directly.
+/// The legacy `method_return_types: HashSet<String>` bridge field is removed.
+/// `outgoing` is passed in directly from `build_type_graph`, which derives it
+/// by filtering self-receiver method return types against the set of
+/// typestate-declared type names (ADR 0002 Q4). Callers that need the full set
+/// of return type names should walk `methods().iter().flat_map(|m| ...)` directly.
 #[derive(Debug, Clone)]
 pub struct TypeNode {
     kind: TypeKind,
@@ -515,9 +514,8 @@ impl TraitImplEntry {
 
 /// A public trait in the crate, as indexed for TDDD evaluation.
 ///
-/// T005 (Phase 1 Task 5): the legacy `method_names: Vec<String>` mirror is
-/// removed. Callers that need the list of method names should walk
-/// `methods().iter().map(|m| m.name())`.
+/// The legacy `method_names: Vec<String>` mirror is removed. Callers that need
+/// the list of method names should walk `methods().iter().map(|m| m.name())`.
 #[derive(Debug, Clone)]
 pub struct TraitNode {
     methods: Vec<MethodDeclaration>,

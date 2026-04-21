@@ -18,9 +18,9 @@ pub mod worktree_guard;
 use std::sync::Arc;
 
 use domain::{
-    CommitHash, DomainError, ImplPlanDocument, ImplPlanReader, ImplPlanWriter, RepositoryError,
-    StatusOverride, TaskId, TaskStatusKind, TaskTransition, TrackId, TrackMetadata, TrackReadError,
-    TrackReader, TrackStatus, TrackWriteError, TrackWriter, ValidationError,
+    CommitHash, ImplPlanReader, ImplPlanWriter, RepositoryError, StatusOverride, TaskId,
+    TaskTransition, TrackId, TrackMetadata, TrackReadError, TrackReader, TrackWriteError,
+    TrackWriter, ValidationError,
 };
 
 /// Persists a track aggregate.
@@ -63,47 +63,26 @@ impl<R: TrackReader> LoadTrackUseCase<R> {
     }
 }
 
-/// Derives `TrackStatus` from the current state of an `ImplPlanDocument`.
-///
-/// Rules (mirrors the pre-T005 `TrackMetadata::derive_status_from_tasks`):
-/// - Empty plan → `TrackStatus::Planned`
-/// - All tasks resolved (done/skipped) → `TrackStatus::Done`
-/// - Any task `InProgress`, or any mix of at least one resolved + at least one
-///   unresolved (todo) task → `TrackStatus::InProgress` (partial progress must
-///   not regress to `Planned` after the first commit)
-/// - All tasks `Todo` → `TrackStatus::Planned`
-fn derive_track_status_from_impl_plan(plan: &ImplPlanDocument) -> TrackStatus {
-    if plan.tasks().is_empty() {
-        return TrackStatus::Planned;
-    }
-    if plan.all_tasks_resolved() {
-        return TrackStatus::Done;
-    }
-    let any_in_progress =
-        plan.tasks().iter().any(|t| matches!(t.status().kind(), TaskStatusKind::InProgress));
-    let any_resolved = plan
-        .tasks()
-        .iter()
-        .any(|t| matches!(t.status().kind(), TaskStatusKind::Done | TaskStatusKind::Skipped));
-    if any_in_progress || any_resolved { TrackStatus::InProgress } else { TrackStatus::Planned }
-}
-
 /// Applies a state transition to a task within a track and persists the result.
 ///
 /// Reads `impl-plan.json` via [`ImplPlanReader`], applies the transition on the
-/// `ImplPlanDocument` aggregate, persists via [`ImplPlanWriter`], then synchronizes
-/// `metadata.json` status via [`TrackWriter`] (unless a status override is active).
-/// Returns the updated [`TrackMetadata`].
+/// `ImplPlanDocument` aggregate, persists via [`ImplPlanWriter`].
+/// Returns the (unchanged) [`TrackMetadata`] from the initial read.
+///
+/// `metadata.json` is **not** written — track status is derived on demand from
+/// `impl-plan.json` via `domain::derive_track_status`. This eliminates the
+/// two-file non-atomic write (impl-plan.json + metadata.json) that was flagged
+/// in PR #107.
 pub struct TransitionTaskUseCase<S>
 where
-    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter,
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
 {
     store: Arc<S>,
 }
 
 impl<S> TransitionTaskUseCase<S>
 where
-    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter,
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
 {
     #[must_use]
     pub fn new(store: Arc<S>) -> Self {
@@ -112,14 +91,14 @@ where
 
     /// Transitions a task by an explicit [`TaskTransition`] and persists the result.
     ///
+    /// Only `impl-plan.json` is written. `metadata.json` is not touched.
+    ///
     /// # Concurrency note
     /// This performs a non-serialized read-modify-write on `impl-plan.json`. Concurrent
     /// callers operating against the same track directory are not supported — the CLI is
     /// designed for sequential single-process execution, consistent with
     /// `FsTrackStore::with_locked_document`'s documented assumption that "concurrent
     /// callers are not supported — parallel access will be handled by worktree isolation".
-    /// A future `ImplPlanWriter::update_impl_plan` port method would allow adapters to
-    /// provide serialized R-M-W (tracked as a follow-up to T007).
     ///
     /// # Errors
     /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
@@ -132,11 +111,10 @@ where
         task_id: &TaskId,
         transition: TaskTransition,
     ) -> Result<TrackMetadata, TrackWriteError> {
-        // Verify the track exists (check for override before any mutation).
+        // Verify the track exists.
         let track = self.store.find(track_id).map_err(TrackWriteError::from)?.ok_or_else(|| {
             TrackWriteError::Repository(RepositoryError::TrackNotFound(track_id.to_string()))
         })?;
-        let has_override = track.status_override().is_some();
 
         // Load impl-plan.json (required for transition).
         let mut impl_plan =
@@ -151,23 +129,16 @@ where
         // Apply transition on the domain aggregate.
         impl_plan.apply_transition(task_id, transition).map_err(TrackWriteError::from)?;
 
-        // Persist impl-plan.json.
+        // Persist impl-plan.json ONLY (single-file atomic write).
         self.store.save_impl_plan(track_id, &impl_plan).map_err(TrackWriteError::from)?;
 
-        // Sync metadata.json status from impl-plan state (skip if override is active).
-        if !has_override {
-            let derived = derive_track_status_from_impl_plan(&impl_plan);
-            let updated = self.store.update(track_id, |t| {
-                t.set_status(derived);
-                Ok::<(), DomainError>(())
-            })?;
-            return Ok(updated);
-        }
-
+        // Return the (unchanged) metadata — callers derive status on demand.
         Ok(track)
     }
 
     /// Resolves a target status string to the correct transition and applies it.
+    ///
+    /// Only `impl-plan.json` is written. `metadata.json` is not touched.
     ///
     /// # Errors
     /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
@@ -182,11 +153,10 @@ where
         target_status: &str,
         commit_hash: Option<CommitHash>,
     ) -> Result<TrackMetadata, TrackWriteError> {
-        // Verify the track exists (check for override before any mutation).
+        // Verify the track exists.
         let track = self.store.find(track_id).map_err(TrackWriteError::from)?.ok_or_else(|| {
             TrackWriteError::Repository(RepositoryError::TrackNotFound(track_id.to_string()))
         })?;
-        let has_override = track.status_override().is_some();
 
         // Load impl-plan.json (required for transition).
         let mut impl_plan =
@@ -203,19 +173,10 @@ where
             .apply_transition_by_status(task_id, target_status, commit_hash)
             .map_err(TrackWriteError::from)?;
 
-        // Persist impl-plan.json.
+        // Persist impl-plan.json ONLY (single-file atomic write).
         self.store.save_impl_plan(track_id, &impl_plan).map_err(TrackWriteError::from)?;
 
-        // Sync metadata.json status from impl-plan state (skip if override is active).
-        if !has_override {
-            let derived = derive_track_status_from_impl_plan(&impl_plan);
-            let updated = self.store.update(track_id, |t| {
-                t.set_status(derived);
-                Ok::<(), DomainError>(())
-            })?;
-            return Ok(updated);
-        }
-
+        // Return the (unchanged) metadata — callers derive status on demand.
         Ok(track)
     }
 }
@@ -223,20 +184,21 @@ where
 /// Adds a new task to a track's `impl-plan.json` and persists the result.
 ///
 /// Reads `impl-plan.json` via [`ImplPlanReader`], delegates to
-/// [`domain::ImplPlanDocument::add_task`], persists via [`ImplPlanWriter`], then
-/// re-derives and syncs `metadata.json` status via [`TrackWriter`] (a new Todo task
-/// on a previously-Done track moves it back to `InProgress`/`Planned`).
-/// Returns the updated [`TrackMetadata`] and the newly-allocated [`TaskId`].
+/// [`domain::ImplPlanDocument::add_task`], persists via [`ImplPlanWriter`].
+/// Returns the (unchanged) [`TrackMetadata`] and the newly-allocated [`TaskId`].
+///
+/// `metadata.json` is **not** written — track status is derived on demand from
+/// `impl-plan.json` via `domain::derive_track_status`.
 pub struct AddTaskUseCase<S>
 where
-    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter,
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
 {
     store: Arc<S>,
 }
 
 impl<S> AddTaskUseCase<S>
 where
-    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter,
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
 {
     #[must_use]
     pub fn new(store: Arc<S>) -> Self {
@@ -245,10 +207,11 @@ where
 
     /// Adds a task to the track and persists the result.
     ///
+    /// Only `impl-plan.json` is written. `metadata.json` is not touched.
+    ///
     /// # Concurrency note
     /// This performs a non-serialized read-modify-write on `impl-plan.json`. See
-    /// [`TransitionTaskUseCase::execute`] for the documented single-process assumption
-    /// and the follow-up T007 note for `ImplPlanWriter::update_impl_plan`.
+    /// [`TransitionTaskUseCase::execute`] for the documented single-process assumption.
     ///
     /// # Errors
     /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
@@ -268,11 +231,10 @@ where
             return Err(TrackWriteError::Domain(ValidationError::EmptyTaskDescription.into()));
         }
 
-        // Verify the track exists (check for override before any mutation).
+        // Verify the track exists.
         let track = self.store.find(track_id).map_err(TrackWriteError::from)?.ok_or_else(|| {
             TrackWriteError::Repository(RepositoryError::TrackNotFound(track_id.to_string()))
         })?;
-        let has_override = track.status_override().is_some();
 
         // Load impl-plan.json (required for task management).
         let mut impl_plan =
@@ -289,40 +251,29 @@ where
             .add_task(description, section_id, after_task_id)
             .map_err(TrackWriteError::from)?;
 
-        // Persist impl-plan.json.
+        // Persist impl-plan.json ONLY (single-file atomic write).
         self.store.save_impl_plan(track_id, &impl_plan).map_err(TrackWriteError::from)?;
 
-        // Sync metadata.json status (skip if override is active).
-        // A new Todo task added to a Done track must move it back to Planned/InProgress.
-        if !has_override {
-            let derived = derive_track_status_from_impl_plan(&impl_plan);
-            let updated = self.store.update(track_id, |t| {
-                t.set_status(derived);
-                Ok::<(), DomainError>(())
-            })?;
-            return Ok((updated, new_task_id));
-        }
-
+        // Return the (unchanged) metadata — callers derive status on demand.
         Ok((track, new_task_id))
     }
 }
 
 /// Sets or clears a status override on a track and persists the result atomically.
 ///
-/// On a `clear` operation (`status_override = None`), the derived status is
-/// restored from `impl-plan.json` via [`ImplPlanReader`] so tracks that are
-/// already `InProgress` / `Done` do not collapse back to `Planned` after an
-/// override is lifted.
+/// This is a genuine identity mutation (not a derived-status sync): it updates
+/// `status_override` in `metadata.json`. Track status is derived on demand
+/// from `impl-plan.json` + `status_override` by callers.
 pub struct SetOverrideUseCase<S>
 where
-    S: TrackWriter + ImplPlanReader,
+    S: TrackWriter,
 {
     store: Arc<S>,
 }
 
 impl<S> SetOverrideUseCase<S>
 where
-    S: TrackWriter + ImplPlanReader,
+    S: TrackWriter,
 {
     #[must_use]
     pub fn new(store: Arc<S>) -> Self {
@@ -331,43 +282,19 @@ where
 
     /// Sets or clears a status override on the track and persists atomically.
     ///
-    /// * `status_override = Some(ov)` — sets the override and mirrors
-    ///   `track.status()` to `ov.track_status()`.
-    /// * `status_override = None` — clears the override and restores the
-    ///   derived status from `impl-plan.json`:
-    ///   - no impl-plan.json (planning-only track) → `Planned`.
-    ///   - all tasks resolved → `Done`.
-    ///   - any task in-progress or mixed resolved/unresolved → `InProgress`.
-    ///   - all tasks `Todo` → `Planned`.
+    /// * `status_override = Some(ov)` — sets the override (Blocked/Cancelled + reason).
+    /// * `status_override = None` — clears the override.
+    ///
+    /// Only `metadata.json` is written. `impl-plan.json` is not touched.
     ///
     /// # Errors
-    /// Returns `TrackWriteError` if the track is not found, if
-    /// `impl-plan.json` cannot be loaded during a clear, or if the underlying
-    /// writer fails.
+    /// Returns `TrackWriteError` if the track is not found or the underlying writer fails.
     pub fn execute(
         &self,
         track_id: &TrackId,
         status_override: Option<StatusOverride>,
     ) -> Result<TrackMetadata, TrackWriteError> {
-        // When clearing, derive the restored status from impl-plan.json
-        // BEFORE opening the write transaction — keeps the closure infallible
-        // for the reader side.
-        let restored_status = if status_override.is_none() {
-            let impl_plan = self.store.load_impl_plan(track_id).map_err(TrackWriteError::from)?;
-            Some(match impl_plan.as_ref() {
-                Some(doc) => derive_track_status_from_impl_plan(doc),
-                None => TrackStatus::Planned,
-            })
-        } else {
-            None
-        };
-
         self.store.update(track_id, |track| {
-            if let Some(ref ov) = status_override {
-                track.set_status(ov.track_status());
-            } else if let Some(status) = restored_status {
-                track.set_status(status);
-            }
             track.set_status_override(status_override);
             Ok(())
         })
@@ -384,7 +311,7 @@ mod tests {
         DomainError, ImplPlanDocument, ImplPlanReader, ImplPlanWriter, PlanSection, PlanView,
         RepositoryError, StatusOverride, TaskId, TaskStatus, TaskTransition, TrackId,
         TrackMetadata, TrackReadError, TrackReader, TrackStatus, TrackTask, TrackWriteError,
-        TrackWriter, ValidationError,
+        TrackWriter, ValidationError, derive_track_status,
     };
 
     use super::{
@@ -462,11 +389,11 @@ mod tests {
     }
 
     fn sample_track() -> TrackMetadata {
-        // T005: identity-only TrackMetadata; tasks/plan live in impl-plan.json.
+        // Identity-only TrackMetadata; tasks/plan live in impl-plan.json.
+        // Status is derived on demand via derive_track_status.
         TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            TrackStatus::Planned,
             None,
         )
         .unwrap()
@@ -499,7 +426,7 @@ mod tests {
     }
 
     #[test]
-    fn transition_usecase_execute_by_status_transitions_task_and_syncs_metadata_status() {
+    fn transition_usecase_execute_by_status_transitions_task_and_updates_impl_plan_only() {
         let store = Arc::new(StubTrackStore::default());
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
@@ -512,7 +439,6 @@ mod tests {
 
         let result = transition.execute_by_status(track.id(), &task_id, "in_progress", None);
         assert!(result.is_ok(), "transition to in_progress must succeed: {result:?}");
-        let returned_track = result.unwrap();
 
         // Verify the impl-plan task was updated.
         let updated_plan = store.load_impl_plan(track.id()).unwrap().unwrap();
@@ -520,22 +446,18 @@ mod tests {
             matches!(updated_plan.tasks()[0].status(), TaskStatus::InProgress),
             "task must be InProgress after transition"
         );
-        // Verify metadata.status was synced.
+
+        // Status is derived on demand — metadata.json is NOT written by transition.
+        // Verify derived status reflects the updated impl-plan.
         assert_eq!(
-            returned_track.status(),
+            derive_track_status(Some(&updated_plan), None),
             TrackStatus::InProgress,
-            "metadata.status must be synced to InProgress when a task is in_progress"
-        );
-        let stored_track = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(
-            stored_track.status(),
-            TrackStatus::InProgress,
-            "persisted metadata.status must also be InProgress"
+            "derived status must be InProgress when a task is in_progress"
         );
     }
 
     #[test]
-    fn transition_usecase_execute_with_explicit_transition_transitions_task_and_syncs_status() {
+    fn transition_usecase_execute_with_explicit_transition_updates_impl_plan_only() {
         let store = Arc::new(StubTrackStore::default());
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
@@ -548,8 +470,10 @@ mod tests {
 
         let result = transition.execute(track.id(), &task_id, TaskTransition::Start);
         assert!(result.is_ok(), "explicit Start transition must succeed: {result:?}");
-        // Metadata status should be synced to InProgress.
-        assert_eq!(result.unwrap().status(), TrackStatus::InProgress);
+
+        // metadata.json is NOT written — derive status from updated impl-plan.
+        let updated_plan = store.load_impl_plan(track.id()).unwrap().unwrap();
+        assert_eq!(derive_track_status(Some(&updated_plan), None), TrackStatus::InProgress);
     }
 
     #[test]
@@ -632,9 +556,11 @@ mod tests {
             .execute(track.id(), Some(StatusOverride::blocked("blocker reason").unwrap()))
             .unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::Blocked);
+        // Status is derived from status_override.
+        assert_eq!(derive_track_status(None, updated.status_override()), TrackStatus::Blocked);
         let loaded = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(loaded.status(), TrackStatus::Blocked);
+        assert!(loaded.status_override().is_some());
+        assert_eq!(derive_track_status(None, loaded.status_override()), TrackStatus::Blocked);
     }
 
     #[test]
@@ -648,7 +574,8 @@ mod tests {
         set_override.execute(track.id(), Some(StatusOverride::blocked("reason").unwrap())).unwrap();
         let updated = set_override.execute(track.id(), None).unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::Planned);
+        // Override cleared → derived status from impl-plan (None) + no override = Planned
+        assert_eq!(derive_track_status(None, updated.status_override()), TrackStatus::Planned);
     }
 
     #[test]

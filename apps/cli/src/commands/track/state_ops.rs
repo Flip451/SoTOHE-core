@@ -1,6 +1,6 @@
 //! CLI handlers for add-task, set-override, clear-override, next-task, and task-counts.
 
-use domain::{ImplPlanReader, TaskStatusKind, TrackId, TrackStatus, TrackWriter};
+use domain::{ImplPlanReader, TaskStatusKind, TrackId, derive_track_status};
 use infrastructure::track::fs_store::read_track_metadata;
 
 use crate::CliError;
@@ -38,7 +38,13 @@ pub(super) fn execute_add_task(
         .execute(&track_id, &description, section.as_deref(), after_task_id.as_ref())
         .map_err(|err| CliError::Message(format!("add-task failed: {err}")))?;
 
-    println!("[OK] Added task {new_task_id}: {description} (track status: {})", track.status());
+    // Derive status from updated impl-plan.json + status_override.
+    // Fail-closed: if the plan we just wrote is unreadable, surface the error.
+    let updated_impl_plan = store.load_impl_plan(&track_id).map_err(|err| {
+        CliError::Message(format!("add-task succeeded but cannot read impl-plan: {err}"))
+    })?;
+    let derived_status = derive_track_status(updated_impl_plan.as_ref(), track.status_override());
+    println!("[OK] Added task {new_task_id}: {description} (track status: {derived_status})");
 
     sync_views(&project_root, &track_id);
     Ok(ExitCode::SUCCESS)
@@ -81,7 +87,9 @@ pub(super) fn execute_set_override(
         .execute(&track_id, Some(override_value))
         .map_err(|err| CliError::Message(format!("set-override failed: {err}")))?;
 
-    println!("[OK] Override set to '{}' (track status: {})", status, track.status());
+    // Derive status from status_override (no impl-plan needed for override display).
+    let derived_status = derive_track_status(None, track.status_override());
+    println!("[OK] Override set to '{}' (track status: {})", status, derived_status);
 
     sync_views(&project_root, &track_id);
     Ok(ExitCode::SUCCESS)
@@ -105,27 +113,21 @@ pub(super) fn execute_clear_override(
             .map_err(|msg| CliError::Message(format!("branch guard: {msg}")))?;
     }
 
-    // T007: Re-derive status from impl-plan before clearing the override so both mutations
-    // happen in a single atomic `store.update()` call. This avoids partial-write state if
-    // the impl-plan read fails (the override is only cleared if the status is derivable).
-    let restored_status = store
-        .load_impl_plan(&track_id)
-        .map_err(|err| {
-            CliError::Message(format!("clear-override failed reading impl-plan: {err}"))
-        })?
-        .map(|doc| derive_track_status_from_tasks(doc.tasks()))
-        .unwrap_or(TrackStatus::Planned);
-
-    // Single atomic write: clear override and restore derived status together.
-    let track = store
-        .update(&track_id, |t| {
-            t.set_status_override(None);
-            t.set_status(restored_status);
-            Ok(())
-        })
+    // clear-override only writes metadata.json (status_override → None).
+    // Track status is derived on demand from impl-plan.json; no secondary status sync needed.
+    let set_override = usecase::SetOverrideUseCase::new(Arc::clone(&store));
+    let track = set_override
+        .execute(&track_id, None)
         .map_err(|err| CliError::Message(format!("clear-override failed: {err}")))?;
 
-    println!("[OK] Override cleared (track status: {})", track.status());
+    // Derive display status from updated impl-plan.json.
+    // Fail-closed: if impl-plan.json is unreadable, surface the error rather than
+    // silently falling back to Planned.
+    let impl_plan = store.load_impl_plan(&track_id).map_err(|err| {
+        CliError::Message(format!("clear-override succeeded but cannot read impl-plan: {err}"))
+    })?;
+    let derived_status = derive_track_status(impl_plan.as_ref(), track.status_override());
+    println!("[OK] Override cleared (track status: {})", derived_status);
 
     sync_views(&project_root, &track_id);
     Ok(ExitCode::SUCCESS)
@@ -150,7 +152,11 @@ pub(super) fn execute_next_task(
         .load_impl_plan(&valid_id)
         .map_err(|err| CliError::Message(format!("next-task failed reading impl-plan: {err}")))?;
 
-    if impl_plan.is_none() && (track.branch().is_some() || track.status() != TrackStatus::Planned) {
+    // Derive status on demand to check if track is "activated" (past Planned).
+    let derived_status = derive_track_status(impl_plan.as_ref(), track.status_override());
+    if impl_plan.is_none()
+        && (track.branch().is_some() || derived_status != domain::TrackStatus::Planned)
+    {
         return Err(CliError::Message(format!(
             "next-task: activated track '{valid_id}' is missing impl-plan.json; \
              refusing to report no-open-task for a potentially corrupt track state"
@@ -213,12 +219,9 @@ pub(super) fn execute_task_counts(
             (total, todo, in_progress, done, skipped)
         }
         None => {
-            // Only planning-only tracks (no branch, status still Planned) may
-            // have no impl-plan.json. An activated track (branch is Some, or
-            // status has moved past Planned) missing its impl-plan is a
-            // corruption state — fail closed so automation / operators are
-            // not told "0 tasks" when work may actually be outstanding.
-            if track.branch().is_some() || track.status() != TrackStatus::Planned {
+            // Derive status on demand to check if track is "activated".
+            let derived_status = derive_track_status(None, track.status_override());
+            if track.branch().is_some() || derived_status != domain::TrackStatus::Planned {
                 return Err(CliError::Message(format!(
                     "task-counts: activated track '{valid_id}' is missing impl-plan.json; \
                      refusing to report zero counts for a potentially corrupt track state"
@@ -232,30 +235,6 @@ pub(super) fn execute_task_counts(
         r#"{{"total":{total},"todo":{todo},"in_progress":{in_progress},"done":{done},"skipped":{skipped}}}"#
     );
     Ok(ExitCode::SUCCESS)
-}
-
-/// Derives the track-level `TrackStatus` from a task slice.
-///
-/// Mirrors the logic in `usecase::derive_track_status_from_impl_plan`:
-/// - Empty → `Planned`
-/// - All resolved (done/skipped) → `Done`
-/// - Any `InProgress`, OR mix of at least one resolved + at least one unresolved → `InProgress`
-/// - All `Todo` → `Planned`
-fn derive_track_status_from_tasks(tasks: &[domain::TrackTask]) -> TrackStatus {
-    if tasks.is_empty() {
-        return TrackStatus::Planned;
-    }
-    let all_resolved = tasks
-        .iter()
-        .all(|t| matches!(t.status().kind(), TaskStatusKind::Done | TaskStatusKind::Skipped));
-    if all_resolved {
-        return TrackStatus::Done;
-    }
-    let any_in_progress = tasks.iter().any(|t| t.status().kind() == TaskStatusKind::InProgress);
-    let any_resolved = tasks
-        .iter()
-        .any(|t| matches!(t.status().kind(), TaskStatusKind::Done | TaskStatusKind::Skipped));
-    if any_in_progress || any_resolved { TrackStatus::InProgress } else { TrackStatus::Planned }
 }
 
 /// Sync rendered views, printing results. Non-fatal on failure.
@@ -281,15 +260,14 @@ mod tests {
     use super::*;
     use std::fs;
 
-    /// Write a minimal valid v4 (identity-only) metadata.json.
-    fn write_metadata_v4(track_dir: &std::path::Path, track_id: &str) {
+    /// Write a minimal valid v5 (identity-only, no `status` field) metadata.json.
+    fn write_metadata_v5(track_dir: &std::path::Path, track_id: &str) {
         let metadata = format!(
             r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Test Track",
-  "status": "in_progress",
   "created_at": "2026-01-01T00:00:00Z",
   "updated_at": "2026-01-01T00:00:00Z"
 }}"#
@@ -318,7 +296,7 @@ mod tests {
     fn setup_test_track(tmp: &std::path::Path, track_id: &str) -> (PathBuf, PathBuf, PathBuf) {
         let track_dir = tmp.join("track").join("items").join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
-        write_metadata_v4(&track_dir, track_id);
+        write_metadata_v5(&track_dir, track_id);
         let items_dir = tmp.join("track").join("items");
         (tmp.to_path_buf(), items_dir, track_dir)
     }
@@ -383,18 +361,19 @@ mod tests {
 
     #[test]
     fn test_execute_task_counts_with_no_impl_plan_on_planning_only_track_succeeds() {
-        // A planning-only track (no branch, status: planned) legitimately has no
+        // A planning-only track (no branch, no override) legitimately has no
         // impl-plan.json; the command reports zeros without erroring.
         let tmp = tempfile::tempdir().unwrap();
         let track_id = "planning-only";
         let track_dir = tmp.path().join("track").join("items").join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
+        // v5 metadata without branch (branchless planning-only track)
         let metadata = format!(
             r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "{track_id}",
+  "branch": null,
   "title": "Planning Only",
-  "status": "planned",
   "created_at": "2026-01-01T00:00:00Z",
   "updated_at": "2026-01-01T00:00:00Z"
 }}"#

@@ -58,21 +58,21 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 
         // Skip v2/v3 legacy tracks: they predate the current renderer and
         // their committed plan.md reflects the renderer that shipped at
-        // their commit time. We only validate v4 (identity-only, post-T005)
-        // metadata so that sibling tracks stay untouched by the active
-        // track's work.
+        // their commit time. We only validate v5 (identity-only, current
+        // schema) metadata so that sibling tracks stay untouched by the
+        // active track's work.
         //
-        // Only skip when schema_version is an explicit integer < 4.
+        // Only skip when schema_version is an explicit integer < 5.
         // When the field is missing, non-numeric, or the file cannot be read
         // or parsed, fall through so that the subsequent render attempt
         // surfaces the real error (fail-closed: do not silently bypass
-        // freshness verification for a corrupted v4 file).
+        // freshness verification for a corrupted v5 file).
         if let Ok(content) = std::fs::read_to_string(&metadata_path) {
             if let Ok(raw) = serde_json::from_str::<serde_json::Value>(&content) {
                 if let Some(schema_version) =
                     raw.get("schema_version").and_then(serde_json::Value::as_u64)
                 {
-                    if schema_version < 4 {
+                    if schema_version < 5 {
                         continue;
                     }
                 }
@@ -124,8 +124,8 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 /// Render plan.md content from metadata.json (+ optional impl-plan.json) using the
 /// infrastructure render module.
 ///
-/// Only renders v4 (identity-only, post-T005) metadata. Callers are expected
-/// to pre-filter by schema_version; v2/v3 metadata is not supported and will
+/// Only renders v4/v5 (identity-only) metadata. Callers are expected to
+/// pre-filter by schema_version; v2/v3 metadata is not supported and will
 /// return a decode error.
 fn render_plan_from_metadata(metadata_path: &Path) -> Result<String, String> {
     let content = std::fs::read_to_string(metadata_path).map_err(|e| format!("read error: {e}"))?;
@@ -163,14 +163,13 @@ mod tests {
         let track_dir = root.join(TRACK_ITEMS_DIR).join(name);
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // v4 identity-only metadata — legacy v2/v3 tracks are skipped by the
+        // v5 identity-only metadata — legacy v2/v3/v4 tracks are skipped by the
         // freshness validator on purpose.
         let metadata = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "id": name,
             "branch": format!("track/{name}"),
             "title": "Test Track",
-            "status": "in_progress",
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
         });
@@ -185,11 +184,10 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let metadata = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "id": "test-track",
             "branch": "track/test-track",
             "title": "Test Track",
-            "status": "in_progress",
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
         });
@@ -225,11 +223,10 @@ mod tests {
         let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("no-plan");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": 5,
             "id": "no-plan",
             "branch": "track/no-plan",
             "title": "No Plan",
-            "status": "planned",
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
         });
@@ -274,12 +271,11 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("ambiguous-track");
         std::fs::create_dir_all(&track_dir).unwrap();
-        // metadata.json without schema_version field — could be a corrupted v4 file.
+        // metadata.json without schema_version field — could be a corrupted v5 file.
         let metadata = serde_json::json!({
             "id": "ambiguous-track",
             "branch": "track/ambiguous-track",
             "title": "Ambiguous Track",
-            "status": "in_progress",
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
         });

@@ -1,3 +1,5 @@
+use domain::ImplPlanReader;
+
 use crate::CliError;
 
 use super::*;
@@ -54,18 +56,23 @@ pub(super) fn execute_transition(
     }
 
     // Delegate task-lookup → resolve-transition → transition-task to usecase.
-    // T005: `TransitionTaskUseCase::execute_by_status` persists `impl-plan.json` and
-    // syncs `metadata.json` status in one atomic sequence, returning the updated metadata.
+    // `TransitionTaskUseCase::execute_by_status` persists `impl-plan.json` and
+    // returns the updated metadata; metadata.json is not written.
     let transition = usecase::TransitionTaskUseCase::new(Arc::clone(&store));
     let track = transition
         .execute_by_status(&track_id, &task_id, &target_status, parsed_hash)
         .map_err(|err| CliError::Message(format!("transition failed: {err}")))?;
 
+    // Derive status from updated impl-plan.json + status_override.
+    // Fail-closed: if the plan we just wrote is unreadable, surface the error.
+    let updated_impl_plan = store.load_impl_plan(&track_id).map_err(|err| {
+        CliError::Message(format!("transition succeeded but cannot read impl-plan: {err}"))
+    })?;
+    let derived_status =
+        domain::derive_track_status(updated_impl_plan.as_ref(), track.status_override());
     println!(
         "[OK] {}: transitioned to {} (track status: {})",
-        task_id,
-        target_status,
-        track.status()
+        task_id, target_status, derived_status,
     );
     match render::sync_rendered_views(&project_root, Some(track_id.as_ref())) {
         Ok(changed) => {
@@ -156,7 +163,7 @@ mod tests {
     use std::collections::HashMap;
     use std::sync::Mutex;
 
-    use domain::{RepositoryError, TrackBranch, TrackMetadata, TrackReadError, TrackStatus};
+    use domain::{RepositoryError, TrackBranch, TrackMetadata, TrackReadError};
 
     use super::*;
 
@@ -189,12 +196,11 @@ mod tests {
     }
 
     fn sample_track(id: &str, branch: Option<&str>) -> TrackMetadata {
-        // T005: TrackMetadata is identity-only; no tasks/plan fields.
+        // TrackMetadata is identity-only; status derived on demand.
         TrackMetadata::with_branch(
             TrackId::try_new(id).unwrap(),
             branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
-            TrackStatus::Planned,
             None,
         )
         .unwrap()

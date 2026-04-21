@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
 use domain::{
-    TrackBranch, TrackId, TrackMetadata, TrackStatus, TrackWriteError, TrackWriter, ValidationError,
+    TrackBranch, TrackId, TrackMetadata, TrackStatus, TrackWriteError, TrackWriter,
+    ValidationError, derive_track_status,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -43,10 +44,10 @@ impl<W: TrackWriter> ActivateTrackUseCase<W> {
                 .into());
             }
 
-            // T005: schema_version 4 is the new identity-only shape. Accept both 3 and 4.
-            // The error variant name is kept as-is for compatibility; the display message
-            // covers both versions.
-            if !matches!(schema_version, 3 | 4) {
+            // Schema versions 4 and 5 are the identity-only shapes (v4 has status,
+            // v5 removes it). Accept 3, 4, or 5. The error variant name is kept
+            // as-is for compatibility; the display message covers all versions.
+            if !matches!(schema_version, 3..=5) {
                 return Err(ValidationError::TrackActivationRequiresSchemaV3 {
                     track_id: track.id().to_string(),
                     schema_version,
@@ -54,10 +55,14 @@ impl<W: TrackWriter> ActivateTrackUseCase<W> {
                 .into());
             }
 
-            if track.status() != TrackStatus::Planned {
+            // Status is derived on demand; a branchless track with no impl-plan
+            // and no override is always Planned (the only valid activation
+            // precondition). Use derive_track_status to be explicit.
+            let derived = derive_track_status(None, track.status_override());
+            if derived != TrackStatus::Planned {
                 return Err(ValidationError::TrackActivationRequiresPlanningOnly {
                     track_id: track.id().to_string(),
-                    status: track.status(),
+                    status: derived,
                 }
                 .into());
             }
@@ -77,8 +82,8 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use domain::{
-        DomainError, RepositoryError, TrackBranch, TrackId, TrackMetadata, TrackReader,
-        TrackStatus, TrackWriteError, TrackWriter, ValidationError,
+        DomainError, RepositoryError, StatusOverride, TrackBranch, TrackId, TrackMetadata,
+        TrackReader, TrackWriteError, TrackWriter, ValidationError,
     };
 
     use super::{ActivateTrackOutcome, ActivateTrackUseCase};
@@ -124,14 +129,9 @@ mod tests {
     }
 
     fn sample_track() -> TrackMetadata {
-        // T005: TrackMetadata is identity-only; tasks/plan live in impl-plan.json.
-        TrackMetadata::new(
-            TrackId::try_new("activation-track").unwrap(),
-            "Activation Track",
-            TrackStatus::Planned,
-            None,
-        )
-        .unwrap()
+        // TrackMetadata is identity-only; status derived from impl-plan + override.
+        TrackMetadata::new(TrackId::try_new("activation-track").unwrap(), "Activation Track", None)
+            .unwrap()
     }
 
     #[test]
@@ -175,11 +175,11 @@ mod tests {
         let mut track = sample_track();
         let branch = TrackBranch::try_new("track/activation-track").unwrap();
 
-        // T005: status is now explicitly stored; set it to InProgress to simulate
+        // Status is derived; set status_override to Blocked to simulate
         // a track that is not planning-only.
-        track.set_status(TrackStatus::InProgress);
+        track.set_status_override(Some(StatusOverride::blocked("testing").unwrap()));
         store.save(&track).unwrap();
-        let err = usecase.execute(track.id(), &branch, 3).unwrap_err();
+        let err = usecase.execute(track.id(), &branch, 5).unwrap_err();
 
         assert!(matches!(
             err,
@@ -211,8 +211,9 @@ mod tests {
 
     #[test]
     fn activation_accepts_schema_version_4_identity_only_track() {
-        // T005: schema_version 4 is the new identity-only shape. Activation must
-        // accept v4 tracks so that /track:activate works for newly created tracks.
+        // Schema version 4 is the identity-only shape (without derived-status
+        // semantics). Activation must accept v4 tracks so that /track:activate
+        // works for newly created tracks.
         let store = Arc::new(StubTrackStore::default());
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let track = sample_track();
@@ -220,6 +221,22 @@ mod tests {
 
         store.save(&track).unwrap();
         let outcome = usecase.execute(track.id(), &branch, 4).unwrap();
+
+        assert!(matches!(outcome, ActivateTrackOutcome::Materialized(_)));
+        assert_eq!(outcome.track().branch().unwrap(), &branch);
+    }
+
+    #[test]
+    fn activation_accepts_schema_version_5_derived_status_track() {
+        // Schema version 5 removes the status field; activation must accept
+        // v5 tracks (the canonical current format).
+        let store = Arc::new(StubTrackStore::default());
+        let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
+
+        store.save(&track).unwrap();
+        let outcome = usecase.execute(track.id(), &branch, 5).unwrap();
 
         assert!(matches!(outcome, ActivateTrackOutcome::Materialized(_)));
         assert_eq!(outcome.track().branch().unwrap(), &branch);

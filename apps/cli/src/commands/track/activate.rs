@@ -1,4 +1,5 @@
 use crate::CliError;
+use domain::ImplPlanReader;
 
 use super::*;
 
@@ -77,13 +78,41 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     }
 
     let resume_allowed = if already_materialized && mode == BranchMode::Auto {
+        // Derive the track status on demand from impl-plan.json + status_override.
+        // v5 tracks no longer store a status field in metadata.json, so reading
+        // `track_record.status` (which is `None` for v5) and defaulting to "planned"
+        // would allow `activation_resume_allowed` to skip its early-return guard
+        // for done/blocked/cancelled tracks. Instead, derive the status properly.
+        let (track_meta, _) = super::resolve::read_track_metadata(&items_dir, &track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let store = FsTrackStore::new(items_dir.clone());
+        let impl_plan_for_status = store
+            .load_impl_plan(&track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let derived_status = domain::derive_track_status(
+            impl_plan_for_status.as_ref(),
+            track_meta.status_override(),
+        );
+        // Fail-closed: an already-materialized track (branch set, or non-Planned derived
+        // status) with no impl-plan is potentially corrupt. Reject rather than defaulting
+        // to Planned and allowing activation_resume_allowed to proceed on a corrupt state.
+        if impl_plan_for_status.is_none()
+            && (track_meta.branch().is_some() || derived_status != domain::TrackStatus::Planned)
+        {
+            return Err(CliError::Message(format!(
+                "activation preflight failed: track '{track_id}' has no impl-plan.json but \
+                 is not in planning state (derived_status={derived_status}); \
+                 track may be corrupt"
+            )));
+        }
+        let status_str = derived_status.to_string();
         activation_resume_allowed(
             &repo,
             &project_root,
             &items_dir,
             &track_id,
             &branch_name,
-            track_record.status.as_deref().unwrap_or("planned"),
+            &status_str,
             current_branch.as_deref(),
         )
         .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?
@@ -116,6 +145,27 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     let branch_exists =
         preflight_branch_operation(&repo, &branch_name, mode, !already_materialized)
             .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+
+    // Fail-closed: for a not-yet-materialized track, derive status from impl-plan +
+    // status_override. If the track already has a non-Planned status (e.g., someone
+    // added an impl-plan directly without going through the branch workflow), reject
+    // activation rather than allowing materialization of a non-planning track.
+    if !already_materialized {
+        let (track_meta, _) = super::resolve::read_track_metadata(&items_dir, &track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let activation_store = FsTrackStore::new(items_dir.clone());
+        let preflight_plan = activation_store
+            .load_impl_plan(&track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let preflight_status =
+            domain::derive_track_status(preflight_plan.as_ref(), track_meta.status_override());
+        if preflight_status != domain::TrackStatus::Planned {
+            return Err(CliError::Message(format!(
+                "activation preflight failed: track '{track_id}' has derived status \
+                 '{preflight_status}' (not Planned); cannot activate a non-planning track"
+            )));
+        }
+    }
 
     let materialized_now = if already_materialized {
         false
@@ -613,8 +663,8 @@ fn activation_rejects_invalid_source_branch(
 }
 
 pub(super) fn uses_legacy_branch_mode(_mode: BranchMode, _schema_version: u32) -> bool {
-    // The legacy branch-mode path is retired. Post-T005 the only supported
-    // metadata schema is v4 (identity-only); legacy schemas (v1 / v2 / v3)
+    // The legacy branch-mode path is retired. The only supported metadata
+    // schemas are v4/v5 (identity-only); legacy schemas (v1 / v2 / v3)
     // are frozen history and have no backward-compat route. All branch ops
     // — regardless of mode or schema — flow through the full activation
     // path, which materializes metadata properly and fails explicitly on an
@@ -871,9 +921,12 @@ mod tests {
 
     fn write_track_metadata(
         root: &Path,
-        schema_version: u32,
+        _schema_version: u32,
         branch: Option<&str>,
     ) -> std::path::PathBuf {
+        // All new tracks are schema_version 5 (no status/tasks/plan fields).
+        // The _schema_version argument is kept for call-site compatibility but
+        // always writes v5 since legacy schemas are no longer accepted by FsTrackStore.
         let track_dir = root.join("track/items/demo");
         fs::create_dir_all(&track_dir).unwrap();
         let branch_json = match branch {
@@ -884,31 +937,12 @@ mod tests {
             track_dir.join("metadata.json"),
             format!(
                 r#"{{
-  "schema_version": {schema_version},
+  "schema_version": 5,
   "id": "demo",
   "branch": {branch_json},
   "title": "Demo",
-  "status": "planned",
   "created_at": "2026-03-14T00:00:00Z",
-  "updated_at": "2026-03-14T00:00:00Z",
-  "tasks": [
-    {{
-      "id": "T1",
-      "description": "Implement activation guard",
-      "status": "todo"
-    }}
-  ],
-  "plan": {{
-    "summary": [],
-    "sections": [
-      {{
-        "id": "S1",
-        "title": "Build",
-        "description": [],
-        "task_ids": ["T1"]
-      }}
-    ]
-  }}
+  "updated_at": "2026-03-14T00:00:00Z"
 }}
 "#
             ),
@@ -989,21 +1023,19 @@ mod tests {
     }
 
     #[test]
-    fn reject_branchless_guard_allows_legacy_v2_branchless_tracks_via_fs_store() {
-        let dir = tempfile::tempdir().unwrap();
-        write_track_metadata(dir.path(), 2, None);
-
-        let items_dir = dir.path().join("track/items");
-        let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
-
-        let result = usecase::track_resolution::reject_branchless_guard(
-            &store,
-            &TrackId::try_new("demo").unwrap(),
-            "in_progress",
+    fn reject_branchless_guard_allows_legacy_v2_branchless_tracks_via_direct_call() {
+        // v2 tracks cannot be read via FsTrackStore (codec now requires v5).
+        // Test the underlying guard directly: schema_version 2 branchless tracks
+        // are allowed by `reject_branchless_implementation_transition` because
+        // the guard only fires for schema_version >= 3.
+        let id = TrackId::try_new("demo").unwrap();
+        let result = usecase::track_resolution::reject_branchless_implementation_transition(
             2,
+            None, // branchless
+            &id,
+            "in_progress",
         );
-
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "v2 branchless tracks must not be blocked by the guard");
     }
 
     #[rstest]

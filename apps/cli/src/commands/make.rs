@@ -588,7 +588,7 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
 ///    that `sotp track type-signals` uses — see §D2 last paragraph).
 /// 2. Delegate the recomputation itself to `execute_type_signals`, which
 ///    writes `<layer>-type-signals.json` and re-encodes declaration files
-///    via the T007 codec (which omits the `signals` field). Symlink guards
+///    via the declaration codec (which omits the `signals` field). Symlink guards
 ///    (§D7) are applied inside `execute_type_signals` on both write paths.
 /// 3. After recomputation, read each generated signal file and classify the
 ///    result: Red → BLOCKED (exit 1, commit-message.txt preserved), Yellow
@@ -670,8 +670,31 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
         })?;
         match infrastructure::track::fs_store::read_track_metadata(&items_dir, &valid_id) {
             Ok((metadata, _doc_meta)) => {
-                // T005: schema_version 4 stores status directly in TrackMetadata (no original_status).
-                let effective_status = metadata.status();
+                // Status is derived on demand from impl-plan + status_override.
+                // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt
+                // impl-plan.json blocks the commit rather than being treated as absent.
+                use domain::ImplPlanReader;
+                let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir.clone());
+                let impl_plan = store.load_impl_plan(&valid_id).map_err(|e| {
+                    CliError::Message(format!(
+                        "[track-commit-message] BLOCKED: cannot load impl-plan for \
+                         '{track_id}': {e}"
+                    ))
+                })?;
+                // Fail-closed: a track with no impl-plan but non-Planned status (branch set
+                // or non-Planned override) is potentially corrupt — block the commit.
+                let effective_status =
+                    domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
+                if impl_plan.is_none()
+                    && (metadata.branch().is_some()
+                        || effective_status != domain::TrackStatus::Planned)
+                {
+                    return Err(CliError::Message(format!(
+                        "[track-commit-message] BLOCKED: track '{track_id}' has no \
+                         impl-plan.json but is not in planning state \
+                         (derived_status={effective_status}); track may be corrupt"
+                    )));
+                }
                 if ensure_active_track(effective_status, track_id).is_err() {
                     // Track is Done or Archived — skip pre-commit type-signal recomputation.
                     // The frozen track's signal files are already correct from when it was active.

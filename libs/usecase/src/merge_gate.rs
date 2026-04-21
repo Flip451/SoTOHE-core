@@ -58,11 +58,10 @@ pub trait TrackBlobReader {
     /// Reads and decodes the TDDD catalogue file for a single layer on the
     /// given branch.
     ///
-    /// T007 (Phase 1 Task 7): accepts a `layer_id` so the merge-gate
-    /// multilayer loop can read each layer's catalogue (`domain-types.json`,
-    /// `usecase-types.json`, …). Returns `NotFound` when the file does not
-    /// exist on the target ref — this corresponds to "TDDD not active for
-    /// this layer" per ADR §D2.1.
+    /// Accepts a `layer_id` so the merge-gate multilayer loop can read each
+    /// layer's catalogue (`domain-types.json`, `usecase-types.json`, …).
+    /// Returns `NotFound` when the file does not exist on the target ref —
+    /// this corresponds to "TDDD not active for this layer" per ADR §D2.1.
     ///
     /// The `Found` variant returns `(doc, catalogue_file)` where
     /// `catalogue_file` is the resolved filename the adapter actually read
@@ -174,8 +173,8 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
         return stage1;
     }
 
-    // 5. Stage 2: multi-layer TDDD gate. T007 — loop every `tddd.enabled`
-    //    layer read from `architecture-rules.json` on the PR branch blob.
+    // 5. Stage 2: multi-layer TDDD gate — loop every `tddd.enabled` layer
+    //    read from `architecture-rules.json` on the PR branch blob.
     //    For each layer:
     //      - NotFound → TDDD opt-out for that layer (no finding)
     //      - FetchError → fail-closed
@@ -738,7 +737,7 @@ mod tests {
     }
 
     // ===============================================================
-    // U19–U26 — multilayer merge gate tests (T007)
+    // U19–U26 — multilayer merge gate tests
     //
     // A `MultiLayerMock` returns per-layer catalogue outcomes keyed by
     // `layer_id`, and also drives `read_enabled_layers`. The 8 scenarios

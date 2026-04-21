@@ -4,7 +4,7 @@ use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Parser, Subcommand};
-use domain::{DomainError, TrackId, TrackMetadata, TrackStatus};
+use domain::{DomainError, TrackId, TrackMetadata, derive_track_status};
 use infrastructure::InMemoryTrackStore;
 use usecase::SaveTrackUseCase;
 
@@ -114,18 +114,14 @@ fn run_demo() -> Result<ExitCode, CliError> {
     save.execute(&track)
         .map_err(|e| CliError::Message(format!("failed to save example track: {e}")))?;
 
-    println!("SoTOHE-core CLI stub: '{}' is {}", track.id(), track.status());
+    let status = derive_track_status(None, track.status_override());
+    println!("SoTOHE-core CLI stub: '{}' is {status}", track.id());
     Ok(ExitCode::SUCCESS)
 }
 
 fn example_track() -> Result<TrackMetadata, DomainError> {
-    // T005: TrackMetadata is identity-only; no tasks/plan fields.
-    TrackMetadata::new(
-        TrackId::try_new("track-state-machine")?,
-        "Track state machine",
-        TrackStatus::Planned,
-        None,
-    )
+    // TrackMetadata is identity-only; status is derived on demand.
+    TrackMetadata::new(TrackId::try_new("track-state-machine")?, "Track state machine", None)
 }
 
 #[cfg(test)]
@@ -133,7 +129,7 @@ fn example_track() -> Result<TrackMetadata, DomainError> {
 mod tests {
     use std::sync::Arc;
 
-    use domain::TrackStatus;
+    use domain::derive_track_status;
     use infrastructure::InMemoryTrackStore;
     use usecase::SaveTrackUseCase;
 
@@ -141,14 +137,14 @@ mod tests {
 
     #[test]
     fn example_cli_flow_saves_track_successfully() {
-        // T005: TransitionTaskUseCase is stubbed pending T007 (impl-plan.json task transitions).
-        // Verify the identity-only track can be saved and loaded.
+        // Status is derived on demand from impl-plan + override.
+        // A freshly created track with no impl-plan and no override → Planned.
         let store = Arc::new(InMemoryTrackStore::new());
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let track = example_track().unwrap();
 
         save.execute(&track).unwrap();
 
-        assert_eq!(track.status(), TrackStatus::Planned);
+        assert_eq!(derive_track_status(None, track.status_override()).to_string(), "planned");
     }
 }

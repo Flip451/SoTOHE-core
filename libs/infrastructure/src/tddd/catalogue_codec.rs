@@ -68,7 +68,7 @@ struct TypeCatalogueDocDto {
     #[serde(default)]
     pub type_definitions: Vec<TypeCatalogueEntryDto>,
     /// Backward-compat decode slot for legacy files that still carry inline
-    /// `signals`. T007 (ADR 2026-04-18-1400 §D1 / §D6) moved signals out of
+    /// `signals`. Per ADR 2026-04-18-1400 §D1 / §D6, signals moved out of
     /// the declaration file into `<layer>-type-signals.json`. The DTO
     /// accepts (and discards) any inline signals blob so that decoding a
     /// legacy catalogue file does not fail `deny_unknown_fields`, but the
@@ -98,11 +98,11 @@ struct TypeCatalogueEntryDto {
     #[serde(flatten)]
     pub kind: TypeDefinitionKindDto,
     /// SoT Chain ② references to spec.json elements.
-    /// Defaults to empty when absent in JSON (additive field added by T005).
+    /// Defaults to empty when absent in JSON.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub spec_refs: Vec<SpecRefDto>,
     /// Unpersisted ground citations. Non-empty → 🟡 advisory signal.
-    /// Defaults to empty when absent in JSON (additive field added by T005).
+    /// Defaults to empty when absent in JSON.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub informal_grounds: Vec<InformalGroundRefDto>,
 }
@@ -224,7 +224,7 @@ struct TraitImplDeclDto {
     expected_methods: Vec<MethodDto>,
 }
 
-// NOTE: T007 removed the `TypeSignalDto` struct — signal payloads live in
+// NOTE: The `TypeSignalDto` struct was removed — signal payloads live in
 // `<layer>-type-signals.json` (see `type_signals_codec`), not in the
 // declaration file.
 
@@ -447,12 +447,12 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
 
     let doc = TypeCatalogueDocument::new(dto.schema_version, entries);
 
-    // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file no longer
-    // carries signals. The DTO still accepts the field for backward-compatible
-    // decode of legacy files written before the split, but the values are
-    // discarded — the authoritative signals live in `<layer>-type-signals.json`
-    // (read by `evaluate_layer_catalogue`, T005). This is the read-side half of
-    // the declaration/evaluation split; the write-side half is `encode` below.
+    // Per ADR 2026-04-18-1400 §D1 / §D6 the declaration file no longer carries
+    // signals. The DTO still accepts the field for backward-compatible decode
+    // of legacy files written before the split, but the values are discarded —
+    // the authoritative signals live in `<layer>-type-signals.json` (read by
+    // `evaluate_layer_catalogue`). This is the read-side half of the
+    // declaration/evaluation split; the write-side half is `encode` below.
     let _legacy_inline_signals = dto.signals;
 
     Ok(doc)
@@ -727,7 +727,7 @@ fn type_catalogue_doc_to_dto(
 ) -> Result<TypeCatalogueDocDto, TypeCatalogueCodecError> {
     let type_definitions =
         doc.entries().iter().map(type_catalogue_entry_to_dto).collect::<Result<Vec<_>, _>>()?;
-    // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file is authored
+    // Per ADR 2026-04-18-1400 §D1 / §D6, the declaration file is authored
     // content; evaluation results live in `<layer>-type-signals.json`. Emit
     // `signals: None` so the DTO's `skip_serializing_if = "Option::is_none"`
     // elides the field entirely from the on-disk JSON. `doc.signals()` is
@@ -893,8 +893,8 @@ fn method_to_dto(
     })
 }
 
-// NOTE: T007 removed `type_signal_to_dto`, `confidence_signal_to_str`, and
-// `type_signal_from_dto` helpers — signals now live in
+// NOTE: The `type_signal_to_dto`, `confidence_signal_to_str`, and
+// `type_signal_from_dto` helpers were removed — signals live in
 // `<layer>-type-signals.json` via `type_signals_codec`, not in the
 // declaration file.
 
@@ -1179,7 +1179,7 @@ mod tests {
 
     #[test]
     fn test_decode_silently_drops_legacy_inline_signals() {
-        // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file no longer
+        // Per ADR 2026-04-18-1400 §D1 / §D6 the declaration file no longer
         // carries signals. Legacy declaration files that still have an inline
         // `signals` blob must be decodable (backward compat), but the value
         // is discarded — the authoritative signals live in
@@ -1194,10 +1194,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(
-            doc.signals().is_none(),
-            "legacy inline signals must be dropped after T007 codec strip"
-        );
+        assert!(doc.signals().is_none(), "legacy inline signals must be dropped during decode");
 
         let encoded = encode(&doc).unwrap();
         assert!(
@@ -1394,11 +1391,10 @@ mod tests {
 
     #[test]
     fn test_encode_never_emits_signals_even_with_inline_red_input() {
-        // T007: even when the legacy declaration file has rich inline signals
+        // Even when the legacy declaration file has rich inline signals
         // (Red + missing_items), the decoder drops them and the encoder emits
-        // a clean declaration with no `signals` field. This closes the
-        // Migration §5b write-side contract: after T007 lands, every written
-        // declaration file is authored-only.
+        // a clean declaration with no `signals` field. This enforces the
+        // write-side contract: every written declaration file is authored-only.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -2007,7 +2003,7 @@ mod tests {
         );
     }
 
-    // --- T005: spec_refs and informal_grounds round-trip tests ---
+    // --- spec_refs and informal_grounds round-trip tests ---
 
     #[test]
     fn test_decode_entry_without_spec_refs_defaults_to_empty() {

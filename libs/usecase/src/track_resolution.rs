@@ -360,7 +360,6 @@ mod tests {
 
     use domain::{
         RepositoryError, TrackBranch, TrackId, TrackMetadata, TrackReadError, TrackReader,
-        TrackStatus,
     };
 
     #[derive(Default)]
@@ -379,12 +378,11 @@ mod tests {
     }
 
     fn sample_track(id: &str, branch: Option<&str>) -> TrackMetadata {
-        // T005: identity-only TrackMetadata
+        // Identity-only TrackMetadata; status derived on demand.
         TrackMetadata::with_branch(
             TrackId::try_new(id).unwrap(),
             branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
-            TrackStatus::Planned,
             None,
         )
         .unwrap()

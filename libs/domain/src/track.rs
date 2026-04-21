@@ -1,8 +1,8 @@
 use std::fmt;
 
 use crate::{
-    CommitHash, DomainError, NonEmptyString, PlanView, TaskId, TrackBranch, TrackId,
-    TransitionError, ValidationError,
+    CommitHash, DomainError, ImplPlanDocument, NonEmptyString, PlanView, TaskId, TrackBranch,
+    TrackId, TransitionError, ValidationError,
 };
 
 /// Derived status of a track, computed from its task states and optional override.
@@ -255,13 +255,13 @@ impl TrackTask {
 
 /// Identity-only aggregate for a track (metadata.json SSoT after ADR 2026-04-19-1242 §D1.4).
 ///
-/// Retains only: `id`, `branch`, `title`, `status` (explicitly stored),
+/// Retains only: `id`, `branch`, `title`,
 /// `created_at`, `updated_at` (handled at DTO layer in `DocumentMeta`).
 ///
 /// `tasks` and `plan` have moved to `ImplPlanDocument` (`impl-plan.json`).
-/// Status is an explicit stored value, no longer task-derived.
-/// `status_override` is retained as an optional sub-field that feeds into
-/// the stored status on save; codec layer (T005) stores it separately.
+/// `status` is now **derived on demand** via `derive_track_status`; it is no longer
+/// stored in `metadata.json`.
+/// `status_override` is retained as an optional sub-field for Blocked/Cancelled semantics.
 ///
 /// Branch validation: when a branch is present it must begin with `"track/"` and
 /// the slug after the prefix must match the track id exactly.
@@ -272,11 +272,8 @@ pub struct TrackMetadata {
     id: TrackId,
     branch: Option<TrackBranch>,
     title: NonEmptyString,
-    /// Explicit stored status. No longer derived from tasks.
-    status: TrackStatus,
-    /// Optional override sub-field preserved for callers that still use
-    /// status_override semantics (e.g., `track_phase.rs` Blocked/Cancelled display).
-    /// The codec stores this when present.
+    /// Optional override sub-field: Blocked/Cancelled with reason.
+    /// Feeds into derived status via `derive_track_status`.
     status_override: Option<StatusOverride>,
 }
 
@@ -288,10 +285,9 @@ impl TrackMetadata {
     pub fn new(
         id: TrackId,
         title: impl Into<String>,
-        status: TrackStatus,
         status_override: Option<StatusOverride>,
     ) -> Result<Self, DomainError> {
-        Self::with_branch(id, None, title, status, status_override)
+        Self::with_branch(id, None, title, status_override)
     }
 
     /// Creates a new `TrackMetadata` with an optional branch field.
@@ -300,21 +296,14 @@ impl TrackMetadata {
     /// match the track `id` exactly. This ensures that branch-based readers and
     /// activation logic cannot be misrouted.
     ///
-    /// When `status_override` is `Some`, the `status` must equal the override's
-    /// canonical status (e.g., `StatusOverride::blocked(...)` requires
-    /// `TrackStatus::Blocked`).
-    ///
     /// # Errors
     /// - `DomainError::Validation(ValidationError::EmptyTrackTitle)` if title is empty.
     /// - `DomainError::Validation(ValidationError::BranchIdMismatch)` if the branch
     ///   slug does not match the track id.
-    /// - `DomainError::Validation(ValidationError::StatusOverrideMismatch)` if
-    ///   `status_override` is present but `status` does not match.
     pub fn with_branch(
         id: TrackId,
         branch: Option<TrackBranch>,
         title: impl Into<String>,
-        status: TrackStatus,
         status_override: Option<StatusOverride>,
     ) -> Result<Self, DomainError> {
         if let Some(ref b) = branch {
@@ -326,18 +315,8 @@ impl TrackMetadata {
                 }));
             }
         }
-        if let Some(ref o) = status_override {
-            let required = o.track_status();
-            if status != required {
-                return Err(DomainError::Validation(ValidationError::StatusOverrideMismatch {
-                    override_kind: o.kind().to_string(),
-                    required: required.to_string(),
-                    actual: status.to_string(),
-                }));
-            }
-        }
         let title = NonEmptyString::try_new(title).map_err(|_| ValidationError::EmptyTrackTitle)?;
-        Ok(Self { id, branch, title, status, status_override })
+        Ok(Self { id, branch, title, status_override })
     }
 
     #[must_use]
@@ -377,45 +356,53 @@ impl TrackMetadata {
         self.title.as_ref()
     }
 
-    /// Returns the explicitly stored status.
-    #[must_use]
-    pub fn status(&self) -> TrackStatus {
-        self.status
-    }
-
-    /// Sets the explicit stored status.
-    ///
-    /// If a `status_override` is currently set and the new `status` does not
-    /// match the override's canonical status, the override is automatically
-    /// cleared to preserve the status/override coherence invariant.
-    pub fn set_status(&mut self, status: TrackStatus) {
-        if let Some(ref o) = self.status_override {
-            if status != o.track_status() {
-                self.status_override = None;
-            }
-        }
-        self.status = status;
-    }
-
     #[must_use]
     pub fn status_override(&self) -> Option<&StatusOverride> {
         self.status_override.as_ref()
     }
 
     /// Sets or clears the status override sub-field.
-    ///
-    /// When `status_override` is `Some`, the `status` is automatically synced
-    /// to the override's canonical status (e.g., setting a `Blocked` override
-    /// also sets `status = TrackStatus::Blocked`).
-    ///
-    /// When `status_override` is `None`, the `status` is left unchanged;
-    /// the caller is responsible for setting an appropriate status after clearing.
     pub fn set_status_override(&mut self, status_override: Option<StatusOverride>) {
-        if let Some(ref o) = status_override {
-            self.status = o.track_status();
-        }
         self.status_override = status_override;
     }
+}
+
+/// Derives `TrackStatus` on demand from an optional `ImplPlanDocument` and an optional
+/// `StatusOverride`.
+///
+/// This is the single source of truth for computing track status from the two authoritative
+/// sources (`impl-plan.json` and `status_override` in `metadata.json`).
+///
+/// Rules:
+/// - `Some(override)` → the override wins: `Blocked` or `Cancelled`.
+/// - No impl-plan (planning-only track) → `Planned`.
+/// - All tasks resolved (done/skipped) → `Done`.
+/// - Any task `InProgress`, or a mix of resolved + unresolved → `InProgress`.
+/// - All tasks `Todo` → `Planned`.
+#[must_use]
+pub fn derive_track_status(
+    impl_plan: Option<&ImplPlanDocument>,
+    status_override: Option<&StatusOverride>,
+) -> TrackStatus {
+    if let Some(ov) = status_override {
+        return ov.track_status();
+    }
+    let Some(plan) = impl_plan else {
+        return TrackStatus::Planned;
+    };
+    if plan.tasks().is_empty() {
+        return TrackStatus::Planned;
+    }
+    if plan.all_tasks_resolved() {
+        return TrackStatus::Done;
+    }
+    let any_in_progress =
+        plan.tasks().iter().any(|t| matches!(t.status().kind(), TaskStatusKind::InProgress));
+    let any_resolved = plan
+        .tasks()
+        .iter()
+        .any(|t| matches!(t.status().kind(), TaskStatusKind::Done | TaskStatusKind::Skipped));
+    if any_in_progress || any_resolved { TrackStatus::InProgress } else { TrackStatus::Planned }
 }
 
 /// Re-exported for `impl_plan.rs` which still needs plan validation.
@@ -471,28 +458,17 @@ mod tests {
 
     #[test]
     fn test_track_metadata_new_with_valid_title_succeeds() {
-        let track = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            TrackStatus::Planned,
-            None,
-        )
-        .unwrap();
+        let track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
         assert_eq!(track.id().as_ref(), "my-track");
         assert_eq!(track.title(), "My Track");
-        assert_eq!(track.status(), TrackStatus::Planned);
         assert!(track.branch().is_none());
         assert!(track.status_override().is_none());
     }
 
     #[test]
     fn test_track_metadata_new_with_empty_title_returns_error() {
-        let result = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "",
-            TrackStatus::Planned,
-            None,
-        );
+        let result = TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "", None);
         assert!(matches!(result, Err(DomainError::Validation(ValidationError::EmptyTrackTitle))));
     }
 
@@ -502,12 +478,10 @@ mod tests {
             TrackId::try_new("my-track").unwrap(),
             Some(TrackBranch::try_new("track/my-track").unwrap()),
             "My Track",
-            TrackStatus::InProgress,
             None,
         )
         .unwrap();
         assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
-        assert_eq!(track.status(), TrackStatus::InProgress);
     }
 
     #[test]
@@ -516,7 +490,6 @@ mod tests {
             TrackId::try_new("my-track").unwrap(),
             Some(TrackBranch::try_new("track/other-track").unwrap()),
             "My Track",
-            TrackStatus::Planned,
             None,
         );
         assert!(
@@ -530,117 +503,63 @@ mod tests {
 
     #[test]
     fn test_track_metadata_without_branch_returns_none() {
-        let track = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            TrackStatus::Planned,
-            None,
-        )
-        .unwrap();
+        let track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
         assert!(track.branch().is_none());
     }
 
     #[test]
     fn test_track_metadata_set_branch_updates_branch() {
-        let mut track = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            TrackStatus::Planned,
-            None,
-        )
-        .unwrap();
+        let mut track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
         assert!(track.branch().is_none());
         track.set_branch(Some(TrackBranch::try_new("track/my-track").unwrap())).unwrap();
         assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
     }
 
     #[test]
-    fn test_track_metadata_set_status_updates_status() {
-        let mut track = TrackMetadata::new(
-            TrackId::try_new("status-track").unwrap(),
-            "Status Track",
-            TrackStatus::Planned,
-            None,
-        )
-        .unwrap();
-        track.set_status(TrackStatus::Done);
-        assert_eq!(track.status(), TrackStatus::Done);
-    }
-
-    #[test]
-    fn test_track_metadata_stores_blocked_status_directly() {
+    fn test_track_metadata_stores_blocked_override() {
         let track = TrackMetadata::new(
             TrackId::try_new("blocked-track").unwrap(),
             "Blocked Track",
-            TrackStatus::Blocked,
             Some(StatusOverride::blocked("waiting on review").unwrap()),
         )
         .unwrap();
-        assert_eq!(track.status(), TrackStatus::Blocked);
+        // Derived status from override = Blocked
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Blocked);
         assert!(track.status_override().is_some());
     }
 
     #[test]
-    fn test_track_metadata_stores_archived_status() {
-        let track = TrackMetadata::new(
-            TrackId::try_new("archived-track").unwrap(),
-            "Archived Track",
-            TrackStatus::Archived,
-            None,
-        )
-        .unwrap();
-        assert_eq!(track.status(), TrackStatus::Archived);
-    }
-
-    #[test]
-    fn test_track_metadata_set_status_override_stores_override_and_syncs_status() {
-        let mut track = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            TrackStatus::InProgress,
-            None,
-        )
-        .unwrap();
+    fn test_track_metadata_set_status_override_stores_override() {
+        let mut track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
         track.set_status_override(Some(StatusOverride::blocked("dep issue").unwrap()));
         assert!(track.status_override().is_some());
-        // set_status_override auto-syncs status to the override's canonical status.
-        assert_eq!(track.status(), TrackStatus::Blocked);
+        // derive_track_status returns Blocked when override is set
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Blocked);
+    }
+
+    // --- derive_track_status tests ---
+
+    #[test]
+    fn test_derive_track_status_no_override_no_plan_returns_planned() {
+        assert_eq!(derive_track_status(None, None), TrackStatus::Planned);
     }
 
     #[test]
-    fn test_track_metadata_set_status_clears_incompatible_override() {
-        let mut track = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            TrackStatus::Blocked,
-            Some(StatusOverride::blocked("waiting").unwrap()),
-        )
-        .unwrap();
-        assert!(track.status_override().is_some());
-        // Setting status to an incompatible value auto-clears the override.
-        track.set_status(TrackStatus::Planned);
-        assert_eq!(track.status(), TrackStatus::Planned);
-        assert!(track.status_override().is_none());
+    fn test_derive_track_status_override_wins_over_plan() {
+        let ov = StatusOverride::blocked("reason").unwrap();
+        assert_eq!(derive_track_status(None, Some(&ov)), TrackStatus::Blocked);
     }
 
     #[test]
-    fn test_track_metadata_constructor_rejects_status_override_mismatch() {
-        let result = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            TrackStatus::Planned, // inconsistent: override says Blocked
-            Some(StatusOverride::blocked("dep issue").unwrap()),
-        );
-        assert!(
-            matches!(
-                result,
-                Err(DomainError::Validation(ValidationError::StatusOverrideMismatch { .. }))
-            ),
-            "expected StatusOverrideMismatch but got: {result:?}"
-        );
+    fn test_derive_track_status_cancelled_override() {
+        let ov = StatusOverride::cancelled("reason").unwrap();
+        assert_eq!(derive_track_status(None, Some(&ov)), TrackStatus::Cancelled);
     }
 
-    // --- TaskStatus and TaskTransition tests (standalone, no TrackMetadata dependency) ---
+    // --- TaskStatus and TrackStatus tests (standalone) ---
 
     #[test]
     fn test_done_pending_is_resolved() {

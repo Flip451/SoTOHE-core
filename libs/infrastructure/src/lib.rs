@@ -97,16 +97,17 @@ impl TrackWriter for InMemoryTrackStore {
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
-    use domain::{TrackId, TrackMetadata, TrackReader, TrackStatus, TrackWriter};
+    use domain::{
+        StatusOverride, TrackId, TrackMetadata, TrackReader, TrackWriter, derive_track_status,
+    };
 
     use super::InMemoryTrackStore;
 
     fn sample_track() -> TrackMetadata {
-        // T005: TrackMetadata is identity-only; no tasks/plan fields.
+        // TrackMetadata is identity-only; status derived from impl-plan + override.
         TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            TrackStatus::Planned,
             None,
         )
         .unwrap()
@@ -132,14 +133,16 @@ mod tests {
 
         let updated = store
             .update(track.id(), |t| {
-                t.set_status(TrackStatus::InProgress);
+                t.set_status_override(Some(StatusOverride::blocked("testing").unwrap()));
                 Ok(())
             })
             .unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::InProgress);
+        assert!(updated.status_override().is_some());
+        assert_eq!(derive_track_status(None, updated.status_override()).to_string(), "blocked");
 
         let reloaded = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(reloaded.status(), TrackStatus::InProgress);
+        assert!(reloaded.status_override().is_some());
+        assert_eq!(derive_track_status(None, reloaded.status_override()).to_string(), "blocked");
     }
 }

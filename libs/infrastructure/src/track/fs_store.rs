@@ -7,9 +7,9 @@ use domain::{
     TrackMetadata, TrackReadError, TrackReader, TrackWriteError, TrackWriter,
 };
 
-// NOTE (T007): FsTrackStore no longer validates task descriptions or task
-// removal on save — those invariants are now enforced on ImplPlanDocument
-// (impl-plan.json). The identity-only TrackMetadata has no tasks/plan.
+// NOTE: FsTrackStore no longer validates task descriptions or task removal on
+// save — those invariants are enforced on ImplPlanDocument (impl-plan.json).
+// The identity-only TrackMetadata has no tasks/plan.
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
@@ -137,13 +137,13 @@ impl TrackWriter for FsTrackStore {
         // Read existing meta to preserve created_at, or create new meta.
         let meta = match self.read_track(track.id()).map_err(TrackWriteError::from)? {
             Some((_existing, mut meta)) => {
-                // NOTE (T007): task description / removal validation removed —
-                // those invariants now belong to ImplPlanDocument (impl-plan.json).
+                // NOTE: task description / removal validation removed — those
+                // invariants now belong to ImplPlanDocument (impl-plan.json).
                 meta.updated_at = Self::now_iso8601().map_err(TrackWriteError::from)?;
                 meta
             }
             None => DocumentMeta {
-                schema_version: 4,
+                schema_version: 5,
                 created_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
                 updated_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
             },
@@ -320,16 +320,43 @@ pub fn read_track_metadata(
         .map_err(|err| RepositoryError::Message(format!("cannot parse {}: {err}", path.display())))
 }
 
+/// Load `impl-plan.json` for a track, returning `None` when the file is absent.
+///
+/// **WARNING — render-only helper**: this function silently absorbs I/O and
+/// decode errors. A present-but-corrupt `impl-plan.json` is indistinguishable
+/// from a missing one and the caller receives `None` in both cases.
+///
+/// This is acceptable **only** in display/rendering contexts where a corrupt
+/// plan falls back gracefully to "Planned" status without security implications.
+///
+/// For any security-sensitive guard (active-track check, activation preflight,
+/// type-signals guard, etc.) use `FsTrackStore::load_impl_plan` instead, which
+/// propagates errors so that corruption blocks the operation rather than
+/// silently bypassing it.
+///
+/// # Errors
+///
+/// Always returns `Ok`; individual failures are swallowed and treated as
+/// "absent".
+pub fn load_impl_plan_for_track(items_dir: &Path, id: &TrackId) -> Option<ImplPlanDocument> {
+    let path = items_dir.join(id.as_ref()).join("impl-plan.json");
+    if !path.exists() {
+        return None;
+    }
+    let json = std::fs::read_to_string(&path).ok()?;
+    crate::impl_plan_codec::decode(&json).ok()
+}
+
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
 
-    use domain::{TrackId, TrackMetadata, TrackStatus};
+    use domain::{StatusOverride, TrackId, TrackMetadata};
 
     fn sample_track(id: &str) -> TrackMetadata {
-        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", TrackStatus::Planned, None)
-            .unwrap()
+        // Identity-only TrackMetadata; status is derived on demand via derive_track_status.
+        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", None).unwrap()
     }
 
     #[test]
@@ -361,18 +388,19 @@ mod tests {
 
         store.save(&track).unwrap();
 
+        // Status is not stored; test that set_status_override persists.
         let updated = store
             .update(track.id(), |t| {
-                t.set_status(TrackStatus::InProgress);
+                t.set_status_override(Some(StatusOverride::blocked("testing").unwrap()));
                 Ok(())
             })
             .unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::InProgress);
+        assert!(updated.status_override().is_some(), "override must be set after update");
 
         // Verify persistence.
         let reloaded = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(reloaded.status(), TrackStatus::InProgress);
+        assert!(reloaded.status_override().is_some(), "override must survive reload");
     }
 
     #[test]
@@ -453,18 +481,25 @@ mod tests {
         let track = sample_track("test-track");
         store.save(&track).unwrap();
 
+        // Status is not stored; test that set_status_override persists via with_locked_document.
         let updated = store
             .with_locked_document(track.id(), |t, _meta| {
-                t.set_status(TrackStatus::InProgress);
+                t.set_status_override(Some(StatusOverride::blocked("locked test").unwrap()));
                 Ok(())
             })
             .unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::InProgress);
+        assert!(
+            updated.status_override().is_some(),
+            "override must be set after with_locked_document"
+        );
 
         // Verify persistence.
         let reloaded = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(reloaded.status(), TrackStatus::InProgress);
+        assert!(
+            reloaded.status_override().is_some(),
+            "override must survive reload after with_locked_document"
+        );
     }
 
     #[test]

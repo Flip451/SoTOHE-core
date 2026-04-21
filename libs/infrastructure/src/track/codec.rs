@@ -1,14 +1,13 @@
 //! Serde types for metadata.json (TrackDocumentV2) — identity-only shape.
 //!
-//! T005 (ADR 2026-04-19-1242 §D1.4): `tasks` and `plan` fields removed from
+//! Per ADR 2026-04-19-1242 §D1.4, `tasks` and `plan` fields are removed from
 //! `TrackDocumentV2`; they now live in `impl-plan.json` (ImplPlanDocument).
-//! `status` is now stored explicitly rather than task-derived.
-//! Schema version bumped to 4 (no backward-compat per the ADR no-backward-compat rule).
+//! The `status` field is also removed from metadata.json; track status is
+//! derived on demand via `domain::derive_track_status`. Schema version is 5.
 //!
-//! Legacy fields `tasks`/`plan` in old metadata.json files will cause a decode
-//! error — migration to the new shape is the caller's responsibility.
+//! Legacy v4 (has `status`) and older are rejected on decode — no backward-compat.
 
-use domain::{DomainError, StatusOverride, TrackBranch, TrackId, TrackMetadata, TrackStatus};
+use domain::{DomainError, StatusOverride, TrackBranch, TrackId, TrackMetadata};
 
 /// Codec error for metadata.json serialization/deserialization.
 #[derive(Debug, thiserror::Error)]
@@ -26,12 +25,12 @@ pub enum CodecError {
     Validation(String),
 }
 
-/// Identity-only DTO for `metadata.json` (schema_version = 4).
+/// Identity-only DTO for `metadata.json` (schema_version = 5).
 ///
-/// Per ADR 2026-04-19-1242 §D1.4: retained fields are
-/// `schema_version, id, branch, title, status, created_at, updated_at`.
-/// Optional `status_override` is kept for Blocked/Cancelled semantics.
-/// `tasks` and `plan` are removed — they now live in `impl-plan.json`.
+/// Per ADR 2026-04-19-1242 §D1.4:
+/// - `status` is removed; track status is derived on demand from `impl-plan.json`.
+/// - `status_override` is kept for Blocked/Cancelled semantics.
+/// - `tasks` and `plan` are removed — they live in `impl-plan.json`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TrackDocumentV2 {
     pub schema_version: u32,
@@ -39,7 +38,6 @@ pub struct TrackDocumentV2 {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub branch: Option<String>,
     pub title: String,
-    pub status: String,
     pub created_at: String,
     pub updated_at: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,22 +60,39 @@ pub struct DocumentMeta {
 
 /// Decodes a JSON string into a domain `TrackMetadata` and infrastructure `DocumentMeta`.
 ///
-/// Accepts both `schema_version = 4` (identity-only, new shape) and
-/// `schema_version = 2` / `schema_version = 3` (legacy shape — `tasks`/`plan`
-/// fields are silently ignored via serde's `#[serde(default)]`-style lenient
-/// parsing so that existing metadata.json files can still be read during the
-/// migration window, even though the tasks/plan data is not loaded here).
+/// Accepts only `schema_version = 5` (identity-only, no `status` field).
+/// All previous schema versions (v2/v3/v4) are rejected with a clear error message.
 ///
 /// # Errors
-/// Returns `CodecError` on JSON parse failure or domain validation failure.
+/// Returns `CodecError` on JSON parse failure, schema version mismatch, or domain
+/// validation failure.
 pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
-    // Lenient decode: unknown fields (tasks, plan) are silently ignored so
-    // legacy v2/v3 files round-trip without error during the migration window.
-    // We use serde_json::Value first to strip any unknown keys before feeding
-    // into the strict TrackDocumentV2 DTO.
+    // Peek at schema_version before full decode.
     let raw: serde_json::Value = serde_json::from_str(json)?;
-    let stripped = strip_legacy_fields(raw);
-    let doc: TrackDocumentV2 = serde_json::from_value(stripped)?;
+    let schema_version =
+        raw.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(0);
+    if schema_version != 5 {
+        return Err(CodecError::Validation(format!(
+            "metadata.json schema_version {schema_version} is not supported; \
+             schema v5 is required (migrate by removing the 'status' field and \
+             setting schema_version to 5)"
+        )));
+    }
+
+    // Reject any file that still carries legacy fields from pre-v5 schemas.
+    // `status`, `tasks`, and `plan` are the three v4/v3 fields that must not
+    // appear in v5 identity-only metadata. Any of these indicates an
+    // incomplete migration; fail closed rather than silently ignoring them.
+    for legacy_field in ["status", "tasks", "plan"] {
+        if raw.get(legacy_field).is_some() {
+            return Err(CodecError::Validation(format!(
+                "metadata.json has a '{legacy_field}' field which is not valid in schema v5; \
+                 remove '{legacy_field}' (and any other v4 fields) and set schema_version to 5"
+            )));
+        }
+    }
+
+    let doc: TrackDocumentV2 = serde_json::from_value(raw)?;
 
     let meta = DocumentMeta {
         schema_version: doc.schema_version,
@@ -88,29 +103,16 @@ pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
     Ok((track, meta))
 }
 
-/// Removes legacy fields (`tasks`, `plan`) from a JSON value so that
-/// `TrackDocumentV2` can be deserialized without unknown-field errors
-/// during the migration window.
-fn strip_legacy_fields(mut value: serde_json::Value) -> serde_json::Value {
-    if let serde_json::Value::Object(ref mut map) = value {
-        map.remove("tasks");
-        map.remove("plan");
-        map.remove("extra");
-        // Remove any other unknown fields that old versions may have written.
-    }
-    value
-}
-
 /// Encodes a domain `TrackMetadata` and infrastructure `DocumentMeta` into a JSON string.
 ///
-/// Always writes `schema_version = 4` (the identity-only shape).
+/// Always writes `schema_version = 5` (no `status` field).
 ///
 /// # Errors
 /// Returns `CodecError` on JSON serialization failure.
 pub fn encode(track: &TrackMetadata, meta: &DocumentMeta) -> Result<String, CodecError> {
     let doc = document_from_track_metadata(track, meta);
     let mut value = serde_json::to_value(&doc)?;
-    // Preserve `branch: null` for planning-only tracks (schema_version 3/4 + no branch).
+    // Preserve `branch: null` for planning-only tracks (schema_version 5 + no branch).
     if track.branch().is_none() {
         if let serde_json::Value::Object(ref mut object) = value {
             object.insert("branch".to_owned(), serde_json::Value::Null);
@@ -129,41 +131,23 @@ fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, C
         .transpose()
         .map_err(|e| CodecError::Domain(e.into()))?;
 
-    let status = parse_track_status(&doc.status)?;
-
     let status_override =
         doc.status_override.map(|o| parse_status_override(&o.status, o.reason)).transpose()?;
 
-    let track = TrackMetadata::with_branch(id, branch, doc.title, status, status_override)?;
+    let track = TrackMetadata::with_branch(id, branch, doc.title, status_override)?;
 
     Ok(track)
 }
 
 fn document_from_track_metadata(track: &TrackMetadata, meta: &DocumentMeta) -> TrackDocumentV2 {
     TrackDocumentV2 {
-        schema_version: 4,
+        schema_version: 5,
         id: track.id().to_string(),
         branch: track.branch().map(|b| b.to_string()),
         title: track.title().to_string(),
-        status: track.status().to_string(),
         created_at: meta.created_at.clone(),
         updated_at: meta.updated_at.clone(),
         status_override: track.status_override().map(override_to_document),
-    }
-}
-
-fn parse_track_status(status: &str) -> Result<TrackStatus, CodecError> {
-    match status {
-        "planned" => Ok(TrackStatus::Planned),
-        "in_progress" => Ok(TrackStatus::InProgress),
-        "done" => Ok(TrackStatus::Done),
-        "blocked" => Ok(TrackStatus::Blocked),
-        "cancelled" => Ok(TrackStatus::Cancelled),
-        "archived" => Ok(TrackStatus::Archived),
-        other => Err(CodecError::InvalidField {
-            field: "status".into(),
-            reason: format!("unknown track status: {other}"),
-        }),
     }
 }
 
@@ -191,8 +175,19 @@ mod tests {
     use super::*;
     use domain::TrackStatus;
 
-    /// Minimal identity-only metadata.json (schema_version = 4).
-    fn sample_json_v4() -> &'static str {
+    /// Minimal identity-only metadata.json (schema_version = 5, no status field).
+    fn sample_json_v5() -> &'static str {
+        r#"{
+  "schema_version": 5,
+  "id": "test-track",
+  "title": "Test Track",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z"
+}"#
+    }
+
+    /// Legacy v4 metadata.json (has `status` field) — must be rejected.
+    fn sample_json_v4_legacy() -> &'static str {
         r#"{
   "schema_version": 4,
   "id": "test-track",
@@ -203,8 +198,7 @@ mod tests {
 }"#
     }
 
-    /// Legacy metadata.json (schema_version = 2 with tasks/plan).
-    /// The codec must accept this during the migration window (tasks/plan silently ignored).
+    /// Legacy v2 metadata.json (has tasks/plan) — must be rejected.
     fn sample_json_legacy_v2() -> &'static str {
         r#"{
   "schema_version": 2,
@@ -214,53 +208,58 @@ mod tests {
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
   "tasks": [
-    {"id": "T1", "description": "First task", "status": "todo"},
-    {"id": "T2", "description": "Second task", "status": "done", "commit_hash": "abc1234"}
+    {"id": "T1", "description": "First task", "status": "todo"}
   ],
   "plan": {
-    "summary": ["Test plan summary"],
-    "sections": [
-      {
-        "id": "S1",
-        "title": "Section 1",
-        "description": ["Description line"],
-        "task_ids": ["T1", "T2"]
-      }
-    ]
+    "summary": [],
+    "sections": []
   }
 }"#
     }
 
     #[test]
-    fn test_decode_v4_identity_only_json_returns_track_metadata() {
-        let (track, meta) = decode(sample_json_v4()).unwrap();
+    fn test_decode_v5_identity_only_json_returns_track_metadata() {
+        let (track, meta) = decode(sample_json_v5()).unwrap();
         assert_eq!(track.id().as_ref(), "test-track");
         assert_eq!(track.title(), "Test Track");
-        assert_eq!(track.status(), TrackStatus::Planned);
-        assert_eq!(meta.schema_version, 4);
+        assert!(track.status_override().is_none());
+        assert_eq!(meta.schema_version, 5);
         assert_eq!(meta.created_at, "2026-03-11T00:00:00Z");
     }
 
     #[test]
-    fn test_decode_legacy_v2_succeeds_ignoring_tasks_and_plan() {
-        // Migration window: legacy v2 files can be read; tasks/plan are dropped.
-        let (track, meta) = decode(sample_json_legacy_v2()).unwrap();
-        assert_eq!(track.id().as_ref(), "test-track");
-        assert_eq!(track.status(), TrackStatus::Planned);
-        assert_eq!(meta.schema_version, 2);
+    fn test_decode_v4_legacy_with_status_field_returns_error() {
+        // v4 files have a `status` field — must be rejected in schema v5.
+        let result = decode(sample_json_v4_legacy());
+        assert!(result.is_err(), "v4 metadata with status field must be rejected");
+        if let Err(CodecError::Validation(msg)) = result {
+            assert!(
+                msg.contains("schema_version 4") || msg.contains("schema v5"),
+                "error must mention v4 or schema v5: {msg}"
+            );
+        } else {
+            panic!("expected Validation error");
+        }
     }
 
     #[test]
-    fn test_encode_always_writes_schema_version_4() {
-        let (track, meta) = decode(sample_json_legacy_v2()).unwrap();
+    fn test_decode_legacy_v2_returns_error() {
+        // Legacy v2 files are no longer accepted.
+        let result = decode(sample_json_legacy_v2());
+        assert!(result.is_err(), "legacy v2 must be rejected");
+    }
+
+    #[test]
+    fn test_encode_always_writes_schema_version_5() {
+        let (track, meta) = decode(sample_json_v5()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(doc["schema_version"].as_u64().unwrap(), 4);
+        assert_eq!(doc["schema_version"].as_u64().unwrap(), 5);
     }
 
     #[test]
-    fn test_encode_v4_then_decode_round_trip() {
-        let (track, meta) = decode(sample_json_v4()).unwrap();
+    fn test_encode_v5_then_decode_round_trip() {
+        let (track, meta) = decode(sample_json_v5()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let (track2, meta2) = decode(&json).unwrap();
         assert_eq!(track, track2);
@@ -268,52 +267,31 @@ mod tests {
     }
 
     #[test]
+    fn test_encode_does_not_emit_status_field() {
+        let (track, meta) = decode(sample_json_v5()).unwrap();
+        let json = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert!(doc.get("status").is_none(), "status must NOT be emitted in v5 output");
+    }
+
+    #[test]
     fn test_decode_with_status_override_blocked() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "blocked-track",
   "title": "Blocked Track",
-  "status": "blocked",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
   "status_override": {"status": "blocked", "reason": "waiting on review"}
 }"#;
         let (track, _meta) = decode(json).unwrap();
-        assert_eq!(track.status(), TrackStatus::Blocked);
+        // derive_track_status with override = Blocked
+        assert_eq!(
+            domain::derive_track_status(None, track.status_override()),
+            TrackStatus::Blocked
+        );
         assert!(track.status_override().is_some());
         assert_eq!(track.status_override().unwrap().reason(), "waiting on review");
-    }
-
-    #[test]
-    fn test_decode_archived_status_round_trips() {
-        let json = r#"{
-  "schema_version": 4,
-  "id": "archived-track",
-  "title": "Archived Track",
-  "status": "archived",
-  "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z"
-}"#;
-        let (track, meta) = decode(json).unwrap();
-        assert_eq!(track.status(), TrackStatus::Archived);
-
-        let re_encoded = encode(&track, &meta).unwrap();
-        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
-        assert_eq!(doc["status"].as_str().unwrap(), "archived");
-    }
-
-    #[test]
-    fn test_decode_invalid_status_returns_error() {
-        let json = r#"{
-  "schema_version": 4,
-  "id": "bad-track",
-  "title": "Bad Track",
-  "status": "unknown_status",
-  "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z"
-}"#;
-        let result = decode(json);
-        assert!(result.is_err());
     }
 
     #[test]
@@ -324,7 +302,7 @@ mod tests {
 
     #[test]
     fn test_encode_branchless_track_has_null_branch_field() {
-        let (track, meta) = decode(sample_json_v4()).unwrap();
+        let (track, meta) = decode(sample_json_v5()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
         // Branchless track must emit `"branch": null`
@@ -335,11 +313,10 @@ mod tests {
     #[test]
     fn test_encode_with_branch_emits_branch_string() {
         let json = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "branched-track",
   "branch": "track/branched-track",
   "title": "Branched Track",
-  "status": "in_progress",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z"
 }"#;
@@ -350,22 +327,54 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_no_tasks_or_plan_fields_in_v4_output() {
-        let (track, meta) = decode(sample_json_v4()).unwrap();
+    fn test_decode_no_tasks_or_plan_fields_in_v5_output() {
+        let (track, meta) = decode(sample_json_v5()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
         // Identity-only: tasks and plan must NOT appear in the encoded output.
-        assert!(doc.get("tasks").is_none(), "tasks must not be emitted in v4 output");
-        assert!(doc.get("plan").is_none(), "plan must not be emitted in v4 output");
+        assert!(doc.get("tasks").is_none(), "tasks must not be emitted in v5 output");
+        assert!(doc.get("plan").is_none(), "plan must not be emitted in v5 output");
     }
 
     #[test]
-    fn test_decode_legacy_v2_encodes_to_v4_without_tasks_or_plan() {
-        let (track, meta) = decode(sample_json_legacy_v2()).unwrap();
-        let json = encode(&track, &meta).unwrap();
-        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(doc["schema_version"].as_u64().unwrap(), 4);
-        assert!(doc.get("tasks").is_none());
-        assert!(doc.get("plan").is_none());
+    fn test_decode_v5_with_stale_tasks_field_is_rejected() {
+        // A metadata.json that was partially migrated (schema_version bumped to 5
+        // but `tasks` not yet removed) must be rejected. This is an incomplete
+        // migration — fail closed rather than silently ignoring legacy fields.
+        let json = r#"{
+  "schema_version": 5,
+  "id": "partial-migration",
+  "title": "Partial Migration",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "leftover", "status": "todo"}]
+}"#;
+        let result = decode(json);
+        assert!(result.is_err(), "v5 doc with stale `tasks` field must be rejected");
+        if let Err(CodecError::Validation(msg)) = result {
+            assert!(msg.contains("tasks"), "error must mention the offending field: {msg}");
+        } else {
+            panic!("expected Validation error, got: {result:?}");
+        }
+    }
+
+    #[test]
+    fn test_decode_v5_with_stale_plan_field_is_rejected() {
+        // Similarly, a `plan` field in schema v5 indicates an incomplete migration.
+        let json = r#"{
+  "schema_version": 5,
+  "id": "partial-migration-plan",
+  "title": "Partial Migration Plan",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "plan": {"summary": [], "sections": []}
+}"#;
+        let result = decode(json);
+        assert!(result.is_err(), "v5 doc with stale `plan` field must be rejected");
+        if let Err(CodecError::Validation(msg)) = result {
+            assert!(msg.contains("plan"), "error must mention the offending field: {msg}");
+        } else {
+            panic!("expected Validation error, got: {result:?}");
+        }
     }
 }

@@ -1,9 +1,9 @@
 //! Integration tests for `sotp track transition` and `sotp track views sync`.
 //!
-//! T005: TrackMetadata is identity-only.
-//! T007: `sotp track transition` delegates to `TransitionTaskUseCase`, which
-//!       loads and persists task state via `ImplPlanDocument` (impl-plan.json).
-//! T008: `plan.md` is rendered from `impl-plan.json`; task markers are present.
+//! TrackMetadata is identity-only. `sotp track transition` delegates to
+//! `TransitionTaskUseCase`, which loads and persists task state via
+//! `ImplPlanDocument` (impl-plan.json). `plan.md` is rendered from
+//! `impl-plan.json` with task markers.
 
 #![allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
@@ -14,19 +14,18 @@ fn sotp_bin() -> Command {
     Command::new(env!("CARGO_BIN_EXE_sotp"))
 }
 
-/// Writes a minimal v4 metadata.json fixture (identity-only, no tasks/plan).
+/// Writes a minimal v5 metadata.json fixture (identity-only, no status field).
 fn write_fixture_metadata(items_dir: &Path, track_id: &str) -> PathBuf {
     let track_dir = items_dir.join(track_id);
     std::fs::create_dir_all(&track_dir).unwrap();
 
-    // schema_version 4: identity-only (T005)
+    // schema_version 5: identity-only, no status field
     let metadata = format!(
         r#"{{
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Integration Track",
-  "status": "planned",
   "created_at": "2026-03-13T00:00:00Z",
   "updated_at": "2026-03-13T00:00:00Z"
 }}
@@ -63,13 +62,13 @@ fn project_root_with_full_track(root: &Path, track_id: &str) -> PathBuf {
     items_dir
 }
 
-// --- transition tests (T007 implemented) ---
+// --- transition tests ---
 
 #[test]
 fn transition_subcommand_success_updates_status_and_persists() {
-    // T007: `sotp track transition` loads impl-plan.json, applies transition,
-    // and persists updated impl-plan.json back to disk.
-    // T005: metadata.json `status` must also be synced to the derived track status.
+    // `sotp track transition` loads impl-plan.json, applies transition, and
+    // persists updated impl-plan.json back to disk. metadata.json is not
+    // written; status is derived on demand from impl-plan.json.
     let root_dir = tempfile::tempdir().unwrap();
     let items_dir = project_root_with_full_track(root_dir.path(), "demo");
 
@@ -102,19 +101,19 @@ fn transition_subcommand_success_updates_status_and_persists() {
         "impl-plan.json must reflect new status:\n{content}"
     );
 
-    // T005: metadata.json status must also be synced to "in_progress" after
-    // the first task starts (derived track status: in_progress).
+    // metadata.json does NOT contain a status field — status is derived on
+    // demand from impl-plan.json. Verify metadata.json has no "status" key.
     let metadata_path = items_dir.join("demo/metadata.json");
     let metadata_content = std::fs::read_to_string(&metadata_path).unwrap();
     assert!(
-        metadata_content.contains("\"in_progress\""),
-        "metadata.json status must be synced to in_progress:\n{metadata_content}"
+        !metadata_content.contains("\"status\""),
+        "metadata.json must NOT contain a status field (derived-status):\n{metadata_content}"
     );
 }
 
 #[test]
 fn transition_subcommand_rejects_invalid_status_transition() {
-    // T007: todo -> done is invalid (must go todo -> in_progress -> done).
+    // todo -> done is invalid (must go todo -> in_progress -> done).
     // Also verifies that impl-plan.json is NOT partially written on a failed
     // transition — the task state must remain "todo" after rejection.
     let root_dir = tempfile::tempdir().unwrap();
@@ -173,7 +172,7 @@ fn transition_subcommand_fails_on_missing_items_dir() {
 
 #[test]
 fn transition_subcommand_persists_commit_hash_on_done_transition() {
-    // T007: transition to done with a commit hash traces the hash in impl-plan.json.
+    // Transition to done with a commit hash traces the hash in impl-plan.json.
     // Must first transition to in_progress before done.
     let root_dir = tempfile::tempdir().unwrap();
     let items_dir = project_root_with_full_track(root_dir.path(), "demo");
@@ -409,7 +408,7 @@ fn views_sync_subcommand_renders_plan_and_registry() {
     let plan_md = root_dir.path().join("track/items/demo/plan.md");
     assert!(plan_md.is_file(), "plan.md must be rendered at {}", plan_md.display());
 
-    // T008: task markers are now rendered from impl-plan.json.
+    // Task markers are rendered from impl-plan.json.
     let plan_content = std::fs::read_to_string(&plan_md).unwrap();
     assert!(!plan_content.is_empty(), "plan.md must not be empty");
     assert!(plan_content.contains("T001"), "plan.md must contain task T001:\n{plan_content}");

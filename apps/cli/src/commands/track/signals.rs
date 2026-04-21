@@ -96,8 +96,7 @@ fn execute_signals_legacy(track_dir: &std::path::Path) -> Result<ExitCode, CliEr
     let body = body_lines.join("\n");
     let counts = evaluate(&body);
 
-    // T005: DocumentMeta.extra removed (schema_version 4 is identity-only).
-    // Spec signals are no longer stored in metadata.json; they are computed on demand.
+    // Spec signals are not stored in metadata.json; they are computed on demand.
     let total = counts.total();
     println!(
         "[OK] Signals (legacy): blue={} yellow={} red={} (total={total})",
@@ -172,8 +171,7 @@ mod tests {
 
     #[test]
     fn test_execute_signals_writes_spec_signals_to_metadata() {
-        // T005: DocumentMeta.extra removed; spec_signals are no longer written to metadata.json.
-        // The legacy path now only prints signals to stdout.
+        // spec_signals are not written to metadata.json; the legacy path only prints to stdout.
         let dir = tempfile::tempdir().unwrap();
         let (items_dir, track_id) = setup_track(
             dir.path(),
@@ -188,7 +186,7 @@ mod tests {
         let result = execute_signals(items_dir.clone(), track_id.clone());
         assert!(result.is_ok());
 
-        // T005: spec_signals are computed and printed but no longer persisted to metadata.json.
+        // spec_signals are computed and printed but not persisted to metadata.json.
         let metadata_content =
             std::fs::read_to_string(items_dir.join(&track_id).join("metadata.json")).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&metadata_content).unwrap();

@@ -1,5 +1,5 @@
-//! Verify structured-ref fields introduced in T002 / T003 / T005, plus
-//! task-coverage enforcement and canonical-block suspicion detection (T011).
+//! Verify structured-ref fields in spec.json and catalogue entries, plus
+//! task-coverage enforcement and canonical-block suspicion detection.
 //!
 //! This module validates plan artifact references in a track directory:
 //! - `spec.json` ref fields: `adr_refs`, `convention_refs`, `informal_grounds`,
@@ -333,12 +333,13 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
     match symlink_guard::reject_symlinks_below(&task_coverage_path, &trusted_root) {
         Ok(false) => {
             // task-coverage.json absent — emit warning, not error.
-            // T012 will make it required; T011 keeps existing tracks functional.
-            // impl-plan.json integrity is only enforced when task-coverage.json is present
-            // (integrity validates task refs that appear in coverage; no coverage → no refs
-            // to validate).
+            // task-coverage.json is optional for existing tracks; coverage
+            // enforcement is deferred when the file is absent.
+            // impl-plan.json integrity is only enforced when task-coverage.json
+            // is present (integrity validates task refs that appear in coverage;
+            // no coverage → no refs to validate).
             findings.push(VerifyFinding::warning(
-                "task-coverage.json absent — coverage enforcement deferred until T012 makes it required",
+                "task-coverage.json absent — coverage enforcement deferred",
             ));
         }
         Ok(true) => {

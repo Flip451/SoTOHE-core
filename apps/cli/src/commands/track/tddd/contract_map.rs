@@ -10,10 +10,11 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use domain::ImplPlanReader;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue::{TypeDefinitionKind, TypestateTransitions};
 use infrastructure::tddd::contract_map_adapter::{FsCatalogueLoader, FsContractMapWriter};
-use infrastructure::track::fs_store::read_track_metadata;
+use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
 use usecase::contract_map_workflow::{
     RenderContractMap, RenderContractMapCommand, RenderContractMapInteractor,
 };
@@ -42,8 +43,25 @@ pub fn execute_contract_map(
     // Active-track guard (mirrors type-signals / type-graph).
     let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    // T005: schema_version 4 stores status directly; no original_status fallback needed.
-    let effective_status = metadata.status();
+    // Status is derived on demand from impl-plan + status_override.
+    // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt impl-plan.json
+    // blocks the guard instead of being silently treated as absent.
+    let store = FsTrackStore::new(items_dir.clone());
+    let impl_plan = store
+        .load_impl_plan(&valid_id)
+        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
+    // Fail-closed: an activated track (branch set, or non-Planned derived status) with
+    // no impl-plan is potentially corrupt — reject rather than treating as Planned.
+    let effective_status =
+        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
+    if impl_plan.is_none()
+        && (metadata.branch().is_some() || effective_status != domain::TrackStatus::Planned)
+    {
+        return Err(CliError::Message(format!(
+            "cannot run contract-map on '{track_id}': track has no impl-plan.json but is \
+             not in planning state (derived_status={effective_status}); track may be corrupt"
+        )));
+    }
     ensure_active_track(effective_status, &track_id)?;
 
     let kind_filter_parsed = kind_filter.as_deref().map(parse_kind_filter).transpose()?;
@@ -232,19 +250,22 @@ mod tests {
 
     #[test]
     fn test_execute_contract_map_rejects_done_track() {
+        // Write v5 metadata (no status field) + impl-plan with all tasks done
+        // so derive_track_status → Done → guard rejects.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-done");
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let metadata = r#"{
-  "schema_version": 3, "id": "test-done", "branch": "track/test-done",
-  "title": "Done", "status": "done",
-  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z",
-  "tasks": [{"id":"T001","description":"t","status":"done","commit_hash":"0000000000000000000000000000000000000000"}],
-  "plan": {"summary":["t"],"sections":[{"id":"S001","title":"t","description":["t"],"task_ids":["T001"]}]}
+  "schema_version": 5, "id": "test-done", "branch": "track/test-done",
+  "title": "Done",
+  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z"
 }"#;
         std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+        // All tasks done → derive_track_status → Done
+        let impl_plan = r#"{"schema_version":1,"tasks":[{"id":"T001","description":"t","status":"done","commit_hash":"abc1234"}],"plan":{"summary":[],"sections":[{"id":"S001","title":"t","description":[],"task_ids":["T001"]}]}}"#;
+        std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
 
         let result =
             execute_contract_map(items_dir, "test-done".to_owned(), dir.path().into(), None, None);
@@ -255,19 +276,22 @@ mod tests {
 
     #[test]
     fn test_execute_contract_map_with_invalid_kind_filter_returns_error() {
+        // Write v5 metadata (no status field) + impl-plan with in-progress task
+        // so derive_track_status → InProgress → guard passes → kind-filter error surfaces.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let metadata = r#"{
-  "schema_version": 3, "id": "test-track", "branch": "track/test-track",
-  "title": "Test", "status": "in_progress",
-  "created_at": "2026-04-17T00:00:00Z", "updated_at": "2026-04-17T00:00:00Z",
-  "tasks": [{"id":"T001","description":"t","status":"in_progress","commit_hash":null}],
-  "plan": {"summary":["t"],"sections":[{"id":"S001","title":"t","description":["t"],"task_ids":["T001"]}]}
+  "schema_version": 5, "id": "test-track", "branch": "track/test-track",
+  "title": "Test",
+  "created_at": "2026-04-17T00:00:00Z", "updated_at": "2026-04-17T00:00:00Z"
 }"#;
         std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+        // In-progress task → derive_track_status → InProgress
+        let impl_plan = r#"{"schema_version":1,"tasks":[{"id":"T001","description":"t","status":"in_progress"}],"plan":{"summary":[],"sections":[{"id":"S001","title":"t","description":[],"task_ids":["T001"]}]}}"#;
+        std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
 
         let result = execute_contract_map(
             items_dir,

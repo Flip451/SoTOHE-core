@@ -6,7 +6,7 @@
 
 use std::fmt;
 
-use crate::{TrackMetadata, TrackStatus};
+use crate::{ImplPlanDocument, TrackMetadata, TrackStatus, derive_track_status};
 
 /// User-facing workflow phase.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,13 +76,20 @@ pub struct TrackPhaseInfo {
 ///
 /// `schema_version` is required because `TrackMetadata` does not carry it
 /// (it is a serialization concern in the codec layer).
+///
+/// `impl_plan` is required to derive the track's current status.
+/// Pass `None` for planning-only tracks that have not yet generated `impl-plan.json`.
 #[must_use]
-pub fn resolve_phase(track: &TrackMetadata, schema_version: u32) -> TrackPhaseInfo {
-    let status = track.status();
-    // Schema versions 3 and 4 both represent the identity-only / branchless planning shape.
-    // Version 4 is the new canonical shape (ADR 2026-04-19-1242 §D1.4); version 3 is the
-    // previous planning-only shape. Both require activation before implementation.
-    let is_branchless_activatable = matches!(schema_version, 3 | 4) && track.branch().is_none();
+pub fn resolve_phase(
+    track: &TrackMetadata,
+    schema_version: u32,
+    impl_plan: Option<&ImplPlanDocument>,
+) -> TrackPhaseInfo {
+    // Derive status on demand from impl-plan.json + status_override.
+    let status = derive_track_status(impl_plan, track.status_override());
+    // Schema versions 3, 4, and 5 represent identity-only / branchless planning shapes.
+    // All three require activation before implementation; branchless tracks must activate.
+    let is_branchless_activatable = matches!(schema_version, 3..=5) && track.branch().is_none();
 
     match status {
         TrackStatus::Planned if is_branchless_activatable => TrackPhaseInfo {
@@ -156,8 +163,9 @@ pub fn resolve_phase_from_record(
     schema_version: u32,
     override_reason: Option<&str>,
 ) -> TrackPhaseInfo {
-    // Schema versions 3 and 4 both require activation before implementation.
-    let is_branchless_activatable = matches!(schema_version, 3 | 4) && !has_branch;
+    // Schema versions 3, 4, and 5 all require activation before implementation
+    // when the track is branchless. v5 is the current identity-only format.
+    let is_branchless_activatable = matches!(schema_version, 3..=5) && !has_branch;
 
     match status {
         TrackStatus::Planned if is_branchless_activatable => TrackPhaseInfo {
@@ -214,9 +222,15 @@ pub fn resolve_phase_from_record(
 }
 
 /// Returns the recommended next command for registry rendering.
+///
+/// `impl_plan` is required to derive the track's current status.
 #[must_use]
-pub fn next_command(track: &TrackMetadata, schema_version: u32) -> NextCommand {
-    resolve_phase(track, schema_version).next_command
+pub fn next_command(
+    track: &TrackMetadata,
+    schema_version: u32,
+    impl_plan: Option<&ImplPlanDocument>,
+) -> NextCommand {
+    resolve_phase(track, schema_version, impl_plan).next_command
 }
 
 #[cfg(test)]
@@ -228,11 +242,11 @@ mod tests {
     use crate::{StatusOverride, TrackBranch, TrackId};
 
     fn planned_track(id: &str, branch: Option<&str>) -> TrackMetadata {
+        // Identity-only TrackMetadata; status is derived on demand.
         TrackMetadata::with_branch(
             TrackId::try_new(id).unwrap(),
             branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
-            TrackStatus::Planned,
             None,
         )
         .unwrap()
@@ -243,7 +257,7 @@ mod tests {
     #[test]
     fn resolve_phase_branchless_v3_planned_returns_ready_to_activate() {
         let track = planned_track("demo", None);
-        let info = resolve_phase(&track, 3);
+        let info = resolve_phase(&track, 3, None);
         assert_eq!(info.phase, TrackPhase::ReadyToActivate);
         assert_eq!(info.next_command, NextCommand::ActivateTrack("demo".to_owned()));
         assert!(info.blocker.is_some());
@@ -253,7 +267,17 @@ mod tests {
     fn resolve_phase_branchless_v4_planned_returns_ready_to_activate() {
         // Schema v4 is the new identity-only shape; branchless v4 must also activate.
         let track = planned_track("demo", None);
-        let info = resolve_phase(&track, 4);
+        let info = resolve_phase(&track, 4, None);
+        assert_eq!(info.phase, TrackPhase::ReadyToActivate);
+        assert_eq!(info.next_command, NextCommand::ActivateTrack("demo".to_owned()));
+        assert!(info.blocker.is_some());
+    }
+
+    #[test]
+    fn resolve_phase_branchless_v5_planned_returns_ready_to_activate() {
+        // Schema v5 branchless tracks must also activate.
+        let track = planned_track("demo", None);
+        let info = resolve_phase(&track, 5, None);
         assert_eq!(info.phase, TrackPhase::ReadyToActivate);
         assert_eq!(info.next_command, NextCommand::ActivateTrack("demo".to_owned()));
         assert!(info.blocker.is_some());
@@ -262,7 +286,7 @@ mod tests {
     #[test]
     fn resolve_phase_materialized_v3_planned_returns_planning() {
         let track = planned_track("demo", Some("track/demo"));
-        let info = resolve_phase(&track, 3);
+        let info = resolve_phase(&track, 3, None);
         assert_eq!(info.phase, TrackPhase::Planning);
         assert_eq!(info.next_command, NextCommand::Implement);
         assert!(info.blocker.is_none());
@@ -271,7 +295,7 @@ mod tests {
     #[test]
     fn resolve_phase_materialized_v4_planned_returns_planning() {
         let track = planned_track("demo", Some("track/demo"));
-        let info = resolve_phase(&track, 4);
+        let info = resolve_phase(&track, 4, None);
         assert_eq!(info.phase, TrackPhase::Planning);
         assert_eq!(info.next_command, NextCommand::Implement);
         assert!(info.blocker.is_none());
@@ -280,47 +304,71 @@ mod tests {
     #[test]
     fn resolve_phase_v2_branchless_planned_returns_planning_not_ready_to_activate() {
         let track = planned_track("demo", None);
-        let info = resolve_phase(&track, 2);
+        let info = resolve_phase(&track, 2, None);
         assert_eq!(info.phase, TrackPhase::Planning);
         assert_ne!(info.phase, TrackPhase::ReadyToActivate);
     }
 
     #[test]
     fn resolve_phase_in_progress_returns_in_progress() {
-        let mut track = planned_track("demo", Some("track/demo"));
-        track.set_status(TrackStatus::InProgress);
-        let info = resolve_phase(&track, 3);
+        use crate::{PlanSection, PlanView, TaskId, TaskStatus, TrackTask};
+        // Build an impl-plan with an in-progress task to derive InProgress status.
+        let task = TrackTask::with_status(
+            TaskId::try_new("T001").unwrap(),
+            "Task",
+            TaskStatus::InProgress,
+        )
+        .unwrap();
+        let section =
+            PlanSection::new("S1", "Section", vec![], vec![TaskId::try_new("T001").unwrap()])
+                .unwrap();
+        let impl_plan =
+            crate::ImplPlanDocument::new(vec![task], PlanView::new(vec![], vec![section])).unwrap();
+        let track = planned_track("demo", Some("track/demo"));
+        let info = resolve_phase(&track, 5, Some(&impl_plan));
         assert_eq!(info.phase, TrackPhase::InProgress);
         assert_eq!(info.next_command, NextCommand::Implement);
     }
 
     #[test]
     fn resolve_phase_done_returns_ready_to_ship() {
-        let mut track = planned_track("demo", Some("track/demo"));
-        track.set_status(TrackStatus::Done);
-        let info = resolve_phase(&track, 3);
+        use crate::{CommitHash, PlanSection, PlanView, TaskId, TaskStatus, TrackTask};
+        // Build an impl-plan with all tasks resolved to derive Done status.
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        let task = TrackTask::with_status(
+            TaskId::try_new("T001").unwrap(),
+            "Task",
+            TaskStatus::DoneTraced { commit_hash: hash },
+        )
+        .unwrap();
+        let section =
+            PlanSection::new("S1", "Section", vec![], vec![TaskId::try_new("T001").unwrap()])
+                .unwrap();
+        let impl_plan =
+            crate::ImplPlanDocument::new(vec![task], PlanView::new(vec![], vec![section])).unwrap();
+        let track = planned_track("demo", Some("track/demo"));
+        let info = resolve_phase(&track, 5, Some(&impl_plan));
         assert_eq!(info.phase, TrackPhase::ReadyToShip);
         assert_eq!(info.next_command, NextCommand::Done);
     }
 
     #[test]
     fn resolve_phase_blocked_returns_blocked_with_reason() {
+        // Blocked status comes from status_override.
         let mut track = TrackMetadata::with_branch(
             TrackId::try_new("demo").unwrap(),
             Some(TrackBranch::try_new("track/demo").unwrap()),
             "Test",
-            TrackStatus::Blocked,
             Some(StatusOverride::blocked("waiting on review").unwrap()),
         )
         .unwrap();
-        // status_override carries the reason for rendering; set it explicitly.
-        let info = resolve_phase(&track, 3);
+        let info = resolve_phase(&track, 5, None);
         assert_eq!(info.phase, TrackPhase::Blocked);
         assert!(info.blocker.unwrap().contains("waiting on review"));
 
         // Also verify set_status_override path.
         track.set_status_override(Some(StatusOverride::blocked("new reason").unwrap()));
-        let info2 = resolve_phase(&track, 3);
+        let info2 = resolve_phase(&track, 5, None);
         assert!(info2.blocker.unwrap().contains("new reason"));
     }
 
@@ -330,11 +378,10 @@ mod tests {
             TrackId::try_new("demo").unwrap(),
             Some(TrackBranch::try_new("track/demo").unwrap()),
             "Test",
-            TrackStatus::Cancelled,
             Some(StatusOverride::cancelled("scope changed").unwrap()),
         )
         .unwrap();
-        let info = resolve_phase(&track, 3);
+        let info = resolve_phase(&track, 5, None);
         assert_eq!(info.phase, TrackPhase::Cancelled);
         assert_eq!(info.next_command, NextCommand::PlanNewFeature);
     }
@@ -433,16 +480,16 @@ mod tests {
     // --- next_command ---
 
     #[test]
-    fn next_command_for_branchless_v3_returns_activate() {
+    fn next_command_for_branchless_v5_returns_activate() {
         let track = planned_track("demo", None);
-        let cmd = next_command(&track, 3);
+        let cmd = next_command(&track, 5, None);
         assert_eq!(cmd, NextCommand::ActivateTrack("demo".to_owned()));
     }
 
     #[test]
     fn next_command_for_materialized_planned_returns_implement() {
         let track = planned_track("demo", Some("track/demo"));
-        let cmd = next_command(&track, 3);
+        let cmd = next_command(&track, 5, None);
         assert_eq!(cmd, NextCommand::Implement);
     }
 }

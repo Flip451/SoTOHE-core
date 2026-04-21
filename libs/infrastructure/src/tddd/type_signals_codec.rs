@@ -20,8 +20,8 @@
 //!   ADR §D5 and the `declaration_hash` algorithm documentation on
 //!   `TypeSignalsCodecError::UnsupportedSchemaVersion`.
 //!
-//! No filesystem I/O lives here — callers (CLI writer in T004 / T007, CI
-//! reader in T005) handle `std::fs` and the `reject_symlinks_below` guard.
+//! No filesystem I/O lives here — callers (CLI writer, CI reader) handle
+//! `std::fs` and the `reject_symlinks_below` guard.
 
 use domain::tddd::type_signals_doc::TypeSignalsDocument;
 use domain::{ConfidenceSignal, Timestamp, TypeSignal};

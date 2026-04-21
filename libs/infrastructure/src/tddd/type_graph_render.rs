@@ -1589,7 +1589,7 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // T005: EdgeSet::Fields + EdgeSet::Impls + EdgeSet::All + traitNode
+    // EdgeSet::Fields + EdgeSet::Impls + EdgeSet::All + traitNode
     // -----------------------------------------------------------------------
 
     /// Helper: builds a struct node with a list of struct fields.
@@ -1607,7 +1607,7 @@ mod tests {
         node
     }
 
-    /// T005 test 1 — field edges: `EdgeSet::Fields` produces solid no-arrow edges
+    /// Field edges test: `EdgeSet::Fields` produces solid no-arrow edges
     /// `A ---|field_name| B` when a struct field type exists in the graph.
     #[test]
     fn test_render_field_edges_uses_solid_no_arrow_syntax() {
@@ -1639,7 +1639,7 @@ mod tests {
         );
     }
 
-    /// T005 test 2 — trait impl edges: `EdgeSet::Impls` produces dashed arrow edges
+    /// Trait impl edges test: `EdgeSet::Impls` produces dashed arrow edges
     /// `A -.->|impl| TraitName` and renders trait nodes as stadium shape `([TraitName])`.
     #[test]
     fn test_render_impl_edges_uses_dashed_arrow_and_trait_node_stadium_shape() {
@@ -1678,7 +1678,7 @@ mod tests {
         );
     }
 
-    /// T005 test 3 — `EdgeSet::All` is the union of methods + fields + impls.
+    /// `EdgeSet::All` is the union of methods + fields + impls.
     #[test]
     fn test_edge_set_all_is_union_of_methods_fields_and_impls() {
         use domain::schema::TraitImplEntry;
@@ -1726,7 +1726,7 @@ mod tests {
         );
     }
 
-    /// T005 test 4 — trait node uses stadium shape `([TraitName])` in cluster mode.
+    /// Trait node uses stadium shape `([TraitName])` in cluster mode.
     ///
     /// Verifies that trait nodes rendered inside a cluster diagram also use
     /// the stadium shape with `traitNode` class (not the default rect/hexagon shapes).

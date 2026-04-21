@@ -149,7 +149,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         track_id: &str,
         layer_id: &str,
     ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
-        // T007: resolve the catalogue filename from the PR branch's
+        // Resolve the catalogue filename from the PR branch's
         // `architecture-rules.json` so that layers with an explicit
         // `tddd.catalogue_file` override are handled consistently between
         // the CI path (`verify_from_spec_json`) and the merge gate.
@@ -175,12 +175,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         };
 
         // ADR 2026-04-18-1400 §D5: Stage 2 signal data lives in the companion
-        // `<layer>-type-signals.json` (T001–T007). Merge gate must hydrate
-        // `doc.signals()` from that file before calling `check_type_signals`
-        // — otherwise every migrated track would fail-closed with
-        // "type signals not yet evaluated". Fail-closed when:
-        // - signal file is absent (T005-equivalent Missing, symmetric on
-        //   both CI and merge gate paths per §D5),
+        // `<layer>-type-signals.json`. Merge gate must hydrate `doc.signals()`
+        // from that file before calling `check_type_signals` — otherwise every
+        // migrated track would fail-closed with "type signals not yet
+        // evaluated". Fail-closed when:
+        // - signal file is absent (symmetric with the CI path per §D5),
         // - signal file is present but `declaration_hash` does not match
         //   the declaration blob bytes (stale),
         // - signal file decode error.
@@ -221,12 +220,12 @@ impl TrackBlobReader for GitShowTrackBlobReader {
     }
 
     fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>> {
-        // T007: read `architecture-rules.json` from the PR branch blob so
-        // that tracks which modify the rules file itself are evaluated
-        // against their own layer definitions (not the local workspace).
-        // An empty binding list (legacy rules file, or a PR that disables
-        // every layer) is returned verbatim — the usecase gate is the
-        // fail-closed authority and will reject an empty set explicitly.
+        // Read `architecture-rules.json` from the PR branch blob so that
+        // tracks which modify the rules file itself are evaluated against
+        // their own layer definitions (not the local workspace). An empty
+        // binding list (legacy rules file, or a PR that disables every layer)
+        // is returned verbatim — the usecase gate is the fail-closed authority
+        // and will reject an empty set explicitly.
         let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
             Ok(s) => s,
             Err(result) => return result,
@@ -346,7 +345,7 @@ mod tests {
     /// matches the SHA-256 of the given declaration file bytes and whose
     /// `signals` mirrors the legacy inline payload in
     /// [`DOMAIN_TYPES_MINIMAL`]. Used by adapter tests to construct the
-    /// companion signal blob the T007 codec strip made mandatory.
+    /// companion signal blob required by the declaration/signal split.
     fn signal_file_matching(declaration_bytes: &[u8]) -> Vec<u8> {
         let hash = crate::tddd::type_signals_codec::declaration_hash(declaration_bytes);
         let body = format!(
@@ -453,10 +452,10 @@ mod tests {
             BlobFetchResult::Found((doc, filename)) => {
                 assert_eq!(doc.entries().len(), 1);
                 assert_eq!(filename, "domain-types.json");
-                // T007 post-merge: the adapter must hydrate `doc.signals()`
-                // from the companion signal file so the downstream
-                // `check_type_signals` call in `check_strict_merge_gate`
-                // sees the evaluated Blue signal instead of `None`.
+                // The adapter must hydrate `doc.signals()` from the companion
+                // signal file so the downstream `check_type_signals` call in
+                // `check_strict_merge_gate` sees the evaluated Blue signal
+                // instead of `None`.
                 let signals = doc.signals().expect("signals must be hydrated from signal file");
                 assert_eq!(signals.len(), 1);
                 assert_eq!(signals[0].type_name(), "TrackId");

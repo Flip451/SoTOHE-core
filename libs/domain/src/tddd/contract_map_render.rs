@@ -2,15 +2,15 @@
 //! catalogues into a single-file mermaid flowchart (ADR 2026-04-17-1528 §D1).
 //!
 //! Placement rationale: the function is I/O-free and is called directly
-//! from the usecase interactor (T005). Per ADR §D1 this belongs in the
-//! domain layer — rendering the catalogue is a pure transformation, not an
+//! from the usecase interactor. Per ADR §D1 this belongs in the domain
+//! layer — rendering the catalogue is a pure transformation, not an
 //! infrastructure concern.
 //!
 //! Layer-agnostic invariant (ADR §4.5): the renderer never hard-codes
 //! layer names. Every subgraph label comes from the `LayerId` supplied in
 //! `layer_order`, and every edge is derived from the contents of
 //! `catalogues`. The function therefore works identically for 2-layer,
-//! 3-layer, or custom-layer architectures (verified by T007 fixtures).
+//! 3-layer, or custom-layer architectures (verified by multilayer fixtures).
 //!
 //! The module intentionally does **not** import `infrastructure::…` — a
 //! duplicate of `extract_type_names` lives here so the dependency

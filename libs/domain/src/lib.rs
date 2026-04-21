@@ -65,7 +65,7 @@ pub use tddd::type_signals_doc::{
 pub use timestamp::Timestamp;
 pub use track::{
     StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,
-    TrackStatus, TrackTask,
+    TrackStatus, TrackTask, derive_track_status,
 };
 
 #[cfg(test)]
@@ -113,37 +113,20 @@ mod tests {
         assert_eq!(task.status().kind(), TaskStatusKind::Done);
     }
 
-    // T005: TrackMetadata is identity-only; status is now explicitly stored.
-    // Task-level state machine tests stay in track.rs; the lib integration tests
-    // verify the public API surface without relying on the removed tasks/plan fields.
+    // TrackMetadata is identity-only; status is derived on demand via
+    // derive_track_status(impl_plan, status_override). Task-level state machine tests
+    // stay in track.rs; the lib integration tests verify the public API surface.
 
     #[test]
-    fn track_status_defaults_to_planned_on_new() {
+    fn track_status_derives_to_planned_with_no_plan_no_override() {
         let track = TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            TrackStatus::Planned,
             None,
         )
         .unwrap();
-        assert_eq!(track.status(), TrackStatus::Planned);
-    }
-
-    #[test]
-    fn track_status_can_be_set_explicitly() {
-        let mut track = TrackMetadata::new(
-            TrackId::try_new("track-state-machine").unwrap(),
-            "Track state machine",
-            TrackStatus::Planned,
-            None,
-        )
-        .unwrap();
-
-        track.set_status(TrackStatus::InProgress);
-        assert_eq!(track.status(), TrackStatus::InProgress);
-
-        track.set_status(TrackStatus::Done);
-        assert_eq!(track.status(), TrackStatus::Done);
+        // No impl-plan, no override → Planned
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Planned);
     }
 
     #[test]
@@ -151,21 +134,18 @@ mod tests {
         let mut track = TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            TrackStatus::Planned,
             None,
         )
         .unwrap();
 
-        track.set_status(TrackStatus::Blocked);
         track.set_status_override(Some(StatusOverride::blocked("waiting on review").unwrap()));
-        assert_eq!(track.status(), TrackStatus::Blocked);
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Blocked);
         assert!(track.status_override().is_some());
 
-        // Clearing override and status returns to planned
+        // Clearing override → Planned
         track.set_status_override(None);
-        track.set_status(TrackStatus::Planned);
         assert_eq!(track.status_override(), None);
-        assert_eq!(track.status(), TrackStatus::Planned);
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Planned);
     }
 
     #[rstest]
@@ -243,7 +223,6 @@ mod tests {
             TrackId::try_new("my-track").unwrap(),
             Some(TrackBranch::try_new("track/my-track").unwrap()),
             "My Track",
-            TrackStatus::Planned,
             None,
         )
         .unwrap();
@@ -252,13 +231,8 @@ mod tests {
 
     #[test]
     fn track_metadata_without_branch_returns_none() {
-        let track = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            TrackStatus::Planned,
-            None,
-        )
-        .unwrap();
+        let track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
         assert!(track.branch().is_none());
     }
 }

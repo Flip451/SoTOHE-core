@@ -1,0 +1,510 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_impl_plan_for_track` turns any I/O or decode error into `None`, so a corrupted `impl-plan.json` is treated exactly like a missing one. That makes this active-track guard fail open: a frozen/broken track can be classified as `Planned` and `execute_type_signals` will continue rewriting signal files instead of rejecting the track.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 117,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6dd87618c382e962a4377bc08eaa835e563d84914c26c2441446cac4777cbd9d",
+          "at": "2026-04-21T15:04:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track_record.status` now comes from `metadata.json`, but schema v5 no longer stores that field. Defaulting `None` to `\"planned\"` makes already-materialized tracks look planned here, so `sotp track activate --auto` can resume activation on done/blocked/cancelled tracks instead of failing closed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/activate.rs",
+              "line": 86,
+              "category": "logic"
+            },
+            {
+              "message": "`load_impl_plan_for_track()` swallows read/decode errors and returns `None`, so a missing or corrupt `impl-plan.json` is treated as planning-only. That defeats the active-track guard and lets this command run on completed/corrupted tracks; the same pattern appears in `contract_map.rs` and `resolve.rs`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 70,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:da0614601d1a471093bb1e9e2ba2ef17b21a05d9c087e973264552491262af55",
+          "at": "2026-04-21T15:09:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsTrackStore::load_impl_plan` returns `Ok(None)` when `impl-plan.json` is missing, so a frozen done/archived track with a deleted or never-written plan is now classified as `Planned` and passes `ensure_active_track`. That lets `type-signals` proceed and overwrite derived artifacts on a track that should have been rejected. The same fail-open pattern appears in `graph.rs` and `contract_map.rs` too.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 121,
+              "category": "logic"
+            },
+            {
+              "message": "`load_impl_plan_for_track` swallows read/decode errors, so the pre-commit status check treats a missing or corrupt `impl-plan.json` as `Planned`. A frozen track with a broken plan will therefore skip the \"Completed tracks are frozen\" guard and the hook will recompute type-signals instead of failing closed; the same helper is also reused in `activate.rs` for resume preflight.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 674,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:8e1eb2c1f22aa89a8b2bdce34c8e8fedb2c119ce06bf3c77543519aa4c8460ca",
+          "at": "2026-04-21T15:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_activate` uses `load_impl_plan_for_track` here, which silently turns unreadable or corrupt `impl-plan.json` into `None`. In `BranchMode::Auto`, that can make a damaged already-materialized track look `planned`, so `activation_resume_allowed` may approve a resume path that should fail closed. This preflight should use the fallible `FsTrackStore::load_impl_plan` instead of the display-only helper.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/activate.rs",
+              "line": 87,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:976b4ea63e784e0bbef2e76a2089f7f7bd420d310f5e6be23422489e9896ebb1",
+          "at": "2026-04-21T15:25:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This should use `FsTrackStore::load_impl_plan`, not `load_impl_plan_for_track`. The latter intentionally swallows I/O and decode failures and returns `None`, so a corrupt `impl-plan.json` is treated as `Planned` and `activation_resume_allowed` can incorrectly allow auto-resume on a track that should have been blocked.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/activate.rs",
+              "line": 88,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:976b4ea63e784e0bbef2e76a2089f7f7bd420d310f5e6be23422489e9896ebb1",
+          "at": "2026-04-21T15:29:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guard is unreachable in practice: `read_track_metadata` only decodes schema v5, so `meta.schema_version == 3` can never be true. As a result, a corrupt branchless v5 track with a non-empty impl-plan will bypass the intended fail-closed check and be classified by `resolve_phase` instead of erroring.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 47,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:94f3c8501c72fa8827c73f9c3bd45d7835782fdd5bcce3b46b74283abd3bc55c",
+          "at": "2026-04-21T15:33:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_resolve` now hard-fails whenever `impl-plan.json` is absent, but this command is supposed to work for valid planning-only v5 tracks too. `resolve_phase` already accepts `impl_plan: None` for that case, so a brand-new branchless track without an impl-plan will now error instead of reporting its phase.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0e13c4dfde045169d30b2a36f35aa65d7819251fc1e5fe64b3e6dc4717a60e5b",
+          "at": "2026-04-21T15:37:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_impl_plan()` returning `None` is passed straight into `resolve_phase()` here, so a materialized track whose `impl-plan.json` is missing or unreadable is reported as `Planning` instead of failing closed. That masks corruption on v5 tracks and lets `bin/sotp track resolve` suggest `/track:implement` when the plan data is actually gone.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 41,
+              "category": "correctness"
+            },
+            {
+              "message": "`execute_add_task` and `execute_clear_override` both swallow `load_impl_plan()` errors with `.ok().flatten()`. If `impl-plan.json` is corrupt or unreadable after the mutation, the CLI still prints an `Ok` status using the fallback `planned`/override-derived value instead of surfacing the failure. This is silent error suppression, and the same pattern also appears in `apps/cli/src/commands/track/transition.rs:67`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 42,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5ac9490fdf7fa4f42c9e231d2ac99b5ba54e14957cc99fda817b7770ac46195f",
+          "at": "2026-04-21T15:41:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This pre-commit guard still treats a missing `impl-plan.json` on a materialized track as `Planned` because `derive_track_status(None, ...)` defaults to `Planned`, so the hook will continue instead of blocking a corrupted active track. That means `bin/sotp git commit-from-file` can proceed and stage regenerated files even when the track's plan file has been deleted or corrupted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 672,
+              "category": "correctness"
+            },
+            {
+              "message": "The auto-resume path has the same fail-open behavior: if an already-materialized track is missing `impl-plan.json`, `derive_track_status(None, ...)` returns `Planned`, so `activation_resume_allowed` can approve `/track:activate` instead of failing closed on a corrupted materialized track. This needs an explicit missing-plan check before deriving the status.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/activate.rs",
+              "line": 80,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f6f8091dc5b5a9d8ce077b007d28126ed8cc9d64996bc2722d367cb0436bfa38",
+          "at": "2026-04-21T15:46:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The missing-plan fail-closed check still only keys off `branch().is_some()`. That lets a branchless track with `status_override` set to blocked/cancelled and no `impl-plan.json` pass as valid, even though the briefing says `derived_status != Planned` must also be treated as activated/corrupt. The same branch-only guard is duplicated in the other CLI call sites (`make.rs`, `activate.rs`, `track/tddd/{contract_map,graph,signals}.rs`).",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/resolve.rs",
+              "line": 47,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:1508c04e8dbe42820e3b2a85a3d79b69a25b4fb0a791900e18639c0d04ec0113",
+          "at": "2026-04-21T15:49:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These guards still depend on `FsTrackStore::load_impl_plan()`, but that helper can collapse filesystem errors into `Ok(None)` before the CLI checks `impl_plan.is_none()`. On an activated track, an unreadable `impl-plan.json` (for example due to permissions or a broken symlink) will be treated as \"missing\" and `next-task`/`task-counts` will succeed instead of blocking the potentially corrupt state. The same fail-open pattern appears in the new resolve/type-graph/type-signals/contract-map guards.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 151,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:babfe8e0fecb3891833dba3f9d4a38bbbcc7e44be6917ccc2c8159614b9016da",
+          "at": "2026-04-21T15:55:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:babfe8e0fecb3891833dba3f9d4a38bbbcc7e44be6917ccc2c8159614b9016da",
+          "at": "2026-04-21T15:58:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_activate` only loads `impl-plan.json` and derives status in the `already_materialized && Auto` resume path. For a branchless v5 track with an existing impl-plan whose tasks derive to `in_progress` or `done`, this path is skipped and activation delegates directly to `ActivateTrackUseCase::execute`, which cannot see the impl-plan and treats the track as `planned`. That lets `bin/sotp track activate` materialize a non-planning track instead of failing closed. Load the impl-plan and reject non-`planned` derived status before the non-materialized activation path as well.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/activate.rs",
+              "line": 80,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:babfe8e0fecb3891833dba3f9d4a38bbbcc7e44be6917ccc2c8159614b9016da",
+          "at": "2026-04-21T16:03:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:846c666f48dce17ff3deb6600148aacafdcb0cd5abceadbdc767c5ec68933915",
+          "at": "2026-04-21T16:06:38Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a3d99b139f515c4aaac36c3916776b0cbb3b545bc0fab8048cacb5c2782a9ec",
+          "at": "2026-04-21T15:02:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a3d99b139f515c4aaac36c3916776b0cbb3b545bc0fab8048cacb5c2782a9ec",
+          "at": "2026-04-21T15:04:03Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Do not silently coerce unreadable/corrupt `impl-plan.json` or malformed `status_override` into `planned` here. `derive_status_from_v5` bypasses the strict v5 codec and turns those failures into the same state as a genuine planning-only track, so a broken latest track can still be selected and its next command computed as if it were healthy. Surface an error or validate through the codec instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 363,
+              "category": "correctness"
+            },
+            {
+              "message": "Pre-v5 metadata is still admitted into latest-track ranking instead of being skipped. The brief for this patch says `v < 5` tracks should be skipped structurally, but this branch still returns legacy v2/v3/v4 records and lets them compete for \"latest track\" selection, so obsolete metadata can keep driving verification and command guidance.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:05d8c489b1b30400220f50ae5b748783ec9d11fdf4f8898ff98f82a1f9e4adb0",
+          "at": "2026-04-21T15:05:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_track_metadata()` defaults a missing or non-numeric `schema_version` to `2`, so a malformed v5 `metadata.json` is silently treated as legacy and skipped. That lets `verify()` pass without ever surfacing corruption in the latest track selection path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 223,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:d19830ed1189ecc47f7e5f32492250f363618179bd98414084a71bea96684ffd",
+          "at": "2026-04-21T15:15:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_impl_plan_for_track()` turns any read or decode failure into `None`, so callers cannot distinguish a missing plan from a corrupt one. That makes the status check fail open: a broken `impl-plan.json` is treated as `planned` and can bypass the active/frozen-track guard.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 333,
+              "category": "correctness"
+            },
+            {
+              "message": "Defaulting a missing or non-numeric `schema_version` to `5` does not fail closed. A malformed `metadata.json` can still be selected as the latest track and pass verification if the rest of the files are present, even though schema v5 should be required.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 240,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e4c84886a38870ebdb73f12cf6c4649f9f790ef7b44d25b175422939a9eea820",
+          "at": "2026-04-21T15:20:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_impl_plan_for_track` collapses read/parse failures into `None`, so a corrupt `impl-plan.json` is indistinguishable from an absent one. Any caller that uses this helper for control flow will treat a broken plan as a healthy planned track instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 341,
+              "category": "error handling"
+            },
+            {
+              "message": "`derive_status_from_v5` silently ignores a `status_override` value that exists but is not a JSON object because `as_object()` returns `None`. That drops malformed blocked/cancelled overrides instead of rejecting the metadata, which can change latest-track selection and next-command output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 380,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8b7c5ebfeface784343d371a247261bfba2af3921e43ec5f7d72587e9c8fe503",
+          "at": "2026-04-21T15:26:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_track_metadata()` now bypasses the v5 codec and trusts raw JSON for `id`/`branch`/timestamps. That means malformed v5 `metadata.json` files can still be treated as the latest track even though `track::codec::decode()` would reject them, so this verifier no longer fails closed on the full schema.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 227,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:bd0c8aa61cba994be1acbccb93edc7495d92cd6d579bf7654d8c1c0e70136d51",
+          "at": "2026-04-21T15:31:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8cde231f2c086b9afde379d1e7ec4eb278156bfe6816cfcdb9df03b10e529ed",
+          "at": "2026-04-21T15:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_track_snapshots` is meant to skip v<5 tracks structurally, but the skip happens only after `collect_track_snapshots` has already deserialized every metadata file and called `validate_track_document`. A malformed legacy sibling track, such as a v3/v4 metadata file with an id mismatch or legacy validation issue, will still fail freshness validation instead of being ignored, which can block the current v5 track even though legacy tracks are supposed to be skipped.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 201,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cde231f2c086b9afde379d1e7ec4eb278156bfe6816cfcdb9df03b10e529ed",
+          "at": "2026-04-21T15:40:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "v5 archived tracks are no longer rendered as archived. `collect_track_snapshots` derives every v5 snapshot status solely from `impl-plan.json`/`status_override`, but `derive_track_status` cannot return `archived`; archive state is represented by the track living under `track/archive`. As a result, a v5 archived track collected from `track/archive` will appear in `registry.md` as `planned` when it has no impl-plan, or `done` when all tasks are resolved, and the Archived Tracks section will omit it. The existing registry-only test creates a v5 archive entry but only checks that the id appears, so this regression is not caught.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 214,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cde231f2c086b9afde379d1e7ec4eb278156bfe6816cfcdb9df03b10e529ed",
+          "at": "2026-04-21T15:46:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Legacy v2/v3 decoding drops `status_override` entirely. A branchless v3 track with a blocked/cancelled override will now be accepted and rendered as `planned`, which changes the computed next command instead of rejecting the malformed legacy metadata.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 146,
+              "category": "correctness"
+            },
+            {
+              "message": "The legacy fallback also treats missing `created_at`/`updated_at` as empty strings. That lets corrupt v2/v3 metadata pass through `collect_track_snapshots` and produces blank dates in `registry.md` instead of surfacing an error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 137,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:88113cb0c5836372b862c59d37b99839c49913d56c680877af9c6e99c3d68cf7",
+          "at": "2026-04-21T15:52:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_track_snapshots` now derives v5 status from `load_impl_plan_opt`, but that helper swallows `impl-plan.json` read/decode errors and returns `None`. A corrupt implementation plan on a v5 track will therefore be treated as `planned` instead of failing closed, so registry generation and freshness validation can silently pass with bad data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 271,
+              "category": "correctness"
+            },
+            {
+              "message": "`TrackDocumentV2` is still deserialized with default Serde behavior, so schema v5 metadata accepts unknown keys instead of rejecting them. That means stale legacy fields such as `tasks` or `plan` can remain in `metadata.json` and still decode successfully, which violates the new identity-only contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 34,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:7fe8f1f54ca20835e3e9d7802d02af39da618d9db527bd142bbe1281ab6ba127",
+          "at": "2026-04-21T15:58:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Legacy v4 metadata no longer gets its `status` validated here, and the legacy snapshot path later defaults a missing status to `planned`. A malformed v4 `metadata.json` can therefore be accepted as an active track and win `registry.md` / next-command selection instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 628,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a4ade3b1caf76ac25a05b6d41c0b1160f637e95d0c1793511d4cd987b2725225",
+          "at": "2026-04-21T16:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24d731da5892da0b59dc117d232d7db78f5acac27d81bce291933f3f2fba057c",
+          "at": "2026-04-21T16:11:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24d731da5892da0b59dc117d232d7db78f5acac27d81bce291933f3f2fba057c",
+          "at": "2026-04-21T16:14:39Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55a4f4eb2ee66db76dc40837a1a7d577399bbb1419fd42cdad7cd9d38e570d51",
+          "at": "2026-04-21T15:01:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55a4f4eb2ee66db76dc40837a1a7d577399bbb1419fd42cdad7cd9d38e570d51",
+          "at": "2026-04-21T15:02:14Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ActivateTrackUseCase` now checks `derive_track_status(None, track.status_override())`, so it can no longer reject a branchless track whose `impl-plan.json` already has `in_progress` or `done` tasks. `resolve_phase` and the v5 verifier derive status from `impl-plan.json` + override, so this can materialize a track that should still be blocked from activation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_activation.rs",
+              "line": 61,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
+          "at": "2026-04-21T15:03:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
+          "at": "2026-04-21T15:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
+          "at": "2026-04-21T15:07:31Z"
+        }
+      ]
+    }
+  }
+}

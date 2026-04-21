@@ -80,7 +80,7 @@ impl ParamDeclaration {
 /// - `TypeGraph`: `TypeNode::methods` / `TraitNode::methods` (the "code reality"
 ///   extracted from rustdoc JSON)
 /// - Baseline: `TypeBaselineEntry::methods` / `TraitBaselineEntry::methods`
-///   (captured snapshot at `/track:design` time — populated in T005)
+///   (captured snapshot at `/track:design` time)
 ///
 /// Type strings (`ParamDeclaration::ty`, `returns`) use last-segment short
 /// names and preserve generics verbatim (e.g. `"Result<Option<User>, DomainError>"`,
@@ -1191,7 +1191,7 @@ mod tests {
         assert!(names.contains("StateB"));
     }
 
-    // --- spec_refs and informal_grounds fields (T005) ---
+    // --- spec_refs and informal_grounds fields ---
 
     #[test]
     fn test_type_catalogue_entry_new_has_empty_spec_refs_by_default() {

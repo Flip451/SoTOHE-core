@@ -64,7 +64,7 @@ pub enum VerifyCommand {
     /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
     SpecCodeConsistency(SpecCodeConsistencyArgs),
     /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
-    /// introduced in T002 / T003 / T005 per ADR 2026-04-19-1242 §D2.3.
+    /// per ADR 2026-04-19-1242 §D2.3.
     PlanArtifactRefs(PlanArtifactRefsArgs),
 }
 
@@ -841,8 +841,8 @@ mod tests {
 
     /// Writes a minimal `architecture-rules.json` with only `domain` TDDD-enabled
     /// into the given tmp dir. Shared by the two Yellow-signal CLI tests below,
-    /// which both need the new T007 multilayer loop to find exactly one enabled
-    /// layer that points at `domain-types.json`.
+    /// which both need the multilayer loop to find exactly one enabled layer
+    /// that points at `domain-types.json`.
     fn write_minimal_arch_rules(dir: &std::path::Path) {
         let content = r#"{
   "version": 2,
@@ -865,8 +865,8 @@ mod tests {
     /// Writes `<dir>/<signal_name>` with a matching `declaration_hash` so the
     /// ADR 2026-04-18-1400 §D5 signal-file evaluation path accepts it.
     /// `signals` is copied verbatim from the declaration file's legacy
-    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`
-    /// which, after T007, drops inline signals during decode.
+    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`,
+    /// which drops inline signals during decode.
     fn write_matching_signal_file(dir: &std::path::Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
