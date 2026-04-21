@@ -1,4 +1,5 @@
-//! Verify structured-ref fields introduced in T002 / T003 / T005.
+//! Verify structured-ref fields introduced in T002 / T003 / T005, plus
+//! task-coverage enforcement and canonical-block suspicion detection (T011).
 //!
 //! This module validates plan artifact references in a track directory:
 //! - `spec.json` ref fields: `adr_refs`, `convention_refs`, `informal_grounds`,
@@ -8,10 +9,13 @@
 //! - `SpecRef.hash` must match the SHA-256 of the canonical JSON subtree
 //! - `AdrAnchor` / `ConventionAnchor` loose non-empty validation (already enforced by newtypes)
 //! - `InformalGroundRef` newtype validation (kind variant + non-empty summary)
+//! - `task-coverage.json` coverage enforcement (in_scope + acceptance_criteria must have task_refs)
+//! - `task-coverage.json` referential integrity (all 4 sections: element ids in spec, task ids in impl-plan)
+//! - Canonical-block suspicion detection in `plan.md` + `verification.md` (warning only)
 //!
-//! Per ADR 2026-04-19-1242 §D2.3.
+//! Per ADR 2026-04-19-1242 §D2.3 / §D3.3.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
@@ -50,7 +54,7 @@ pub enum PlanArtifactRefsError {
     #[error("invalid anchor '{anchor}' in file '{}'", file.display())]
     InvalidAnchor { file: PathBuf, anchor: String },
 
-    /// A task-coverage constraint was violated (reserved for T011).
+    /// A task-coverage coverage or referential-integrity constraint was violated (T011).
     #[error("coverage violation: {0}")]
     CoverageViolation(String),
 }
@@ -319,6 +323,61 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
         }
     }
 
+    // -----------------------------------------------------------------------
+    // 5. task-coverage.json coverage enforcement + referential integrity
+    //    Migrated from spec_coverage::verify (T011).
+    //    When task-coverage.json is absent: warn (soft failure for now).
+    //    When present: enforce coverage + referential integrity.
+    // -----------------------------------------------------------------------
+    let task_coverage_path = abs_track_dir.join("task-coverage.json");
+    match symlink_guard::reject_symlinks_below(&task_coverage_path, &trusted_root) {
+        Ok(false) => {
+            // task-coverage.json absent — emit warning, not error.
+            // T012 will make it required; T011 keeps existing tracks functional.
+            // impl-plan.json integrity is only enforced when task-coverage.json is present
+            // (integrity validates task refs that appear in coverage; no coverage → no refs
+            // to validate).
+            findings.push(VerifyFinding::warning(
+                "task-coverage.json absent — coverage enforcement deferred until T012 makes it required",
+            ));
+        }
+        Ok(true) => {
+            // task-coverage.json present — run coverage + referential integrity.
+            verify_task_coverage(
+                &abs_track_dir,
+                &task_coverage_path,
+                &spec_doc,
+                &trusted_root,
+                &mut findings,
+            );
+        }
+        Err(e) => {
+            findings.push(VerifyFinding::error(format!("task-coverage.json symlink guard: {e}")));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. Canonical-block suspicion detection in plan.md + verification.md
+    //    Warning-only: long fenced code blocks >10 lines that lack an
+    //    "example" marker may be canonical blocks leaking into rendered docs.
+    // -----------------------------------------------------------------------
+    for doc_file in &["plan.md", "verification.md"] {
+        let doc_path = abs_track_dir.join(doc_file);
+        match symlink_guard::reject_symlinks_below(&doc_path, &trusted_root) {
+            Ok(false) => {} // absent — skip silently
+            Ok(true) => {
+                scan_canonical_block_suspicion(&doc_path, doc_file, &mut findings);
+            }
+            Err(e) => {
+                // Symlink-guard failures are security controls: fail at error level,
+                // consistent with all other symlink-guard checks in this verifier.
+                findings.push(VerifyFinding::error(format!(
+                    "{doc_file} symlink guard (canonical-block scan): {e}"
+                )));
+            }
+        }
+    }
+
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
@@ -566,6 +625,477 @@ fn canonical_json_sha256(json: &str) -> String {
         out.push_str(&format!("{byte:02x}"));
     }
     out
+}
+
+// ---------------------------------------------------------------------------
+// T011: task-coverage enforcement helper
+// ---------------------------------------------------------------------------
+
+/// Run coverage enforcement + referential integrity checks for `task-coverage.json`.
+///
+/// Called from `verify()` when `task-coverage.json` is confirmed present and
+/// passes the symlink guard.
+///
+/// Checks:
+/// 1. Coverage: every `in_scope` and `acceptance_criteria` requirement in `spec.json`
+///    must have at least one task_ref entry in `task-coverage.json`.
+/// 2. Referential integrity (spec elements): every SpecElementId key present in any
+///    section of `task-coverage.json` must resolve to an element in `spec.json`.
+/// 3. Referential integrity (task ids): every TaskId value in any section must exist
+///    in `impl-plan.json` (skipped when `impl-plan.json` is absent).
+fn verify_task_coverage(
+    track_dir: &Path,
+    task_coverage_path: &Path,
+    spec_doc: &domain::SpecDocument,
+    trusted_root: &Path,
+    findings: &mut Vec<VerifyFinding>,
+) {
+    // Load task-coverage.json
+    let task_coverage_content = match std::fs::read_to_string(task_coverage_path) {
+        Ok(c) => c,
+        Err(e) => {
+            findings.push(VerifyFinding::error(format!("Cannot read task-coverage.json: {e}")));
+            return;
+        }
+    };
+    let task_coverage_doc = match crate::task_coverage_codec::decode(&task_coverage_content) {
+        Ok(d) => d,
+        Err(e) => {
+            findings.push(VerifyFinding::error(format!("Cannot parse task-coverage.json: {e}")));
+            return;
+        }
+    };
+
+    // -----------------------------------------------------------------------
+    // 5a. Coverage enforcement: in_scope requirements
+    // -----------------------------------------------------------------------
+    for req in spec_doc.scope().in_scope() {
+        let covered =
+            task_coverage_doc.in_scope().get(req.id()).is_some_and(|refs| !refs.is_empty());
+        if !covered {
+            findings.push(VerifyFinding::error(format!(
+                "coverage violation: in_scope requirement \"{}\" (id: {}) has no task_refs in task-coverage.json",
+                req.text(),
+                req.id()
+            )));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 5b. Coverage enforcement: acceptance_criteria requirements
+    // -----------------------------------------------------------------------
+    for req in spec_doc.acceptance_criteria() {
+        let covered = task_coverage_doc
+            .acceptance_criteria()
+            .get(req.id())
+            .is_some_and(|refs| !refs.is_empty());
+        if !covered {
+            findings.push(VerifyFinding::error(format!(
+                "coverage violation: acceptance_criteria requirement \"{}\" (id: {}) has no task_refs in task-coverage.json",
+                req.text(),
+                req.id()
+            )));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 5c. Referential integrity: spec element ids
+    //
+    // Each task-coverage section is validated against its matching spec section.
+    // `goal` is intentionally excluded because task-coverage.json has no `goal`
+    // section — goal requirements are not tracked at the task level.
+    // Cross-section mappings (e.g., a constraints ID in the in_scope map) are
+    // flagged as referential integrity errors.
+    // -----------------------------------------------------------------------
+    let in_scope_ids: HashSet<String> =
+        spec_doc.scope().in_scope().iter().map(|r| r.id().as_ref().to_owned()).collect();
+    let out_of_scope_ids: HashSet<String> =
+        spec_doc.scope().out_of_scope().iter().map(|r| r.id().as_ref().to_owned()).collect();
+    let constraints_ids: HashSet<String> =
+        spec_doc.constraints().iter().map(|r| r.id().as_ref().to_owned()).collect();
+    let acceptance_criteria_ids: HashSet<String> =
+        spec_doc.acceptance_criteria().iter().map(|r| r.id().as_ref().to_owned()).collect();
+
+    // Validate referential integrity for each section against its matching spec section.
+    check_section_integrity("in_scope", task_coverage_doc.in_scope(), &in_scope_ids, findings);
+    check_section_integrity(
+        "acceptance_criteria",
+        task_coverage_doc.acceptance_criteria(),
+        &acceptance_criteria_ids,
+        findings,
+    );
+    check_section_integrity(
+        "out_of_scope",
+        task_coverage_doc.out_of_scope(),
+        &out_of_scope_ids,
+        findings,
+    );
+    check_section_integrity(
+        "constraints",
+        task_coverage_doc.constraints(),
+        &constraints_ids,
+        findings,
+    );
+
+    // -----------------------------------------------------------------------
+    // 5d. Referential integrity: task ids against impl-plan.json
+    //
+    // impl-plan.json is optional; when absent, skip entirely.
+    // When present but unreadable/malformed, fail closed.
+    // -----------------------------------------------------------------------
+    let impl_plan_path = track_dir.join("impl-plan.json");
+    match symlink_guard::reject_symlinks_below(&impl_plan_path, trusted_root) {
+        Ok(false) => {} // impl-plan.json absent — skip task-id integrity
+        Ok(true) => match load_impl_plan_task_ids_from_path(&impl_plan_path) {
+            Ok(valid_task_ids) => {
+                check_task_id_integrity(&task_coverage_doc, &valid_task_ids, findings);
+            }
+            Err(e) => {
+                findings.push(VerifyFinding::error(format!(
+                    "Cannot load impl-plan.json for referential-integrity check: {e}"
+                )));
+            }
+        },
+        Err(e) => {
+            findings.push(VerifyFinding::error(format!("impl-plan.json symlink guard: {e}")));
+        }
+    }
+}
+
+/// Validate that every SpecElementId key in a single task-coverage section matches
+/// an element in the corresponding spec section.
+///
+/// Emits error findings for any key not found in `valid_ids`.
+fn check_section_integrity(
+    section_name: &str,
+    section_map: &std::collections::BTreeMap<domain::SpecElementId, Vec<domain::TaskId>>,
+    valid_ids: &HashSet<String>,
+    findings: &mut Vec<VerifyFinding>,
+) {
+    for req_id in section_map.keys() {
+        let id_str = req_id.as_ref();
+        if !valid_ids.contains(id_str) {
+            findings.push(VerifyFinding::error(format!(
+                "coverage violation: task-coverage.json \
+                 {section_name}[\"{id_str}\"] references an element id that does not exist \
+                 in spec.json {section_name} section"
+            )));
+        }
+    }
+}
+
+/// Validate that every TaskId in all four task-coverage sections exists in `valid_task_ids`.
+///
+/// Emits error findings for any task_ref not found in the impl-plan task set.
+fn check_task_id_integrity(
+    task_coverage_doc: &domain::TaskCoverageDocument,
+    valid_task_ids: &HashSet<domain::TaskId>,
+    findings: &mut Vec<VerifyFinding>,
+) {
+    let sections: [(&str, &std::collections::BTreeMap<domain::SpecElementId, Vec<domain::TaskId>>);
+        4] = [
+        ("in_scope", task_coverage_doc.in_scope()),
+        ("acceptance_criteria", task_coverage_doc.acceptance_criteria()),
+        ("out_of_scope", task_coverage_doc.out_of_scope()),
+        ("constraints", task_coverage_doc.constraints()),
+    ];
+    for (section_name, section_map) in &sections {
+        for (req_id, task_refs) in *section_map {
+            let id_str = req_id.as_ref();
+            for task_ref in task_refs {
+                if !valid_task_ids.contains(task_ref) {
+                    findings.push(VerifyFinding::error(format!(
+                        "coverage violation: task_ref \"{task_ref}\" in \
+                         {section_name}[\"{id_str}\"] does not exist in impl-plan.json"
+                    )));
+                }
+            }
+        }
+    }
+}
+
+/// Load task IDs from `impl-plan.json` at the given path.
+///
+/// Returns `Ok(ids)` when decoded successfully (may be empty — an empty plan
+/// means every task_ref is invalid).
+/// Returns `Err(message)` when the file is unreadable or malformed.
+fn load_impl_plan_task_ids_from_path(path: &Path) -> Result<HashSet<domain::TaskId>, String> {
+    let content = std::fs::read_to_string(path)
+        .map_err(|e| format!("cannot read {}: {e}", path.display()))?;
+    let doc = crate::impl_plan_codec::decode(&content)
+        .map_err(|e| format!("cannot decode {}: {e}", path.display()))?;
+    Ok(doc.tasks().iter().map(|t| t.id().clone()).collect())
+}
+
+// ---------------------------------------------------------------------------
+// T011: canonical-block suspicion detection helper
+// ---------------------------------------------------------------------------
+
+/// Scan a Markdown file for fenced code blocks longer than 10 lines.
+///
+/// Emits a `VerifyFinding::warning` for each suspicious block (file + line number).
+/// Blocks with an ADR-style "example" marker are excluded. The marker is recognized in:
+/// 1. The line immediately preceding the opening fence.
+/// 2. The info string on the opening fence line itself (e.g., ` ```example `).
+///
+/// Inner-line scanning is intentionally excluded to avoid false negatives from block
+/// content that happens to contain example-marker text.
+///
+/// Each line is normalized by `fence_line_normalize` before fence detection: blockquote
+/// `> ` markers are stripped recursively and all leading whitespace is removed. The same
+/// normalization is applied consistently to every line — opening fence, inner body lines,
+/// and closing fence — so that fenced blocks at any container depth are detected and
+/// their boundaries are correctly matched.
+///
+/// Known accepted deviation: `plan.md` and `verification.md` are flat rendered views
+/// generated by `sotp`. They do not use CommonMark indented code blocks (4-space indent)
+/// or embed literal fence delimiters (`` ``` ``, `~~~`) as body content inside fenced
+/// blocks. Treating these edge cases as fence delimiters would result in spurious
+/// warnings, but this is acceptable because: (a) the patterns never appear in practice
+/// in the target files, and (b) the canonical-block warning is suppression-only and
+/// never fails CI — false positives can always be suppressed with an example marker.
+///
+/// Recognized preceding-line markers (case-insensitive, matched on normalized text):
+/// - `<!-- illustrative, non-canonical -->` — canonical ADR Q3 marker (ADR 2026-04-19-1242 §Q3)
+/// - `<!-- example -->` or `<!-- example:` — HTML comment markers
+/// - `// example` — C-style line comment (word-boundary match)
+///
+/// Fence-open inline marker (case-insensitive info string, word-boundary match):
+/// - ` ```example ` / ` ~~~example ` — "example" as a whole word in the info string
+fn scan_canonical_block_suspicion(
+    doc_path: &Path,
+    doc_label: &str,
+    findings: &mut Vec<VerifyFinding>,
+) {
+    let content = match std::fs::read_to_string(doc_path) {
+        Ok(c) => c,
+        Err(e) => {
+            // Symlink guard already confirmed the file is present; a read failure here
+            // is unexpected and should fail at error level, consistent with other I/O
+            // failures in this verifier.
+            findings.push(VerifyFinding::error(format!(
+                "canonical-block scan: cannot read {doc_label}: {e}"
+            )));
+            return;
+        }
+    };
+
+    let lines: Vec<&str> = content.lines().collect();
+    let mut i = 0;
+    while i < lines.len() {
+        // Safe: loop invariant guarantees i < lines.len()
+        let raw_line = lines.get(i).copied().unwrap_or("");
+
+        // Opening-fence detection: strip blockquote prefixes and ALL leading whitespace
+        // so that fenced blocks at any container depth are visible.
+        let line = fence_line_normalize(raw_line);
+
+        // Detect opening fence: line starting with ``` or ~~~ (CommonMark fenced code block).
+        // Returns both the fence character and the opening fence length (>= 3) so that
+        // the closing fence can be validated per CommonMark (must be >= opening length).
+        if let Some((fence_kind, open_len)) = detect_fence_open(line.as_str()) {
+            let fence_start = i;
+            let preceding_line = if i > 0 { lines.get(i - 1).copied() } else { None };
+
+            // Example markers are recognized in two places only, to avoid false negatives
+            // from block content that happens to contain marker text:
+            //   1. The line immediately preceding the opening fence.
+            //   2. The info string on the opening fence line itself (e.g., "```example").
+            // Inner-line scanning is intentionally excluded.
+            let fence_open_has_example = fence_info_has_example(line.as_str());
+
+            // Closing-fence detection: apply the same `fence_line_normalize` as opening.
+            // This is consistent: blockquote-level fences find their closers correctly,
+            // and the scanner applies the same transformation at every container depth.
+            // `plan.md` and `verification.md` are generated flat views that do not
+            // contain `` ``` `` as literal text inside fenced code block bodies.
+            let mut j = i + 1;
+            while j < lines.len() {
+                // Safe: loop invariant guarantees j < lines.len()
+                let inner_raw = lines.get(j).copied().unwrap_or("");
+                let inner = fence_line_normalize(inner_raw);
+                if is_fence_close(inner.as_str(), fence_kind, open_len) {
+                    break;
+                }
+                j += 1;
+            }
+
+            // Count lines inside the fence (excluding opening and closing fence lines).
+            let block_line_count = j.saturating_sub(fence_start + 1);
+
+            if block_line_count > 10 {
+                // Normalize the preceding line (strip container prefixes) before checking
+                // for an example marker so that markers inside blockquotes are recognized.
+                let preceding_has_example = preceding_line
+                    .is_some_and(|l| is_example_marker(fence_line_normalize(l).as_str()));
+
+                if !preceding_has_example && !fence_open_has_example {
+                    findings.push(VerifyFinding::warning(format!(
+                        "canonical-block suspicion: {doc_label} line {} has a fenced code block \
+                         with {block_line_count} lines — may be a canonical block leaking into a \
+                         rendered view (add an example marker to suppress)",
+                        fence_start + 1
+                    )));
+                }
+            }
+
+            // Advance past the closing fence (or end of file if unclosed).
+            i = if j < lines.len() { j + 1 } else { j };
+        } else {
+            i += 1;
+        }
+    }
+}
+
+/// Normalize a raw Markdown line for fence detection.
+///
+/// 1. Strips blockquote `> ` markers (0-3 leading spaces + `>` + optional space) recursively
+///    so that fenced blocks inside blockquotes are detected.
+/// 2. Strips all remaining leading and trailing whitespace.
+///
+/// Step 2 means that indented lines (e.g., 4-space indented) are also treated as fence
+/// candidates after blockquote stripping. This is intentional for `plan.md` and
+/// `verification.md`, which are flat rendered views generated by `sotp` and do not use
+/// CommonMark indented code blocks in practice. The same normalization is applied to
+/// every line — opening fence, inner body lines, and closing fence — so the scanner
+/// is self-consistent across all container depths.
+fn fence_line_normalize(line: &str) -> String {
+    strip_container_prefix(line).trim().to_owned()
+}
+
+/// Strip CommonMark blockquote container prefixes from a line.
+///
+/// A blockquote prefix consists of 0-3 leading spaces followed by `>` and an optional
+/// single space. This function strips as many such prefixes as are present (recursive
+/// nesting), returning the innermost content.
+///
+/// Example:
+/// - `"   > > ```rust"` → `"```rust"`  (two levels of blockquote stripped)
+/// - `"> line"` → `"line"`
+/// - `"normal line"` → `"normal line"`  (unchanged)
+fn strip_container_prefix(line: &str) -> String {
+    let mut s = line;
+    loop {
+        // Strip 0-3 optional leading spaces
+        let trimmed = s.trim_start_matches(' ');
+        let spaces_stripped = s.len() - trimmed.len();
+        if spaces_stripped > 3 {
+            // 4+ leading spaces = indented code block context; stop stripping
+            break;
+        }
+        // Check for blockquote `>` marker
+        if let Some(after_gt) = trimmed.strip_prefix('>') {
+            // Optionally consume one trailing space after `>`
+            s = after_gt.strip_prefix(' ').unwrap_or(after_gt);
+        } else {
+            break;
+        }
+    }
+    s.to_owned()
+}
+
+/// Returns `Some((fence_char, fence_len))` if the trimmed line opens a fenced code block.
+///
+/// `fence_char` is `'`'` or `'~'`. `fence_len` is the number of consecutive fence
+/// characters at the start of the line (>= 3). An info string (e.g. "rust") may follow
+/// the fence prefix — that does not affect detection.
+///
+/// Per CommonMark, the closing fence must use the same character and be at least as long
+/// as the opening fence. Returning the opening length allows `is_fence_close` to enforce
+/// this requirement.
+fn detect_fence_open(line: &str) -> Option<(char, usize)> {
+    let fence_char = if line.starts_with("```") {
+        '`'
+    } else if line.starts_with("~~~") {
+        '~'
+    } else {
+        return None;
+    };
+    let fence_len = line.chars().take_while(|&c| c == fence_char).count();
+    Some((fence_char, fence_len))
+}
+
+/// Return true if a trimmed line is a valid closing fence for the given opening fence.
+///
+/// Per CommonMark, a closing fence:
+/// - consists entirely of the same fence character as the opening fence
+/// - has length >= `open_len` (the opening fence length)
+///
+/// This prevents a shorter fence (e.g., 3 backticks) from incorrectly closing a
+/// block opened with a longer fence (e.g., 4 or more backticks).
+fn is_fence_close(line: &str, fence_char: char, open_len: usize) -> bool {
+    if line.len() < open_len {
+        return false;
+    }
+    line.chars().all(|c| c == fence_char)
+}
+
+/// Return true if a line contains an ADR-style example marker.
+///
+/// Markers (matched case-insensitively on the trimmed normalized line):
+/// - `<!-- illustrative, non-canonical -->` — canonical ADR Q3 marker (ADR 2026-04-19-1242 §Q3)
+/// - `<!-- example -->` or `<!-- example:` — HTML comment markers
+/// - `// example` — C-style line comment (word-boundary: not `// examples` etc.)
+///
+/// Deliberately excluded patterns that are too broad for plan.md/verification.md:
+/// - `# example` — would match Markdown section headings like `# Examples`
+/// - `example:` — would match YAML content and other prose lines
+fn is_example_marker(line: &str) -> bool {
+    let lower = line.to_ascii_lowercase();
+    if lower.contains("<!-- illustrative, non-canonical -->") {
+        return true;
+    }
+    if lower.contains("<!-- example -->") || lower.contains("<!-- example:") {
+        return true;
+    }
+    // `// example` with word-boundary: followed by end-of-string, space, or colon
+    if let Some(rest) = lower.strip_prefix("// example") {
+        if rest.is_empty() || rest.starts_with(':') || rest.starts_with(' ') {
+            return true;
+        }
+    }
+    false
+}
+
+/// Return true if the info string of a fence-open line contains "example" (case-insensitive).
+///
+/// The info string is the portion of the trimmed fence-open line that follows the
+/// 3-character fence prefix (` ``` ` or `~~~`). For example:
+/// - ` ```example ` → info string is "example" → returns true
+/// - ` ```example my-block ` → info string is "example my-block" → returns true
+/// - ` ```rust ` → info string is "rust" → returns false
+///
+/// This handles the case where the author tags the opening fence line itself with
+/// "example" to mark the entire block as an intentional example.
+fn fence_info_has_example(line: &str) -> bool {
+    // Determine the fence character (` or ~) and strip all leading fence characters
+    // to get the info string. A fence may use 3+ characters, so we strip all of them.
+    let fence_char = if line.starts_with("```") {
+        '`'
+    } else if line.starts_with("~~~") {
+        '~'
+    } else {
+        return false;
+    };
+    let info = line.trim_start_matches(fence_char);
+    // Require "example" as a standalone word: preceded by start-of-string or whitespace,
+    // and followed by end-of-string or whitespace. This allows ` ```example ` and
+    // ` ```my example ` but rejects ` ```non-example ` and ` ```notexample `.
+    let lower_info = info.to_ascii_lowercase();
+    let target = "example";
+    let mut search = lower_info.as_str();
+    while let Some(pos) = search.find(target) {
+        let before_ok = pos == 0 || search.as_bytes().get(pos - 1).is_some_and(|b| *b == b' ');
+        let after_pos = pos + target.len();
+        let after_ok = after_pos >= search.len()
+            || search.as_bytes().get(after_pos).is_some_and(|b| *b == b' ');
+        if before_ok && after_ok {
+            return true;
+        }
+        // Advance past this occurrence; stop if at end
+        search = search.get(pos + 1..).unwrap_or("");
+    }
+    false
 }
 
 // ---------------------------------------------------------------------------
@@ -1066,5 +1596,256 @@ mod tests {
 
         let outcome = verify(&track_dir);
         assert!(!outcome.is_ok(), "symlink-to-directory spec.json must be rejected: {:?}", outcome);
+    }
+
+    // -----------------------------------------------------------------------
+    // T011: task-coverage enforcement tests
+    // -----------------------------------------------------------------------
+
+    /// When task-coverage.json is absent, emit a warning (not an error).
+    /// The outcome is still ok() because warnings don't fail CI in T011.
+    #[test]
+    fn test_absent_task_coverage_emits_warning_not_error() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        // No task-coverage.json
+        let outcome = verify(&track_dir);
+        assert!(outcome.is_ok(), "absent task-coverage.json must not fail CI: {:?}", outcome);
+        let has_warning =
+            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Warning);
+        assert!(has_warning, "absent task-coverage.json must emit a warning: {:?}", outcome);
+    }
+
+    /// in_scope requirement without a task_ref entry in task-coverage.json → error.
+    #[test]
+    fn test_in_scope_missing_task_ref_reports_coverage_violation() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        // task-coverage.json with empty in_scope section
+        write_file(
+            &track_dir,
+            "task-coverage.json",
+            r#"{"schema_version": 1, "in_scope": {}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
+        );
+        let outcome = verify(&track_dir);
+        assert!(outcome.has_errors(), "uncovered in_scope must produce error: {:?}", outcome);
+        let has_coverage_error = outcome
+            .findings()
+            .iter()
+            .any(|f| f.message().contains("coverage violation") && f.message().contains("IN-01"));
+        assert!(has_coverage_error, "error must mention IN-01: {:?}", outcome);
+    }
+
+    /// Stale element id in task-coverage (not in spec.json) → referential integrity error.
+    #[test]
+    fn test_stale_element_id_in_task_coverage_reports_integrity_error() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        // task-coverage.json references IN-99 which doesn't exist in spec.json
+        write_file(
+            &track_dir,
+            "task-coverage.json",
+            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T001"], "IN-99": ["T001"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
+        );
+        // impl-plan.json with T001
+        write_file(
+            &track_dir,
+            "impl-plan.json",
+            r#"{"schema_version": 1, "tasks": [{"id": "T001", "description": "task", "status": "todo"}], "plan": {"summary": [], "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T001"]}]}}"#,
+        );
+        let outcome = verify(&track_dir);
+        assert!(outcome.has_errors(), "stale element id must produce error: {:?}", outcome);
+        let has_integrity_error = outcome.findings().iter().any(|f| f.message().contains("IN-99"));
+        assert!(has_integrity_error, "error must mention IN-99: {:?}", outcome);
+    }
+
+    /// Stale TaskId in task-coverage (not in impl-plan.json) → impl-plan integrity error.
+    #[test]
+    fn test_stale_task_id_in_task_coverage_reports_implplan_integrity_error() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        // task-coverage.json references T999 which doesn't exist in impl-plan.json
+        write_file(
+            &track_dir,
+            "task-coverage.json",
+            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T999"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
+        );
+        // impl-plan.json with T001 only (T999 absent)
+        write_file(
+            &track_dir,
+            "impl-plan.json",
+            r#"{"schema_version": 1, "tasks": [{"id": "T001", "description": "task", "status": "todo"}], "plan": {"summary": [], "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T001"]}]}}"#,
+        );
+        let outcome = verify(&track_dir);
+        assert!(outcome.has_errors(), "stale TaskId must produce error: {:?}", outcome);
+        let has_task_error = outcome
+            .findings()
+            .iter()
+            .any(|f| f.message().contains("T999") && f.message().contains("impl-plan.json"));
+        assert!(has_task_error, "error must mention T999 and impl-plan.json: {:?}", outcome);
+    }
+
+    /// Fully covered track (IN-01 → T001 in both coverage and impl-plan) passes.
+    #[test]
+    fn test_fully_covered_track_passes() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        write_file(
+            &track_dir,
+            "task-coverage.json",
+            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T001"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
+        );
+        write_file(
+            &track_dir,
+            "impl-plan.json",
+            r#"{"schema_version": 1, "tasks": [{"id": "T001", "description": "task", "status": "todo"}], "plan": {"summary": [], "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T001"]}]}}"#,
+        );
+        let outcome = verify(&track_dir);
+        assert!(outcome.is_ok(), "fully covered track must pass: {:?}", outcome);
+    }
+
+    // -----------------------------------------------------------------------
+    // T011: canonical-block suspicion detection tests
+    // -----------------------------------------------------------------------
+
+    /// A fenced code block with >10 lines and no example marker → warning.
+    #[test]
+    fn test_canonical_block_over_10_lines_emits_warning() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+
+        // Create a plan.md with a long fenced code block (12 lines inside).
+        let plan_md = "# Plan\n\n```rust\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
+        write_file(&track_dir, "plan.md", plan_md);
+
+        let outcome = verify(&track_dir);
+        let has_block_warning = outcome.findings().iter().any(|f| {
+            f.severity() == domain::verify::Severity::Warning
+                && f.message().contains("canonical-block suspicion")
+        });
+        assert!(
+            has_block_warning,
+            "long code block must emit canonical-block warning: {:?}",
+            outcome
+        );
+        // Must NOT be an error (warning only).
+        assert!(outcome.is_ok(), "canonical-block warning must not fail CI: {:?}", outcome);
+    }
+
+    /// A fenced code block with an example marker in the preceding line → no warning.
+    #[test]
+    fn test_canonical_block_with_preceding_example_marker_no_warning() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+
+        // plan.md with example marker on the line before the fence
+        let plan_md = "# Plan\n\n<!-- example: long block -->\n```rust\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
+        write_file(&track_dir, "plan.md", plan_md);
+
+        let outcome = verify(&track_dir);
+        let has_block_warning =
+            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
+        assert!(
+            !has_block_warning,
+            "example-marked block must not emit canonical-block warning: {:?}",
+            outcome
+        );
+    }
+
+    /// A fenced code block with an example marker only inside the body (no preceding-line or
+    /// fence-open marker) → warning IS emitted. Inner-line scanning is intentionally excluded
+    /// to avoid false negatives from block content that happens to contain `example:` text.
+    #[test]
+    fn test_canonical_block_with_inner_only_example_marker_still_warns() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+
+        // plan.md with example: marker inside the fence but NOT in preceding line or info string.
+        // Inner markers alone do not suppress the canonical-block warning.
+        let plan_md = "# Plan\n\n```rust\n// example\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\n```\n";
+        write_file(&track_dir, "plan.md", plan_md);
+
+        let outcome = verify(&track_dir);
+        let has_block_warning =
+            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
+        assert!(
+            has_block_warning,
+            "inner-only example marker must not suppress canonical-block warning: {:?}",
+            outcome
+        );
+    }
+
+    /// A fenced code block with an example marker in the opening fence info string → no warning.
+    ///
+    /// Example: "```example" or "```example my-block" — the info string contains "example".
+    #[test]
+    fn test_canonical_block_with_fence_open_example_marker_no_warning() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+
+        // plan.md with example marker inline on the opening fence line (info string)
+        let plan_md = "# Plan\n\n```example\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
+        write_file(&track_dir, "plan.md", plan_md);
+
+        let outcome = verify(&track_dir);
+        let has_block_warning =
+            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
+        assert!(
+            !has_block_warning,
+            "block with fence-open example marker must not emit warning: {:?}",
+            outcome
+        );
+    }
+
+    /// A fenced code block preceded by the canonical ADR Q3 marker
+    /// `<!-- illustrative, non-canonical -->` → no warning.
+    #[test]
+    fn test_canonical_block_with_adr_illustrative_marker_no_warning() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+
+        // plan.md with the canonical ADR Q3 marker on the line before the fence.
+        let plan_md = "# Plan\n\n<!-- illustrative, non-canonical -->\n```rust\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
+        write_file(&track_dir, "plan.md", plan_md);
+
+        let outcome = verify(&track_dir);
+        let has_block_warning =
+            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
+        assert!(
+            !has_block_warning,
+            "ADR Q3 illustrative marker must suppress canonical-block warning: {:?}",
+            outcome
+        );
+    }
+
+    /// A fenced code block with exactly 10 lines (not >10) → no warning.
+    #[test]
+    fn test_canonical_block_exactly_10_lines_no_warning() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+
+        // plan.md with exactly 10 lines inside the fence (boundary: not >10)
+        let plan_md = "# Plan\n\n```\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n```\n";
+        write_file(&track_dir, "plan.md", plan_md);
+
+        let outcome = verify(&track_dir);
+        let has_block_warning =
+            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
+        assert!(
+            !has_block_warning,
+            "block with exactly 10 lines must not emit warning: {:?}",
+            outcome
+        );
     }
 }

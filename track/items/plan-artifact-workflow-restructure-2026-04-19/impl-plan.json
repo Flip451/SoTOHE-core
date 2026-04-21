@@ -58,12 +58,13 @@
     {
       "id": "T010",
       "description": "apps/cli/src/commands/verify/plan_artifact_refs.rs を新設し sotp verify plan-artifact-refs subcommand として公開。各 ref field (adr_refs / convention_refs / spec_refs / related_conventions / informal_grounds) の走査、schema validation、file 存在チェック (file ベース ref のみ)、SpecRef.anchor 解決 (spec 要素 id lookup)、SpecRef.hash 照合 (canonical JSON subtree SHA-256)、AdrAnchor / ConventionAnchor の newtype loose validation、InformalGroundRef の newtype validation (kind variant / summary 非空、file resolution なし) を実装。unit + integration tests",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "99c5ecdfea923ab3b9f030fb507e980bdd1ae457"
     },
     {
       "id": "T011",
       "description": "T010 の CLI に task-coverage.json の coverage 強制 + referential integrity 検査 (現行 spec_coverage::verify 踏襲) を追加し、canonical block 疑惑検出 (ADR 例示マーカー除外 / spec フィールド内 10 行超コードブロック警告) を実装。cargo make ci / Makefile.toml に組み込み、CI で fail-closed 動作を検証",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T012",
