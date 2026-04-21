@@ -24,7 +24,9 @@ use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
 /// 3. `track/` prefix stripped and validated via `TrackId::try_new`
 /// 4. `reader.read_impl_plan(branch, track_id)`:
 ///    - `Found(doc)` → check `all_tasks_resolved()`; report unresolved task IDs
-///    - `NotFound` → PASS (impl-plan.json is optional for planning-only tracks)
+///    - `NotFound` → BLOCKED (activated `track/*` branches must carry impl-plan.json;
+///      `plan/*` branches already short-circuited at step 1, so a missing impl-plan
+///      here is an activated track with no task list — a merge bypass path)
 ///    - `FetchError` → BLOCKED
 ///
 /// This function is a thin orchestration that delegates all I/O to the
@@ -59,12 +61,22 @@ pub fn check_tasks_resolved_from_git_ref(
         }
     }
 
-    // 4. Fetch and inspect impl-plan.json
+    // 4. Fetch and inspect impl-plan.json.
+    //
+    // `plan/*` branches short-circuit at step 1 (planning-only, no tasks yet).
+    // `track/*` branches reach this point only after activation, at which
+    // point impl-plan.json is required — it is the SSoT for the task list
+    // that this gate must enforce. Treating a missing impl-plan.json as
+    // `pass()` would silently bypass the "all tasks resolved" check, letting
+    // a merge proceed on an activated track that never produced its task
+    // plan (or whose plan was deleted). Fail closed instead.
     let impl_plan = match reader.read_impl_plan(branch, track_id_str) {
         BlobFetchResult::Found(doc) => doc,
         BlobFetchResult::NotFound => {
-            // impl-plan.json is optional (planning-only tracks have no tasks).
-            return VerifyOutcome::pass();
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "track '{track_id_str}' missing impl-plan.json on origin/{branch}: \
+                 activated tracks must commit impl-plan.json before merge"
+            ))]);
         }
         BlobFetchResult::FetchError(msg) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -209,11 +221,19 @@ mod tests {
     }
 
     #[test]
-    fn test_k4_impl_plan_not_found_passes() {
-        // K4: impl-plan.json NotFound → PASS (planning-only track is OK)
+    fn test_k4_impl_plan_not_found_blocks_on_track_branch() {
+        // K4: impl-plan.json NotFound on an activated `track/*` branch → BLOCKED.
+        // planning-only `plan/*` branches short-circuit at step 1 before ever
+        // reaching the reader; by the time `read_impl_plan` runs we are on
+        // an activated track, so a missing impl-plan.json is a merge bypass.
         let reader = MockReader::new(BlobFetchResult::NotFound);
         let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
-        assert!(!outcome.has_errors(), "{outcome:?}");
+        assert!(outcome.has_errors(), "{outcome:?}");
+        assert!(
+            outcome.findings()[0].message().contains("missing impl-plan.json"),
+            "finding must mention missing impl-plan.json: {}",
+            outcome.findings()[0].message()
+        );
     }
 
     #[test]

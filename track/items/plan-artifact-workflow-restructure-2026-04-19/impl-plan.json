@@ -70,7 +70,8 @@
     {
       "id": "T012",
       "description": "既存 libs/infrastructure/src/verify/spec_coverage.rs の spec_coverage::verify を新 CLI (plan-artifact-refs) に統合し、旧呼び出し経路 (Makefile.toml / scripts/ / 関連 verify-*) を新 CLI 経由に切り替え、不要コードを削除。tests 整理",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "70fb44ee5f3a72683c77e032ddb112566b9a5412"
     }
   ],
   "plan": {
