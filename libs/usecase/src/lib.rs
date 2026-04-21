@@ -308,40 +308,65 @@ where
 }
 
 /// Sets or clears a status override on a track and persists the result atomically.
-pub struct SetOverrideUseCase<W: TrackWriter> {
-    writer: Arc<W>,
+///
+/// On a `clear` operation (`status_override = None`), the derived status is
+/// restored from `impl-plan.json` via [`ImplPlanReader`] so tracks that are
+/// already `InProgress` / `Done` do not collapse back to `Planned` after an
+/// override is lifted.
+pub struct SetOverrideUseCase<S>
+where
+    S: TrackWriter + ImplPlanReader,
+{
+    store: Arc<S>,
 }
 
-impl<W: TrackWriter> SetOverrideUseCase<W> {
+impl<S> SetOverrideUseCase<S>
+where
+    S: TrackWriter + ImplPlanReader,
+{
     #[must_use]
-    pub fn new(writer: Arc<W>) -> Self {
-        Self { writer }
+    pub fn new(store: Arc<S>) -> Self {
+        Self { store }
     }
 
-    /// Sets a status override on the track and persists atomically.
+    /// Sets or clears a status override on the track and persists atomically.
+    ///
+    /// * `status_override = Some(ov)` — sets the override and mirrors
+    ///   `track.status()` to `ov.track_status()`.
+    /// * `status_override = None` — clears the override and restores the
+    ///   derived status from `impl-plan.json`:
+    ///   - no impl-plan.json (planning-only track) → `Planned`.
+    ///   - all tasks resolved → `Done`.
+    ///   - any task in-progress or mixed resolved/unresolved → `InProgress`.
+    ///   - all tasks `Todo` → `Planned`.
     ///
     /// # Errors
-    /// Returns `TrackWriteError` if the track is not found.
+    /// Returns `TrackWriteError` if the track is not found, if
+    /// `impl-plan.json` cannot be loaded during a clear, or if the underlying
+    /// writer fails.
     pub fn execute(
         &self,
         track_id: &TrackId,
         status_override: Option<StatusOverride>,
     ) -> Result<TrackMetadata, TrackWriteError> {
-        self.writer.update(track_id, |track| {
-            // T005: set_status_override no longer returns Result (it is infallible).
-            // Mirror the status so track.status() stays consistent with the override.
+        // When clearing, derive the restored status from impl-plan.json
+        // BEFORE opening the write transaction — keeps the closure infallible
+        // for the reader side.
+        let restored_status = if status_override.is_none() {
+            let impl_plan = self.store.load_impl_plan(track_id).map_err(TrackWriteError::from)?;
+            Some(match impl_plan.as_ref() {
+                Some(doc) => derive_track_status_from_impl_plan(doc),
+                None => TrackStatus::Planned,
+            })
+        } else {
+            None
+        };
+
+        self.store.update(track_id, |track| {
             if let Some(ref ov) = status_override {
                 track.set_status(ov.track_status());
-            } else {
-                // Clearing override: revert to Planned.
-                // T005: task transitions are stubbed (T007 pending), so tracks cannot
-                // organically reach InProgress/Done. Reverting to Planned is correct for
-                // the T005 stub phase.
-                // TODO T007: once TransitionTaskUseCase operates on impl-plan.json, the
-                // pre-override status must be preserved (e.g. via a stored field or an
-                // explicit restore_status parameter) so that clearing an override on an
-                // active track restores the correct phase rather than resetting to Planned.
-                track.set_status(domain::TrackStatus::Planned);
+            } else if let Some(status) = restored_status {
+                track.set_status(status);
             }
             track.set_status_override(status_override);
             Ok(())
