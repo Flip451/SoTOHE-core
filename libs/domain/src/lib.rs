@@ -44,9 +44,9 @@ pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };
 pub use spec::{
-    CoverageResult, HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot,
-    SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecValidationError,
-    check_spec_doc_signals, evaluate_requirement_signal,
+    HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot, SpecDocument,
+    SpecRequirement, SpecScope, SpecSection, SpecValidationError, check_spec_doc_signals,
+    evaluate_requirement_signal,
 };
 pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};

@@ -193,7 +193,7 @@
     },
     {
       "name": "CoverageResult",
-      "description": "Legacy domain value object returned by `SpecDocument::evaluate_coverage()` / `validate_all_task_refs`. Deleted per ADR 2026-04-19-1242 §D2.3 / T012: requirement-to-task coverage now lives in `task-coverage.json` and is verified exclusively by the new `sotp verify plan-artifact-refs` CLI, which emits `VerifyFinding`s rather than a structured CoverageResult. Unused in domain after the migration.",
+      "description": "Legacy domain value object returned by `SpecDocument::evaluate_coverage()` / `validate_all_task_refs`. Deleted per ADR 2026-04-19-1242 §D2.3 / T012: requirement-to-task coverage now lives in `task-coverage.json` and is verified exclusively by the `sotp verify plan-artifact-refs` CLI, which emits `VerifyFinding`s rather than a structured CoverageResult.",
       "approved": true,
       "action": "delete",
       "kind": "value_object"

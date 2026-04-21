@@ -61,22 +61,11 @@ pub enum VerifyCommand {
     SpecSignals(SpecVerifyArgs),
     /// Check spec.md contains a ## Domain States section with table data rows.
     SpecStates(SpecStatesArgs),
-    /// Check requirement-to-task coverage for a track (resolved from branch or --track-dir).
-    SpecCoverage(SpecCoverageArgs),
     /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
     SpecCodeConsistency(SpecCodeConsistencyArgs),
     /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
     /// introduced in T002 / T003 / T005 per ADR 2026-04-19-1242 §D2.3.
     PlanArtifactRefs(PlanArtifactRefsArgs),
-}
-
-/// Arguments for spec-coverage verify subcommand.
-#[derive(Args)]
-pub struct SpecCoverageArgs {
-    /// Path to the track directory (e.g., track/items/<id>).
-    /// If not provided, the command is a no-op (pass).
-    #[arg(long)]
-    track_dir: Option<PathBuf>,
 }
 
 /// Arguments for plan-artifact-refs verify subcommand.
@@ -189,18 +178,6 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                     }
                 };
             ("verify spec states", outcome)
-        }
-        VerifyCommand::SpecCoverage(args) => {
-            let outcome = match &args.track_dir {
-                Some(dir) if dir.is_dir() => infrastructure::verify::spec_coverage::verify(dir),
-                Some(dir) => {
-                    VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                        format!("Track directory does not exist: {}", dir.display()),
-                    )])
-                }
-                None => VerifyOutcome::pass(),
-            };
-            ("verify spec coverage", outcome)
         }
         VerifyCommand::SpecCodeConsistency(args) => {
             ("verify spec-code consistency", execute_spec_code_consistency(args))
@@ -954,56 +931,6 @@ mod tests {
         let exit =
             execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: true }));
         assert_eq!(exit, ExitCode::FAILURE, "yellow signal must fail in strict (merge-gate) mode");
-    }
-
-    // --- spec-coverage CLI wiring ---
-
-    #[test]
-    fn test_spec_coverage_subcommand_returns_success_with_no_track_dir() {
-        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: None }));
-        assert_eq!(exit, ExitCode::SUCCESS);
-    }
-
-    #[test]
-    fn test_spec_coverage_subcommand_returns_success_with_covered_track() {
-        let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("track/items/test-track");
-        std::fs::create_dir_all(&dir).unwrap();
-        write_file(
-            tmp.path(),
-            "track/items/test-track/metadata.json",
-            r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
-        );
-        // schema v2: no task_refs / sources; empty in_scope so evaluate_coverage stub returns pass.
-        write_file(
-            tmp.path(),
-            "track/items/test-track/spec.json",
-            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
-        );
-        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
-        assert_eq!(exit, ExitCode::SUCCESS);
-    }
-
-    #[test]
-    fn test_spec_coverage_subcommand_returns_failure_for_uncovered() {
-        let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("track/items/test-track");
-        std::fs::create_dir_all(&dir).unwrap();
-        write_file(
-            tmp.path(),
-            "track/items/test-track/metadata.json",
-            r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
-        );
-        // schema v2: in_scope item with no task_refs → evaluate_coverage stub reports uncovered → fail.
-        write_file(
-            tmp.path(),
-            "track/items/test-track/spec.json",
-            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[{"id":"IN-01","text":"uncovered"}],"out_of_scope":[]}}"#,
-        );
-        // task-coverage.json must exist to trigger coverage check (T003 transition guard).
-        write_file(tmp.path(), "track/items/test-track/task-coverage.json", "{}");
-        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
-        assert_eq!(exit, ExitCode::FAILURE);
     }
 
     // --- consistency_report_to_findings tests ---

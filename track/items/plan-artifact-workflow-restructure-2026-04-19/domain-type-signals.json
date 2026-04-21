@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-21T12:12:48Z",
-  "declaration_hash": "b51fe7997c881f9b5b3ceee8a28d3f30757a5aed93fe1bd2963d014ef9fb04cb",
+  "generated_at": "2026-04-21T12:31:32Z",
+  "declaration_hash": "2c31ff374e523a59004d643fdf431f0ec45bb7b5e86f08e9618498640ed1ab47",
   "signals": [
     {
       "type_name": "SpecElementId",
@@ -159,8 +159,8 @@
     {
       "type_name": "CoverageResult",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

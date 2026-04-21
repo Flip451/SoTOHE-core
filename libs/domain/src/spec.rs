@@ -12,7 +12,7 @@ use std::collections::HashSet;
 use std::fmt;
 
 use crate::plan_ref::{AdrRef, ConventionRef, InformalGroundRef, SpecElementId};
-use crate::{ConfidenceSignal, SignalCounts, TaskId, Timestamp};
+use crate::{ConfidenceSignal, SignalCounts, Timestamp};
 
 // ---------------------------------------------------------------------------
 // Value objects
@@ -332,39 +332,6 @@ impl SpecDocument {
 
         SignalCounts::new(blue, yellow, red)
     }
-
-    /// Evaluates requirement-to-task coverage for CI gate enforcement.
-    ///
-    /// NOTE: `task_refs` are removed from `SpecRequirement` in T003 and now live
-    /// in `task-coverage.json` (T004/T005). This method is retained for T012
-    /// which will delete it along with `CoverageResult`. Callers must pass an
-    /// empty `valid_task_ids` set until T012 migration is complete.
-    ///
-    /// # Returns
-    ///
-    /// A `CoverageResult` with `covered=0` and `uncovered` listing all
-    /// enforced requirement texts, since no task_refs exist in T003+.
-    #[must_use]
-    pub fn evaluate_coverage(&self, valid_task_ids: &HashSet<TaskId>) -> CoverageResult {
-        let _ = valid_task_ids; // task_refs removed; parameter kept for API compat until T012
-        let uncovered: Vec<String> = self
-            .scope
-            .in_scope
-            .iter()
-            .chain(self.acceptance_criteria.iter())
-            .map(|req| req.text.clone())
-            .collect();
-        CoverageResult::new(0, uncovered, vec![])
-    }
-
-    /// Validates referential integrity of task_refs across ALL sections.
-    ///
-    /// NOTE: `task_refs` removed in T003; this method always returns empty
-    /// until T012 removes it.
-    #[must_use]
-    pub fn validate_all_task_refs(&self, _valid_task_ids: &HashSet<TaskId>) -> Vec<String> {
-        vec![]
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -457,58 +424,6 @@ pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify
 }
 
 // ---------------------------------------------------------------------------
-// Coverage evaluation (retained for T012 — do not delete here)
-// ---------------------------------------------------------------------------
-
-/// Result of evaluating requirement-to-task coverage.
-///
-/// Produced by `SpecDocument::evaluate_coverage()`.
-/// Retained for T012 which will delete it along with the evaluate_coverage method.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CoverageResult {
-    covered: u32,
-    uncovered: Vec<String>,
-    invalid_refs: Vec<String>,
-}
-
-impl CoverageResult {
-    /// Creates a new coverage result.
-    #[must_use]
-    pub fn new(covered: u32, uncovered: Vec<String>, invalid_refs: Vec<String>) -> Self {
-        Self { covered, uncovered, invalid_refs }
-    }
-
-    /// Returns the count of requirements that have at least one task_ref.
-    #[must_use]
-    pub fn covered(&self) -> u32 {
-        self.covered
-    }
-
-    /// Returns the texts of requirements missing task_refs (in_scope + acceptance_criteria only).
-    #[must_use]
-    pub fn uncovered(&self) -> &[String] {
-        &self.uncovered
-    }
-
-    /// Returns task_ref IDs that do not exist in the provided task set.
-    #[must_use]
-    pub fn invalid_refs(&self) -> &[String] {
-        &self.invalid_refs
-    }
-
-    /// Returns `true` if all evaluable requirements are covered and no invalid refs exist.
-    #[must_use]
-    pub fn is_fully_covered(&self) -> bool {
-        self.uncovered.is_empty() && self.invalid_refs.is_empty()
-    }
-
-    /// Returns the total number of evaluable requirements.
-    #[must_use]
-    pub fn total(&self) -> u32 {
-        self.covered + self.uncovered.len() as u32
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Hearing record types (TSUMIKI-07)
 // ---------------------------------------------------------------------------
@@ -975,25 +890,6 @@ mod tests {
         )
         .unwrap();
         assert_eq!(doc.related_conventions().len(), 1);
-    }
-
-    // --- CoverageResult ---
-
-    #[test]
-    fn test_coverage_result_accessors() {
-        let result = CoverageResult::new(3, vec!["uncov".into()], vec!["T999".into()]);
-        assert_eq!(result.covered(), 3);
-        assert_eq!(result.uncovered(), &["uncov"]);
-        assert_eq!(result.invalid_refs(), &["T999"]);
-        assert!(!result.is_fully_covered());
-        assert_eq!(result.total(), 4);
-    }
-
-    #[test]
-    fn test_coverage_result_fully_covered() {
-        let result = CoverageResult::new(5, vec![], vec![]);
-        assert!(result.is_fully_covered());
-        assert_eq!(result.total(), 5);
     }
 
     // --- HearingRecord ---

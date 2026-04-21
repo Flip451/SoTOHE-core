@@ -26,7 +26,7 @@
 | SpecRequirement | value_object | modify | — | 🔵 |
 | TrackMetadata | value_object | modify | — | 🔵 |
 | TypeCatalogueEntry | value_object | modify | — | 🔵 |
-| CoverageResult | value_object | delete | — | 🟡 |
+| CoverageResult | value_object | delete | — | 🔵 |
 
 ## Error Types
 

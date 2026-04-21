@@ -532,28 +532,6 @@ description = "[internal] Verify latest track has spec.md, plan.md, and verifica
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify latest-track']
 
-[tasks.verify-spec-coverage-local]
-private = true
-description = "[internal] Verify spec requirement-to-task coverage (branch-bound track resolution)"
-script_runner = "@shell"
-script = ['''
-BRANCH=$(git branch --show-current 2>/dev/null || true)
-case "$BRANCH" in
-  track/*)
-    TRACK_ID="${BRANCH#track/}"
-    TRACK_DIR="track/items/$TRACK_ID"
-    if [ -d "$TRACK_DIR" ]; then
-      cargo run --quiet -p cli -- verify spec-coverage --track-dir "$TRACK_DIR"
-    else
-      echo "[SKIP] Track dir not found: $TRACK_DIR"
-    fi
-    ;;
-  *)
-    echo "[SKIP] Not on a track branch (branch: ${BRANCH:-detached})"
-    ;;
-esac
-''']
-
 [tasks.verify-plan-artifact-refs-local]
 private = true
 description = "[internal] Verify plan artifact refs + task-coverage integrity (branch-bound track resolution)"
@@ -620,7 +598,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -628,7 +606,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -776,11 +754,6 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 description = "[gate] Verify latest track files (host, no docker; uses bash/find only)"
 command = "cargo"
 args = ["make", "--allow-private", "verify-latest-track-local"]
-
-[tasks.verify-spec-coverage]
-description = "[gate] Verify spec requirement-to-task coverage (host, no docker)"
-command = "cargo"
-args = ["make", "--allow-private", "verify-spec-coverage-local"]
 
 [tasks.verify-plan-artifact-refs]
 description = "[gate] Verify plan artifact refs + task-coverage integrity (docker compose)"

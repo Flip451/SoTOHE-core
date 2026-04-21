@@ -1,6 +1,583 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:04:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:45:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Schema 4 tracks cannot be activated: T005 now writes identity-only metadata with schema_version 4, and execute_activate passes that DocumentMeta schema_version into ActivateTrackUseCase, but this guard still rejects anything other than 3 before materializing the branch. New branchless schema 4 tracks will fail /track:activate with TrackActivationRequiresSchemaV3 even though schema 4 is the new metadata shape.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_activation.rs",
+              "line": 46,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:48:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ActivateTrackUseCase::execute` still rejects every schema version except 3, but T005 now writes identity-only metadata as schema_version 4. A newly created branchless v4 track that is otherwise planned will fail activation with `TrackActivationRequiresSchemaV3`, so the non-task activation path is broken by this update.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_activation.rs",
+              "line": 46,
+              "category": null
+            },
+            {
+              "message": "Clearing an override always writes `TrackStatus::Planned`. Because T005 makes track status an explicitly persisted field, clearing a blocked/cancelled override on an active or done track rewrites the stored workflow status to planned instead of restoring or preserving the underlying status, corrupting the track phase for non-task override flows.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 197,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:50:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new transition/add-task path performs a separate `find` / `load_impl_plan` / `save_impl_plan` read-modify-write without the per-track lock that `TrackWriter::update` used to provide. Two concurrent `track-add-task` or `track-transition` calls can read the same snapshot, compute the same next `TaskId`, and then the last save wins, dropping one update. This is a data-loss regression and needs a serialized update boundary around the impl-plan mutation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 100,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6ecd6db28f4028ab6674601372ed56e9d27c214cf4243b6b32d3c5b3a453c260",
+          "at": "2026-04-21T03:41:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
+          "at": "2026-04-21T03:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a `track/` branch, `BlobFetchResult::NotFound` means the PR head does not contain `impl-plan.json`; `plan/` branches already short-circuit before this point. Returning `VerifyOutcome::pass()` here fail-opens the merge-time task-completion gate when there is no implementation plan to inspect, even though final merge requires `impl-plan.json` task state to be present and resolved.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_completion.rs",
+              "line": 65,
+              "category": "merge-gate"
+            },
+            {
+              "message": "An empty `ImplPlanDocument` is accepted because `all_tasks_resolved()` is vacuously true, so a PR can pass the merge task-completion gate with `impl-plan.json` present but containing zero tasks. The workflow requirement explicitly blocks empty task sets to avoid this nullable bypass; this use case needs to reject `impl_plan.tasks().is_empty()` before returning pass.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_completion.rs",
+              "line": 77,
+              "category": "merge-gate"
+            },
+            {
+              "message": "The branchless implementation-transition guard still only rejects `schema_version == 3`. New identity-only tracks are saved as schema version 4 and activation was updated to accept v4, so a branchless v4 planned track can run an implementation transition (`in_progress`, `done`, or `skipped`) without going through activation or materializing a track branch.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_resolution.rs",
+              "line": 139,
+              "category": "activation-guard"
+            },
+            {
+              "message": "`execute_by_status` mutates and saves only `impl-plan.json`, then returns the `TrackMetadata` read before the transition. Since `metadata.json` still carries the explicit persisted track status and no other task-transition path updates it, moving tasks to `in_progress` or `done` leaves `metadata.status` stuck at its old value, so resolve/registry/CLI status consumers continue to treat the track as planned after task state changed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 169,
+              "category": "state-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
+          "at": "2026-04-21T03:55:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase::execute` never re-derives or persists `TrackMetadata.status` after appending a new Todo task. If the track was previously `Done`, `metadata.json` stays `done` even though `impl-plan.json` now contains unresolved work, so `resolve_phase()`/CLI status reporting will keep treating the track as ready to ship.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 283,
+              "category": "correctness"
+            },
+            {
+              "message": "The transition paths write `impl-plan.json` first and then perform a second `metadata.json` update. If that second write fails, the task transition is already committed but the use case returns an error, leaving the two persisted documents out of sync and making retries non-idempotent. The same pattern exists in both `execute` and `execute_by_status`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase` mutates `impl-plan.json` but never re-syncs `TrackMetadata.status` after inserting a new task. That leaves the persisted metadata and the returned `TrackMetadata` stale for any track that was already `Done` or otherwise not `Planned`: adding a new `Todo` task will still report the old phase, so CLI output and stored metadata can become inconsistent with the updated task list.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:07:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AddTaskUseCase::execute persists `impl-plan.json` but never re-derives or writes `metadata.status`. Adding a task to a completed or in-progress track leaves `metadata.json` stale, so later phase checks and CLI output keep reporting the old status even though the track now has an unresolved task.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 278,
+              "category": "correctness"
+            },
+            {
+              "message": "TransitionTaskUseCase::execute and execute_by_status now save `impl-plan.json` and then update `metadata.json` in a second step. If the metadata update fails after the plan save succeeds, the method returns an error but the repository is left half-updated (impl-plan changed, metadata stale), which reintroduces a data-consistency failure mode the old single-write path avoided.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:11:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase` persists the new `impl-plan.json` entry but never re-derives or writes back `metadata.json.status`. Adding a Todo task to a completed track can therefore leave the track marked `done` even though the aggregate is no longer fully resolved.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 284,
+              "category": "correctness"
+            },
+            {
+              "message": "Both transition paths save `impl-plan.json` before syncing `metadata.json`. If the later `TrackWriter::update` fails, the method returns an error after already mutating the plan, leaving `impl-plan.json` and `metadata.json` out of sync.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_impl_plan` only promotes a track to `InProgress` when a task is already `InProgress`. That leaves partially completed plans with only `done` + `todo` tasks classified as `Planned`, so the transition/add-task use cases can write back the wrong phase and `track_phase` will report Planning even though work is still open. The sync should treat any unresolved task mix as `InProgress`, not just explicit in-progress tasks.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:23:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:26:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The read-only sandbox prevents me from inspecting `tmp/reviewer-runtime/briefing-usecase.md` or running `git diff`, so I cannot perform an evidence-based review in this environment.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "environment"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:26:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_impl_plan` classifies a mixed plan such as `[done, todo]` as `Planned` because it only returns `InProgress` when a task is explicitly `InProgress`, and otherwise falls through unless all tasks are resolved. That regresses the previous track-status semantics where any non-empty plan with some progress but unresolved work is active; after completing one task in a multi-task track, the use case can write `metadata.status = planned`, causing phase/status consumers to misreport active implementation work.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:28:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
+          "at": "2026-04-21T04:46:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
+          "at": "2026-04-21T04:48:36Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::render_track_views` would move Markdown/view rendering and file I/O into the usecase layer, which is the wrong boundary for this repository's hexagonal split. The validation step can be shared, but the render pipeline should stay infrastructure-owned; otherwise this TODO would invert the dependency direction instead of just extracting the stale-signal check.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:95d0c68702d8fa4626d6c868b51bac1f460775f0126a396badf0d3abad9c59c1",
+          "at": "2026-04-20T09:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new parenthetical still says the workflow's actual Markdown generation and file write happen \"via infra port\", which is inconsistent with the pure-orchestrator boundary described here and with the existing `contract_map_workflow.rs` pattern. As written, it can mislead implementers into reintroducing the same layer-boundary leak this TODO is trying to remove.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2274103460420d28d54a43cc111c0034f7aa5e00312795467d752db7794a17ed",
+          "at": "2026-04-20T09:07:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:09:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:10:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` now says the default profile assigns `adr-editor` to Claude Code, but the sample profiles in this change only define `orchestrator`, `spec-designer`, `impl-planner`, `type-designer`, `implementer`, `reviewer`, and `researcher`. That leaves the workflow pointing at a capability users cannot select from the documented profiles, so the ADR back-and-forth path is unusable as written.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 40,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
+          "at": "2026-04-20T14:30:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor` is referenced by the new workflow, but this source-of-truth capability map never defines it. On a red Phase 1 signal the orchestrator will try to re-invoke `adr-editor`, and capability resolution will fail before the ADR edit loop can start. The same omission also exists in the three sample profile files.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while many existing docs still point at `.claude/skills/track-plan/SKILL.md`. That turns the documented skill path into a dead link and breaks any workflow that still relies on the skill loader instead of the new command docs.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 1,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
+          "at": "2026-04-20T14:33:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b571d7db40a6245e2d0958e9264a8cc4877622e2a7ba7b88c7f77267b1dc39e5",
+          "at": "2026-04-20T14:38:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:43:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new phased workflow says `/track:plan` now orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. Those are incompatible contracts for the canonical planning command, so agents following this user-facing workflow can execute the obsolete artifact flow instead of the new phased one.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 33,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while live guidance still references `track-plan` as a skill workflow. That turns the documented skill path into a dead link and breaks any workflow that relies on skill discovery instead of only the command docs.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 1,
+              "category": "correctness"
+            },
+            {
+              "message": "The new phased workflow says `/track:plan` orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. These are incompatible contracts for the canonical planning command, so agents can follow the obsolete artifact flow instead of the new phased one.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 33,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:51:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:551d8d1d524282f305fdba449f7fdfe17fcdc4acdc3debde02b821f2bc42c7a9",
+          "at": "2026-04-20T14:55:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
+          "at": "2026-04-20T16:30:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
+          "at": "2026-04-20T16:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bb65cb63ee9e51afe8e55ec9f5cce2ebb95aa22922fb62c32d8a5c934701e03",
+          "at": "2026-04-21T06:57:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The design doc still lists `CC-SDD-02: SpecStatus enum + content hash auto-demotion` as an active key design decision, even though this change removes the spec approval/content-hash gate and the detailed section describing it. Leaving this row makes `knowledge/DESIGN.md` internally inconsistent and preserves the obsolete approval model as current design guidance.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 67,
+              "category": "docs-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:0bb65cb63ee9e51afe8e55ec9f5cce2ebb95aa22922fb62c32d8a5c934701e03",
+          "at": "2026-04-21T06:58:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ad5ef97c5d9904f7ffa814543405b35d6e568cc9aaad7c0571feac4f9a4f40e",
+          "at": "2026-04-21T06:59:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ad5ef97c5d9904f7ffa814543405b35d6e568cc9aaad7c0571feac4f9a4f40e",
+          "at": "2026-04-21T07:00:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This branch gate now short-circuits unless the checkout is `track/*`, and it downgrades a missing `track/items/$TRACK_ID` directory to `[SKIP]`. That is a behavioral regression: `plan/*` checkouts will never run the verifier, and a malformed `track/*`/`plan/*` branch with no backing track directory will pass instead of failing closed. The task should let the verifier resolve both branch types and surface the missing-directory error.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 562,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3bfe215aa54683f92500b3fe6b72edc9e1fccaf0b1186946b726f23fc32e6898",
+          "at": "2026-04-21T09:29:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `verify-plan-artifact-refs` task is wired as a host-side `cargo make` wrapper instead of the Docker-compose wrapper called for in the design, so `cargo make verify-plan-artifact-refs` bypasses the sandboxed container path and cache-dir setup used by the other gate tasks.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 774,
+              "category": "architecture"
+            },
+            {
+              "message": "If the branch matches `track/*` but `track/items/<id>` is missing, the task prints `[SKIP]` and exits successfully. That turns a broken branch-to-track mapping into a pass instead of failing the new integrity check.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 567,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3bfe215aa54683f92500b3fe6b72edc9e1fccaf0b1186946b726f23fc32e6898",
+          "at": "2026-04-21T09:30:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify-plan-artifact-refs-local` only matches `track/*` branches, so it will never run on `plan/<id>` checkouts even though this Makefile explicitly supports plan branches via `track-plan-branch`. That leaves `cargo make ci` without this gate on planning-only review branches.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 564,
+              "category": "coverage"
+            },
+            {
+              "message": "If a `track/*` branch is present but `track/items/$TRACK_ID` is missing, the task prints `[SKIP]` and exits successfully. For a CI gate this should fail closed, otherwise a malformed or renamed track branch can bypass plan-artifact verification.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 567,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f2fb5c1fbe77a5f59b45655da5fe855171d1e10348b13d556940fcae32052023",
+          "at": "2026-04-21T09:32:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Restricting the local gate to `track/*` branches skips `plan/<id>` checkouts entirely, even though the verifier's active-track resolution already supports `plan/*` as valid context. That means `cargo make ci` will not run `verify-plan-artifact-refs` on planning-only review branches, leaving the new CI gate uncovered there; delegating branch resolution to the CLI would also avoid the manual `track/items/$TRACK_ID` reconstruction.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 563,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:23100821abe5536f07faa8de62e5e4672c398079d98be79426336f2d0c43708f",
+          "at": "2026-04-21T09:34:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:661baa315f277c5fa989855c537bc930d7f339dcea4b375dba9e65b6c3a48c9a",
+          "at": "2026-04-21T09:35:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a `plan/*` branch, a missing `track/items/<id>` directory is treated as a successful skip. That means `cargo make ci` can pass on a planning branch without running the new branch-bound verifier at all, even though the accepted no-op case is only for branches that are not `track/*` or `plan/*`. This should fail closed like the `track/*` case so broken plan branch to track directory resolution does not silently bypass artifact reference checks.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 580,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:661baa315f277c5fa989855c537bc930d7f339dcea4b375dba9e65b6c3a48c9a",
+          "at": "2026-04-21T09:37:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc955d72d0ddc59eb71b185395f9801762c58b15d6e244b965a77813fe730ab3",
+          "at": "2026-04-21T09:39:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01f592fc440c28fa3d66161e6ac89e5eade6ba012887a804dbfbf33561b4f572",
+          "at": "2026-04-21T12:27:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01f592fc440c28fa3d66161e6ac89e5eade6ba012887a804dbfbf33561b4f572",
+          "at": "2026-04-21T12:28:29Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -498,592 +1075,20 @@
           "findings": [],
           "hash": "rvw1:sha256:6524a45dc3e31847e12e8152cca8ff03a802cb370b0f9e29e7f90723d51f506d",
           "at": "2026-04-21T07:30:12Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
-          "at": "2026-04-20T17:03:19Z"
+          "hash": "rvw1:sha256:8b106d67566a6c3d1e75b99435669279a0e07b0947689590eef8724898aabc5a",
+          "at": "2026-04-21T12:27:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
-          "at": "2026-04-20T17:04:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
-          "at": "2026-04-21T00:45:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Schema 4 tracks cannot be activated: T005 now writes identity-only metadata with schema_version 4, and execute_activate passes that DocumentMeta schema_version into ActivateTrackUseCase, but this guard still rejects anything other than 3 before materializing the branch. New branchless schema 4 tracks will fail /track:activate with TrackActivationRequiresSchemaV3 even though schema 4 is the new metadata shape.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_activation.rs",
-              "line": 46,
-              "category": "behavioral_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
-          "at": "2026-04-21T00:48:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ActivateTrackUseCase::execute` still rejects every schema version except 3, but T005 now writes identity-only metadata as schema_version 4. A newly created branchless v4 track that is otherwise planned will fail activation with `TrackActivationRequiresSchemaV3`, so the non-task activation path is broken by this update.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_activation.rs",
-              "line": 46,
-              "category": null
-            },
-            {
-              "message": "Clearing an override always writes `TrackStatus::Planned`. Because T005 makes track status an explicitly persisted field, clearing a blocked/cancelled override on an active or done track rewrites the stored workflow status to planned instead of restoring or preserving the underlying status, corrupting the track phase for non-task override flows.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 197,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
-          "at": "2026-04-21T00:50:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new transition/add-task path performs a separate `find` / `load_impl_plan` / `save_impl_plan` read-modify-write without the per-track lock that `TrackWriter::update` used to provide. Two concurrent `track-add-task` or `track-transition` calls can read the same snapshot, compute the same next `TaskId`, and then the last save wins, dropping one update. This is a data-loss regression and needs a serialized update boundary around the impl-plan mutation.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 100,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6ecd6db28f4028ab6674601372ed56e9d27c214cf4243b6b32d3c5b3a453c260",
-          "at": "2026-04-21T03:41:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
-          "at": "2026-04-21T03:52:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On a `track/` branch, `BlobFetchResult::NotFound` means the PR head does not contain `impl-plan.json`; `plan/` branches already short-circuit before this point. Returning `VerifyOutcome::pass()` here fail-opens the merge-time task-completion gate when there is no implementation plan to inspect, even though final merge requires `impl-plan.json` task state to be present and resolved.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_completion.rs",
-              "line": 65,
-              "category": "merge-gate"
-            },
-            {
-              "message": "An empty `ImplPlanDocument` is accepted because `all_tasks_resolved()` is vacuously true, so a PR can pass the merge task-completion gate with `impl-plan.json` present but containing zero tasks. The workflow requirement explicitly blocks empty task sets to avoid this nullable bypass; this use case needs to reject `impl_plan.tasks().is_empty()` before returning pass.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_completion.rs",
-              "line": 77,
-              "category": "merge-gate"
-            },
-            {
-              "message": "The branchless implementation-transition guard still only rejects `schema_version == 3`. New identity-only tracks are saved as schema version 4 and activation was updated to accept v4, so a branchless v4 planned track can run an implementation transition (`in_progress`, `done`, or `skipped`) without going through activation or materializing a track branch.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_resolution.rs",
-              "line": 139,
-              "category": "activation-guard"
-            },
-            {
-              "message": "`execute_by_status` mutates and saves only `impl-plan.json`, then returns the `TrackMetadata` read before the transition. Since `metadata.json` still carries the explicit persisted track status and no other task-transition path updates it, moving tasks to `in_progress` or `done` leaves `metadata.status` stuck at its old value, so resolve/registry/CLI status consumers continue to treat the track as planned after task state changed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 169,
-              "category": "state-consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
-          "at": "2026-04-21T03:55:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AddTaskUseCase::execute` never re-derives or persists `TrackMetadata.status` after appending a new Todo task. If the track was previously `Done`, `metadata.json` stays `done` even though `impl-plan.json` now contains unresolved work, so `resolve_phase()`/CLI status reporting will keep treating the track as ready to ship.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 283,
-              "category": "correctness"
-            },
-            {
-              "message": "The transition paths write `impl-plan.json` first and then perform a second `metadata.json` update. If that second write fails, the task transition is already committed but the use case returns an error, leaving the two persisted documents out of sync and making retries non-idempotent. The same pattern exists in both `execute` and `execute_by_status`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:04:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AddTaskUseCase` mutates `impl-plan.json` but never re-syncs `TrackMetadata.status` after inserting a new task. That leaves the persisted metadata and the returned `TrackMetadata` stale for any track that was already `Done` or otherwise not `Planned`: adding a new `Todo` task will still report the old phase, so CLI output and stored metadata can become inconsistent with the updated task list.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:07:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AddTaskUseCase::execute persists `impl-plan.json` but never re-derives or writes `metadata.status`. Adding a task to a completed or in-progress track leaves `metadata.json` stale, so later phase checks and CLI output keep reporting the old status even though the track now has an unresolved task.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 278,
-              "category": "correctness"
-            },
-            {
-              "message": "TransitionTaskUseCase::execute and execute_by_status now save `impl-plan.json` and then update `metadata.json` in a second step. If the metadata update fails after the plan save succeeds, the method returns an error but the repository is left half-updated (impl-plan changed, metadata stale), which reintroduces a data-consistency failure mode the old single-write path avoided.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:11:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AddTaskUseCase` persists the new `impl-plan.json` entry but never re-derives or writes back `metadata.json.status`. Adding a Todo task to a completed track can therefore leave the track marked `done` even though the aggregate is no longer fully resolved.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 284,
-              "category": "correctness"
-            },
-            {
-              "message": "Both transition paths save `impl-plan.json` before syncing `metadata.json`. If the later `TrackWriter::update` fails, the method returns an error after already mutating the plan, leaving `impl-plan.json` and `metadata.json` out of sync.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:15:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_track_status_from_impl_plan` only promotes a track to `InProgress` when a task is already `InProgress`. That leaves partially completed plans with only `done` + `todo` tasks classified as `Planned`, so the transition/add-task use cases can write back the wrong phase and `track_phase` will report Planning even though work is still open. The sync should treat any unresolved task mix as `InProgress`, not just explicit in-progress tasks.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 72,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:23:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:26:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The read-only sandbox prevents me from inspecting `tmp/reviewer-runtime/briefing-usecase.md` or running `git diff`, so I cannot perform an evidence-based review in this environment.",
-              "severity": "P1",
-              "file": null,
-              "line": null,
-              "category": "environment"
-            }
-          ],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:26:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_track_status_from_impl_plan` classifies a mixed plan such as `[done, todo]` as `Planned` because it only returns `InProgress` when a task is explicitly `InProgress`, and otherwise falls through unless all tasks are resolved. That regresses the previous track-status semantics where any non-empty plan with some progress but unresolved work is active; after completing one task in a multi-task track, the use case can write `metadata.status = planned`, causing phase/status consumers to misreport active implementation work.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 72,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:28:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
-          "at": "2026-04-21T04:46:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
-          "at": "2026-04-21T04:48:36Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
-          "at": "2026-04-20T16:31:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
-          "at": "2026-04-20T16:33:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
-          "at": "2026-04-20T17:04:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`convention_refs` should not participate in phase-1 signal evaluation per ADR 2026-04-19-1242 §D3.1. As written, a requirement with only `convention_refs` is classified as Blue, which suppresses the Red finding that `check_spec_doc_signals()` is meant to surface for missing ADR grounding.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec.rs",
-              "line": 384,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
-          "at": "2026-04-20T18:09:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`convention_refs` are treated as a Blue signal here, but ADR 2026-04-19-1242 D3.1 says the spec signal must depend only on `adr_refs` and `informal_grounds`; `convention_refs` are excluded. As written, a requirement with only convention refs will be classified as Blue instead of Red, which weakens the gate.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec.rs",
-              "line": 384,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
-          "at": "2026-04-20T18:11:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_spec_doc_signals()` tells callers to upgrade Yellow by referencing either `adr_refs[]` or `convention_refs[]`, but convention refs are explicitly outside signal evaluation and do not change a requirement from Yellow to Blue. A requirement with only convention refs still evaluates Red, so this guidance is functionally wrong and will mislead users of the gate output.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec.rs",
-              "line": 447,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:97d34f43ea2cddeb065b926d5b8fb741fd82ba42b61140d1d49d8004c30e7332",
-          "at": "2026-04-20T18:16:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
-          "at": "2026-04-20T18:17:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
-          "at": "2026-04-20T18:18:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TaskCoverageDocument::new` only checks for duplicate `SpecElementId` keys across sections; it never rejects duplicate `TaskId` entries inside a single element’s `Vec<TaskId>`, even though this type advertises that as an enforced invariant. That means callers can still construct coverage documents in an illegal state, and the codec will accept that state unchanged.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_coverage.rs",
-              "line": 44,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9bda27ed9d4212dcb6c335a252688220f323dd75743bc92242f6ee168e844b42",
-          "at": "2026-04-20T23:16:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
-          "at": "2026-04-20T23:18:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
-          "at": "2026-04-20T23:20:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackMetadata::with_branch` now only validates the title; it no longer checks that a provided branch matches the track id, and `set_branch` can later introduce the same mismatch. That allows persisted states like `id = my-track` with `branch = track/other-track`, which violates the branch-id consistency required by the new identity-only metadata model and can misroute branch-based readers/activation logic.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/track.rs",
-              "line": 300,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:9b07da54fc4423102751c166ded489b8277a7972f4883a15bd03700065d2d706",
-          "at": "2026-04-21T00:45:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`set_branch` bypasses the new branch/id invariant enforced in `TrackMetadata::with_branch`. A caller can mutate an already-validated track into a mismatched `track/<other>` branch, and `ActivateTrackUseCase` uses this setter directly, so the domain can persist an invalid branch/id pair without any error.",
-              "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 337,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:168ba683894d8aa7326203724f818ce860eb0bdd7615f5e49ff0a2c42c3ec9f2",
-          "at": "2026-04-21T00:50:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackMetadata` no longer enforces coherence between `status` and `status_override`. `new`/`with_branch` accept any combination, and `set_status`/`set_status_override` can mutate a track into `status = Planned` while keeping a blocked/cancelled override. `resolve_phase()` only consults `status`, so the override is then silently ignored and the track is misclassified. The previous implementation prevented impossible states here.",
-              "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 307,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3a5efea3b1688def811484ea70d487b7b3ea9eab26a2d872cd5d91bda5c7800c",
-          "at": "2026-04-21T00:55:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`add_task` is not fail-safe: it appends the new task before validating the target section, and it `mem::take`s `self.plan` before the same validation. Any `SectionNotFound`/`NoSectionsAvailable` error leaves the aggregate mutated and the plan dropped, so a failed call corrupts in-memory state.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
-              "line": 173,
-              "category": "safety"
-            },
-            {
-              "message": "`next_num + 1` overflows when the highest existing task suffix is `u64::MAX`. That is a reachable `TaskId` value, so `add_task` can panic in debug builds or wrap to a duplicate `T000` in release builds.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
-              "line": 168,
-              "category": "safety"
-            },
-            {
-              "message": "`resolve_transition` only looks at `TaskStatusKind::Done`, so it cannot distinguish `DonePending` from `DoneTraced`. A traced task given target `done` plus a commit hash is mapped to `BackfillHash` and then rejected by `TrackTask::transition`, instead of being classified as an unsupported target.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
-              "line": 239,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
-          "at": "2026-04-21T03:41:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`add_task` mutates `self.tasks` and `self.plan` before validating `section_id`. If the section is missing or there are no sections, the method returns an error after the new task has already been pushed and `mem::take(&mut self.plan)` has already cleared the plan, leaving the document corrupted on a recoverable error.",
-              "severity": "P0",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 173,
-              "category": "correctness"
-            },
-            {
-              "message": "The next task ID is computed with `+ 1` on the maximum numeric suffix. When the highest existing task is `T18446744073709551615`, this overflows and panics in library code instead of returning a validation error, regressing the previous checked-add behavior.",
-              "severity": "P0",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 169,
-              "category": "panic"
-            },
-            {
-              "message": "`next_open_task` now scans `self.tasks` in storage order and returns the first Todo/InProgress task it encounters. The previous implementation walked plan order and preferred InProgress over Todo, so a task list that is not aligned with the plan can now report the wrong \"next\" task.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 80,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
-          "at": "2026-04-21T03:44:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`apply_transition_by_status` collapses `DonePending` and `DoneTraced` into `TaskStatusKind::Done` before resolving `done`. That means a `done` request with a commit hash is always mapped to `BackfillHash`, which `TrackTask::transition` rejects for already-traced tasks. The status-based API therefore cannot distinguish the two done states and fails on an already-traced task instead of choosing the correct transition.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 148,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:76e182d450f25d2ef8a454702a1c4dfcd4d726872a4fdfac148cc670d4968420",
-          "at": "2026-04-21T03:51:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_phase` and `resolve_phase_from_record` still treat only `schema_version == 3` as branchless/activatable. That means v4 identity-only tracks are classified as `Planning` and the CLI will suggest `/track:implement` instead of `/track:activate`, even though the activation use case already accepts schema v4.",
-              "severity": "P1",
-              "file": "libs/domain/src/track_phase.rs",
-              "line": 82,
-              "category": "correctness"
-            },
-            {
-              "message": "`next_open_task` looks for any `InProgress` task using `self.tasks.iter().find(...)`, so the chosen task depends on storage order rather than plan order. If more than one task is open, `track next-task` can return a later task instead of the earliest one in the plan, which contradicts the method's own ordering contract.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 84,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:22c223c1b32f8b54b8167f40e8b26f076509c5f09db66a357ec04f750b28b7d1",
-          "at": "2026-04-21T03:56:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PlanSection` is used in `add_task` but never imported into this module, so the new `ImplPlanDocument::add_task` implementation does not compile.",
-              "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 245,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
-          "at": "2026-04-21T04:05:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`add_task` now maps task-id overflow to `ValidationError::DuplicateTaskId(\"task id counter overflow\")`. That is the wrong error class for an arithmetic overflow and is a behavioral regression from the previous `InvalidTaskId` boundary handling, so callers can no longer distinguish overflow from a real duplicate-id case.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 203,
-              "category": "validation"
-            },
-            {
-              "message": "`with_refs` stores `spec_refs` verbatim and never checks whether the same `SpecRef.anchor` appears more than once in a single catalogue entry. That leaves the new structured-ref model able to encode duplicate `SpecElementId` citations without any domain validation, which is the invariant the briefing calls out as needing a new error path.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 490,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
-          "at": "2026-04-21T04:10:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`all_tasks_resolved()` is vacuously true for an empty `ImplPlanDocument`, so a zero-task `impl-plan.json` is treated as fully complete by downstream checks. That lets an empty implementation-plan file satisfy the completion gate instead of being rejected as missing/incomplete work.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 68,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:19226f4e039523bca95924b238af6bdc0ef04d76488e6e2538fe3daf52365823",
-          "at": "2026-04-21T04:15:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
-          "at": "2026-04-21T04:25:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
-          "at": "2026-04-21T04:29:01Z"
+          "hash": "rvw1:sha256:8b106d67566a6c3d1e75b99435669279a0e07b0947689590eef8724898aabc5a",
+          "at": "2026-04-21T12:28:18Z"
         }
       ]
     },
@@ -3161,302 +3166,20 @@
           "findings": [],
           "hash": "rvw1:sha256:f01815579ddb64a2bd70b1ac28db991a241159d4eb8c240b90bb59f441042497",
           "at": "2026-04-21T12:09:45Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::render_track_views` would move Markdown/view rendering and file I/O into the usecase layer, which is the wrong boundary for this repository's hexagonal split. The validation step can be shared, but the render pipeline should stay infrastructure-owned; otherwise this TODO would invert the dependency direction instead of just extracting the stale-signal check.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 856,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:95d0c68702d8fa4626d6c868b51bac1f460775f0126a396badf0d3abad9c59c1",
-          "at": "2026-04-20T09:03:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new parenthetical still says the workflow's actual Markdown generation and file write happen \"via infra port\", which is inconsistent with the pure-orchestrator boundary described here and with the existing `contract_map_workflow.rs` pattern. As written, it can mislead implementers into reintroducing the same layer-boundary leak this TODO is trying to remove.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 856,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:2274103460420d28d54a43cc111c0034f7aa5e00312795467d752db7794a17ed",
-          "at": "2026-04-20T09:07:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
-          "at": "2026-04-20T09:09:20Z"
+          "hash": "rvw1:sha256:b1032ae1ac2510da9b09dc82dbcee075a7c7f1fd1d26b85801bfcdf74b0bebe5",
+          "at": "2026-04-21T12:27:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
-          "at": "2026-04-20T09:10:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/workflow.md` now says the default profile assigns `adr-editor` to Claude Code, but the sample profiles in this change only define `orchestrator`, `spec-designer`, `impl-planner`, `type-designer`, `implementer`, `reviewer`, and `researcher`. That leaves the workflow pointing at a capability users cannot select from the documented profiles, so the ADR back-and-forth path is unusable as written.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 40,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
-          "at": "2026-04-20T14:30:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr-editor` is referenced by the new workflow, but this source-of-truth capability map never defines it. On a red Phase 1 signal the orchestrator will try to re-invoke `adr-editor`, and capability resolution will fail before the ADR edit loop can start. The same omission also exists in the three sample profile files.",
-              "severity": "P1",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 14,
-              "category": "correctness"
-            },
-            {
-              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while many existing docs still point at `.claude/skills/track-plan/SKILL.md`. That turns the documented skill path into a dead link and breaks any workflow that still relies on the skill loader instead of the new command docs.",
-              "severity": "P1",
-              "file": ".claude/skills/track-plan/SKILL.md",
-              "line": 1,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
-          "at": "2026-04-20T14:33:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b571d7db40a6245e2d0958e9264a8cc4877622e2a7ba7b88c7f77267b1dc39e5",
-          "at": "2026-04-20T14:38:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
-          "at": "2026-04-20T14:43:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new phased workflow says `/track:plan` now orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. Those are incompatible contracts for the canonical planning command, so agents following this user-facing workflow can execute the obsolete artifact flow instead of the new phased one.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 33,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
-          "at": "2026-04-20T14:45:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while live guidance still references `track-plan` as a skill workflow. That turns the documented skill path into a dead link and breaks any workflow that relies on skill discovery instead of only the command docs.",
-              "severity": "P1",
-              "file": ".claude/skills/track-plan/SKILL.md",
-              "line": 1,
-              "category": "correctness"
-            },
-            {
-              "message": "The new phased workflow says `/track:plan` orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. These are incompatible contracts for the canonical planning command, so agents can follow the obsolete artifact flow instead of the new phased one.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 33,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
-          "at": "2026-04-20T14:51:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:551d8d1d524282f305fdba449f7fdfe17fcdc4acdc3debde02b821f2bc42c7a9",
-          "at": "2026-04-20T14:55:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
-          "at": "2026-04-20T16:30:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
-          "at": "2026-04-20T16:31:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0bb65cb63ee9e51afe8e55ec9f5cce2ebb95aa22922fb62c32d8a5c934701e03",
-          "at": "2026-04-21T06:57:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The design doc still lists `CC-SDD-02: SpecStatus enum + content hash auto-demotion` as an active key design decision, even though this change removes the spec approval/content-hash gate and the detailed section describing it. Leaving this row makes `knowledge/DESIGN.md` internally inconsistent and preserves the obsolete approval model as current design guidance.",
-              "severity": "P1",
-              "file": "knowledge/DESIGN.md",
-              "line": 67,
-              "category": "docs-consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:0bb65cb63ee9e51afe8e55ec9f5cce2ebb95aa22922fb62c32d8a5c934701e03",
-          "at": "2026-04-21T06:58:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ad5ef97c5d9904f7ffa814543405b35d6e568cc9aaad7c0571feac4f9a4f40e",
-          "at": "2026-04-21T06:59:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ad5ef97c5d9904f7ffa814543405b35d6e568cc9aaad7c0571feac4f9a4f40e",
-          "at": "2026-04-21T07:00:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This branch gate now short-circuits unless the checkout is `track/*`, and it downgrades a missing `track/items/$TRACK_ID` directory to `[SKIP]`. That is a behavioral regression: `plan/*` checkouts will never run the verifier, and a malformed `track/*`/`plan/*` branch with no backing track directory will pass instead of failing closed. The task should let the verifier resolve both branch types and surface the missing-directory error.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 562,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3bfe215aa54683f92500b3fe6b72edc9e1fccaf0b1186946b726f23fc32e6898",
-          "at": "2026-04-21T09:29:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public `verify-plan-artifact-refs` task is wired as a host-side `cargo make` wrapper instead of the Docker-compose wrapper called for in the design, so `cargo make verify-plan-artifact-refs` bypasses the sandboxed container path and cache-dir setup used by the other gate tasks.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 774,
-              "category": "architecture"
-            },
-            {
-              "message": "If the branch matches `track/*` but `track/items/<id>` is missing, the task prints `[SKIP]` and exits successfully. That turns a broken branch-to-track mapping into a pass instead of failing the new integrity check.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 567,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3bfe215aa54683f92500b3fe6b72edc9e1fccaf0b1186946b726f23fc32e6898",
-          "at": "2026-04-21T09:30:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify-plan-artifact-refs-local` only matches `track/*` branches, so it will never run on `plan/<id>` checkouts even though this Makefile explicitly supports plan branches via `track-plan-branch`. That leaves `cargo make ci` without this gate on planning-only review branches.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 564,
-              "category": "coverage"
-            },
-            {
-              "message": "If a `track/*` branch is present but `track/items/$TRACK_ID` is missing, the task prints `[SKIP]` and exits successfully. For a CI gate this should fail closed, otherwise a malformed or renamed track branch can bypass plan-artifact verification.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 567,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f2fb5c1fbe77a5f59b45655da5fe855171d1e10348b13d556940fcae32052023",
-          "at": "2026-04-21T09:32:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Restricting the local gate to `track/*` branches skips `plan/<id>` checkouts entirely, even though the verifier's active-track resolution already supports `plan/*` as valid context. That means `cargo make ci` will not run `verify-plan-artifact-refs` on planning-only review branches, leaving the new CI gate uncovered there; delegating branch resolution to the CLI would also avoid the manual `track/items/$TRACK_ID` reconstruction.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 563,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:23100821abe5536f07faa8de62e5e4672c398079d98be79426336f2d0c43708f",
-          "at": "2026-04-21T09:34:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:661baa315f277c5fa989855c537bc930d7f339dcea4b375dba9e65b6c3a48c9a",
-          "at": "2026-04-21T09:35:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On a `plan/*` branch, a missing `track/items/<id>` directory is treated as a successful skip. That means `cargo make ci` can pass on a planning branch without running the new branch-bound verifier at all, even though the accepted no-op case is only for branches that are not `track/*` or `plan/*`. This should fail closed like the `track/*` case so broken plan branch to track directory resolution does not silently bypass artifact reference checks.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 580,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:661baa315f277c5fa989855c537bc930d7f339dcea4b375dba9e65b6c3a48c9a",
-          "at": "2026-04-21T09:37:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc955d72d0ddc59eb71b185395f9801762c58b15d6e244b965a77813fe730ab3",
-          "at": "2026-04-21T09:39:04Z"
+          "hash": "rvw1:sha256:b1032ae1ac2510da9b09dc82dbcee075a7c7f1fd1d26b85801bfcdf74b0bebe5",
+          "at": "2026-04-21T12:28:30Z"
         }
       ]
     },
@@ -4158,6 +3881,368 @@
           "findings": [],
           "hash": "rvw1:sha256:e50902d6f40674b26e4aa4302582f067a04ed4b07cbf7940be5ba0396fccc1ed",
           "at": "2026-04-21T09:29:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a43c2d068cb200e233e4c0c0b09a14fe923a6798bd1f08e85772ee65e690f1d1",
+          "at": "2026-04-21T12:28:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a43c2d068cb200e233e4c0c0b09a14fe923a6798bd1f08e85772ee65e690f1d1",
+          "at": "2026-04-21T12:30:45Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
+          "at": "2026-04-20T16:31:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
+          "at": "2026-04-20T16:33:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T17:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`convention_refs` should not participate in phase-1 signal evaluation per ADR 2026-04-19-1242 §D3.1. As written, a requirement with only `convention_refs` is classified as Blue, which suppresses the Red finding that `check_spec_doc_signals()` is meant to surface for missing ADR grounding.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 384,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T18:09:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`convention_refs` are treated as a Blue signal here, but ADR 2026-04-19-1242 D3.1 says the spec signal must depend only on `adr_refs` and `informal_grounds`; `convention_refs` are excluded. As written, a requirement with only convention refs will be classified as Blue instead of Red, which weakens the gate.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 384,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T18:11:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_spec_doc_signals()` tells callers to upgrade Yellow by referencing either `adr_refs[]` or `convention_refs[]`, but convention refs are explicitly outside signal evaluation and do not change a requirement from Yellow to Blue. A requirement with only convention refs still evaluates Red, so this guidance is functionally wrong and will mislead users of the gate output.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 447,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97d34f43ea2cddeb065b926d5b8fb741fd82ba42b61140d1d49d8004c30e7332",
+          "at": "2026-04-20T18:16:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
+          "at": "2026-04-20T18:17:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
+          "at": "2026-04-20T18:18:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskCoverageDocument::new` only checks for duplicate `SpecElementId` keys across sections; it never rejects duplicate `TaskId` entries inside a single element’s `Vec<TaskId>`, even though this type advertises that as an enforced invariant. That means callers can still construct coverage documents in an illegal state, and the codec will accept that state unchanged.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_coverage.rs",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9bda27ed9d4212dcb6c335a252688220f323dd75743bc92242f6ee168e844b42",
+          "at": "2026-04-20T23:16:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
+          "at": "2026-04-20T23:18:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
+          "at": "2026-04-20T23:20:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackMetadata::with_branch` now only validates the title; it no longer checks that a provided branch matches the track id, and `set_branch` can later introduce the same mismatch. That allows persisted states like `id = my-track` with `branch = track/other-track`, which violates the branch-id consistency required by the new identity-only metadata model and can misroute branch-based readers/activation logic.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/track.rs",
+              "line": 300,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:9b07da54fc4423102751c166ded489b8277a7972f4883a15bd03700065d2d706",
+          "at": "2026-04-21T00:45:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set_branch` bypasses the new branch/id invariant enforced in `TrackMetadata::with_branch`. A caller can mutate an already-validated track into a mismatched `track/<other>` branch, and `ActivateTrackUseCase` uses this setter directly, so the domain can persist an invalid branch/id pair without any error.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 337,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:168ba683894d8aa7326203724f818ce860eb0bdd7615f5e49ff0a2c42c3ec9f2",
+          "at": "2026-04-21T00:50:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackMetadata` no longer enforces coherence between `status` and `status_override`. `new`/`with_branch` accept any combination, and `set_status`/`set_status_override` can mutate a track into `status = Planned` while keeping a blocked/cancelled override. `resolve_phase()` only consults `status`, so the override is then silently ignored and the track is misclassified. The previous implementation prevented impossible states here.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 307,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3a5efea3b1688def811484ea70d487b7b3ea9eab26a2d872cd5d91bda5c7800c",
+          "at": "2026-04-21T00:55:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` is not fail-safe: it appends the new task before validating the target section, and it `mem::take`s `self.plan` before the same validation. Any `SectionNotFound`/`NoSectionsAvailable` error leaves the aggregate mutated and the plan dropped, so a failed call corrupts in-memory state.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 173,
+              "category": "safety"
+            },
+            {
+              "message": "`next_num + 1` overflows when the highest existing task suffix is `u64::MAX`. That is a reachable `TaskId` value, so `add_task` can panic in debug builds or wrap to a duplicate `T000` in release builds.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 168,
+              "category": "safety"
+            },
+            {
+              "message": "`resolve_transition` only looks at `TaskStatusKind::Done`, so it cannot distinguish `DonePending` from `DoneTraced`. A traced task given target `done` plus a commit hash is mapped to `BackfillHash` and then rejected by `TrackTask::transition`, instead of being classified as an unsupported target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 239,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
+          "at": "2026-04-21T03:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` mutates `self.tasks` and `self.plan` before validating `section_id`. If the section is missing or there are no sections, the method returns an error after the new task has already been pushed and `mem::take(&mut self.plan)` has already cleared the plan, leaving the document corrupted on a recoverable error.",
+              "severity": "P0",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 173,
+              "category": "correctness"
+            },
+            {
+              "message": "The next task ID is computed with `+ 1` on the maximum numeric suffix. When the highest existing task is `T18446744073709551615`, this overflows and panics in library code instead of returning a validation error, regressing the previous checked-add behavior.",
+              "severity": "P0",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 169,
+              "category": "panic"
+            },
+            {
+              "message": "`next_open_task` now scans `self.tasks` in storage order and returns the first Todo/InProgress task it encounters. The previous implementation walked plan order and preferred InProgress over Todo, so a task list that is not aligned with the plan can now report the wrong \"next\" task.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 80,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
+          "at": "2026-04-21T03:44:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`apply_transition_by_status` collapses `DonePending` and `DoneTraced` into `TaskStatusKind::Done` before resolving `done`. That means a `done` request with a commit hash is always mapped to `BackfillHash`, which `TrackTask::transition` rejects for already-traced tasks. The status-based API therefore cannot distinguish the two done states and fails on an already-traced task instead of choosing the correct transition.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 148,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:76e182d450f25d2ef8a454702a1c4dfcd4d726872a4fdfac148cc670d4968420",
+          "at": "2026-04-21T03:51:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_phase` and `resolve_phase_from_record` still treat only `schema_version == 3` as branchless/activatable. That means v4 identity-only tracks are classified as `Planning` and the CLI will suggest `/track:implement` instead of `/track:activate`, even though the activation use case already accepts schema v4.",
+              "severity": "P1",
+              "file": "libs/domain/src/track_phase.rs",
+              "line": 82,
+              "category": "correctness"
+            },
+            {
+              "message": "`next_open_task` looks for any `InProgress` task using `self.tasks.iter().find(...)`, so the chosen task depends on storage order rather than plan order. If more than one task is open, `track next-task` can return a later task instead of the earliest one in the plan, which contradicts the method's own ordering contract.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 84,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:22c223c1b32f8b54b8167f40e8b26f076509c5f09db66a357ec04f750b28b7d1",
+          "at": "2026-04-21T03:56:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanSection` is used in `add_task` but never imported into this module, so the new `ImplPlanDocument::add_task` implementation does not compile.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 245,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
+          "at": "2026-04-21T04:05:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` now maps task-id overflow to `ValidationError::DuplicateTaskId(\"task id counter overflow\")`. That is the wrong error class for an arithmetic overflow and is a behavioral regression from the previous `InvalidTaskId` boundary handling, so callers can no longer distinguish overflow from a real duplicate-id case.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 203,
+              "category": "validation"
+            },
+            {
+              "message": "`with_refs` stores `spec_refs` verbatim and never checks whether the same `SpecRef.anchor` appears more than once in a single catalogue entry. That leaves the new structured-ref model able to encode duplicate `SpecElementId` citations without any domain validation, which is the invariant the briefing calls out as needing a new error path.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 490,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
+          "at": "2026-04-21T04:10:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`all_tasks_resolved()` is vacuously true for an empty `ImplPlanDocument`, so a zero-task `impl-plan.json` is treated as fully complete by downstream checks. That lets an empty implementation-plan file satisfy the completion gate instead of being rejected as missing/incomplete work.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 68,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19226f4e039523bca95924b238af6bdc0ef04d76488e6e2538fe3daf52365823",
+          "at": "2026-04-21T04:15:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
+          "at": "2026-04-21T04:25:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
+          "at": "2026-04-21T04:29:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4069233b33919be8a3fa78fd943be0ccaabecf17b8ae0418f667436b53b2fb0",
+          "at": "2026-04-21T12:27:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cannot perform the requested review: filesystem access is unavailable in this execution environment, so I cannot read `tmp/reviewer-runtime/briefing-domain.md` or inspect `git diff` for `libs/domain/src/lib.rs` and `libs/domain/src/spec.rs`.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "environment"
+            }
+          ],
+          "hash": "rvw1:sha256:f4069233b33919be8a3fa78fd943be0ccaabecf17b8ae0418f667436b53b2fb0",
+          "at": "2026-04-21T12:27:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4069233b33919be8a3fa78fd943be0ccaabecf17b8ae0418f667436b53b2fb0",
+          "at": "2026-04-21T12:28:25Z"
         }
       ]
     }

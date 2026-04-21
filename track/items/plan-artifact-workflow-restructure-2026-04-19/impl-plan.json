@@ -64,12 +64,13 @@
     {
       "id": "T011",
       "description": "T010 の CLI に task-coverage.json の coverage 強制 + referential integrity 検査 (現行 spec_coverage::verify 踏襲) を追加し、canonical block 疑惑検出 (ADR 例示マーカー除外 / spec フィールド内 10 行超コードブロック警告) を実装。cargo make ci / Makefile.toml に組み込み、CI で fail-closed 動作を検証",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "7cb345e4cd1f16f965a5912774b19ec0b6fb9462"
     },
     {
       "id": "T012",
       "description": "既存 libs/infrastructure/src/verify/spec_coverage.rs の spec_coverage::verify を新 CLI (plan-artifact-refs) に統合し、旧呼び出し経路 (Makefile.toml / scripts/ / 関連 verify-*) を新 CLI 経由に切り替え、不要コードを削除。tests 整理",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {
