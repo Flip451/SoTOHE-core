@@ -613,7 +613,15 @@ fn activation_rejects_invalid_source_branch(
 }
 
 pub(super) fn uses_legacy_branch_mode(mode: BranchMode, schema_version: u32) -> bool {
-    schema_version != 3 && !matches!(mode, BranchMode::Auto)
+    // Legacy branch-mode dispatch is reserved for pre-v3 tracks (schema
+    // version 1 / 2) whose metadata pre-dates the materialization workflow.
+    // Both v3 (pre-T005) and v4 (identity-only, post-T005) go through the
+    // current activation path, which materializes metadata properly and
+    // sets `branch`. A v4 track that falls into legacy mode would skip
+    // metadata materialization entirely and leave `branch` unset after
+    // `track branch create` / `switch`, breaking downstream phase /
+    // branch-guard semantics.
+    !matches!(schema_version, 3 | 4) && !matches!(mode, BranchMode::Auto)
 }
 
 /// Fetches dirty worktree paths via git, delegating parsing to the usecase layer.
@@ -1005,7 +1013,11 @@ mod tests {
     #[case::switch_v2(BranchMode::Switch, 2, true)]
     #[case::auto_v2(BranchMode::Auto, 2, false)]
     #[case::create_v3(BranchMode::Create, 3, false)]
-    fn uses_legacy_branch_mode_only_for_non_auto_v2_paths(
+    #[case::switch_v3(BranchMode::Switch, 3, false)]
+    #[case::create_v4(BranchMode::Create, 4, false)]
+    #[case::switch_v4(BranchMode::Switch, 4, false)]
+    #[case::auto_v4(BranchMode::Auto, 4, false)]
+    fn uses_legacy_branch_mode_only_for_non_auto_legacy_paths(
         #[case] mode: BranchMode,
         #[case] schema_version: u32,
         #[case] expected: bool,
