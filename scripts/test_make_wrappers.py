@@ -272,7 +272,6 @@ class MakeWrappersTest(unittest.TestCase):
         for task_header, task_name in (
             ("[tasks.track-add-task]", "track-add-task"),
             ("[tasks.track-set-override]", "track-set-override"),
-            ("[tasks.spec-approve]", "spec-approve"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)

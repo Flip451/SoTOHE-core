@@ -75,8 +75,6 @@ pub enum MakeTask {
     TrackReviewStatus,
     /// Check that the review state is approved and code hash is current.
     TrackCheckApproved,
-    /// Approve a spec (set status=approved + content hash).
-    SpecApprove,
     /// Switch to main branch and pull latest.
     TrackSwitchMain,
     /// Stage paths from tmp/track-commit/add-paths.txt.
@@ -186,7 +184,6 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
         MakeTask::TrackReviewStatus => dispatch_track_review_status(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
-        MakeTask::SpecApprove => dispatch_spec_approve(&args.raw_args),
         MakeTask::TrackPlanBranch => dispatch_track_plan_branch(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
         MakeTask::Note => dispatch_note(&args.raw_args),
@@ -463,12 +460,6 @@ fn dispatch_track_review_status(raw_args: &[String]) -> Result<ExitCode, CliErro
 
 fn dispatch_track_check_approved(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let args = build_forwarded_args(&["review", "check-approved"], raw_args);
-    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
-    run_sotp(&refs)
-}
-
-fn dispatch_spec_approve(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let args = build_forwarded_args(&["spec", "approve"], raw_args);
     let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
     run_sotp(&refs)
 }
@@ -1122,17 +1113,10 @@ mod tests {
     }
 
     #[test]
-    fn test_build_forwarded_args_spec_approve() {
-        let raw = vec!["track/items/my-track".to_owned()];
-        let args = build_forwarded_args(&["spec", "approve"], &raw);
-        assert_eq!(args, vec!["spec", "approve", "track/items/my-track"]);
-    }
-
-    #[test]
     fn test_build_forwarded_args_empty_raw() {
         let raw: Vec<String> = vec![];
-        let args = build_forwarded_args(&["spec", "approve"], &raw);
-        assert_eq!(args, vec!["spec", "approve"]);
+        let args = build_forwarded_args(&["review", "check-approved"], &raw);
+        assert_eq!(args, vec!["review", "check-approved"]);
     }
 
     #[test]

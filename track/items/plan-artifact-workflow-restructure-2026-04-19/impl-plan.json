@@ -28,27 +28,31 @@
     {
       "id": "T005",
       "description": "型カタログドキュメントに spec_refs: Vec<SpecRef> + informal_grounds: Vec<InformalGroundRef> field を追加。libs/domain/src/track.rs の TrackMetadata から tasks / plan を削除し identity-only 化 (schema migration 戦略は実装者判断、既存 v3 との並立対応を含む)。両方の codec 更新 + tests",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "6ddaabcd78242838a4633d9a8ae9e251aff520b4"
     },
     {
       "id": "T006",
       "description": "libs/infrastructure/src/verify/ の verify-track-metadata-local / verify-latest-track-local を file 存在ベースに改訂 (metadata = identity のみ検証、latest-track = impl-plan.json 存在条件で task 項目チェック)。sotp track type-signals / baseline-capture / 関連 verify から「空カタログ拒否」ロジックを撤廃し、エントリ 0 件の空カタログを有効状態として受け入れ。tests 更新",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "6ddaabcd78242838a4633d9a8ae9e251aff520b4"
     },
     {
       "id": "T007",
       "description": "libs/usecase/src/task_completion.rs の check_tasks_resolved_from_git_ref を metadata.json から impl-plan.json 読み替え。TrackBlobReader port の read_track_metadata を read_impl_plan に置換 or 追加、apps/cli/src/commands/pr.rs 呼び出し側も改修。K1-K7 MockReader tests を新 port で書き換え",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "6ddaabcd78242838a4633d9a8ae9e251aff520b4"
     },
     {
       "id": "T008",
       "description": "libs/infrastructure/src/track/render.rs の plan.md / spec.md renderer を集約形式に変更 (plan.md = metadata.json + impl-plan.json、spec.md = spec.json + task-coverage.json)。tests 更新",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "6ddaabcd78242838a4633d9a8ae9e251aff520b4"
     },
     {
       "id": "T009",
       "description": "Makefile.toml から cargo make spec-approve タスクを削除し、関連する apps/cli/src/commands/ の spec approve コマンドを廃止。spec-signals ツールおよび spec schema 参照コードから status / approved_at / content_hash 関連の依存を除去。tests 整理",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",

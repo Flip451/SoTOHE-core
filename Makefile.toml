@@ -873,11 +873,6 @@ description = "[wrapper] Check that the review state is approved and code hash i
 script_runner = "@shell"
 script = ['bin/sotp make track-check-approved "$@"']
 
-[tasks.spec-approve]
-description = "[wrapper] Approve a spec (set status=approved + content hash)"
-script_runner = "@shell"
-script = ['bin/sotp make spec-approve "$@"']
-
 [tasks.track-signals]
 description = "[wrapper] Evaluate confidence signals for a track's spec.json"
 script_runner = "@shell"

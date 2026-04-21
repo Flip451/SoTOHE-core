@@ -1,9 +1,9 @@
 {
-  "schema_version": 4,
-  "id": "plan-artifact-workflow-restructure-2026-04-19",
   "branch": "track/plan-artifact-workflow-restructure-2026-04-19",
-  "title": "計画成果物ワークフローの再構築 (Scope D: T1 + T2 + T3)",
-  "status": "in_progress",
   "created_at": "2026-04-20T00:00:00Z",
-  "updated_at": "2026-04-21T00:00:00Z"
+  "id": "plan-artifact-workflow-restructure-2026-04-19",
+  "schema_version": 4,
+  "status": "in_progress",
+  "title": "計画成果物ワークフローの再構築 (Scope D: T1 + T2 + T3)",
+  "updated_at": "2026-04-21T06:11:20Z"
 }

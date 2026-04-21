@@ -1,1408 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::render_track_views` would move Markdown/view rendering and file I/O into the usecase layer, which is the wrong boundary for this repository's hexagonal split. The validation step can be shared, but the render pipeline should stay infrastructure-owned; otherwise this TODO would invert the dependency direction instead of just extracting the stale-signal check.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 856,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:95d0c68702d8fa4626d6c868b51bac1f460775f0126a396badf0d3abad9c59c1",
-          "at": "2026-04-20T09:03:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new parenthetical still says the workflow's actual Markdown generation and file write happen \"via infra port\", which is inconsistent with the pure-orchestrator boundary described here and with the existing `contract_map_workflow.rs` pattern. As written, it can mislead implementers into reintroducing the same layer-boundary leak this TODO is trying to remove.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 856,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:2274103460420d28d54a43cc111c0034f7aa5e00312795467d752db7794a17ed",
-          "at": "2026-04-20T09:07:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
-          "at": "2026-04-20T09:09:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
-          "at": "2026-04-20T09:10:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/workflow.md` now says the default profile assigns `adr-editor` to Claude Code, but the sample profiles in this change only define `orchestrator`, `spec-designer`, `impl-planner`, `type-designer`, `implementer`, `reviewer`, and `researcher`. That leaves the workflow pointing at a capability users cannot select from the documented profiles, so the ADR back-and-forth path is unusable as written.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 40,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
-          "at": "2026-04-20T14:30:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr-editor` is referenced by the new workflow, but this source-of-truth capability map never defines it. On a red Phase 1 signal the orchestrator will try to re-invoke `adr-editor`, and capability resolution will fail before the ADR edit loop can start. The same omission also exists in the three sample profile files.",
-              "severity": "P1",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 14,
-              "category": "correctness"
-            },
-            {
-              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while many existing docs still point at `.claude/skills/track-plan/SKILL.md`. That turns the documented skill path into a dead link and breaks any workflow that still relies on the skill loader instead of the new command docs.",
-              "severity": "P1",
-              "file": ".claude/skills/track-plan/SKILL.md",
-              "line": 1,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
-          "at": "2026-04-20T14:33:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b571d7db40a6245e2d0958e9264a8cc4877622e2a7ba7b88c7f77267b1dc39e5",
-          "at": "2026-04-20T14:38:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
-          "at": "2026-04-20T14:43:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new phased workflow says `/track:plan` now orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. Those are incompatible contracts for the canonical planning command, so agents following this user-facing workflow can execute the obsolete artifact flow instead of the new phased one.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 33,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
-          "at": "2026-04-20T14:45:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while live guidance still references `track-plan` as a skill workflow. That turns the documented skill path into a dead link and breaks any workflow that relies on skill discovery instead of only the command docs.",
-              "severity": "P1",
-              "file": ".claude/skills/track-plan/SKILL.md",
-              "line": 1,
-              "category": "correctness"
-            },
-            {
-              "message": "The new phased workflow says `/track:plan` orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. These are incompatible contracts for the canonical planning command, so agents can follow the obsolete artifact flow instead of the new phased one.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 33,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
-          "at": "2026-04-20T14:51:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:551d8d1d524282f305fdba449f7fdfe17fcdc4acdc3debde02b821f2bc42c7a9",
-          "at": "2026-04-20T14:55:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
-          "at": "2026-04-20T16:30:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
-          "at": "2026-04-20T16:31:49Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
-          "at": "2026-04-20T16:31:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
-          "at": "2026-04-20T16:33:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
-          "at": "2026-04-20T17:04:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`convention_refs` should not participate in phase-1 signal evaluation per ADR 2026-04-19-1242 §D3.1. As written, a requirement with only `convention_refs` is classified as Blue, which suppresses the Red finding that `check_spec_doc_signals()` is meant to surface for missing ADR grounding.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec.rs",
-              "line": 384,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
-          "at": "2026-04-20T18:09:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`convention_refs` are treated as a Blue signal here, but ADR 2026-04-19-1242 D3.1 says the spec signal must depend only on `adr_refs` and `informal_grounds`; `convention_refs` are excluded. As written, a requirement with only convention refs will be classified as Blue instead of Red, which weakens the gate.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec.rs",
-              "line": 384,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
-          "at": "2026-04-20T18:11:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_spec_doc_signals()` tells callers to upgrade Yellow by referencing either `adr_refs[]` or `convention_refs[]`, but convention refs are explicitly outside signal evaluation and do not change a requirement from Yellow to Blue. A requirement with only convention refs still evaluates Red, so this guidance is functionally wrong and will mislead users of the gate output.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec.rs",
-              "line": 447,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:97d34f43ea2cddeb065b926d5b8fb741fd82ba42b61140d1d49d8004c30e7332",
-          "at": "2026-04-20T18:16:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
-          "at": "2026-04-20T18:17:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
-          "at": "2026-04-20T18:18:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TaskCoverageDocument::new` only checks for duplicate `SpecElementId` keys across sections; it never rejects duplicate `TaskId` entries inside a single element’s `Vec<TaskId>`, even though this type advertises that as an enforced invariant. That means callers can still construct coverage documents in an illegal state, and the codec will accept that state unchanged.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_coverage.rs",
-              "line": 44,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9bda27ed9d4212dcb6c335a252688220f323dd75743bc92242f6ee168e844b42",
-          "at": "2026-04-20T23:16:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
-          "at": "2026-04-20T23:18:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
-          "at": "2026-04-20T23:20:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackMetadata::with_branch` now only validates the title; it no longer checks that a provided branch matches the track id, and `set_branch` can later introduce the same mismatch. That allows persisted states like `id = my-track` with `branch = track/other-track`, which violates the branch-id consistency required by the new identity-only metadata model and can misroute branch-based readers/activation logic.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/track.rs",
-              "line": 300,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:9b07da54fc4423102751c166ded489b8277a7972f4883a15bd03700065d2d706",
-          "at": "2026-04-21T00:45:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`set_branch` bypasses the new branch/id invariant enforced in `TrackMetadata::with_branch`. A caller can mutate an already-validated track into a mismatched `track/<other>` branch, and `ActivateTrackUseCase` uses this setter directly, so the domain can persist an invalid branch/id pair without any error.",
-              "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 337,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:168ba683894d8aa7326203724f818ce860eb0bdd7615f5e49ff0a2c42c3ec9f2",
-          "at": "2026-04-21T00:50:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackMetadata` no longer enforces coherence between `status` and `status_override`. `new`/`with_branch` accept any combination, and `set_status`/`set_status_override` can mutate a track into `status = Planned` while keeping a blocked/cancelled override. `resolve_phase()` only consults `status`, so the override is then silently ignored and the track is misclassified. The previous implementation prevented impossible states here.",
-              "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 307,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3a5efea3b1688def811484ea70d487b7b3ea9eab26a2d872cd5d91bda5c7800c",
-          "at": "2026-04-21T00:55:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`add_task` is not fail-safe: it appends the new task before validating the target section, and it `mem::take`s `self.plan` before the same validation. Any `SectionNotFound`/`NoSectionsAvailable` error leaves the aggregate mutated and the plan dropped, so a failed call corrupts in-memory state.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
-              "line": 173,
-              "category": "safety"
-            },
-            {
-              "message": "`next_num + 1` overflows when the highest existing task suffix is `u64::MAX`. That is a reachable `TaskId` value, so `add_task` can panic in debug builds or wrap to a duplicate `T000` in release builds.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
-              "line": 168,
-              "category": "safety"
-            },
-            {
-              "message": "`resolve_transition` only looks at `TaskStatusKind::Done`, so it cannot distinguish `DonePending` from `DoneTraced`. A traced task given target `done` plus a commit hash is mapped to `BackfillHash` and then rejected by `TrackTask::transition`, instead of being classified as an unsupported target.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
-              "line": 239,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
-          "at": "2026-04-21T03:41:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`add_task` mutates `self.tasks` and `self.plan` before validating `section_id`. If the section is missing or there are no sections, the method returns an error after the new task has already been pushed and `mem::take(&mut self.plan)` has already cleared the plan, leaving the document corrupted on a recoverable error.",
-              "severity": "P0",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 173,
-              "category": "correctness"
-            },
-            {
-              "message": "The next task ID is computed with `+ 1` on the maximum numeric suffix. When the highest existing task is `T18446744073709551615`, this overflows and panics in library code instead of returning a validation error, regressing the previous checked-add behavior.",
-              "severity": "P0",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 169,
-              "category": "panic"
-            },
-            {
-              "message": "`next_open_task` now scans `self.tasks` in storage order and returns the first Todo/InProgress task it encounters. The previous implementation walked plan order and preferred InProgress over Todo, so a task list that is not aligned with the plan can now report the wrong \"next\" task.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 80,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
-          "at": "2026-04-21T03:44:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`apply_transition_by_status` collapses `DonePending` and `DoneTraced` into `TaskStatusKind::Done` before resolving `done`. That means a `done` request with a commit hash is always mapped to `BackfillHash`, which `TrackTask::transition` rejects for already-traced tasks. The status-based API therefore cannot distinguish the two done states and fails on an already-traced task instead of choosing the correct transition.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 148,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:76e182d450f25d2ef8a454702a1c4dfcd4d726872a4fdfac148cc670d4968420",
-          "at": "2026-04-21T03:51:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_phase` and `resolve_phase_from_record` still treat only `schema_version == 3` as branchless/activatable. That means v4 identity-only tracks are classified as `Planning` and the CLI will suggest `/track:implement` instead of `/track:activate`, even though the activation use case already accepts schema v4.",
-              "severity": "P1",
-              "file": "libs/domain/src/track_phase.rs",
-              "line": 82,
-              "category": "correctness"
-            },
-            {
-              "message": "`next_open_task` looks for any `InProgress` task using `self.tasks.iter().find(...)`, so the chosen task depends on storage order rather than plan order. If more than one task is open, `track next-task` can return a later task instead of the earliest one in the plan, which contradicts the method's own ordering contract.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 84,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:22c223c1b32f8b54b8167f40e8b26f076509c5f09db66a357ec04f750b28b7d1",
-          "at": "2026-04-21T03:56:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PlanSection` is used in `add_task` but never imported into this module, so the new `ImplPlanDocument::add_task` implementation does not compile.",
-              "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 245,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
-          "at": "2026-04-21T04:05:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`add_task` now maps task-id overflow to `ValidationError::DuplicateTaskId(\"task id counter overflow\")`. That is the wrong error class for an arithmetic overflow and is a behavioral regression from the previous `InvalidTaskId` boundary handling, so callers can no longer distinguish overflow from a real duplicate-id case.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 203,
-              "category": "validation"
-            },
-            {
-              "message": "`with_refs` stores `spec_refs` verbatim and never checks whether the same `SpecRef.anchor` appears more than once in a single catalogue entry. That leaves the new structured-ref model able to encode duplicate `SpecElementId` citations without any domain validation, which is the invariant the briefing calls out as needing a new error path.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 490,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
-          "at": "2026-04-21T04:10:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`all_tasks_resolved()` is vacuously true for an empty `ImplPlanDocument`, so a zero-task `impl-plan.json` is treated as fully complete by downstream checks. That lets an empty implementation-plan file satisfy the completion gate instead of being rejected as missing/incomplete work.",
-              "severity": "P1",
-              "file": "libs/domain/src/impl_plan.rs",
-              "line": 68,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:19226f4e039523bca95924b238af6bdc0ef04d76488e6e2538fe3daf52365823",
-          "at": "2026-04-21T04:15:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
-          "at": "2026-04-21T04:25:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
-          "at": "2026-04-21T04:29:01Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
-          "at": "2026-04-20T17:03:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
-          "at": "2026-04-20T17:04:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
-          "at": "2026-04-21T00:45:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Schema 4 tracks cannot be activated: T005 now writes identity-only metadata with schema_version 4, and execute_activate passes that DocumentMeta schema_version into ActivateTrackUseCase, but this guard still rejects anything other than 3 before materializing the branch. New branchless schema 4 tracks will fail /track:activate with TrackActivationRequiresSchemaV3 even though schema 4 is the new metadata shape.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_activation.rs",
-              "line": 46,
-              "category": "behavioral_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
-          "at": "2026-04-21T00:48:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ActivateTrackUseCase::execute` still rejects every schema version except 3, but T005 now writes identity-only metadata as schema_version 4. A newly created branchless v4 track that is otherwise planned will fail activation with `TrackActivationRequiresSchemaV3`, so the non-task activation path is broken by this update.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_activation.rs",
-              "line": 46,
-              "category": null
-            },
-            {
-              "message": "Clearing an override always writes `TrackStatus::Planned`. Because T005 makes track status an explicitly persisted field, clearing a blocked/cancelled override on an active or done track rewrites the stored workflow status to planned instead of restoring or preserving the underlying status, corrupting the track phase for non-task override flows.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 197,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
-          "at": "2026-04-21T00:50:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new transition/add-task path performs a separate `find` / `load_impl_plan` / `save_impl_plan` read-modify-write without the per-track lock that `TrackWriter::update` used to provide. Two concurrent `track-add-task` or `track-transition` calls can read the same snapshot, compute the same next `TaskId`, and then the last save wins, dropping one update. This is a data-loss regression and needs a serialized update boundary around the impl-plan mutation.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 100,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6ecd6db28f4028ab6674601372ed56e9d27c214cf4243b6b32d3c5b3a453c260",
-          "at": "2026-04-21T03:41:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
-          "at": "2026-04-21T03:52:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On a `track/` branch, `BlobFetchResult::NotFound` means the PR head does not contain `impl-plan.json`; `plan/` branches already short-circuit before this point. Returning `VerifyOutcome::pass()` here fail-opens the merge-time task-completion gate when there is no implementation plan to inspect, even though final merge requires `impl-plan.json` task state to be present and resolved.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_completion.rs",
-              "line": 65,
-              "category": "merge-gate"
-            },
-            {
-              "message": "An empty `ImplPlanDocument` is accepted because `all_tasks_resolved()` is vacuously true, so a PR can pass the merge task-completion gate with `impl-plan.json` present but containing zero tasks. The workflow requirement explicitly blocks empty task sets to avoid this nullable bypass; this use case needs to reject `impl_plan.tasks().is_empty()` before returning pass.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_completion.rs",
-              "line": 77,
-              "category": "merge-gate"
-            },
-            {
-              "message": "The branchless implementation-transition guard still only rejects `schema_version == 3`. New identity-only tracks are saved as schema version 4 and activation was updated to accept v4, so a branchless v4 planned track can run an implementation transition (`in_progress`, `done`, or `skipped`) without going through activation or materializing a track branch.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_resolution.rs",
-              "line": 139,
-              "category": "activation-guard"
-            },
-            {
-              "message": "`execute_by_status` mutates and saves only `impl-plan.json`, then returns the `TrackMetadata` read before the transition. Since `metadata.json` still carries the explicit persisted track status and no other task-transition path updates it, moving tasks to `in_progress` or `done` leaves `metadata.status` stuck at its old value, so resolve/registry/CLI status consumers continue to treat the track as planned after task state changed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 169,
-              "category": "state-consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
-          "at": "2026-04-21T03:55:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AddTaskUseCase::execute` never re-derives or persists `TrackMetadata.status` after appending a new Todo task. If the track was previously `Done`, `metadata.json` stays `done` even though `impl-plan.json` now contains unresolved work, so `resolve_phase()`/CLI status reporting will keep treating the track as ready to ship.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 283,
-              "category": "correctness"
-            },
-            {
-              "message": "The transition paths write `impl-plan.json` first and then perform a second `metadata.json` update. If that second write fails, the task transition is already committed but the use case returns an error, leaving the two persisted documents out of sync and making retries non-idempotent. The same pattern exists in both `execute` and `execute_by_status`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:04:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AddTaskUseCase` mutates `impl-plan.json` but never re-syncs `TrackMetadata.status` after inserting a new task. That leaves the persisted metadata and the returned `TrackMetadata` stale for any track that was already `Done` or otherwise not `Planned`: adding a new `Todo` task will still report the old phase, so CLI output and stored metadata can become inconsistent with the updated task list.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:07:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AddTaskUseCase::execute persists `impl-plan.json` but never re-derives or writes `metadata.status`. Adding a task to a completed or in-progress track leaves `metadata.json` stale, so later phase checks and CLI output keep reporting the old status even though the track now has an unresolved task.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 278,
-              "category": "correctness"
-            },
-            {
-              "message": "TransitionTaskUseCase::execute and execute_by_status now save `impl-plan.json` and then update `metadata.json` in a second step. If the metadata update fails after the plan save succeeds, the method returns an error but the repository is left half-updated (impl-plan changed, metadata stale), which reintroduces a data-consistency failure mode the old single-write path avoided.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:11:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AddTaskUseCase` persists the new `impl-plan.json` entry but never re-derives or writes back `metadata.json.status`. Adding a Todo task to a completed track can therefore leave the track marked `done` even though the aggregate is no longer fully resolved.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 284,
-              "category": "correctness"
-            },
-            {
-              "message": "Both transition paths save `impl-plan.json` before syncing `metadata.json`. If the later `TrackWriter::update` fails, the method returns an error after already mutating the plan, leaving `impl-plan.json` and `metadata.json` out of sync.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
-          "at": "2026-04-21T04:15:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_track_status_from_impl_plan` only promotes a track to `InProgress` when a task is already `InProgress`. That leaves partially completed plans with only `done` + `todo` tasks classified as `Planned`, so the transition/add-task use cases can write back the wrong phase and `track_phase` will report Planning even though work is still open. The sync should treat any unresolved task mix as `InProgress`, not just explicit in-progress tasks.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 72,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:23:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:26:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The read-only sandbox prevents me from inspecting `tmp/reviewer-runtime/briefing-usecase.md` or running `git diff`, so I cannot perform an evidence-based review in this environment.",
-              "severity": "P1",
-              "file": null,
-              "line": null,
-              "category": "environment"
-            }
-          ],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:26:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_track_status_from_impl_plan` classifies a mixed plan such as `[done, todo]` as `Planned` because it only returns `InProgress` when a task is explicitly `InProgress`, and otherwise falls through unless all tasks are resolved. That regresses the previous track-status semantics where any non-empty plan with some progress but unresolved work is active; after completing one task in a multi-task track, the use case can write `metadata.status = planned`, causing phase/status consumers to misreport active implementation work.",
-              "severity": "P1",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 72,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
-          "at": "2026-04-21T04:28:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
-          "at": "2026-04-21T04:46:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
-          "at": "2026-04-21T04:48:36Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1.1 says the ADR must not contain full trait/struct/method specifications, but D2.1 immediately embeds concrete Rust struct definitions for `SpecElementId`, `AdrAnchor`, `ConventionAnchor`, `ContentHash`, and the three ref types. That makes the ADR internally inconsistent about how much type detail it is allowed to spell out.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 243,
-              "category": "contradiction"
-            },
-            {
-              "message": "`SpecElementId` is only validated as a non-empty string in the task/verification text, but the ADR already fixes an ID naming convention (`IN-\\d+`, `AC-\\d+`, etc.). As written, the implementation can accept arbitrary ids, which weakens `SpecRef.anchor` and the new spec-element identity scheme.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/metadata.json",
-              "line": 18,
-              "category": "factual error"
-            },
-            {
-              "message": "The scope for T001/verification includes `track/workflow.md`, but the ADR rollout section only names `CLAUDE.md` and `DEVELOPER_AI_WORKFLOW.md`. That leaves one of the declared in-scope docs outside the ADR's own migration plan, so the file set is inconsistent across the documents.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
-              "line": 27,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8abadeeaa232f4220d6d16d5e33bc6a94feedb03fd197d93cf22ccecddb89390",
-          "at": "2026-04-20T09:05:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
-          "at": "2026-04-20T09:09:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1.5 permits type catalogues to reference conventions, but the concrete ref schema only places `ConventionRef` on spec.json fields and D3.2 later says catalogues have no convention reference field at all. That gives implementers conflicting requirements: either catalogue entries need a `convention_refs` field and validator coverage, or the D1.5 permission must be removed.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 322,
-              "category": "contradiction"
-            },
-            {
-              "message": "The ADR lists `track/items/review-scope-prompt-injection-2026-04-18/review.json` as an observed-data reference, while the same ADR later forbids ADRs and new tracks from directly referencing track-internal artifacts to preserve lifecycle boundaries. The document should either move/summarize that evidence into a track-crossing artifact or define an explicit exception for historical observation data.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 40,
-              "category": "contradiction"
-            },
-            {
-              "message": "D2.3 says canonical-block detection implementation details are in Q15, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields; Q14 is the canonical-block section. This broken reference points the T011/CLI implementation at the wrong design question.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 426,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
-          "at": "2026-04-20T09:13:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D0.1 says any 🔴/🟡 SoT signal must trigger repair of the next upstream layer, but D3.1 and the /track:plan flow later define 🟡 as allowable and continue to the next phase. Implementers cannot satisfy both semantics: the orchestrator either loops on yellow or records a warning and proceeds.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 196,
-              "category": "contradiction"
-            },
-            {
-              "message": "The merge gate only requires task-coverage.json to cover all acceptance_criteria, while D1.4 defines coverage enforcement as covering both in_scope and acceptance_criteria. This weakens the final PR requirement relative to the task-coverage gate and leaves two conflicting definitions of what coverage is required for merge.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 535,
-              "category": "contradiction"
-            },
-            {
-              "message": "D4 says writers/capabilities must not span multiple phases, but the ownership table assigns the planner to both Phase 1 (/track:spec) and Phase 3 (/track:impl-plan). Since D1.4 also says the planner writes spec in Phase 1 and impl-plan/task-coverage in Phase 3, the writer-boundary rule cannot be enforced as written.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 487,
-              "category": "contradiction"
-            },
-            {
-              "message": "The canonical-block warning bullet points implementers to Q15 for details, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields. The canonical-block unresolved decision is Q14, so this is a self-evidently wrong cross-reference.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 426,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
-          "at": "2026-04-20T09:17:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1.5 allows type catalog entries to reference conventions, but D3.2 says type catalogs have no convention reference field at all. D2.2 also lists `ConventionRef` use sites only for spec.json, so implementers cannot tell whether catalog `convention_refs` must exist and be verified or whether type-catalog-to-convention references are actually forbidden. This is a schema-level contradiction in the SoT reference policy.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 455,
-              "category": "contradiction"
-            },
-            {
-              "message": "The phase matrix still defines `Phase 3 完了` as `task-coverage.json` covering only all acceptance criteria and says merge is OK when SoT signals are blue. That conflicts with the stricter gate defined earlier: task coverage must cover both `in_scope` and `acceptance_criteria` with referential integrity, and final merge also requires every impl-plan task to be resolved. As written, this table can drive an implementation that permits a final merge with uncovered in-scope items or unresolved tasks.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
-              "line": 550,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0774f414a2616b26e59c28730480b536a14773ad27a110a642b0a7a1d3c69e92",
-          "at": "2026-04-20T09:22:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a155cc1561bd4e9e586e9acd3bf717214e1991ea7d1840587d7b7049d24ecd94",
-          "at": "2026-04-20T09:27:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This acceptance criterion is not satisfiable as written: it requires `informal_grounds[]` on type-catalogue entries to emit 🟡, but ADR D3.2 explicitly defers catalogue-side signal evaluation to a later ADR and only keeps the schema presence check in this scope. With only T003/T005 in scope, the track cannot meet this criterion unless you either narrow it to spec-side only or add a follow-on task for catalogue-side signal implementation.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
-              "line": 330,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:79a678b08fa4600d451ea7c05b4a123f1a02d3a23af5340fa4dd4f8d5e752272",
-          "at": "2026-04-20T10:57:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
-          "at": "2026-04-20T11:01:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
-          "at": "2026-04-20T11:04:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The rendered graph still presents the approval/coverage model as live (`approved_at`, `effective_status`/`status`, `evaluate_coverage`, `task_refs`, `SpecStatus`, `CoverageResult`) even though the plan catalog deletes those concepts. That makes the plan-artifact set internally contradictory about the post-migration spec model; the graph and contract-map need to match the deleted-state intent or be explicitly marked legacy-only.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/domain-graph.md",
-              "line": 97,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
-          "at": "2026-04-20T11:55:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackBlobReader` is declared with four methods in the usecase catalogue, but this contract map only renders two edges (`read_spec_document` and `read_track_metadata`). As written, the rendered map no longer describes the full port boundary and misstates the current contract surface.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 39,
-              "category": "contradiction"
-            },
-            {
-              "message": "The `ContentHash` entry describes the type as holding either a raw 32-byte buffer or a 64-character hex string. The ADR models `ContentHash` as a single normalized `[u8; 32]` value object, so this wording conflates constructor input formats with the stored domain representation.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 24,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
-          "at": "2026-04-20T12:01:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
-          "at": "2026-04-20T12:05:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PlanArtifactRefsError` declares canonical-block suspicion as part of a public error enum, but the ADR/T011 design says canonical-block detection is warning-only. Implementing from this catalogue would turn an advisory warning into a fatal verifier error/CI failure, contradicting the planned gate semantics; canonical-block suspicion should be modeled as a warning finding instead of an error variant.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 40,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
-          "at": "2026-04-20T12:08:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecDocument` says every requirement, including `goal`, gains `id: SpecElementId` and the new ref fields, but the only modified requirement item contract (`SpecRequirement`) is documented as used only for `scope / constraints / acceptance_criteria`, and this catalogue declares no separate goal item type. That leaves the target representation for `goal[]` ambiguous and can let an implementation keep goals as bare strings while still following the `SpecRequirement` entry.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 90,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
-          "at": "2026-04-20T12:18:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `AdrRef` catalogue entry says ADR references are used in type catalogue entries, but the same plan’s SoT direction forbids type catalogue -> ADR direct references and `TypeCatalogueEntry` only adds `spec_refs` plus `informal_grounds`. Leaving this text in place gives implementers a contradictory schema target for catalogue entries.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 48,
-              "category": "contradiction"
-            },
-            {
-              "message": "The `ConventionRef` entry also claims use in type catalogue entries, while `TypeCatalogueEntry` explicitly says catalogue-level `convention_refs[]` is deferred to Q8 / a follow-up ADR. That contradicts the current-track scope, where catalogue entries should not gain convention reference fields yet.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 54,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
-          "at": "2026-04-20T12:24:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR D1.4 defines identity-only metadata as retaining the track `status` field while moving only `tasks` and `plan` into `impl-plan.json`. This catalogue entry instead says TrackMetadata retains `status_override` and omits `status`; the matching TrackDocumentV2 entry repeats the same retained-field set. That gives implementers the wrong schema contract for metadata.json after task-derived status is removed, so the plan artifacts are internally inconsistent with the authoritative ADR.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 112,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7892b83742bdc18ac1cee2ceb9abf9e604e04490cb8417167113651f876e577",
-          "at": "2026-04-20T12:29:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb5f5e79cae4d15ad26f942d3d804af71293449bd8e28e9c62a5fb939154da93",
-          "at": "2026-04-20T12:34:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
-          "at": "2026-04-20T14:29:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
-          "at": "2026-04-20T14:31:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
-          "at": "2026-04-20T16:30:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
-          "at": "2026-04-20T16:32:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `TrackBlobReader` boundary is rendered with only two operations here (`read_spec_document` and `read_track_metadata`), but the same plan set still treats that port as the task-completion boundary and the surrounding contract files describe a fuller port surface. As rendered, this map is a partial view of the port contract and no longer matches the rest of the plan artifact set.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 40,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
-          "at": "2026-04-20T17:06:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
-          "at": "2026-04-20T17:07:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
-          "at": "2026-04-20T17:10:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Stage 1 signal summary is still `0` yellow, but this spec now introduces `informal_grounds` entries and AC-05 explicitly says those inputs should fire yellow signals. The rendered summary is inconsistent with the document's own signal rules.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
-              "line": 4,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
-          "at": "2026-04-20T18:09:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`spec.json` now contains two `informal_grounds` entries (CN-02 and CN-03), but the generated `spec.md` still reports `signals: { blue: 44, yellow: 0, red: 0 }`. That contradicts the new schema/AC-05 semantics, where informal grounds are supposed to contribute a yellow signal, so the rendered artifact is stale or the signal aggregation is missing the new field.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
-              "line": 4,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
-          "at": "2026-04-20T18:11:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 says every `spec.json` element must have a non-empty `informal_grounds[]`, but this migrated spec only attaches `informal_grounds` to `CN-02` and `CN-03` and leaves the rest of the requirements without that field. As written, the acceptance criterion and the instance shape disagree, so the artifact cannot satisfy the schema story it is documenting.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
-              "line": 61,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
-          "at": "2026-04-20T18:14:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
-          "at": "2026-04-20T18:16:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
-          "at": "2026-04-20T18:17:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The rendered contract map does not include the new `SpecCodecError` infrastructure type, even though `infrastructure-types.json` and `infrastructure-types.md` add it as part of the spec codec boundary. That leaves the contract map out of sync with the rest of the plan-artifact artifacts and hides the new domain-validation error surface.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 32,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ef7e2c93895ec457de8db095949dfdb265dee6cced3c471a51c9d321290f8a86",
-          "at": "2026-04-20T18:22:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecCodecError` is added to the infrastructure type catalog, but the rendered contract map never adds a corresponding infrastructure node. That leaves the cross-artifact inventory inconsistent and omits the new spec codec error from the map view.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 32,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ef7e2c93895ec457de8db095949dfdb265dee6cced3c471a51c9d321290f8a86",
-          "at": "2026-04-20T18:24:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93cf54cc1caa316fe54a779b235e3ae0aea8bba416d4c63b9eca67a271318bed",
-          "at": "2026-04-20T18:26:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecCodecError` says the existing `Json`, `Validation`, `UnsupportedSchemaVersion`, and `InvalidField` variants are preserved, but `expected_variants` lists only `DomainValidation`. The rendered infrastructure type table therefore advertises an incomplete error contract, which contradicts the description and can mislead the T003 codec contract review.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 65,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:93cf54cc1caa316fe54a779b235e3ae0aea8bba416d4c63b9eca67a271318bed",
-          "at": "2026-04-20T18:28:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c362b604dfbe5aeda9eb52aab321db7e42bf2780e3fac025ed23f148b6aa8c5b",
-          "at": "2026-04-20T18:30:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c362b604dfbe5aeda9eb52aab321db7e42bf2780e3fac025ed23f148b6aa8c5b",
-          "at": "2026-04-20T18:33:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dafe3a0f3c0241cc7024a56034a638aeda03a333edceb01f9e4eaffe7802b8af",
-          "at": "2026-04-20T23:15:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The regenerated type catalogs now mark the T004-owned artifacts as complete/Blue (`ImplPlanDocument`, `TaskCoverageDocument`, their DTOs, and codec errors), but the rendered plan and metadata still leave T004 as todo. That is a semantic contradiction in the plan artifacts: readers cannot tell whether the impl-plan/task-coverage document work has actually been completed or is still pending.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/plan.md",
-              "line": 40,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:dafe3a0f3c0241cc7024a56034a638aeda03a333edceb01f9e4eaffe7802b8af",
-          "at": "2026-04-20T23:17:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:471cc494ce48dcfd3f49e08260eafdf69c8c13d2cff2089563a63e28b64e095c",
-          "at": "2026-04-20T23:33:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:471cc494ce48dcfd3f49e08260eafdf69c8c13d2cff2089563a63e28b64e095c",
-          "at": "2026-04-20T23:34:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ImplPlanDocumentDto` says the existing `PlanDocument` / `PlanSectionDocument` / `TrackTaskDocument` DTOs from `track/codec.rs` are reused for `impl-plan.json`, but the newly added `ImplPlanTaskDto` / `ImplPlanPlanDto` / `ImplPlanSectionDto` entries below describe codec-local replacements added specifically because the track DTOs are not sufficient. The catalog needs one consistent design story here.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 6,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:add68d4f2ffd640ffa854ee439c11e162a79255a75a807b956a793d2db0bce9b",
-          "at": "2026-04-20T23:36:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:add68d4f2ffd640ffa854ee439c11e162a79255a75a807b956a793d2db0bce9b",
-          "at": "2026-04-20T23:37:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ImplPlanDocumentDto` still says the impl-plan codec reuses `PlanDocument`, `PlanSectionDocument`, and `TrackTaskDocument` for `plan` / `tasks`, but the newly added T004 DTO entries define codec-local `ImplPlanTaskDto`, `ImplPlanPlanDto`, and `ImplPlanSectionDto` specifically to avoid reusing those track DTOs and to enforce `deny_unknown_fields`. These two descriptions give contradictory implementation guidance for the impl-plan DTO contract.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 6,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:add68d4f2ffd640ffa854ee439c11e162a79255a75a807b956a793d2db0bce9b",
-          "at": "2026-04-20T23:38:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d12f87233a16a7a146649e60b240d884a45394df06a9e12074dc3a8da20754d7",
-          "at": "2026-04-20T23:40:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c26619137f789db8c19d0b2b9906f6764e0f3577d3808bef689547322f98bfe2",
-          "at": "2026-04-21T00:44:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c26619137f789db8c19d0b2b9906f6764e0f3577d3808bef689547322f98bfe2",
-          "at": "2026-04-21T00:46:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This description contradicts the v4 identity-only metadata contract: it says `metadata.json` drops task/plan fields, but then leaves `status_override` as a separate JSON field option. That would reintroduce a legacy field into the supposedly identity-only shape.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 54,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5e0724dd36f7b46af07ca9e4b936b795ee8c7a4ddec327faade1e608183524c2",
-          "at": "2026-04-21T03:40:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The contract map no longer reflects the full port surface: it renders `TrackBlobReader` only with `read_spec_document` and `read_impl_plan`, but `usecase-types.json` still declares `read_type_catalogue` and `read_enabled_layers` as part of the same contract, and the task use cases are left disconnected from `ImplPlanReader`/`ImplPlanWriter`. That makes the diagram semantically incomplete relative to the other catalog files.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 52,
-              "category": "factual error"
-            },
-            {
-              "message": "`TrackDocumentV2` still claims an optional `status_override` field is retained, but `metadata.json` has been reduced to an identity-only shape and the briefing explicitly says the metadata file should not carry legacy fields. Keeping that field in the codec description contradicts the new metadata schema.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 53,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:6a631c164326d9226bdce824ba204951363d890b823fdb991ac564fe470db008",
-          "at": "2026-04-21T03:44:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated contract map only wires `TrackBlobReader` to `read_spec_document` and `read_impl_plan`, but `usecase-types.md` still defines the same port with four methods (`read_spec_document`, `read_type_catalogue`, `read_impl_plan`, `read_enabled_layers`). As rendered, the map understates the port boundary and conflicts with the catalog.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 52,
-              "category": "contradiction"
-            },
-            {
-              "message": "The graph adds `AddTaskUseCase` and `TransitionTaskUseCase`, but it does not draw any dependency edges from those use cases to `ImplPlanReader`/`ImplPlanWriter`, even though `domain-types.json` says those ports were introduced specifically so those use cases can mutate and persist impl-plan state. That makes the new use-case nodes misleadingly disconnected from the ports that justify them.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
-              "line": 31,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
-          "at": "2026-04-21T03:49:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
-          "at": "2026-04-21T03:56:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This entry assigns the task-completion gate (`check_tasks_resolved_from_git_ref`) to the domain `ImplPlanReader` port, but the same plan artifacts describe T007 as changing the usecase `TrackBlobReader` port to `read_impl_plan` for PR-branch blob reads. `ImplPlanReader` loads by `TrackId` from the track store and cannot represent the branch/ref-based merge-gate input, so the catalogue now gives that gate the wrong port/layer responsibility.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
-              "line": 127,
-              "category": "contradiction"
-            },
-            {
-              "message": "The DTO description first states that v4 `metadata.json` has the canonical retained fields `schema_version, id, branch, title, status, created_at, updated_at`, then keeps an additional optional `status_override` field. That contradicts the identity-only/no-legacy-fields v4 shape described for this migration, leaving consumers unable to tell whether `status_override` is valid in v4 metadata.",
-              "severity": "P1",
-              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
-              "line": 54,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
-          "at": "2026-04-21T03:59:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:347c171a8c0fb3ff76622f63da2d4dafb67f657c3779e25d6a8b2cdc52c0d4fe",
-          "at": "2026-04-21T04:02:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:347c171a8c0fb3ff76622f63da2d4dafb67f657c3779e25d6a8b2cdc52c0d4fe",
-          "at": "2026-04-21T04:08:15Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -2110,6 +708,872 @@
         }
       ]
     },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.1 says the ADR must not contain full trait/struct/method specifications, but D2.1 immediately embeds concrete Rust struct definitions for `SpecElementId`, `AdrAnchor`, `ConventionAnchor`, `ContentHash`, and the three ref types. That makes the ADR internally inconsistent about how much type detail it is allowed to spell out.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 243,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SpecElementId` is only validated as a non-empty string in the task/verification text, but the ADR already fixes an ID naming convention (`IN-\\d+`, `AC-\\d+`, etc.). As written, the implementation can accept arbitrary ids, which weakens `SpecRef.anchor` and the new spec-element identity scheme.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/metadata.json",
+              "line": 18,
+              "category": "factual error"
+            },
+            {
+              "message": "The scope for T001/verification includes `track/workflow.md`, but the ADR rollout section only names `CLAUDE.md` and `DEVELOPER_AI_WORKFLOW.md`. That leaves one of the declared in-scope docs outside the ADR's own migration plan, so the file set is inconsistent across the documents.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8abadeeaa232f4220d6d16d5e33bc6a94feedb03fd197d93cf22ccecddb89390",
+          "at": "2026-04-20T09:05:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:09:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.5 permits type catalogues to reference conventions, but the concrete ref schema only places `ConventionRef` on spec.json fields and D3.2 later says catalogues have no convention reference field at all. That gives implementers conflicting requirements: either catalogue entries need a `convention_refs` field and validator coverage, or the D1.5 permission must be removed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 322,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR lists `track/items/review-scope-prompt-injection-2026-04-18/review.json` as an observed-data reference, while the same ADR later forbids ADRs and new tracks from directly referencing track-internal artifacts to preserve lifecycle boundaries. The document should either move/summarize that evidence into a track-crossing artifact or define an explicit exception for historical observation data.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 40,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2.3 says canonical-block detection implementation details are in Q15, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields; Q14 is the canonical-block section. This broken reference points the T011/CLI implementation at the wrong design question.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 426,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:13:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D0.1 says any 🔴/🟡 SoT signal must trigger repair of the next upstream layer, but D3.1 and the /track:plan flow later define 🟡 as allowable and continue to the next phase. Implementers cannot satisfy both semantics: the orchestrator either loops on yellow or records a warning and proceeds.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 196,
+              "category": "contradiction"
+            },
+            {
+              "message": "The merge gate only requires task-coverage.json to cover all acceptance_criteria, while D1.4 defines coverage enforcement as covering both in_scope and acceptance_criteria. This weakens the final PR requirement relative to the task-coverage gate and leaves two conflicting definitions of what coverage is required for merge.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 535,
+              "category": "contradiction"
+            },
+            {
+              "message": "D4 says writers/capabilities must not span multiple phases, but the ownership table assigns the planner to both Phase 1 (/track:spec) and Phase 3 (/track:impl-plan). Since D1.4 also says the planner writes spec in Phase 1 and impl-plan/task-coverage in Phase 3, the writer-boundary rule cannot be enforced as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 487,
+              "category": "contradiction"
+            },
+            {
+              "message": "The canonical-block warning bullet points implementers to Q15 for details, but Q15 is about AdrAnchor/ConventionAnchor semantics and hash fields. The canonical-block unresolved decision is Q14, so this is a self-evidently wrong cross-reference.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 426,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6382c31605c16aa34013052821404f82f3de10879f6823136e90da5b1c58f6",
+          "at": "2026-04-20T09:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.5 allows type catalog entries to reference conventions, but D3.2 says type catalogs have no convention reference field at all. D2.2 also lists `ConventionRef` use sites only for spec.json, so implementers cannot tell whether catalog `convention_refs` must exist and be verified or whether type-catalog-to-convention references are actually forbidden. This is a schema-level contradiction in the SoT reference policy.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 455,
+              "category": "contradiction"
+            },
+            {
+              "message": "The phase matrix still defines `Phase 3 完了` as `task-coverage.json` covering only all acceptance criteria and says merge is OK when SoT signals are blue. That conflicts with the stricter gate defined earlier: task coverage must cover both `in_scope` and `acceptance_criteria` with referential integrity, and final merge also requires every impl-plan task to be resolved. As written, this table can drive an implementation that permits a final merge with uncovered in-scope items or unresolved tasks.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 550,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0774f414a2616b26e59c28730480b536a14773ad27a110a642b0a7a1d3c69e92",
+          "at": "2026-04-20T09:22:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a155cc1561bd4e9e586e9acd3bf717214e1991ea7d1840587d7b7049d24ecd94",
+          "at": "2026-04-20T09:27:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This acceptance criterion is not satisfiable as written: it requires `informal_grounds[]` on type-catalogue entries to emit 🟡, but ADR D3.2 explicitly defers catalogue-side signal evaluation to a later ADR and only keeps the schema presence check in this scope. With only T003/T005 in scope, the track cannot meet this criterion unless you either narrow it to spec-side only or add a follow-on task for catalogue-side signal implementation.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+              "line": 330,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:79a678b08fa4600d451ea7c05b4a123f1a02d3a23af5340fa4dd4f8d5e752272",
+          "at": "2026-04-20T10:57:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
+          "at": "2026-04-20T11:01:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c617ed0c9c6247c7ad79a53c66e326fc018adadfc214fe8212d3097ae9405904",
+          "at": "2026-04-20T11:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered graph still presents the approval/coverage model as live (`approved_at`, `effective_status`/`status`, `evaluate_coverage`, `task_refs`, `SpecStatus`, `CoverageResult`) even though the plan catalog deletes those concepts. That makes the plan-artifact set internally contradictory about the post-migration spec model; the graph and contract-map need to match the deleted-state intent or be explicitly marked legacy-only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/domain-graph.md",
+              "line": 97,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
+          "at": "2026-04-20T11:55:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader` is declared with four methods in the usecase catalogue, but this contract map only renders two edges (`read_spec_document` and `read_track_metadata`). As written, the rendered map no longer describes the full port boundary and misstates the current contract surface.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 39,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ContentHash` entry describes the type as holding either a raw 32-byte buffer or a 64-character hex string. The ADR models `ContentHash` as a single normalized `[u8; 32]` value object, so this wording conflates constructor input formats with the stored domain representation.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 24,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:26e0f40469c9223693d9021a367afcb4dcce39b3fb5714f744fc03f604556c89",
+          "at": "2026-04-20T12:01:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
+          "at": "2026-04-20T12:05:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanArtifactRefsError` declares canonical-block suspicion as part of a public error enum, but the ADR/T011 design says canonical-block detection is warning-only. Implementing from this catalogue would turn an advisory warning into a fatal verifier error/CI failure, contradicting the planned gate semantics; canonical-block suspicion should be modeled as a warning finding instead of an error variant.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2c82b9e5df1c8cc735d4ff6406ea75d7fd0c05eea8e369e52ed0d7aab927060c",
+          "at": "2026-04-20T12:08:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecDocument` says every requirement, including `goal`, gains `id: SpecElementId` and the new ref fields, but the only modified requirement item contract (`SpecRequirement`) is documented as used only for `scope / constraints / acceptance_criteria`, and this catalogue declares no separate goal item type. That leaves the target representation for `goal[]` ambiguous and can let an implementation keep goals as bare strings while still following the `SpecRequirement` entry.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 90,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
+          "at": "2026-04-20T12:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `AdrRef` catalogue entry says ADR references are used in type catalogue entries, but the same plan’s SoT direction forbids type catalogue -> ADR direct references and `TypeCatalogueEntry` only adds `spec_refs` plus `informal_grounds`. Leaving this text in place gives implementers a contradictory schema target for catalogue entries.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ConventionRef` entry also claims use in type catalogue entries, while `TypeCatalogueEntry` explicitly says catalogue-level `convention_refs[]` is deferred to Q8 / a follow-up ADR. That contradicts the current-track scope, where catalogue entries should not gain convention reference fields yet.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c748421a81756692dd18949d0389c324924e651a86f116012e1799499d671c",
+          "at": "2026-04-20T12:24:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1.4 defines identity-only metadata as retaining the track `status` field while moving only `tasks` and `plan` into `impl-plan.json`. This catalogue entry instead says TrackMetadata retains `status_override` and omits `status`; the matching TrackDocumentV2 entry repeats the same retained-field set. That gives implementers the wrong schema contract for metadata.json after task-derived status is removed, so the plan artifacts are internally inconsistent with the authoritative ADR.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 112,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7892b83742bdc18ac1cee2ceb9abf9e604e04490cb8417167113651f876e577",
+          "at": "2026-04-20T12:29:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb5f5e79cae4d15ad26f942d3d804af71293449bd8e28e9c62a5fb939154da93",
+          "at": "2026-04-20T12:34:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
+          "at": "2026-04-20T14:29:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abc37df2d5dfa51b7915485dbe089448ab6ffdc87dd97b144bf97e4aa7e55cbb",
+          "at": "2026-04-20T14:31:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
+          "at": "2026-04-20T16:30:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f603984108b2feec2aaa2c9721935b6b9c1c3924e8cba9d0313d1c6bfae81f4",
+          "at": "2026-04-20T16:32:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `TrackBlobReader` boundary is rendered with only two operations here (`read_spec_document` and `read_track_metadata`), but the same plan set still treats that port as the task-completion boundary and the surrounding contract files describe a fuller port surface. As rendered, this map is a partial view of the port contract and no longer matches the rest of the plan artifact set.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
+          "at": "2026-04-20T17:06:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
+          "at": "2026-04-20T17:07:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e5f4ae0b0a3d4163e92a5907d4ecf892d887b39527a2b189ceea47b83dad2f4",
+          "at": "2026-04-20T17:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Stage 1 signal summary is still `0` yellow, but this spec now introduces `informal_grounds` entries and AC-05 explicitly says those inputs should fire yellow signals. The rendered summary is inconsistent with the document's own signal rules.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
+              "line": 4,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:09:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` now contains two `informal_grounds` entries (CN-02 and CN-03), but the generated `spec.md` still reports `signals: { blue: 44, yellow: 0, red: 0 }`. That contradicts the new schema/AC-05 semantics, where informal grounds are supposed to contribute a yellow signal, so the rendered artifact is stale or the signal aggregation is missing the new field.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
+              "line": 4,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:11:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 says every `spec.json` element must have a non-empty `informal_grounds[]`, but this migrated spec only attaches `informal_grounds` to `CN-02` and `CN-03` and leaves the rest of the requirements without that field. As written, the acceptance criterion and the instance shape disagree, so the artifact cannot satisfy the schema story it is documenting.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.md",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:14:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:16:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a9afeb2a7c91ce6480482b3442a7e1ccfb80d47e6bfa5b66b2113c7f57060dc",
+          "at": "2026-04-20T18:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered contract map does not include the new `SpecCodecError` infrastructure type, even though `infrastructure-types.json` and `infrastructure-types.md` add it as part of the spec codec boundary. That leaves the contract map out of sync with the rest of the plan-artifact artifacts and hides the new domain-validation error surface.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ef7e2c93895ec457de8db095949dfdb265dee6cced3c471a51c9d321290f8a86",
+          "at": "2026-04-20T18:22:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecCodecError` is added to the infrastructure type catalog, but the rendered contract map never adds a corresponding infrastructure node. That leaves the cross-artifact inventory inconsistent and omits the new spec codec error from the map view.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ef7e2c93895ec457de8db095949dfdb265dee6cced3c471a51c9d321290f8a86",
+          "at": "2026-04-20T18:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93cf54cc1caa316fe54a779b235e3ae0aea8bba416d4c63b9eca67a271318bed",
+          "at": "2026-04-20T18:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecCodecError` says the existing `Json`, `Validation`, `UnsupportedSchemaVersion`, and `InvalidField` variants are preserved, but `expected_variants` lists only `DomainValidation`. The rendered infrastructure type table therefore advertises an incomplete error contract, which contradicts the description and can mislead the T003 codec contract review.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:93cf54cc1caa316fe54a779b235e3ae0aea8bba416d4c63b9eca67a271318bed",
+          "at": "2026-04-20T18:28:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c362b604dfbe5aeda9eb52aab321db7e42bf2780e3fac025ed23f148b6aa8c5b",
+          "at": "2026-04-20T18:30:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c362b604dfbe5aeda9eb52aab321db7e42bf2780e3fac025ed23f148b6aa8c5b",
+          "at": "2026-04-20T18:33:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dafe3a0f3c0241cc7024a56034a638aeda03a333edceb01f9e4eaffe7802b8af",
+          "at": "2026-04-20T23:15:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regenerated type catalogs now mark the T004-owned artifacts as complete/Blue (`ImplPlanDocument`, `TaskCoverageDocument`, their DTOs, and codec errors), but the rendered plan and metadata still leave T004 as todo. That is a semantic contradiction in the plan artifacts: readers cannot tell whether the impl-plan/task-coverage document work has actually been completed or is still pending.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/plan.md",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dafe3a0f3c0241cc7024a56034a638aeda03a333edceb01f9e4eaffe7802b8af",
+          "at": "2026-04-20T23:17:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:471cc494ce48dcfd3f49e08260eafdf69c8c13d2cff2089563a63e28b64e095c",
+          "at": "2026-04-20T23:33:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:471cc494ce48dcfd3f49e08260eafdf69c8c13d2cff2089563a63e28b64e095c",
+          "at": "2026-04-20T23:34:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplPlanDocumentDto` says the existing `PlanDocument` / `PlanSectionDocument` / `TrackTaskDocument` DTOs from `track/codec.rs` are reused for `impl-plan.json`, but the newly added `ImplPlanTaskDto` / `ImplPlanPlanDto` / `ImplPlanSectionDto` entries below describe codec-local replacements added specifically because the track DTOs are not sufficient. The catalog needs one consistent design story here.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:add68d4f2ffd640ffa854ee439c11e162a79255a75a807b956a793d2db0bce9b",
+          "at": "2026-04-20T23:36:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:add68d4f2ffd640ffa854ee439c11e162a79255a75a807b956a793d2db0bce9b",
+          "at": "2026-04-20T23:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplPlanDocumentDto` still says the impl-plan codec reuses `PlanDocument`, `PlanSectionDocument`, and `TrackTaskDocument` for `plan` / `tasks`, but the newly added T004 DTO entries define codec-local `ImplPlanTaskDto`, `ImplPlanPlanDto`, and `ImplPlanSectionDto` specifically to avoid reusing those track DTOs and to enforce `deny_unknown_fields`. These two descriptions give contradictory implementation guidance for the impl-plan DTO contract.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:add68d4f2ffd640ffa854ee439c11e162a79255a75a807b956a793d2db0bce9b",
+          "at": "2026-04-20T23:38:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d12f87233a16a7a146649e60b240d884a45394df06a9e12074dc3a8da20754d7",
+          "at": "2026-04-20T23:40:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c26619137f789db8c19d0b2b9906f6764e0f3577d3808bef689547322f98bfe2",
+          "at": "2026-04-21T00:44:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c26619137f789db8c19d0b2b9906f6764e0f3577d3808bef689547322f98bfe2",
+          "at": "2026-04-21T00:46:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This description contradicts the v4 identity-only metadata contract: it says `metadata.json` drops task/plan fields, but then leaves `status_override` as a separate JSON field option. That would reintroduce a legacy field into the supposedly identity-only shape.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e0724dd36f7b46af07ca9e4b936b795ee8c7a4ddec327faade1e608183524c2",
+          "at": "2026-04-21T03:40:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The contract map no longer reflects the full port surface: it renders `TrackBlobReader` only with `read_spec_document` and `read_impl_plan`, but `usecase-types.json` still declares `read_type_catalogue` and `read_enabled_layers` as part of the same contract, and the task use cases are left disconnected from `ImplPlanReader`/`ImplPlanWriter`. That makes the diagram semantically incomplete relative to the other catalog files.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 52,
+              "category": "factual error"
+            },
+            {
+              "message": "`TrackDocumentV2` still claims an optional `status_override` field is retained, but `metadata.json` has been reduced to an identity-only shape and the briefing explicitly says the metadata file should not carry legacy fields. Keeping that field in the codec description contradicts the new metadata schema.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6a631c164326d9226bdce824ba204951363d890b823fdb991ac564fe470db008",
+          "at": "2026-04-21T03:44:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated contract map only wires `TrackBlobReader` to `read_spec_document` and `read_impl_plan`, but `usecase-types.md` still defines the same port with four methods (`read_spec_document`, `read_type_catalogue`, `read_impl_plan`, `read_enabled_layers`). As rendered, the map understates the port boundary and conflicts with the catalog.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 52,
+              "category": "contradiction"
+            },
+            {
+              "message": "The graph adds `AddTaskUseCase` and `TransitionTaskUseCase`, but it does not draw any dependency edges from those use cases to `ImplPlanReader`/`ImplPlanWriter`, even though `domain-types.json` says those ports were introduced specifically so those use cases can mutate and persist impl-plan state. That makes the new use-case nodes misleadingly disconnected from the ports that justify them.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
+          "at": "2026-04-21T03:49:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
+          "at": "2026-04-21T03:56:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This entry assigns the task-completion gate (`check_tasks_resolved_from_git_ref`) to the domain `ImplPlanReader` port, but the same plan artifacts describe T007 as changing the usecase `TrackBlobReader` port to `read_impl_plan` for PR-branch blob reads. `ImplPlanReader` loads by `TrackId` from the track store and cannot represent the branch/ref-based merge-gate input, so the catalogue now gives that gate the wrong port/layer responsibility.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-types.json",
+              "line": 127,
+              "category": "contradiction"
+            },
+            {
+              "message": "The DTO description first states that v4 `metadata.json` has the canonical retained fields `schema_version, id, branch, title, status, created_at, updated_at`, then keeps an additional optional `status_override` field. That contradicts the identity-only/no-legacy-fields v4 shape described for this migration, leaving consumers unable to tell whether `status_override` is valid in v4 metadata.",
+              "severity": "P1",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f75e17a6b9df60371b0d1f02b147fca003c6a9ecdfa35b510fd1420cf84504ab",
+          "at": "2026-04-21T03:59:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:347c171a8c0fb3ff76622f63da2d4dafb67f657c3779e25d6a8b2cdc52c0d4fe",
+          "at": "2026-04-21T04:02:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:347c171a8c0fb3ff76622f63da2d4dafb67f657c3779e25d6a8b2cdc52c0d4fe",
+          "at": "2026-04-21T04:08:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d241eabd3fa4738e13994d50d3b3c271718193bf13969ce0c2646456ca55c692",
+          "at": "2026-04-21T06:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d241eabd3fa4738e13994d50d3b3c271718193bf13969ce0c2646456ca55c692",
+          "at": "2026-04-21T06:58:13Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::render_track_views` would move Markdown/view rendering and file I/O into the usecase layer, which is the wrong boundary for this repository's hexagonal split. The validation step can be shared, but the render pipeline should stay infrastructure-owned; otherwise this TODO would invert the dependency direction instead of just extracting the stale-signal check.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:95d0c68702d8fa4626d6c868b51bac1f460775f0126a396badf0d3abad9c59c1",
+          "at": "2026-04-20T09:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new parenthetical still says the workflow's actual Markdown generation and file write happen \"via infra port\", which is inconsistent with the pure-orchestrator boundary described here and with the existing `contract_map_workflow.rs` pattern. As written, it can mislead implementers into reintroducing the same layer-boundary leak this TODO is trying to remove.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 856,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2274103460420d28d54a43cc111c0034f7aa5e00312795467d752db7794a17ed",
+          "at": "2026-04-20T09:07:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:09:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d6665d6ac11d97314d0661a3442532fb0d048a570af87b866d2188e8dcc41a6",
+          "at": "2026-04-20T09:10:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` now says the default profile assigns `adr-editor` to Claude Code, but the sample profiles in this change only define `orchestrator`, `spec-designer`, `impl-planner`, `type-designer`, `implementer`, `reviewer`, and `researcher`. That leaves the workflow pointing at a capability users cannot select from the documented profiles, so the ADR back-and-forth path is unusable as written.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 40,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
+          "at": "2026-04-20T14:30:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor` is referenced by the new workflow, but this source-of-truth capability map never defines it. On a red Phase 1 signal the orchestrator will try to re-invoke `adr-editor`, and capability resolution will fail before the ADR edit loop can start. The same omission also exists in the three sample profile files.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while many existing docs still point at `.claude/skills/track-plan/SKILL.md`. That turns the documented skill path into a dead link and breaks any workflow that still relies on the skill loader instead of the new command docs.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 1,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:330bdf440976b36a542815c96bc80a700940730c9451b650fd005f697eb5ed72",
+          "at": "2026-04-20T14:33:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b571d7db40a6245e2d0958e9264a8cc4877622e2a7ba7b88c7f77267b1dc39e5",
+          "at": "2026-04-20T14:38:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:43:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new phased workflow says `/track:plan` now orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. Those are incompatible contracts for the canonical planning command, so agents following this user-facing workflow can execute the obsolete artifact flow instead of the new phased one.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 33,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting the backing `track-plan` skill file leaves the repo with no `track-plan` skill entry while live guidance still references `track-plan` as a skill workflow. That turns the documented skill path into a dead link and breaks any workflow that relies on skill discovery instead of only the command docs.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 1,
+              "category": "correctness"
+            },
+            {
+              "message": "The new phased workflow says `/track:plan` orchestrates Phase 0-3 to produce `metadata.json`, `spec.json`, type catalogues, `impl-plan.json`, and `task-coverage.json`, but the same document still later tells users that `/track:plan` creates the old artifact set (`metadata.json`, `plan.md`, `spec.md`, `verification.md`) after approval and after clearing `track/tech-stack.md` TODOs. These are incompatible contracts for the canonical planning command, so agents can follow the obsolete artifact flow instead of the new phased one.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 33,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:42e0bc3bc5be5b3aa703d57b062cda862615170b269e2a7cc2233af088f0f44f",
+          "at": "2026-04-20T14:51:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:551d8d1d524282f305fdba449f7fdfe17fcdc4acdc3debde02b821f2bc42c7a9",
+          "at": "2026-04-20T14:55:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
+          "at": "2026-04-20T16:30:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:928941c649aa0499f536d87bc4188d56ac9122a35e1e7271af6639ec8d604e5b",
+          "at": "2026-04-20T16:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bb65cb63ee9e51afe8e55ec9f5cce2ebb95aa22922fb62c32d8a5c934701e03",
+          "at": "2026-04-21T06:57:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The design doc still lists `CC-SDD-02: SpecStatus enum + content hash auto-demotion` as an active key design decision, even though this change removes the spec approval/content-hash gate and the detailed section describing it. Leaving this row makes `knowledge/DESIGN.md` internally inconsistent and preserves the obsolete approval model as current design guidance.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 67,
+              "category": "docs-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:0bb65cb63ee9e51afe8e55ec9f5cce2ebb95aa22922fb62c32d8a5c934701e03",
+          "at": "2026-04-21T06:58:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ad5ef97c5d9904f7ffa814543405b35d6e568cc9aaad7c0571feac4f9a4f40e",
+          "at": "2026-04-21T06:59:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ad5ef97c5d9904f7ffa814543405b35d6e568cc9aaad7c0571feac4f9a4f40e",
+          "at": "2026-04-21T07:00:19Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -2512,6 +1976,606 @@
           "findings": [],
           "hash": "rvw1:sha256:f21d30fbc5e42964f4884b1fd649c1a64c43ac1db852513ff243b3f4d40142ce",
           "at": "2026-04-21T04:59:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dcefd677b17851a1b7c37aaef8a2f9ccca237a71855d14753c4fed59918d901",
+          "at": "2026-04-21T06:56:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dcefd677b17851a1b7c37aaef8a2f9ccca237a71855d14753c4fed59918d901",
+          "at": "2026-04-21T06:57:27Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d68aa4f91203b33f68790c54fa2e0220213df03c80fb0a948e5c45c3f4743bf9",
+          "at": "2026-04-20T17:04:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:45:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Schema 4 tracks cannot be activated: T005 now writes identity-only metadata with schema_version 4, and execute_activate passes that DocumentMeta schema_version into ActivateTrackUseCase, but this guard still rejects anything other than 3 before materializing the branch. New branchless schema 4 tracks will fail /track:activate with TrackActivationRequiresSchemaV3 even though schema 4 is the new metadata shape.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_activation.rs",
+              "line": 46,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:48:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ActivateTrackUseCase::execute` still rejects every schema version except 3, but T005 now writes identity-only metadata as schema_version 4. A newly created branchless v4 track that is otherwise planned will fail activation with `TrackActivationRequiresSchemaV3`, so the non-task activation path is broken by this update.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_activation.rs",
+              "line": 46,
+              "category": null
+            },
+            {
+              "message": "Clearing an override always writes `TrackStatus::Planned`. Because T005 makes track status an explicitly persisted field, clearing a blocked/cancelled override on an active or done track rewrites the stored workflow status to planned instead of restoring or preserving the underlying status, corrupting the track phase for non-task override flows.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 197,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:d69124cf029dcc277e40d4ddd041dc1181e102764bd502602a861dbf1d9fc89d",
+          "at": "2026-04-21T00:50:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new transition/add-task path performs a separate `find` / `load_impl_plan` / `save_impl_plan` read-modify-write without the per-track lock that `TrackWriter::update` used to provide. Two concurrent `track-add-task` or `track-transition` calls can read the same snapshot, compute the same next `TaskId`, and then the last save wins, dropping one update. This is a data-loss regression and needs a serialized update boundary around the impl-plan mutation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 100,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6ecd6db28f4028ab6674601372ed56e9d27c214cf4243b6b32d3c5b3a453c260",
+          "at": "2026-04-21T03:41:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
+          "at": "2026-04-21T03:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a `track/` branch, `BlobFetchResult::NotFound` means the PR head does not contain `impl-plan.json`; `plan/` branches already short-circuit before this point. Returning `VerifyOutcome::pass()` here fail-opens the merge-time task-completion gate when there is no implementation plan to inspect, even though final merge requires `impl-plan.json` task state to be present and resolved.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_completion.rs",
+              "line": 65,
+              "category": "merge-gate"
+            },
+            {
+              "message": "An empty `ImplPlanDocument` is accepted because `all_tasks_resolved()` is vacuously true, so a PR can pass the merge task-completion gate with `impl-plan.json` present but containing zero tasks. The workflow requirement explicitly blocks empty task sets to avoid this nullable bypass; this use case needs to reject `impl_plan.tasks().is_empty()` before returning pass.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_completion.rs",
+              "line": 77,
+              "category": "merge-gate"
+            },
+            {
+              "message": "The branchless implementation-transition guard still only rejects `schema_version == 3`. New identity-only tracks are saved as schema version 4 and activation was updated to accept v4, so a branchless v4 planned track can run an implementation transition (`in_progress`, `done`, or `skipped`) without going through activation or materializing a track branch.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_resolution.rs",
+              "line": 139,
+              "category": "activation-guard"
+            },
+            {
+              "message": "`execute_by_status` mutates and saves only `impl-plan.json`, then returns the `TrackMetadata` read before the transition. Since `metadata.json` still carries the explicit persisted track status and no other task-transition path updates it, moving tasks to `in_progress` or `done` leaves `metadata.status` stuck at its old value, so resolve/registry/CLI status consumers continue to treat the track as planned after task state changed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 169,
+              "category": "state-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9261c12d8ca4a8b53f526ea336b83ed0fb0c5d915db1fa02f1ffcd17f29f1a19",
+          "at": "2026-04-21T03:55:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase::execute` never re-derives or persists `TrackMetadata.status` after appending a new Todo task. If the track was previously `Done`, `metadata.json` stays `done` even though `impl-plan.json` now contains unresolved work, so `resolve_phase()`/CLI status reporting will keep treating the track as ready to ship.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 283,
+              "category": "correctness"
+            },
+            {
+              "message": "The transition paths write `impl-plan.json` first and then perform a second `metadata.json` update. If that second write fails, the task transition is already committed but the use case returns an error, leaving the two persisted documents out of sync and making retries non-idempotent. The same pattern exists in both `execute` and `execute_by_status`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase` mutates `impl-plan.json` but never re-syncs `TrackMetadata.status` after inserting a new task. That leaves the persisted metadata and the returned `TrackMetadata` stale for any track that was already `Done` or otherwise not `Planned`: adding a new `Todo` task will still report the old phase, so CLI output and stored metadata can become inconsistent with the updated task list.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:07:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AddTaskUseCase::execute persists `impl-plan.json` but never re-derives or writes `metadata.status`. Adding a task to a completed or in-progress track leaves `metadata.json` stale, so later phase checks and CLI output keep reporting the old status even though the track now has an unresolved task.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 278,
+              "category": "correctness"
+            },
+            {
+              "message": "TransitionTaskUseCase::execute and execute_by_status now save `impl-plan.json` and then update `metadata.json` in a second step. If the metadata update fails after the plan save succeeds, the method returns an error but the repository is left half-updated (impl-plan changed, metadata stale), which reintroduces a data-consistency failure mode the old single-write path avoided.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:11:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AddTaskUseCase` persists the new `impl-plan.json` entry but never re-derives or writes back `metadata.json.status`. Adding a Todo task to a completed track can therefore leave the track marked `done` even though the aggregate is no longer fully resolved.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 284,
+              "category": "correctness"
+            },
+            {
+              "message": "Both transition paths save `impl-plan.json` before syncing `metadata.json`. If the later `TrackWriter::update` fails, the method returns an error after already mutating the plan, leaving `impl-plan.json` and `metadata.json` out of sync.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c0d0af37a52decb1bf71423c883227105c0358950632c11f2a67b21e95febeb7",
+          "at": "2026-04-21T04:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_impl_plan` only promotes a track to `InProgress` when a task is already `InProgress`. That leaves partially completed plans with only `done` + `todo` tasks classified as `Planned`, so the transition/add-task use cases can write back the wrong phase and `track_phase` will report Planning even though work is still open. The sync should treat any unresolved task mix as `InProgress`, not just explicit in-progress tasks.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:23:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:26:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The read-only sandbox prevents me from inspecting `tmp/reviewer-runtime/briefing-usecase.md` or running `git diff`, so I cannot perform an evidence-based review in this environment.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "environment"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:26:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_impl_plan` classifies a mixed plan such as `[done, todo]` as `Planned` because it only returns `InProgress` when a task is explicitly `InProgress`, and otherwise falls through unless all tasks are resolved. That regresses the previous track-status semantics where any non-empty plan with some progress but unresolved work is active; after completing one task in a multi-task track, the use case can write `metadata.status = planned`, causing phase/status consumers to misreport active implementation work.",
+              "severity": "P1",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:539a4e6af8af8fd761da723c61b4f5b80766ca201883fe7e2299256c3cefd407",
+          "at": "2026-04-21T04:28:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
+          "at": "2026-04-21T04:46:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85d8c03a0daaa3ab8148c6f44e37870bc7e380bc608dc4a2ddb3759527c6e210",
+          "at": "2026-04-21T04:48:36Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
+          "at": "2026-04-20T16:31:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3baa0747d365ce0f59d1077a02bc44c0bf7543369d064cef12ee22eceacc333",
+          "at": "2026-04-20T16:33:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T17:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`convention_refs` should not participate in phase-1 signal evaluation per ADR 2026-04-19-1242 §D3.1. As written, a requirement with only `convention_refs` is classified as Blue, which suppresses the Red finding that `check_spec_doc_signals()` is meant to surface for missing ADR grounding.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 384,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T18:09:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`convention_refs` are treated as a Blue signal here, but ADR 2026-04-19-1242 D3.1 says the spec signal must depend only on `adr_refs` and `informal_grounds`; `convention_refs` are excluded. As written, a requirement with only convention refs will be classified as Blue instead of Red, which weakens the gate.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 384,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f87152ed535c1f52dc283e3c66a4eea7c23133b733576ede316142fb31d3ec8",
+          "at": "2026-04-20T18:11:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_spec_doc_signals()` tells callers to upgrade Yellow by referencing either `adr_refs[]` or `convention_refs[]`, but convention refs are explicitly outside signal evaluation and do not change a requirement from Yellow to Blue. A requirement with only convention refs still evaluates Red, so this guidance is functionally wrong and will mislead users of the gate output.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 447,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97d34f43ea2cddeb065b926d5b8fb741fd82ba42b61140d1d49d8004c30e7332",
+          "at": "2026-04-20T18:16:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
+          "at": "2026-04-20T18:17:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d31984ad63525f66e624f9e4ed147d26e51f0c1b85be17eac890b48fc4c8fc0",
+          "at": "2026-04-20T18:18:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskCoverageDocument::new` only checks for duplicate `SpecElementId` keys across sections; it never rejects duplicate `TaskId` entries inside a single element’s `Vec<TaskId>`, even though this type advertises that as an enforced invariant. That means callers can still construct coverage documents in an illegal state, and the codec will accept that state unchanged.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_coverage.rs",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9bda27ed9d4212dcb6c335a252688220f323dd75743bc92242f6ee168e844b42",
+          "at": "2026-04-20T23:16:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
+          "at": "2026-04-20T23:18:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c30386c10de595fae58d6a0ee742dfa2518aea5a1f61ba6170089dd34b86b9c",
+          "at": "2026-04-20T23:20:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackMetadata::with_branch` now only validates the title; it no longer checks that a provided branch matches the track id, and `set_branch` can later introduce the same mismatch. That allows persisted states like `id = my-track` with `branch = track/other-track`, which violates the branch-id consistency required by the new identity-only metadata model and can misroute branch-based readers/activation logic.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/track.rs",
+              "line": 300,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:9b07da54fc4423102751c166ded489b8277a7972f4883a15bd03700065d2d706",
+          "at": "2026-04-21T00:45:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set_branch` bypasses the new branch/id invariant enforced in `TrackMetadata::with_branch`. A caller can mutate an already-validated track into a mismatched `track/<other>` branch, and `ActivateTrackUseCase` uses this setter directly, so the domain can persist an invalid branch/id pair without any error.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 337,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:168ba683894d8aa7326203724f818ce860eb0bdd7615f5e49ff0a2c42c3ec9f2",
+          "at": "2026-04-21T00:50:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackMetadata` no longer enforces coherence between `status` and `status_override`. `new`/`with_branch` accept any combination, and `set_status`/`set_status_override` can mutate a track into `status = Planned` while keeping a blocked/cancelled override. `resolve_phase()` only consults `status`, so the override is then silently ignored and the track is misclassified. The previous implementation prevented impossible states here.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 307,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3a5efea3b1688def811484ea70d487b7b3ea9eab26a2d872cd5d91bda5c7800c",
+          "at": "2026-04-21T00:55:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` is not fail-safe: it appends the new task before validating the target section, and it `mem::take`s `self.plan` before the same validation. Any `SectionNotFound`/`NoSectionsAvailable` error leaves the aggregate mutated and the plan dropped, so a failed call corrupts in-memory state.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 173,
+              "category": "safety"
+            },
+            {
+              "message": "`next_num + 1` overflows when the highest existing task suffix is `u64::MAX`. That is a reachable `TaskId` value, so `add_task` can panic in debug builds or wrap to a duplicate `T000` in release builds.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 168,
+              "category": "safety"
+            },
+            {
+              "message": "`resolve_transition` only looks at `TaskStatusKind::Done`, so it cannot distinguish `DonePending` from `DoneTraced`. A traced task given target `done` plus a commit hash is mapped to `BackfillHash` and then rejected by `TrackTask::transition`, instead of being classified as an unsupported target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "line": 239,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
+          "at": "2026-04-21T03:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` mutates `self.tasks` and `self.plan` before validating `section_id`. If the section is missing or there are no sections, the method returns an error after the new task has already been pushed and `mem::take(&mut self.plan)` has already cleared the plan, leaving the document corrupted on a recoverable error.",
+              "severity": "P0",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 173,
+              "category": "correctness"
+            },
+            {
+              "message": "The next task ID is computed with `+ 1` on the maximum numeric suffix. When the highest existing task is `T18446744073709551615`, this overflows and panics in library code instead of returning a validation error, regressing the previous checked-add behavior.",
+              "severity": "P0",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 169,
+              "category": "panic"
+            },
+            {
+              "message": "`next_open_task` now scans `self.tasks` in storage order and returns the first Todo/InProgress task it encounters. The previous implementation walked plan order and preferred InProgress over Todo, so a task list that is not aligned with the plan can now report the wrong \"next\" task.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 80,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:850a4fad3f8009f4b4cd1ccfffa69826ddda3ef5f94792dcb0758dad139c1b88",
+          "at": "2026-04-21T03:44:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`apply_transition_by_status` collapses `DonePending` and `DoneTraced` into `TaskStatusKind::Done` before resolving `done`. That means a `done` request with a commit hash is always mapped to `BackfillHash`, which `TrackTask::transition` rejects for already-traced tasks. The status-based API therefore cannot distinguish the two done states and fails on an already-traced task instead of choosing the correct transition.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 148,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:76e182d450f25d2ef8a454702a1c4dfcd4d726872a4fdfac148cc670d4968420",
+          "at": "2026-04-21T03:51:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_phase` and `resolve_phase_from_record` still treat only `schema_version == 3` as branchless/activatable. That means v4 identity-only tracks are classified as `Planning` and the CLI will suggest `/track:implement` instead of `/track:activate`, even though the activation use case already accepts schema v4.",
+              "severity": "P1",
+              "file": "libs/domain/src/track_phase.rs",
+              "line": 82,
+              "category": "correctness"
+            },
+            {
+              "message": "`next_open_task` looks for any `InProgress` task using `self.tasks.iter().find(...)`, so the chosen task depends on storage order rather than plan order. If more than one task is open, `track next-task` can return a later task instead of the earliest one in the plan, which contradicts the method's own ordering contract.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 84,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:22c223c1b32f8b54b8167f40e8b26f076509c5f09db66a357ec04f750b28b7d1",
+          "at": "2026-04-21T03:56:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanSection` is used in `add_task` but never imported into this module, so the new `ImplPlanDocument::add_task` implementation does not compile.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 245,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
+          "at": "2026-04-21T04:05:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` now maps task-id overflow to `ValidationError::DuplicateTaskId(\"task id counter overflow\")`. That is the wrong error class for an arithmetic overflow and is a behavioral regression from the previous `InvalidTaskId` boundary handling, so callers can no longer distinguish overflow from a real duplicate-id case.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 203,
+              "category": "validation"
+            },
+            {
+              "message": "`with_refs` stores `spec_refs` verbatim and never checks whether the same `SpecRef.anchor` appears more than once in a single catalogue entry. That leaves the new structured-ref model able to encode duplicate `SpecElementId` citations without any domain validation, which is the invariant the briefing calls out as needing a new error path.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 490,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:deb652351031995b363b71ffa948c8dfb6e04bdcf0d140aa2f8606acb54e5802",
+          "at": "2026-04-21T04:10:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`all_tasks_resolved()` is vacuously true for an empty `ImplPlanDocument`, so a zero-task `impl-plan.json` is treated as fully complete by downstream checks. That lets an empty implementation-plan file satisfy the completion gate instead of being rejected as missing/incomplete work.",
+              "severity": "P1",
+              "file": "libs/domain/src/impl_plan.rs",
+              "line": 68,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19226f4e039523bca95924b238af6bdc0ef04d76488e6e2538fe3daf52365823",
+          "at": "2026-04-21T04:15:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
+          "at": "2026-04-21T04:25:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fceeb329d0a33b8cfbc1421dccf4629af61f49409559712c848eaf8d1d7240e8",
+          "at": "2026-04-21T04:29:01Z"
         }
       ]
     },
@@ -2989,6 +3053,65 @@
           "findings": [],
           "hash": "rvw1:sha256:9339bc4c829a71f14af7e3f3b4e8107f9ec6ad33588d066065edadde44e0e9e5",
           "at": "2026-04-20T16:31:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Bash permission prompt still tells reviewers to replace `bin/sotp spec approve` with `cargo make spec-approve`, but this wrapper has been removed. That leaves the permission flow pointing at a non-existent command and will mis-handle direct `bin/sotp spec approve` requests.",
+              "severity": "P1",
+              "file": ".claude/settings.json",
+              "line": 64,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8526723693a5a3e153cc33f3a9443944b88f1e8098fc49cba9e7e8d24c94796a",
+          "at": "2026-04-21T06:56:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The PermissionRequest prompt still treats `bin/sotp spec approve` as a valid direct command and maps it to `cargo make spec-approve`, even though this wrapper is being removed. That leaves a stale permission path that will keep suggesting a nonexistent alternative for the deleted command.",
+              "severity": "P1",
+              "file": ".claude/settings.json",
+              "line": 64,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:8526723693a5a3e153cc33f3a9443944b88f1e8098fc49cba9e7e8d24c94796a",
+          "at": "2026-04-21T06:57:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `PermissionRequest` prompt still tells users to replace `bin/sotp spec approve` with `cargo make spec-approve`, but that wrapper was removed from the allowlist and is no longer part of the harness policy. Hitting this hook will now produce a dead-end suggestion for a nonexistent command.",
+              "severity": "P1",
+              "file": ".claude/settings.json",
+              "line": 64,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8526723693a5a3e153cc33f3a9443944b88f1e8098fc49cba9e7e8d24c94796a",
+          "at": "2026-04-21T06:59:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8526723693a5a3e153cc33f3a9443944b88f1e8098fc49cba9e7e8d24c94796a",
+          "at": "2026-04-21T07:00:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8526723693a5a3e153cc33f3a9443944b88f1e8098fc49cba9e7e8d24c94796a",
+          "at": "2026-04-21T07:01:14Z"
         }
       ]
     }

@@ -68,11 +68,6 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::file::FileCommand,
     },
-    /// Spec operations (approve, etc.).
-    Spec {
-        #[command(subcommand)]
-        cmd: commands::spec::SpecCommand,
-    },
     /// Verification checks for CI validation.
     Verify {
         #[command(subcommand)]
@@ -97,7 +92,6 @@ fn main() -> ExitCode {
         Some(CliCommand::Plan { cmd }) => commands::plan::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
-        Some(CliCommand::Spec { cmd }) => commands::spec::execute(cmd),
         Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
         Some(CliCommand::Make(args)) => commands::make::execute(args),
         Some(CliCommand::Demo) | None => match run_demo() {
