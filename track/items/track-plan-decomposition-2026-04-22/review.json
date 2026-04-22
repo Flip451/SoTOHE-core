@@ -1,6 +1,42 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:09:25Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:05:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:07:25Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -214,42 +250,87 @@
           "findings": [],
           "hash": "rvw1:sha256:07588c0764331154ab1fa8eb40a62662bb805971bbdb91a8b8ea36d6a2c4ce76",
           "at": "2026-04-22T06:50:27Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec still carries the promoted items as `informal_grounds.kind = \"user_directive\"` instead of moving them onto the new child ADR; `2026-04-22-0829` is not referenced anywhere in this file, so the claimed `blue: 59 / yellow: 0` state is not actually backed by the artifact contents. This starts at GO-05/GO-06 and repeats through the later IN/AC entries.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 81,
+              "category": "contradiction"
+            },
+            {
+              "message": "This ADR omits the repository-required `## Status` section, so the new index entry cannot be grounded in one of the documented lifecycle states (`Proposed` / `Accepted` / `Superseded` / `Deprecated`). That makes the README row fall back to an unlabeled `—` state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+              "line": 1,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
+          "at": "2026-04-22T09:01:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `signals` summary was changed to `blue: 59, yellow: 0`, but this same spec still contains unresolved `user_directive` informal grounds in multiple entries (for example GO-05, GO-06, IN-01, IN-02, and others). That makes the zero-yellow claim internally inconsistent with the file contents.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 1148,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
+          "at": "2026-04-22T09:03:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この ADR は `spec.json` の 31 件の yellow signal を本 ADR の `adr_refs[]` へ昇格させて解消したと説明していますが、現行の `spec.json` 側では該当項目がまだ親 ADR 参照のままで、本文で説明している評価ルールに従うとそれらはすでに Blue です。つまり『この ADR で yellow を解消した』という因果関係が、実際の artifact 群と噛み合っていません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+              "line": 18,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
+          "at": "2026-04-22T09:06:02Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:06:08Z"
+          "hash": "rvw1:sha256:cbc1978007a383b18aff58ee5f1c9a604772f3ec1059ac27a3ccef6a33e81198",
+          "at": "2026-04-22T09:17:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 says the command definition body should describe steps (1)-(3), where step 3 is the post-write signal/binary CLI call, but the spec's CN-10/AC-22 require phase command definitions to contain only writer invocation plus result receipt and to contain no `sotp` CLI calls. This gives implementers contradictory guidance about whether CLI evaluation belongs in the command definition text.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cbc1978007a383b18aff58ee5f1c9a604772f3ec1059ac27a3ccef6a33e81198",
+          "at": "2026-04-22T09:20:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:09:25Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:05:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:07:25Z"
+          "hash": "rvw1:sha256:dcc673264ae1e509b2ccb8302869de41ea568c77b8d8f9f5ed452e26b6a362cf",
+          "at": "2026-04-22T09:26:12Z"
         }
       ]
     },

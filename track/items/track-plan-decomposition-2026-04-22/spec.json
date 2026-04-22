@@ -88,6 +88,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D4"
         }
       ],
       "informal_grounds": [
@@ -108,6 +112,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "D1.4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D5"
         }
       ],
       "informal_grounds": [
@@ -135,6 +143,10 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "D1.4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D3"
           }
         ],
         "convention_refs": [
@@ -165,6 +177,14 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "展開フェーズ 4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D2"
           }
         ],
         "convention_refs": [
@@ -195,6 +215,10 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "展開フェーズ 6"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D1"
           }
         ],
         "convention_refs": [
@@ -269,6 +293,14 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "展開フェーズ 5"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D2"
           }
         ],
         "informal_grounds": [
@@ -323,6 +355,10 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "展開フェーズ 5"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D4"
           }
         ],
         "informal_grounds": [
@@ -347,6 +383,10 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "D1.4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D5"
           }
         ],
         "informal_grounds": [
@@ -439,6 +479,10 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "展開フェーズ 6.5"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D5"
           }
         ],
         "informal_grounds": [
@@ -620,6 +664,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "convention_refs": [
@@ -646,6 +694,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 6.5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -666,6 +718,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D4"
         }
       ],
       "informal_grounds": [
@@ -686,6 +742,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -728,6 +788,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -748,6 +812,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 6"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -912,6 +980,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "convention_refs": [
@@ -938,6 +1010,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -958,6 +1034,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 6.5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -974,6 +1054,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D2"
         }
       ],
       "informal_grounds": [
@@ -994,6 +1078,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D4"
         }
       ],
       "informal_grounds": [
@@ -1014,6 +1102,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -1030,6 +1122,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "D0.0"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D5"
         }
       ],
       "informal_grounds": [
@@ -1076,6 +1172,14 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "D3.2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D2"
         }
       ],
       "informal_grounds": [
@@ -1096,6 +1200,10 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
         }
       ],
       "informal_grounds": [
@@ -1145,8 +1253,8 @@
     }
   ],
   "signals": {
-    "blue": 28,
-    "yellow": 31,
+    "blue": 59,
+    "yellow": 0,
     "red": 0
   }
 }
