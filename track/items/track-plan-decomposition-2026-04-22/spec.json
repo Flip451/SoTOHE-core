@@ -93,12 +93,6 @@
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D4"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 設計変更: spec-designer / impl-planner への write 権限付与に加え、signal 評価も subagent 内部に閉じ込める。ADR 未言及部分はユーザー指示による拡大適用として spec に根拠明示し、ADR revise は back-and-forth で対応"
-        }
       ]
     },
     {
@@ -116,16 +110,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D5"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "「別にワークスペースクリーンの要求っていらなくない？」— init で branch create する設計を有効化するため、resume flow 以外での worktree clean 要求を撤廃する"
-        },
-        {
-          "kind": "memory",
-          "summary": "apps/cli/src/commands/track/activate.rs の activation_requires_clean_worktree 関数を修正済 (未 commit)。BranchMode::Auto && already_materialized && resume_allowed の場合のみ true を返す"
         }
       ]
     }
@@ -153,12 +137,6 @@
           {
             "file": "knowledge/conventions/pre-track-adr-authoring.md",
             "anchor": "Rules"
-          }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "「ブランチの作成はinit段階ですべきです」「/track:init も独立コマンドとして定義するが、たまたまmainが担当するというだけ」— branch create を /track:init の責務として明確化。/track:init のみ writer=main なので command 定義本文が直接処理を実行する (CN-10 例外)。ADR §D0.0 の /track:init 新設記述と方向性は一致するが branch create の明示は ADR 未言及 (OQ-7)"
           }
         ]
       },
@@ -192,12 +170,6 @@
             "file": ".claude/rules/11-subagent-model.md",
             "anchor": "Subagent Model"
           }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "v3 変更: command 定義本文は subagent invocation + 結果受け取りのみ。sotp CLI 呼び出しは spec-designer 内部に閉じ込める。コマンド名は /track:spec-design (ADR の /track:spec から変更)。ADR との差分は OQ-6 に明記"
-          }
         ]
       },
       {
@@ -225,12 +197,6 @@
           {
             "file": ".claude/rules/11-subagent-model.md",
             "anchor": "Subagent Model"
-          }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "v3 変更: command 定義本文は subagent invocation + 結果受け取りのみ。sotp CLI 呼び出しは impl-planner 内部に閉じ込める"
           }
         ]
       },
@@ -302,16 +268,6 @@
             "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
             "anchor": "D2"
           }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "v3 変更: command 定義本文は subagent invocation + 結果受け取りのみ。baseline capture / types.json write / graph md render / contract-map render / type-signals render / 信号機評価は type-designer 内部に閉じ込める。<layer>-type-design.json はユーザー表記の揺れ; 実ファイル名 <layer>-types.json を維持 (rename は OS-07 緩和範囲外)。コマンド名は /track:type-design (ADR の /track:design から変更)。ADR との差分は OQ-6 に明記。T001 で刷新済のため大幅な書き直しは含まない"
-          },
-          {
-            "kind": "memory",
-            "summary": "T001 (plan-artifact-workflow-restructure-2026-04-19) で design.md は Phase 2 専任仕様として刷新済。本 track では rename + 責務縮小 + 共通構造パターンへの整合のみ"
-          }
         ]
       },
       {
@@ -336,12 +292,6 @@
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "D0.0"
           }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "memory",
-            "summary": "T001 merge (PR #107) で CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md への Phase 0-3 大枠記載は完了済。本 track での更新は新 command 名の差分のみ"
-          }
         ]
       },
       {
@@ -360,16 +310,6 @@
             "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
             "anchor": "D4"
           }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "v3 変更: Write に加えて Bash (sotp CLI 呼び出し用) を追加。cat/grep/head 等の禁止 Bash 操作は引き続き禁止。spec-designer / impl-planner への write 権限付与は ADR 未言及 (type-designer のみ §展開フェーズ 5 で明記)。ユーザー指示による拡大適用。ADR との差分は OQ-8 に明記"
-          },
-          {
-            "kind": "memory",
-            "summary": "現状: spec-designer.md は 'This agent is read-only'、impl-planner.md は 'This agent is advisory'、type-designer.md は 'The catalogue JSON write ... are the orchestrator's responsibility' と宣言。3 つとも write + bash 権限付与に変更が必要"
-          }
         ]
       },
       {
@@ -387,16 +327,6 @@
           {
             "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
             "anchor": "D5"
-          }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "「別にワークスペースクリーンの要求っていらなくない？」— init で branch create する設計を有効化するため、新規 track / 一般 branch create での worktree clean 要求を撤廃。git の通常動作 (branch switch で untracked files を carry over) で安全"
-          },
-          {
-            "kind": "memory",
-            "summary": "activation_requires_clean_worktree は現在 'matches!(mode, BranchMode::Auto) && already_materialized && resume_allowed' として実装済 (bootstrap 先行修正)"
           }
         ]
       }
@@ -460,12 +390,6 @@
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "移行"
           }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "memory",
-            "summary": "前 track PR #107 merge 済。domain::plan_ref, ImplPlanDocument, TaskCoverageDocument, TrackDocumentV2, sotp verify plan-artifact-refs 等は既に main 上に存在する"
-          }
         ]
       },
       {
@@ -484,12 +408,6 @@
             "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
             "anchor": "D5"
           }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "OS-07 緩和: 「Rust コード変更なし」から「activate.rs の preflight 緩和 + 関連 tests のみ」に変更"
-          }
         ]
       },
       {
@@ -499,12 +417,6 @@
           {
             "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
             "anchor": "Q16"
-          }
-        ],
-        "informal_grounds": [
-          {
-            "kind": "user_directive",
-            "summary": "briefing v2 §1 IN-11 (optional) として言及。本 track では対象外とし別 track に委ねる"
           }
         ]
       }
@@ -564,12 +476,6 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 6.5"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "memory",
-          "summary": "feedback_no_backward_compat — 後方互換のための Option/nullable 混在を作らない原則の command 定義への適用"
         }
       ]
     },
@@ -645,12 +551,6 @@
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 6.5"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "memory",
-          "summary": "briefing v2 §3: current branch = track/track-plan-decomposition-2026-04-22、metadata.json 作成済 (branch=track/..., schema v5)、main 上に activation commit de5a66b 済、activate.rs 修正済 (未 commit)"
-        }
       ]
     },
     {
@@ -675,12 +575,6 @@
           "file": ".claude/rules/08-orchestration.md",
           "anchor": "Delegation Rules"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 強化: command 定義本文から sotp CLI 呼び出しも排除。sotp CLI は subagent 内部 (または /track:init では main) に閉じ込める。Directive 1: command 定義はロジック無しの呼び出し結線のみ"
-        }
       ]
     },
     {
@@ -698,12 +592,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "ユーザー指示: /track:plan が state machine を担い、各フェーズコマンドは subagent 呼び出し + 信号機評価のみ。state machine の遷移ロジックを phase command に書かない"
         }
       ]
     },
@@ -723,12 +611,6 @@
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D4"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "ユーザー指示: 各フェーズで対応する subagent がファイルを書く。orchestrator (main) の transcribe 作業が今回 spec.json で実際に発生したため、subagent write 権限付与で解消する"
-        }
       ]
     },
     {
@@ -746,12 +628,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 具体化: 4 phase command の共通構造パターン = writer invocation + 結果受け取りのみ。各 writer の内部責務リストを明記。subagent が sotp CLI まで内部実行することが構造パターンの核心"
         }
       ]
     }
@@ -793,12 +669,6 @@
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 変更: subagent が spec.json write + render + signal 評価を一括。command 定義本文は subagent invoke + 結果受け取りのみ"
-        }
       ]
     },
     {
@@ -816,12 +686,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 変更: subagent が impl-plan.json + task-coverage.json write + gate 評価を一括。command 定義本文は subagent invoke + 結果受け取りのみ"
         }
       ]
     },
@@ -850,12 +714,6 @@
         {
           "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
           "anchor": "展開フェーズ 6.5"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "memory",
-          "summary": "feedback_no_backward_compat — Interim mode と新 command の並立を許さない"
         }
       ]
     },
@@ -991,12 +849,6 @@
           "file": ".claude/rules/08-orchestration.md",
           "anchor": "Delegation Rules"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Directive 1: command 定義はロジック無しの呼び出し結線のみ"
-        }
       ]
     },
     {
@@ -1014,12 +866,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Directive 2: /track:plan は orchestration が複雑なので冒頭で TaskCreate を使って progress tracking を明示指示する"
         }
       ]
     },
@@ -1039,12 +885,6 @@
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "state machine は /track:plan のみ"
-        }
       ]
     },
     {
@@ -1058,12 +898,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D2"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "コマンド名が ADR 記載から変更。ADR 差分は OQ-6 / OQ-7"
         }
       ]
     },
@@ -1083,12 +917,6 @@
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D4"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 変更: Write に加えて Bash (sotp CLI 用) を frontmatter tools に追加"
-        }
       ]
     },
     {
@@ -1107,12 +935,6 @@
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 具体化: 4 phase command の共通構造パターン。subagent が sotp CLI まで内部実行するのが核心"
-        }
       ]
     },
     {
@@ -1126,12 +948,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D5"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "activate.rs の activation_requires_clean_worktree 緩和による期待動作"
         }
       ]
     },
@@ -1152,12 +968,6 @@
         {
           "file": ".claude/rules/05-testing.md",
           "anchor": "Core Principles"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "memory",
-          "summary": "activation_requires_clean_worktree 関連 tests が新仕様で pass すること"
         }
       ]
     },
@@ -1181,12 +991,6 @@
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D2"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 新規: type-designer の全パイプライン (baseline → write → render × 3 → signal eval) を subagent 内部で完結させることを verification 基準として明示"
-        }
       ]
     },
     {
@@ -1204,12 +1008,6 @@
         {
           "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
           "anchor": "D1"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "v3 新規: sotp CLI は subagent 内部に閉じ込め、command 定義本文に混入していないことを grep 検証で担保"
         }
       ]
     }
