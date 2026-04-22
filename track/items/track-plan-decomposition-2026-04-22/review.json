@@ -1,42 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:06:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:09:25Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:05:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:07:25Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -331,6 +295,115 @@
           "findings": [],
           "hash": "rvw1:sha256:dcc673264ae1e509b2ccb8302869de41ea568c77b8d8f9f5ed452e26b6a362cf",
           "at": "2026-04-22T09:26:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d958309ff30beb0f34c49ad3800ac1dd3738dd6736b9ccf042e41c5aa5d49b8",
+          "at": "2026-04-22T09:47:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d958309ff30beb0f34c49ad3800ac1dd3738dd6736b9ccf042e41c5aa5d49b8",
+          "at": "2026-04-22T09:48:37Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
+          "at": "2026-04-22T09:48:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make track-branch-create` already materializes `metadata.json.branch` and persists the activation artifacts, so the command's next step to edit `metadata.json.branch` again leaves a fresh `updated_at` change after the activation commit instead of the clean post-init state the workflow expects. This step should be a verification/reporting step, or the wrapper behavior must be changed with the command updated accordingly.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 31,
+              "category": "architecture"
+            },
+            {
+              "message": "The behavior section still describes looping into a state machine and the Phase 0 -> Phase 1 transition ownership. The harness policy for `/track:init` explicitly excludes state-machine transition/back-and-forth loop wording from phase commands, so this leaks orchestration policy into the standalone Phase 0 command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 49,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
+          "at": "2026-04-22T09:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The execution sequence no longer matches the required five-step `/track:init` flow: ADR pre-check is supposed to be step 1, followed by metadata creation, branch creation, metadata branch update, and verification. This command inserts track-id derivation as step 1 and shifts ADR pre-check to step 2, producing a six-step sequence that violates the harness-policy briefing and can cause downstream reviewers/tools to treat the command contract as non-compliant.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 19,
+              "category": null
+            },
+            {
+              "message": "The briefing explicitly excludes state-machine transition and back-and-forth loop wording from this command, but this behavior section still mentions looping into a state machine and the `/track:plan` Phase 0 -> Phase 1 transition. Even though it says `/track:init` does not own that logic, including the excluded transition/loop language makes the command policy non-compliant for this scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 49,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
+          "at": "2026-04-22T09:53:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make track-branch-create` already materializes `metadata.json.branch` and persists the activation artifacts before switching branches, so step 4 edits `metadata.json.branch` and refreshes `updated_at` a second time after the activation commit. That leaves the newly initialized track dirty and out of sync with the wrapper's committed activation state; this step should verify/report the branch value or the wrapper behavior must be changed to match the documented five-step flow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 31,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:609fe5909ababb68f64ba71738b92872f21744af3405396728da25b126174caa",
+          "at": "2026-04-22T09:56:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4121a78a9ce9d6752d4467fa8981aff7764f3172faf3de4755022c1e3cae86c5",
+          "at": "2026-04-22T10:00:48Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:05:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:07:25Z"
         }
       ]
     },
@@ -349,6 +422,24 @@
           "findings": [],
           "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
           "at": "2026-04-22T06:07:52Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:09:25Z"
         }
       ]
     }
