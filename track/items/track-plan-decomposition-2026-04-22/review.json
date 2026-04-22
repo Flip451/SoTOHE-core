@@ -19,6 +19,24 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:09:25Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -210,6 +228,146 @@
           "findings": [],
           "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
           "at": "2026-04-22T10:43:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec-designer` is now instructed to run `bin/sotp track views sync`, but that command also rewrites `plan.md` in addition to `spec.md` (`sync_rendered_views` does both on the single-track path). That lets a Phase 1 agent mutate a file its own scope explicitly forbids and can interfere with Phase 3 ownership. Use a spec-only render path here, or explicitly narrow the command so it cannot touch `plan.md`.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 79,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:17630784e0ab247c661f6b97026e4a853f38be8877d48f55afaeb63e4921fae1",
+          "at": "2026-04-22T10:51:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec-designer` directs the agent to regenerate `spec.md` with `bin/sotp track views sync`, but that command only syncs `plan.md` and `registry.md`. As written, Phase 1 will not produce the required `spec.md` view and may clobber the wrong rendered files instead.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 77,
+              "category": "correctness"
+            },
+            {
+              "message": "`type-designer` names the rendered artifact `<layer>-type-signals.md`, but the current `type-signals` renderer emits `<layer>-types.md` and only writes `<layer>-type-signals.json` for the evaluation result. This points the phase-2 pipeline at a non-existent markdown artifact.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:17630784e0ab247c661f6b97026e4a853f38be8877d48f55afaeb63e4921fae1",
+          "at": "2026-04-22T10:55:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This instruction routes Phase 1 through `bin/sotp track views sync` and `bin/sotp verify plan-artifact-refs`, but `track views sync` also syncs `plan.md` and `registry.md` (`libs/infrastructure/src/track/render.rs:1`) and the repo's spec-signal path is `sotp track signals` (`libs/domain/src/spec.rs:376`, `apps/cli/src/commands/track/signals.rs:64`). A spec-designer following this text can overwrite files outside its ownership and run the wrong gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
+              "line": 37,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a1900d34e3ac22b533cb76b8e97bb9b8c86addfd2b4febea01ae6a278e9de2b9",
+          "at": "2026-04-22T11:00:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`type-signals` does not produce `<layer>-type-signals.md`; it writes `<layer>-types.md` plus `<layer>-type-signals.json`. The phase-2 contract is pointing at the wrong artifact name, so a literal subagent would manage a file the CLI never emits.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 29,
+              "category": "artifact_name_mismatch"
+            },
+            {
+              "message": "The permitted render outputs list only `<layer>-graph.md`, but `bin/sotp track type-graph` defaults to cluster mode (`--cluster-depth 2`) and writes a `<layer>-graph/` directory with `index.md` plus cluster files. The scope rule does not cover the command's actual default output.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 145,
+              "category": "write_scope_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5e999df91d57a011056f5d0782a4541147e13a0f73359f01b43884e8903f83dd",
+          "at": "2026-04-22T11:04:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.md` is described as a generated artifact produced by `bin/sotp track signals`, but the generic `Write`/`Edit` allowance still covers it. That lets the agent bypass the renderer and manually edit a derived view, risking drift from `spec.json` and the signal counts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
+              "line": 104,
+              "category": "workflow"
+            },
+            {
+              "message": "The scope explicitly allows direct writes to baseline and rendered-view artifacts, even though the internal pipeline says those files are produced by `bin/sotp track baseline-capture`, `type-graph`, `contract-map`, and `type-signals`. That opens the door to hand-editing derived artifacts outside the canonical generation path, which can leave the views inconsistent with `<layer>-types.json`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:c988d4c8afdb45bdadb85a2400db476904d367e70bf8d73198e6d9ca241d6525",
+          "at": "2026-04-22T11:06:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
+          "at": "2026-04-22T11:08:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 2 pipeline tells the subagent to render the contract map with `bin/sotp track contract-map <id> [--layer <layer_id>]`, but the actual `contract-map` CLI uses the plural `--layers` option for layer filtering. A type-designer following this contract will run an invalid command and fail the required render/gate step for layer-scoped `/track:type-design` runs; change this invocation to `--layers <layer_id>` or omit the filter when rendering all layers.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 76,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
+          "at": "2026-04-22T11:11:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 2 internal pipeline tells the subagent to run `bin/sotp track contract-map <id> [--layer <layer_id>]`, but the actual `contract-map` command exposes `--layers`, not `--layer`, and writes one shared `contract-map.md`. Following this contract will make the type-designer fail during the required view-render step, so `/track:type-design` cannot reliably complete its direct-writer pipeline. Use the supported `--layers` form or render the shared contract map once after all scoped layer catalogues are written.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 76,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
+          "at": "2026-04-22T11:14:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32033c338fc9c2f607f5c8e9eae4acb03ff473328f30c252e844ea4925e32f2b",
+          "at": "2026-04-22T11:16:51Z"
         }
       ]
     },
@@ -549,24 +707,20 @@
           "findings": [],
           "hash": "rvw1:sha256:2398531d94e5fcf75a083b77233860d03e7318a30a164fadee01644b9c13fb0d",
           "at": "2026-04-22T10:18:57Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:06:08Z"
+          "hash": "rvw1:sha256:66c0875e901ca61a443a7e7e614a31d8c410cc0850b32b2344e8e2a9f174059e",
+          "at": "2026-04-22T10:50:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:09:25Z"
+          "hash": "rvw1:sha256:66c0875e901ca61a443a7e7e614a31d8c410cc0850b32b2344e8e2a9f174059e",
+          "at": "2026-04-22T10:51:25Z"
         }
       ]
     },

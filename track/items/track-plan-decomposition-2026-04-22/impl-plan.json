@@ -28,7 +28,8 @@
     {
       "id": "T004",
       "description": ".claude/commands/track/design.md を .claude/commands/track/type-design.md に rename し、CN-10 v3 / CN-13 に従って command 定義本文を (a) type-designer subagent を Agent tool 経由で invoke、(b) subagent が返した signal 評価結果を受け取って /track:plan に surface する、の 2 要素のみに縮小する。以下はすべて type-designer 内部に移動し command 定義からは削除する: baseline capture (sotp track baseline-capture)、<layer>-types.json 直接 Write、graph md render (sotp track type-graph 等)、contract-map.md render (sotp track contract-map)、<layer>-type-signals.md render、信号機評価 (sotp track type-signals)。command 定義本文に sotp CLI 呼び出しを含めない (AC-21 / AC-22)。command frontmatter の description と内部参照を /track:design → /track:type-design に更新。state machine 遷移 / ceremony 文言は含まない。単独 invoke 可能 (IN-06 / AC-10 / AC-13 / AC-15 / AC-16 / AC-18 / AC-21 / AC-22)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "e03bd2295362aa256b590fe688f791b575cb22e4"
     },
     {
       "id": "T005",
