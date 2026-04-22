@@ -85,7 +85,21 @@ pub fn check_tasks_resolved_from_git_ref(
         }
     };
 
-    // 5. All tasks must be resolved.
+    // 5. Empty task list is a merge bypass path — reject explicitly.
+    //
+    // `ImplPlanDocument::all_tasks_resolved()` returns `true` vacuously for an
+    // empty task list, which would let an accidentally or intentionally wiped
+    // impl-plan.json pass the gate. An activated track reaching the merge gate
+    // must have produced at least one task; otherwise the task-completion
+    // check is meaningless.
+    if impl_plan.tasks().is_empty() {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "track '{track_id_str}' has empty impl-plan.json tasks on origin/{branch}: \
+             activated tracks must declare at least one task before merge"
+        ))]);
+    }
+
+    // 6. All tasks must be resolved.
     if impl_plan.all_tasks_resolved() {
         return VerifyOutcome::pass();
     }
@@ -275,11 +289,17 @@ mod tests {
     }
 
     #[test]
-    fn test_empty_impl_plan_passes() {
-        // Extra: impl-plan.json with zero tasks → all_tasks_resolved() = true → PASS
+    fn test_k8_empty_impl_plan_blocks() {
+        // K8: impl-plan.json with zero tasks → BLOCKED (explicit empty-list guard prevents
+        // vacuous-truth bypass via all_tasks_resolved() returning true for an empty Vec).
         let reader = MockReader::new(BlobFetchResult::Found(impl_plan_empty()));
         let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
-        assert!(!outcome.has_errors(), "{outcome:?}");
+        assert!(outcome.has_errors(), "empty impl-plan must be blocked: {outcome:?}");
+        assert!(
+            outcome.findings()[0].message().contains("empty impl-plan.json tasks"),
+            "finding must mention empty impl-plan: {}",
+            outcome.findings()[0].message()
+        );
     }
 
     #[test]
