@@ -76,7 +76,7 @@
     {
       "id": "T013",
       "description": "PR-review cycle fix: metadata.json から status 除去し、track status は impl-plan.json + status_override から derive する domain::derive_track_status に一本化。activation 不変条件を domain::TrackMetadata::is_activated() + domain::check_impl_plan_presence() で codify し、全 CLI 呼び出し側の ad-hoc 判定 (branch.is_some() || derived_status != Planned) をこの single source of truth に置き換え。schema_version を v4 → v5 に bump (identity-only)。ADR 2026-04-19-1242 §D1.4 Follow-up で経緯を記録。Codex Cloud PR #107 の atomic-write P0 findings に構造的対応",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "plan": {
