@@ -70,7 +70,8 @@
     {
       "id": "T011",
       "description": "cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-* 一式) を実行し、すべての先行 task commit 後に全通過することを確認する。regression があれば修正。T012 の Rust 変更を含む全変更が CI を通ることが AC-12 の充足証拠。本 track 全体の最終 integration gate (AC-12)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "733ab26e0d89ba526998aac25cd4aa2e362f0324"
     }
   ],
   "plan": {

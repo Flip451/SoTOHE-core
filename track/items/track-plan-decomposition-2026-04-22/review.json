@@ -1,6 +1,697 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
+          "at": "2026-04-22T06:05:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
+          "at": "2026-04-22T06:07:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:05:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:07:25Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6058e7d7709d69b34953100c448ca5c1f29e52b1f2863d1b729727294f03f70",
+          "at": "2026-04-22T11:52:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21da7b6753045f56098a2959b5496c26661f953c3ab0036ac4dc5a21f9ce95f8",
+          "at": "2026-04-22T11:55:51Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-19 uses `BranchMode::Create / resume flow` as the negated condition, but the rest of the track defines the relaxed preflight as `matches!(mode, BranchMode::Auto) && already_materialized && resume_allowed` and the verification text separately checks `BranchMode::Auto && already_materialized=false`. This mixes an unrelated `Create` mode into the acceptance criterion and conflicts with T012/AC-20.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
+              "line": 76,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:677498047bef837011c9e6e3d10fe13b377b27df1c22b0fa3a5314e7c47edd65",
+          "at": "2026-04-22T06:07:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 only adds `Bash` for `type-designer.md`, but `IN-09` and `AC-17` require `Write + Bash` for all three subagents and explicitly require `type-designer` to directly write `<layer>-types.json`. As written, this task cannot satisfy the acceptance criteria for subagent write permission.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            },
+            {
+              "message": "`CN-10` says revised `track/*.md` bodies should contain only writer invocation and result receive, but `T007`/`AC-14` require a `TaskCreate` preamble in `/track:plan`. That preamble is extra command-body logic, so the plan contradicts its own command-slimming rule unless `CN-10` is relaxed first.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 932,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AC-19` names `BranchMode::Create` as the false-path test condition, but `IN-10` and `T012` define the allowed true path as `BranchMode::Auto && already_materialized && resume_allowed`. The acceptance criterion is pointing at the wrong branch mode, so the required unit test is mis-specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 1028,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:677498047bef837011c9e6e3d10fe13b377b27df1c22b0fa3a5314e7c47edd65",
+          "at": "2026-04-22T06:12:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b78166f41d2fd3b88811f3633c0d39da4ad2add4535c00848ec1121949f69ce8",
+          "at": "2026-04-22T06:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b78166f41d2fd3b88811f3633c0d39da4ad2add4535c00848ec1121949f69ce8",
+          "at": "2026-04-22T06:17:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 says each subagent may write only its corresponding SSoT file and touch nothing else, but the same spec requires those subagents to render generated view files: spec-designer renders spec.md, type-designer renders graph/contract-map/type-signal markdown, and impl-planner may render plan.md. As written, an implementation cannot satisfy both the writer-boundary constraint and the required subagent render pipeline; clarify that generated views are within the owning subagent's write scope or move rendering to another writer.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 486,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-13 includes init.md in the set of command definitions that must contain no schema validation/codec-round-trip procedure, but AC-01/CN-10/T001 explicitly require /track:init to perform identity schema binary verification via sotp verify track-metadata. This makes the /track:init acceptance criteria self-contradictory; AC-13 needs to exclude the /track:init identity check or AC-01/T001 need to move that validation out of the command definition.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 906,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b78166f41d2fd3b88811f3633c0d39da4ad2add4535c00848ec1121949f69ce8",
+          "at": "2026-04-22T06:21:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "spec.json reports `yellow: 0` even though many spec elements carry `informal_grounds`. The referenced ADR gate semantics make non-empty informal grounds yellow until they are formalized, so this artifact is claiming all 59 signals are blue while simultaneously relying on unresolved user_directive/memory grounds. That can hide the required ADR/convention formalization before merge.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 1149,
+              "category": "factual_error"
+            },
+            {
+              "message": "CN-12 says each subagent writes only its corresponding SSoT file and nothing else, but CN-02/CN-13 and the in-scope requirements require those same subagents to render derived files such as `spec.md`, graph/type-signal views, `contract-map.md`, and `plan.md`. These are mutually exclusive write-boundary instructions for the agent definitions, so implementers cannot satisfy both constraints as written.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
+              "line": 54,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-13 explicitly applies to `.claude/commands/track/plan.md`, but task-coverage maps AC-13 only to T001-T004. The plan rewrite is done by T007/T008, so the coverage artifact can pass AC-13 without covering the command file that AC-13 names, leaving the forbidden-logic check for `plan.md` untracked.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/task-coverage.json",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "The artifacts refer to OQ-6/OQ-7/OQ-8/OQ-10 as recorded open questions, and spec entries say differences are documented in those OQs, but the reviewed plan artifacts contain no open-question definitions or section for those labels. The OQ references are therefore not usable design records for reviewers or implementers.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 124,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:04b0b754e249e605967151795ff5b9f45301aeb4aaec05eebfe2bfffabad6864",
+          "at": "2026-04-22T06:26:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-13 now says `/track:init` is explicitly excluded from the no-schema-validation/no-logic inspection because T001 is allowed to run `sotp verify track-metadata`, but the same rendered AC still maps AC-13 to `T001`. That leaves the plan internally inconsistent about whether `/track:init` must satisfy AC-13, and can make reviewers or implementers reject the required identity validation step.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
+              "line": 70,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e6bed28e36298d34aa5f1896c1231ea4fbb9c1665883730167307dfb5e6da53b",
+          "at": "2026-04-22T06:34:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-08 says every standalone phase command, including `/track:type-design`, must own its upstream artifact pre-check, but the same sentence only defines checks for `/track:spec-design` and `/track:impl-plan`; T004 and the T004 verification steps also omit any `spec.json` pre-check for `/track:type-design`. Since IN-06 marks `/track:type-design` as independently invokable, the plan leaves Phase 2 able to run without its required Phase 1 artifact despite the stated command contract.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f745070f1e09a8b4f878767eba0ee7921dc736842b8e18e5aa0ec8117559fa77",
+          "at": "2026-04-22T06:38:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-13 was revised to explicitly exclude `/track:init` because that command is the CN-10 writer=main exception, but the plan still presents T001 as satisfying AC-13: `impl-plan.json`/rendered `plan.md` list `AC-13` in T001, while `task-coverage.json` removes T001 from AC-13. That leaves the artifacts internally contradictory about whether `/track:init` must be checked under AC-13, so an implementer could apply the logic-free command-body constraint to the one command the spec now exempts.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 906,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7a792f3b8dbed3ef2fd5a3d2d72dedea6a81e5507c3fd126dc1c65fbb465742f",
+          "at": "2026-04-22T06:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-13 was changed to explicitly exclude /track:init because T001 is allowed to include identity schema validation, but the T001 verification checklist still says /track:init should be checked against AC-13. That makes the verification procedure contradict the updated acceptance criterion and can cause reviewers to apply the no-schema-logic gate to the one command the spec says is exempt.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "task-coverage now claims AC-13 is covered by T008, but T008's task description does not list AC-13 among its covered criteria. Since AC-13 is the low-level-logic exclusion gate for plan.md and T008 adds the loop body to plan.md, the plan artifacts are inconsistent about whether T008 must verify that gate.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/task-coverage.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b687638cc47e9042a61430cc920167038ec393cae3aad571761ccbfbbb4356a2",
+          "at": "2026-04-22T06:43:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-13 is now assigned to T007/T008 for the rewritten `.claude/commands/track/plan.md` in the spec/task coverage, but the verification steps for T007/T008 only check the plan skeleton and loop behavior and never verify AC-13's forbidden schema/signal/reference/coverage/canonical-logic condition for `plan.md`. As written, the verification artifact no longer covers all tasks/ACs it claims to cover.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 77,
+              "category": "contradiction"
+            },
+            {
+              "message": "The new Open Questions section says it defines OQ labels that appear in the spec's `informal_grounds`, and it includes OQ-10, but OQ-10 is only defined in `verification.md` and is not recorded in `spec.json`/`spec.md` informal grounds. That makes OQ-10 invisible to the spec SSoT despite the verification artifact claiming it is part of the spec's informal grounds.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 120,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:52118b0eb360a26f4a75290316b3c8e273af59970e15dcd81d48abdc9bbbf5f6",
+          "at": "2026-04-22T06:46:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07588c0764331154ab1fa8eb40a62662bb805971bbdb91a8b8ea36d6a2c4ce76",
+          "at": "2026-04-22T06:50:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec still carries the promoted items as `informal_grounds.kind = \"user_directive\"` instead of moving them onto the new child ADR; `2026-04-22-0829` is not referenced anywhere in this file, so the claimed `blue: 59 / yellow: 0` state is not actually backed by the artifact contents. This starts at GO-05/GO-06 and repeats through the later IN/AC entries.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 81,
+              "category": "contradiction"
+            },
+            {
+              "message": "This ADR omits the repository-required `## Status` section, so the new index entry cannot be grounded in one of the documented lifecycle states (`Proposed` / `Accepted` / `Superseded` / `Deprecated`). That makes the README row fall back to an unlabeled `—` state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+              "line": 1,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
+          "at": "2026-04-22T09:01:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `signals` summary was changed to `blue: 59, yellow: 0`, but this same spec still contains unresolved `user_directive` informal grounds in multiple entries (for example GO-05, GO-06, IN-01, IN-02, and others). That makes the zero-yellow claim internally inconsistent with the file contents.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "line": 1148,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
+          "at": "2026-04-22T09:03:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この ADR は `spec.json` の 31 件の yellow signal を本 ADR の `adr_refs[]` へ昇格させて解消したと説明していますが、現行の `spec.json` 側では該当項目がまだ親 ADR 参照のままで、本文で説明している評価ルールに従うとそれらはすでに Blue です。つまり『この ADR で yellow を解消した』という因果関係が、実際の artifact 群と噛み合っていません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+              "line": 18,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
+          "at": "2026-04-22T09:06:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc1978007a383b18aff58ee5f1c9a604772f3ec1059ac27a3ccef6a33e81198",
+          "at": "2026-04-22T09:17:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 says the command definition body should describe steps (1)-(3), where step 3 is the post-write signal/binary CLI call, but the spec's CN-10/AC-22 require phase command definitions to contain only writer invocation plus result receipt and to contain no `sotp` CLI calls. This gives implementers contradictory guidance about whether CLI evaluation belongs in the command definition text.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cbc1978007a383b18aff58ee5f1c9a604772f3ec1059ac27a3ccef6a33e81198",
+          "at": "2026-04-22T09:20:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc673264ae1e509b2ccb8302869de41ea568c77b8d8f9f5ed452e26b6a362cf",
+          "at": "2026-04-22T09:26:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d958309ff30beb0f34c49ad3800ac1dd3738dd6736b9ccf042e41c5aa5d49b8",
+          "at": "2026-04-22T09:47:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d958309ff30beb0f34c49ad3800ac1dd3738dd6736b9ccf042e41c5aa5d49b8",
+          "at": "2026-04-22T09:48:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23c8df48dec90c6b888ed10afd86472121b5e441d02f17757c1cf6ec5db715d4",
+          "at": "2026-04-22T10:07:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23c8df48dec90c6b888ed10afd86472121b5e441d02f17757c1cf6ec5db715d4",
+          "at": "2026-04-22T10:09:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2398531d94e5fcf75a083b77233860d03e7318a30a164fadee01644b9c13fb0d",
+          "at": "2026-04-22T10:17:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2398531d94e5fcf75a083b77233860d03e7318a30a164fadee01644b9c13fb0d",
+          "at": "2026-04-22T10:18:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66c0875e901ca61a443a7e7e614a31d8c410cc0850b32b2344e8e2a9f174059e",
+          "at": "2026-04-22T10:50:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66c0875e901ca61a443a7e7e614a31d8c410cc0850b32b2344e8e2a9f174059e",
+          "at": "2026-04-22T10:51:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac82afdd17eb96aa65082ad4285a482b405fcacd49b72640804b4c7e8b35508",
+          "at": "2026-04-22T11:19:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac82afdd17eb96aa65082ad4285a482b405fcacd49b72640804b4c7e8b35508",
+          "at": "2026-04-22T11:21:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:043d02497865b9377d8b67baeab1ef05db5e01d2b3e7f21821e3b430404fd744",
+          "at": "2026-04-22T11:25:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:043d02497865b9377d8b67baeab1ef05db5e01d2b3e7f21821e3b430404fd744",
+          "at": "2026-04-22T11:27:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3b4f9e9f492a53dafe406e3e1366e1a131623d96f50617b2aedaee20d600587",
+          "at": "2026-04-22T11:47:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3b4f9e9f492a53dafe406e3e1366e1a131623d96f50617b2aedaee20d600587",
+          "at": "2026-04-22T11:48:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16413d1c884d89e2a91d868d3619c143bcf8f105726547e8be8706b4e35b7e08",
+          "at": "2026-04-22T11:58:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16413d1c884d89e2a91d868d3619c143bcf8f105726547e8be8706b4e35b7e08",
+          "at": "2026-04-22T12:03:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16413d1c884d89e2a91d868d3619c143bcf8f105726547e8be8706b4e35b7e08",
+          "at": "2026-04-22T12:05:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 is summarized here as requiring `Write + Edit + Bash`, but the corresponding task definition in `plan.md` only specifies `Write + Bash` for the three subagent definitions. That makes the verification summary internally inconsistent with the plan and overstates the intended tool set.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 163,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:49ffa2dccf5d6ef3a20afed5c1ffd2712af204e611d5d0694285d725207891fb",
+          "at": "2026-04-22T12:09:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49ffa2dccf5d6ef3a20afed5c1ffd2712af204e611d5d0694285d725207891fb",
+          "at": "2026-04-22T12:11:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added final status marks OQ-6/OQ-7/OQ-8 as closed by the child ADR, but the same verification document still defines those OQs as unresolved informal_grounds that require ADR updates before merge. That leaves the post-loop completion record internally inconsistent about whether these questions are open or closed; update the earlier OQ table/current-handling text to historical context or the final closed state.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 171,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:49ffa2dccf5d6ef3a20afed5c1ffd2712af204e611d5d0694285d725207891fb",
+          "at": "2026-04-22T12:13:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC summary contradicts the documented /track:init design. Earlier in this same file, T001 says /track:init's command body must include `sotp track branch create` and identity schema verification, and plan.md/impl-plan.json also describe /track:init as the writer=main exception that directly runs those steps. The new AC-13/AC-22 summary then says all 4 phase command bodies contain no sotp CLI calls. Either /track:init must be explicitly excluded from these summaries, or the T001 design needs to change; as written, the verification artifact records mutually incompatible acceptance evidence.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 167,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:49ffa2dccf5d6ef3a20afed5c1ffd2712af204e611d5d0694285d725207891fb",
+          "at": "2026-04-22T12:15:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` line 7 makes a global claim that command definitions are only “writer invocation + result receipt,” but S2/T001 on line 30 explicitly makes `/track:init` a direct-execution command that runs branch creation, metadata writes, ADR pre-checks, and identity verification itself. That exception is not carved out in the summary, so the plan is internally inconsistent unless the summary is narrowed to the three subagent-backed commands.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/plan.md",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "`verification.md` describes `/track:init` with two different execution paths: T001 says it directly runs `sotp track branch create` and `sotp verify track-metadata`, while the AC-22 summary on line 167 says main directly calls `cargo make track-branch-create` and `cargo make verify-track-metadata`. Those are not equivalent, so the verification artifact is self-contradictory about what `/track:init` actually does.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 167,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:df174dfb27ab2078b49b455ca9dc7f891342a508672aed5e13aaa819cea273ab",
+          "at": "2026-04-22T12:17:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 conflicts with the tasking in `plan.md`: T005 and the plan summary require the three subagents' frontmatter `tools:` to be extended with `Write + Bash`, but this verification item upgrades that to `Write + Edit + Bash`. That changes the permission contract and makes the acceptance criterion ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 163,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9279ceb2e5a286dc85561ddb64afc432c60a01e49310a731b8856ab4deec50f3",
+          "at": "2026-04-22T12:19:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 says this track passed CI for \"7 commit\"s, but the task table in the same section lists 9 distinct `commit_hash` values (including the bootstrap T012 entry and the paired task commits). That makes the completion summary internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 158,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6dbcca29e54b7c4f70f7cde15586bc272c302f1f3b34132c499f4f0b491114ed",
+          "at": "2026-04-22T12:22:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36d2b05eb1b547610b0687693c43bab74102bcde95d22ebe232792ea3dd2b6a7",
+          "at": "2026-04-22T12:23:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Open Questions table still says OQ-6/OQ-7/OQ-8 are informal grounds that require ADR updates before merge, while the newly added results section says the same OQs were formalized in child ADR sections and are closed. These two current-state descriptions conflict, so readers cannot tell whether the OQs remain actionable or are resolved.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 128,
+              "category": "contradiction"
+            },
+            {
+              "message": "The AC summary groups AC-01..AC-04 as 'each phase command standalone invoke' and treats authoring the four phase commands as satisfying all four, but this same verification document maps AC-04 to the /track:plan loop body/back-and-forth behavior under T008. That makes the final AC-04 satisfaction claim semantically inconsistent with the verification procedure above.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 155,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:36d2b05eb1b547610b0687693c43bab74102bcde95d22ebe232792ea3dd2b6a7",
+          "at": "2026-04-22T12:24:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b00b0a00ee85855aaa43489608de1179af81714b3e978a8ffa48bcc610b2414",
+          "at": "2026-04-22T12:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 and the referenced child ADR D4 define the subagent permission contract as adding only `Write + Bash`, but this verification summary treats the separately added `Edit` tool as merely a non-contract-changing variant of `Write`. `Edit` is an additional frontmatter tool permission, so the artifact now claims AC-17 is satisfied while expanding the permission set beyond the plan/ADR contract; this should either be removed from the tools or explicitly reflected in the plan/ADR contract.",
+              "severity": "P1",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 164,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3b00b0a00ee85855aaa43489608de1179af81714b3e978a8ffa48bcc610b2414",
+          "at": "2026-04-22T12:31:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 is recorded as satisfied by `Write + Bash`, but the next line says `Edit` was also added to the subagent frontmatter and is still awaiting follow-up formalization. That leaves the completed-state permission set inconsistent: the plan says only the minimum tools were added, while the verification says the actual contract is already broader.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 165,
+              "category": "contradiction"
+            },
+            {
+              "message": "The OQ closure section references `OQ-10`, but the document's OQ definition table only defines `OQ-6`, `OQ-7`, and `OQ-8`. As written, the reader cannot map the closure claim back to a defined open question, so the `OQ-10` entry is a dangling/broken reference.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 176,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:7cb18c75dcd19e86df0fc73f91c2107a64f727f2364b68b2a3e9671b9ad6c62e",
+          "at": "2026-04-22T12:33:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The round-12 briefing says `verification.md` should record closure judgments for OQ-6/7/8/10, but this file only defines and closes OQ-6/7/8. OQ-10 is dropped from both the OQ definition table and the remaining-status summary, so the verification record is incomplete relative to the stated scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 126,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:443833373c4e03b58e661f40e4113c3eb33e5cc7e7eefbc548c74af6577a989f",
+          "at": "2026-04-22T12:35:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `結果 / 未解決事項` section says there are no unresolved items, but the Open Questions table only records OQ-6/OQ-7/OQ-8. OQ-10 from the round-12 verification scope is no longer represented anywhere in this file, so the completion claim is not fully supported by the artifact.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "line": 134,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c6087d78b61a0cdd677f5d8142138d3d7b92775725e9c34f1b899793ff9c8b2e",
+          "at": "2026-04-22T12:44:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6087d78b61a0cdd677f5d8142138d3d7b92775725e9c34f1b899793ff9c8b2e",
+          "at": "2026-04-22T12:46:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6087d78b61a0cdd677f5d8142138d3d7b92775725e9c34f1b899793ff9c8b2e",
+          "at": "2026-04-22T12:49:17Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -462,476 +1153,13 @@
           "findings": [],
           "hash": "rvw1:sha256:c536e41d7bc619d938cc4343e05a9877a632f944bcd2f9fe56ab51ae94ff2f44",
           "at": "2026-04-22T11:49:52Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6058e7d7709d69b34953100c448ca5c1f29e52b1f2863d1b729727294f03f70",
-          "at": "2026-04-22T11:52:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21da7b6753045f56098a2959b5496c26661f953c3ab0036ac4dc5a21f9ce95f8",
-          "at": "2026-04-22T11:55:51Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:05:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:07:25Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
-          "at": "2026-04-22T06:05:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
-          "at": "2026-04-22T06:07:52Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-19 uses `BranchMode::Create / resume flow` as the negated condition, but the rest of the track defines the relaxed preflight as `matches!(mode, BranchMode::Auto) && already_materialized && resume_allowed` and the verification text separately checks `BranchMode::Auto && already_materialized=false`. This mixes an unrelated `Create` mode into the acceptance criterion and conflicts with T012/AC-20.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
-              "line": 76,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:677498047bef837011c9e6e3d10fe13b377b27df1c22b0fa3a5314e7c47edd65",
-          "at": "2026-04-22T06:07:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 only adds `Bash` for `type-designer.md`, but `IN-09` and `AC-17` require `Write + Bash` for all three subagents and explicitly require `type-designer` to directly write `<layer>-types.json`. As written, this task cannot satisfy the acceptance criteria for subagent write permission.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/impl-plan.json",
-              "line": 36,
-              "category": "contradiction"
-            },
-            {
-              "message": "`CN-10` says revised `track/*.md` bodies should contain only writer invocation and result receive, but `T007`/`AC-14` require a `TaskCreate` preamble in `/track:plan`. That preamble is extra command-body logic, so the plan contradicts its own command-slimming rule unless `CN-10` is relaxed first.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 932,
-              "category": "contradiction"
-            },
-            {
-              "message": "`AC-19` names `BranchMode::Create` as the false-path test condition, but `IN-10` and `T012` define the allowed true path as `BranchMode::Auto && already_materialized && resume_allowed`. The acceptance criterion is pointing at the wrong branch mode, so the required unit test is mis-specified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 1028,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:677498047bef837011c9e6e3d10fe13b377b27df1c22b0fa3a5314e7c47edd65",
-          "at": "2026-04-22T06:12:28Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b78166f41d2fd3b88811f3633c0d39da4ad2add4535c00848ec1121949f69ce8",
-          "at": "2026-04-22T06:15:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b78166f41d2fd3b88811f3633c0d39da4ad2add4535c00848ec1121949f69ce8",
-          "at": "2026-04-22T06:17:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-02 says each subagent may write only its corresponding SSoT file and touch nothing else, but the same spec requires those subagents to render generated view files: spec-designer renders spec.md, type-designer renders graph/contract-map/type-signal markdown, and impl-planner may render plan.md. As written, an implementation cannot satisfy both the writer-boundary constraint and the required subagent render pipeline; clarify that generated views are within the owning subagent's write scope or move rendering to another writer.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 486,
-              "category": "contradiction"
-            },
-            {
-              "message": "AC-13 includes init.md in the set of command definitions that must contain no schema validation/codec-round-trip procedure, but AC-01/CN-10/T001 explicitly require /track:init to perform identity schema binary verification via sotp verify track-metadata. This makes the /track:init acceptance criteria self-contradictory; AC-13 needs to exclude the /track:init identity check or AC-01/T001 need to move that validation out of the command definition.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 906,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b78166f41d2fd3b88811f3633c0d39da4ad2add4535c00848ec1121949f69ce8",
-          "at": "2026-04-22T06:21:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "spec.json reports `yellow: 0` even though many spec elements carry `informal_grounds`. The referenced ADR gate semantics make non-empty informal grounds yellow until they are formalized, so this artifact is claiming all 59 signals are blue while simultaneously relying on unresolved user_directive/memory grounds. That can hide the required ADR/convention formalization before merge.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 1149,
-              "category": "factual_error"
-            },
-            {
-              "message": "CN-12 says each subagent writes only its corresponding SSoT file and nothing else, but CN-02/CN-13 and the in-scope requirements require those same subagents to render derived files such as `spec.md`, graph/type-signal views, `contract-map.md`, and `plan.md`. These are mutually exclusive write-boundary instructions for the agent definitions, so implementers cannot satisfy both constraints as written.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
-              "line": 54,
-              "category": "contradiction"
-            },
-            {
-              "message": "AC-13 explicitly applies to `.claude/commands/track/plan.md`, but task-coverage maps AC-13 only to T001-T004. The plan rewrite is done by T007/T008, so the coverage artifact can pass AC-13 without covering the command file that AC-13 names, leaving the forbidden-logic check for `plan.md` untracked.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/task-coverage.json",
-              "line": 30,
-              "category": "contradiction"
-            },
-            {
-              "message": "The artifacts refer to OQ-6/OQ-7/OQ-8/OQ-10 as recorded open questions, and spec entries say differences are documented in those OQs, but the reviewed plan artifacts contain no open-question definitions or section for those labels. The OQ references are therefore not usable design records for reviewers or implementers.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
-              "line": 124,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:04b0b754e249e605967151795ff5b9f45301aeb4aaec05eebfe2bfffabad6864",
-          "at": "2026-04-22T06:26:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-13 now says `/track:init` is explicitly excluded from the no-schema-validation/no-logic inspection because T001 is allowed to run `sotp verify track-metadata`, but the same rendered AC still maps AC-13 to `T001`. That leaves the plan internally inconsistent about whether `/track:init` must satisfy AC-13, and can make reviewers or implementers reject the required identity validation step.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
-              "line": 70,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e6bed28e36298d34aa5f1896c1231ea4fbb9c1665883730167307dfb5e6da53b",
-          "at": "2026-04-22T06:34:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-08 says every standalone phase command, including `/track:type-design`, must own its upstream artifact pre-check, but the same sentence only defines checks for `/track:spec-design` and `/track:impl-plan`; T004 and the T004 verification steps also omit any `spec.json` pre-check for `/track:type-design`. Since IN-06 marks `/track:type-design` as independently invokable, the plan leaves Phase 2 able to run without its required Phase 1 artifact despite the stated command contract.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.md",
-              "line": 50,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f745070f1e09a8b4f878767eba0ee7921dc736842b8e18e5aa0ec8117559fa77",
-          "at": "2026-04-22T06:38:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-13 was revised to explicitly exclude `/track:init` because that command is the CN-10 writer=main exception, but the plan still presents T001 as satisfying AC-13: `impl-plan.json`/rendered `plan.md` list `AC-13` in T001, while `task-coverage.json` removes T001 from AC-13. That leaves the artifacts internally contradictory about whether `/track:init` must be checked under AC-13, so an implementer could apply the logic-free command-body constraint to the one command the spec now exempts.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 906,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:7a792f3b8dbed3ef2fd5a3d2d72dedea6a81e5507c3fd126dc1c65fbb465742f",
-          "at": "2026-04-22T06:40:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-13 was changed to explicitly exclude /track:init because T001 is allowed to include identity schema validation, but the T001 verification checklist still says /track:init should be checked against AC-13. That makes the verification procedure contradict the updated acceptance criterion and can cause reviewers to apply the no-schema-logic gate to the one command the spec says is exempt.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
-              "line": 30,
-              "category": "contradiction"
-            },
-            {
-              "message": "task-coverage now claims AC-13 is covered by T008, but T008's task description does not list AC-13 among its covered criteria. Since AC-13 is the low-level-logic exclusion gate for plan.md and T008 adds the loop body to plan.md, the plan artifacts are inconsistent about whether T008 must verify that gate.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/task-coverage.json",
-              "line": 30,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b687638cc47e9042a61430cc920167038ec393cae3aad571761ccbfbbb4356a2",
-          "at": "2026-04-22T06:43:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-13 is now assigned to T007/T008 for the rewritten `.claude/commands/track/plan.md` in the spec/task coverage, but the verification steps for T007/T008 only check the plan skeleton and loop behavior and never verify AC-13's forbidden schema/signal/reference/coverage/canonical-logic condition for `plan.md`. As written, the verification artifact no longer covers all tasks/ACs it claims to cover.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
-              "line": 77,
-              "category": "contradiction"
-            },
-            {
-              "message": "The new Open Questions section says it defines OQ labels that appear in the spec's `informal_grounds`, and it includes OQ-10, but OQ-10 is only defined in `verification.md` and is not recorded in `spec.json`/`spec.md` informal grounds. That makes OQ-10 invisible to the spec SSoT despite the verification artifact claiming it is part of the spec's informal grounds.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
-              "line": 120,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:52118b0eb360a26f4a75290316b3c8e273af59970e15dcd81d48abdc9bbbf5f6",
-          "at": "2026-04-22T06:46:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07588c0764331154ab1fa8eb40a62662bb805971bbdb91a8b8ea36d6a2c4ce76",
-          "at": "2026-04-22T06:50:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The spec still carries the promoted items as `informal_grounds.kind = \"user_directive\"` instead of moving them onto the new child ADR; `2026-04-22-0829` is not referenced anywhere in this file, so the claimed `blue: 59 / yellow: 0` state is not actually backed by the artifact contents. This starts at GO-05/GO-06 and repeats through the later IN/AC entries.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 81,
-              "category": "contradiction"
-            },
-            {
-              "message": "This ADR omits the repository-required `## Status` section, so the new index entry cannot be grounded in one of the documented lifecycle states (`Proposed` / `Accepted` / `Superseded` / `Deprecated`). That makes the README row fall back to an unlabeled `—` state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
-              "line": 1,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
-          "at": "2026-04-22T09:01:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `signals` summary was changed to `blue: 59, yellow: 0`, but this same spec still contains unresolved `user_directive` informal grounds in multiple entries (for example GO-05, GO-06, IN-01, IN-02, and others). That makes the zero-yellow claim internally inconsistent with the file contents.",
-              "severity": "P1",
-              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
-              "line": 1148,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
-          "at": "2026-04-22T09:03:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "この ADR は `spec.json` の 31 件の yellow signal を本 ADR の `adr_refs[]` へ昇格させて解消したと説明していますが、現行の `spec.json` 側では該当項目がまだ親 ADR 参照のままで、本文で説明している評価ルールに従うとそれらはすでに Blue です。つまり『この ADR で yellow を解消した』という因果関係が、実際の artifact 群と噛み合っていません。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
-              "line": 18,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ea650cac070794ab2871367a3a60265f4afeb9f29aa62186e0893f681dbf8ce9",
-          "at": "2026-04-22T09:06:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbc1978007a383b18aff58ee5f1c9a604772f3ec1059ac27a3ccef6a33e81198",
-          "at": "2026-04-22T09:17:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR D1 says the command definition body should describe steps (1)-(3), where step 3 is the post-write signal/binary CLI call, but the spec's CN-10/AC-22 require phase command definitions to contain only writer invocation plus result receipt and to contain no `sotp` CLI calls. This gives implementers contradictory guidance about whether CLI evaluation belongs in the command definition text.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
-              "line": 32,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:cbc1978007a383b18aff58ee5f1c9a604772f3ec1059ac27a3ccef6a33e81198",
-          "at": "2026-04-22T09:20:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcc673264ae1e509b2ccb8302869de41ea568c77b8d8f9f5ed452e26b6a362cf",
-          "at": "2026-04-22T09:26:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d958309ff30beb0f34c49ad3800ac1dd3738dd6736b9ccf042e41c5aa5d49b8",
-          "at": "2026-04-22T09:47:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d958309ff30beb0f34c49ad3800ac1dd3738dd6736b9ccf042e41c5aa5d49b8",
-          "at": "2026-04-22T09:48:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23c8df48dec90c6b888ed10afd86472121b5e441d02f17757c1cf6ec5db715d4",
-          "at": "2026-04-22T10:07:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23c8df48dec90c6b888ed10afd86472121b5e441d02f17757c1cf6ec5db715d4",
-          "at": "2026-04-22T10:09:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2398531d94e5fcf75a083b77233860d03e7318a30a164fadee01644b9c13fb0d",
-          "at": "2026-04-22T10:17:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2398531d94e5fcf75a083b77233860d03e7318a30a164fadee01644b9c13fb0d",
-          "at": "2026-04-22T10:18:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66c0875e901ca61a443a7e7e614a31d8c410cc0850b32b2344e8e2a9f174059e",
-          "at": "2026-04-22T10:50:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66c0875e901ca61a443a7e7e614a31d8c410cc0850b32b2344e8e2a9f174059e",
-          "at": "2026-04-22T10:51:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ac82afdd17eb96aa65082ad4285a482b405fcacd49b72640804b4c7e8b35508",
-          "at": "2026-04-22T11:19:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ac82afdd17eb96aa65082ad4285a482b405fcacd49b72640804b4c7e8b35508",
-          "at": "2026-04-22T11:21:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:043d02497865b9377d8b67baeab1ef05db5e01d2b3e7f21821e3b430404fd744",
-          "at": "2026-04-22T11:25:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:043d02497865b9377d8b67baeab1ef05db5e01d2b3e7f21821e3b430404fd744",
-          "at": "2026-04-22T11:27:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3b4f9e9f492a53dafe406e3e1366e1a131623d96f50617b2aedaee20d600587",
-          "at": "2026-04-22T11:47:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3b4f9e9f492a53dafe406e3e1366e1a131623d96f50617b2aedaee20d600587",
-          "at": "2026-04-22T11:48:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16413d1c884d89e2a91d868d3619c143bcf8f105726547e8be8706b4e35b7e08",
-          "at": "2026-04-22T11:58:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16413d1c884d89e2a91d868d3619c143bcf8f105726547e8be8706b4e35b7e08",
-          "at": "2026-04-22T12:03:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16413d1c884d89e2a91d868d3619c143bcf8f105726547e8be8706b4e35b7e08",
-          "at": "2026-04-22T12:05:18Z"
+          "hash": "rvw1:sha256:ec992dcead97ab1f7e70ade6fa3ddaf3462dce80f6d39f154c44b68daee52f8c",
+          "at": "2026-04-22T12:26:22Z"
         }
       ]
     },

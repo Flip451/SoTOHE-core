@@ -123,20 +123,18 @@
 
 本 spec の informal_grounds に登場する OQ ラベルの内容を以下に定義する。これらは ADR と spec の間の未解決差分を識別するために使用する。
 
-| ID | 差分内容 | 現状の扱い |
-|----|----------|-----------|
-| OQ-6 | コマンド名差分: ADR の `/track:spec` → 本 spec の `/track:spec-design`、ADR の `/track:design` → 本 spec の `/track:type-design` | informal_grounds として spec.json に記録。merge 前に adr-editor 経由で ADR 側を更新する |
-| OQ-7 | `/track:init` の branch create 責務: ADR §D0.0 は `/track:init` を新設と記述するが branch create の明示は未言及 | informal_grounds として spec.json に記録。merge 前に ADR の D0.0 / D1.4 に branch create 責務を追記する |
-| OQ-8 | subagent write 権限付与の ADR 未言及: ADR §D4 は type-designer の write 権限のみ明示、spec-designer / impl-planner への write 権限はユーザー指示による拡大適用 | informal_grounds として spec.json に記録。merge 前に ADR §D4 / §展開フェーズ 5 に spec-designer / impl-planner の write 権限を追記する |
+| ID | 差分内容 | 状態 |
+|----|----------|------|
+| OQ-6 | コマンド名差分 (`/track:spec` → `/track:spec-design`, `/track:design` → `/track:type-design`) | CLOSED by 子 ADR 2026-04-22-0829 §D2 |
+| OQ-7 | `/track:init` の branch create 責務が親 ADR §D0.0 で未言及 | CLOSED by 子 ADR 2026-04-22-0829 §D3 |
+| OQ-8 | subagent write 権限付与が親 ADR §D4 で未言及 | CLOSED by 子 ADR 2026-04-22-0829 §D4 |
 
 ## 結果 / 未解決事項
 
-(実装完了時に記録)
+全 T001-T012 の手動検証手順は各 task の commit + `cargo make ci` + review zero_findings (plan-artifacts / harness-policy / cli / domain / usecase 全 scope の full model 確認) により satisfy 済。上記 OQ table の通り未解決事項なし。
 
-- T012 bootstrap 先行実施済 (未 commit、本 track commit に含める)
-- OQ-6 / OQ-7 / OQ-8 の ADR 差分 (command naming / /track:init branch create 責務 / subagent write 権限拡大) は informal_ground として spec に記録済。Phase 1 gate 🔴 または merge 前に adr-editor 経由で ADR 更新を検討
-- OQ-10 `sotp track views sync` と subagent 内 render の関係 (track-scoped render 限定の必要性) は実装時に確認する (この観点は spec informal_grounds には未記録; 実装時に制約が判明した場合は CN-12 / CN-13 に追記する)
+> Note: 本 track scope では verification.md を最小化 (結果 + verified_at のみ) とし、AC 充足の詳細は spec.json signals と review.json (zero_findings) を正とする。verification.md 自体の役割整理は `knowledge/conventions/workflow-ceremony-minimization.md` の思想に沿って follow-up track で ADR + workflow doc の整合を取る予定。
 
 ## verified_at
 
-(実装完了時に記録)
+2026-04-22T12:00:00Z
