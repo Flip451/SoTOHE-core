@@ -4,14 +4,12 @@
     {
       "id": "T001",
       "description": "apps/cli/src/commands/track/activate.rs: separate execute_branch(BranchAction::Create) from execute_activate into an independent path that runs only `git switch -c track/<id> main` with no commit side-effects; retire BranchMode::Create from execute_activate (Switch/Auto only); update rstest callers that reference BranchMode::Create; add unit tests verifying the new Create path produces no git commit call and that existing Auto/Switch execute_activate tests continue to pass",
-      "status": "todo",
-      "commit_hash": null
+      "status": "in_progress"
     },
     {
       "id": "T002",
       "description": "Run `cargo make ci` (fmt / clippy / nextest / deny / verify-* suite) and confirm all checks pass; report any regressions introduced by T001",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
@@ -30,7 +28,9 @@
           "新 Create path が git commit を一切呼ばないこと、BranchMode::Auto / BranchMode::Switch の既存テストが引き続き pass することを単体テストで確認する",
           "no panics in library code 原則 (CN-01) および BranchMode::Auto resume flow 維持 (CN-02) を遵守する"
         ],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ]
       },
       {
         "id": "S2",
@@ -39,7 +39,9 @@
           "cargo make ci (fmt / clippy / nextest / deny / verify-* 一式) を実行して全チェックが pass することを確認する",
           "T001 実装後の回帰 (clippy lint / フォーマット崩れ / 既存テスト失敗) を検出して報告する"
         ],
-        "task_ids": ["T002"]
+        "task_ids": [
+          "T002"
+        ]
       }
     ]
   }

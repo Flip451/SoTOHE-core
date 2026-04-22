@@ -14,15 +14,85 @@ fn is_gitignored_rendered_view(project_root: &std::path::Path, path: &std::path:
 
 pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError> {
     match action {
-        BranchAction::Create(args) => execute_activate(
-            ActivateArgs { items_dir: args.items_dir, track_id: args.track_id },
-            BranchMode::Create,
-        ),
+        BranchAction::Create(args) => execute_branch_create(args),
         BranchAction::Switch(args) => execute_activate(
             ActivateArgs { items_dir: args.items_dir, track_id: args.track_id },
             BranchMode::Switch,
         ),
     }
+}
+
+/// Creates a new `track/<track-id>` branch from `main` and switches to it.
+///
+/// # Errors
+/// Returns `CliError::Message` when any of the following holds:
+/// - `track_id` is malformed, or the derived branch name is invalid
+/// - `items_dir` does not point at `<project-root>/track/items`
+/// - the current branch is not `main`
+/// - a branch named `track/<track-id>` already exists
+/// - the underlying `git switch -c` invocation fails
+fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
+    let BranchArgs { items_dir, track_id } = args;
+
+    let track_id = TrackId::try_new(&track_id)
+        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
+
+    let branch_name = format!("track/{track_id}");
+
+    TrackBranch::try_new(&branch_name)
+        .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
+    resolve_project_root(&items_dir).map_err(CliError::Message)?;
+
+    let repo = SystemGitRepo::discover()
+        .map_err(|err| CliError::Message(format!("failed to discover git repository: {err}")))?;
+
+    branch_create_execute(&repo, &branch_name)
+        .map_err(|err| CliError::Message(format!("branch create failed: {err}")))?;
+
+    println!("[OK] Created and switched to branch: {branch_name}");
+    Ok(ExitCode::SUCCESS)
+}
+
+/// Returns the git command list for a branch-create invocation.
+///
+/// The create path intentionally emits only `git switch -c track/<id> main`; it must never
+/// stage or commit metadata so that `main` stays untouched while the new track branch is being
+/// bootstrapped. Metadata persistence belongs to the subsequent activation step that runs on
+/// the newly created track branch.
+fn branch_create_git_commands(branch_name: &str) -> Vec<Vec<String>> {
+    vec![vec!["switch".to_owned(), "-c".to_owned(), branch_name.to_owned(), "main".to_owned()]]
+}
+
+/// Executes the branch-create git commands against `repo` after validating preconditions.
+///
+/// Preconditions:
+/// - current branch must be `main` (branch create must fork from main)
+/// - target branch `branch_name` must not yet exist
+///
+/// The function guarantees it never runs `git add` / `git commit` — only the commands produced
+/// by [`branch_create_git_commands`] are issued.
+fn branch_create_execute(repo: &impl GitRepository, branch_name: &str) -> Result<(), String> {
+    let current = repo.current_branch().map_err(|err| err.to_string())?;
+    if current.as_deref() != Some("main") {
+        return Err(format!(
+            "branch create must start from 'main'; current branch is {}",
+            current.as_deref().unwrap_or("<detached>")
+        ));
+    }
+
+    if branch_exists(repo, branch_name)? {
+        return Err(format!("branch '{branch_name}' already exists"));
+    }
+
+    for command in branch_create_git_commands(branch_name) {
+        let args: Vec<&str> = command.iter().map(String::as_str).collect();
+        match repo.status(&args) {
+            Ok(0) => {}
+            Ok(_) => return Err(format!("git {} failed", args.join(" "))),
+            Err(err) => return Err(format!("failed to run git {}: {err}", args.join(" "))),
+        }
+    }
+    Ok(())
 }
 
 #[allow(clippy::too_many_lines)]
@@ -48,10 +118,6 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     let track_record = load_track_branch_record(&project_root, &items_dir, &track_id)
         .map_err(|err| CliError::Message(format!("activation failed: {err}")))?;
 
-    if uses_legacy_branch_mode(mode, track_record.schema_version) {
-        return execute_legacy_branch_mode(&repo, &branch_name, mode);
-    }
-
     let already_materialized = track_record.branch.is_some();
     let current_branch = repo.current_branch().map_err(|err| {
         CliError::Message(format!("failed to determine current branch before activation: {err}"))
@@ -69,12 +135,6 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
         return Err(CliError::Message(
             "activation preflight failed: activation must start from a non-track source branch; switch to 'main' or another non-track branch and rerun".to_owned()
         ));
-    }
-    if activation_create_requires_main_branch(mode, already_materialized, current_branch.as_deref())
-    {
-        return Err(CliError::Message(format!(
-            "activation preflight failed: track branch creation must start from 'main'; switch to main or use /track:activate {track_id} instead"
-        )));
     }
 
     let resume_allowed = if already_materialized && mode == BranchMode::Auto {
@@ -264,54 +324,6 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     Ok(ExitCode::SUCCESS)
 }
 
-pub(super) fn execute_legacy_branch_mode(
-    repo: &impl GitRepository,
-    branch_name: &str,
-    mode: BranchMode,
-) -> Result<ExitCode, CliError> {
-    let branch_exists = preflight_branch_operation(repo, branch_name, mode, false)
-        .map_err(|err| CliError::Message(format!("legacy branch preflight failed: {err}")))?;
-    let current_branch = repo
-        .current_branch()
-        .map_err(|err| CliError::Message(format!("failed to determine current branch: {err}")))?;
-    let create_from = matches!(mode, BranchMode::Create).then_some("main");
-    let git_commands = activation_git_commands(
-        mode,
-        branch_name,
-        branch_exists,
-        false,
-        current_branch.as_deref(),
-        create_from,
-    );
-    for command in &git_commands {
-        let args = command.iter().map(String::as_str).collect::<Vec<_>>();
-        match repo.status(&args) {
-            Ok(0) => {}
-            Ok(_) => {
-                return Err(CliError::Message(format!("git {} failed", args.join(" "))));
-            }
-            Err(err) => {
-                return Err(CliError::Message(format!(
-                    "failed to run git {}: {err}",
-                    args.join(" ")
-                )));
-            }
-        }
-    }
-
-    println!("[OK] Legacy track left branch metadata unchanged");
-    println!(
-        "[OK] {} branch: {}",
-        activation_switch_label(
-            mode,
-            branch_exists,
-            current_branch.as_deref() == Some(branch_name)
-        ),
-        branch_name
-    );
-    Ok(ExitCode::SUCCESS)
-}
-
 pub(super) fn load_track_branch_record(
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
@@ -439,12 +451,6 @@ fn activation_git_commands(
     }
 
     match (mode, branch_exists, materialized_now) {
-        (BranchMode::Create, _, _) => vec![vec![
-            "switch".to_owned(),
-            "-c".to_owned(),
-            branch_name.to_owned(),
-            create_from.unwrap_or("main").to_owned(),
-        ]],
         (BranchMode::Switch, _, true) => vec![
             vec!["branch".to_owned(), "-f".to_owned(), branch_name.to_owned(), "HEAD".to_owned()],
             vec!["switch".to_owned(), branch_name.to_owned()],
@@ -483,7 +489,6 @@ fn activation_branch_create_base(
     materialized_now: bool,
 ) -> Result<Option<String>, String> {
     match mode {
-        BranchMode::Create => Ok((!branch_exists).then_some("main".to_owned())),
         BranchMode::Switch => Ok(None),
         BranchMode::Auto if materialized_now => {
             if branch_exists {
@@ -554,7 +559,6 @@ fn allow_materialized_activation(mode: BranchMode, resume_allowed: bool) -> bool
     match mode {
         BranchMode::Auto => resume_allowed,
         BranchMode::Switch => true,
-        BranchMode::Create => true,
     }
 }
 
@@ -634,14 +638,6 @@ pub(super) fn ensure_clean_worktree(
         .map_err(|e| e.to_string())
 }
 
-fn activation_create_requires_main_branch(
-    mode: BranchMode,
-    already_materialized: bool,
-    current_branch: Option<&str>,
-) -> bool {
-    mode == BranchMode::Create && !already_materialized && current_branch != Some("main")
-}
-
 fn activation_rejects_invalid_source_branch(
     mode: BranchMode,
     already_materialized: bool,
@@ -654,18 +650,7 @@ fn activation_rejects_invalid_source_branch(
     match mode {
         BranchMode::Auto => invalid,
         BranchMode::Switch => !already_materialized && invalid,
-        BranchMode::Create => false,
     }
-}
-
-pub(super) fn uses_legacy_branch_mode(_mode: BranchMode, _schema_version: u32) -> bool {
-    // The legacy branch-mode path is retired. The only supported metadata
-    // schemas are v4/v5 (identity-only); legacy schemas (v1 / v2 / v3)
-    // are frozen history and have no backward-compat route. All branch ops
-    // — regardless of mode or schema — flow through the full activation
-    // path, which materializes metadata properly and fails explicitly on an
-    // unsupported schema rather than silently succeeding with stale state.
-    false
 }
 
 /// Fetches dirty worktree paths via git, delegating parsing to the usecase layer.
@@ -733,7 +718,6 @@ fn activation_switch_label(
     }
 
     match mode {
-        BranchMode::Create => "Created and switched to",
         BranchMode::Switch => "Switched to",
         BranchMode::Auto if branch_exists => "Switched to",
         BranchMode::Auto => "Created and switched to",
@@ -796,7 +780,6 @@ pub(super) fn preflight_branch_operation(
         reject_stale_or_divergent_branch(repo, branch_name, exists)?;
     }
     match mode {
-        BranchMode::Create if exists => Err(format!("branch '{branch_name}' already exists")),
         BranchMode::Switch if !exists => Err(format!("branch '{branch_name}' does not exist")),
         _ => Ok(exists),
     }
@@ -820,12 +803,12 @@ mod tests {
     use super::load_track_branch_record;
     use super::{
         activation_artifact_paths, activation_branch_create_base, activation_commit_paths,
-        activation_create_requires_main_branch, activation_git_commands,
-        activation_rejects_invalid_source_branch, activation_requires_clean_worktree,
-        activation_resume_allowed, activation_resume_marker_path, allow_materialized_activation,
-        allowed_activation_dirty_paths, clear_activation_resume_marker, ensure_clean_worktree,
-        persist_activation_commit, preflight_branch_operation,
-        should_persist_activation_side_effects, uses_legacy_branch_mode,
+        activation_git_commands, activation_rejects_invalid_source_branch,
+        activation_requires_clean_worktree, activation_resume_allowed,
+        activation_resume_marker_path, allow_materialized_activation,
+        allowed_activation_dirty_paths, branch_create_execute, branch_create_git_commands,
+        clear_activation_resume_marker, ensure_clean_worktree, persist_activation_commit,
+        preflight_branch_operation, should_persist_activation_side_effects,
         write_activation_resume_marker,
     };
     use std::path::Path;
@@ -1035,22 +1018,6 @@ mod tests {
     }
 
     #[rstest]
-    #[case::create_v2(BranchMode::Create, 2)]
-    #[case::switch_v2(BranchMode::Switch, 2)]
-    #[case::auto_v2(BranchMode::Auto, 2)]
-    #[case::create_v3(BranchMode::Create, 3)]
-    #[case::switch_v3(BranchMode::Switch, 3)]
-    #[case::create_v4(BranchMode::Create, 4)]
-    #[case::switch_v4(BranchMode::Switch, 4)]
-    #[case::auto_v4(BranchMode::Auto, 4)]
-    fn uses_legacy_branch_mode_is_retired(#[case] mode: BranchMode, #[case] schema_version: u32) {
-        assert!(
-            !uses_legacy_branch_mode(mode, schema_version),
-            "legacy branch-mode dispatch is retired; all ops must flow through the activation path"
-        );
-    }
-
-    #[rstest]
     #[case::auto_mode(BranchMode::Auto)]
     #[case::switch_mode(BranchMode::Switch)]
     fn activation_git_commands_fast_forward_existing_branch_after_materialization(
@@ -1240,7 +1207,6 @@ mod tests {
     #[rstest]
     #[case::switch_not_resume(BranchMode::Switch, false, true)]
     #[case::auto_resume(BranchMode::Auto, true, true)]
-    #[case::create_not_resume(BranchMode::Create, false, true)]
     #[case::auto_not_resume(BranchMode::Auto, false, false)]
     fn allow_materialized_activation_only_allows_switch_or_auto_resume(
         #[case] mode: BranchMode,
@@ -1272,7 +1238,6 @@ mod tests {
     #[case::auto_materialized_no_resume(BranchMode::Auto, true, false, false)]
     #[case::switch_materialized_no_resume(BranchMode::Switch, true, false, false)]
     #[case::switch_not_materialized_dirty_allowed(BranchMode::Switch, false, false, false)]
-    #[case::create_not_materialized_dirty_allowed(BranchMode::Create, false, false, false)]
     fn activation_resume_requires_clean_worktree(
         #[case] mode: BranchMode,
         #[case] already_materialized: bool,
@@ -1485,15 +1450,11 @@ mod tests {
     }
 
     #[test]
-    fn activation_git_commands_create_track_branch_from_main() {
-        let commands = activation_git_commands(
-            BranchMode::Create,
-            "track/demo",
-            false,
-            false,
-            Some("feature"),
-            Some("main"),
-        );
+    fn branch_create_git_commands_returns_switch_c_main_only() {
+        // Regression guard (ADR 2026-04-22-1432 §D3): branch create must only emit
+        // `git switch -c track/<id> main`. No commit, no add, no branch -f — any
+        // additional command would risk generating a commit on main.
+        let commands = branch_create_git_commands("track/demo");
 
         assert_eq!(
             commands,
@@ -1503,6 +1464,88 @@ mod tests {
                 "track/demo".to_owned(),
                 "main".to_owned(),
             ]]
+        );
+    }
+
+    #[test]
+    fn branch_create_execute_runs_only_switch_c_main_and_no_commit() {
+        // Regression guard (ADR 2026-04-22-1432 §D1): the execute_branch(Create)
+        // path must never invoke `git add` or `git commit`. If any future refactor
+        // reintroduces metadata persistence into this path, this test fails.
+        let repo = RecordingRepo {
+            current_branch: Some("main".to_owned()),
+            outputs: HashMap::from([(
+                vec![
+                    "rev-parse".to_owned(),
+                    "--verify".to_owned(),
+                    "--quiet".to_owned(),
+                    "track/demo".to_owned(),
+                ],
+                exit_output(1, ""),
+            )]),
+            status_calls: Mutex::new(Vec::new()),
+        };
+
+        branch_create_execute(&repo, "track/demo").unwrap();
+
+        let calls = repo.status_calls.lock().unwrap().clone();
+        assert_eq!(
+            calls,
+            vec![vec![
+                "switch".to_owned(),
+                "-c".to_owned(),
+                "track/demo".to_owned(),
+                "main".to_owned(),
+            ]],
+            "branch create must only execute `git switch -c`; any commit/add call is a regression"
+        );
+        assert!(
+            !calls.iter().any(|args| args.first().map(String::as_str) == Some("commit")),
+            "branch create must not invoke `git commit`"
+        );
+        assert!(
+            !calls.iter().any(|args| args.first().map(String::as_str) == Some("add")),
+            "branch create must not invoke `git add`"
+        );
+    }
+
+    #[test]
+    fn branch_create_execute_rejects_non_main_source_branch() {
+        let repo = RecordingRepo {
+            current_branch: Some("feature".to_owned()),
+            outputs: HashMap::new(),
+            status_calls: Mutex::new(Vec::new()),
+        };
+
+        let err = branch_create_execute(&repo, "track/demo").unwrap_err();
+        assert!(err.contains("must start from 'main'"));
+        assert!(
+            repo.status_calls.lock().unwrap().is_empty(),
+            "no git side-effects must happen when preflight fails"
+        );
+    }
+
+    #[test]
+    fn branch_create_execute_rejects_existing_branch() {
+        let repo = RecordingRepo {
+            current_branch: Some("main".to_owned()),
+            outputs: HashMap::from([(
+                vec![
+                    "rev-parse".to_owned(),
+                    "--verify".to_owned(),
+                    "--quiet".to_owned(),
+                    "track/demo".to_owned(),
+                ],
+                success_output("track/demo\n"),
+            )]),
+            status_calls: Mutex::new(Vec::new()),
+        };
+
+        let err = branch_create_execute(&repo, "track/demo").unwrap_err();
+        assert!(err.contains("already exists"));
+        assert!(
+            repo.status_calls.lock().unwrap().is_empty(),
+            "no git side-effects must happen when preflight fails"
         );
     }
 
@@ -1724,23 +1767,6 @@ mod tests {
         .unwrap();
 
         assert_eq!(base, Some("abc1234".to_owned()));
-    }
-
-    #[rstest]
-    #[case::create_not_materialized_non_main(BranchMode::Create, false, Some("feature"), true)]
-    #[case::create_not_materialized_main(BranchMode::Create, false, Some("main"), false)]
-    #[case::create_already_materialized(BranchMode::Create, true, Some("feature"), false)]
-    #[case::auto_not_materialized(BranchMode::Auto, false, Some("feature"), false)]
-    fn activation_create_requires_main_branch_for_new_materialization(
-        #[case] mode: BranchMode,
-        #[case] already_materialized: bool,
-        #[case] current_branch: Option<&str>,
-        #[case] expected: bool,
-    ) {
-        assert_eq!(
-            activation_create_requires_main_branch(mode, already_materialized, current_branch),
-            expected
-        );
     }
 
     #[test]

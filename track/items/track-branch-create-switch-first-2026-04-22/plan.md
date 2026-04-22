@@ -16,7 +16,7 @@ T002: cargo make ci 全体 gate を通過させ、回帰がないことを確認
 > 新 Create path が git commit を一切呼ばないこと、BranchMode::Auto / BranchMode::Switch の既存テストが引き続き pass することを単体テストで確認する
 > no panics in library code 原則 (CN-01) および BranchMode::Auto resume flow 維持 (CN-02) を遵守する
 
-- [ ] **T001**: apps/cli/src/commands/track/activate.rs: separate execute_branch(BranchAction::Create) from execute_activate into an independent path that runs only `git switch -c track/<id> main` with no commit side-effects; retire BranchMode::Create from execute_activate (Switch/Auto only); update rstest callers that reference BranchMode::Create; add unit tests verifying the new Create path produces no git commit call and that existing Auto/Switch execute_activate tests continue to pass
+- [~] **T001**: apps/cli/src/commands/track/activate.rs: separate execute_branch(BranchAction::Create) from execute_activate into an independent path that runs only `git switch -c track/<id> main` with no commit side-effects; retire BranchMode::Create from execute_activate (Switch/Auto only); update rstest callers that reference BranchMode::Create; add unit tests verifying the new Create path produces no git commit call and that existing Auto/Switch execute_activate tests continue to pass
 
 ### S2 — S2 — CI gate 全体確認 (CN-03 / AC-04)
 

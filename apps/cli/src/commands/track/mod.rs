@@ -323,9 +323,14 @@ pub struct ActivateArgs {
     track_id: String,
 }
 
+/// Activation mode for [`super::activate::execute_activate`].
+///
+/// `Create` is intentionally absent: branch creation (`sotp track branch create`) runs through
+/// the independent [`super::activate::execute_branch_create`] path so that branch-only bootstrap
+/// can never generate an activation commit on `main`. See
+/// `knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md` §D1-D2.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum BranchMode {
-    Create,
     Switch,
     Auto,
 }
