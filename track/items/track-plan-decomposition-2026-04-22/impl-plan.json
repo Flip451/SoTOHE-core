@@ -34,7 +34,8 @@
     {
       "id": "T005",
       "description": "3 subagent agent definition (.claude/agents/*.md) の frontmatter tools / Scope Ownership / Rules / Boundary table を IN-09 v3 に従って更新する: (a) spec-designer.md — frontmatter tools に Write + Bash (sotp CLI 専用、cat/grep/head 禁止) を追加。'This agent is advisory: the orchestrator synthesizes its output into spec.json' を 'spec-designer が spec.json を直接 Write し、spec.md render + 信号機評価 (sotp CLI) を内部実行する' に変更。Scope Ownership / Rules に内部 pipeline を明記。Boundary table の typical trigger を /track:spec-design に。(b) type-designer.md — frontmatter tools に Write + Bash (sotp CLI 専用、cat/grep/head 禁止) を追加 (type-designer は既存 frontmatter に tools 宣言がないため Write も明示追加)。'Output is advisory JSON that the orchestrator writes' を 'type-designer が <layer>-types.json を直接 Write し、baseline capture + graph md render + contract-map render + type-signals render + 信号機評価 (sotp CLI) を内部実行する' に変更。Scope Ownership を更新。Boundary table の typical trigger を /track:type-design に。(c) impl-planner.md — frontmatter tools に Write + Bash を追加。'This agent is advisory: the orchestrator writes the artifacts' を 'impl-planner が impl-plan.json + task-coverage.json を直接 Write し、gate 評価 (sotp CLI) を内部実行する' に変更。Scope Ownership / Rules を更新。Boundary table の typical trigger を /track:impl-plan に (IN-09 / CN-12 / AC-17)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "3f808c02c78e4b497432903c9cdac58ba851d945"
     },
     {
       "id": "T006",

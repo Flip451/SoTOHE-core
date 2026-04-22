@@ -17,8 +17,8 @@ This agent is **write-only to `knowledge/adr/*.md`**. It must not edit spec.json
 
 The orchestrator (`/track:plan`) invokes this agent only when:
 
-1. The downstream gate evaluated a 🔴 signal
-2. The ADR file at the target path has commit history (determined by the orchestrator before invocation; no commit history → user pause, not adr-editor invocation)
+1. The Phase 1 gate (spec → ADR signal) evaluated a 🔴 signal. Phase 2 🔴 escalates to `spec-designer` (not adr-editor); Phase 3 ERROR re-invokes `impl-planner` in the same phase.
+2. The ADR file at the target path has commit history (determined by the orchestrator before invocation; no commit history → user pause, not adr-editor invocation).
 
 The briefing from the orchestrator must include:
 
@@ -30,9 +30,9 @@ The briefing from the orchestrator must include:
 
 | aspect | adr-editor (this agent) | spec-designer | impl-planner | type-designer |
 |---|---|---|---|---|
-| output | `knowledge/adr/*.md` edits | `spec.json` | `impl-plan.json` + `task-coverage.json` | `<layer>-types.json` |
-| trigger | downstream 🔴 signal escalation | `/track:spec` (Phase 1) | `/track:impl-plan` (Phase 3) | `/track:design` (Phase 2) |
-| scope | working tree only, no commit | advisory (orchestrator writes) | advisory (orchestrator writes) | advisory (orchestrator writes) |
+| output | `knowledge/adr/*.md` edits | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` | `<layer>-types.json` + rendered views |
+| trigger | Phase 1 🔴 signal escalation | `/track:spec-design` (Phase 1) | `/track:impl-plan` (Phase 3) | `/track:type-design` (Phase 2) |
+| scope | working tree only, no commit | writes own SSoT + rendered view | writes own SSoT files | writes own SSoT + rendered views |
 
 If the briefing asks for:
 

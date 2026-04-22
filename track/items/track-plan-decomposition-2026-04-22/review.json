@@ -19,358 +19,6 @@
         }
       ]
     },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:06:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:09:25Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
-          "at": "2026-04-22T09:48:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cargo make track-branch-create` already materializes `metadata.json.branch` and persists the activation artifacts, so the command's next step to edit `metadata.json.branch` again leaves a fresh `updated_at` change after the activation commit instead of the clean post-init state the workflow expects. This step should be a verification/reporting step, or the wrapper behavior must be changed with the command updated accordingly.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 31,
-              "category": "architecture"
-            },
-            {
-              "message": "The behavior section still describes looping into a state machine and the Phase 0 -> Phase 1 transition ownership. The harness policy for `/track:init` explicitly excludes state-machine transition/back-and-forth loop wording from phase commands, so this leaks orchestration policy into the standalone Phase 0 command.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 49,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
-          "at": "2026-04-22T09:52:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The execution sequence no longer matches the required five-step `/track:init` flow: ADR pre-check is supposed to be step 1, followed by metadata creation, branch creation, metadata branch update, and verification. This command inserts track-id derivation as step 1 and shifts ADR pre-check to step 2, producing a six-step sequence that violates the harness-policy briefing and can cause downstream reviewers/tools to treat the command contract as non-compliant.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 19,
-              "category": null
-            },
-            {
-              "message": "The briefing explicitly excludes state-machine transition and back-and-forth loop wording from this command, but this behavior section still mentions looping into a state machine and the `/track:plan` Phase 0 -> Phase 1 transition. Even though it says `/track:init` does not own that logic, including the excluded transition/loop language makes the command policy non-compliant for this scope.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 49,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
-          "at": "2026-04-22T09:53:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cargo make track-branch-create` already materializes `metadata.json.branch` and persists the activation artifacts before switching branches, so step 4 edits `metadata.json.branch` and refreshes `updated_at` a second time after the activation commit. That leaves the newly initialized track dirty and out of sync with the wrapper's committed activation state; this step should verify/report the branch value or the wrapper behavior must be changed to match the documented five-step flow.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 31,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:609fe5909ababb68f64ba71738b92872f21744af3405396728da25b126174caa",
-          "at": "2026-04-22T09:56:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4121a78a9ce9d6752d4467fa8981aff7764f3172faf3de4755022c1e3cae86c5",
-          "at": "2026-04-22T10:00:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:90e6487a0eb62287a2eb996cd7dffa2bb4d15499294d65eacbfa6c087f50ee24",
-          "at": "2026-04-22T10:11:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bbbde2b33ccc6b6bc25ed9af653e40463a45f3d1c7bd8bf1e0a111f91e12b010",
-          "at": "2026-04-22T10:12:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The wrapper still performs local pre-check orchestration (`spec.json` existence and `architecture-rules.json` validation) before invoking `type-designer`. Round 3 explicitly narrowed this command to subagent invocation plus result receipt only, so these checks reintroduce workflow logic outside the subagent and break the intended minimal wrapper shape.",
-              "severity": "P1",
-              "file": ".claude/commands/track/type-design.md",
-              "line": 18,
-              "category": "workflow_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:bb3eeb8330f8b4d902f0eba5e42e34351ad07c77a01840cfda57b05f2be269cb",
-          "at": "2026-04-22T10:19:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:609659b6db190c85fa9e284ba761d13e37d9d331290237543612de1beefc7ace",
-          "at": "2026-04-22T10:21:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.claude/commands/track/type-design.md` still tells the subagent to accept an optional `--layer` filter. That reintroduces the argument-handling the briefing explicitly removed and conflicts with the new always-process-all-layers contract for Phase 2.",
-              "severity": "P1",
-              "file": ".claude/commands/track/type-design.md",
-              "line": 25,
-              "category": "behavior"
-            }
-          ],
-          "hash": "rvw1:sha256:695cd69b426e22484cf1f99676a64e84756416ddad2f9eac476f37e4133424d9",
-          "at": "2026-04-22T10:28:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7efddd290df768e14652f6ce07f039b3ed13ed9629fa3e7c7283f9789c7d8986",
-          "at": "2026-04-22T10:30:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `.claude/commands/track/design.md` and replacing it with `type-design.md` changes the slash-command name to `/track:type-design`, but the rest of the workflow still invokes and documents `/track:design`. That leaves the documented Phase 2 entry point unreachable unless a compatibility alias is kept.",
-              "severity": "P1",
-              "file": ".claude/commands/track/design.md",
-              "line": 1,
-              "category": "workflow regression"
-            }
-          ],
-          "hash": "rvw1:sha256:eb47608968be40a47eebf8210a0fef0485a82d0bcd63dc538dbcdaf1e04e11a1",
-          "at": "2026-04-22T10:34:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `.claude/commands/track/design.md` and replacing it with `.claude/commands/track/type-design.md` changes the slash-command name, but the workflow still has live `/track:design` call sites. Without a compatibility alias or a repo-wide update in the same change, Phase 2 becomes unreachable from those existing entry points.",
-              "severity": "P1",
-              "file": ".claude/commands/track/design.md",
-              "line": null,
-              "category": "regression"
-            }
-          ],
-          "hash": "rvw1:sha256:eb47608968be40a47eebf8210a0fef0485a82d0bcd63dc538dbcdaf1e04e11a1",
-          "at": "2026-04-22T10:36:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
-          "at": "2026-04-22T10:40:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The diff deletes the tracked `.claude/commands/track/design.md` and updates the orchestrator to call `/track:type-design`, but `.claude/commands/track/type-design.md` is untracked and therefore not part of the patch shown by `git diff`. If this is committed as-is, Phase 2 will point at a command file that is not added to the repository, breaking the planning workflow for type-design.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 70,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
-          "at": "2026-04-22T10:42:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
-          "at": "2026-04-22T10:43:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`spec-designer` is now instructed to run `bin/sotp track views sync`, but that command also rewrites `plan.md` in addition to `spec.md` (`sync_rendered_views` does both on the single-track path). That lets a Phase 1 agent mutate a file its own scope explicitly forbids and can interfere with Phase 3 ownership. Use a spec-only render path here, or explicitly narrow the command so it cannot touch `plan.md`.",
-              "severity": "P1",
-              "file": ".claude/agents/spec-designer.md",
-              "line": 79,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:17630784e0ab247c661f6b97026e4a853f38be8877d48f55afaeb63e4921fae1",
-          "at": "2026-04-22T10:51:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`spec-designer` directs the agent to regenerate `spec.md` with `bin/sotp track views sync`, but that command only syncs `plan.md` and `registry.md`. As written, Phase 1 will not produce the required `spec.md` view and may clobber the wrong rendered files instead.",
-              "severity": "P1",
-              "file": ".claude/agents/spec-designer.md",
-              "line": 77,
-              "category": "correctness"
-            },
-            {
-              "message": "`type-designer` names the rendered artifact `<layer>-type-signals.md`, but the current `type-signals` renderer emits `<layer>-types.md` and only writes `<layer>-type-signals.json` for the evaluation result. This points the phase-2 pipeline at a non-existent markdown artifact.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 73,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:17630784e0ab247c661f6b97026e4a853f38be8877d48f55afaeb63e4921fae1",
-          "at": "2026-04-22T10:55:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This instruction routes Phase 1 through `bin/sotp track views sync` and `bin/sotp verify plan-artifact-refs`, but `track views sync` also syncs `plan.md` and `registry.md` (`libs/infrastructure/src/track/render.rs:1`) and the repo's spec-signal path is `sotp track signals` (`libs/domain/src/spec.rs:376`, `apps/cli/src/commands/track/signals.rs:64`). A spec-designer following this text can overwrite files outside its ownership and run the wrong gate.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
-              "line": 37,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:a1900d34e3ac22b533cb76b8e97bb9b8c86addfd2b4febea01ae6a278e9de2b9",
-          "at": "2026-04-22T11:00:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`type-signals` does not produce `<layer>-type-signals.md`; it writes `<layer>-types.md` plus `<layer>-type-signals.json`. The phase-2 contract is pointing at the wrong artifact name, so a literal subagent would manage a file the CLI never emits.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 29,
-              "category": "artifact_name_mismatch"
-            },
-            {
-              "message": "The permitted render outputs list only `<layer>-graph.md`, but `bin/sotp track type-graph` defaults to cluster mode (`--cluster-depth 2`) and writes a `<layer>-graph/` directory with `index.md` plus cluster files. The scope rule does not cover the command's actual default output.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 145,
-              "category": "write_scope_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:5e999df91d57a011056f5d0782a4541147e13a0f73359f01b43884e8903f83dd",
-          "at": "2026-04-22T11:04:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`spec.md` is described as a generated artifact produced by `bin/sotp track signals`, but the generic `Write`/`Edit` allowance still covers it. That lets the agent bypass the renderer and manually edit a derived view, risking drift from `spec.json` and the signal counts.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
-              "line": 104,
-              "category": "workflow"
-            },
-            {
-              "message": "The scope explicitly allows direct writes to baseline and rendered-view artifacts, even though the internal pipeline says those files are produced by `bin/sotp track baseline-capture`, `type-graph`, `contract-map`, and `type-signals`. That opens the door to hand-editing derived artifacts outside the canonical generation path, which can leave the views inconsistent with `<layer>-types.json`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 145,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:c988d4c8afdb45bdadb85a2400db476904d367e70bf8d73198e6d9ca241d6525",
-          "at": "2026-04-22T11:06:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
-          "at": "2026-04-22T11:08:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Phase 2 pipeline tells the subagent to render the contract map with `bin/sotp track contract-map <id> [--layer <layer_id>]`, but the actual `contract-map` CLI uses the plural `--layers` option for layer filtering. A type-designer following this contract will run an invalid command and fail the required render/gate step for layer-scoped `/track:type-design` runs; change this invocation to `--layers <layer_id>` or omit the filter when rendering all layers.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 76,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
-          "at": "2026-04-22T11:11:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Phase 2 internal pipeline tells the subagent to run `bin/sotp track contract-map <id> [--layer <layer_id>]`, but the actual `contract-map` command exposes `--layers`, not `--layer`, and writes one shared `contract-map.md`. Following this contract will make the type-designer fail during the required view-render step, so `/track:type-design` cannot reliably complete its direct-writer pipeline. Use the supported `--layers` form or render the shared contract map once after all scoped layer catalogues are written.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 76,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
-          "at": "2026-04-22T11:14:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32033c338fc9c2f607f5c8e9eae4acb03ff473328f30c252e844ea4925e32f2b",
-          "at": "2026-04-22T11:16:51Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -721,6 +369,20 @@
           "findings": [],
           "hash": "rvw1:sha256:66c0875e901ca61a443a7e7e614a31d8c410cc0850b32b2344e8e2a9f174059e",
           "at": "2026-04-22T10:51:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac82afdd17eb96aa65082ad4285a482b405fcacd49b72640804b4c7e8b35508",
+          "at": "2026-04-22T11:19:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ac82afdd17eb96aa65082ad4285a482b405fcacd49b72640804b4c7e8b35508",
+          "at": "2026-04-22T11:21:00Z"
         }
       ]
     },
@@ -739,6 +401,372 @@
           "findings": [],
           "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
           "at": "2026-04-22T06:07:52Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
+          "at": "2026-04-22T09:48:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make track-branch-create` already materializes `metadata.json.branch` and persists the activation artifacts, so the command's next step to edit `metadata.json.branch` again leaves a fresh `updated_at` change after the activation commit instead of the clean post-init state the workflow expects. This step should be a verification/reporting step, or the wrapper behavior must be changed with the command updated accordingly.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 31,
+              "category": "architecture"
+            },
+            {
+              "message": "The behavior section still describes looping into a state machine and the Phase 0 -> Phase 1 transition ownership. The harness policy for `/track:init` explicitly excludes state-machine transition/back-and-forth loop wording from phase commands, so this leaks orchestration policy into the standalone Phase 0 command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 49,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
+          "at": "2026-04-22T09:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The execution sequence no longer matches the required five-step `/track:init` flow: ADR pre-check is supposed to be step 1, followed by metadata creation, branch creation, metadata branch update, and verification. This command inserts track-id derivation as step 1 and shifts ADR pre-check to step 2, producing a six-step sequence that violates the harness-policy briefing and can cause downstream reviewers/tools to treat the command contract as non-compliant.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 19,
+              "category": null
+            },
+            {
+              "message": "The briefing explicitly excludes state-machine transition and back-and-forth loop wording from this command, but this behavior section still mentions looping into a state machine and the `/track:plan` Phase 0 -> Phase 1 transition. Even though it says `/track:init` does not own that logic, including the excluded transition/loop language makes the command policy non-compliant for this scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 49,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:36a0b23d889d38e73fd8f69c78589d8e14f559122e38b669a170bcd3c8fed23a",
+          "at": "2026-04-22T09:53:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make track-branch-create` already materializes `metadata.json.branch` and persists the activation artifacts before switching branches, so step 4 edits `metadata.json.branch` and refreshes `updated_at` a second time after the activation commit. That leaves the newly initialized track dirty and out of sync with the wrapper's committed activation state; this step should verify/report the branch value or the wrapper behavior must be changed to match the documented five-step flow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 31,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:609fe5909ababb68f64ba71738b92872f21744af3405396728da25b126174caa",
+          "at": "2026-04-22T09:56:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4121a78a9ce9d6752d4467fa8981aff7764f3172faf3de4755022c1e3cae86c5",
+          "at": "2026-04-22T10:00:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90e6487a0eb62287a2eb996cd7dffa2bb4d15499294d65eacbfa6c087f50ee24",
+          "at": "2026-04-22T10:11:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbbde2b33ccc6b6bc25ed9af653e40463a45f3d1c7bd8bf1e0a111f91e12b010",
+          "at": "2026-04-22T10:12:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The wrapper still performs local pre-check orchestration (`spec.json` existence and `architecture-rules.json` validation) before invoking `type-designer`. Round 3 explicitly narrowed this command to subagent invocation plus result receipt only, so these checks reintroduce workflow logic outside the subagent and break the intended minimal wrapper shape.",
+              "severity": "P1",
+              "file": ".claude/commands/track/type-design.md",
+              "line": 18,
+              "category": "workflow_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:bb3eeb8330f8b4d902f0eba5e42e34351ad07c77a01840cfda57b05f2be269cb",
+          "at": "2026-04-22T10:19:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:609659b6db190c85fa9e284ba761d13e37d9d331290237543612de1beefc7ace",
+          "at": "2026-04-22T10:21:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/type-design.md` still tells the subagent to accept an optional `--layer` filter. That reintroduces the argument-handling the briefing explicitly removed and conflicts with the new always-process-all-layers contract for Phase 2.",
+              "severity": "P1",
+              "file": ".claude/commands/track/type-design.md",
+              "line": 25,
+              "category": "behavior"
+            }
+          ],
+          "hash": "rvw1:sha256:695cd69b426e22484cf1f99676a64e84756416ddad2f9eac476f37e4133424d9",
+          "at": "2026-04-22T10:28:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7efddd290df768e14652f6ce07f039b3ed13ed9629fa3e7c7283f9789c7d8986",
+          "at": "2026-04-22T10:30:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `.claude/commands/track/design.md` and replacing it with `type-design.md` changes the slash-command name to `/track:type-design`, but the rest of the workflow still invokes and documents `/track:design`. That leaves the documented Phase 2 entry point unreachable unless a compatibility alias is kept.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 1,
+              "category": "workflow regression"
+            }
+          ],
+          "hash": "rvw1:sha256:eb47608968be40a47eebf8210a0fef0485a82d0bcd63dc538dbcdaf1e04e11a1",
+          "at": "2026-04-22T10:34:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `.claude/commands/track/design.md` and replacing it with `.claude/commands/track/type-design.md` changes the slash-command name, but the workflow still has live `/track:design` call sites. Without a compatibility alias or a repo-wide update in the same change, Phase 2 becomes unreachable from those existing entry points.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": null,
+              "category": "regression"
+            }
+          ],
+          "hash": "rvw1:sha256:eb47608968be40a47eebf8210a0fef0485a82d0bcd63dc538dbcdaf1e04e11a1",
+          "at": "2026-04-22T10:36:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
+          "at": "2026-04-22T10:40:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The diff deletes the tracked `.claude/commands/track/design.md` and updates the orchestrator to call `/track:type-design`, but `.claude/commands/track/type-design.md` is untracked and therefore not part of the patch shown by `git diff`. If this is committed as-is, Phase 2 will point at a command file that is not added to the repository, breaking the planning workflow for type-design.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 70,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
+          "at": "2026-04-22T10:42:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
+          "at": "2026-04-22T10:43:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec-designer` is now instructed to run `bin/sotp track views sync`, but that command also rewrites `plan.md` in addition to `spec.md` (`sync_rendered_views` does both on the single-track path). That lets a Phase 1 agent mutate a file its own scope explicitly forbids and can interfere with Phase 3 ownership. Use a spec-only render path here, or explicitly narrow the command so it cannot touch `plan.md`.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 79,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:17630784e0ab247c661f6b97026e4a853f38be8877d48f55afaeb63e4921fae1",
+          "at": "2026-04-22T10:51:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec-designer` directs the agent to regenerate `spec.md` with `bin/sotp track views sync`, but that command only syncs `plan.md` and `registry.md`. As written, Phase 1 will not produce the required `spec.md` view and may clobber the wrong rendered files instead.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 77,
+              "category": "correctness"
+            },
+            {
+              "message": "`type-designer` names the rendered artifact `<layer>-type-signals.md`, but the current `type-signals` renderer emits `<layer>-types.md` and only writes `<layer>-type-signals.json` for the evaluation result. This points the phase-2 pipeline at a non-existent markdown artifact.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:17630784e0ab247c661f6b97026e4a853f38be8877d48f55afaeb63e4921fae1",
+          "at": "2026-04-22T10:55:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This instruction routes Phase 1 through `bin/sotp track views sync` and `bin/sotp verify plan-artifact-refs`, but `track views sync` also syncs `plan.md` and `registry.md` (`libs/infrastructure/src/track/render.rs:1`) and the repo's spec-signal path is `sotp track signals` (`libs/domain/src/spec.rs:376`, `apps/cli/src/commands/track/signals.rs:64`). A spec-designer following this text can overwrite files outside its ownership and run the wrong gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
+              "line": 37,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a1900d34e3ac22b533cb76b8e97bb9b8c86addfd2b4febea01ae6a278e9de2b9",
+          "at": "2026-04-22T11:00:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`type-signals` does not produce `<layer>-type-signals.md`; it writes `<layer>-types.md` plus `<layer>-type-signals.json`. The phase-2 contract is pointing at the wrong artifact name, so a literal subagent would manage a file the CLI never emits.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 29,
+              "category": "artifact_name_mismatch"
+            },
+            {
+              "message": "The permitted render outputs list only `<layer>-graph.md`, but `bin/sotp track type-graph` defaults to cluster mode (`--cluster-depth 2`) and writes a `<layer>-graph/` directory with `index.md` plus cluster files. The scope rule does not cover the command's actual default output.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 145,
+              "category": "write_scope_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5e999df91d57a011056f5d0782a4541147e13a0f73359f01b43884e8903f83dd",
+          "at": "2026-04-22T11:04:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.md` is described as a generated artifact produced by `bin/sotp track signals`, but the generic `Write`/`Edit` allowance still covers it. That lets the agent bypass the renderer and manually edit a derived view, risking drift from `spec.json` and the signal counts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
+              "line": 104,
+              "category": "workflow"
+            },
+            {
+              "message": "The scope explicitly allows direct writes to baseline and rendered-view artifacts, even though the internal pipeline says those files are produced by `bin/sotp track baseline-capture`, `type-graph`, `contract-map`, and `type-signals`. That opens the door to hand-editing derived artifacts outside the canonical generation path, which can leave the views inconsistent with `<layer>-types.json`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:c988d4c8afdb45bdadb85a2400db476904d367e70bf8d73198e6d9ca241d6525",
+          "at": "2026-04-22T11:06:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
+          "at": "2026-04-22T11:08:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 2 pipeline tells the subagent to render the contract map with `bin/sotp track contract-map <id> [--layer <layer_id>]`, but the actual `contract-map` CLI uses the plural `--layers` option for layer filtering. A type-designer following this contract will run an invalid command and fail the required render/gate step for layer-scoped `/track:type-design` runs; change this invocation to `--layers <layer_id>` or omit the filter when rendering all layers.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 76,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
+          "at": "2026-04-22T11:11:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 2 internal pipeline tells the subagent to run `bin/sotp track contract-map <id> [--layer <layer_id>]`, but the actual `contract-map` command exposes `--layers`, not `--layer`, and writes one shared `contract-map.md`. Following this contract will make the type-designer fail during the required view-render step, so `/track:type-design` cannot reliably complete its direct-writer pipeline. Use the supported `--layers` form or render the shared contract map once after all scoped layer catalogues are written.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 76,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:100ccd416b04423a8882ab198455bde4e07ab274905dfd5b78f7bfaba82b5aca",
+          "at": "2026-04-22T11:14:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32033c338fc9c2f607f5c8e9eae4acb03ff473328f30c252e844ea4925e32f2b",
+          "at": "2026-04-22T11:16:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ab5335e151a0f27f0f6d477ddf767913750609cbd4f192fafbff6d6fb220c99",
+          "at": "2026-04-22T11:19:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ab5335e151a0f27f0f6d477ddf767913750609cbd4f192fafbff6d6fb220c99",
+          "at": "2026-04-22T11:21:06Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:09:25Z"
         }
       ]
     }
