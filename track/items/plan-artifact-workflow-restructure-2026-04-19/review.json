@@ -1,35 +1,50 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a3d99b139f515c4aaac36c3916776b0cbb3b545bc0fab8048cacb5c2782a9ec",
-          "at": "2026-04-21T15:02:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a3d99b139f515c4aaac36c3916776b0cbb3b545bc0fab8048cacb5c2782a9ec",
-          "at": "2026-04-21T15:04:03Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ActivateTrackUseCase` now checks `derive_track_status(None, track.status_override())`, so it can no longer reject a branchless track whose `impl-plan.json` already has `in_progress` or `done` tasks. `resolve_phase` and the v5 verifier derive status from `impl-plan.json` + override, so this can materialize a track that should still be blocked from activation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_activation.rs",
+              "line": 61,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
+          "at": "2026-04-21T15:03:28Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fdffe4a9e0663ac60e079016990be9e51b4a132644691d2f91ca4a63b45f1f76",
-          "at": "2026-04-21T16:57:45Z"
+          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
+          "at": "2026-04-21T15:05:45Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fdffe4a9e0663ac60e079016990be9e51b4a132644691d2f91ca4a63b45f1f76",
-          "at": "2026-04-21T17:00:39Z"
+          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
+          "at": "2026-04-21T15:07:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e385c731519e5abd742bffc52e891c140df6b6a51f03b65e99b98224c151890a",
+          "at": "2026-04-22T00:24:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e385c731519e5abd742bffc52e891c140df6b6a51f03b65e99b98224c151890a",
+          "at": "2026-04-22T00:25:25Z"
         }
       ]
     },
@@ -315,24 +330,6 @@
           "findings": [],
           "hash": "rvw1:sha256:314636d506557ac59e55ef293fdb3041394fcdd3be2e5265c0fc3d45579ec48b",
           "at": "2026-04-21T17:08:57Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
-          "at": "2026-04-21T16:57:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
-          "at": "2026-04-21T16:58:16Z"
         }
       ]
     },
@@ -659,6 +656,136 @@
           "findings": [],
           "hash": "rvw1:sha256:834f53001bc23eaf8a3a7ba8f5c3be830d5b1cbde9268133fd3b5f60727a9d92",
           "at": "2026-04-22T01:16:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new overflow guard is not covered by a regression test. Add a case with `schema_version > u32::MAX` so this path stays fail-closed and cannot regress back to silent truncation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 77,
+              "category": "test-coverage"
+            },
+            {
+              "message": "The new `u32::try_from` check here has no overflow regression test. Please cover a `schema_version` just above `u32::MAX` to lock in the fail-closed behavior.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 255,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7dd5cf7b6d752e9dc7b37e95114d09cadd5010daf4f61a749bb2b4d709a3e70f",
+          "at": "2026-04-22T01:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "No regression test covers this new overflow path, so the fix is unverified against a schema_version above `u32::MAX` and the silent-wrap bug could regress later. Add an error-case test that feeds an oversized `schema_version` and asserts a validation failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 77,
+              "category": "test coverage"
+            },
+            {
+              "message": "No regression test covers this new overflow path, so an oversized `schema_version` is still untested here. Add an error-case test that feeds a value above `u32::MAX` and asserts the expected `UnsupportedSchemaVersion(u32::MAX)` failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 255,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7dd5cf7b6d752e9dc7b37e95114d09cadd5010daf4f61a749bb2b4d709a3e70f",
+          "at": "2026-04-22T01:32:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7acfb34639816a56df8d2c5a7175b6e2984b563bf817de289e7dd5795f414af1",
+          "at": "2026-04-22T01:35:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new metadata overflow test uses `4294967296`, which wrapped to `0` under the old `as u32` cast and was already rejected as an unsupported schema version. That means this test would pass even before the P0 fix and does not cover the dangerous regression class where an overflowing value wraps to the supported v5, e.g. `4294967301`. Add a case with a value congruent to `5` modulo 2^32 so the test fails on the previous implementation and proves the codec cannot accept overflow as schema v5.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 432,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:7acfb34639816a56df8d2c5a7175b6e2984b563bf817de289e7dd5795f414af1",
+          "at": "2026-04-22T01:36:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a23daf1ae341f7d83a7358ecd72ca83be219fec6e4479ce9885d3195ac0ed08f",
+          "at": "2026-04-22T01:38:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a23daf1ae341f7d83a7358ecd72ca83be219fec6e4479ce9885d3195ac0ed08f",
+          "at": "2026-04-22T01:39:49Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a3d99b139f515c4aaac36c3916776b0cbb3b545bc0fab8048cacb5c2782a9ec",
+          "at": "2026-04-21T15:02:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a3d99b139f515c4aaac36c3916776b0cbb3b545bc0fab8048cacb5c2782a9ec",
+          "at": "2026-04-21T15:04:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdffe4a9e0663ac60e079016990be9e51b4a132644691d2f91ca4a63b45f1f76",
+          "at": "2026-04-21T16:57:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdffe4a9e0663ac60e079016990be9e51b4a132644691d2f91ca4a63b45f1f76",
+          "at": "2026-04-21T17:00:39Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
+          "at": "2026-04-21T16:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
+          "at": "2026-04-21T16:58:16Z"
         }
       ]
     },
@@ -905,53 +1032,6 @@
           "findings": [],
           "hash": "rvw1:sha256:a64bde30a4469dfd83465c6ec3e1c1703df095390470f0eafde67ef7e02f2203",
           "at": "2026-04-21T23:25:23Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ActivateTrackUseCase` now checks `derive_track_status(None, track.status_override())`, so it can no longer reject a branchless track whose `impl-plan.json` already has `in_progress` or `done` tasks. `resolve_phase` and the v5 verifier derive status from `impl-plan.json` + override, so this can materialize a track that should still be blocked from activation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_activation.rs",
-              "line": 61,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
-          "at": "2026-04-21T15:03:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
-          "at": "2026-04-21T15:05:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3528d5fab705d0100b0452c634d481d233ba0d701027fa1e2338c87146f63950",
-          "at": "2026-04-21T15:07:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e385c731519e5abd742bffc52e891c140df6b6a51f03b65e99b98224c151890a",
-          "at": "2026-04-22T00:24:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e385c731519e5abd742bffc52e891c140df6b6a51f03b65e99b98224c151890a",
-          "at": "2026-04-22T00:25:25Z"
         }
       ]
     }

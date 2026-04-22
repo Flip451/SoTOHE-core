@@ -139,8 +139,10 @@ fn decode_legacy_metadata(
 ) -> Result<(TrackMetadata, DocumentMeta), codec::CodecError> {
     use domain::{StatusOverride, TrackBranch, TrackId};
 
-    let schema_version =
-        raw.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(0);
+    let schema_version_u64 = raw.get("schema_version").and_then(|v| v.as_u64()).unwrap_or(0);
+    let schema_version = u32::try_from(schema_version_u64).map_err(|_| {
+        codec::CodecError::Validation(format!("schema_version {schema_version_u64} overflows u32"))
+    })?;
     let id_str =
         raw.get("id").and_then(|v| v.as_str()).ok_or_else(|| codec::CodecError::InvalidField {
             field: "id".to_owned(),

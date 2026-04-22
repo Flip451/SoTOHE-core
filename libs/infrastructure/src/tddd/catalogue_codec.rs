@@ -249,8 +249,11 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
     // `deny_unknown_fields`.  Parsing as `serde_json::Value` is cheap and avoids
     // a second full deserialization on the happy path.
     let raw: serde_json::Value = serde_json::from_str(json)?;
-    let schema_version =
-        raw.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(0);
+    let schema_version_u64 = raw.get("schema_version").and_then(|v| v.as_u64()).unwrap_or(0);
+    // Use `u32::try_from` to reject values that overflow u32 instead of silently
+    // wrapping (e.g. `4294967298` must not truncate to `2` and masquerade as v2).
+    let schema_version = u32::try_from(schema_version_u64)
+        .map_err(|_| TypeCatalogueCodecError::UnsupportedSchemaVersion(u32::MAX))?;
     if schema_version != 2 {
         return Err(TypeCatalogueCodecError::UnsupportedSchemaVersion(schema_version));
     }
@@ -2248,5 +2251,20 @@ mod tests {
                 "kind '{kind_str}' did not round-trip correctly"
             );
         }
+    }
+
+    #[test]
+    fn test_decode_schema_version_overflowing_u32_returns_unsupported_error() {
+        // Regression guard for the `u32::try_from` fix: a schema_version value that
+        // exceeds u32::MAX (e.g. 4294967298 = u32::MAX + 3) must be rejected with
+        // UnsupportedSchemaVersion(u32::MAX) and NOT silently truncated to 2
+        // (which would make it masquerade as a valid v2 catalogue).
+        // Before the fix, `v as u32` would wrap 4294967298 → 2 (valid v2!).
+        let json = r#"{ "schema_version": 4294967298, "type_definitions": [] }"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::UnsupportedSchemaVersion(u32::MAX)),
+            "expected UnsupportedSchemaVersion(u32::MAX) for overflow schema_version, got: {err:?}"
+        );
     }
 }

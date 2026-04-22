@@ -69,10 +69,17 @@ pub struct DocumentMeta {
 /// Returns `CodecError` on JSON parse failure, schema version mismatch, or domain
 /// validation failure.
 pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
-    // Peek at schema_version before full decode.
+    // Peek at schema_version before full decode. Use `u32::try_from` to reject
+    // values that overflow u32 instead of silently wrapping (e.g., `4294967301`
+    // must not truncate to `5` and be misclassified as valid v5 metadata).
     let raw: serde_json::Value = serde_json::from_str(json)?;
-    let schema_version =
-        raw.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(0);
+    let schema_version_u64 = raw.get("schema_version").and_then(|v| v.as_u64()).unwrap_or(0);
+    let schema_version = u32::try_from(schema_version_u64).map_err(|_| {
+        CodecError::Validation(format!(
+            "metadata.json schema_version {schema_version_u64} overflows u32; \
+             schema v5 is required"
+        ))
+    })?;
     if schema_version != 5 {
         return Err(CodecError::Validation(format!(
             "metadata.json schema_version {schema_version} is not supported; \
@@ -413,5 +420,29 @@ mod tests {
 }"#;
         let result = decode(json);
         assert!(result.is_err(), "status_override with unknown field must be rejected");
+    }
+
+    #[test]
+    fn test_decode_schema_version_overflowing_u32_returns_validation_error() {
+        // Regression guard for the `u32::try_from` fix: a schema_version value that
+        // exceeds u32::MAX and wraps to the supported v5 value under the old `as u32`
+        // cast must be rejected with a Validation error.
+        //
+        // 4294967301 = 2^32 + 5. Under `v as u32` this truncates to 5, which is the
+        // valid schema v5 — the codec would silently accept the file as a legitimate
+        // v5 metadata.json. With `u32::try_from` it must be rejected.
+        let json = r#"{
+  "schema_version": 4294967301,
+  "id": "overflow-track",
+  "title": "Overflow Track",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z"
+}"#;
+        let result = decode(json);
+        assert!(result.is_err(), "schema_version > u32::MAX must be rejected");
+        assert!(
+            matches!(result, Err(CodecError::Validation(_))),
+            "expected Validation error for overflow schema_version, got: {result:?}"
+        );
     }
 }
