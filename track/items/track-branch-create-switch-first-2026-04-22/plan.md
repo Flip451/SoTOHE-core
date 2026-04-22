@@ -7,7 +7,7 @@
 T001: activate.rs 単一ファイル内で実装変更 (D1 path 分離 + D2 BranchMode::Create 退役) + ユニットテスト追加/更新を 1 commit にまとめる (コンパイル可能 + テスト green を各 commit で維持)
 T002: cargo make ci 全体 gate を通過させ、回帰がないことを確認して track を完了状態にする
 
-## Tasks (1/2 resolved)
+## Tasks (2/2 resolved)
 
 ### S1 — S1 — branch create path 分離 + BranchMode::Create 退役 + テスト (D1/D2/D3)
 
@@ -23,4 +23,4 @@ T002: cargo make ci 全体 gate を通過させ、回帰がないことを確認
 > cargo make ci (fmt / clippy / nextest / deny / verify-* 一式) を実行して全チェックが pass することを確認する
 > T001 実装後の回帰 (clippy lint / フォーマット崩れ / 既存テスト失敗) を検出して報告する
 
-- [ ] **T002**: Run `cargo make ci` (fmt / clippy / nextest / deny / verify-* suite) and confirm all checks pass; report any regressions introduced by T001
+- [x] **T002**: Run `cargo make ci` (fmt / clippy / nextest / deny / verify-* suite) and confirm all checks pass; report any regressions introduced by T001
