@@ -88,6 +88,13 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD Type Graph View — TypeGraph から mermaid 図をレンダーして型間関係を可視化する](2026-04-16-2200-tddd-type-graph-view.md) | Accepted | 2026-04-16 |
 | [TDDD Contract Map — 全層カタログを入力とする統合 mermaid view](2026-04-17-1528-tddd-contract-map.md) | Accepted | 2026-04-17 |
 
+### トラック・ワークフロー
+
+| ADR | Status | Date |
+|-----|--------|------|
+| [計画成果物ワークフローの再構築 — SoT Chain に沿ったフェーズ分離](2026-04-19-1242-plan-artifact-workflow-restructure.md) | — | 2026-04-19 |
+| [Phase command 共通構造 + subagent 内部 pipeline 決定](2026-04-22-0829-plan-command-structural-refinements.md) | — | 2026-04-22 |
+
 ### ADR 運用
 
 | ADR | Status | Date |

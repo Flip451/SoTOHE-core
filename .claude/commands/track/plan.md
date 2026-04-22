@@ -2,17 +2,29 @@
 description: Plan a feature via the canonical track planning workflow (Phase 0-3 orchestrator).
 ---
 
-Canonical command for feature planning. `/track:plan` orchestrates the track planning phases — ADR pre-check, then Phase 0 (init) → Phase 1 (spec) → Phase 2 (design) → Phase 3 (impl-plan) — delegating each phase to its assigned writer capability. The pre-track stage must have authored an ADR under `knowledge/adr/` beforehand; back-and-forth fixes are triggered automatically when downstream gates fail.
+Canonical command for feature planning. `/track:plan` is the state-machine orchestrator that drives Phase 0 → Phase 1 → Phase 2 → Phase 3 through the four independent phase commands, delegating each phase to its writer capability. The pre-track stage must have authored an ADR under `knowledge/adr/` beforehand; back-and-forth escalation is triggered automatically when a downstream gate fails.
 
-Provider routing is resolved via `.harness/config/agent-profiles.json`. Concrete capabilities depend on the active profile (`spec-designer` / `impl-planner` / `type-designer` / `researcher` / `adr-editor`).
+Provider routing is resolved via `.harness/config/agent-profiles.json`.
 
 Arguments:
 
-- `$ARGUMENTS` is one of the following:
-  - `<feature>`: feature name / slug for a new track.
-  - `<integer>`: `max_retry` (back-and-forth loop upper bound, default 5). If the argument parses as an integer it is treated as `max_retry`; otherwise it is treated as `<feature>`.
-  - `<feature> <max_retry>` (space-separated) when both are needed.
-  - Empty: ask the user for a feature name and stop.
+- `$ARGUMENTS`:
+  - `<feature>`: feature name / slug for a new track
+  - `<integer>`: `max_retry` positional integer (default 5). If `$ARGUMENTS` parses as a bare integer it is treated as `max_retry`; otherwise as `<feature>`. Flag-style names are not used — invoke as `/track:plan 3` for `max_retry=3`.
+  - `<feature> <integer>`: both (space-separated)
+  - Empty: ask the user for a feature name and stop
+
+## Preamble: create a task list
+
+Before executing the state machine, create a `TaskCreate` task list covering the following items so progress stays visible across phases and back-and-forth loops:
+
+1. Phase 0 — invoke `/track:init <feature>`
+2. Phase 1 loop — invoke `/track:spec-design`, evaluate the spec → ADR signal, escalate on 🔴
+3. Phase 2 loop — invoke `/track:type-design`, evaluate the type → spec signal per layer, escalate on 🔴
+4. Phase 3 loop — invoke `/track:impl-plan`, evaluate the task-coverage gate, re-invoke on ERROR
+5. Termination — ADR working-tree diff presentation and user decision
+
+Mark each item `in_progress` before executing and `completed` after it passes. When back-and-forth escalation runs, append a sub-task for each re-invocation (the back-and-forth transition is itself a task). Propagate the gate result sequentially through each task; do not parallelise phases.
 
 ## SoT Chain (dependency direction)
 
@@ -31,8 +43,8 @@ implementation (Rust code)
 | # | Reference source → target | Evaluation |
 |---|---|---|
 | ① | spec → ADR | Phase 1 evaluates each spec element's `adr_refs[]` / `convention_refs[]` / `informal_grounds[]` (🔵🟡🔴) |
-| ② | type contract → spec | Phase 2 evaluates each catalogue entry's `spec_refs[]` / `informal_grounds[]` (schema/file existence only until the signal is implemented) |
-| ③ | implementation → type contract | Phase 4 and later (existing flow). Evaluated by rustdoc extraction cross-checked against catalogue declarations in CI. |
+| ② | type contract → spec | Phase 2 evaluates each catalogue entry's `spec_refs[]` / `informal_grounds[]` and renders per-layer 🔵/🟡/🔴 counts |
+| ③ | implementation → type contract | Phase 4 and later. Evaluated by rustdoc extraction cross-checked against catalogue declarations in CI. |
 
 **Reverse references and layer skipping are forbidden**:
 
@@ -42,89 +54,103 @@ implementation (Rust code)
 
 Conventions are cross-track auxiliary information shared by every layer and may be cited from any artifact (outside the SoT Chain).
 
-## Lifecycle at a glance
+## Phase invocation table
 
-```
-(Pre-track stage)
-  Author an ADR: /adr:add or a user + main dialogue that writes to knowledge/adr/
-     ↓
-/track:plan [max_retry]
-  ├─ ADR pre-check: confirm the referenced ADR exists under knowledge/adr/
-  │   (strict mode: stop and ask the user to author the ADR when missing;
-  │    see knowledge/conventions/pre-track-adr-authoring.md)
-  │
-  ├─ Phase 0: /track:init
-  │   ├─ Writer: main
-  │   ├─ Output: track/items/<id>/metadata.json (identity-only)
-  │   └─ Gate: file existence + identity schema validation
-  │
-  ├─ Phase 1: /track:spec
-  │   ├─ Writer: spec-designer subagent
-  │   ├─ Output: track/items/<id>/spec.json
-  │   ├─ Inputs: ADR + convention (SoT Chain ①)
-  │   └─ Gate: spec → ADR signal (🔵🟡🔴)
-  │         🔴 → escalate to ADR editing (re-invoke adr-editor)
-  │         🟡 → log a warning and proceed (commit allowed, must be resolved before merge)
-  │         🔵 → proceed to the next phase
-  │
-  ├─ Phase 2: /track:design
-  │   ├─ Writer: type-designer subagent
-  │   ├─ Output: track/items/<id>/<layer>-types.json (per TDDD-enabled layer)
-  │   ├─ Inputs: spec (SoT Chain ②)
-  │   └─ Gate: type contract → spec signal
-  │         Before the signal is implemented: file/schema existence only
-  │         Once implemented: 🔴 → escalate to spec editing (re-invoke spec-designer)
-  │
-  └─ Phase 3: /track:impl-plan
-      ├─ Writer: impl-planner subagent
-      ├─ Output: track/items/<id>/impl-plan.json + track/items/<id>/task-coverage.json
-      ├─ Inputs: type catalogue + spec
-      └─ Gate: task-coverage binary pass/fail
-            ERROR → re-invoke /track:impl-plan automatically (same phase, regenerate)
-```
+| Phase | Command | Writer | Gate |
+|---|---|---|---|
+| 0 | `/track:init` | main (direct) | metadata identity schema (OK / ERROR) |
+| 1 | `/track:spec-design` | spec-designer subagent (direct writer) | spec → ADR signal (🔵🟡🔴) |
+| 2 | `/track:type-design` | type-designer subagent (direct writer) | type → spec signal, per layer (🔵🟡🔴) |
+| 3 | `/track:impl-plan` | impl-planner subagent (direct writer) | task-coverage binary gate (OK / ERROR) |
 
-## Back-and-forth (exploratory refinement loop)
+Each phase command owns its full internal pipeline (Write + render + CLI gate evaluation). `/track:plan` receives only the gate result and decides the next transition — it does not read or manipulate the artifacts itself.
 
-When a downstream phase reports a 🔴 signal, automatically re-invoke the writer **one layer above**:
+## Phase 0: /track:init
+
+Invoke `/track:init <feature>` with the feature name from `$ARGUMENTS`. Phase 0 creates the track directory, writes `metadata.json`, materializes the branch, and runs the identity-schema binary gate. On ERROR, stop and report to the user. On OK, mark the Phase 0 task `completed` and proceed to Phase 1.
+
+## Phase 1 loop: /track:spec-design
+
+1. Invoke `/track:spec-design` (no arguments).
+2. Read the signal result returned by the command. The result includes per-section blue / yellow / red counts **and**, for each 🔴 element, the spec element id and the target ADR path cited by that element — so the orchestrator has enough information to brief `adr-editor` without reading `spec.json` itself.
+3. Apply the loop rule:
+   - 🔵 (all elements blue): mark the Phase 1 task `completed` and proceed to Phase 2.
+   - 🟡 (at least one yellow, no red): log a warning and proceed to Phase 2. Yellow must be resolved before merge but does not block the phase transition.
+   - 🔴 (at least one red): escalate per the **ADR auto-edit criteria** below:
+     a. Identify the target ADR file path cited by the 🔴 element(s).
+     b. Check the ADR file's commit history:
+        - Has commit history → invoke the `adr-editor` subagent (Agent tool, `subagent_type: "adr-editor"`). Briefing must include: the 🔴 spec element(s), the target ADR path, and the explicit instruction "edit the working tree only; do not commit inside the loop".
+        - No commit history → user pause. Instruct the user to commit the ADR first, then resume.
+     c. After the ADR edit, re-invoke `/track:spec-design`.
+     d. **max_retry guard**: each 🔴 → adr-editor → re-invoke iteration counts against `max_retry`. On overflow, stop and present options to the user (continue with warnings, abort, or manual edit).
+
+## Phase 2 loop: /track:type-design
+
+1. Invoke `/track:type-design` (no arguments).
+2. Read the per-layer signal result.
+3. Apply the loop rule:
+   - 🔵 across all processed layers: mark the Phase 2 task `completed` and proceed to Phase 3.
+   - 🟡: log a warning and proceed. Yellow must be resolved before merge.
+   - 🔴:
+     a. Re-invoke `/track:spec-design` (Phase 2 🔴 typically indicates the spec needs refinement before the type catalogue can pass).
+     b. Re-evaluate the Phase 1 gate. If Phase 1 returns 🔴 as well, escalate via the Phase 1 ADR loop above.
+     c. On Phase 1 🔵 or 🟡, re-invoke `/track:type-design`.
+     d. **max_retry guard**: the Phase 2 retry counter is independent of Phase 1's. On overflow, stop and present options.
+
+## Phase 3 loop: /track:impl-plan
+
+1. Invoke `/track:impl-plan` (no arguments).
+2. Read the binary gate verdict (OK / ERROR).
+3. Apply the loop rule:
+   - OK: mark the Phase 3 task `completed` and proceed to termination.
+   - ERROR: re-invoke `/track:impl-plan` in the same phase (the impl-planner subagent regenerates `impl-plan.json` + `task-coverage.json` on each invocation). **max_retry guard** applies; on overflow, stop and present the latest error message to the user.
+
+## Termination
+
+After Phase 3 OK (or `max_retry` overflow anywhere in the loop):
+
+1. Check whether the ADR working tree differs from HEAD.
+2. If the diff is non-empty, present the diff to the user and ask them to decide:
+   - **accept**: stage and commit the ADR alongside the other artifacts
+   - **revert**: discard the ADR working-tree changes
+   - **manual edit**: pause for the user to refine the ADR further
+   - **abort**: stop `/track:plan` and leave the tree as-is for the user to inspect
+3. Mark the termination task `completed`.
+
+## Back-and-forth (summary table)
 
 | Downstream failure | Upstream writer | Re-invoke command |
 |---|---|---|
-| Phase 1 signal 🔴 | adr-editor subagent | Invoke adr-editor to edit the ADR in the working tree |
-| Phase 2 signal 🔴 | spec-designer subagent | Re-invoke `/track:spec` to edit `spec.json` |
+| Phase 1 🔴 | adr-editor subagent | Invoke adr-editor (working-tree edit only, no commit inside the loop) |
+| Phase 2 🔴 | spec-designer subagent | Re-invoke `/track:spec-design`; if Phase 1 also 🔴, escalate to the ADR loop |
 | Phase 3 ERROR | impl-planner subagent | Re-invoke `/track:impl-plan` (regenerate in the same phase) |
 
-**ADR auto-edit criteria** (for adr-editor invocation):
+**ADR auto-edit criteria**:
 
-- ADR file has commit history → auto-edit (working-tree-only; never commit inside the loop)
-- ADR file has no commit history → user pause (user must commit the ADR first, then the loop resumes)
+- ADR file has commit history → auto-invoke adr-editor
+- ADR file has no commit history → user pause (user commits the ADR first, then the loop resumes)
 
-**Termination**: When `/track:plan` finishes (either success or `max_retry` exceeded), if the ADR working tree differs from HEAD, present the diff to the user for a decision (accept / revert / manual edit / abort).
-
-**No unilateral design edits by main**: During back-and-forth, the main orchestrator must not make design decisions and directly apply them to `knowledge/adr/`, `spec.json`, or any type catalogue. Each artifact has one writer:
-- `knowledge/adr/*.md`: `adr-editor` edits the file directly (working tree only, no commit during the loop).
-- `spec.json` / type catalogues: `spec-designer` / `type-designer` produce **advisory** proposals; the orchestrator transcribes those proposals into the files. The orchestrator does not invent or filter the proposals.
-
-See `knowledge/conventions/pre-track-adr-authoring.md` for the one-file = one-writer principle.
+**One writer per file**: the orchestrator does not directly Write or Edit `knowledge/adr/*.md`, `spec.json`, `<layer>-types.json`, `impl-plan.json`, or `task-coverage.json`. Each artifact's writer owns its file end-to-end (see Writer ownership below).
 
 ## Writer ownership
 
 | Phase | Artifact | Writer capability |
 |---|---|---|
-| Pre-track | `knowledge/adr/*.md` (initial authoring) | user + main dialogue (`/adr:add` is also available) |
+| Pre-track | `knowledge/adr/*.md` (initial authoring) | user + main dialogue (`/adr:add` is available) |
 | Pre-track | `knowledge/adr/*.md` (back-and-forth edits) | adr-editor subagent (auto-invoked) |
-| 0 | `track/items/<id>/metadata.json` | main |
-| 1 | `track/items/<id>/spec.json` | spec-designer subagent |
-| 2 | `track/items/<id>/<layer>-types.json` | type-designer subagent |
-| 3 | `track/items/<id>/impl-plan.json` + `track/items/<id>/task-coverage.json` | impl-planner subagent |
+| 0 | `track/items/<id>/metadata.json` | main (direct) |
+| 1 | `track/items/<id>/spec.json` + `spec.md` | spec-designer subagent (direct writer) |
+| 2 | `track/items/<id>/<layer>-types.json` + `<catalogue-stem>-baseline.json` + derived views (type-graph md, contract-map md, `<layer>-types.md`) | type-designer subagent (direct writer) |
+| 3 | `track/items/<id>/impl-plan.json` + `task-coverage.json` | impl-planner subagent (direct writer) |
 
-Each phase has an independent writer. Rewriting the same file as regular work in another phase is forbidden so the file hash stays stable; only back-and-forth escalation may re-edit upstream artifacts.
+Each writer owns its SSoT files and associated rendered views end-to-end. Rewriting another writer's files during the same phase is forbidden so file hashes stay stable; only back-and-forth escalation may re-invoke an upstream writer.
 
 ## Gate policy
 
 Each gate uses one of two evaluation styles:
 
-- **SoT Chain signal** (🔵🟡🔴): Phase 1 and Phase 2. Each reference field is evaluated independently; the overall signal is the `max` across fields.
-- **Binary check** (OK / ERROR): Phase 0 schema validation / Phase 3 task-coverage.
+- **SoT Chain signal** (🔵🟡🔴): Phase 1 and Phase 2.
+- **Binary check** (OK / ERROR): Phase 0 identity schema / Phase 3 task-coverage.
 
 Artificial states such as `approved` / `status` are not introduced (see `knowledge/conventions/workflow-ceremony-minimization.md`).
 
@@ -135,107 +161,83 @@ Artificial states such as `approved` / `status` are not introduced (see `knowled
 - Destructive filesystem operations
 - Environment-breaking changes (CI configuration, lockfile rewrites)
 
-Artifact generation does not belong in that list — every artifact uses post-hoc review (show the real artifact to the user and wait for guidance).
-
-## Interim mode (before independent phase commands exist)
-
-While `/track:init`, `/track:spec`, and `/track:impl-plan` are not yet implemented, `/track:plan` runs the equivalent steps inline:
-
-- Phase 0 equivalent: main writes `track/items/<id>/metadata.json` (identity fields only)
-- Phase 1 equivalent: invoke the spec-designer subagent to produce `spec.json`
-- Phase 2 equivalent: invoke `/track:design` (the existing command dedicated to Phase 2)
-- Phase 3 equivalent: invoke the impl-planner subagent to produce `impl-plan.json` + `task-coverage.json`
-
-Once the independent phase commands are in place, `/track:plan` becomes a thin orchestrator that simply invokes the four commands in order.
+Artifact generation uses post-hoc review (show the artifact to the user and wait for guidance), not pre-write approval.
 
 ## Sub-invocation details
 
-### Invoking adr-editor
+### /track:init (Phase 0, writer = main)
 
-Resolve the provider through `capabilities.adr-editor` in `.harness/config/agent-profiles.json`. On the Claude profile, invoke through the Agent tool with `subagent_type: "adr-editor"`. The briefing must include:
+`/track:init` runs the identity-only bootstrap directly from main: ADR pre-check, track directory creation, `metadata.json` write, branch materialization, and identity-schema verification. Refer to `.claude/commands/track/init.md` for the full step list; `/track:plan` passes the feature name and receives the schema verdict.
 
-- The downstream signal evaluation that triggered the 🔴 (which elements fired)
-- The target ADR path (and the caller should verify its commit history beforehand)
-- An explicit instruction: "edit the working tree only; do not commit inside the loop"
+### /track:spec-design (Phase 1, writer = spec-designer subagent)
 
-### Invoking spec-designer / impl-planner
+Invocation path depends on the active profile (`.harness/config/agent-profiles.json`):
 
-The invocation path depends on the active profile:
-
-- **Claude (default profile)**: invoke through the Agent tool with a custom subagent. Use `subagent_type: "spec-designer"` (Phase 1) or `subagent_type: "impl-planner"` (Phase 3); the `model: opus` frontmatter in the corresponding `.claude/agents/<name>.md` file ensures Claude Opus is selected. This path inherits the main-session context, which is better suited to design review than an external process.
-- **Codex (codex-heavy profile)**: invoke through `cargo make track-local-plan` (out-of-process, override-first path):
-
+- **Claude (default profile)**: invoke via the Agent tool with `subagent_type: "spec-designer"`. The `model: opus` frontmatter in `.claude/agents/spec-designer.md` guarantees Opus selection.
+- **Codex (codex-heavy profile)**: invoke out-of-process through the repo-owned wrapper:
   ```bash
-  cargo make track-local-plan -- --model {model} --briefing-file tmp/<capability>-briefing.md
+  cargo make track-local-plan -- --model {model} --briefing-file tmp/spec-designer-briefing.md
+  ```
+  The wrapper translates `--briefing-file` internally so git keywords do not leak into the command string (compatible with the `block-direct-git-ops` guardrail).
+
+The subagent owns `spec.json` and `spec.md`, runs the CLI signal evaluation internally, and returns the blue / yellow / red counts to `/track:plan`. See `.claude/agents/spec-designer.md` for its internal pipeline.
+
+### /track:type-design (Phase 2, writer = type-designer subagent)
+
+Invoke via the Agent tool with `subagent_type: "type-designer"`. The subagent owns every `<layer>-types.json`, captures baselines, renders per-layer views, and evaluates the type → spec signal internally. `/track:plan` receives per-layer signal counts. See `.claude/agents/type-designer.md`.
+
+### /track:impl-plan (Phase 3, writer = impl-planner subagent)
+
+Invocation path depends on the active profile:
+
+- **Claude (default profile)**: invoke via the Agent tool with `subagent_type: "impl-planner"`.
+- **Codex (codex-heavy profile)**: invoke out-of-process through the same wrapper used for Phase 1:
+  ```bash
+  cargo make track-local-plan -- --model {model} --briefing-file tmp/impl-planner-briefing.md
   ```
 
-  The `--briefing-file` path is internally translated to `"Read {path} and perform the task"` so that git keywords do not leak into the Bash command string (maintaining compatibility with the guardrail). The briefing content distinguishes the spec-designer vs impl-planner role; the CLI wrapper is a generic entrypoint that handles both.
+The subagent owns `impl-plan.json` and `task-coverage.json`, and evaluates the task-coverage binary gate internally. `/track:plan` receives the OK / ERROR verdict. See `.claude/agents/impl-planner.md`.
 
-The briefing should include:
+### Invoking adr-editor (Phase 1 back-and-forth)
 
-- The target phase (Phase 1 spec authoring vs Phase 3 impl-plan authoring) and the responsible capability name
-- Paths to the ADRs, conventions, and type catalogue (directory path or explicit file path)
-- A reference to `.claude/rules/04-coding-principles.md` (enum-first / typestate / newtype principles — spec-designer cites them as contract constraints; impl-planner uses them for task-decomposition consistency)
-
-Save subagent output under (per-track research):
-
-- spec-designer: `track/items/<id>/research/<YYYY-MM-DD-HHMM>-spec-designer-<feature>.md`
-- impl-planner: `track/items/<id>/research/<YYYY-MM-DD-HHMM>-impl-planner-<feature>.md`
-
-Cross-track analyses (version baselines, ecosystem surveys) continue to live under `knowledge/research/`. Obtain the timestamp prefix with `date -u +"%Y-%m-%d-%H%M"`.
-
-### Invoking type-designer
-
-`/track:design` invokes the type-designer subagent internally. Do not invoke type-designer directly from `/track:plan`; route through `/track:design`.
+Invoke via the Agent tool with `subagent_type: "adr-editor"`. Briefing must include the Phase 1 🔴 spec element(s), the target ADR path (caller verifies commit history beforehand), and the explicit instruction "edit the working tree only; do not commit inside the loop". See `.claude/agents/adr-editor.md`.
 
 ## Pre-flight checks (before `/track:plan` runs)
 
-1. ADR existence check (`knowledge/adr/`)
-2. `track/tech-stack.md` has zero `TODO:` markers (precondition for starting implementation)
-3. Current branch (decide how to handle `main` / `plan/<id>` until `track/<id>` is materialized)
-4. `.harness/config/agent-profiles.json` capability mapping is readable
-
-If check 1 fails, stop and ask the user to author the ADR (`/adr:add <slug>` is a suggested path).
+1. ADR existence check (`knowledge/adr/`). If no relevant ADR exists, stop and ask the user to author one (`/adr:add <slug>` is a suggested path).
+2. `track/tech-stack.md` has zero `TODO:` markers (precondition for implementation).
+3. Current branch is compatible with the operation (`main` / `plan/<id>` / `track/<id>`).
+4. `.harness/config/agent-profiles.json` capability mapping is readable.
 
 ## Timestamps
 
-Obtain `created_at` / `updated_at` / research-note prefixes as follows:
+Obtain `created_at` / `updated_at` / research-note prefixes via:
 
 ```bash
 date -u +"%Y-%m-%dT%H:%M:%SZ"  # ISO 8601 UTC (metadata fields)
 date -u +"%Y-%m-%d-%H%M"       # research-note prefix
 ```
 
-Manual input / guessing is forbidden. The `sotp` CLI `now_iso8601()` uses UTC, so all timestamps are UTC-aligned.
-
-## Guide injection
-
-`$ARGUMENTS` (the feature name) and the latest track's `spec.md` / `plan.md` are scanned. Any external guide in `knowledge/external/guides.json` whose `trigger_keywords` match is auto-injected into context as a summary (raw cached text is opened only when needed).
-
-## Rendered views
-
-After `/track:plan` completes, `track/items/<id>/plan.md` and `track/items/<id>/spec.md` are regenerated as read-only views via `cargo make track-sync-views` (direct edits are forbidden). Refresh `track/items/<id>/verification.md` and `track/registry.md` as needed.
-
-`/track:plan` does not write implementation code. Implementation is delegated to `/track:implement` or `/track:full-cycle`.
+Manual input / guessing is forbidden.
 
 ## Report format
 
 On completion, present:
 
-1. Per-phase gate results (🔵🟡🔴 / OK / ERROR)
+1. Per-phase gate results (🔵🟡🔴 / OK / ERROR) and the final `max_retry` counters per loop
 2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json`)
-3. Back-and-forth edits that occurred (the target artifact and its original writer)
-4. ADR working-tree diff against HEAD, if any (ask the user to decide: accept / revert / manual edit / abort)
+3. Back-and-forth edits that occurred (target artifact and its writer)
+4. ADR working-tree diff against HEAD (if any) and the user's termination decision
 5. Suggested next commands:
-   - Standard lane: `/track:implement` → `/track:review` → `/track:commit`, or `/track:full-cycle <task>`
-   - Planning-review-first: `/track:review` → `/track:commit` to review the planning artifacts before implementation
-   - Plan-only lane: `/track:plan-only <feature>` creates a `plan/<id>` branch, merge the PR into main, then `/track:activate <track-id>` to start implementation
+   - Standard lane: `/track:implement` → `/track:review` → `/track:commit`, or `/track:full-cycle`
+   - Planning-review-first: `/track:review` → `/track:commit` to review planning artifacts before implementation
+   - Plan-only lane: `/track:plan-only <feature>` + `/track:activate <track-id>`
 
 ## References
 
 - `knowledge/conventions/pre-track-adr-authoring.md` — ADR pre-track authoring, strict mode, adr-editor operation
-- `knowledge/conventions/workflow-ceremony-minimization.md` — post-hoc review, removal of the `approved` state, pre-approval restricted to irreversible actions
+- `knowledge/conventions/workflow-ceremony-minimization.md` — post-hoc review, pre-approval limited to irreversible actions
 - `knowledge/conventions/source-attribution.md` — source attribution for spec.json elements
 - `knowledge/conventions/adr.md` — ADR format rules
 - `knowledge/external/guides.json` — external guide registry (auto-injected via `trigger_keywords`)
-- `.claude/rules/04-coding-principles.md` — enum-first / typestate / newtype principles (required reading for spec-designer / impl-planner / type-designer briefings)
+- `.claude/rules/04-coding-principles.md` — enum-first / typestate / newtype principles

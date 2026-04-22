@@ -39,10 +39,10 @@ Operating notes:
 - The track workflow uses a **pre-track stage + 3-phase** structure:
   - **Pre-track stage**: ADRs are authored under `knowledge/adr/` outside the track (user-driven, see `knowledge/conventions/pre-track-adr-authoring.md`)
   - **Phase 0**: `/track:init` → `metadata.json` (identity-only)
-  - **Phase 1**: `/track:spec` → `spec.json` (spec SSoT)
-  - **Phase 2**: `/track:design` → `<layer>-types.json` (type-contract SSoT)
+  - **Phase 1**: `/track:spec-design` → `spec.json` (spec SSoT)
+  - **Phase 2**: `/track:type-design` → `<layer>-types.json` (type-contract SSoT)
   - **Phase 3**: `/track:impl-plan` → `impl-plan.json` + `task-coverage.json` (progression markers + spec coverage)
-  - `/track:plan` orchestrates these four commands in order; while the independent phase commands are not yet implemented, `/track:plan` temporarily runs all phases inline
+  - `/track:plan` orchestrates these four commands in order as a thin state machine; back-and-forth escalation re-invokes the upstream writer on gate failure
 - Artificial states such as `approved` / `Status` are removed; gates are built from SoT Chain signals (🔵🟡🔴) plus binary checks (see `knowledge/conventions/workflow-ceremony-minimization.md`)
 
 Details:

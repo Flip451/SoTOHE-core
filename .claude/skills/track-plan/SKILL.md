@@ -2,11 +2,13 @@
 name: track-plan
 description: |
   Plan a new Rust feature via the canonical track planning workflow.
-  Orchestrates Phase 0 (init) → Phase 1 (spec) → Phase 2 (design) →
-  Phase 3 (impl-plan), delegating each phase to its assigned writer capability.
-  Triggers automatically when the user invokes /track:plan.
+  `/track:plan` is a state-machine orchestrator that invokes the four
+  independent phase commands in order: /track:init (Phase 0) →
+  /track:spec-design (Phase 1) → /track:type-design (Phase 2) →
+  /track:impl-plan (Phase 3). Each phase command delegates to its writer
+  capability. Triggers automatically when the user invokes /track:plan.
 metadata:
-  short-description: Rust feature kickoff — pre-track ADR + Phase 0-3 planning
+  short-description: Rust feature kickoff — pre-track ADR + /track:init /spec-design /type-design /impl-plan
 ---
 
 # `/track:plan` Backing Skill

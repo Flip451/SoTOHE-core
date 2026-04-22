@@ -482,14 +482,17 @@ mod tests {
     }
 
     #[test]
-    fn test_u5_spec_blue_dt_empty_entries_blocks() {
-        // U5: spec=Blue, dt=empty entries → BLOCKED
+    fn test_u5_spec_blue_dt_empty_entries_passes_per_adr_d64() {
+        // ADR 2026-04-19-1242 §D6.4: empty catalogues (zero type declarations) are
+        // a valid state for tracks that reuse only pre-existing types. Drift
+        // detection remains via reverse SoT Chain ③ (rustdoc ↔ catalogue).
+        // Previously this was U5 BLOCKED; post-D6.4 it passes.
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::Found(TypeCatalogueDocument::new(1, Vec::new())),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(outcome.has_errors());
+        assert!(outcome.findings().is_empty(), "empty catalogue must pass per D6.4");
     }
 
     #[test]
