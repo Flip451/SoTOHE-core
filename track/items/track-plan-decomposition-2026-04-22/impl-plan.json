@@ -10,7 +10,8 @@
     {
       "id": "T001",
       "description": ".claude/commands/track/init.md を Phase 0 独立 command として新規作成する (writer = main)。/track:init は唯一 writer=main の command なので CN-13 例外として command 定義本文が直接全 step を実行する: (a) track directory 作成 + metadata.json (branch=null 暫定) write、(b) sotp track branch create '<track-id>' で main から track/<id> branch を作成して switch、(c) metadata.json update (branch=track/<id>)、(d) ADR 存在 pre-check (knowledge/adr/ に参照 ADR がなければ停止してユーザーに整備を促す)、(e) identity schema binary 検証 (sotp verify track-metadata)。state machine 遷移 / back-and-forth / max_retry / 事前承認 ceremony 文言は含まない。単独 invoke 可能。注: AC-13 (schema validation ロジック不含検査) は CN-10 により /track:init を明示除外するため本 task の AC-13 適用対象外 (IN-01 / AC-01 / AC-10 / AC-15 / AC-16 / AC-18)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "4b7d32b2e03e0c47a96ee7e309b576a161b2c666"
     },
     {
       "id": "T002",
