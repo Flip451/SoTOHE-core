@@ -247,16 +247,33 @@ fn load_track_metadata(
     // inconsistency (missing required fields, malformed branch, invalid
     // status_override syntax, etc.) is surfaced as an error here rather than
     // being discovered later or silently ignored.
-    let (_track, doc_meta) = codec::decode(&content).map_err(|e| {
+    let (track, doc_meta) = codec::decode(&content).map_err(|e| {
         vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because metadata.json fails v5 schema validation: {} ({e})",
             display_path(&metadata_file, root)
         ))]
     })?;
 
+    // Load impl-plan.json (if present) and enforce the activation invariant
+    // `is_activated() -> impl-plan.json present` at the domain layer. A
+    // branch-materialized track with a missing impl-plan.json is corrupt and
+    // must not be treated as a healthy "planned" track.
+    let impl_plan = load_impl_plan_from_dir(track_dir).map_err(|e| {
+        vec![VerifyFinding::error(format!(
+            "[ERROR] Cannot determine latest track because impl-plan.json is invalid: {} ({e})",
+            display_path(&metadata_file, root)
+        ))]
+    })?;
+    domain::check_impl_plan_presence(&track, impl_plan.as_ref()).map_err(|e| {
+        vec![VerifyFinding::error(format!(
+            "[ERROR] Cannot determine latest track because activation invariant is violated: {} ({e})",
+            display_path(&metadata_file, root)
+        ))]
+    })?;
+
     // Derive status from impl-plan.json + status_override (v5 has no status field in JSON).
     // Surface errors so that a broken track cannot silently be treated as a healthy "planned" track.
-    let status = derive_status_from_v5(track_dir, obj).map_err(|e| {
+    let status = derive_status_from_v5(impl_plan.as_ref(), obj).map_err(|e| {
         vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because status derivation failed: {} ({e})",
             display_path(&metadata_file, root)
@@ -370,9 +387,12 @@ fn parse_updated_at(raw: &str) -> Result<i64, String> {
 /// - `status_override` is present but has an unrecognised `status` value.
 ///
 /// Absent `impl-plan.json` (file does not exist) is not an error — it means
-/// the track is in the planning phase (`Planned` status).
+/// the track is in the planning phase (`Planned` status). Activation-invariant
+/// enforcement (a branch-materialized track must carry an impl-plan.json) is
+/// the caller's responsibility — this helper only derives status from the
+/// already-loaded optional impl-plan plus the raw `status_override` JSON.
 fn derive_status_from_v5(
-    track_dir: &Path,
+    impl_plan: Option<&domain::ImplPlanDocument>,
     obj: &serde_json::Map<String, serde_json::Value>,
 ) -> Result<String, String> {
     // Parse status_override from raw JSON (same shape as codec.rs).
@@ -408,22 +428,28 @@ fn derive_status_from_v5(
         }
     };
 
-    // Load impl-plan.json. Absent file → None (planning-only track).
-    // Present but unreadable or corrupt → propagate error (fail-closed).
-    let impl_plan: Option<domain::ImplPlanDocument> = {
-        let path = track_dir.join("impl-plan.json");
-        if !path.exists() {
-            None
-        } else {
-            let json = std::fs::read_to_string(&path)
-                .map_err(|e| format!("cannot read impl-plan.json: {e}"))?;
-            let doc = crate::impl_plan_codec::decode(&json)
-                .map_err(|e| format!("cannot decode impl-plan.json: {e}"))?;
-            Some(doc)
-        }
-    };
+    Ok(derive_track_status(impl_plan, status_override.as_ref()).to_string())
+}
 
-    Ok(derive_track_status(impl_plan.as_ref(), status_override.as_ref()).to_string())
+/// Load and decode `impl-plan.json` from a track directory.
+///
+/// Absent file → `Ok(None)` (planning-only track).
+/// Present but unreadable or corrupt → `Err` (fail-closed).
+///
+/// # Errors
+///
+/// Returns a descriptive error string when the file exists but cannot be read
+/// or decoded.
+fn load_impl_plan_from_dir(track_dir: &Path) -> Result<Option<domain::ImplPlanDocument>, String> {
+    let path = track_dir.join("impl-plan.json");
+    if !path.exists() {
+        return Ok(None);
+    }
+    let json =
+        std::fs::read_to_string(&path).map_err(|e| format!("cannot read impl-plan.json: {e}"))?;
+    let doc = crate::impl_plan_codec::decode(&json)
+        .map_err(|e| format!("cannot decode impl-plan.json: {e}"))?;
+    Ok(Some(doc))
 }
 
 /// Compute track selection priority.
@@ -842,6 +868,11 @@ mod tests {
         )
     }
 
+    /// Minimal valid `impl-plan.json` content for test fixtures that need an
+    /// activated (branched) track without caring about the plan contents.
+    const MINIMAL_IMPL_PLAN_JSON: &str =
+        r#"{"schema_version":1,"plan":{"summary":[],"sections":[]}}"#;
+
     fn setup_track(root: &Path, id: &str, branch: Option<&str>) {
         let dir = root.join(TRACK_ITEMS_DIR).join(id);
         fs::create_dir_all(&dir).unwrap();
@@ -861,10 +892,23 @@ mod tests {
     fn setup_track_with_branch(root: &Path, id: &str) {
         let branch = format!("track/{id}");
         setup_track(root, id, Some(&branch));
+        // Activated tracks (branch materialized) must carry impl-plan.json per the
+        // activation invariant `is_activated() → impl-plan.json present`. Write a
+        // minimal valid document so that `check_impl_plan_presence` in
+        // `load_track_metadata` succeeds and tests can focus on artifact validation.
+        let dir = root.join(TRACK_ITEMS_DIR).join(id);
+        fs::write(dir.join("impl-plan.json"), MINIMAL_IMPL_PLAN_JSON).unwrap();
     }
 
     fn setup_complete_track(root: &Path, id: &str, branch: Option<&str>) {
         setup_track(root, id, branch);
+        // Activated (branched) tracks must carry impl-plan.json. Write a minimal valid
+        // document so `check_impl_plan_presence` succeeds and the verifier can proceed
+        // to check the actual markdown artifacts that this helper is testing.
+        if branch.is_some() {
+            let dir = root.join(TRACK_ITEMS_DIR).join(id);
+            fs::write(dir.join("impl-plan.json"), MINIMAL_IMPL_PLAN_JSON).unwrap();
+        }
         write_file(
             root,
             &format!("{TRACK_ITEMS_DIR}/{id}/spec.md"),
@@ -1110,6 +1154,33 @@ mod tests {
             outcome.has_errors(),
             "corrupt impl-plan.json must surface an error: {:#?}",
             outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_activated_track_missing_impl_plan_surfaces_error() {
+        // An activated (branch-materialized) v5 track without impl-plan.json violates
+        // the activation invariant `is_activated() → impl-plan.json present` and must
+        // surface an error. A broken activated track must not be silently selected and
+        // treated as a healthy "planned" track.
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("activated-no-plan");
+        fs::create_dir_all(&dir).unwrap();
+        // Branch is set → activated; no impl-plan.json written → invariant violation.
+        let meta = make_metadata_v5("activated-no-plan", r#""track/activated-no-plan""#, "");
+        fs::write(dir.join("metadata.json"), meta).unwrap();
+        // Intentionally omit impl-plan.json.
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "activated track missing impl-plan.json must surface an error: {:#?}",
+            outcome.findings()
+        );
+        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            msgs.iter().any(|m| m.contains("activation invariant")),
+            "error should mention activation invariant, got: {msgs:?}"
         );
     }
 
