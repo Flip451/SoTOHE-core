@@ -225,9 +225,18 @@ fn load_track_metadata(
     // A missing or non-numeric `schema_version` is an error — do NOT silently
     // default to a legacy value (which would skip the track) or to `5` (which
     // would let a malformed file pass as a valid v5 track). Require an explicit
-    // integer value.
+    // integer value. Also reject values that overflow u32 instead of silently
+    // wrapping (e.g. `4294967298` must not wrap to `2` and be skipped as legacy).
     let schema_version: u32 = match obj.get("schema_version").and_then(|v| v.as_u64()) {
-        Some(v) => v as u32,
+        Some(v) => match u32::try_from(v) {
+            Ok(narrowed) => narrowed,
+            Err(_) => {
+                return Err(vec![VerifyFinding::error(format!(
+                    "[ERROR] Cannot determine latest track because schema_version {v} overflows u32: {}",
+                    display_path(&metadata_file, root)
+                ))]);
+            }
+        },
         None => {
             return Err(vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot determine latest track because schema_version is missing or invalid: {}",
@@ -1214,6 +1223,32 @@ mod tests {
             outcome.has_errors(),
             "track with missing schema_version must not be silently skipped: {:#?}",
             outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_schema_version_overflow_u32_is_rejected() {
+        // u32::MAX + 1 == 4294967296; as u32 would silently wrap to 0 (which is
+        // < 5 and would cause the track to be silently skipped as legacy).
+        // The fix using u32::try_from must surface an explicit error instead.
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("overflow-track");
+        fs::create_dir_all(&dir).unwrap();
+        // schema_version = 4294967298 (u32::MAX + 3) — overflows u32, would wrap to 2
+        // with `as u32` and be silently skipped as a legacy v2 track.
+        let meta = r#"{"schema_version":4294967298,"id":"overflow-track","title":"Overflow Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-15T00:00:00Z","branch":"track/overflow-track"}"#;
+        fs::write(dir.join("metadata.json"), meta).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "schema_version overflow must produce an error (fail-closed): {:#?}",
+            outcome.findings()
+        );
+        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            msgs.iter().any(|m| m.contains("overflows u32")),
+            "error should mention overflow, got: {msgs:?}"
         );
     }
 
