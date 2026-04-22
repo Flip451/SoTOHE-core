@@ -375,12 +375,28 @@ pub fn check_type_signals(
     catalogue_file: &str,
 ) -> VerifyOutcome {
     // ADR 2026-04-19-1242 §D6.4: empty catalogues (zero type declarations) are a
-    // valid state for tracks that only reuse pre-existing types. Drift (types added
-    // in code without catalogue declarations) is still surfaced downstream by the
-    // reverse-direction SoT Chain ③ evaluation (rustdoc ↔ catalogue), so rejecting
-    // empty catalogues here would over-constrain tracks with no new type work.
+    // valid state for tracks that only reuse pre-existing types. However, if
+    // `<layer>-type-signals.json` has already hydrated reverse-direction Red
+    // findings (undeclared types detected by `check_consistency` /
+    // `undeclared_to_signals`) into `doc.signals()`, those must still surface
+    // so the merge gate does not suppress real drift violations.
     if doc.entries().is_empty() {
-        return VerifyOutcome::pass();
+        let Some(signals) = doc.signals() else {
+            return VerifyOutcome::pass();
+        };
+        let reds: Vec<&str> = signals
+            .iter()
+            .filter(|s| s.signal() == ConfidenceSignal::Red)
+            .map(|s| s.type_name())
+            .collect();
+        if reds.is_empty() {
+            return VerifyOutcome::pass();
+        }
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{catalogue_file}: {} type(s) have Red signal (reverse-direction drift on empty catalogue — add the types to the catalogue or remove them from code): {}",
+            reds.len(),
+            reds.join(", ")
+        ))]);
     }
 
     let Some(signals) = doc.signals() else {
@@ -1016,6 +1032,48 @@ mod tests {
         let doc = TypeCatalogueDocument::new(1, Vec::new());
         let outcome = check_type_signals(&doc, false, "domain-types.json");
         assert!(outcome.findings().is_empty(), "empty entries must pass per D6.4");
+    }
+
+    #[test]
+    fn test_check_type_signals_empty_entries_with_red_signals_blocks() {
+        // When the catalogue is empty but `<layer>-type-signals.json` has already
+        // hydrated reverse-direction Red findings (undeclared types in code)
+        // into `doc.signals()`, the gate must surface them instead of short-circuiting
+        // to pass. Otherwise drift could silently merge.
+        let mut doc = TypeCatalogueDocument::new(1, Vec::new());
+        doc.set_signals(vec![TypeSignal::new(
+            "UndeclaredType",
+            "undeclared_type",
+            ConfidenceSignal::Red,
+            true,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        )]);
+        let outcome = check_type_signals(&doc, false, "domain-types.json");
+        assert!(outcome.has_errors(), "empty entries + red reverse signal must be an error");
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("domain-types.json"), "must mention catalogue file: {msg}");
+        assert!(msg.contains("UndeclaredType"), "must mention the offending type: {msg}");
+        assert!(msg.contains("reverse-direction drift"), "must name the condition: {msg}");
+    }
+
+    #[test]
+    fn test_check_type_signals_empty_entries_with_yellow_only_passes() {
+        // Undeclared yellow signals alone must not block an empty catalogue
+        // (only reverse-direction Red is a drift violation).
+        let mut doc = TypeCatalogueDocument::new(1, Vec::new());
+        doc.set_signals(vec![TypeSignal::new(
+            "UndeclaredType",
+            "undeclared_type",
+            ConfidenceSignal::Yellow,
+            false,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        )]);
+        let outcome = check_type_signals(&doc, false, "domain-types.json");
+        assert!(outcome.findings().is_empty(), "empty entries + yellow-only reverse must pass");
     }
 
     #[test]
