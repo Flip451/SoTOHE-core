@@ -58,17 +58,19 @@
     {
       "id": "T009",
       "description": ".claude/skills/track-plan/SKILL.md thin registry の frontmatter description を更新: /track:init / /track:spec-design / /track:type-design / /track:impl-plan を名前で参照。/track:spec → /track:spec-design、/track:design → /track:type-design に置換。SKILL.md 本体は plan.md へ defer する設計を維持し、frontmatter description と明示的な command 名参照の更新のみ (IN-07)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "690cf012c39eaaa86c20ab77c8a2cf4e01242ce4"
     },
     {
       "id": "T010",
       "description": "DEVELOPER_AI_WORKFLOW.md / CLAUDE.md / track/workflow.md / knowledge/WORKFLOW.md に新独立 phase command 名を反映する。T001 (PR #107) で Phase 0-3 の大枠構造は記述済みのため差分の最小追記のみ: (a) Phase 1 行の /track:spec を /track:spec-design に置換、(b) Phase 2 行の /track:design を /track:type-design に置換、(c) Phase 0 行に /track:init を追加 (未記載箇所)、(d) Phase 3 行に /track:impl-plan を追加 (未記載箇所)。セクション全体の書き直しは行わない (IN-08)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "690cf012c39eaaa86c20ab77c8a2cf4e01242ce4"
     },
     {
       "id": "T011",
       "description": "cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-* 一式) を実行し、すべての先行 task commit 後に全通過することを確認する。regression があれば修正。T012 の Rust 変更を含む全変更が CI を通ることが AC-12 の充足証拠。本 track 全体の最終 integration gate (AC-12)",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {
