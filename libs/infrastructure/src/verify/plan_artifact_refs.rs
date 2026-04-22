@@ -643,7 +643,9 @@ fn canonical_json_sha256(json: &str) -> String {
 /// 2. Referential integrity (spec elements): every SpecElementId key present in any
 ///    section of `task-coverage.json` must resolve to an element in `spec.json`.
 /// 3. Referential integrity (task ids): every TaskId value in any section must exist
-///    in `impl-plan.json` (skipped when `impl-plan.json` is absent).
+///    in `impl-plan.json`. If `impl-plan.json` is absent, this check fails closed:
+///    an error finding is emitted because dangling task references would otherwise
+///    pass silently.
 fn verify_task_coverage(
     track_dir: &Path,
     task_coverage_path: &Path,
@@ -741,12 +743,22 @@ fn verify_task_coverage(
     // -----------------------------------------------------------------------
     // 5d. Referential integrity: task ids against impl-plan.json
     //
-    // impl-plan.json is optional; when absent, skip entirely.
-    // When present but unreadable/malformed, fail closed.
+    // `task-coverage.json` is present at this point (caller pre-filtered).
+    // If `impl-plan.json` is missing, fail closed: the task_ref entries in
+    // task-coverage.json have no authoritative task-id source to validate
+    // against, so accepting the track would let dangling task references
+    // pass silently (e.g. after an accidental delete or partial commit).
+    // If present but unreadable/malformed, fail closed.
     // -----------------------------------------------------------------------
     let impl_plan_path = track_dir.join("impl-plan.json");
     match symlink_guard::reject_symlinks_below(&impl_plan_path, trusted_root) {
-        Ok(false) => {} // impl-plan.json absent — skip task-id integrity
+        Ok(false) => {
+            findings.push(VerifyFinding::error(format!(
+                "task-coverage.json is present but impl-plan.json is missing at {}; \
+                 cannot validate task_ref integrity fail-closed",
+                impl_plan_path.display()
+            )));
+        }
         Ok(true) => match load_impl_plan_task_ids_from_path(&impl_plan_path) {
             Ok(valid_task_ids) => {
                 check_task_id_integrity(&task_coverage_doc, &valid_task_ids, findings);
@@ -1688,6 +1700,41 @@ mod tests {
             .iter()
             .any(|f| f.message().contains("T999") && f.message().contains("impl-plan.json"));
         assert!(has_task_error, "error must mention T999 and impl-plan.json: {:?}", outcome);
+    }
+
+    /// task-coverage.json present but impl-plan.json absent → fail-closed error.
+    ///
+    /// The verifier must not silently skip task_ref integrity when impl-plan.json is
+    /// missing. Dangling task references would otherwise pass undetected (e.g. after
+    /// an accidental delete or partial commit).
+    #[test]
+    fn test_task_coverage_present_impl_plan_absent_fails_closed() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        // task-coverage.json is present with a task ref
+        write_file(
+            &track_dir,
+            "task-coverage.json",
+            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T001"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
+        );
+        // impl-plan.json is intentionally absent
+        let outcome = verify(&track_dir);
+        assert!(
+            outcome.has_errors(),
+            "task-coverage present + impl-plan absent must produce error: {:?}",
+            outcome
+        );
+        let has_fail_closed_error = outcome.findings().iter().any(|f| {
+            f.message().contains("impl-plan.json is missing")
+                || f.message().contains("impl-plan.json")
+                    && f.message().contains("task-coverage.json is present")
+        });
+        assert!(
+            has_fail_closed_error,
+            "error must mention both task-coverage.json and impl-plan.json absence: {:?}",
+            outcome
+        );
     }
 
     /// Fully covered track (IN-01 → T001 in both coverage and impl-plan) passes.
