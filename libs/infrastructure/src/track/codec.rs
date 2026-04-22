@@ -32,6 +32,7 @@ pub enum CodecError {
 /// - `status_override` is kept for Blocked/Cancelled semantics.
 /// - `tasks` and `plan` are removed — they live in `impl-plan.json`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TrackDocumentV2 {
     pub schema_version: u32,
     pub id: String,
@@ -45,6 +46,7 @@ pub struct TrackDocumentV2 {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct TrackStatusOverrideDocument {
     pub status: String,
     pub reason: String,
@@ -376,5 +378,40 @@ mod tests {
         } else {
             panic!("expected Validation error, got: {result:?}");
         }
+    }
+
+    #[test]
+    fn test_decode_v5_with_unknown_top_level_field_is_rejected() {
+        // `deny_unknown_fields` regression: any unknown top-level field that is not
+        // one of the explicitly filtered legacy fields (status/tasks/plan) must still
+        // be rejected. This guards against future typos or unanticipated extensions
+        // silently passing through the codec.
+        let json = r#"{
+  "schema_version": 5,
+  "id": "unknown-field-track",
+  "title": "Unknown Field Track",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "extra_field": "should not be here"
+}"#;
+        let result = decode(json);
+        assert!(result.is_err(), "v5 doc with unknown top-level field must be rejected");
+    }
+
+    #[test]
+    fn test_decode_v5_with_unknown_field_in_status_override_is_rejected() {
+        // `deny_unknown_fields` regression on nested `TrackStatusOverrideDocument`:
+        // a status_override object with an unexpected field must be rejected rather
+        // than silently dropped.
+        let json = r#"{
+  "schema_version": 5,
+  "id": "override-unknown-track",
+  "title": "Override Unknown Track",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "status_override": {"status": "blocked", "reason": "waiting on review", "extra": "surprise"}
+}"#;
+        let result = decode(json);
+        assert!(result.is_err(), "status_override with unknown field must be rejected");
     }
 }

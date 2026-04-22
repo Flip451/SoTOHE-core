@@ -318,6 +318,24 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
+          "at": "2026-04-21T16:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
+          "at": "2026-04-21T16:58:16Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -598,6 +616,49 @@
           "findings": [],
           "hash": "rvw1:sha256:fa66671255536c292b1365d1875eb34cb9f8e1ea5ab2986ff4d6e052fd414204",
           "at": "2026-04-22T00:51:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This change adds `deny_unknown_fields`, but there is no regression test that proves a v5 metadata payload with an unexpected key is rejected, so a future refactor could reintroduce silent field dropping without CI catching it. The same gap applies to nested `status_override` fields.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/codec.rs",
+              "line": 35,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8bd4861dd25a78fdfe1f66030c40f1bce450021d8a06be0a3866cedbf2e4f310",
+          "at": "2026-04-22T01:04:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed11466a472d2b3f9bb52351e3aa18ace7711c650b5b2e3c8839257445a25bfa",
+          "at": "2026-04-22T01:07:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed11466a472d2b3f9bb52351e3aa18ace7711c650b5b2e3c8839257445a25bfa",
+          "at": "2026-04-22T01:07:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:834f53001bc23eaf8a3a7ba8f5c3be830d5b1cbde9268133fd3b5f60727a9d92",
+          "at": "2026-04-22T01:15:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:834f53001bc23eaf8a3a7ba8f5c3be830d5b1cbde9268133fd3b5f60727a9d92",
+          "at": "2026-04-22T01:16:46Z"
         }
       ]
     },
@@ -844,24 +905,6 @@
           "findings": [],
           "hash": "rvw1:sha256:a64bde30a4469dfd83465c6ec3e1c1703df095390470f0eafde67ef7e02f2203",
           "at": "2026-04-21T23:25:23Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
-          "at": "2026-04-21T16:57:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd8927d24bff2b92a0ea0edd078755b4c401a4bb3e35d1316aa196c6dc3cdc37",
-          "at": "2026-04-21T16:58:16Z"
         }
       ]
     },

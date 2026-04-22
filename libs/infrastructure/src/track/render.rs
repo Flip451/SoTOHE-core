@@ -58,6 +58,21 @@ fn rendered_matches(actual: &str, expected: &str) -> bool {
     actual == expected || actual.trim_end_matches('\n') == expected.trim_end_matches('\n')
 }
 
+/// Minimal DTO for peeking at a metadata.json's schema_version + identity
+/// before dispatching to a version-specific decoder. This is intentionally
+/// loose (no `deny_unknown_fields`) so that legacy v2/v3/v4 metadata — which
+/// still carries removed fields like `status`, `tasks`, `plan` — can be
+/// identified and routed through the legacy path. The strict v5 DTO
+/// (`codec::TrackDocumentV2`) is only applied in the v5 branch via
+/// `codec::decode`.
+#[derive(Debug, Clone, serde::Deserialize)]
+struct TrackSchemaPeek {
+    schema_version: u32,
+    id: String,
+    #[serde(default)]
+    branch: Option<String>,
+}
+
 /// Track aggregate plus metadata-only fields required for view rendering.
 #[derive(Debug, Clone)]
 pub struct TrackSnapshot {
@@ -235,7 +250,12 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
         }
 
         let json = std::fs::read_to_string(&metadata_path)?;
-        let parsed: codec::TrackDocumentV2 =
+        // Peek at schema_version + identity through a loose DTO that does not
+        // enforce `deny_unknown_fields`; this is required because legacy
+        // v2/v3/v4 metadata still carries removed fields (`status`, `tasks`,
+        // `plan`) that the strict `codec::TrackDocumentV2` DTO rejects. The
+        // strict DTO is applied inside the v5 branch via `codec::decode`.
+        let parsed: TrackSchemaPeek =
             serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
                 path: metadata_path.clone(),
                 source: codec::CodecError::Json(source),
@@ -594,7 +614,7 @@ pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
 fn validate_track_document(
     metadata_path: &Path,
     dir_name: Option<&std::ffi::OsStr>,
-    doc: &codec::TrackDocumentV2,
+    doc: &TrackSchemaPeek,
 ) -> Result<(), RenderError> {
     let Some(dir_name) = dir_name.and_then(std::ffi::OsStr::to_str) else {
         return Err(RenderError::InvalidTrackMetadata {
@@ -708,7 +728,8 @@ pub fn sync_rendered_views(
             continue;
         }
         let json = std::fs::read_to_string(&metadata_path)?;
-        let parsed: codec::TrackDocumentV2 =
+        // Loose peek (same rationale as `collect_track_snapshots_inner`).
+        let parsed: TrackSchemaPeek =
             serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
                 path: metadata_path.clone(),
                 source: codec::CodecError::Json(source),
