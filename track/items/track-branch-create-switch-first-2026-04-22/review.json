@@ -1,6 +1,211 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3a44a2eb06b559e5eb05f3f770174319d343435d9fd1cacb6f6b712c6888f38",
+          "at": "2026-04-22T22:46:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3a44a2eb06b559e5eb05f3f770174319d343435d9fd1cacb6f6b712c6888f38",
+          "at": "2026-04-22T22:49:28Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0be98bfde5d51d1cb818fae04a02c023a00249a091fa614fabb5ada1fe72b365",
+          "at": "2026-04-22T23:02:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Bash(find:*)` treats `find` as a read-only permission, but unrestricted `find` can execute or mutate through options such as `-exec`, `-execdir`, and `-delete`. This becomes a guardrail bypass because an allow entry like this would permit commands such as `find . -exec git commit ... \\;` even though those utilities remain forbidden elsewhere. Do not add a blanket `find:*` allow; restrict it to a non-executing wrapper or specific safe forms.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 105,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0be98bfde5d51d1cb818fae04a02c023a00249a091fa614fabb5ada1fe72b365",
+          "at": "2026-04-22T23:04:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e2d99851f1ca8b3e3f361268e449db023a77f901f27757b5054dcd1edd66d51",
+          "at": "2026-04-22T23:14:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Bash(sort:*)` is being allowed on the premise that `sort` is exec-incapable, but GNU sort supports `--compress-program=PROG`, which executes an arbitrary compression helper while creating temporary files. That gives this allow entry the same class of wrapper-exec bypass the change is explicitly trying to keep forbidden for `find` and `env`, so a user with this permission can route execution through `sort` instead of the blocked command names.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 106,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:9e2d99851f1ca8b3e3f361268e449db023a77f901f27757b5054dcd1edd66d51",
+          "at": "2026-04-22T23:15:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Bash(sort:*)` is being added to the allowed baseline as \"exec-incapable\", but GNU `sort` can execute an arbitrary helper via `--compress-program=PROG` when it creates temporary files. That means an allowed `sort` invocation can wrap forbidden commands in the same class as `env`/`find -exec`, bypassing the `FORBIDDEN_ALLOW` guardrail. Keep `sort` forbidden unless the permission can exclude `--compress-program`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 106,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:9e2d99851f1ca8b3e3f361268e449db023a77f901f27757b5054dcd1edd66d51",
+          "at": "2026-04-22T23:16:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb77e65a200a6cdf16667454dde5466090cc299901855800b148c202c1978663",
+          "at": "2026-04-22T23:24:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb77e65a200a6cdf16667454dde5466090cc299901855800b148c202c1978663",
+          "at": "2026-04-22T23:25:55Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/rules/10-guardrails.md` now says `Bash(env:*)` was moved to `allow`, but this round’s policy explicitly keeps `env` forbidden because it is used by the wrap-execute boundary. That makes the rules text disagree with `.claude/settings.json` and the intended guardrail, and could mislead future permission updates.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 24,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:21c2d89c08beb576676c469d467749223baf2e59983962c5ebad4feeccf3aa60",
+          "at": "2026-04-22T23:03:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21c2d89c08beb576676c469d467749223baf2e59983962c5ebad4feeccf3aa60",
+          "at": "2026-04-22T23:03:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Bash(find:*)` and `Bash(sort:*)` are not actually read-only. `find` can execute arbitrary commands via `-exec`/`-delete`, and `sort -o` can overwrite files, so adding them to `permissions.allow` re-opens command-execution and file-write paths behind the Bash guardrail.",
+              "severity": "P0",
+              "file": ".claude/settings.json",
+              "line": 183,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d69ed87c1c709c43ba44398582c6308e2459e4689dfa13e9fce815a6497d9090",
+          "at": "2026-04-22T23:07:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The subagent guidance says `Bash(find ...)` is read-only and already allowed, but the same file explicitly keeps `Bash(find:*)` forbidden above and `.claude/settings.json` does not allow it. That contradiction will mislead agents into treating a blocked wrap-execute-capable command as permitted.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 44,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:bf27a27835776c75d722812df00f466f19a3c50ed86f214aaa9e19ed6a7d77aa",
+          "at": "2026-04-22T23:14:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69427ccb0a3ac3e132da765d9e6eccd54db25cfc7d04c44fd6f61c0751deae17",
+          "at": "2026-04-22T23:15:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The guardrail text still introduces the whole bullet list as commands that `FORBIDDEN_ALLOW` prevents from being added to `permissions.allow`, and the follow-up says requests for “these permissions” should be rejected. The newly allowed grep/sort/uniq/diff/jq/pwd entries are placed inside that list, so the policy now tells agents both that these commands are allowed and that they remain forbidden. This is out of sync with `.claude/settings.json` and can cause agents/reviewers to reject or flag allowed permissions incorrectly.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 19,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:69427ccb0a3ac3e132da765d9e6eccd54db25cfc7d04c44fd6f61c0751deae17",
+          "at": "2026-04-22T23:17:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90f93094cc9a3ef82a2cd994811125dd044c4cacb4dae1e1ab9dcb7fc13aee10",
+          "at": "2026-04-22T23:21:53Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:592d97b19e8ca35db5f5954f3de13c55fc79471b091f69bd5b6ec53819e457eb",
+          "at": "2026-04-22T14:57:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a9b2c0004426f0ee1a330536168ce904e36a2de48f96b80034021bfb98093fe",
+          "at": "2026-04-22T14:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a9b2c0004426f0ee1a330536168ce904e36a2de48f96b80034021bfb98093fe",
+          "at": "2026-04-22T14:59:44Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -74,49 +279,20 @@
           "findings": [],
           "hash": "rvw1:sha256:873a751ff67f1ec7a40d2df323e517dbb961e4840fe0328d1010c6ffa3ca3b2f",
           "at": "2026-04-22T22:45:57Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3a44a2eb06b559e5eb05f3f770174319d343435d9fd1cacb6f6b712c6888f38",
-          "at": "2026-04-22T22:46:56Z"
+          "hash": "rvw1:sha256:5999e2f3c4146bfcbff65952f4e8ae499ae9c9ad5121e24eb486733a3c97c94b",
+          "at": "2026-04-22T23:02:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3a44a2eb06b559e5eb05f3f770174319d343435d9fd1cacb6f6b712c6888f38",
-          "at": "2026-04-22T22:49:28Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:592d97b19e8ca35db5f5954f3de13c55fc79471b091f69bd5b6ec53819e457eb",
-          "at": "2026-04-22T14:57:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a9b2c0004426f0ee1a330536168ce904e36a2de48f96b80034021bfb98093fe",
-          "at": "2026-04-22T14:58:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a9b2c0004426f0ee1a330536168ce904e36a2de48f96b80034021bfb98093fe",
-          "at": "2026-04-22T14:59:44Z"
+          "hash": "rvw1:sha256:5999e2f3c4146bfcbff65952f4e8ae499ae9c9ad5121e24eb486733a3c97c94b",
+          "at": "2026-04-22T23:03:04Z"
         }
       ]
     }

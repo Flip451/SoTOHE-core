@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "apps/cli/src/commands/track/activate.rs: separate execute_branch(BranchAction::Create) from execute_activate into an independent path that runs only `git switch -c track/<id> main` with no commit side-effects; retire BranchMode::Create from execute_activate (Switch/Auto only); update rstest callers that reference BranchMode::Create; add unit tests verifying the new Create path produces no git commit call and that existing Auto/Switch execute_activate tests continue to pass",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "34d0214cac2318e32cebda5a3f442893a49fe626"
     },
     {
       "id": "T002",

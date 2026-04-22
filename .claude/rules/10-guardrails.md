@@ -16,16 +16,36 @@ Core guardrails:
 
 ## Permission Guardrails
 
-The `FORBIDDEN_ALLOW` list in `scripts/verify_orchestra_guardrails.py` prevents the following
-shell commands from being added to `permissions.allow` in `.claude/settings.json`:
+`permissions.allow` in `.claude/settings.json` is split into two categories: commands that are
+explicitly **allowed** and commands that are **forbidden** (rejected by `FORBIDDEN_ALLOW` in
+`scripts/verify_orchestra_guardrails.py`).
 
-- `Bash(ls:*)`, `Bash(cat:*)`, `Bash(find:*)`, `Bash(grep:*)` etc. — use dedicated tools (`Glob`, `Read`, `Grep`) instead
-- `Bash(head:*)`, `Bash(tail:*)`, `Bash(wc:*)` — moved to `allow` (read-only, no write risk)
+### Allowed (present in `permissions.allow`)
+
+These commands are in `permissions.allow`. Use dedicated tools (`Glob`, `Grep`, `Read`) when
+they can fully replace the Bash command — the Bash entries exist for cases where dedicated tools
+cannot fully substitute (e.g., GNU grep flags, jq JSON filters):
+
+- `Bash(head:*)`, `Bash(tail:*)`, `Bash(wc:*)` — read-only, no write risk
+- `Bash(grep:*)`, `Bash(diff:*)`, `Bash(jq:*)`, `Bash(pwd:*)` — read-only; prefer Glob/Grep/Read for normal searches
+- `Bash(uniq:*)` — 第2引数で write 可能だが exec 機構を持たないため許容 (Write tool と同等権限)
+
+### Forbidden (in `FORBIDDEN_ALLOW`, rejected by verifier)
+
+The `FORBIDDEN_ALLOW` list prevents the following shell commands from being added to
+`permissions.allow` in `.claude/settings.json`:
+
+- `Bash(ls:*)`, `Bash(cat:*)` — use dedicated tools (`Glob`, `Read`) instead
 - `Bash(cd:*)` — use each tool's `path` parameter instead
-- `Bash(echo:*)`, `Bash(pwd:*)` — output text directly, use `Glob` for path confirmation
+- `Bash(echo:*)` — output text directly
+- `Bash(sed:*)`, `Bash(awk:*)` — destructive flag (`-i`) 可能のため維持。行内編集は Edit tool を使う
+- `Bash(xargs:*)` — 任意 command を exec できるため維持
+- `Bash(find:*)` — `-exec`/`-execdir` で任意 utility exec、`-delete`/`-fprint` で destructive 操作可能 (env 型の wrap-execute 脆弱性)。維持
+- `Bash(sort:*)` — GNU sort の `--compress-program=PROG` で temporary files 処理時に任意プログラムを exec する wrap-execute 脆弱性 (env / find -exec と同型)。維持
+- `Bash(env:*)` — `env [name=value ...] [utility [argument ...]]` 形式で任意 utility を exec する wrapper。allow すると `env git commit` 等で他の guardrail を bypass できるため維持
 - `Bash(git add:*)`, `Bash(git commit:*)` etc. — use `cargo make` wrappers instead
 
-If a user requests adding these permissions, explain that they are in `FORBIDDEN_ALLOW` and
+If a user requests adding a forbidden permission, explain that it is in `FORBIDDEN_ALLOW` and
 suggest the alternative tools. For project-specific extensions, add entries to
 `.claude/permission-extensions.json` under `extra_allow`, but entries matching `FORBIDDEN_ALLOW`
 will be rejected.
@@ -34,8 +54,12 @@ will be rejected.
 
 Background agents (Agent tool) must not use `Bash` for operations covered by dedicated tools.
 In particular, when reading output files or extracting results (e.g. reviewer verdicts),
-use the `Read` tool — not `Bash(grep ...)`, `Bash(cat ...)`, or `Bash(head ...)`.
-These commands are in the `FORBIDDEN_ALLOW` list and trigger permission prompts every time.
+use the `Read` tool — not `Bash(cat ...)`.
+`Bash(grep ...)` は permission 上は allow 済だが、
+ripgrep ベースの `Grep` / `Glob` で完全置換できる検索は専用 tool を優先した方が UX が良い。
+`Bash(find ...)` は FORBIDDEN (wrap-execute 脆弱性)。`Glob` で代替すること。
+`Bash(head ...)` / `Bash(tail ...)` も同様に allow 済だが、Read tool の offset/limit で
+ファイルの一部を読めるのでまず Read を検討する。
 
 ## Bash Output Redirect Constraint
 
