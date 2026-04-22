@@ -46,12 +46,14 @@
     {
       "id": "T007",
       "description": ".claude/commands/track/plan.md の書き直し Part 1 構造スケルトン: (a) 冒頭に TaskCreate preamble を追加 (Phase 0 / Phase 1 loop / Phase 2 loop / Phase 3 loop / 終端処理 + back-and-forth 逐次伝播を task として立てる明示指示)、(b) Interim mode セクション全体を削除 ('While /track:init, /track:spec, and /track:impl-plan are not yet implemented ...')、(c) phase invocation table を /track:init → /track:spec-design → /track:type-design → /track:impl-plan の順次 invoke に書き換え、(d) Sub-invocation details セクションを 'subagent が sotp CLI を含む全 pipeline を内部実行し signal/gate 結果だけを /track:plan に返す' 契約に書き換え、'orchestrator が transcribe する' / 'orchestrator が sotp CLI を呼ぶ' 系の記述を削除、(e) Writer ownership table を更新して advisory/transcribe 文言を spec.json / <layer>-types.json / impl-plan.json / task-coverage.json 行から削除、(f) ADR pre-check セクションが /track:init を branch create step として参照していることを確認。T008 で per-phase loop body を書く (IN-04 / AC-05 / AC-13 / AC-14 / AC-15)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "62e3ec69ff4cffff7b604908e4a78502c43c03ea"
     },
     {
       "id": "T008",
       "description": ".claude/commands/track/plan.md の書き直し Part 2 back-and-forth loop body (T007 skeleton 上に追加): (a) Phase 1 loop block — /track:spec-design invoke → 返却された signal 結果読み取り → 🔴 の場合 ADR commit 履歴確認 → 履歴あり → adr-editor invoke (briefing に 🔴 発火 spec 要素 + ADR パス + working-tree-only 指示) → loop-back、履歴なし → user pause、max_retry guard、(b) Phase 2 loop block — /track:type-design invoke → signal 結果読み取り → 🔴 の場合 /track:spec-design 再 invoke → Phase 1 gate 再評価 → 🔴 なら ADR loop に escalate、max_retry guard、(c) Phase 3 loop block — /track:impl-plan invoke → gate 結果読み取り → ERROR の場合同 phase 再 invoke、max_retry guard、(d) 終端処理 (成功 / max_retry 超過いずれも): git diff HEAD -- knowledge/adr/*.md で ADR working-tree diff 確認、diff あれば accept / revert / manual edit / abort を user に提示、(e) max_retry positional integer 引数 (default 5、flag 名なし、/track:plan 3 形式) の記述を確認 (IN-04 / IN-05 / AC-04 / AC-06 / AC-07 / AC-08 / AC-09 / AC-13)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "62e3ec69ff4cffff7b604908e4a78502c43c03ea"
     },
     {
       "id": "T009",

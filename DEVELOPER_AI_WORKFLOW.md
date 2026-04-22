@@ -65,7 +65,7 @@ flowchart TD
     P2 --> PM["plan/&lt;id&gt; で PR → main にマージ"]
     PM --> ACT["/track:activate &lt;track-id&gt;"]
     ACT --> IMPL
-    DS["(任意) /track:design"] -.->|"TDDD: 型宣言"| IMPL
+    DS["(任意) /track:type-design"] -.->|"TDDD: 型宣言"| IMPL
     IMPL -->|"対話型"| F["/track:implement"]
     IMPL -->|"自律型"| FC["/track:full-cycle &lt;task&gt;"]
     F --> G["実装完了"]
@@ -92,8 +92,8 @@ flowchart TD
 | `/track:catchup` | 環境構築 + track setup + プロジェクト状態ブリーフィング | 初回セットアップ時・新規参入時 |
 | `/track:setup` | 初期状態を整えて主要ドキュメントを確認・整備する | track ワークフローの論理的な初期化のみ必要な時 |
 | `/track:plan <feature>` | ADR 確認 + Phase 0-3 orchestrator（spec.json / 型カタログ / impl-plan を順次生成） | track 前段階で ADR を整備してから実装計画全体を一括作成する時 |
-| `/track:design` | TDDD: 全 TDDD 有効レイヤーの `<layer>-types.json` に型を宣言（`domain-types.json`・`usecase-types.json` 等） | TDDD フロー（plan → design → implement）での型宣言時 |
-| `/track:full-cycle <task>` | 自律実装（TDDD 使用時は事前に `/track:design` 推奨） | タスクを自律的に進めたい時 |
+| `/track:type-design` | TDDD: 全 TDDD 有効レイヤーの `<layer>-types.json` に型を宣言（`domain-types.json`・`usecase-types.json` 等） | TDDD フロー（plan → design → implement）での型宣言時 |
+| `/track:full-cycle <task>` | 自律実装（TDDD 使用時は事前に `/track:type-design` 推奨） | タスクを自律的に進めたい時 |
 | `/track:implement` | 対話型並列実装 | 実装中に途中判断を挟みたい時 |
 | `/track:review` | 計画・実装レビュー（ローカル） | 計画 artifact や実装内容を確認したい時 |
 | `/track:pr-review` | GitHub PR レビュー（Codex Cloud） | PR 上で非同期レビューしたい時（要: Codex Cloud GitHub App） |
@@ -109,7 +109,7 @@ flowchart TD
 | `/track:status` | 進捗確認 | 現在地を知りたい時 |
 | `/conventions:add <name>` | Project Conventions の正式ルールを追加・管理 | プロジェクト固有の実装規約を一次資料として残したい時 |
 
-注: `<feature>` は作りたい機能名・作業名、`<task>` はその機能内で今回実行する具体的な作業のこと。`/track:plan <feature>` は ADR 確認 → Phase 0-3 を順次 invoke し、各 phase 完了後に実成果物をユーザーへ提示して事後確認する（例: `/track:plan user-auth` → Phase 0-3 完了 → `/track:implement`）。`/track:design` は `/track:plan` が内部で invoke する Phase 2 コマンドだが、単独で追加呼び出すことも可能。
+注: `<feature>` は作りたい機能名・作業名、`<task>` はその機能内で今回実行する具体的な作業のこと。`/track:plan <feature>` は ADR 確認 → Phase 0-3 を順次 invoke し、各 phase 完了後に実成果物をユーザーへ提示して事後確認する（例: `/track:plan user-auth` → Phase 0-3 完了 → `/track:implement`）。`/track:type-design` は `/track:plan` が内部で invoke する Phase 2 コマンドだが、単独で追加呼び出すことも可能。
 
 ### 0.5 守るべきルール
 
@@ -138,12 +138,12 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 
 - **track 前段階**: `/track:plan` の外で、user と main が ADR (`knowledge/adr/*.md`) を作成する。`/track:plan` は ADR を自動生成しない (事前確認のみ)
 - **Phase 0 (初期化)**: `/track:init` が `metadata.json` (identity のみ) を作る
-- **Phase 1 (振る舞い契約)**: `/track:spec` が `spec.json` を作る (spec → ADR signal で gate)
-- **Phase 2 (型設計)**: `/track:design` が `<layer>-types.json` を作る (型契約 → 仕様書 signal、signal 未実装期は schema 存在のみ)
+- **Phase 1 (振る舞い契約)**: `/track:spec-design` が `spec.json` を作る (spec → ADR signal で gate)
+- **Phase 2 (型設計)**: `/track:type-design` が `<layer>-types.json` を作る (型契約 → 仕様書 signal で gate)
 - **Phase 3 (実装計画)**: `/track:impl-plan` が `impl-plan.json` + `task-coverage.json` を作る (task-coverage binary gate)
 - **Phase 4 以降 (実装)**: `/track:implement` が実装コードを書く (実装 → 型契約 signal、rustdoc 突合)
 
-`/track:plan` は上記 4 独立コマンドを順次 invoke する orchestrator として動作する (独立コマンド `/track:init` / `/track:spec` / `/track:impl-plan` は後続 track で新設、現時点では `/track:plan` 単独で全 phase を扱う暫定形)。back-and-forth で上流修正が必要になった場合は、元 writer (adr-editor / spec-designer / type-designer / impl-planner) を再 invoke する (main の直接編集は禁止)。
+`/track:plan` は上記 4 独立コマンドを順次 invoke する state-machine orchestrator として動作する。back-and-forth で上流修正が必要になった場合は、元 writer (adr-editor / spec-designer / type-designer / impl-planner) を再 invoke する (main の直接編集は禁止)。
 
 関連 convention:
 - `knowledge/conventions/pre-track-adr-authoring.md` — ADR を track 前段階で作成する原則、厳密モード、adr-editor 運用
@@ -188,7 +188,7 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
    - 環境構築（Python venv、Docker イメージ、CI）+ track setup + プロジェクト状態ブリーフィングをまとめて実行
 2. `[Claude Code]` `/track:plan <feature>`
    - ADR 確認 + Phase 0-3 を順次 invoke する orchestrator（§1.2 参照）。実行前に ADR が `knowledge/adr/` に存在することを確認する
-   - Phase 0: `metadata.json` (identity)、Phase 1: `spec.json` (振る舞い契約)、Phase 2: `<layer>-types.json` (型契約、`/track:design` 経由)、Phase 3: `impl-plan.json` + `task-coverage.json` (実装計画)
+   - Phase 0: `metadata.json` (identity)、Phase 1: `spec.json` (振る舞い契約)、Phase 2: `<layer>-types.json` (型契約、`/track:type-design` 経由)、Phase 3: `impl-plan.json` + `task-coverage.json` (実装計画)
    - `track/tech-stack.md` の `TODO:` を解消し、version baseline を確定する（実装開始の前提条件）
    - 各 phase 完了後に成果物を実物でユーザーへ提示して事後レビュー（事前承認ではなく事後確認）
    - `cargo make ci` は `verify-track-metadata` と `verify-tech-stack` を通して track 状態と tech-stack の整合を検証する
@@ -205,7 +205,7 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
    - 計画 artifact のレビューを実行する
 4. (任意) `[Claude Code]` `/track:commit <message>`
    - 計画 artifact をコミットする（レビュー有無にかかわらず）
-4b. (任意・TDDD) `[Claude Code]` `/track:design`
+4b. (任意・TDDD) `[Claude Code]` `/track:type-design`
    - 実装前に全 TDDD 有効レイヤーの型カタログ（`domain-types.json`・`usecase-types.json` 等）を宣言・確認する（TDDD フロー推奨）
 5. `[Claude Code]` `/track:implement` または `/track:full-cycle <task>`
    - `/track:implement`: 対話しながら並列実装
@@ -239,7 +239,7 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 2. Claude Code が `track/registry.md`, `track/items/<id>/spec.md`, `track/items/<id>/plan.md`, `track/items/<id>/verification.md` を読んで状況を整理し、次に使うべきコマンドを提案する
    - 例: `/track:plan`, `/track:implement`, `/track:review`, `/track:ci`
 
-   > **TDDD 参考**: 型を新規追加・変更する場合は、実装前に標準フローの任意ステップ 4b（`/track:design`）で各レイヤーの型カタログ（`domain-types.json`・`usecase-types.json` 等）に型を宣言することを推奨する（Yellow = WIP 宣言 → `/track:implement` で実装 → Blue 確定。未宣言の型がコードに存在すると Red = TDDD 違反）。`/track:status` はトラック状態に基づいてコマンドを提案するため、設計フェーズが必要かどうかは開発者自身が判断して明示的に実行する。
+   > **TDDD 参考**: 型を新規追加・変更する場合は、実装前に標準フローの任意ステップ 4b（`/track:type-design`）で各レイヤーの型カタログ（`domain-types.json`・`usecase-types.json` 等）に型を宣言することを推奨する（Yellow = WIP 宣言 → `/track:implement` で実装 → Blue 確定。未宣言の型がコードに存在すると Red = TDDD 違反）。`/track:status` はトラック状態に基づいてコマンドを提案するため、設計フェーズが必要かどうかは開発者自身が判断して明示的に実行する。
 
 3. 開発者が提案を採用するか、別の進め方を指示する
 4. Claude Code がコマンドを実行し、必要なら active profile に応じて specialist capability / Agent Teams を使う
@@ -358,7 +358,7 @@ cargo make bacon-test  # テスト寄りの継続チェック
 - `knowledge/external/POLICY.md`
 - `knowledge/external/guides.json`
 
-`/track:plan`, `/track:implement`, `/track:full-cycle`、`/track:design` では、プロンプトと最新トラックの
+`/track:plan`, `/track:implement`, `/track:full-cycle`、`/track:type-design` では、プロンプトと最新トラックの
 `spec.md` / `plan.md` を走査し、`trigger_keywords` に一致すると該当ガイドの要約が
 追加コンテキストとして自動注入される。
 
