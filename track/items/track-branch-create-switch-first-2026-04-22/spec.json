@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "sotp track branch create: main 上 activation commit bug fix (switch-before-commit)",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "`sotp track branch create` (`execute_branch(BranchAction::Create)`) を `execute_activate` への forward から切り離し、`git switch -c track/<id> main` のみを実行する独立 path に分離することで、main ブランチ上に activation commit が生成される regression を構造的に排除する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "`/track:init` が `cargo make track-branch-create '<track-id>'` を呼んだ際、branch 作成と switch のみが実行され、metadata persist / activation commit は後続 step (track ブランチ上) で行われる設計を確立し、main ブランチを汚染しない不変条件を保証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`apps/cli/src/commands/track/activate.rs` の `execute_branch(BranchAction::Create)` を `execute_activate(BranchMode::Create)` への forward から切り離し、単純な `git switch -c track/<id> main` のみを実行する独立 path として実装する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "`BranchMode::Create` を `execute_activate` から退役させる: `execute_activate` は `BranchMode::Switch` / `BranchMode::Auto` のみを受け付け、`BranchMode::Create` 経由の呼び出しは存在しないようにする。関連する rstest / unit test の caller を更新する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`execute_branch(BranchAction::Create)` の独立 path 実装と `BranchMode::Create` 退役に対応するユニットテスト: 新 path が `git switch -c` のみを実行し commit を生成しないこと、`BranchMode::Auto` / `BranchMode::Switch` の既存テストが引き続き pass することを確認する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "`execute_branch` / `execute_activate` の上位 refactor (OS-08、ADR 2026-04-22-0829 で別 track に委譲): `BranchMode` のコードパス全体の統廃合・再設計は本 track では行わない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "Consequences"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "Reassess When"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "`BranchMode::Auto` / `BranchMode::Switch` の activation フローへの変更: `BranchMode::Create` が `execute_activate` から退役するため、残る `Auto` / `Switch` のコードパスは既存動作を維持する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "activation resume flow の変更: resume marker / `already_materialized = true` パスのロジックは `BranchMode::Auto` 配下であり、`BranchMode::Create` 退役の影響を受けない。変更は行わない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "`/track:init` command 定義本文の変更: `sotp track branch create` の責務が branch 作成 + switch のみに限定される (D3) ことで `/track:init` の後続 step 設計は既に整合している。command definition のテキスト変更は不要",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "no panics in library code: `activate.rs` の変更箇所でパニックしうる構文 (unwrap / expect / slice indexing / unreachable など) を使わない。`Result` / `?` 演算子で伝搬する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": ".claude/rules/04-coding-principles.md",
+          "anchor": "No Panics in Library Code"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "`execute_activate` に残る `BranchMode::Switch` / `BranchMode::Auto` のロジックは変更しない。`BranchMode::Create` 退役後も `BranchMode::Auto` の resume flow (already_materialized = true かつ resume_allowed = true) の動作を壊さないこと",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "`cargo make ci` (fmt / clippy / nextest / deny / verify-* 一式) が pass すること",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "Consequences"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": ".claude/rules/07-dev-environment.md",
+          "anchor": "Pre-commit Checklist"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`cargo make track-branch-create '<track-id>'` 実行後、`git log main --oneline` に activation commit が現れない。main ブランチは track ブランチ作成前後で HEAD が変化しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`execute_branch(BranchAction::Create)` の独立 path ユニットテストが pass する: `git switch -c track/<id> main` のみが実行され、`git commit` が実行されないことを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`BranchMode::Auto` / `BranchMode::Switch` の `execute_activate` 既存テストが `BranchMode::Create` 退役後も引き続き pass し、動作が変わっていないことを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`cargo make ci` (fmt / clippy / nextest / deny / verify-* 一式) が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "Consequences"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": ".claude/rules/07-dev-environment.md",
+          "anchor": "Pre-commit Checklist"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Core Principles"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 16,
+    "yellow": 0,
+    "red": 0
+  }
+}

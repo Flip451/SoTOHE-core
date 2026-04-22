@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` still says `impl-plan.json` is not yet generated, but this artifact set already includes a populated `impl-plan.json` and the file header says the plan is generated from it. That makes the generated plan self-contradictory and misleading to readers about whether the implementation plan exists.",
+              "severity": "P1",
+              "file": "track/items/track-branch-create-switch-first-2026-04-22/plan.md",
+              "line": 4,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d3c147d08a252369ac6595537f3638210212e69c1983fe33f87b33c4579c0916",
+          "at": "2026-04-22T15:01:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9a8c14e7900387719b5063b67ff70010f8f3e4d9972e2f9e2f6504cc6a223e8",
+          "at": "2026-04-22T15:03:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D2 still lists `unreachable!(...)` as an acceptable way to deny `BranchMode::Create`, but the same plan’s CN-01 explicitly forbids `unreachable`/panic constructs in the `activate.rs` changes and requires `Result`/`?` propagation. This leaves implementers with a design-approved option that violates the track constraint; D2 should only allow removing the variant or returning an error.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+              "line": 37,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c9a8c14e7900387719b5063b67ff70010f8f3e4d9972e2f9e2f6504cc6a223e8",
+          "at": "2026-04-22T15:05:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:146c8abcea3321190dd992db6ac7b95b3b6ba6e9193fa458445e5c8bc2400208",
+          "at": "2026-04-22T15:07:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1887509f4ec9243dc9494f0463b506d992162aa7c7d6f2442782500f160f13cf",
+          "at": "2026-04-22T15:11:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1887509f4ec9243dc9494f0463b506d992162aa7c7d6f2442782500f160f13cf",
+          "at": "2026-04-22T15:13:21Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:592d97b19e8ca35db5f5954f3de13c55fc79471b091f69bd5b6ec53819e457eb",
+          "at": "2026-04-22T14:57:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a9b2c0004426f0ee1a330536168ce904e36a2de48f96b80034021bfb98093fe",
+          "at": "2026-04-22T14:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a9b2c0004426f0ee1a330536168ce904e36a2de48f96b80034021bfb98093fe",
+          "at": "2026-04-22T14:59:44Z"
+        }
+      ]
+    }
+  }
+}
