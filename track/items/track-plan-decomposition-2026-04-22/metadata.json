@@ -1,0 +1,8 @@
+{
+  "branch": "track/track-plan-decomposition-2026-04-22",
+  "created_at": "2026-04-22T04:56:42Z",
+  "id": "track-plan-decomposition-2026-04-22",
+  "schema_version": 5,
+  "title": "/track:plan 構造的分解 (Phase 0-3 独立 command + adr-editor capability)",
+  "updated_at": "2026-04-22T04:56:57Z"
+}

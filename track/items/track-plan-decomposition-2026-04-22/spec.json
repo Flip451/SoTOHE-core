@@ -1,0 +1,1152 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "/track:plan 構造的分解 (Phase 0-3 独立 command + adr-editor capability + activate preflight 緩和 + subagent 責務拡大)",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "現行 /track:plan の Interim mode (Phase 0-3 inline 一括実行) を、/track:plan が orchestrate する state machine + 独立 phase command 群 (/track:init / /track:spec-design / /track:type-design / /track:impl-plan) に分解し、ADR 展開フェーズ 4-6.5 を完了させる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "フェーズ 1 gate 評価で 🔴 が生じた場合に adr-editor capability を自動 invoke し、ADR 側を working tree のみで修正する D0.1 back-and-forth loop を /track:plan state machine に組み込む",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "/track:plan に整数 positional 引数 max_retry (省略時 5、フラグ名なし) を導入し、各フェーズの back-and-forth loop 上限を制御可能にする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "adr-editor capability の invocation 契約を /track:plan state machine に統合し、既存 .claude/agents/adr-editor.md および .harness/config/agent-profiles.json の定義と整合させた正式な自動 invoke 経路を確立する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ]
+    },
+    {
+      "id": "GO-05",
+      "text": "spec-designer / type-designer / impl-planner の 3 subagent が、対応 SSoT ファイルの Write から view render、sotp CLI による信号機評価までを一括担当する契約を確立し、orchestrator (main) の transcribe 作業と post-subagent sotp CLI 呼び出しを排除することで ADR §D4 の 1 file = 1 writer 原則を subagent 実装として落とす",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 設計変更: spec-designer / impl-planner への write 権限付与に加え、signal 評価も subagent 内部に閉じ込める。ADR 未言及部分はユーザー指示による拡大適用として spec に根拠明示し、ADR revise は back-and-forth で対応"
+        }
+      ]
+    },
+    {
+      "id": "GO-06",
+      "text": "activate.rs の activation_requires_clean_worktree を resume flow のみに限定し、/track:init 内で sotp track branch create を metadata.json 作成直後 (dirty worktree) から呼べるようにする。これにより「init で branch create する設計」が有効になる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D1.4"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "「別にワークスペースクリーンの要求っていらなくない？」— init で branch create する設計を有効化するため、resume flow 以外での worktree clean 要求を撤廃する"
+        },
+        {
+          "kind": "memory",
+          "summary": "apps/cli/src/commands/track/activate.rs の activation_requires_clean_worktree 関数を修正済 (未 commit)。BranchMode::Auto && already_materialized && resume_allowed の場合のみ true を返す"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": ".claude/commands/track/init.md を新規作成する (Phase 0、writer = main、独立 command)。共通構造パターンに従い以下を実行する: (a) track directory 作成 + metadata.json (branch=null 暫定) 生成、(b) sotp track branch create '<track-id>' で main から track/<id> branch を作成して switch、(c) metadata.json update (branch=track/<id>)、(d) ADR 存在 pre-check (knowledge/adr/ に参照予定 ADR が存在するか確認、未整備なら停止してユーザーに整備を促す)、(e) identity schema binary 検証 (sotp verify track-metadata 相当)。単独 invoke 可能。/track:init は writer = main のため command 定義本文が直接これらを実行する (subagent invocation なし)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.0"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D1.4"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/pre-track-adr-authoring.md",
+            "anchor": "Rules"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "「ブランチの作成はinit段階ですべきです」「/track:init も独立コマンドとして定義するが、たまたまmainが担当するというだけ」— branch create を /track:init の責務として明確化。/track:init のみ writer=main なので command 定義本文が直接処理を実行する (CN-10 例外)。ADR §D0.0 の /track:init 新設記述と方向性は一致するが branch create の明示は ADR 未言及 (OQ-7)"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": ".claude/commands/track/spec-design.md を新規作成する (Phase 1 専任、独立 command)。command 定義本文は spec-designer subagent を Agent tool 経由で invoke し、その結果 (signal 評価結果) を受け取るのみ。spec.json の Write、spec.md の render (sotp track views sync)、信号機評価 (sotp verify plan-artifact-refs 等) はすべて spec-designer subagent 内部で完結する。state machine 遷移 / back-and-forth / max_retry は含まない。単独 invoke 可能",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.0"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D3.1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 4"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": ".claude/rules/11-subagent-model.md",
+            "anchor": "Subagent Model"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "v3 変更: command 定義本文は subagent invocation + 結果受け取りのみ。sotp CLI 呼び出しは spec-designer 内部に閉じ込める。コマンド名は /track:spec-design (ADR の /track:spec から変更)。ADR との差分は OQ-6 に明記"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": ".claude/commands/track/impl-plan.md を新規作成する (Phase 3 専任、独立 command)。command 定義本文は impl-planner subagent を Agent tool 経由で invoke し、その結果 (gate 評価結果) を受け取るのみ。impl-plan.json + task-coverage.json の Write、plan.md の render (必要であれば)、gate 評価 (sotp verify plan-artifact-refs) はすべて impl-planner subagent 内部で完結する。state machine 遷移 / back-and-forth / max_retry は含まない。単独 invoke 可能",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.0"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D3.3"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 6"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": ".claude/rules/11-subagent-model.md",
+            "anchor": "Subagent Model"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "v3 変更: command 定義本文は subagent invocation + 結果受け取りのみ。sotp CLI 呼び出しは impl-planner 内部に閉じ込める"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": ".claude/commands/track/plan.md を改訂する — (a) 冒頭で TaskCreate を使った orchestration progress tracking を明示的に指示する、(b) Interim mode セクションを削除する、(c) Phase 0 (/track:init) → Phase 1 (/track:spec-design) → Phase 2 (/track:type-design) → Phase 3 (/track:impl-plan) を順次 invoke する state machine フローを記述する、(d) 各フェーズ gate 評価結果に基づく D0.1 back-and-forth 逐次伝播を自動化する (Phase 1 🔴 → adr-editor、Phase 2 🔴 → /track:spec-design 再 invoke、Phase 3 ERROR → /track:impl-plan 再 invoke)、(e) max_retry guard と終端 ADR diff 判断 (accept / revert / 手動修正 / 中止) を含める。command 定義本文には subagent invocations + state machine 遷移の結線のみ記述し、signal 合成などのロジックは書かない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "コマンド境界"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 6.5"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.1"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+            "anchor": "Rules"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "adr-editor capability の invocation 契約を /track:plan state machine に組み込む (呼び出し条件: Phase 1 gate 🔴 かつ ADR に commit 履歴あり → adr-editor 自動 invoke (working tree のみ編集、loop 中はコミットしない); commit 履歴なし → user pause。briefing 必須項目: 🔴 を発火した spec 要素 + 対象 ADR パス + working-tree-only 指示)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 6.5"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/pre-track-adr-authoring.md",
+            "anchor": "Rules"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "/track:type-design コマンドを確立する — 既存 .claude/commands/track/design.md を /track:type-design に rename し、command 定義本文を type-designer subagent を Agent tool 経由で invoke し、その結果 (信号機評価結果) を受け取るのみに縮小する。baseline capture (sotp track baseline-capture)、<layer>-types.json の直接 Write、<layer>-graph 系 md のレンダリング (sotp track type-graph 等)、contract-map.md のレンダリング (sotp track contract-map)、<layer>-type-signals.md のレンダリング、信号機評価 (sotp track type-signals) はすべて type-designer subagent 内部で完結する。state machine 遷移 / back-and-forth / max_retry は含まない。単独 invoke 可能",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.0"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 5"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "v3 変更: command 定義本文は subagent invocation + 結果受け取りのみ。baseline capture / types.json write / graph md render / contract-map render / type-signals render / 信号機評価は type-designer 内部に閉じ込める。<layer>-type-design.json はユーザー表記の揺れ; 実ファイル名 <layer>-types.json を維持 (rename は OS-07 緩和範囲外)。コマンド名は /track:type-design (ADR の /track:design から変更)。ADR との差分は OQ-6 に明記。T001 で刷新済のため大幅な書き直しは含まない"
+          },
+          {
+            "kind": "memory",
+            "summary": "T001 (plan-artifact-workflow-restructure-2026-04-19) で design.md は Phase 2 専任仕様として刷新済。本 track では rename + 責務縮小 + 共通構造パターンへの整合のみ"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": ".claude/skills/track-plan/SKILL.md の thin registry を新 command 群 (/track:init / /track:spec-design / /track:type-design / /track:impl-plan) に合わせて更新する (必要な範囲に限定)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "コマンド境界"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "DEVELOPER_AI_WORKFLOW.md / CLAUDE.md / track/workflow.md / knowledge/WORKFLOW.md に新 command 呼び出し経路 (/track:init / /track:spec-design / /track:type-design / /track:impl-plan) を追記する (T001 で大枠刷新済のため差分の最小追記)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "移行"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.0"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "memory",
+            "summary": "T001 merge (PR #107) で CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / track/workflow.md への Phase 0-3 大枠記載は完了済。本 track での更新は新 command 名の差分のみ"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "spec-designer / type-designer / impl-planner の 3 subagent agent definition (.claude/agents/*.md) の frontmatter tools 宣言、Scope Ownership 節、Rules 節を更新し: (1) 対応 SSoT ファイルへの直接 Write 権限、(2) Bash ツール (sotp CLI 呼び出し専用、cat/grep/head 系は引き続き禁止) を追加宣言する。spec-designer は spec.json Write + spec.md render + 信号機評価を、type-designer は baseline capture + <layer>-types.json Write + graph md render + contract-map render + type-signals render + 信号機評価を、impl-planner は impl-plan.json + task-coverage.json Write + gate 評価を内部実行するよう責務範囲を記述する。現在 'This agent is read-only' / 'This agent is advisory' / 'orchestrator が transcribe する' と宣言されている箇所を write 権限ありに変更する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 5"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "v3 変更: Write に加えて Bash (sotp CLI 呼び出し用) を追加。cat/grep/head 等の禁止 Bash 操作は引き続き禁止。spec-designer / impl-planner への write 権限付与は ADR 未言及 (type-designer のみ §展開フェーズ 5 で明記)。ユーザー指示による拡大適用。ADR との差分は OQ-8 に明記"
+          },
+          {
+            "kind": "memory",
+            "summary": "現状: spec-designer.md は 'This agent is read-only'、impl-planner.md は 'This agent is advisory'、type-designer.md は 'The catalogue JSON write ... are the orchestrator's responsibility' と宣言。3 つとも write + bash 権限付与に変更が必要"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "apps/cli/src/commands/track/activate.rs の activation_requires_clean_worktree 関数を「resume flow のみ worktree clean 要求」に緩和する (BranchMode::Auto && already_materialized && resume_allowed のときのみ true を返す)。新規 track materialization および一般 branch create は dirty worktree を許容する。関連する unit tests を新仕様に合わせて更新する。修正は bootstrap 中に先行実施済 (未 commit、本 track commit に含める)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D0.0"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D1.4"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "「別にワークスペースクリーンの要求っていらなくない？」— init で branch create する設計を有効化するため、新規 track / 一般 branch create での worktree clean 要求を撤廃。git の通常動作 (branch switch で untracked files を carry over) で安全"
+          },
+          {
+            "kind": "memory",
+            "summary": "activation_requires_clean_worktree は現在 'matches!(mode, BranchMode::Auto) && already_materialized && resume_allowed' として実装済 (bootstrap 先行修正)"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "T8 hook 強制 (展開フェーズ 7) — 具体的な hook 内容は別 ADR 待ち。skill-compliance による ceremony 文言 grep gate は ADR に定義がないため本 track では扱わない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 7"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "canonical block / ## Canonical Blocks セクションの最終形決定 (Q14 別 ADR)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "Q14"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "AdrAnchor / ConventionAnchor の semantic 厳密化 + AdrRef/ConventionRef の hash 追加 (Q15 別 ADR)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "Q15"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "writer 境界の自動強制 (Q16 別 ADR。本 track では subagent agent definition の明示的 write 権限宣言 + 人手レビューによる運用で対処)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "Q16"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "catalogue-signal (型契約 → 仕様書 signal) の実装 (別 ADR、tddd-ci-gate-and-signals-separation 系)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D3.2"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "前 track (plan-artifact-workflow-restructure-2026-04-19) で作成・改修済の domain 型 / CLI / renderer / verify ツール群 — 本 track ではそれらを利用する側の command / agent / docs および IN-10 で限定した Rust 修正のみを対象とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "移行"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "memory",
+            "summary": "前 track PR #107 merge 済。domain::plan_ref, ImplPlanDocument, TaskCoverageDocument, TrackDocumentV2, sotp verify plan-artifact-refs 等は既に main 上に存在する"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "Rust コード変更の範囲は apps/cli/src/commands/track/activate.rs の activation_requires_clean_worktree 緩和とそれに関連する unit tests のみ (IN-10)。それ以外の Rust domain 型・newtype・CLI の追加・変更は本 track では行わない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "展開フェーズ 6.5"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "OS-07 緩和: 「Rust コード変更なし」から「activate.rs の preflight 緩和 + 関連 tests のみ」に変更"
+          }
+        ]
+      },
+      {
+        "id": "OS-08",
+        "text": "execute_branch → execute_activate の共有を整理し、branch create と activate の code path を責務分離する (Q16 writer 境界の自動強制と合わせて別 track で扱う)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "Q16"
+          }
+        ],
+        "informal_grounds": [
+          {
+            "kind": "user_directive",
+            "summary": "briefing v2 §1 IN-11 (optional) として言及。本 track では対象外とし別 track に委ねる"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "SoT Chain 一方向依存を維持する — spec → ADR の方向性のみ許可し、逆流 (ADR → spec / command → ADR への直接書き込みなど) は禁止する (D1.5)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D1.5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "1 ファイル = 1 writer 原則を守る (D4) — metadata.json は main、spec.json は spec-designer、<layer>-types.json は type-designer、impl-plan.json + task-coverage.json は impl-planner、ADR は adr-editor が書く。各 subagent は対応 SSoT ファイルおよびそこから派生する rendered view ファイル (spec.md / <layer>-graph md / contract-map.md / <layer>-type-signals md / plan.md 等) のみ Write し、他 subagent の担当ファイルには触れない。main orchestrator が knowledge/adr/*.md / spec.json / 型カタログを直接 Edit することは禁止",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "post-hoc review 方式に従い、新 phase command に事前承認手続き文言 (present design for review before writing / iterate until user accepts など) を書かない (D5 / workflow-ceremony-minimization)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D5"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "Interim mode と新 phase command の並立を許さない — T7.5 完了時点で /track:plan の Interim mode セクションは完全削除する。後方互換のための並立期間を設けない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "memory",
+          "summary": "feedback_no_backward_compat — 後方互換のための Option/nullable 混在を作らない原則の command 定義への適用"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "approved / Status 人工状態を新 command に導入しない — gate は signal (🔵🟡🔴) または binary (OK/ERROR) のみ (D3)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D3.5"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "file 存在 = phase 状態 の判定方式を command 定義内で一貫して使用する — optional field チェックや conditional phase detection を書かない (D0.0.1 / D6)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "ADR auto-edit 判定基準を git 履歴ベースの機械的な規則とする — 主観的な decision 変更の大きさでなく「ADR に commit 履歴あり → auto-edit / なし → user pause」の二分岐のみ (D0.1)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "各独立コマンド (/track:spec-design / /track:type-design / /track:impl-plan) は上流 artifact の存在確認 (pre-check) を自己責任で行う — /track:spec-design は metadata.json の存在を、/track:type-design は spec.json の存在を、/track:impl-plan は spec.json と型カタログ (<layer>-types.json) の存在を、それぞれ起動時に確認してから処理に進む。/track:init は ADR 存在 pre-check を内部で実行する (IN-01)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "bootstrap sequencing — T5-T7 の実装完了前は現行 Interim mode で本 track 自身の Phase 0-3 artifacts を生成する。T7.5 での Interim mode 削除は AC-02 / AC-03 / AC-04 で検証済みであることを条件とする。現在の bootstrap は track branch 上に到達済み (metadata.json 作成済、activate.rs 修正済)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "memory",
+          "summary": "briefing v2 §3: current branch = track/track-plan-decomposition-2026-04-22、metadata.json 作成済 (branch=track/..., schema v5)、main 上に activation commit de5a66b 済、activate.rs 修正済 (未 commit)"
+        }
+      ]
+    },
+    {
+      "id": "CN-10",
+      "text": "4 phase command 定義ファイルのスリム化原則 (強化版) — 新規 / 改訂する 4 phase command (.claude/commands/track/init.md / spec-design.md / type-design.md / impl-plan.md) の本文には、以下 2 要素のみを記述する: (a) 対応 writer (subagent または main) の invocation、(b) 結果受け取り (信号機評価 / binary gate の結果を orchestrator に戻す)。sotp CLI 呼び出しを含む以下はすべて command 定義の外 (subagent 内部または /track:init の main 内部) に閉じ込め、command 定義には書かない: sotp CLI 呼び出し全般 (signal 評価 / gate 評価 / render / baseline capture)、schema 検証 / codec round-trip、signal 合成アルゴリズム、reference resolution、coverage 判定、canonical block 疑惑検出。本制約の対象外: /track:plan は orchestrator として state machine ロジック / TaskCreate preamble / back-and-forth loop body を含むことを CN-11 / AC-14 で明示的に許可する。例外: /track:init のみ writer = main なので main が直接 (a) sotp track branch create 呼び出し、(b) metadata.json write、(c) ADR pre-check、(d) identity schema binary 検証を実行する (CN-13 参照)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": ".claude/rules/08-orchestration.md",
+          "anchor": "Delegation Rules"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 強化: command 定義本文から sotp CLI 呼び出しも排除。sotp CLI は subagent 内部 (または /track:init では main) に閉じ込める。Directive 1: command 定義はロジック無しの呼び出し結線のみ"
+        }
+      ]
+    },
+    {
+      "id": "CN-11",
+      "text": "state machine 遷移ロジックは /track:plan のみに書く — 各 phase command (/track:init / /track:spec-design / /track:type-design / /track:impl-plan) の command 定義には state machine の遷移判断 / back-and-forth loop 制御 / max_retry guard / 終端 ADR diff 判断を記述しない。これらはすべて /track:plan の責務",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "ユーザー指示: /track:plan が state machine を担い、各フェーズコマンドは subagent 呼び出し + 信号機評価のみ。state machine の遷移ロジックを phase command に書かない"
+        }
+      ]
+    },
+    {
+      "id": "CN-12",
+      "text": "subagent の直接 Write — spec-designer / type-designer / impl-planner の 3 subagent は対応 SSoT ファイルおよびそこから派生する rendered view ファイルを直接 Write する。各 subagent の agent definition に Write 権限を明示し、orchestrator の transcribe を不要にする。各 subagent は自身の担当 SSoT ファイルとその rendered view ファイル以外には Write しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "ユーザー指示: 各フェーズで対応する subagent がファイルを書く。orchestrator (main) の transcribe 作業が今回 spec.json で実際に発生したため、subagent write 権限付与で解消する"
+        }
+      ]
+    },
+    {
+      "id": "CN-13",
+      "text": "4 phase command (/track:init / /track:spec-design / /track:type-design / /track:impl-plan) は共通構造パターンに従う: writer invocation + 結果受け取り。各 writer の内部責務: /track:init (writer=main): main が sotp track branch create 呼び出し + metadata.json write + ADR pre-check + identity schema binary 検証を実行し、結果を /track:init 出力として報告。/track:spec-design (writer=spec-designer subagent): subagent が spec.json write + spec.md render + signal 評価を実行し、signal 結果を /track:spec-design 出力として報告。/track:type-design (writer=type-designer subagent): subagent が baseline capture + <layer>-types.json write + graph md render + contract-map render + type-signals render + signal 評価を実行し、signal 結果を /track:type-design 出力として報告。/track:impl-plan (writer=impl-planner subagent): subagent が impl-plan.json + task-coverage.json write + gate 評価を実行し、gate 結果を /track:impl-plan 出力として報告。command 定義本文の視点からは: /track:init は writer=main なので command 定義が直接実行する; それ以外の 3 command は subagent invocation + 結果受け取りのみ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 具体化: 4 phase command の共通構造パターン = writer invocation + 結果受け取りのみ。各 writer の内部責務リストを明記。subagent が sotp CLI まで内部実行することが構造パターンの核心"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "/track:init が単独 invoke で以下を順番に実行する: (a) track directory 作成 + metadata.json (branch=null 暫定) 生成、(b) sotp track branch create '<track-id>' で main から track/<id> branch を作成して switch、(c) metadata.json update (branch=track/<id>)、(d) ADR 存在 pre-check (knowledge/adr/ に参照予定 ADR が存在しない場合は停止してユーザーに整備を促す)、(e) identity schema binary 検証 (sotp verify track-metadata 相当)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D1.4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "/track:spec-design が単独 invoke で spec-designer subagent を呼び出し、subagent が spec.json 直接 Write + spec.md render + 信号機評価 (sotp verify plan-artifact-refs 等) を一括実行し、spec → ADR signal (🔵🟡🔴) の gate 結果を /track:spec-design 出力として返す。command 定義本文には sotp CLI 呼び出しが含まれない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D3.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 4"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 変更: subagent が spec.json write + render + signal 評価を一括。command 定義本文は subagent invoke + 結果受け取りのみ"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "/track:impl-plan が単独 invoke で impl-planner subagent を呼び出し、subagent が impl-plan.json + task-coverage.json 直接 Write + gate 評価 (sotp verify plan-artifact-refs) を一括実行し、task-coverage binary gate (OK / ERROR) の結果を /track:impl-plan 出力として返す。command 定義本文には sotp CLI 呼び出しが含まれない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D3.3"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 変更: subagent が impl-plan.json + task-coverage.json write + gate 評価を一括。command 定義本文は subagent invoke + 結果受け取りのみ"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "/track:plan state machine が /track:init → /track:spec-design → /track:type-design → /track:impl-plan を順次 invoke し、各フェーズ gate 🔴 / ERROR 時に D0.1 逐次伝播に従って元 writer を自動再 invoke し、max_retry 超過時に user pause する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "/track:plan の Interim mode セクション (while /track:init, /track:spec, and /track:impl-plan are not yet implemented など) が削除されており、grep で 0 件になる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "memory",
+          "summary": "feedback_no_backward_compat — Interim mode と新 command の並立を許さない"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "Phase 1 gate 🔴 時に adr-editor が自動 invoke され、briefing に『🔴 を発火した spec 要素 + 対象 ADR パス + working-tree-only 指示』が含まれ、loop 中に commit が発生しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "/track:plan 完了時 (成功 / max_retry 超過いずれも) に ADR working tree の HEAD からの diff があればユーザーに提示し、accept / revert / 手動修正 / 中止の判断を仰ぐ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "/track:plan の max_retry 引数が整数 positional 引数として受け付けられ、省略時は 5 として動作し、フラグ名を持たない (/track:plan 3 の形式で invoke 可能)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "ADR に commit 履歴がない場合、adr-editor を invoke せずに user pause し、ユーザーに ADR を先に commit するよう促す",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "新規作成された /track:init / /track:spec-design / /track:impl-plan および改訂後の /track:type-design コマンドの定義文書に、事前承認手続き文言 (present design for review before writing 相当) が含まれていない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D5"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": ".claude/agents/adr-editor.md の Invocation contract セクションが /track:plan state machine の back-and-forth 呼び出し経路と矛盾しない — 呼び出し条件・briefing 必須項目・working-tree-only 指示が /track:plan の定義と整合している",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "cargo make ci が新 command / agent / skill / docs / Rust 修正 (IN-10) の変更後に pass する (fmt-check + clippy + nextest + deny + check-layers + verify-* 一式)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D6"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": ".claude/rules/07-dev-environment.md",
+          "anchor": "Pre-commit Checklist"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "新規 / 改訂した .claude/commands/track/*.md (spec-design.md / type-design.md / impl-plan.md / plan.md) の本文に、以下のロジック記述が含まれていない: schema validation / codec round-trip の手順、signal 合成アルゴリズム、reference resolution、coverage 判定ロジック、canonical block 疑惑検出。inspection または grep で 0 件であること (CN-10)。なお /track:init は CN-10 の明示例外であり、writer=main として identity schema binary 検証 (sotp verify track-metadata) を直接実行することが AC-01 / T001 で許可されているため本 AC の検査対象から除外する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": ".claude/rules/08-orchestration.md",
+          "anchor": "Delegation Rules"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Directive 1: command 定義はロジック無しの呼び出し結線のみ"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "改訂後の .claude/commands/track/plan.md の冒頭セクションに、TaskCreate tool を使って Phase 0-3 の各段階 (Phase 0: /track:init / Phase 1 loop / Phase 2 loop / Phase 3 loop / 終端処理) および back-and-forth 逐次伝播ステップを task として立て、orchestration progress を tracking するよう orchestrator への明示的指示が含まれている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Directive 2: /track:plan は orchestration が複雑なので冒頭で TaskCreate を使って progress tracking を明示指示する"
+        }
+      ]
+    },
+    {
+      "id": "AC-15",
+      "text": "各 phase command (/track:init / /track:spec-design / /track:type-design / /track:impl-plan) の command 定義本文に state machine 遷移ロジック (phase 間の判断、back-and-forth loop 制御、max_retry guard、終端 ADR diff 判断) が含まれていない (CN-11)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 6.5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "state machine は /track:plan のみ"
+        }
+      ]
+    },
+    {
+      "id": "AC-16",
+      "text": "実装された独立コマンドのファイル名が /track:init (.claude/commands/track/init.md)、/track:spec-design (.claude/commands/track/spec-design.md)、/track:type-design (.claude/commands/track/type-design.md)、/track:impl-plan (.claude/commands/track/impl-plan.md) であることを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "コマンド名が ADR 記載から変更。ADR 差分は OQ-6 / OQ-7"
+        }
+      ]
+    },
+    {
+      "id": "AC-17",
+      "text": "spec-designer / type-designer / impl-planner の 3 subagent の .claude/agents/*.md の frontmatter tools 宣言に Write と Bash が追加されており、Scope Ownership / Rules 節に以下が明記されている: (1) 対応 SSoT ファイルへの直接 Write 権限、(2) Bash (sotp CLI 呼び出し専用; cat/grep/head 系は禁止) 使用権。'This agent is read-only' / 'This agent is advisory' / 'orchestrator が transcribe する' という記述が修正されている (CN-12 / IN-09)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 5"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 変更: Write に加えて Bash (sotp CLI 用) を frontmatter tools に追加"
+        }
+      ]
+    },
+    {
+      "id": "AC-18",
+      "text": "4 phase command の各 command 定義が CN-13 の共通構造パターン (writer invocation + 結果受け取り) に従っている。/track:init は writer = main である点のみ異なり、それ以外のパターンは同一。command 定義本文から見た責務は: /track:init = 直接実行、/track:spec-design / /track:type-design / /track:impl-plan = subagent invocation + 結果受け取りのみ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 具体化: 4 phase command の共通構造パターン。subagent が sotp CLI まで内部実行するのが核心"
+        }
+      ]
+    },
+    {
+      "id": "AC-19",
+      "text": "worktree に untracked files (例: /track:init が metadata.json を作成した直後の状態) がある状態で sotp track branch create '<track-id>' が成功する。activation_requires_clean_worktree が BranchMode::Auto && already_materialized=false (新規 track materialization) のとき false を返すことを unit test で確認する (IN-10)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "activate.rs の activation_requires_clean_worktree 緩和による期待動作"
+        }
+      ]
+    },
+    {
+      "id": "AC-20",
+      "text": "apps/cli/src/commands/track/activate.rs の activation_requires_clean_worktree に関連する unit tests が新仕様 (BranchMode::Auto && already_materialized && resume_allowed のみ true) で pass し、cargo make ci が通る (IN-10)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D0.0"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D6"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": ".claude/rules/05-testing.md",
+          "anchor": "Core Principles"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "memory",
+          "summary": "activation_requires_clean_worktree 関連 tests が新仕様で pass すること"
+        }
+      ]
+    },
+    {
+      "id": "AC-21",
+      "text": "/track:type-design が単独 invoke で type-designer subagent を呼び出し、subagent が以下を一括実行し、信号機評価結果を /track:type-design 出力として返す: (a) baseline capture (sotp track baseline-capture)、(b) <layer>-types.json 直接 Write、(c) <layer>-graph 系 md のレンダリング (sotp track type-graph 等)、(d) contract-map.md のレンダリング (sotp track contract-map)、(e) <layer>-type-signals.md のレンダリング、(f) 信号機評価 (sotp track type-signals)。command 定義本文には sotp CLI 呼び出しが含まれない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "展開フェーズ 5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D3.2"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 新規: type-designer の全パイプライン (baseline → write → render × 3 → signal eval) を subagent 内部で完結させることを verification 基準として明示"
+        }
+      ]
+    },
+    {
+      "id": "AC-22",
+      "text": "各 phase command (/track:init を除く /track:spec-design / /track:type-design / /track:impl-plan) の command 定義ファイル (.claude/commands/track/spec-design.md / type-design.md / impl-plan.md) の本文に sotp CLI 呼び出しが含まれていない。grep による機械的検証で 0 件であること (CN-10 強化)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "コマンド境界"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D4"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "v3 新規: sotp CLI は subagent 内部に閉じ込め、command 定義本文に混入していないことを grep 検証で担保"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "intro"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "intro"
+    },
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "intro"
+    },
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "intro"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "intro"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "intro"
+    },
+    {
+      "file": ".claude/rules/08-orchestration.md",
+      "anchor": "intro"
+    },
+    {
+      "file": ".claude/rules/10-guardrails.md",
+      "anchor": "intro"
+    },
+    {
+      "file": ".claude/rules/11-subagent-model.md",
+      "anchor": "intro"
+    }
+  ],
+  "signals": {
+    "blue": 28,
+    "yellow": 31,
+    "red": 0
+  }
+}

@@ -574,10 +574,12 @@ fn activation_requires_clean_worktree(
     already_materialized: bool,
     resume_allowed: bool,
 ) -> bool {
-    if !already_materialized {
-        return true;
-    }
-    matches!(mode, BranchMode::Auto) && resume_allowed
+    // Worktree clean is only enforced for the resume-activation flow, where the
+    // activation commit must not sweep up unrelated dirty changes. New track
+    // materialization and plain branch-create flows tolerate untracked /
+    // modified files: git carries them across branch switches safely, and the
+    // init stage routinely authors track artifacts before the branch exists.
+    matches!(mode, BranchMode::Auto) && already_materialized && resume_allowed
 }
 
 fn allowed_activation_dirty_paths(
@@ -1265,10 +1267,12 @@ mod tests {
     }
 
     #[rstest]
-    #[case::auto_not_materialized(BranchMode::Auto, false, false, true)]
+    #[case::auto_not_materialized_dirty_allowed(BranchMode::Auto, false, false, false)]
     #[case::auto_materialized_resume(BranchMode::Auto, true, true, true)]
     #[case::auto_materialized_no_resume(BranchMode::Auto, true, false, false)]
     #[case::switch_materialized_no_resume(BranchMode::Switch, true, false, false)]
+    #[case::switch_not_materialized_dirty_allowed(BranchMode::Switch, false, false, false)]
+    #[case::create_not_materialized_dirty_allowed(BranchMode::Create, false, false, false)]
     fn activation_resume_requires_clean_worktree(
         #[case] mode: BranchMode,
         #[case] already_materialized: bool,
