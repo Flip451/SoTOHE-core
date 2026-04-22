@@ -6,6 +6,7 @@ pub mod code_profile_builder;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod guides_codec;
+pub mod impl_plan_codec;
 pub mod review_v2;
 pub mod schema_export;
 pub mod schema_export_codec;
@@ -13,6 +14,7 @@ pub mod schema_export_codec;
 mod schema_export_tests;
 pub mod shell;
 pub mod spec;
+pub mod task_coverage_codec;
 pub mod tddd;
 pub mod track;
 pub mod type_catalogue_render;
@@ -96,23 +98,16 @@ impl TrackWriter for InMemoryTrackStore {
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use domain::{
-        PlanSection, PlanView, TaskId, TaskTransition, TrackId, TrackMetadata, TrackReader,
-        TrackStatus, TrackTask, TrackWriter,
+        StatusOverride, TrackId, TrackMetadata, TrackReader, TrackWriter, derive_track_status,
     };
 
     use super::InMemoryTrackStore;
 
     fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Persist the track aggregate").unwrap();
-        let section = PlanSection::new("S1", "Persistence", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-
+        // TrackMetadata is identity-only; status derived from impl-plan + override.
         TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            vec![task],
-            plan,
             None,
         )
         .unwrap()
@@ -133,20 +128,21 @@ mod tests {
     fn update_atomically_mutates_and_persists() {
         let store = InMemoryTrackStore::new();
         let track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
 
         store.save(&track).unwrap();
 
         let updated = store
             .update(track.id(), |t| {
-                t.transition_task(&task_id, TaskTransition::Start)?;
+                t.set_status_override(Some(StatusOverride::blocked("testing").unwrap()));
                 Ok(())
             })
             .unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::InProgress);
+        assert!(updated.status_override().is_some());
+        assert_eq!(derive_track_status(None, updated.status_override()).to_string(), "blocked");
 
         let reloaded = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(reloaded.status(), TrackStatus::InProgress);
+        assert!(reloaded.status_override().is_some());
+        assert_eq!(derive_track_status(None, reloaded.status_override()).to_string(), "blocked");
     }
 }

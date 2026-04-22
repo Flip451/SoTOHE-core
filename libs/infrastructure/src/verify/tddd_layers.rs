@@ -4,12 +4,11 @@
 //! a canonical list of enabled layers with their resolved catalogue file
 //! names. Unknown layers and disabled layers are excluded.
 //!
-//! T007 (TDDD-01 Phase 1 Task 7): each enabled layer produces one
-//! `TdddLayerBinding` describing which catalogue file to read and which
-//! crates to export. `catalogue_file` defaults to `<layers[].crate>-types.json`
-//! when omitted. Duplicate `catalogue_file` values across enabled layers are
-//! rejected fail-closed so that one layer cannot overwrite another's
-//! catalogue.
+//! Each enabled layer produces one `TdddLayerBinding` describing which
+//! catalogue file to read and which crates to export. `catalogue_file`
+//! defaults to `<layers[].crate>-types.json` when omitted. Duplicate
+//! `catalogue_file` values across enabled layers are rejected fail-closed so
+//! that one layer cannot overwrite another's catalogue.
 //!
 //! Reference: ADR `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §D1.
 
@@ -246,7 +245,7 @@ pub fn parse_tddd_layers(json: &str) -> Result<Vec<TdddLayerBinding>, TdddLayerP
             tddd.schema_export.map(|s| s.targets).filter(|t| !t.is_empty()).unwrap_or_else(|| {
                 // Default: `targets = [layer_id]`.
                 // An absent or empty `schema_export.targets` both default to
-                // `[layer_id]` per the T007 contract.
+                // `[layer_id]` per the layer binding contract.
                 vec![layer.crate_name.clone()]
             });
         bindings.push(TdddLayerBinding { layer_id: layer.crate_name, catalogue_file, targets });

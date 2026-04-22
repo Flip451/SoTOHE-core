@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-22T03:03:13Z",
+  "declaration_hash": "3bd21c2eaf99d0b76f3538dd5ccd3b3f19dc062b7badd1e5dfb7d5c2faaab909",
+  "signals": [
+    {
+      "type_name": "SpecElementId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrAnchor",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionAnchor",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContentHash",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "InformalGroundKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Discussion",
+        "Feedback",
+        "Memory",
+        "UserDirective"
+      ]
+    },
+    {
+      "type_name": "InformalGroundSummary",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrRef",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionRef",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecRef",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "InformalGroundRef",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplPlanDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskCoverageDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecRequirement",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecValidationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyTitle",
+        "EmptyVersion",
+        "EmptyRequirementText",
+        "EmptyDomainStateName",
+        "EmptySectionTitle"
+      ]
+    },
+    {
+      "type_name": "ValidationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidSpecElementId",
+        "EmptyAdrAnchor",
+        "EmptyConventionAnchor",
+        "InvalidContentHash",
+        "EmptyInformalGroundSummary",
+        "MultiLineInformalGroundSummary"
+      ]
+    },
+    {
+      "type_name": "ImplPlanReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError>"
+      ]
+    },
+    {
+      "type_name": "ImplPlanWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError>"
+      ]
+    },
+    {
+      "type_name": "TrackMetadata",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplPlanPresenceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "MissingForActivatedTrack"
+      ]
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecStatus",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "CoverageResult",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

@@ -7,6 +7,7 @@
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
+use domain::ImplPlanReader;
 use domain::TrackStatus;
 use domain::TypeSignalsDocument;
 use domain::schema::{SchemaExportError, SchemaExporter};
@@ -15,7 +16,7 @@ use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::{catalogue_codec, type_signals_codec};
 use infrastructure::timestamp_now;
 use infrastructure::track::atomic_write::atomic_write_file;
-use infrastructure::track::fs_store::read_track_metadata;
+use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
 use infrastructure::track::symlink_guard::reject_symlinks_below;
 use infrastructure::verify::tddd_layers::{
     LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
@@ -111,18 +112,24 @@ pub fn execute_type_signals(
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
     // Active-track guard: reject type-signals on completed/archived tracks.
-    // `metadata.status()` is derived from task states and can never return
-    // `TrackStatus::Archived` (archived is a workflow-level state stored only in
-    // `DocumentMeta::original_status`). Check `original_status` first so that an
-    // archived track with unresolved tasks is not misclassified as `InProgress` and
-    // allowed through.
-    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+    // Status is derived on demand from impl-plan + status_override.
+    // Use FsTrackStore::load_impl_plan (fail-closed) rather than the free
+    // load_impl_plan_for_track helper, which silently swallows I/O and decode
+    // errors. A corrupt impl-plan.json must block the guard (not pass it).
+    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-        domain::TrackStatus::Archived
-    } else {
-        metadata.status()
-    };
+    let store = FsTrackStore::new(items_dir.clone());
+    let impl_plan = store
+        .load_impl_plan(&valid_id)
+        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
+    // Fail-closed: route through the domain API so the activation invariant
+    // has a single source of truth. Activation is identified by branch
+    // materialization only; an override on a branchless planning track does
+    // not imply activation.
+    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
+        .map_err(|e| CliError::Message(format!("cannot run type-signals on '{track_id}': {e}")))?;
+    let effective_status =
+        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;
 
     // Resolve the set of TDDD-enabled layers to process. When
@@ -200,13 +207,23 @@ pub fn execute_type_signals_lenient_with_bindings(
 ) -> Result<ExitCode, CliError> {
     let valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
-    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-        domain::TrackStatus::Archived
-    } else {
-        metadata.status()
-    };
+    // Status is derived on demand from impl-plan + status_override.
+    // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt impl-plan
+    // blocks the guard instead of being silently treated as absent.
+    let store = FsTrackStore::new(items_dir.clone());
+    let impl_plan = store
+        .load_impl_plan(&valid_id)
+        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
+    // Fail-closed: route through the domain API so the activation invariant
+    // has a single source of truth. Activation is identified by branch
+    // materialization only; an override on a branchless planning track does
+    // not imply activation.
+    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
+        .map_err(|e| CliError::Message(format!("cannot run type-signals on '{track_id}': {e}")))?;
+    let effective_status =
+        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;
 
     if bindings.is_empty() {
@@ -459,10 +476,8 @@ pub(crate) fn evaluate_and_write_signals(
         rendered_file_stem,
     )?;
 
-    // T004: dual-write the signal file alongside the declaration file. Signals
-    // stay co-located in `<layer>-types.json` during this transitional task
-    // (ADR Migration §2); T007 strips them from the declaration codec in the
-    // same commit that wires pre-commit auto-recomputation.
+    // Write the signal file alongside the declaration file. Signals are stored
+    // separately in `<layer>-type-signals.json` per ADR Migration §2.
     write_signal_file(&all_signals, &declaration_bytes, track_dir, signal_file_name)?;
 
     let skipped = report.skipped_count();
@@ -558,8 +573,8 @@ fn validate_and_write_catalogue(
 ///
 /// `declaration_bytes` MUST be the exact byte sequence just written to the
 /// declaration file. The SHA-256 hash of these bytes is persisted as
-/// `declaration_hash` so that T005's stale detection can compare against the
-/// current on-disk declaration file (ADR §D5).
+/// `declaration_hash` so that stale detection can compare against the current
+/// on-disk declaration file (ADR §D5).
 ///
 /// # Errors
 ///
@@ -675,42 +690,32 @@ fn print_signal_summary(
 mod tests {
     use super::*;
 
-    /// Minimal valid `metadata.json` for tests where the active-track guard should pass.
-    /// All tasks are `todo` → derived `TrackStatus::Planned`.
+    /// Minimal valid `metadata.json` (schema v5) with a branch set (activated track).
+    /// Callers must also write `impl-plan.json` (see [`minimal_impl_plan_json`]) to satisfy
+    /// the activated-track guard in `execute_type_signals`.
     fn minimal_active_metadata_json(track_id: &str) -> String {
         format!(
             r#"{{
-  "schema_version": 3,
+  "schema_version": 5,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Test Track",
-  "status": "planned",
   "created_at": "2026-04-15T00:00:00Z",
-  "updated_at": "2026-04-15T00:00:00Z",
-  "tasks": [
-    {{
-      "id": "T001",
-      "description": "A task",
-      "status": "todo",
-      "commit_hash": null
-    }}
-  ],
-  "plan": {{
-    "summary": ["Test"],
-    "sections": [{{
-      "id": "S001",
-      "title": "Test",
-      "description": ["Test"],
-      "task_ids": ["T001"]
-    }}]
-  }}
+  "updated_at": "2026-04-15T00:00:00Z"
 }}
 "#
         )
     }
 
-    /// Sets up a minimal track directory with the given `domain-types.json` content
-    /// and a valid `metadata.json` (status=planned) so the active-track guard passes.
+    /// Minimal valid `impl-plan.json` content.  Required alongside any fixture that uses
+    /// [`minimal_active_metadata_json`] (branch set) so the activated-track guard passes.
+    fn minimal_impl_plan_json() -> &'static str {
+        r#"{"schema_version":1,"tasks":[],"plan":{"summary":[],"sections":[]}}"#
+    }
+
+    /// Sets up a minimal track directory with the given `domain-types.json` content,
+    /// a valid `metadata.json` (activated, branch set), and a minimal `impl-plan.json`
+    /// so the activated-track guard in `execute_type_signals` passes.
     fn setup_track(dir: &std::path::Path, domain_types: &str) -> (PathBuf, String) {
         let items_dir = dir.join("track/items");
         let track_id = "test-track";
@@ -719,6 +724,7 @@ mod tests {
         std::fs::write(track_dir.join("domain-types.json"), domain_types).unwrap();
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json(track_id))
             .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
         (items_dir, track_id.to_owned())
     }
 
@@ -741,6 +747,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
         let result = execute_type_signals(items_dir, "test-track".to_owned(), workspace_root, None);
@@ -769,6 +776,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
         // No architecture-rules.json => fallback has only "domain"; "nonexistent" should fail.
@@ -799,6 +807,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
 
         // Write architecture-rules.json with usecase enabled.
         let rules_json = r#"{
@@ -1317,6 +1326,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
 
         let rules_json = r#"{
           "layers": [
@@ -1455,22 +1465,30 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_rejects_done_track() {
-        // Integration: a track whose derived TrackStatus is Done (all tasks DoneTraced)
+        // Integration: a track whose derived TrackStatus is Done (all tasks done/skipped)
         // must be rejected by execute_type_signals before reaching catalogue read,
         // protecting merged-track data immutability.
+        //
+        // Schema v5: status is derived from impl-plan.json. All tasks done → Done.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-done-track");
         std::fs::create_dir_all(&track_dir).unwrap();
 
+        // v5 metadata — no status field
         let done_metadata = r#"{
-  "schema_version": 3,
+  "schema_version": 5,
   "id": "test-done-track",
   "branch": "track/test-done-track",
   "title": "Test Done Track",
-  "status": "done",
   "created_at": "2026-04-15T00:00:00Z",
-  "updated_at": "2026-04-15T00:00:00Z",
+  "updated_at": "2026-04-15T00:00:00Z"
+}"#;
+        std::fs::write(track_dir.join("metadata.json"), done_metadata).unwrap();
+
+        // impl-plan with all tasks done → derives TrackStatus::Done
+        let done_impl_plan = r#"{
+  "schema_version": 1,
   "tasks": [
     {
       "id": "T001",
@@ -1489,7 +1507,7 @@ mod tests {
     }]
   }
 }"#;
-        std::fs::write(track_dir.join("metadata.json"), done_metadata).unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), done_impl_plan).unwrap();
 
         let result = execute_type_signals(
             items_dir,
@@ -1510,18 +1528,21 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_rejects_archived_track_with_incomplete_tasks() {
-        // Regression guard: archived tracks with unresolved tasks must still be
-        // rejected. `metadata.status()` derives from task states and would return
-        // `InProgress` for such a track (which `ensure_active_track` allows). The
-        // guard must consult `DocumentMeta::original_status` to catch this case.
+        // Regression guard: schema v3 metadata (which carries status="archived") is
+        // rejected at the codec decode step — schema v5 is required. This ensures that
+        // legacy archived tracks (stored under v3) cannot have type-signals run on them,
+        // because the metadata load fails before the active-track guard is reached.
+        //
+        // The `ensure_active_track` unit tests (`test_ensure_active_track_rejects_archived`)
+        // cover the TrackStatus::Archived → rejection path directly. This integration test
+        // verifies the full path: v3 metadata decode failure → error propagation.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-archived-track");
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // status="archived" in JSON, but task T001 is still "in_progress" →
-        // metadata.status() would return InProgress (not Archived).
-        let archived_incomplete_metadata = r#"{
+        // v3 metadata with status="archived" — codec::decode rejects schema_version < 5
+        let archived_v3_metadata = r#"{
   "schema_version": 3,
   "id": "test-archived-track",
   "branch": "track/test-archived-track",
@@ -1529,25 +1550,10 @@ mod tests {
   "status": "archived",
   "created_at": "2026-04-15T00:00:00Z",
   "updated_at": "2026-04-15T00:00:00Z",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "An incomplete task",
-      "status": "in_progress",
-      "commit_hash": null
-    }
-  ],
-  "plan": {
-    "summary": ["Test"],
-    "sections": [{
-      "id": "S001",
-      "title": "Test",
-      "description": ["Test"],
-      "task_ids": ["T001"]
-    }]
-  }
+  "tasks": [],
+  "plan": { "summary": [], "sections": [] }
 }"#;
-        std::fs::write(track_dir.join("metadata.json"), archived_incomplete_metadata).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), archived_v3_metadata).unwrap();
 
         let result = execute_type_signals(
             items_dir,
@@ -1558,11 +1564,9 @@ mod tests {
 
         let err = result.unwrap_err();
         let msg = format!("{err}");
-        assert!(msg.contains("status=archived"), "guard must mention status=archived, got: {msg}");
-        assert!(
-            msg.contains("Completed tracks are frozen"),
-            "guard must mention 'Completed tracks are frozen', got: {msg}"
-        );
-        assert!(msg.contains("test-archived-track"), "guard must mention the track_id, got: {msg}");
+        // The codec rejects v3 with a schema_version error; the active-track guard is
+        // never reached. Either message form is acceptable — what matters is the call
+        // returns an error (verified by `unwrap_err()` above which panics on Ok).
+        assert!(msg.contains("test-archived-track"), "error must mention the track_id, got: {msg}");
     }
 }

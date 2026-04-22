@@ -1,0 +1,1642 @@
+{
+  "schema_version": 2,
+  "captured_at": "2026-04-20T16:15:54Z",
+  "types": {
+    "AgentProfiles": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "load",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&Path"
+            }
+          ],
+          "returns": "Result<Self, AgentProfilesError>",
+          "is_async": false
+        },
+        {
+          "name": "provider_label",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "provider",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "resolve_capability",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Option<&CapabilityConfigDto>",
+          "is_async": false
+        },
+        {
+          "name": "resolve_execution",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "returns": "Option<ResolvedExecution>",
+          "is_async": false
+        },
+        {
+          "name": "resolve_model",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "returns": "Option<String>",
+          "is_async": false
+        },
+        {
+          "name": "resolve_provider",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "returns": "Option<String>",
+          "is_async": false
+        }
+      ]
+    },
+    "AgentProfilesError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidCapability"
+        },
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "Parse"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedSchemaVersion"
+        }
+      ],
+      "methods": []
+    },
+    "BaselineCodecError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidTimestamp"
+        },
+        {
+          "kind": "variant",
+          "name": "Json"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedSchemaVersion"
+        }
+      ],
+      "methods": []
+    },
+    "CapabilityConfigDto": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "fast_model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "fast_provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "ClusterPlan": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "assignments",
+          "ty": "HashMap<String, Vec<String>>"
+        },
+        {
+          "kind": "field",
+          "name": "cross_edges",
+          "ty": "Vec<CrossEdge>"
+        },
+        {
+          "kind": "field",
+          "name": "depth",
+          "ty": "usize"
+        }
+      ],
+      "methods": []
+    },
+    "CodecError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Domain"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidField"
+        },
+        {
+          "kind": "variant",
+          "name": "Json"
+        },
+        {
+          "kind": "variant",
+          "name": "Validation"
+        }
+      ],
+      "methods": []
+    },
+    "CodexReviewer": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "model",
+              "ty": "impl Into"
+            },
+            {
+              "name": "timeout",
+              "ty": "Duration"
+            },
+            {
+              "name": "base_prompt",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "with_scope_label",
+          "receiver": "self",
+          "params": [
+            {
+              "name": "label",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "ConchShellParser": {
+      "kind": "struct",
+      "members": [],
+      "methods": []
+    },
+    "CrossEdge": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "edge_kind",
+          "ty": "&str"
+        },
+        {
+          "kind": "field",
+          "name": "label",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "source_cluster",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "source_type",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "target_cluster",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "target_type",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "DocumentMeta": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "created_at",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "extra",
+          "ty": "Map<String, Value>"
+        },
+        {
+          "kind": "field",
+          "name": "original_status",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "schema_version",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "updated_at",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "EdgeSet": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "All"
+        },
+        {
+          "kind": "variant",
+          "name": "Fields"
+        },
+        {
+          "kind": "variant",
+          "name": "Impls"
+        },
+        {
+          "kind": "variant",
+          "name": "Methods"
+        }
+      ],
+      "methods": []
+    },
+    "Frontmatter": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "body_start",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "frontmatter",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "FsCatalogueLoader": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "track_root",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "rules_path",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "trusted_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "FsCommitHashStore": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "commit_hash_path",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "trusted_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "FsContractMapWriter": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "track_root",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "trusted_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "FsReviewStore": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "review_json_path",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "trusted_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "FsTrackStore": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "find_with_meta",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<Option<(TrackMetadata, DocumentMeta)>, TrackReadError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "root",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "with_locked_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "f",
+              "ty": "F"
+            }
+          ],
+          "returns": "Result<TrackMetadata, TrackWriteError>",
+          "is_async": false
+        }
+      ]
+    },
+    "FunctionInfoDto": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "docs",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "has_self_receiver",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "is_async",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "name",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "params",
+          "ty": "Vec<SchemaParamDto>"
+        },
+        {
+          "kind": "field",
+          "name": "receiver",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "return_type_names",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "returns",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "GhError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "CommandFailed"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidBodyPath"
+        },
+        {
+          "kind": "variant",
+          "name": "JsonDecode"
+        },
+        {
+          "kind": "variant",
+          "name": "PrNumberUnknown"
+        },
+        {
+          "kind": "variant",
+          "name": "Spawn"
+        }
+      ],
+      "methods": []
+    },
+    "GitDiffGetter": {
+      "kind": "struct",
+      "members": [],
+      "methods": []
+    },
+    "GitError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "CommandFailed"
+        },
+        {
+          "kind": "variant",
+          "name": "CurrentDir"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyRepoRoot"
+        },
+        {
+          "kind": "variant",
+          "name": "Spawn"
+        }
+      ],
+      "methods": []
+    },
+    "GitShowTrackBlobReader": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "GuidesCodecError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "Json"
+        }
+      ],
+      "methods": []
+    },
+    "ImplInfoDto": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "methods",
+          "ty": "Vec<FunctionInfoDto>"
+        },
+        {
+          "kind": "field",
+          "name": "target_type",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "trait_name",
+          "ty": "Option<String>"
+        }
+      ],
+      "methods": []
+    },
+    "InMemoryTrackStore": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "LoadAllCataloguesError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "ArchRulesParse"
+        },
+        {
+          "kind": "variant",
+          "name": "CatalogueNotFound"
+        },
+        {
+          "kind": "variant",
+          "name": "Decode"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidLayerId"
+        },
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "LayerBindings"
+        },
+        {
+          "kind": "variant",
+          "name": "TopologicalSortFailed"
+        }
+      ],
+      "methods": []
+    },
+    "LoadTdddLayersError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "Parse"
+        }
+      ],
+      "methods": []
+    },
+    "MemberDeclarationDto": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Field"
+        },
+        {
+          "kind": "variant",
+          "name": "Variant"
+        }
+      ],
+      "methods": []
+    },
+    "PlanDocument": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "sections",
+          "ty": "Vec<PlanSectionDocument>"
+        },
+        {
+          "kind": "field",
+          "name": "summary",
+          "ty": "Vec<String>"
+        }
+      ],
+      "methods": []
+    },
+    "PlanSectionDocument": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "description",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "task_ids",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "title",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "PrCheckRecord": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "bucket",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "name",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "state",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "RenderError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidMetadata"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidTrackMetadata"
+        },
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "OutOfSync"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedSchemaVersion"
+        }
+      ],
+      "methods": []
+    },
+    "ResolvedExecution": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "model",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "provider",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "RoundType": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Fast"
+        },
+        {
+          "kind": "variant",
+          "name": "Final"
+        }
+      ],
+      "methods": []
+    },
+    "RustdocSchemaExporter": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "SchemaExportCodecError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Json"
+        }
+      ],
+      "methods": []
+    },
+    "SchemaExportDto": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "crate_name",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "functions",
+          "ty": "Vec<FunctionInfoDto>"
+        },
+        {
+          "kind": "field",
+          "name": "impls",
+          "ty": "Vec<ImplInfoDto>"
+        },
+        {
+          "kind": "field",
+          "name": "traits",
+          "ty": "Vec<TraitInfoDto>"
+        },
+        {
+          "kind": "field",
+          "name": "types",
+          "ty": "Vec<TypeInfoDto>"
+        }
+      ],
+      "methods": []
+    },
+    "SchemaParamDto": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "name",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "ty",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "ScopeConfigLoadError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Config"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidField"
+        },
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "Parse"
+        }
+      ],
+      "methods": []
+    },
+    "SpecCodecError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidField"
+        },
+        {
+          "kind": "variant",
+          "name": "Json"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedSchemaVersion"
+        },
+        {
+          "kind": "variant",
+          "name": "Validation"
+        }
+      ],
+      "methods": []
+    },
+    "SystemGhClient": {
+      "kind": "struct",
+      "members": [],
+      "methods": []
+    },
+    "SystemGitRepo": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "discover",
+          "params": [],
+          "returns": "Result<Self, GitError>",
+          "is_async": false
+        }
+      ]
+    },
+    "SystemReviewHasher": {
+      "kind": "struct",
+      "members": [],
+      "methods": []
+    },
+    "TdddLayerBinding": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "baseline_file",
+          "receiver": "&self",
+          "params": [],
+          "returns": "String",
+          "is_async": false
+        },
+        {
+          "name": "catalogue_file",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "layer_id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "rendered_file",
+          "receiver": "&self",
+          "params": [],
+          "returns": "String",
+          "is_async": false
+        },
+        {
+          "name": "signal_file",
+          "receiver": "&self",
+          "params": [],
+          "returns": "String",
+          "is_async": false
+        },
+        {
+          "name": "targets",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        }
+      ]
+    },
+    "TdddLayerParseError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "DuplicateCatalogueFile"
+        },
+        {
+          "kind": "variant",
+          "name": "DuplicateLayerId"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidCatalogueFile"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidLayerId"
+        },
+        {
+          "kind": "variant",
+          "name": "Json"
+        },
+        {
+          "kind": "variant",
+          "name": "MissingLayers"
+        }
+      ],
+      "methods": []
+    },
+    "TrackBranchRecord": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "branch",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "display_path",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "schema_version",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "track_name",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TrackDocumentV2": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "branch",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "created_at",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "extra",
+          "ty": "Map<String, Value>"
+        },
+        {
+          "kind": "field",
+          "name": "id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "plan",
+          "ty": "PlanDocument"
+        },
+        {
+          "kind": "field",
+          "name": "schema_version",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "status_override",
+          "ty": "Option<TrackStatusOverrideDocument>"
+        },
+        {
+          "kind": "field",
+          "name": "tasks",
+          "ty": "Vec<TrackTaskDocument>"
+        },
+        {
+          "kind": "field",
+          "name": "title",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "updated_at",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TrackSnapshot": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "dir",
+          "ty": "PathBuf"
+        },
+        {
+          "kind": "field",
+          "name": "meta",
+          "ty": "DocumentMeta"
+        },
+        {
+          "kind": "field",
+          "name": "schema_version",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "track",
+          "ty": "TrackMetadata"
+        }
+      ],
+      "methods": [
+        {
+          "name": "status",
+          "receiver": "&self",
+          "params": [],
+          "returns": "String",
+          "is_async": false
+        },
+        {
+          "name": "updated_at",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "TrackStatusOverrideDocument": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TrackTaskDocument": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "commit_hash",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "description",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TraitInfoDto": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "docs",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "methods",
+          "ty": "Vec<FunctionInfoDto>"
+        },
+        {
+          "kind": "field",
+          "name": "name",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TypeCatalogueCodecError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidEntry"
+        },
+        {
+          "kind": "variant",
+          "name": "Json"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedSchemaVersion"
+        },
+        {
+          "kind": "variant",
+          "name": "Validation"
+        }
+      ],
+      "methods": []
+    },
+    "TypeGraphRenderOptions": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "cluster_depth",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "edge_set",
+          "ty": "EdgeSet"
+        },
+        {
+          "kind": "field",
+          "name": "max_nodes_per_diagram",
+          "ty": "usize"
+        }
+      ],
+      "methods": []
+    },
+    "TypeInfoDto": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "docs",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "kind",
+          "ty": "TypeKindDto"
+        },
+        {
+          "kind": "field",
+          "name": "members",
+          "ty": "Vec<MemberDeclarationDto>"
+        },
+        {
+          "kind": "field",
+          "name": "module_path",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "name",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TypeKindDto": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Enum"
+        },
+        {
+          "kind": "variant",
+          "name": "Struct"
+        },
+        {
+          "kind": "variant",
+          "name": "TypeAlias"
+        }
+      ],
+      "methods": []
+    },
+    "TypeSignalsCodecError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidTimestamp"
+        },
+        {
+          "kind": "variant",
+          "name": "Json"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedSchemaVersion"
+        }
+      ],
+      "methods": []
+    }
+  },
+  "traits": {
+    "GhClient": {
+      "methods": [
+        {
+          "name": "create_pr",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "head",
+              "ty": "&str"
+            },
+            {
+              "name": "base",
+              "ty": "&str"
+            },
+            {
+              "name": "title",
+              "ty": "&str"
+            },
+            {
+              "name": "body_file",
+              "ty": "&Path"
+            }
+          ],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "find_open_pr",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "head",
+              "ty": "&str"
+            },
+            {
+              "name": "base",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Option<String>, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "list_issue_comments",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "_repo_nwo",
+              "ty": "&str"
+            },
+            {
+              "name": "_pr",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "list_reactions",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "_repo_nwo",
+              "ty": "&str"
+            },
+            {
+              "name": "_pr",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "list_review_comments",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "_repo_nwo",
+              "ty": "&str"
+            },
+            {
+              "name": "_pr",
+              "ty": "&str"
+            },
+            {
+              "name": "_review_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "list_reviews",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "_repo_nwo",
+              "ty": "&str"
+            },
+            {
+              "name": "_pr",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "merge_pr",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "pr",
+              "ty": "&str"
+            },
+            {
+              "name": "method",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<(), GhError>",
+          "is_async": false
+        },
+        {
+          "name": "post_issue_comment",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "_repo_nwo",
+              "ty": "&str"
+            },
+            {
+              "name": "_pr",
+              "ty": "&str"
+            },
+            {
+              "name": "_body",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "pr_checks",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "pr",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Vec<PrCheckRecord>, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "pr_head_branch",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "_pr",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        },
+        {
+          "name": "pr_url",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "pr",
+              "ty": "&str"
+            }
+          ],
+          "returns": "String",
+          "is_async": false
+        },
+        {
+          "name": "repo_nwo",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, GhError>",
+          "is_async": false
+        }
+      ]
+    },
+    "GitRepository": {
+      "methods": [
+        {
+          "name": "current_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<String>, GitError>",
+          "is_async": false
+        },
+        {
+          "name": "index_tree_hash",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, GitError>",
+          "is_async": false
+        },
+        {
+          "name": "output",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "args",
+              "ty": "&[&str]"
+            }
+          ],
+          "returns": "Result<Output, GitError>",
+          "is_async": false
+        },
+        {
+          "name": "push_branch",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<(), GitError>",
+          "is_async": false
+        },
+        {
+          "name": "resolve_path",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&Path"
+            }
+          ],
+          "returns": "PathBuf",
+          "is_async": false
+        },
+        {
+          "name": "root",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Path",
+          "is_async": false
+        },
+        {
+          "name": "stage_all_excluding",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "exclude_files",
+              "ty": "&[&str]"
+            },
+            {
+              "name": "exclude_dirs",
+              "ty": "&[&str]"
+            }
+          ],
+          "returns": "Result<(), GitError>",
+          "is_async": false
+        },
+        {
+          "name": "status",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "args",
+              "ty": "&[&str]"
+            }
+          ],
+          "returns": "Result<i32, GitError>",
+          "is_async": false
+        }
+      ]
+    }
+  }
+}

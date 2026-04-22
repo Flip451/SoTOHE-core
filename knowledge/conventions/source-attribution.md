@@ -36,7 +36,6 @@ To unblock merge, promote each Yellow requirement to Blue:
 1. **Create persistent documentation**: Write an ADR (`knowledge/adr/<date>-<hhmm>-<slug>.md`) or convention (`knowledge/conventions/<topic>.md`) that records the decision.
 2. **Reference the new document**: Update the spec requirement's `sources` array to point at the new ADR/convention via a `document` or `convention` source.
 3. **Re-run signal evaluation**: `cargo make track-signals <track-id>` recomputes signals; previously-Yellow items should now be Blue.
-4. **Re-approve the spec**: `cargo make spec-approve track/items/<id>` updates the `content_hash`.
 
 This workflow is the structural incentive created by the strict signal gate:
 design decisions accumulate as persistent artifacts rather than undocumented

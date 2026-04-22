@@ -1,11 +1,19 @@
 //! Serde codec for spec.json (SpecDocument SSoT).
 //!
-//! Mirrors the pattern of `crate::track::codec` but for the spec document schema.
+//! Schema version 2: ADR 2026-04-19-1242 §D1.2 — approved-lifecycle fields
+//! (`status`, `approved_at`, `content_hash`) removed; each requirement now
+//! carries a required `id`; `sources: Vec<String>` replaced by three typed
+//! ref arrays; `task_refs` removed (moved to task-coverage.json); `goal`
+//! promoted from `Vec<String>` to `Vec<SpecRequirementDto>`; `related_conventions`
+//! promoted from `Vec<String>` to `Vec<ConventionRefDto>`.
+
+use std::path::PathBuf;
 
 use domain::{
-    HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot, SignalCounts,
-    SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError, TaskId,
-    Timestamp,
+    AdrAnchor, AdrRef, ConventionAnchor, ConventionRef, HearingMode, HearingRecord,
+    HearingSignalDelta, HearingSignalSnapshot, InformalGroundKind, InformalGroundRef,
+    InformalGroundSummary, SignalCounts, SpecDocument, SpecElementId, SpecRequirement, SpecScope,
+    SpecSection, SpecValidationError, Timestamp, ValidationError,
 };
 use serde::{Deserialize, Serialize};
 
@@ -22,7 +30,10 @@ pub enum SpecCodecError {
     #[error("validation error: {0}")]
     Validation(#[from] SpecValidationError),
 
-    #[error("unsupported schema_version: expected 1, got {0}")]
+    #[error("domain validation error: {0}")]
+    DomainValidation(#[from] ValidationError),
+
+    #[error("unsupported schema_version: expected 2, got {0}")]
     UnsupportedSchemaVersion(u32),
 
     #[error("invalid field '{field}': {reason}")]
@@ -33,30 +44,30 @@ pub enum SpecCodecError {
 // DTO types
 // ---------------------------------------------------------------------------
 
-/// Top-level DTO for spec.json.
+/// Top-level DTO for spec.json (schema_version 2).
+///
+/// `deny_unknown_fields` rejects legacy v1 fields (`status`, `approved_at`,
+/// `content_hash`, `sources`, `task_refs`) so that `verify_spec_schema()`
+/// actually enforces the v2 schema contract.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct SpecDocumentDto {
     pub schema_version: u32,
-    pub status: String,
     pub version: String,
     pub title: String,
-    #[serde(default)]
-    pub goal: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub goal: Vec<SpecRequirementDto>,
     pub scope: SpecScopeDto,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub constraints: Vec<SpecRequirementDto>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub acceptance_criteria: Vec<SpecRequirementDto>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub additional_sections: Vec<SpecSectionDto>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub related_conventions: Vec<String>,
+    pub related_conventions: Vec<ConventionRefDto>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signals: Option<SignalCountsDto>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub approved_at: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub content_hash: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub hearing_history: Vec<HearingRecordDto>,
 }
@@ -79,18 +90,50 @@ struct HearingSignalDeltaDto {
     pub after: SignalCountsDto,
 }
 
-/// DTO for a single requirement (text + provenance sources + task references).
+/// DTO for a single requirement with typed provenance references.
+///
+/// `deny_unknown_fields` rejects legacy v1 per-requirement fields (`sources`,
+/// `task_refs`) so that v1 spec.json files are not silently accepted.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct SpecRequirementDto {
+    pub id: String,
     pub text: String,
-    #[serde(default)]
-    pub sources: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub task_refs: Vec<String>,
+    pub adr_refs: Vec<AdrRefDto>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub convention_refs: Vec<ConventionRefDto>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub informal_grounds: Vec<InformalGroundRefDto>,
+}
+
+/// DTO for a reference to a section in an ADR document.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AdrRefDto {
+    pub file: String,
+    pub anchor: String,
+}
+
+/// DTO for a reference to a section in a convention document.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ConventionRefDto {
+    pub file: String,
+    pub anchor: String,
+}
+
+/// DTO for an informal (unpersisted) ground reference.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct InformalGroundRefDto {
+    pub kind: String,
+    pub summary: String,
 }
 
 /// DTO for the scope section.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct SpecScopeDto {
     #[serde(default)]
     pub in_scope: Vec<SpecRequirementDto>,
@@ -100,6 +143,7 @@ struct SpecScopeDto {
 
 /// DTO for a free-form additional section.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct SpecSectionDto {
     pub title: String,
     #[serde(default)]
@@ -108,6 +152,7 @@ struct SpecSectionDto {
 
 /// DTO for aggregate signal counts.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct SignalCountsDto {
     pub blue: u32,
     pub yellow: u32,
@@ -123,14 +168,17 @@ struct SignalCountsDto {
 /// # Errors
 ///
 /// Returns `SpecCodecError::Json` if the JSON is malformed.
-/// Returns `SpecCodecError::UnsupportedSchemaVersion` if `schema_version != 1`.
+/// Returns `SpecCodecError::UnsupportedSchemaVersion` if `schema_version != 2`.
 /// Returns `SpecCodecError::Validation` if any domain type construction fails.
+/// Returns `SpecCodecError::DomainValidation` if any plan_ref newtype fails validation.
 pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
     let dto: SpecDocumentDto = serde_json::from_str(json)?;
 
-    if dto.schema_version != 1 {
+    if dto.schema_version != 2 {
         return Err(SpecCodecError::UnsupportedSchemaVersion(dto.schema_version));
     }
+
+    let goal = dto.goal.into_iter().map(requirement_from_dto).collect::<Result<Vec<_>, _>>()?;
 
     let in_scope =
         dto.scope.in_scope.into_iter().map(requirement_from_dto).collect::<Result<Vec<_>, _>>()?;
@@ -156,46 +204,29 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
     let additional_sections =
         dto.additional_sections.into_iter().map(section_from_dto).collect::<Result<Vec<_>, _>>()?;
 
+    let related_conventions = dto
+        .related_conventions
+        .into_iter()
+        .map(convention_ref_from_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+
     let signals = dto.signals.map(signal_counts_from_dto);
-
-    let status = status_from_str(&dto.status)?;
-
-    let approved_at = dto
-        .approved_at
-        .map(|s| {
-            Timestamp::new(s).map_err(|e| SpecCodecError::InvalidField {
-                field: "approved_at".into(),
-                reason: e.to_string(),
-            })
-        })
-        .transpose()?;
 
     let mut doc = SpecDocument::new(
         dto.title,
-        status,
         dto.version,
-        dto.goal,
+        goal,
         scope,
         constraints,
         acceptance_criteria,
         additional_sections,
-        dto.related_conventions,
+        related_conventions,
         signals,
-        approved_at,
-        dto.content_hash,
     )?;
 
-    // Decode hearing history (append-only)
+    // Decode hearing history (append-only).
     for record in decode_hearing_history(&dto.hearing_history)? {
         doc.append_hearing_record(record);
-    }
-
-    // Auto-demote: if status is Approved but content hash doesn't match, revert to Draft.
-    if doc.status() == SpecStatus::Approved {
-        let current_hash = compute_content_hash(&doc)?;
-        if !doc.is_approval_valid(&current_hash) {
-            doc.demote();
-        }
     }
 
     Ok(doc)
@@ -243,30 +274,52 @@ fn hearing_mode_from_str(s: &str) -> Result<HearingMode, String> {
     }
 }
 
-/// Parses a status string into `SpecStatus`.
-fn status_from_str(s: &str) -> Result<SpecStatus, SpecCodecError> {
-    match s {
-        "draft" => Ok(SpecStatus::Draft),
-        "approved" => Ok(SpecStatus::Approved),
-        other => Err(SpecCodecError::InvalidField {
-            field: "status".into(),
-            reason: format!("unknown status '{other}': expected 'draft' or 'approved'"),
-        }),
-    }
+fn requirement_from_dto(dto: SpecRequirementDto) -> Result<SpecRequirement, SpecCodecError> {
+    let id = SpecElementId::try_new(dto.id)?;
+    let adr_refs = dto.adr_refs.into_iter().map(adr_ref_from_dto).collect::<Result<Vec<_>, _>>()?;
+    let convention_refs = dto
+        .convention_refs
+        .into_iter()
+        .map(convention_ref_from_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+    let informal_grounds = dto
+        .informal_grounds
+        .into_iter()
+        .map(informal_ground_ref_from_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(SpecRequirement::new(id, dto.text, adr_refs, convention_refs, informal_grounds)?)
 }
 
-fn requirement_from_dto(dto: SpecRequirementDto) -> Result<SpecRequirement, SpecCodecError> {
-    let task_refs: Vec<TaskId> = dto
-        .task_refs
-        .into_iter()
-        .map(|s| {
-            TaskId::try_new(s).map_err(|e| SpecCodecError::InvalidField {
-                field: "task_refs".to_owned(),
-                reason: e.to_string(),
-            })
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-    Ok(SpecRequirement::with_task_refs(dto.text, dto.sources, task_refs)?)
+fn adr_ref_from_dto(dto: AdrRefDto) -> Result<AdrRef, SpecCodecError> {
+    let anchor = AdrAnchor::try_new(dto.anchor)?;
+    Ok(AdrRef::new(PathBuf::from(dto.file), anchor))
+}
+
+fn convention_ref_from_dto(dto: ConventionRefDto) -> Result<ConventionRef, SpecCodecError> {
+    let anchor = ConventionAnchor::try_new(dto.anchor)?;
+    Ok(ConventionRef::new(PathBuf::from(dto.file), anchor))
+}
+
+fn informal_ground_ref_from_dto(
+    dto: InformalGroundRefDto,
+) -> Result<InformalGroundRef, SpecCodecError> {
+    let kind = informal_ground_kind_from_str(&dto.kind).map_err(|reason| {
+        SpecCodecError::InvalidField { field: "informal_grounds[].kind".to_owned(), reason }
+    })?;
+    let summary = InformalGroundSummary::try_new(dto.summary)?;
+    Ok(InformalGroundRef::new(kind, summary))
+}
+
+fn informal_ground_kind_from_str(s: &str) -> Result<InformalGroundKind, String> {
+    match s {
+        "discussion" => Ok(InformalGroundKind::Discussion),
+        "feedback" => Ok(InformalGroundKind::Feedback),
+        "memory" => Ok(InformalGroundKind::Memory),
+        "user_directive" => Ok(InformalGroundKind::UserDirective),
+        other => Err(format!(
+            "unknown kind '{other}': expected 'discussion', 'feedback', 'memory', or 'user_directive'"
+        )),
+    }
 }
 
 fn section_from_dto(dto: SpecSectionDto) -> Result<SpecSection, SpecValidationError> {
@@ -278,77 +331,6 @@ fn signal_counts_from_dto(dto: SignalCountsDto) -> SignalCounts {
 }
 
 // ---------------------------------------------------------------------------
-// Content hash computation
-// ---------------------------------------------------------------------------
-
-/// Computes a SHA-256 content hash of the substantive fields of a spec document.
-///
-/// Hashed fields: title, version, goal, scope (in + out), constraints,
-/// acceptance_criteria.
-/// Excluded: status, signals, additional_sections,
-/// related_conventions, approved_at, content_hash, task_refs (bookkeeping metadata).
-///
-/// # Errors
-///
-/// Returns `SpecCodecError::Json` if the DTO cannot be serialized (should not happen
-/// in practice since all fields are primitive/String types).
-pub fn compute_content_hash(doc: &SpecDocument) -> Result<String, SpecCodecError> {
-    use sha2::{Digest, Sha256};
-
-    let hashable = ContentHashDto {
-        title: doc.title().to_owned(),
-        version: doc.version().to_owned(),
-        goal: doc.goal().to_vec(),
-        scope: HashScopeDto {
-            in_scope: doc.scope().in_scope().iter().map(requirement_to_hash_dto).collect(),
-            out_of_scope: doc.scope().out_of_scope().iter().map(requirement_to_hash_dto).collect(),
-        },
-        constraints: doc.constraints().iter().map(requirement_to_hash_dto).collect(),
-        acceptance_criteria: doc
-            .acceptance_criteria()
-            .iter()
-            .map(requirement_to_hash_dto)
-            .collect(),
-    };
-
-    // Deterministic JSON: serde_json serializes struct fields in declaration order.
-    let json = serde_json::to_string(&hashable)?;
-    let hash = Sha256::digest(json.as_bytes());
-    Ok(format!("sha256:{hash:x}"))
-}
-
-/// DTO for the subset of fields included in the content hash.
-/// Uses `HashRequirementDto` (text + sources only, no task_refs) to avoid
-/// bookkeeping changes from invalidating the approval hash.
-#[derive(Serialize)]
-struct ContentHashDto {
-    title: String,
-    version: String,
-    goal: Vec<String>,
-    scope: HashScopeDto,
-    constraints: Vec<HashRequirementDto>,
-    acceptance_criteria: Vec<HashRequirementDto>,
-}
-
-/// Scope DTO for content hash (uses HashRequirementDto).
-#[derive(Serialize)]
-struct HashScopeDto {
-    in_scope: Vec<HashRequirementDto>,
-    out_of_scope: Vec<HashRequirementDto>,
-}
-
-/// Requirement DTO for content hash — text + sources only, excludes task_refs.
-#[derive(Serialize)]
-struct HashRequirementDto {
-    text: String,
-    sources: Vec<String>,
-}
-
-fn requirement_to_hash_dto(req: &SpecRequirement) -> HashRequirementDto {
-    HashRequirementDto { text: req.text().to_owned(), sources: req.sources().to_vec() }
-}
-
-// ---------------------------------------------------------------------------
 // Encode: domain -> JSON
 // ---------------------------------------------------------------------------
 
@@ -357,31 +339,40 @@ fn requirement_to_hash_dto(req: &SpecRequirement) -> HashRequirementDto {
 /// # Errors
 ///
 /// Returns `SpecCodecError::Json` if serialization fails.
+/// Returns `SpecCodecError::InvalidField` if any file path is not valid UTF-8.
 pub fn encode(doc: &SpecDocument) -> Result<String, SpecCodecError> {
-    let dto = spec_document_to_dto(doc);
+    let dto = spec_document_to_dto(doc)?;
     Ok(serde_json::to_string_pretty(&dto)?)
 }
 
-fn spec_document_to_dto(doc: &SpecDocument) -> SpecDocumentDto {
-    SpecDocumentDto {
-        schema_version: 1,
-        status: doc.status().as_str().to_owned(),
+fn spec_document_to_dto(doc: &SpecDocument) -> Result<SpecDocumentDto, SpecCodecError> {
+    let goal = doc.goal().iter().map(requirement_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let in_scope =
+        doc.scope().in_scope().iter().map(requirement_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let out_of_scope =
+        doc.scope().out_of_scope().iter().map(requirement_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let constraints =
+        doc.constraints().iter().map(requirement_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let acceptance_criteria =
+        doc.acceptance_criteria().iter().map(requirement_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let related_conventions = doc
+        .related_conventions()
+        .iter()
+        .map(convention_ref_to_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(SpecDocumentDto {
+        schema_version: 2,
         version: doc.version().to_owned(),
         title: doc.title().to_owned(),
-        goal: doc.goal().to_vec(),
-        scope: SpecScopeDto {
-            in_scope: doc.scope().in_scope().iter().map(requirement_to_dto).collect(),
-            out_of_scope: doc.scope().out_of_scope().iter().map(requirement_to_dto).collect(),
-        },
-        constraints: doc.constraints().iter().map(requirement_to_dto).collect(),
-        acceptance_criteria: doc.acceptance_criteria().iter().map(requirement_to_dto).collect(),
+        goal,
+        scope: SpecScopeDto { in_scope, out_of_scope },
+        constraints,
+        acceptance_criteria,
         additional_sections: doc.additional_sections().iter().map(section_to_dto).collect(),
-        related_conventions: doc.related_conventions().to_vec(),
+        related_conventions,
         signals: doc.signals().map(signal_counts_to_dto),
-        approved_at: doc.approved_at().map(|ts| ts.as_str().to_owned()),
-        content_hash: doc.content_hash().map(|s| s.to_owned()),
         hearing_history: doc.hearing_history().iter().map(hearing_record_to_dto).collect(),
-    }
+    })
 }
 
 fn hearing_record_to_dto(rec: &HearingRecord) -> HearingRecordDto {
@@ -406,11 +397,39 @@ fn hearing_record_to_dto(rec: &HearingRecord) -> HearingRecordDto {
     }
 }
 
-fn requirement_to_dto(req: &SpecRequirement) -> SpecRequirementDto {
-    SpecRequirementDto {
+fn requirement_to_dto(req: &SpecRequirement) -> Result<SpecRequirementDto, SpecCodecError> {
+    let adr_refs = req.adr_refs().iter().map(adr_ref_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let convention_refs =
+        req.convention_refs().iter().map(convention_ref_to_dto).collect::<Result<Vec<_>, _>>()?;
+    Ok(SpecRequirementDto {
+        id: req.id().as_ref().to_owned(),
         text: req.text().to_owned(),
-        sources: req.sources().to_vec(),
-        task_refs: req.task_refs().iter().map(|id| id.to_string()).collect(),
+        adr_refs,
+        convention_refs,
+        informal_grounds: req.informal_grounds().iter().map(informal_ground_ref_to_dto).collect(),
+    })
+}
+
+fn adr_ref_to_dto(r: &AdrRef) -> Result<AdrRefDto, SpecCodecError> {
+    let file = r.file.to_str().ok_or_else(|| SpecCodecError::InvalidField {
+        field: "adr_refs[].file".to_owned(),
+        reason: format!("path is not valid UTF-8: {:?}", r.file),
+    })?;
+    Ok(AdrRefDto { file: file.to_owned(), anchor: r.anchor.as_ref().to_owned() })
+}
+
+fn convention_ref_to_dto(r: &ConventionRef) -> Result<ConventionRefDto, SpecCodecError> {
+    let file = r.file.to_str().ok_or_else(|| SpecCodecError::InvalidField {
+        field: "convention_refs[].file".to_owned(),
+        reason: format!("path is not valid UTF-8: {:?}", r.file),
+    })?;
+    Ok(ConventionRefDto { file: file.to_owned(), anchor: r.anchor.as_ref().to_owned() })
+}
+
+fn informal_ground_ref_to_dto(r: &InformalGroundRef) -> InformalGroundRefDto {
+    InformalGroundRefDto {
+        kind: r.kind.as_str().to_owned(),
+        summary: r.summary.as_ref().to_owned(),
     }
 }
 
@@ -434,8 +453,7 @@ mod tests {
     // --- Fixtures ---
 
     const MINIMAL_JSON: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Title",
   "scope": {
@@ -445,20 +463,51 @@ mod tests {
 }"#;
 
     const FULL_JSON: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Title",
-  "goal": ["Line 1"],
+  "goal": [
+    {
+      "id": "GL-01",
+      "text": "Goal item",
+      "adr_refs": [{"file": "knowledge/adr/2026-04-19-1242.md", "anchor": "D1.2"}]
+    }
+  ],
   "scope": {
-    "in_scope": [{ "text": "Req 1", "sources": ["PRD §3.2"] }],
-    "out_of_scope": [{ "text": "Excluded 1", "sources": ["inference — not needed"] }]
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "Req 1",
+        "adr_refs": [{"file": "knowledge/adr/2026-04-19-1242.md", "anchor": "D1.2"}]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "Excluded 1",
+        "informal_grounds": [{"kind": "discussion", "summary": "agreed out of scope"}]
+      }
+    ]
   },
-  "constraints": [{ "text": "Constraint 1", "sources": ["convention — hex.md"] }],
-  "acceptance_criteria": [{ "text": "AC 1", "sources": ["PRD §4.1"] }],
-  "additional_sections": [{ "title": "Custom Section", "content": ["Line 1"] }],
-  "related_conventions": ["knowledge/conventions/source-attribution.md"],
-  "signals": { "blue": 15, "yellow": 0, "red": 0 }
+  "constraints": [
+    {
+      "id": "CO-01",
+      "text": "Constraint 1",
+      "convention_refs": [{"file": ".claude/rules/04-coding-principles.md", "anchor": "newtype-pattern"}]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "AC 1",
+      "adr_refs": [{"file": "knowledge/adr/2026-04-19-1242.md", "anchor": "D3.1"}]
+    }
+  ],
+  "additional_sections": [{"title": "Custom Section", "content": ["Line 1"]}],
+  "related_conventions": [
+    {"file": "knowledge/conventions/source-attribution.md", "anchor": "intro"}
+  ],
+  "signals": { "blue": 3, "yellow": 1, "red": 0 }
 }"#;
 
     // --- decode: happy path ---
@@ -467,7 +516,6 @@ mod tests {
     fn test_decode_minimal_json_succeeds() {
         let doc = decode(MINIMAL_JSON).unwrap();
         assert_eq!(doc.title(), "Feature Title");
-        assert_eq!(doc.status(), domain::SpecStatus::Draft);
         assert_eq!(doc.version(), "1.0");
         assert!(doc.goal().is_empty());
         assert!(doc.scope().in_scope().is_empty());
@@ -483,21 +531,24 @@ mod tests {
     fn test_decode_full_json_succeeds() {
         let doc = decode(FULL_JSON).unwrap();
         assert_eq!(doc.title(), "Feature Title");
-        assert_eq!(doc.goal(), &["Line 1"]);
+        assert_eq!(doc.goal().len(), 1);
+        assert_eq!(doc.goal()[0].id().as_ref(), "GL-01");
+        assert_eq!(doc.goal()[0].text(), "Goal item");
+        assert_eq!(doc.goal()[0].adr_refs().len(), 1);
         assert_eq!(doc.scope().in_scope().len(), 1);
+        assert_eq!(doc.scope().in_scope()[0].id().as_ref(), "IN-01");
         assert_eq!(doc.scope().in_scope()[0].text(), "Req 1");
-        assert_eq!(doc.scope().in_scope()[0].sources(), &["PRD §3.2"]);
         assert_eq!(doc.scope().out_of_scope().len(), 1);
+        assert_eq!(doc.scope().out_of_scope()[0].informal_grounds().len(), 1);
         assert_eq!(doc.constraints().len(), 1);
-        assert_eq!(doc.constraints()[0].text(), "Constraint 1");
+        assert_eq!(doc.constraints()[0].convention_refs().len(), 1);
         assert_eq!(doc.acceptance_criteria().len(), 1);
         assert_eq!(doc.additional_sections().len(), 1);
         assert_eq!(doc.additional_sections()[0].title(), "Custom Section");
-        assert_eq!(doc.additional_sections()[0].content(), &["Line 1"]);
-        assert_eq!(doc.related_conventions(), &["knowledge/conventions/source-attribution.md"]);
+        assert_eq!(doc.related_conventions().len(), 1);
         let signals = doc.signals().unwrap();
-        assert_eq!(signals.blue(), 15);
-        assert_eq!(signals.yellow(), 0);
+        assert_eq!(signals.blue(), 3);
+        assert_eq!(signals.yellow(), 1);
         assert_eq!(signals.red(), 0);
     }
 
@@ -505,59 +556,74 @@ mod tests {
 
     #[test]
     fn test_decode_with_absent_goal_defaults_to_empty() {
-        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":2,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let doc = decode(json).unwrap();
         assert!(doc.goal().is_empty());
     }
 
     #[test]
     fn test_decode_with_null_signals_gives_none() {
-        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":null}"#;
-        // null is not the same as absent — serde(default) + skip_serializing_if handles absent,
-        // but explicit null must also be tolerated. Using Option<> on the DTO absorbs null as None.
+        let json = r#"{"schema_version":2,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":null}"#;
         let doc = decode(json).unwrap();
         assert!(doc.signals().is_none());
     }
 
     #[test]
     fn test_decode_additional_sections_defaults_to_empty() {
-        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":2,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let doc = decode(json).unwrap();
         assert!(doc.additional_sections().is_empty());
     }
 
     #[test]
     fn test_decode_related_conventions_defaults_to_empty() {
-        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":2,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let doc = decode(json).unwrap();
         assert!(doc.related_conventions().is_empty());
     }
 
     #[test]
-    fn test_decode_requirement_without_sources_defaults_to_empty() {
+    fn test_decode_requirement_without_refs_defaults_to_empty() {
         let json = r#"{
-          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
+          "schema_version": 2, "version": "1", "title": "T",
           "scope": {
-            "in_scope": [{"text": "needs req"}],
+            "in_scope": [{"id": "IN-01", "text": "needs req"}],
             "out_of_scope": []
           }
         }"#;
         let doc = decode(json).unwrap();
-        assert_eq!(doc.scope().in_scope()[0].sources(), &[] as &[String]);
+        assert!(doc.scope().in_scope()[0].adr_refs().is_empty());
+        assert!(doc.scope().in_scope()[0].convention_refs().is_empty());
+        assert!(doc.scope().in_scope()[0].informal_grounds().is_empty());
     }
 
     // --- decode: schema_version validation ---
 
     #[test]
-    fn test_decode_with_unsupported_schema_version_returns_error() {
-        let json = r#"{"schema_version":2,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+    fn test_decode_with_unsupported_schema_version_1_returns_error() {
+        // schema_version 1 without any unknown fields — the version check fires first.
+        // (v1 files with unknown fields like `status` will hit a Json error first, which
+        //  is also a valid rejection; this test covers the schema_version gate path.)
+        let json = r#"{"schema_version":1,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, SpecCodecError::UnsupportedSchemaVersion(2)));
+        assert!(matches!(err, SpecCodecError::UnsupportedSchemaVersion(1)));
+    }
+
+    #[test]
+    fn test_decode_v1_with_unknown_status_field_is_rejected() {
+        // v1 spec.json with legacy `status` field — deny_unknown_fields rejects it.
+        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let err = decode(json).unwrap_err();
+        // Rejected either as Json (unknown field) or UnsupportedSchemaVersion — both are correct.
+        assert!(
+            matches!(err, SpecCodecError::Json(_) | SpecCodecError::UnsupportedSchemaVersion(1)),
+            "expected Json or UnsupportedSchemaVersion, got: {err}"
+        );
     }
 
     #[test]
     fn test_decode_with_schema_version_zero_returns_error() {
-        let json = r#"{"schema_version":0,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":0,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::UnsupportedSchemaVersion(0)));
     }
@@ -566,21 +632,14 @@ mod tests {
 
     #[test]
     fn test_decode_with_empty_title_returns_validation_error() {
-        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":2,"version":"1","title":"","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::Validation(SpecValidationError::EmptyTitle)));
     }
 
     #[test]
-    fn test_decode_with_empty_status_returns_invalid_field_error() {
-        let json = r#"{"schema_version":1,"status":"","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
-        let err = decode(json).unwrap_err();
-        assert!(matches!(err, SpecCodecError::InvalidField { .. }));
-    }
-
-    #[test]
     fn test_decode_with_empty_version_returns_validation_error() {
-        let json = r#"{"schema_version":1,"status":"draft","version":"","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":2,"version":"","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::Validation(SpecValidationError::EmptyVersion)));
     }
@@ -588,8 +647,8 @@ mod tests {
     #[test]
     fn test_decode_with_empty_requirement_text_returns_validation_error() {
         let json = r#"{
-          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
-          "scope": {"in_scope": [{"text": ""}], "out_of_scope": []}
+          "schema_version": 2, "version": "1", "title": "T",
+          "scope": {"in_scope": [{"id": "IN-01", "text": ""}], "out_of_scope": []}
         }"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(
@@ -601,12 +660,69 @@ mod tests {
     #[test]
     fn test_decode_with_empty_section_title_returns_validation_error() {
         let json = r#"{
-          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
+          "schema_version": 2, "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "additional_sections": [{"title": "", "content": []}]
         }"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::Validation(SpecValidationError::EmptySectionTitle)));
+    }
+
+    #[test]
+    fn test_decode_with_invalid_spec_element_id_returns_domain_validation_error() {
+        let json = r#"{
+          "schema_version": 2, "version": "1", "title": "T",
+          "scope": {"in_scope": [{"id": "A-01", "text": "bad id"}], "out_of_scope": []}
+        }"#;
+        // "A-01" has only one uppercase letter prefix — invalid
+        let err = decode(json).unwrap_err();
+        assert!(matches!(
+            err,
+            SpecCodecError::DomainValidation(ValidationError::InvalidSpecElementId(_))
+        ));
+    }
+
+    #[test]
+    fn test_decode_with_duplicate_element_ids_returns_duplicate_error() {
+        let json = r#"{
+          "schema_version": 2, "version": "1", "title": "T",
+          "scope": {
+            "in_scope": [{"id": "IN-01", "text": "first"}],
+            "out_of_scope": []
+          },
+          "constraints": [{"id": "IN-01", "text": "duplicate"}]
+        }"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(
+            err,
+            SpecCodecError::Validation(SpecValidationError::DuplicateElementId(_))
+        ));
+    }
+
+    #[test]
+    fn test_decode_with_invalid_informal_ground_kind_returns_error() {
+        let json = r#"{
+          "schema_version": 2, "version": "1", "title": "T",
+          "scope": {
+            "in_scope": [{"id": "IN-01", "text": "req", "informal_grounds": [{"kind": "typo", "summary": "test"}]}],
+            "out_of_scope": []
+          }
+        }"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, SpecCodecError::InvalidField { .. }));
+    }
+
+    #[test]
+    fn test_decode_with_empty_adr_anchor_returns_error() {
+        let json = r#"{
+          "schema_version": 2, "version": "1", "title": "T",
+          "scope": {
+            "in_scope": [{"id": "IN-01", "text": "req", "adr_refs": [{"file": "x.md", "anchor": ""}]}],
+            "out_of_scope": []
+          }
+        }"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, SpecCodecError::DomainValidation(ValidationError::EmptyAdrAnchor)));
     }
 
     // --- decode: malformed JSON ---
@@ -623,7 +739,6 @@ mod tests {
     fn test_encode_minimal_document_produces_valid_json() {
         let doc = SpecDocument::new(
             "T",
-            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -632,24 +747,22 @@ mod tests {
             vec![],
             vec![],
             None,
-            None,
-            None,
         )
         .unwrap();
 
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(parsed["schema_version"], 1);
+        assert_eq!(parsed["schema_version"], 2);
         assert_eq!(parsed["title"], "T");
-        assert_eq!(parsed["status"], "draft");
         assert_eq!(parsed["version"], "1.0");
+        // No status field in schema version 2
+        assert!(parsed.get("status").is_none());
     }
 
     #[test]
-    fn test_encode_omits_signals_when_none() {
+    fn test_encode_omits_status_approved_at_content_hash() {
         let doc = SpecDocument::new(
             "T",
-            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -658,7 +771,25 @@ mod tests {
             vec![],
             vec![],
             None,
-            None,
+        )
+        .unwrap();
+        let json = encode(&doc).unwrap();
+        assert!(!json.contains("\"status\""), "status must not be in schema v2 output");
+        assert!(!json.contains("\"approved_at\""), "approved_at must not be in schema v2 output");
+        assert!(!json.contains("\"content_hash\""), "content_hash must not be in schema v2 output");
+    }
+
+    #[test]
+    fn test_encode_omits_signals_when_none() {
+        let doc = SpecDocument::new(
+            "T",
+            "1",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
             None,
         )
         .unwrap();
@@ -669,9 +800,8 @@ mod tests {
 
     #[test]
     fn test_encode_includes_signals_when_present() {
-        let doc = SpecDocument::new(
+        let mut doc = SpecDocument::new(
             "T",
-            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -679,11 +809,10 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            Some(SignalCounts::new(5, 2, 1)),
-            None,
             None,
         )
         .unwrap();
+        doc.set_signals(SignalCounts::new(5, 2, 1));
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed["signals"]["blue"], 5);
@@ -695,7 +824,6 @@ mod tests {
     fn test_encode_omits_empty_additional_sections() {
         let doc = SpecDocument::new(
             "T",
-            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -703,8 +831,6 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            None,
-            None,
             None,
         )
         .unwrap();
@@ -717,7 +843,6 @@ mod tests {
     fn test_encode_omits_empty_related_conventions() {
         let doc = SpecDocument::new(
             "T",
-            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -726,13 +851,118 @@ mod tests {
             vec![],
             vec![],
             None,
-            None,
-            None,
         )
         .unwrap();
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert!(parsed.get("related_conventions").is_none());
+    }
+
+    #[test]
+    fn test_encode_requirement_with_adr_refs() {
+        use domain::{AdrAnchor, AdrRef};
+        let anchor = AdrAnchor::try_new("D1.2").unwrap();
+        let adr_ref = AdrRef::new(PathBuf::from("knowledge/adr/x.md"), anchor);
+        let id = SpecElementId::try_new("IN-01").unwrap();
+        let req = SpecRequirement::new(id, "req", vec![adr_ref], vec![], vec![]).unwrap();
+        let doc = SpecDocument::new(
+            "T",
+            "1",
+            vec![],
+            SpecScope::new(vec![req], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
+        let json = encode(&doc).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let in_scope = &parsed["scope"]["in_scope"];
+        assert_eq!(in_scope[0]["id"], "IN-01");
+        assert_eq!(in_scope[0]["adr_refs"][0]["file"], "knowledge/adr/x.md");
+        assert_eq!(in_scope[0]["adr_refs"][0]["anchor"], "D1.2");
+    }
+
+    #[test]
+    fn test_encode_requirement_with_convention_refs() {
+        use domain::{ConventionAnchor, ConventionRef};
+        let anchor = ConventionAnchor::try_new("newtype-pattern").unwrap();
+        let conv_ref = ConventionRef::new(PathBuf::from(".claude/rules/04.md"), anchor);
+        let id = SpecElementId::try_new("CO-01").unwrap();
+        let req = SpecRequirement::new(id, "constraint", vec![], vec![conv_ref], vec![]).unwrap();
+        let doc = SpecDocument::new(
+            "T",
+            "1",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![req],
+            vec![],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
+        let json = encode(&doc).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let constraints = &parsed["constraints"];
+        assert_eq!(constraints[0]["convention_refs"][0]["anchor"], "newtype-pattern");
+    }
+
+    #[test]
+    fn test_encode_requirement_with_informal_grounds() {
+        use domain::{InformalGroundKind, InformalGroundRef, InformalGroundSummary};
+        let summary = InformalGroundSummary::try_new("user directive").unwrap();
+        let informal = InformalGroundRef::new(InformalGroundKind::UserDirective, summary);
+        let id = SpecElementId::try_new("AC-01").unwrap();
+        let req = SpecRequirement::new(id, "AC 1", vec![], vec![], vec![informal]).unwrap();
+        let doc = SpecDocument::new(
+            "T",
+            "1",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![req],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
+        let json = encode(&doc).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let ac = &parsed["acceptance_criteria"];
+        assert_eq!(ac[0]["informal_grounds"][0]["kind"], "user_directive");
+        assert_eq!(ac[0]["informal_grounds"][0]["summary"], "user directive");
+    }
+
+    #[test]
+    fn test_encode_related_conventions_as_struct() {
+        use domain::{ConventionAnchor, ConventionRef};
+        let anchor = ConventionAnchor::try_new("intro").unwrap();
+        let conv = ConventionRef::new(
+            PathBuf::from("knowledge/conventions/source-attribution.md"),
+            anchor,
+        );
+        let doc = SpecDocument::new(
+            "T",
+            "1",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![conv],
+            None,
+        )
+        .unwrap();
+        let json = encode(&doc).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(
+            parsed["related_conventions"][0]["file"],
+            "knowledge/conventions/source-attribution.md"
+        );
+        assert_eq!(parsed["related_conventions"][0]["anchor"], "intro");
     }
 
     // --- round-trip tests ---
@@ -762,31 +992,81 @@ mod tests {
     }
 
     #[test]
-    fn test_round_trip_multiple_requirements_with_sources() {
+    fn test_round_trip_all_informal_ground_kinds() {
+        let kinds = [
+            ("discussion", InformalGroundKind::Discussion),
+            ("feedback", InformalGroundKind::Feedback),
+            ("memory", InformalGroundKind::Memory),
+            ("user_directive", InformalGroundKind::UserDirective),
+        ];
+        for (kind_str, kind_enum) in &kinds {
+            let json = format!(
+                r#"{{
+                  "schema_version": 2, "version": "1", "title": "T",
+                  "scope": {{
+                    "in_scope": [{{
+                      "id": "IN-01", "text": "req",
+                      "informal_grounds": [{{"kind": "{kind_str}", "summary": "test"}}]
+                    }}],
+                    "out_of_scope": []
+                  }}
+                }}"#
+            );
+            let doc = decode(&json).unwrap();
+            assert_eq!(
+                doc.scope().in_scope()[0].informal_grounds()[0].kind,
+                *kind_enum,
+                "kind {kind_str} should round-trip"
+            );
+        }
+    }
+
+    #[test]
+    fn test_round_trip_multiple_requirements_with_typed_refs() {
         let json = r#"{
-          "schema_version": 1, "status": "draft", "version": "1.0", "title": "Multi",
+          "schema_version": 2, "version": "1.0", "title": "Multi",
           "scope": {
             "in_scope": [
-              {"text": "R1", "sources": ["PRD §1", "feedback — user"]},
-              {"text": "R2", "sources": ["convention — style.md"]}
+              {
+                "id": "IN-01",
+                "text": "R1",
+                "adr_refs": [{"file": "adr/x.md", "anchor": "D1"}, {"file": "adr/y.md", "anchor": "D2"}]
+              },
+              {
+                "id": "IN-02",
+                "text": "R2",
+                "convention_refs": [{"file": "conventions/style.md", "anchor": "section-1"}]
+              }
             ],
-            "out_of_scope": [{"text": "X1", "sources": ["inference — low value"]}]
+            "out_of_scope": [
+              {
+                "id": "OS-01",
+                "text": "X1",
+                "informal_grounds": [{"kind": "feedback", "summary": "low value"}]
+              }
+            ]
           },
-          "acceptance_criteria": [{"text": "AC1", "sources": []}, {"text": "AC2", "sources": ["discussion"]}]
+          "acceptance_criteria": [
+            {"id": "AC-01", "text": "AC1"},
+            {"id": "AC-02", "text": "AC2", "informal_grounds": [{"kind": "discussion", "summary": "agreed"}]}
+          ]
         }"#;
         let doc = decode(json).unwrap();
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
         assert_eq!(doc2.scope().in_scope().len(), 2);
-        assert_eq!(doc2.scope().in_scope()[0].sources().len(), 2);
+        assert_eq!(doc2.scope().in_scope()[0].adr_refs().len(), 2);
+        assert_eq!(doc2.scope().in_scope()[1].convention_refs().len(), 1);
         assert_eq!(doc2.scope().out_of_scope().len(), 1);
         assert_eq!(doc2.acceptance_criteria().len(), 2);
+        assert!(doc2.acceptance_criteria()[0].informal_grounds().is_empty());
+        assert_eq!(doc2.acceptance_criteria()[1].informal_grounds().len(), 1);
     }
 
     #[test]
     fn test_round_trip_additional_sections() {
         let json = r#"{
-          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
+          "schema_version": 2, "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "additional_sections": [
             {"title": "Sec A", "content": ["line 1", "line 2"]},
@@ -808,173 +1088,46 @@ mod tests {
     fn test_encode_output_is_pretty_printed() {
         let doc = decode(MINIMAL_JSON).unwrap();
         let json = encode(&doc).unwrap();
-        // Pretty-printed JSON contains newlines
         assert!(json.contains('\n'));
     }
 
     #[test]
-    fn test_encode_schema_version_is_always_1() {
+    fn test_encode_schema_version_is_always_2() {
         let doc = decode(FULL_JSON).unwrap();
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(parsed["schema_version"], 1);
-    }
-
-    // --- transitions_to round-trip (removed — now handled by domain_types_codec) ---
-
-    // --- task_refs round-trip ---
-
-    #[test]
-    fn test_decode_task_refs_present() {
-        let json = r#"{
-  "schema_version": 1,
-  "status": "draft",
-  "version": "1.0",
-  "title": "Feature",
-  "scope": {
-    "in_scope": [{ "text": "Req", "sources": ["PRD"], "task_refs": ["T001", "T002"] }],
-    "out_of_scope": []
-  }
-}"#;
-        let doc = decode(json).unwrap();
-        let refs = doc.scope().in_scope()[0].task_refs();
-        assert_eq!(refs.len(), 2);
-        assert_eq!(refs[0].as_ref(), "T001");
-        assert_eq!(refs[1].as_ref(), "T002");
+        assert_eq!(parsed["schema_version"], 2);
     }
 
     #[test]
-    fn test_decode_task_refs_omitted_defaults_to_empty() {
-        let json = r#"{
-  "schema_version": 1,
-  "status": "draft",
-  "version": "1.0",
-  "title": "Feature",
-  "scope": {
-    "in_scope": [{ "text": "Req", "sources": ["PRD"] }],
-    "out_of_scope": []
-  }
-}"#;
-        let doc = decode(json).unwrap();
-        assert!(doc.scope().in_scope()[0].task_refs().is_empty());
-    }
-
-    #[test]
-    fn test_decode_invalid_task_ref_format_returns_error() {
-        let json = r#"{
-  "schema_version": 1,
-  "status": "draft",
-  "version": "1.0",
-  "title": "Feature",
-  "scope": {
-    "in_scope": [{ "text": "Req", "sources": ["PRD"], "task_refs": ["not-valid"] }],
-    "out_of_scope": []
-  }
-}"#;
-        let result = decode(json);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_encode_task_refs_round_trip() {
-        let json = r#"{
-  "schema_version": 1,
-  "status": "draft",
-  "version": "1.0",
-  "title": "Feature",
-  "scope": {
-    "in_scope": [{ "text": "Req", "sources": ["PRD"], "task_refs": ["T001"] }],
-    "out_of_scope": []
-  }
-}"#;
-        let doc = decode(json).unwrap();
-        let encoded = encode(&doc).unwrap();
-        let re_decoded = decode(&encoded).unwrap();
-        let refs = re_decoded.scope().in_scope()[0].task_refs();
-        assert_eq!(refs.len(), 1);
-        assert_eq!(refs[0].as_ref(), "T001");
-    }
-
-    #[test]
-    fn test_encode_empty_task_refs_omitted_from_json() {
-        let doc = decode(MINIMAL_JSON).unwrap();
-        let encoded = encode(&doc).unwrap();
-        // task_refs should not appear in output when empty (skip_serializing_if)
-        assert!(!encoded.contains("task_refs"));
-    }
-
-    // --- content hash + approval round-trip ---
-
-    #[test]
-    fn test_content_hash_is_deterministic() {
-        let doc = decode(MINIMAL_JSON).unwrap();
-        let h1 = compute_content_hash(&doc).unwrap();
-        let h2 = compute_content_hash(&doc).unwrap();
-        assert_eq!(h1, h2);
-        assert!(h1.starts_with("sha256:"));
-    }
-
-    #[test]
-    fn test_content_hash_ignores_task_refs_changes() {
-        let without_refs = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"item","sources":["PRD"]}],"out_of_scope":[]}}"#;
-        let with_refs = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"item","sources":["PRD"],"task_refs":["T001","T002"]}],"out_of_scope":[]}}"#;
-        let h1 = compute_content_hash(&decode(without_refs).unwrap()).unwrap();
-        let h2 = compute_content_hash(&decode(with_refs).unwrap()).unwrap();
-        assert_eq!(h1, h2, "task_refs should not affect content hash");
-    }
-
-    #[test]
-    fn test_content_hash_changes_when_goal_changes() {
-        let json1 = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","goal":["A"],"scope":{"in_scope":[],"out_of_scope":[]}}"#;
-        let json2 = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","goal":["B"],"scope":{"in_scope":[],"out_of_scope":[]}}"#;
-        let h1 = compute_content_hash(&decode(json1).unwrap()).unwrap();
-        let h2 = compute_content_hash(&decode(json2).unwrap()).unwrap();
-        assert_ne!(h1, h2);
-    }
-
-    #[test]
-    fn test_approval_round_trip() {
-        let mut doc = decode(MINIMAL_JSON).unwrap();
-        let hash = compute_content_hash(&doc).unwrap();
-        let ts = domain::Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts, hash.clone()).unwrap();
-
+    fn test_encode_omits_empty_refs_from_requirements() {
+        let id = SpecElementId::try_new("IN-01").unwrap();
+        let req = SpecRequirement::new(id, "req", vec![], vec![], vec![]).unwrap();
+        let doc = SpecDocument::new(
+            "T",
+            "1",
+            vec![],
+            SpecScope::new(vec![req], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
         let json = encode(&doc).unwrap();
-        let reloaded = decode(&json).unwrap();
-
-        assert_eq!(reloaded.status(), domain::SpecStatus::Approved);
-        assert!(reloaded.approved_at().is_some());
-        assert_eq!(reloaded.content_hash(), Some(hash.as_str()));
-        assert!(reloaded.is_approval_valid(&hash));
+        // Empty arrays must be omitted (skip_serializing_if = Vec::is_empty)
+        assert!(!json.contains("\"adr_refs\""), "empty adr_refs must be omitted");
+        assert!(!json.contains("\"convention_refs\""), "empty convention_refs must be omitted");
+        assert!(!json.contains("\"informal_grounds\""), "empty informal_grounds must be omitted");
     }
 
-    #[test]
-    fn test_effective_status_draft_after_content_change() {
-        let mut doc = decode(MINIMAL_JSON).unwrap();
-        let hash = compute_content_hash(&doc).unwrap();
-        let ts = domain::Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts, hash).unwrap();
-
-        // Simulate content change: decode a modified spec with stale content_hash.
-        // decode() auto-demotes when hash doesn't match.
-        let modified = r#"{"schema_version":1,"status":"approved","version":"1.0","title":"Feature Title CHANGED","approved_at":"2026-03-24T10:00:00Z","content_hash":"sha256:old","scope":{"in_scope":[],"out_of_scope":[]}}"#;
-        let reloaded = decode(modified).unwrap();
-
-        assert_eq!(
-            reloaded.status(),
-            domain::SpecStatus::Draft,
-            "decode should auto-demote when content hash mismatches"
-        );
-        assert!(reloaded.approved_at().is_none(), "auto-demote should clear approved_at");
-    }
-
-    // --- Hearing history (TSUMIKI-07) ---
+    // --- Hearing history round-trip ---
 
     #[test]
     fn test_hearing_history_roundtrip() {
         let json = r#"{
-            "schema_version": 1,
-            "status": "draft",
+            "schema_version": 2,
             "version": "1.0",
             "title": "Feature",
             "scope": {"in_scope": [], "out_of_scope": []},
@@ -1000,7 +1153,6 @@ mod tests {
         assert_eq!(rec.signal_delta().after().red(), 0);
         assert_eq!(rec.questions_asked(), 4);
 
-        // Re-encode and decode again
         let re_encoded = encode(&doc).unwrap();
         let doc2 = decode(&re_encoded).unwrap();
         assert_eq!(doc2.hearing_history().len(), 1);
@@ -1008,38 +1160,9 @@ mod tests {
     }
 
     #[test]
-    fn test_hearing_history_backward_compat() {
-        // Old spec.json without hearing_history should decode fine
-        let json = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"Old","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+    fn test_hearing_history_absent_defaults_to_empty() {
+        let json = r#"{"schema_version":2,"version":"1.0","title":"Old","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let doc = decode(json).unwrap();
         assert!(doc.hearing_history().is_empty());
-    }
-
-    #[test]
-    fn test_hearing_history_excluded_from_content_hash() {
-        let base_json = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"Feature","scope":{"in_scope":[],"out_of_scope":[]}}"#;
-        let with_history = r#"{
-            "schema_version": 1,
-            "status": "draft",
-            "version": "1.0",
-            "title": "Feature",
-            "scope": {"in_scope": [], "out_of_scope": []},
-            "hearing_history": [
-                {
-                    "date": "2026-04-01T10:00:00Z",
-                    "mode": "full",
-                    "signal_delta": {
-                        "before": {"blue": 0, "yellow": 0, "red": 0},
-                        "after": {"blue": 5, "yellow": 1, "red": 0}
-                    },
-                    "questions_asked": 3,
-                    "items_added": 2,
-                    "items_modified": 0
-                }
-            ]
-        }"#;
-        let h1 = compute_content_hash(&decode(base_json).unwrap()).unwrap();
-        let h2 = compute_content_hash(&decode(with_history).unwrap()).unwrap();
-        assert_eq!(h1, h2, "hearing_history must not affect content_hash");
     }
 }

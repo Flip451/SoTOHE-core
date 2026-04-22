@@ -75,8 +75,6 @@ pub enum MakeTask {
     TrackReviewStatus,
     /// Check that the review state is approved and code hash is current.
     TrackCheckApproved,
-    /// Approve a spec (set status=approved + content hash).
-    SpecApprove,
     /// Switch to main branch and pull latest.
     TrackSwitchMain,
     /// Stage paths from tmp/track-commit/add-paths.txt.
@@ -186,7 +184,6 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
         MakeTask::TrackReviewStatus => dispatch_track_review_status(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
-        MakeTask::SpecApprove => dispatch_spec_approve(&args.raw_args),
         MakeTask::TrackPlanBranch => dispatch_track_plan_branch(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
         MakeTask::Note => dispatch_note(&args.raw_args),
@@ -467,12 +464,6 @@ fn dispatch_track_check_approved(raw_args: &[String]) -> Result<ExitCode, CliErr
     run_sotp(&refs)
 }
 
-fn dispatch_spec_approve(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let args = build_forwarded_args(&["spec", "approve"], raw_args);
-    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
-    run_sotp(&refs)
-}
-
 // --- Phase 2: New logic dispatchers ---
 
 fn dispatch_commit(raw_args: &[String]) -> Result<ExitCode, CliError> {
@@ -597,7 +588,7 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
 ///    that `sotp track type-signals` uses — see §D2 last paragraph).
 /// 2. Delegate the recomputation itself to `execute_type_signals`, which
 ///    writes `<layer>-type-signals.json` and re-encodes declaration files
-///    via the T007 codec (which omits the `signals` field). Symlink guards
+///    via the declaration codec (which omits the `signals` field). Symlink guards
 ///    (§D7) are applied inside `execute_type_signals` on both write paths.
 /// 3. After recomputation, read each generated signal file and classify the
 ///    result: Red → BLOCKED (exit 1, commit-message.txt preserved), Yellow
@@ -678,12 +669,27 @@ fn run_pre_commit_type_signals(track_id: &str) -> Result<ExitCode, CliError> {
             CliError::Message(format!("[track-commit-message] invalid track ID '{track_id}': {e}"))
         })?;
         match infrastructure::track::fs_store::read_track_metadata(&items_dir, &valid_id) {
-            Ok((metadata, doc_meta)) => {
-                let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-                    domain::TrackStatus::Archived
-                } else {
-                    metadata.status()
-                };
+            Ok((metadata, _doc_meta)) => {
+                // Status is derived on demand from impl-plan + status_override.
+                // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt
+                // impl-plan.json blocks the commit rather than being treated as absent.
+                use domain::ImplPlanReader;
+                let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir.clone());
+                let impl_plan = store.load_impl_plan(&valid_id).map_err(|e| {
+                    CliError::Message(format!(
+                        "[track-commit-message] BLOCKED: cannot load impl-plan for \
+                         '{track_id}': {e}"
+                    ))
+                })?;
+                // Fail-closed: a track with no impl-plan.json but with a
+                // materialized branch is potentially corrupt — block the
+                // commit. Route through the domain API so the activation
+                // invariant has a single source of truth.
+                let effective_status =
+                    domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
+                domain::check_impl_plan_presence(&metadata, impl_plan.as_ref()).map_err(|e| {
+                    CliError::Message(format!("[track-commit-message] BLOCKED: {e}"))
+                })?;
                 if ensure_active_track(effective_status, track_id).is_err() {
                     // Track is Done or Archived — skip pre-commit type-signal recomputation.
                     // The frozen track's signal files are already correct from when it was active.
@@ -1125,17 +1131,10 @@ mod tests {
     }
 
     #[test]
-    fn test_build_forwarded_args_spec_approve() {
-        let raw = vec!["track/items/my-track".to_owned()];
-        let args = build_forwarded_args(&["spec", "approve"], &raw);
-        assert_eq!(args, vec!["spec", "approve", "track/items/my-track"]);
-    }
-
-    #[test]
     fn test_build_forwarded_args_empty_raw() {
         let raw: Vec<String> = vec![];
-        let args = build_forwarded_args(&["spec", "approve"], &raw);
-        assert_eq!(args, vec!["spec", "approve"]);
+        let args = build_forwarded_args(&["review", "check-approved"], &raw);
+        assert_eq!(args, vec!["review", "check-approved"]);
     }
 
     #[test]

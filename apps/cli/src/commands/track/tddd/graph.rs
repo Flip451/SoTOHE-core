@@ -10,14 +10,14 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use domain::TrackStatus;
+use domain::ImplPlanReader;
 use domain::schema::{SchemaExportError, SchemaExporter};
 use infrastructure::code_profile_builder::build_type_graph;
 use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::type_graph_render::{
     EdgeSet, TypeGraphRenderOptions, write_type_graph_dir, write_type_graph_file,
 };
-use infrastructure::track::fs_store::read_track_metadata;
+use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
 
 use crate::CliError;
@@ -65,13 +65,23 @@ pub fn execute_type_graph(
 
     // Active-track guard (mirrors type-signals).
     // Symlink protection for metadata read is handled inside `read_track_metadata`.
-    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
-        TrackStatus::Archived
-    } else {
-        metadata.status()
-    };
+    // Status is derived on demand from impl-plan + status_override.
+    // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt impl-plan.json
+    // blocks the guard instead of being silently treated as absent.
+    let store = FsTrackStore::new(items_dir.clone());
+    let impl_plan = store
+        .load_impl_plan(&valid_id)
+        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
+    // Fail-closed: route through the domain API so the activation invariant
+    // has a single source of truth. Activation is identified by branch
+    // materialization only; an override on a branchless planning track does
+    // not imply activation.
+    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
+        .map_err(|e| CliError::Message(format!("cannot run type-graph on '{track_id}': {e}")))?;
+    let effective_status =
+        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;
 
     let edge_set = parse_edge_set(&edges)?;
@@ -215,14 +225,21 @@ mod tests {
         let track_dir = items_dir.join("test-track");
         std::fs::create_dir_all(&track_dir).unwrap();
 
+        // v5 format, no status field
         let metadata = r#"{
-  "schema_version": 3, "id": "test-track", "branch": "track/test-track",
-  "title": "Test", "status": "planned",
-  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z",
-  "tasks": [{"id":"T001","description":"t","status":"todo","commit_hash":null}],
-  "plan": {"summary":["t"],"sections":[{"id":"S001","title":"t","description":["t"],"task_ids":["T001"]}]}
+  "schema_version": 5, "id": "test-track", "branch": "track/test-track",
+  "title": "Test",
+  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z"
 }"#;
         std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+        // Provide a minimal impl-plan.json so the activated-track guard passes
+        // and the test reaches the layer-name validation step.
+        let impl_plan = r#"{
+  "schema_version": 1,
+  "tasks": [],
+  "plan": { "summary": [], "sections": [] }
+}"#;
+        std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
 
         let result = execute_type_graph(
             items_dir,
@@ -335,14 +352,15 @@ mod tests {
         let track_dir = items_dir.join("test-done");
         std::fs::create_dir_all(&track_dir).unwrap();
 
+        // v5 format, no status field. All tasks done → derive_track_status → Done.
         let metadata = r#"{
-  "schema_version": 3, "id": "test-done", "branch": "track/test-done",
-  "title": "Done", "status": "done",
-  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z",
-  "tasks": [{"id":"T001","description":"t","status":"done","commit_hash":"0000000000000000000000000000000000000000"}],
-  "plan": {"summary":["t"],"sections":[{"id":"S001","title":"t","description":["t"],"task_ids":["T001"]}]}
+  "schema_version": 5, "id": "test-done", "branch": "track/test-done",
+  "title": "Done",
+  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z"
 }"#;
         std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+        let impl_plan = r#"{"schema_version":1,"tasks":[{"id":"T001","description":"t","status":"done","commit_hash":"abc1234"}],"plan":{"summary":[],"sections":[{"id":"S001","title":"t","description":[],"task_ids":["T001"]}]}}"#;
+        std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
 
         let result = execute_type_graph(
             items_dir,

@@ -21,6 +21,7 @@
 use std::collections::HashSet;
 
 use crate::ConfidenceSignal;
+use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::spec::SpecValidationError;
 
 // ---------------------------------------------------------------------------
@@ -79,7 +80,7 @@ impl ParamDeclaration {
 /// - `TypeGraph`: `TypeNode::methods` / `TraitNode::methods` (the "code reality"
 ///   extracted from rustdoc JSON)
 /// - Baseline: `TypeBaselineEntry::methods` / `TraitBaselineEntry::methods`
-///   (captured snapshot at `/track:design` time — populated in T005)
+///   (captured snapshot at `/track:design` time)
 ///
 /// Type strings (`ParamDeclaration::ty`, `returns`) use last-segment short
 /// names and preserve generics verbatim (e.g. `"Result<Option<User>, DomainError>"`,
@@ -430,6 +431,10 @@ impl TypeDefinitionKind {
 /// (`kind`), intended operation (`action`), and whether the entry has been
 /// human-approved.
 ///
+/// `spec_refs` holds structured references to spec.json elements (SoT Chain ②).
+/// `informal_grounds` holds unpersisted ground citations; non-empty → 🟡 advisory
+/// signal per ADR 2026-04-19-1242 §D1.3 / §D3.2.
+///
 /// Layer-neutral naming (T001, formerly `DomainTypeEntry`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeCatalogueEntry {
@@ -438,10 +443,16 @@ pub struct TypeCatalogueEntry {
     kind: TypeDefinitionKind,
     action: TypeAction,
     approved: bool,
+    /// Structured references to spec.json elements (SoT Chain ②).
+    /// Empty by default; populated when the entry is traced to a spec requirement.
+    spec_refs: Vec<SpecRef>,
+    /// Unpersisted ground citations.
+    /// Non-empty → 🟡 advisory signal (ADR 2026-04-19-1242 §D3.2).
+    informal_grounds: Vec<InformalGroundRef>,
 }
 
 impl TypeCatalogueEntry {
-    /// Creates a new `TypeCatalogueEntry`.
+    /// Creates a new `TypeCatalogueEntry` with empty `spec_refs` and `informal_grounds`.
     ///
     /// # Errors
     ///
@@ -459,7 +470,55 @@ impl TypeCatalogueEntry {
         if name.trim().is_empty() {
             return Err(SpecValidationError::EmptyDomainStateName);
         }
-        Ok(Self { name, description: description.into(), kind, action, approved })
+        Ok(Self {
+            name,
+            description: description.into(),
+            kind,
+            action,
+            approved,
+            spec_refs: Vec::new(),
+            informal_grounds: Vec::new(),
+        })
+    }
+
+    /// Creates a new `TypeCatalogueEntry` with explicit `spec_refs` and `informal_grounds`.
+    ///
+    /// # Errors
+    ///
+    /// Returns `SpecValidationError::EmptyDomainStateName` if `name` is empty or
+    /// whitespace-only.
+    /// Returns `SpecValidationError::DuplicateElementId` if two `SpecRef` entries in
+    /// `spec_refs` share the same `anchor` (`SpecElementId`). Element IDs must be unique
+    /// within a single catalogue entry to avoid ambiguous SoT Chain ② citations.
+    pub fn with_refs(
+        name: impl Into<String>,
+        description: impl Into<String>,
+        kind: TypeDefinitionKind,
+        action: TypeAction,
+        approved: bool,
+        spec_refs: Vec<SpecRef>,
+        informal_grounds: Vec<InformalGroundRef>,
+    ) -> Result<Self, SpecValidationError> {
+        let name = name.into();
+        if name.trim().is_empty() {
+            return Err(SpecValidationError::EmptyDomainStateName);
+        }
+        // Validate that no two spec_refs share the same anchor (SpecElementId).
+        let mut seen_anchors: HashSet<&str> = HashSet::new();
+        for sr in &spec_refs {
+            if !seen_anchors.insert(sr.anchor.as_ref()) {
+                return Err(SpecValidationError::DuplicateElementId(sr.anchor.as_ref().to_owned()));
+            }
+        }
+        Ok(Self {
+            name,
+            description: description.into(),
+            kind,
+            action,
+            approved,
+            spec_refs,
+            informal_grounds,
+        })
     }
 
     /// Returns the type name.
@@ -490,6 +549,25 @@ impl TypeCatalogueEntry {
     #[must_use]
     pub fn approved(&self) -> bool {
         self.approved
+    }
+
+    /// Returns the spec.json element references (SoT Chain ②).
+    #[must_use]
+    pub fn spec_refs(&self) -> &[SpecRef] {
+        &self.spec_refs
+    }
+
+    /// Returns the unpersisted ground citations.
+    /// Non-empty → 🟡 advisory signal.
+    #[must_use]
+    pub fn informal_grounds(&self) -> &[InformalGroundRef] {
+        &self.informal_grounds
+    }
+
+    /// Returns `true` if any informal grounds are present (🟡 advisory signal trigger).
+    #[must_use]
+    pub fn has_informal_grounds(&self) -> bool {
+        !self.informal_grounds.is_empty()
     }
 }
 
@@ -1111,6 +1189,114 @@ mod tests {
         assert_eq!(names.len(), 2);
         assert!(names.contains("StateA"));
         assert!(names.contains("StateB"));
+    }
+
+    // --- spec_refs and informal_grounds fields ---
+
+    #[test]
+    fn test_type_catalogue_entry_new_has_empty_spec_refs_by_default() {
+        let entry = TypeCatalogueEntry::new(
+            "Foo",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert!(entry.spec_refs().is_empty());
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_new_has_empty_informal_grounds_by_default() {
+        let entry = TypeCatalogueEntry::new(
+            "Foo",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert!(entry.informal_grounds().is_empty());
+        assert!(!entry.has_informal_grounds());
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_with_refs_stores_spec_refs() {
+        use crate::plan_ref::{ContentHash, SpecElementId, SpecRef};
+
+        let anchor = SpecElementId::try_new("IN-01").unwrap();
+        let hash = ContentHash::from_bytes([0u8; 32]);
+        let spec_ref = SpecRef::new("track/items/x/spec.json", anchor, hash);
+        let entry = TypeCatalogueEntry::with_refs(
+            "Bar",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Modify,
+            true,
+            vec![spec_ref.clone()],
+            vec![],
+        )
+        .unwrap();
+        assert_eq!(entry.spec_refs().len(), 1);
+        assert_eq!(entry.spec_refs()[0], spec_ref);
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_with_refs_stores_informal_grounds() {
+        use crate::plan_ref::{InformalGroundKind, InformalGroundRef, InformalGroundSummary};
+
+        let summary = InformalGroundSummary::try_new("per user directive").unwrap();
+        let ground = InformalGroundRef::new(InformalGroundKind::UserDirective, summary);
+        let entry = TypeCatalogueEntry::with_refs(
+            "Baz",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            false,
+            vec![],
+            vec![ground.clone()],
+        )
+        .unwrap();
+        assert_eq!(entry.informal_grounds().len(), 1);
+        assert_eq!(entry.informal_grounds()[0], ground);
+        assert!(entry.has_informal_grounds());
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_with_refs_empty_name_returns_error() {
+        let result = TypeCatalogueEntry::with_refs(
+            "",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+            vec![],
+            vec![],
+        );
+        assert!(matches!(result, Err(SpecValidationError::EmptyDomainStateName)));
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_with_refs_duplicate_spec_element_id_returns_error() {
+        use crate::plan_ref::{ContentHash, SpecElementId, SpecRef};
+
+        let anchor = SpecElementId::try_new("IN-01").unwrap();
+        let hash = ContentHash::from_bytes([0u8; 32]);
+        let ref1 = SpecRef::new("track/items/x/spec.json", anchor.clone(), hash.clone());
+        let ref2 = SpecRef::new("track/items/y/spec.json", anchor.clone(), hash.clone()); // same anchor
+        let result = TypeCatalogueEntry::with_refs(
+            "Foo",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+            vec![ref1, ref2],
+            vec![],
+        );
+        assert!(
+            matches!(result, Err(SpecValidationError::DuplicateElementId(ref id)) if id == "IN-01"),
+            "duplicate SpecElementId anchor must be rejected"
+        );
     }
 
     // --- TypeSignal ---

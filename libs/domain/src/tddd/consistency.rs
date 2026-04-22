@@ -205,7 +205,7 @@ pub fn check_consistency(
         }
         match graph.get_type(name) {
             Some(code_node) => {
-                // T005: compare using the full structured shape
+                // Compare using the full structured shape
                 // (`Vec<MemberDeclaration>` and `Vec<MethodDeclaration>`).
                 let current = crate::TypeBaselineEntry::new(
                     code_node.kind().clone(),

@@ -17,7 +17,7 @@
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::validate_branch_ref;
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{TrackId, TrackMetadata};
+use domain::{ImplPlanDocument, TrackId};
 use domain::{TypeCatalogueDocument, check_type_signals};
 
 /// Result of a port-level blob fetch.
@@ -58,11 +58,10 @@ pub trait TrackBlobReader {
     /// Reads and decodes the TDDD catalogue file for a single layer on the
     /// given branch.
     ///
-    /// T007 (Phase 1 Task 7): accepts a `layer_id` so the merge-gate
-    /// multilayer loop can read each layer's catalogue (`domain-types.json`,
-    /// `usecase-types.json`, …). Returns `NotFound` when the file does not
-    /// exist on the target ref — this corresponds to "TDDD not active for
-    /// this layer" per ADR §D2.1.
+    /// Accepts a `layer_id` so the merge-gate multilayer loop can read each
+    /// layer's catalogue (`domain-types.json`, `usecase-types.json`, …).
+    /// Returns `NotFound` when the file does not exist on the target ref —
+    /// this corresponds to "TDDD not active for this layer" per ADR §D2.1.
     ///
     /// The `Found` variant returns `(doc, catalogue_file)` where
     /// `catalogue_file` is the resolved filename the adapter actually read
@@ -77,12 +76,15 @@ pub trait TrackBlobReader {
         layer_id: &str,
     ) -> BlobFetchResult<(TypeCatalogueDocument, String)>;
 
-    /// Reads and decodes `track/items/<track_id>/metadata.json` into a
-    /// [`TrackMetadata`] aggregate.
+    /// Reads and decodes `track/items/<track_id>/impl-plan.json` for the given
+    /// `branch`. Returns `NotFound` when the file does not exist on the target
+    /// ref — this corresponds to "impl-plan.json not yet generated" and the
+    /// caller must decide whether this is a fatal condition.
     ///
-    /// Used by the task-completion gate (see `usecase::task_completion`)
-    /// which checks that all tasks are resolved before merge.
-    fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata>;
+    /// A default implementation panics so existing mocks that do not override
+    /// it surface the gap explicitly. Mocks used by task-completion tests must
+    /// override this method.
+    fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument>;
 
     /// Returns the list of TDDD-enabled layer ids on the given branch.
     ///
@@ -171,8 +173,8 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
         return stage1;
     }
 
-    // 5. Stage 2: multi-layer TDDD gate. T007 — loop every `tddd.enabled`
-    //    layer read from `architecture-rules.json` on the PR branch blob.
+    // 5. Stage 2: multi-layer TDDD gate — loop every `tddd.enabled` layer
+    //    read from `architecture-rules.json` on the PR branch blob.
     //    For each layer:
     //      - NotFound → TDDD opt-out for that layer (no finding)
     //      - FetchError → fail-closed
@@ -244,7 +246,7 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
 mod tests {
     use std::cell::RefCell;
 
-    use domain::spec::{SpecScope, SpecStatus};
+    use domain::spec::SpecScope;
     use domain::tddd::catalogue::{TypeAction, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal};
     use domain::{ConfidenceSignal, SignalCounts};
 
@@ -308,14 +310,12 @@ mod tests {
             }
         }
 
-        fn read_track_metadata(
+        fn read_impl_plan(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<TrackMetadata> {
-            // merge_gate tests don't exercise this port method;
-            // task_completion tests (T007) use a separate mock.
-            panic!("read_track_metadata must not be called by merge_gate tests")
+        ) -> BlobFetchResult<ImplPlanDocument> {
+            panic!("read_impl_plan must not be called by merge_gate tests")
         }
     }
 
@@ -365,12 +365,12 @@ mod tests {
             BlobFetchResult::NotFound
         }
 
-        fn read_track_metadata(
+        fn read_impl_plan(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<TrackMetadata> {
-            panic!("read_track_metadata must not be called by merge_gate tests")
+        ) -> BlobFetchResult<ImplPlanDocument> {
+            panic!("read_impl_plan must not be called by merge_gate tests")
         }
     }
 
@@ -379,16 +379,13 @@ mod tests {
     fn spec_doc_with_signals(signals: Option<SignalCounts>) -> SpecDocument {
         let mut doc = SpecDocument::new(
             "Feature",
-            SpecStatus::Draft,
             "1.0",
-            vec!["Goal".to_owned()],
+            vec![],
             SpecScope::new(Vec::new(), Vec::new()),
             Vec::new(),
             Vec::new(),
             Vec::new(),
             Vec::new(),
-            None,
-            None,
             None,
         )
         .unwrap();
@@ -740,7 +737,7 @@ mod tests {
     }
 
     // ===============================================================
-    // U19–U26 — multilayer merge gate tests (T007)
+    // U19–U26 — multilayer merge gate tests
     //
     // A `MultiLayerMock` returns per-layer catalogue outcomes keyed by
     // `layer_id`, and also drives `read_enabled_layers`. The 8 scenarios
@@ -799,12 +796,12 @@ mod tests {
             }
         }
 
-        fn read_track_metadata(
+        fn read_impl_plan(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<TrackMetadata> {
-            panic!("read_track_metadata must not be called by merge_gate tests")
+        ) -> BlobFetchResult<ImplPlanDocument> {
+            panic!("read_impl_plan must not be called by merge_gate tests")
         }
 
         fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {

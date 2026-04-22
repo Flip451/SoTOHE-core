@@ -6,7 +6,10 @@ use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
+use domain::{StatusOverride, derive_track_status};
 use regex::Regex;
+
+use crate::track::codec;
 
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
@@ -218,48 +221,81 @@ fn load_track_metadata(
         }
     };
 
-    let schema_version =
-        obj.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(2);
-
-    // Skip archived tracks early — before v3/timestamp validation so that
-    // malformed archived metadata does not block the verifier.
-    let status = obj.get("status").and_then(|v| v.as_str()).unwrap_or("").to_owned();
-    if status == "archived" {
-        return Ok(None);
-    }
-
-    // v3 branch field validation.
-    if v3_branch_field_missing(&data) {
-        return Err(vec![VerifyFinding::error(format!(
-            "[ERROR] Cannot determine latest track because branch is missing: {}",
-            display_path(&metadata_file, root)
-        ))]);
-    }
-    if v3_branchless_track_invalid(&data) {
-        return Err(vec![VerifyFinding::error(format!(
-            "[ERROR] Cannot determine latest track because branchless v3 metadata is only valid for planning-only tracks: {}",
-            display_path(&metadata_file, root)
-        ))]);
-    }
-    if v3_non_null_branch_invalid(&data) {
-        return Err(vec![VerifyFinding::error(format!(
-            "[ERROR] Cannot determine latest track because branch is invalid: {}",
-            display_path(&metadata_file, root)
-        ))]);
-    }
-
-    // updated_at
-    let updated_at_raw = match obj.get("updated_at").and_then(|v| v.as_str()) {
-        Some(s) => s,
+    // Determine schema_version from the parsed JSON.
+    // A missing or non-numeric `schema_version` is an error — do NOT silently
+    // default to a legacy value (which would skip the track) or to `5` (which
+    // would let a malformed file pass as a valid v5 track). Require an explicit
+    // integer value. Also reject values that overflow u32 instead of silently
+    // wrapping (e.g. `4294967298` must not wrap to `2` and be skipped as legacy).
+    let schema_version: u32 = match obj.get("schema_version").and_then(|v| v.as_u64()) {
+        Some(v) => match u32::try_from(v) {
+            Ok(narrowed) => narrowed,
+            Err(_) => {
+                return Err(vec![VerifyFinding::error(format!(
+                    "[ERROR] Cannot determine latest track because schema_version {v} overflows u32: {}",
+                    display_path(&metadata_file, root)
+                ))]);
+            }
+        },
         None => {
             return Err(vec![VerifyFinding::error(format!(
-                "[ERROR] Cannot determine latest track because updated_at is missing or invalid: {}",
+                "[ERROR] Cannot determine latest track because schema_version is missing or invalid: {}",
                 display_path(&metadata_file, root)
             ))]);
         }
     };
 
-    let updated_at_secs = match parse_updated_at(updated_at_raw) {
+    // Skip legacy (v2/v3/v4) tracks structurally — they predate the identity-only
+    // schema and carry a `status` field that is no longer supported. Only v5+
+    // tracks participate in latest-track selection and verification.
+    if schema_version < 5 {
+        return Ok(None);
+    }
+
+    // Full schema validation via the authoritative v5 codec. Any structural
+    // inconsistency (missing required fields, malformed branch, invalid
+    // status_override syntax, etc.) is surfaced as an error here rather than
+    // being discovered later or silently ignored.
+    let (track, doc_meta) = codec::decode(&content).map_err(|e| {
+        vec![VerifyFinding::error(format!(
+            "[ERROR] Cannot determine latest track because metadata.json fails v5 schema validation: {} ({e})",
+            display_path(&metadata_file, root)
+        ))]
+    })?;
+
+    // Load impl-plan.json (if present) and enforce the activation invariant
+    // `is_activated() -> impl-plan.json present` at the domain layer. A
+    // branch-materialized track with a missing impl-plan.json is corrupt and
+    // must not be treated as a healthy "planned" track.
+    let impl_plan = load_impl_plan_from_dir(track_dir).map_err(|e| {
+        vec![VerifyFinding::error(format!(
+            "[ERROR] Cannot determine latest track because impl-plan.json is invalid: {} ({e})",
+            display_path(&metadata_file, root)
+        ))]
+    })?;
+    domain::check_impl_plan_presence(&track, impl_plan.as_ref()).map_err(|e| {
+        vec![VerifyFinding::error(format!(
+            "[ERROR] Cannot determine latest track because activation invariant is violated: {} ({e})",
+            display_path(&metadata_file, root)
+        ))]
+    })?;
+
+    // Derive status from impl-plan.json + status_override (v5 has no status field in JSON).
+    // Surface errors so that a broken track cannot silently be treated as a healthy "planned" track.
+    let status = derive_status_from_v5(impl_plan.as_ref(), obj).map_err(|e| {
+        vec![VerifyFinding::error(format!(
+            "[ERROR] Cannot determine latest track because status derivation failed: {} ({e})",
+            display_path(&metadata_file, root)
+        ))]
+    })?;
+
+    // Skip archived tracks early.
+    if status == "archived" {
+        return Ok(None);
+    }
+
+    // Use updated_at from the decoded document meta (authoritative — validated by codec).
+    let updated_at_secs = match parse_updated_at(&doc_meta.updated_at) {
         Ok(secs) => secs,
         Err(e) => {
             return Err(vec![VerifyFinding::error(format!(
@@ -343,227 +379,114 @@ fn parse_updated_at(raw: &str) -> Result<i64, String> {
     Err(format!("cannot parse timestamp: '{value}'"))
 }
 
+/// Derive the track status string for a v5 metadata document.
+///
+/// Loads `impl-plan.json` (if present) from the same directory, parses
+/// `status_override` from the raw JSON, and delegates to
+/// `domain::derive_track_status` to compute the effective status.
+///
+/// Returns the status as a lowercase string compatible with the status
+/// strings used throughout this verifier.
+///
+/// # Errors
+///
+/// Returns an error string when:
+/// - `impl-plan.json` exists but cannot be read (I/O error).
+/// - `impl-plan.json` exists but cannot be decoded (corrupt / invalid JSON).
+/// - `status_override` is present but has an unrecognised `status` value.
+///
+/// Absent `impl-plan.json` (file does not exist) is not an error — it means
+/// the track is in the planning phase (`Planned` status). Activation-invariant
+/// enforcement (a branch-materialized track must carry an impl-plan.json) is
+/// the caller's responsibility — this helper only derives status from the
+/// already-loaded optional impl-plan plus the raw `status_override` JSON.
+fn derive_status_from_v5(
+    impl_plan: Option<&domain::ImplPlanDocument>,
+    obj: &serde_json::Map<String, serde_json::Value>,
+) -> Result<String, String> {
+    // Parse status_override from raw JSON (same shape as codec.rs).
+    // If the key is present but the value is not a JSON object (e.g. a string or
+    // null), treat that as malformed metadata and surface an error rather than
+    // silently ignoring the override.
+    let status_override: Option<StatusOverride> = match obj.get("status_override") {
+        None => None,
+        Some(v) if v.is_null() => None,
+        Some(v) => {
+            let override_obj = v
+                .as_object()
+                .ok_or_else(|| "status_override is present but not a JSON object".to_owned())?;
+            let status_str = override_obj
+                .get("status")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| "status_override.status is missing or not a string".to_owned())?;
+            let reason =
+                override_obj.get("reason").and_then(|v| v.as_str()).unwrap_or("").to_owned();
+            match status_str {
+                "blocked" => Some(
+                    StatusOverride::blocked(reason)
+                        .map_err(|e| format!("invalid blocked override: {e}"))?,
+                ),
+                "cancelled" => Some(
+                    StatusOverride::cancelled(reason)
+                        .map_err(|e| format!("invalid cancelled override: {e}"))?,
+                ),
+                other => {
+                    return Err(format!("unrecognised status_override.status: '{other}'"));
+                }
+            }
+        }
+    };
+
+    Ok(derive_track_status(impl_plan, status_override.as_ref()).to_string())
+}
+
+/// Load and decode `impl-plan.json` from a track directory.
+///
+/// Absent file → `Ok(None)` (planning-only track).
+/// Present but unreadable or corrupt → `Err` (fail-closed).
+///
+/// # Errors
+///
+/// Returns a descriptive error string when the file exists but cannot be read
+/// or decoded.
+fn load_impl_plan_from_dir(track_dir: &Path) -> Result<Option<domain::ImplPlanDocument>, String> {
+    let path = track_dir.join("impl-plan.json");
+    if !path.exists() {
+        return Ok(None);
+    }
+    let json =
+        std::fs::read_to_string(&path).map_err(|e| format!("cannot read impl-plan.json: {e}"))?;
+    let doc = crate::impl_plan_codec::decode(&json)
+        .map_err(|e| format!("cannot decode impl-plan.json: {e}"))?;
+    Ok(Some(doc))
+}
+
 /// Compute track selection priority.
 ///
 /// Returns:
-/// - `2` when the track has a branch and is not done, or is a legacy branchless
-///   track (schema_version != 3) with an active status.
-/// - `1` when the track is branchless v3 and `planned` (planning-only).
-/// - `0` otherwise (done, or unrecognized).
+/// - `2` when the track has a branch and is not done, or is branchless but
+///   actively in-progress (status is active and not `planned`).
+/// - `1` when the track is branchless v3/v4 and `planned` (planning-only).
+///   These are deprioritised so that a branchful active track always wins.
+/// - `0` otherwise (done, archived, or unrecognized).
 fn selection_priority(status: &str, branch: Option<&str>, schema_version: u32) -> u32 {
     let branch_name = branch.map(|b| b.trim()).unwrap_or("");
     let has_branch = !branch_name.is_empty();
+    let is_active = status != "done" && status != "archived";
 
-    if has_branch && status != "done" {
+    if has_branch && is_active {
         return 2;
     }
-    if !has_branch && schema_version != 3 && status != "done" && status != "archived" {
+    // Branchless track with active status that is NOT a planning-only placeholder.
+    // v3/v4/v5 tracks in "planned" state are planning-only (priority 1).
+    // All other branchless active tracks get priority 2.
+    if !has_branch && is_active && !(matches!(schema_version, 3..=5) && status == "planned") {
         return 2;
     }
     if !has_branch && status == "planned" {
         return 1;
     }
     0
-}
-
-// ---------------------------------------------------------------------------
-// v3 branch field validation
-// ---------------------------------------------------------------------------
-
-/// Returns `true` when a v3 metadata dict omits the required `branch` field.
-fn v3_branch_field_missing(data: &serde_json::Value) -> bool {
-    let sv = data.get("schema_version").and_then(|v| v.as_u64());
-    if sv != Some(3) {
-        return false;
-    }
-    !data.as_object().is_some_and(|o| o.contains_key("branch"))
-}
-
-/// Returns `true` when a v3 metadata dict keeps `branch=null` outside legal states.
-///
-/// A v3 branchless track is valid only when `status == "planned"` and all tasks are `todo`.
-fn v3_branchless_track_invalid(data: &serde_json::Value) -> bool {
-    let sv = data.get("schema_version").and_then(|v| v.as_u64());
-    if sv != Some(3) {
-        return false;
-    }
-    // A missing branch field is a separate error.
-    if v3_branch_field_missing(data) {
-        return false;
-    }
-    // Only applies when branch is explicitly null.
-    if !data.get("branch").is_some_and(|v| v.is_null()) {
-        return false;
-    }
-
-    let required_v3_fields = [
-        "schema_version",
-        "id",
-        "title",
-        "status",
-        "created_at",
-        "updated_at",
-        "tasks",
-        "plan",
-        "branch",
-    ];
-    let obj = match data.as_object() {
-        Some(o) => o,
-        None => return true,
-    };
-
-    // All required v3 fields must be present.
-    for field in required_v3_fields {
-        if !obj.contains_key(field) {
-            return true;
-        }
-    }
-
-    // Validate field types and non-empty (fail-closed: reject malformed metadata).
-    // Matches Python validate_metadata_v2 checks.
-    for str_field in ["id", "title", "status", "created_at", "updated_at"] {
-        match obj.get(str_field).and_then(|v| v.as_str()) {
-            Some(s) if !s.trim().is_empty() => {}
-            _ => return true,
-        }
-    }
-    if !obj.get("tasks").is_some_and(|v| v.is_array()) {
-        return true;
-    }
-    if !obj.get("plan").is_some_and(|v| v.is_object()) {
-        return true;
-    }
-
-    // Validate status is a known track status.
-    let status = obj.get("status").and_then(|v| v.as_str()).unwrap_or("");
-    let valid_statuses = ["planned", "in_progress", "done", "blocked", "cancelled", "archived"];
-    if !valid_statuses.contains(&status) {
-        return true;
-    }
-    // A branchless v3 track must have status "planned" with no status_override.
-    if status != "planned" {
-        return true;
-    }
-    // Reject if status_override exists (effective status would not be "planned").
-    if obj.get("status_override").is_some_and(|v| !v.is_null()) {
-        return true;
-    }
-
-    // Validate plan.sections shape (must be checked even with empty tasks).
-    let plan = match obj.get("plan").and_then(|v| v.as_object()) {
-        Some(p) => p,
-        None => return true,
-    };
-    // sections must be an array (fail-closed on wrong type).
-    let sections = match plan.get("sections") {
-        Some(v) => match v.as_array() {
-            Some(arr) => arr,
-            None => return true, // sections exists but is not an array
-        },
-        None => &Vec::new(), // missing sections is ok (empty plan)
-    };
-    if !sections.iter().all(is_valid_plan_section) {
-        return true;
-    }
-
-    // All tasks must be valid objects with todo status.
-    let tasks = match obj.get("tasks").and_then(|v| v.as_array()) {
-        Some(t) => t,
-        None => return true,
-    };
-
-    if !tasks.iter().all(is_valid_todo_task) {
-        return true;
-    }
-
-    // Cross-reference: every task id must be unique and referenced exactly once by plan sections.
-    let task_ids: Vec<&str> =
-        tasks.iter().filter_map(|t| t.get("id").and_then(|v| v.as_str())).collect();
-    // Reject duplicate task IDs.
-    {
-        let mut seen = std::collections::BTreeSet::new();
-        for tid in &task_ids {
-            if !seen.insert(*tid) {
-                return true;
-            }
-        }
-    }
-    let mut section_task_ids: Vec<&str> = Vec::new();
-    for section in sections {
-        if let Some(ids) = section.get("task_ids").and_then(|v| v.as_array()) {
-            for id in ids {
-                if let Some(s) = id.as_str() {
-                    section_task_ids.push(s);
-                }
-            }
-        }
-    }
-    // Each task must appear exactly once in sections.
-    for tid in &task_ids {
-        let count = section_task_ids.iter().filter(|s| *s == tid).count();
-        if count != 1 {
-            return true;
-        }
-    }
-    // No unknown task references in sections.
-    for sid in &section_task_ids {
-        if !task_ids.contains(sid) {
-            return true;
-        }
-    }
-
-    // Empty tasks with valid plan is ok.
-    false
-}
-
-/// Validate a single task object has non-empty id, description, status == "todo",
-/// and commit_hash is null (todo tasks must not carry a commit hash).
-fn is_valid_todo_task(task: &serde_json::Value) -> bool {
-    let obj = match task.as_object() {
-        Some(o) => o,
-        None => return false,
-    };
-    let id_ok = obj.get("id").and_then(|v| v.as_str()).is_some_and(|s| !s.trim().is_empty());
-    let desc_ok =
-        obj.get("description").and_then(|v| v.as_str()).is_some_and(|s| !s.trim().is_empty());
-    let status_ok = obj.get("status").and_then(|v| v.as_str()) == Some("todo");
-    // Todo tasks must have null commit_hash (or absent).
-    let commit_ok = obj.get("commit_hash").is_none_or(|v| v.is_null());
-    id_ok && desc_ok && status_ok && commit_ok
-}
-
-/// Validate a plan section has non-empty id, title, and task_ids array of strings.
-fn is_valid_plan_section(section: &serde_json::Value) -> bool {
-    let obj = match section.as_object() {
-        Some(o) => o,
-        None => return false,
-    };
-    let id_ok = obj.get("id").and_then(|v| v.as_str()).is_some_and(|s| !s.trim().is_empty());
-    let title_ok = obj.get("title").and_then(|v| v.as_str()).is_some_and(|s| !s.trim().is_empty());
-    // task_ids must be an array of strings.
-    let task_ids_ok = obj.get("task_ids").and_then(|v| v.as_array()).is_some_and(|arr| {
-        arr.iter().all(|item| item.as_str().is_some_and(|s| !s.trim().is_empty()))
-    });
-    id_ok && title_ok && task_ids_ok
-}
-
-/// Returns `true` when a v3 metadata dict has an invalid non-null `branch` value.
-fn v3_non_null_branch_invalid(data: &serde_json::Value) -> bool {
-    let sv = data.get("schema_version").and_then(|v| v.as_u64());
-    if sv != Some(3) {
-        return false;
-    }
-    let branch = match data.get("branch") {
-        Some(b) => b,
-        None => return false,
-    };
-    if branch.is_null() {
-        return false;
-    }
-    match branch.as_str() {
-        None => true,
-        Some(s) => s.trim().is_empty() || !s.starts_with("track/"),
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -684,8 +607,28 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
     };
 
     // Collect ALL text-bearing strings from the document for placeholder scanning.
-    let mut all_texts: Vec<&str> = vec![doc.title(), doc.status().as_str(), doc.version()];
-    all_texts.extend(doc.goal().iter().map(|s| s.as_str()));
+    // `all_texts` holds borrowed slices; `owned_file_paths` holds String copies
+    // of PathBuf file paths (whose Cow temporaries do not live long enough to
+    // borrow into all_texts directly).
+    let mut all_texts: Vec<&str> = vec![doc.title(), doc.version()];
+    let mut owned_file_paths: Vec<String> = Vec::new();
+
+    // goal is now Vec<SpecRequirement>; scan id, text, and all typed ref strings.
+    for req in doc.goal() {
+        all_texts.push(req.id().as_ref());
+        all_texts.push(req.text());
+        for adr_ref in req.adr_refs() {
+            owned_file_paths.push(adr_ref.file.to_string_lossy().into_owned());
+            all_texts.push(adr_ref.anchor.as_ref());
+        }
+        for conv_ref in req.convention_refs() {
+            owned_file_paths.push(conv_ref.file.to_string_lossy().into_owned());
+            all_texts.push(conv_ref.anchor.as_ref());
+        }
+        for informal in req.informal_grounds() {
+            all_texts.push(informal.summary.as_ref());
+        }
+    }
     let all_reqs = doc
         .scope()
         .in_scope()
@@ -694,9 +637,20 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
         .chain(doc.constraints().iter())
         .chain(doc.acceptance_criteria().iter());
     for req in all_reqs {
+        // Scan id alongside text and typed refs.
+        all_texts.push(req.id().as_ref());
         all_texts.push(req.text());
-        for src in req.sources() {
-            all_texts.push(src.as_str());
+        // Typed refs: scan both file path and anchor for placeholders.
+        for adr_ref in req.adr_refs() {
+            owned_file_paths.push(adr_ref.file.to_string_lossy().into_owned());
+            all_texts.push(adr_ref.anchor.as_ref());
+        }
+        for conv_ref in req.convention_refs() {
+            owned_file_paths.push(conv_ref.file.to_string_lossy().into_owned());
+            all_texts.push(conv_ref.anchor.as_ref());
+        }
+        for informal in req.informal_grounds() {
+            all_texts.push(informal.summary.as_ref());
         }
     }
     for section in doc.additional_sections() {
@@ -705,9 +659,14 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
             all_texts.push(line.as_str());
         }
     }
+    // related_conventions is now Vec<ConventionRef>; scan both file path and anchor.
     for conv in doc.related_conventions() {
-        all_texts.push(conv.as_str());
+        owned_file_paths.push(conv.file.to_string_lossy().into_owned());
+        all_texts.push(conv.anchor.as_ref());
     }
+    // Append owned file path strings so they are scanned alongside the borrowed slices.
+    let file_path_refs: Vec<&str> = owned_file_paths.iter().map(String::as_str).collect();
+    let all_texts: Vec<&str> = all_texts.into_iter().chain(file_path_refs).collect();
 
     let mut findings = Vec::new();
     let placeholder_patterns = ["TODO:", "TEMPLATE STUB", "TBD"];
@@ -793,7 +752,34 @@ fn validate_plan_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
             findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
         }
     }
-    if !has_task_items(&text) {
+    // Skip the task-items check when:
+    //   (a) impl-plan.json is absent AND the plan.md carries both the machine-generated
+    //       header and the stub Note — this is the transition stub emitted by
+    //       `render_plan(_, None)`.  Requiring both markers makes the bypass much harder
+    //       to trigger accidentally via a hand-written plan.  Requiring the file to be
+    //       absent prevents a copied stub header from bypassing the check when a real
+    //       impl-plan.json already exists.
+    //   (b) impl-plan.json is present, has zero tasks, and the plan.md does NOT carry the
+    //       stub Note — render_plan(Some(empty_doc)) produces the "Tasks (0/0 resolved)"
+    //       header but no task-item lines, which is correct.  If the stub Note is still
+    //       present, the plan.md is stale (view_freshness will catch it, and we treat
+    //       it as an error here too rather than silently skipping the check).
+    let impl_plan_path = path.parent().map(|d| d.join("impl-plan.json"));
+    let impl_plan_absent = !impl_plan_path.as_ref().is_some_and(|p| p.is_file());
+    let has_stub_note = text.contains("> **Note**: `impl-plan.json` not yet generated.");
+    let impl_plan_empty_and_fresh = impl_plan_path.as_ref().is_some_and(|p| {
+        !has_stub_note
+            && p.is_file()
+            && std::fs::read_to_string(p).ok().and_then(|json| {
+                crate::impl_plan_codec::decode(&json).ok().map(|doc| doc.tasks().is_empty())
+            }) == Some(true)
+    });
+    let is_t005_stub = impl_plan_absent
+        && text.contains(
+            "<!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->",
+        )
+        && has_stub_note;
+    if !is_t005_stub && !impl_plan_empty_and_fresh && !has_task_items(&text) {
         findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track plan.md does not contain any task items: {}",
             display_path(path, root)
@@ -881,41 +867,57 @@ mod tests {
         fs::write(path, content).unwrap();
     }
 
-    /// Build a minimal valid v3 metadata JSON for a track.
-    fn make_metadata_v3(id: &str, status: &str, branch_json: &str) -> String {
-        let (task_status, commit_field) =
-            if status == "done" { ("done", r#","commit_hash":"abc1234""#) } else { ("todo", "") };
-        let tasks_json = format!(
-            r#"[{{"id":"t1","description":"Task one","status":"{task_status}"{commit_field}}}]"#
-        );
-        let sections_json = r#"[{"id":"s1","title":"Section","description":[],"task_ids":["t1"]}]"#;
+    /// Build a minimal valid v5 identity-only metadata JSON for a track.
+    ///
+    /// v5 has no `status`, `tasks`, or `plan` fields. Status is derived from
+    /// `impl-plan.json` + `status_override` at runtime.
+    fn make_metadata_v5(id: &str, branch_json: &str, status_override_json: &str) -> String {
         format!(
-            r#"{{"schema_version":3,"id":"{id}","title":"Track {id}","status":"{status}","created_at":"2026-01-01T00:00:00+00:00","updated_at":"2026-01-15T00:00:00+00:00","branch":{branch_json},"tasks":{tasks_json},"plan":{{"summary":[],"sections":{sections_json}}}}}"#
+            r#"{{"schema_version":5,"id":"{id}","title":"Track {id}","created_at":"2026-01-01T00:00:00+00:00","updated_at":"2026-01-15T00:00:00+00:00","branch":{branch_json}{status_override_json}}}"#
         )
     }
 
-    fn setup_track(root: &Path, id: &str, status: &str, branch: Option<&str>) {
+    /// Minimal valid `impl-plan.json` content for test fixtures that need an
+    /// activated (branched) track without caring about the plan contents.
+    const MINIMAL_IMPL_PLAN_JSON: &str =
+        r#"{"schema_version":1,"plan":{"summary":[],"sections":[]}}"#;
+
+    fn setup_track(root: &Path, id: &str, branch: Option<&str>) {
         let dir = root.join(TRACK_ITEMS_DIR).join(id);
         fs::create_dir_all(&dir).unwrap();
         let branch_json = match branch {
             Some(b) => format!(r#""{b}""#),
             None => "null".to_owned(),
         };
-        let meta = make_metadata_v3(id, status, &branch_json);
+        let meta = make_metadata_v5(id, &branch_json, "");
         fs::write(dir.join("metadata.json"), meta).unwrap();
     }
 
     fn setup_track_planned(root: &Path, id: &str) {
-        setup_track(root, id, "planned", None);
+        // v5 planning-only: no branch, no impl-plan.json → status derives to "planned".
+        setup_track(root, id, None);
     }
 
-    fn setup_track_with_branch(root: &Path, id: &str, status: &str) {
+    fn setup_track_with_branch(root: &Path, id: &str) {
         let branch = format!("track/{id}");
-        setup_track(root, id, status, Some(&branch));
+        setup_track(root, id, Some(&branch));
+        // Activated tracks (branch materialized) must carry impl-plan.json per the
+        // activation invariant `is_activated() → impl-plan.json present`. Write a
+        // minimal valid document so that `check_impl_plan_presence` in
+        // `load_track_metadata` succeeds and tests can focus on artifact validation.
+        let dir = root.join(TRACK_ITEMS_DIR).join(id);
+        fs::write(dir.join("impl-plan.json"), MINIMAL_IMPL_PLAN_JSON).unwrap();
     }
 
-    fn setup_complete_track(root: &Path, id: &str, status: &str, branch: Option<&str>) {
-        setup_track(root, id, status, branch);
+    fn setup_complete_track(root: &Path, id: &str, branch: Option<&str>) {
+        setup_track(root, id, branch);
+        // Activated (branched) tracks must carry impl-plan.json. Write a minimal valid
+        // document so `check_impl_plan_presence` succeeds and the verifier can proceed
+        // to check the actual markdown artifacts that this helper is testing.
+        if branch.is_some() {
+            let dir = root.join(TRACK_ITEMS_DIR).join(id);
+            fs::write(dir.join("impl-plan.json"), MINIMAL_IMPL_PLAN_JSON).unwrap();
+        }
         write_file(
             root,
             &format!("{TRACK_ITEMS_DIR}/{id}/spec.md"),
@@ -943,17 +945,36 @@ mod tests {
     }
 
     #[test]
-    fn test_complete_track_passes() {
+    fn test_complete_v5_track_passes() {
         let tmp = TempDir::new().unwrap();
-        setup_complete_track(tmp.path(), "my-feature", "in_progress", Some("track/my-feature"));
+        // v5 track with branch (in-progress derived from impl-plan) and all artifacts.
+        setup_complete_track(tmp.path(), "my-feature", Some("track/my-feature"));
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok(), "complete track should pass: {:#?}", outcome.findings());
+        assert!(outcome.is_ok(), "complete v5 track should pass: {:#?}", outcome.findings());
+    }
+
+    #[test]
+    fn test_legacy_v3_track_is_skipped() {
+        // v3 metadata must be skipped by latest_track.rs. With only a v3 track
+        // in the repo, no track is selected and verify() returns pass.
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("legacy-feat");
+        fs::create_dir_all(&dir).unwrap();
+        let meta = r#"{"schema_version":3,"id":"legacy-feat","title":"Legacy","status":"in_progress","created_at":"2026-01-01T00:00:00+00:00","updated_at":"2026-01-15T00:00:00+00:00","branch":"track/legacy-feat","tasks":[{"id":"t1","description":"Task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"s1","title":"S","description":[],"task_ids":["t1"]}]}}"#;
+        fs::write(dir.join("metadata.json"), meta).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.is_ok(),
+            "v3 tracks must be skipped; no v5 track → pass: {:#?}",
+            outcome.findings()
+        );
     }
 
     #[test]
     fn test_missing_spec_fails() {
         let tmp = TempDir::new().unwrap();
-        setup_track_with_branch(tmp.path(), "feat-a", "in_progress");
+        setup_track_with_branch(tmp.path(), "feat-a");
         // plan.md and verification.md present, spec.md absent
         write_file(
             tmp.path(),
@@ -978,7 +999,7 @@ mod tests {
     #[test]
     fn test_placeholder_in_spec_fails() {
         let tmp = TempDir::new().unwrap();
-        setup_track_with_branch(tmp.path(), "feat-b", "in_progress");
+        setup_track_with_branch(tmp.path(), "feat-b");
         write_file(
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/feat-b/spec.md"),
@@ -1007,7 +1028,7 @@ mod tests {
     #[test]
     fn test_placeholder_in_fenced_block_ignored() {
         let tmp = TempDir::new().unwrap();
-        setup_track_with_branch(tmp.path(), "feat-c", "in_progress");
+        setup_track_with_branch(tmp.path(), "feat-c");
         write_file(
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/feat-c/spec.md"),
@@ -1033,24 +1054,24 @@ mod tests {
     }
 
     #[test]
-    fn test_selection_priority_active_branch_highest() {
-        // Branch + not-done => priority 2
-        assert_eq!(selection_priority("in_progress", Some("track/feat"), 3), 2);
-        // Planned + no branch => priority 1
-        assert_eq!(selection_priority("planned", None, 3), 1);
-        // Done + branch => priority 0
-        assert_eq!(selection_priority("done", Some("track/feat"), 3), 0);
+    fn test_selection_priority_v5_active_branch_highest() {
+        // v5 + branch + not-done => priority 2
+        assert_eq!(selection_priority("in_progress", Some("track/feat"), 5), 2);
+        // v5 + planned + no branch => priority 1
+        assert_eq!(selection_priority("planned", None, 5), 1);
+        // v5 + done + branch => priority 0
+        assert_eq!(selection_priority("done", Some("track/feat"), 5), 0);
         // Active branch beats branchless planned
         assert!(
-            selection_priority("in_progress", Some("track/feat"), 3)
-                > selection_priority("planned", None, 3)
+            selection_priority("in_progress", Some("track/feat"), 5)
+                > selection_priority("planned", None, 5)
         );
     }
 
     #[test]
     fn test_scaffold_placeholder_detected() {
         let tmp = TempDir::new().unwrap();
-        setup_track_with_branch(tmp.path(), "feat-d", "in_progress");
+        setup_track_with_branch(tmp.path(), "feat-d");
         write_file(
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/feat-d/spec.md"),
@@ -1078,9 +1099,9 @@ mod tests {
     }
 
     #[test]
-    fn test_v3_branchless_planned_valid() {
+    fn test_v5_branchless_planned_valid() {
         let tmp = TempDir::new().unwrap();
-        // Planned + v3 + branch=null = valid branchless planning-only track
+        // v5 planning-only: no branch, no impl-plan.json → status derives to "planned".
         setup_track_planned(tmp.path(), "planning-track");
         write_file(
             tmp.path(),
@@ -1101,7 +1122,7 @@ mod tests {
         let outcome = verify(tmp.path());
         assert!(
             outcome.is_ok(),
-            "v3 branchless planned track should pass: {:#?}",
+            "v5 branchless planned track should pass: {:#?}",
             outcome.findings()
         );
     }
@@ -1112,7 +1133,8 @@ mod tests {
         // Track under track/archive/ is skipped by path, no markdown files needed.
         let archive_dir = tmp.path().join(TRACK_ARCHIVE_DIR).join("old-feat");
         fs::create_dir_all(&archive_dir).unwrap();
-        let meta = r#"{"schema_version":3,"id":"old-feat","title":"Old","status":"archived","created_at":"2025-01-01T00:00:00+00:00","updated_at":"2025-01-01T00:00:00+00:00","branch":"track/old-feat","tasks":[{"id":"t1","description":"Done task","status":"done","commit_hash":"abc1234"}],"plan":{"summary":[],"sections":[{"id":"s1","title":"S","description":[],"task_ids":["t1"]}]}}"#;
+        // Even v5 metadata in the archive directory is skipped by path.
+        let meta = make_metadata_v5("old-feat", r#""track/old-feat""#, "");
         fs::write(archive_dir.join("metadata.json"), meta).unwrap();
 
         let outcome = verify(tmp.path());
@@ -1120,6 +1142,113 @@ mod tests {
             outcome.is_ok(),
             "archived track under archive dir should be skipped: {:#?}",
             outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_corrupt_impl_plan_surfaces_error() {
+        // A present but corrupt impl-plan.json must NOT silently be treated as
+        // absent. The verifier should surface an error so that a broken track
+        // is not silently selected as the latest track.
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("corrupt-track");
+        fs::create_dir_all(&dir).unwrap();
+        let meta = make_metadata_v5("corrupt-track", r#""track/corrupt-track""#, "");
+        fs::write(dir.join("metadata.json"), meta).unwrap();
+        // Write invalid JSON to impl-plan.json.
+        fs::write(dir.join("impl-plan.json"), "NOT VALID JSON").unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "corrupt impl-plan.json must surface an error: {:#?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_activated_track_missing_impl_plan_surfaces_error() {
+        // An activated (branch-materialized) v5 track without impl-plan.json violates
+        // the activation invariant `is_activated() → impl-plan.json present` and must
+        // surface an error. A broken activated track must not be silently selected and
+        // treated as a healthy "planned" track.
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("activated-no-plan");
+        fs::create_dir_all(&dir).unwrap();
+        // Branch is set → activated; no impl-plan.json written → invariant violation.
+        let meta = make_metadata_v5("activated-no-plan", r#""track/activated-no-plan""#, "");
+        fs::write(dir.join("metadata.json"), meta).unwrap();
+        // Intentionally omit impl-plan.json.
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "activated track missing impl-plan.json must surface an error: {:#?}",
+            outcome.findings()
+        );
+        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            msgs.iter().any(|m| m.contains("activation invariant")),
+            "error should mention activation invariant, got: {msgs:?}"
+        );
+    }
+
+    #[test]
+    fn test_missing_schema_version_is_not_silently_skipped() {
+        // A metadata.json without `schema_version` must NOT be treated as a
+        // legacy v2/v3 track and silently skipped. It should fall through to
+        // v5 processing so that errors are surfaced (fail-closed).
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("no-version-track");
+        fs::create_dir_all(&dir).unwrap();
+        // metadata.json without schema_version — must not be silently skipped.
+        let meta = r#"{"id":"no-version-track","branch":"track/no-version-track","title":"No Version","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-15T00:00:00Z"}"#;
+        fs::write(dir.join("metadata.json"), meta).unwrap();
+        // No impl-plan.json — if the track were processed as v5, status derives
+        // to "planned" and the verifier proceeds to check artifacts. Without the
+        // required spec.md / plan.md the outcome must be an error (not a silent pass).
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/no-version-track/plan.md"),
+            "# Plan\n\n- [ ] Task one\n",
+        );
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/no-version-track/verification.md"),
+            "# Verification\n\nAll done.\n",
+        );
+        // No spec.md — should produce a "missing spec" error (not pass silently).
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "track with missing schema_version must not be silently skipped: {:#?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_schema_version_overflow_u32_is_rejected() {
+        // u32::MAX + 1 == 4294967296; as u32 would silently wrap to 0 (which is
+        // < 5 and would cause the track to be silently skipped as legacy).
+        // The fix using u32::try_from must surface an explicit error instead.
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("overflow-track");
+        fs::create_dir_all(&dir).unwrap();
+        // schema_version = 4294967298 (u32::MAX + 3) — overflows u32, would wrap to 2
+        // with `as u32` and be silently skipped as a legacy v2 track.
+        let meta = r#"{"schema_version":4294967298,"id":"overflow-track","title":"Overflow Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-15T00:00:00Z","branch":"track/overflow-track"}"#;
+        fs::write(dir.join("metadata.json"), meta).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "schema_version overflow must produce an error (fail-closed): {:#?}",
+            outcome.findings()
+        );
+        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            msgs.iter().any(|m| m.contains("overflows u32")),
+            "error should mention overflow, got: {msgs:?}"
         );
     }
 
@@ -1133,8 +1262,7 @@ mod tests {
     // ---- spec.json artifact tests ----
 
     const VALID_SPEC_JSON: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -1142,7 +1270,7 @@ mod tests {
 
     /// Helper: set up a track with spec.json instead of spec.md.
     fn setup_complete_track_with_spec_json(root: &Path, id: &str) {
-        setup_track_with_branch(root, id, "in_progress");
+        setup_track_with_branch(root, id);
         write_file(root, &format!("{TRACK_ITEMS_DIR}/{id}/spec.json"), VALID_SPEC_JSON);
         write_file(root, &format!("{TRACK_ITEMS_DIR}/{id}/plan.md"), "# Plan\n\n- [ ] Task one\n");
         write_file(
@@ -1186,7 +1314,7 @@ mod tests {
     #[test]
     fn test_invalid_spec_json_fails() {
         let tmp = TempDir::new().unwrap();
-        setup_track_with_branch(tmp.path(), "feat-bad-json", "in_progress");
+        setup_track_with_branch(tmp.path(), "feat-bad-json");
         write_file(
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/feat-bad-json/spec.json"),
@@ -1214,7 +1342,7 @@ mod tests {
     #[test]
     fn test_missing_spec_md_and_spec_json_fails() {
         let tmp = TempDir::new().unwrap();
-        setup_track_with_branch(tmp.path(), "feat-no-spec", "in_progress");
+        setup_track_with_branch(tmp.path(), "feat-no-spec");
         // Neither spec.md nor spec.json present
         write_file(
             tmp.path(),

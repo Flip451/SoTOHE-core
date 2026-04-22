@@ -18,10 +18,13 @@
 //! level — illegal field combinations are rejected by serde, not by manual
 //! validation.
 
+use std::path::PathBuf;
+
 use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration, TraitImplDecl};
 use domain::{
-    ConfidenceSignal, SpecValidationError, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry,
-    TypeDefinitionKind, TypestateTransitions,
+    ConfidenceSignal, ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
+    SpecElementId, SpecRef, SpecValidationError, TypeAction, TypeCatalogueDocument,
+    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
 };
 use serde::{Deserialize, Serialize};
 
@@ -65,7 +68,7 @@ struct TypeCatalogueDocDto {
     #[serde(default)]
     pub type_definitions: Vec<TypeCatalogueEntryDto>,
     /// Backward-compat decode slot for legacy files that still carry inline
-    /// `signals`. T007 (ADR 2026-04-18-1400 §D1 / §D6) moved signals out of
+    /// `signals`. Per ADR 2026-04-18-1400 §D1 / §D6, signals moved out of
     /// the declaration file into `<layer>-type-signals.json`. The DTO
     /// accepts (and discards) any inline signals blob so that decoding a
     /// legacy catalogue file does not fail `deny_unknown_fields`, but the
@@ -94,6 +97,40 @@ struct TypeCatalogueEntryDto {
     pub action: TypeActionDto,
     #[serde(flatten)]
     pub kind: TypeDefinitionKindDto,
+    /// SoT Chain ② references to spec.json elements.
+    /// Defaults to empty when absent in JSON.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub spec_refs: Vec<SpecRefDto>,
+    /// Unpersisted ground citations. Non-empty → 🟡 advisory signal.
+    /// Defaults to empty when absent in JSON.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub informal_grounds: Vec<InformalGroundRefDto>,
+}
+
+/// DTO for a single `SpecRef` (SoT Chain ② — catalogue→spec).
+///
+/// `deny_unknown_fields` ensures stale field names are caught at decode time.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SpecRefDto {
+    /// Relative path to the referenced spec.json file.
+    pub file: String,
+    /// Spec element identifier (e.g. `"IN-01"`, `"AC-02"`).
+    pub anchor: String,
+    /// 64-character lowercase SHA-256 hex of the canonical JSON subtree.
+    pub hash: String,
+}
+
+/// DTO for a single `InformalGroundRef` (unpersisted rationale).
+///
+/// `deny_unknown_fields` ensures stale field names are caught at decode time.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct InformalGroundRefDto {
+    /// Kind tag: `"discussion"`, `"feedback"`, `"memory"`, or `"user_directive"`.
+    pub kind: String,
+    /// Single-line summary of the rationale.
+    pub summary: String,
 }
 
 fn default_approved() -> bool {
@@ -187,7 +224,7 @@ struct TraitImplDeclDto {
     expected_methods: Vec<MethodDto>,
 }
 
-// NOTE: T007 removed the `TypeSignalDto` struct — signal payloads live in
+// NOTE: The `TypeSignalDto` struct was removed — signal payloads live in
 // `<layer>-type-signals.json` (see `type_signals_codec`), not in the
 // declaration file.
 
@@ -212,8 +249,11 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
     // `deny_unknown_fields`.  Parsing as `serde_json::Value` is cheap and avoids
     // a second full deserialization on the happy path.
     let raw: serde_json::Value = serde_json::from_str(json)?;
-    let schema_version =
-        raw.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(0);
+    let schema_version_u64 = raw.get("schema_version").and_then(|v| v.as_u64()).unwrap_or(0);
+    // Use `u32::try_from` to reject values that overflow u32 instead of silently
+    // wrapping (e.g. `4294967298` must not truncate to `2` and masquerade as v2).
+    let schema_version = u32::try_from(schema_version_u64)
+        .map_err(|_| TypeCatalogueCodecError::UnsupportedSchemaVersion(u32::MAX))?;
     if schema_version != 2 {
         return Err(TypeCatalogueCodecError::UnsupportedSchemaVersion(schema_version));
     }
@@ -410,12 +450,12 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
 
     let doc = TypeCatalogueDocument::new(dto.schema_version, entries);
 
-    // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file no longer
-    // carries signals. The DTO still accepts the field for backward-compatible
-    // decode of legacy files written before the split, but the values are
-    // discarded — the authoritative signals live in `<layer>-type-signals.json`
-    // (read by `evaluate_layer_catalogue`, T005). This is the read-side half of
-    // the declaration/evaluation split; the write-side half is `encode` below.
+    // Per ADR 2026-04-18-1400 §D1 / §D6 the declaration file no longer carries
+    // signals. The DTO still accepts the field for backward-compatible decode
+    // of legacy files written before the split, but the values are discarded —
+    // the authoritative signals live in `<layer>-type-signals.json` (read by
+    // `evaluate_layer_catalogue`). This is the read-side half of the
+    // declaration/evaluation split; the write-side half is `encode` below.
     let _legacy_inline_signals = dto.signals;
 
     Ok(doc)
@@ -445,8 +485,93 @@ fn type_catalogue_entry_from_dto(
 ) -> Result<TypeCatalogueEntry, TypeCatalogueCodecError> {
     let kind = type_definition_kind_from_dto(&dto.name, &dto.kind)?;
     let action = type_action_from_dto(dto.action);
-    TypeCatalogueEntry::new(&dto.name, &dto.description, kind, action, dto.approved)
-        .map_err(TypeCatalogueCodecError::Validation)
+    let spec_refs = spec_refs_from_dtos(&dto.name, &dto.spec_refs)?;
+    let informal_grounds = informal_grounds_from_dtos(&dto.name, &dto.informal_grounds)?;
+    TypeCatalogueEntry::with_refs(
+        &dto.name,
+        &dto.description,
+        kind,
+        action,
+        dto.approved,
+        spec_refs,
+        informal_grounds,
+    )
+    .map_err(TypeCatalogueCodecError::Validation)
+}
+
+/// Decode `Vec<SpecRefDto>` → `Vec<SpecRef>`.
+fn spec_refs_from_dtos(
+    entry_name: &str,
+    dtos: &[SpecRefDto],
+) -> Result<Vec<SpecRef>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(dtos.len());
+    for dto in dtos {
+        let anchor = SpecElementId::try_new(&dto.anchor).map_err(|_| {
+            TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "spec_refs[].anchor '{}' is not a valid SpecElementId \
+                     (expected pattern: <UPPER>{{2,}}-<digits>+)",
+                    dto.anchor
+                ),
+            }
+        })?;
+        let hash = ContentHash::try_from_hex(&dto.hash).map_err(|_| {
+            TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "spec_refs[].hash '{}' is not a valid SHA-256 hex string \
+                     (expected 64 lowercase hex characters)",
+                    dto.hash
+                ),
+            }
+        })?;
+        out.push(SpecRef::new(PathBuf::from(&dto.file), anchor, hash));
+    }
+    Ok(out)
+}
+
+/// Decode `Vec<InformalGroundRefDto>` → `Vec<InformalGroundRef>`.
+fn informal_grounds_from_dtos(
+    entry_name: &str,
+    dtos: &[InformalGroundRefDto],
+) -> Result<Vec<InformalGroundRef>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(dtos.len());
+    for dto in dtos {
+        let kind = informal_ground_kind_from_str(&dto.kind).ok_or_else(|| {
+            TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "informal_grounds[].kind '{}' is not a valid InformalGroundKind \
+                     (expected one of: discussion, feedback, memory, user_directive)",
+                    dto.kind
+                ),
+            }
+        })?;
+        let summary = InformalGroundSummary::try_new(&dto.summary).map_err(|_| {
+            TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "informal_grounds[].summary '{}' is invalid \
+                     (must be non-empty and single-line)",
+                    dto.summary
+                ),
+            }
+        })?;
+        out.push(InformalGroundRef::new(kind, summary));
+    }
+    Ok(out)
+}
+
+/// Parse an `InformalGroundKind` from its string representation.
+fn informal_ground_kind_from_str(s: &str) -> Option<InformalGroundKind> {
+    match s {
+        "discussion" => Some(InformalGroundKind::Discussion),
+        "feedback" => Some(InformalGroundKind::Feedback),
+        "memory" => Some(InformalGroundKind::Memory),
+        "user_directive" => Some(InformalGroundKind::UserDirective),
+        _ => None,
+    }
 }
 
 fn type_action_from_dto(dto: TypeActionDto) -> TypeAction {
@@ -605,7 +730,7 @@ fn type_catalogue_doc_to_dto(
 ) -> Result<TypeCatalogueDocDto, TypeCatalogueCodecError> {
     let type_definitions =
         doc.entries().iter().map(type_catalogue_entry_to_dto).collect::<Result<Vec<_>, _>>()?;
-    // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file is authored
+    // Per ADR 2026-04-18-1400 §D1 / §D6, the declaration file is authored
     // content; evaluation results live in `<layer>-type-signals.json`. Emit
     // `signals: None` so the DTO's `skip_serializing_if = "Option::is_none"`
     // elides the field entirely from the on-disk JSON. `doc.signals()` is
@@ -656,13 +781,39 @@ fn type_catalogue_entry_to_dto(
             TypeDefinitionKindDto::SecondaryAdapter { implements: dtos }
         }
     };
+    let spec_refs = spec_refs_to_dtos(entry.spec_refs());
+    let informal_grounds = informal_grounds_to_dtos(entry.informal_grounds());
     Ok(TypeCatalogueEntryDto {
         name: entry.name().to_owned(),
         description: entry.description().to_owned(),
         approved: entry.approved(),
         action: type_action_to_dto(entry.action()),
         kind,
+        spec_refs,
+        informal_grounds,
     })
+}
+
+/// Encode `&[SpecRef]` → `Vec<SpecRefDto>`.
+fn spec_refs_to_dtos(refs: &[SpecRef]) -> Vec<SpecRefDto> {
+    refs.iter()
+        .map(|r| SpecRefDto {
+            file: r.file.to_string_lossy().into_owned(),
+            anchor: r.anchor.as_ref().to_owned(),
+            hash: r.hash.to_hex(),
+        })
+        .collect()
+}
+
+/// Encode `&[InformalGroundRef]` → `Vec<InformalGroundRefDto>`.
+fn informal_grounds_to_dtos(grounds: &[InformalGroundRef]) -> Vec<InformalGroundRefDto> {
+    grounds
+        .iter()
+        .map(|g| InformalGroundRefDto {
+            kind: g.kind.as_str().to_owned(),
+            summary: g.summary.as_ref().to_owned(),
+        })
+        .collect()
 }
 
 /// Shared helper: encode a `Vec<MethodDeclaration>` into `Vec<MethodDto>`.
@@ -745,8 +896,8 @@ fn method_to_dto(
     })
 }
 
-// NOTE: T007 removed `type_signal_to_dto`, `confidence_signal_to_str`, and
-// `type_signal_from_dto` helpers — signals now live in
+// NOTE: The `type_signal_to_dto`, `confidence_signal_to_str`, and
+// `type_signal_from_dto` helpers were removed — signals live in
 // `<layer>-type-signals.json` via `type_signals_codec`, not in the
 // declaration file.
 
@@ -1031,7 +1182,7 @@ mod tests {
 
     #[test]
     fn test_decode_silently_drops_legacy_inline_signals() {
-        // T007 (ADR 2026-04-18-1400 §D1 / §D6): the declaration file no longer
+        // Per ADR 2026-04-18-1400 §D1 / §D6 the declaration file no longer
         // carries signals. Legacy declaration files that still have an inline
         // `signals` blob must be decodable (backward compat), but the value
         // is discarded — the authoritative signals live in
@@ -1046,10 +1197,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(
-            doc.signals().is_none(),
-            "legacy inline signals must be dropped after T007 codec strip"
-        );
+        assert!(doc.signals().is_none(), "legacy inline signals must be dropped during decode");
 
         let encoded = encode(&doc).unwrap();
         assert!(
@@ -1246,11 +1394,10 @@ mod tests {
 
     #[test]
     fn test_encode_never_emits_signals_even_with_inline_red_input() {
-        // T007: even when the legacy declaration file has rich inline signals
+        // Even when the legacy declaration file has rich inline signals
         // (Red + missing_items), the decoder drops them and the encoder emits
-        // a clean declaration with no `signals` field. This closes the
-        // Migration §5b write-side contract: after T007 lands, every written
-        // declaration file is authored-only.
+        // a clean declaration with no `signals` field. This enforces the
+        // write-side contract: every written declaration file is authored-only.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -1856,6 +2003,268 @@ mod tests {
             matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
             "expected InvalidEntry for stale implements on enum, got: {:?}",
             err
+        );
+    }
+
+    // --- spec_refs and informal_grounds round-trip tests ---
+
+    #[test]
+    fn test_decode_entry_without_spec_refs_defaults_to_empty() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "TrackId", "kind": "value_object", "description": "ID" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(doc.entries()[0].spec_refs().is_empty());
+        assert!(doc.entries()[0].informal_grounds().is_empty());
+    }
+
+    #[test]
+    fn test_decode_spec_refs_present() {
+        let hash = "a".repeat(64);
+        let json = format!(
+            r#"{{
+  "schema_version": 2,
+  "type_definitions": [
+    {{
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "spec_refs": [
+        {{ "file": "track/items/my-track/spec.json", "anchor": "IN-01", "hash": "{hash}" }}
+      ]
+    }}
+  ]
+}}"#
+        );
+        let doc = decode(&json).unwrap();
+        let entry = &doc.entries()[0];
+        assert_eq!(entry.spec_refs().len(), 1);
+        assert_eq!(entry.spec_refs()[0].anchor.as_ref(), "IN-01");
+        assert_eq!(entry.spec_refs()[0].file.to_string_lossy(), "track/items/my-track/spec.json");
+        assert_eq!(entry.spec_refs()[0].hash.to_hex(), hash);
+    }
+
+    #[test]
+    fn test_decode_informal_grounds_present() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "user asked to defer Q15 anchor semantics" }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let entry = &doc.entries()[0];
+        assert_eq!(entry.informal_grounds().len(), 1);
+        assert!(entry.has_informal_grounds());
+        assert_eq!(entry.informal_grounds()[0].kind, InformalGroundKind::Discussion);
+        assert_eq!(
+            entry.informal_grounds()[0].summary.as_ref(),
+            "user asked to defer Q15 anchor semantics"
+        );
+    }
+
+    #[test]
+    fn test_round_trip_spec_refs_and_informal_grounds() {
+        let hash = "b".repeat(64);
+        let json = format!(
+            r#"{{
+  "schema_version": 2,
+  "type_definitions": [
+    {{
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "spec_refs": [
+        {{ "file": "track/items/my-track/spec.json", "anchor": "AC-02", "hash": "{hash}" }}
+      ],
+      "informal_grounds": [
+        {{ "kind": "user_directive", "summary": "keep as value_object per user" }}
+      ]
+    }}
+  ]
+}}"#
+        );
+        let doc = decode(&json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        let e1 = &doc.entries()[0];
+        let e2 = &doc2.entries()[0];
+        assert_eq!(e1.spec_refs().len(), e2.spec_refs().len());
+        assert_eq!(e1.spec_refs()[0].anchor.as_ref(), e2.spec_refs()[0].anchor.as_ref());
+        assert_eq!(e1.spec_refs()[0].hash.to_hex(), e2.spec_refs()[0].hash.to_hex());
+        assert_eq!(e1.informal_grounds().len(), e2.informal_grounds().len());
+        assert_eq!(e1.informal_grounds()[0].kind, e2.informal_grounds()[0].kind);
+        assert_eq!(
+            e1.informal_grounds()[0].summary.as_ref(),
+            e2.informal_grounds()[0].summary.as_ref()
+        );
+    }
+
+    #[test]
+    fn test_encode_omits_spec_refs_when_empty() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "TrackId", "kind": "value_object", "description": "ID" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        assert!(!encoded.contains("\"spec_refs\""));
+        assert!(!encoded.contains("\"informal_grounds\""));
+    }
+
+    #[test]
+    fn test_decode_invalid_spec_ref_anchor_returns_error() {
+        let hash = "c".repeat(64);
+        let json = format!(
+            r#"{{
+  "schema_version": 2,
+  "type_definitions": [
+    {{
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "spec_refs": [
+        {{ "file": "spec.json", "anchor": "INVALID", "hash": "{hash}" }}
+      ]
+    }}
+  ]
+}}"#
+        );
+        let err = decode(&json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for bad anchor, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_invalid_spec_ref_hash_returns_error() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "spec_refs": [
+        { "file": "spec.json", "anchor": "IN-01", "hash": "not-a-hex-hash" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for bad hash, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_invalid_informal_ground_kind_returns_error() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "informal_grounds": [
+        { "kind": "unknown_kind", "summary": "some summary" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for unknown informal_grounds kind, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_empty_informal_ground_summary_returns_error() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "informal_grounds": [
+        { "kind": "feedback", "summary": "" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for empty summary, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_all_informal_ground_kinds() {
+        let kinds = ["discussion", "feedback", "memory", "user_directive"];
+        let expected = [
+            InformalGroundKind::Discussion,
+            InformalGroundKind::Feedback,
+            InformalGroundKind::Memory,
+            InformalGroundKind::UserDirective,
+        ];
+        for (kind_str, expected_kind) in kinds.iter().zip(expected.iter()) {
+            let json = format!(
+                r#"{{
+  "schema_version": 2,
+  "type_definitions": [
+    {{
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "ID",
+      "informal_grounds": [
+        {{ "kind": "{kind_str}", "summary": "test summary" }}
+      ]
+    }}
+  ]
+}}"#
+            );
+            let doc = decode(&json).unwrap();
+            assert_eq!(
+                doc.entries()[0].informal_grounds()[0].kind,
+                *expected_kind,
+                "kind '{kind_str}' did not round-trip correctly"
+            );
+        }
+    }
+
+    #[test]
+    fn test_decode_schema_version_overflowing_u32_returns_unsupported_error() {
+        // Regression guard for the `u32::try_from` fix: a schema_version value that
+        // exceeds u32::MAX (e.g. 4294967298 = u32::MAX + 3) must be rejected with
+        // UnsupportedSchemaVersion(u32::MAX) and NOT silently truncated to 2
+        // (which would make it masquerade as a valid v2 catalogue).
+        // Before the fix, `v as u32` would wrap 4294967298 → 2 (valid v2!).
+        let json = r#"{ "schema_version": 4294967298, "type_definitions": [] }"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::UnsupportedSchemaVersion(u32::MAX)),
+            "expected UnsupportedSchemaVersion(u32::MAX) for overflow schema_version, got: {err:?}"
         );
     }
 }

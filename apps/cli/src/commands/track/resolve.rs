@@ -1,3 +1,5 @@
+use domain::ImplPlanReader;
+
 use crate::CliError;
 
 use super::*;
@@ -31,29 +33,25 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
     let (track, meta) = read_track_metadata(&items_dir, &track_id)
         .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
 
-    // Fail-closed: reject branchless v3 tracks that violate planning-only invariants.
-    // Both raw status (from JSON) and domain-derived status (from tasks) must be planned.
-    if meta.schema_version == 3 && track.branch().is_none() {
-        let raw = meta.original_status.as_deref();
-        let derived = track.status();
-        if raw != Some("planned") {
-            return Err(CliError::Message(format!(
-                "resolve failed: track '{track_id}' is branchless v3 but raw status is '{}', \
-                 not planned; metadata may be corrupt",
-                raw.unwrap_or("(missing)")
-            )));
-        }
-        if derived != domain::TrackStatus::Planned {
-            return Err(CliError::Message(format!(
-                "resolve failed: track '{track_id}' is branchless v3 but derived status is \
-                 '{derived}', not planned; metadata may be corrupt"
-            )));
-        }
-    }
+    // Load impl-plan.json via FsTrackStore::load_impl_plan (fail-closed):
+    // - Absent file → Ok(None) — valid for planning-only tracks (no branch, no plan).
+    // - Present but corrupt/unreadable → Err — propagated as a hard failure.
+    // Planning-only tracks (no branch, no plan) receive None and are reported correctly.
+    let store = FsTrackStore::new(items_dir.clone());
+    let impl_plan = store
+        .load_impl_plan(&track_id)
+        .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
 
-    // Note: TrackStatus::Archived is not reachable from domain-derived status();
+    // Fail-closed: route through the domain API so the activation invariant
+    // (`is_activated() ↔ impl-plan.json present`) has a single source of truth.
+    // Activation is identified by branch materialization only; an override on
+    // a branchless planning track does not imply activation.
+    domain::check_impl_plan_presence(&track, impl_plan.as_ref())
+        .map_err(|e| CliError::Message(format!("resolve failed: {e}")))?;
+
+    // Note: TrackStatus::Archived is not reachable from derive_track_status();
     // archived tracks live under track/archive/ and are not resolved by this command.
-    let info = domain::track_phase::resolve_phase(&track, meta.schema_version);
+    let info = domain::track_phase::resolve_phase(&track, meta.schema_version, impl_plan.as_ref());
 
     println!("Current phase: {}", info.phase);
     println!("Reason: {}", info.reason);

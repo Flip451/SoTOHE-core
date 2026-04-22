@@ -466,7 +466,7 @@ fn trigger_review<C: GhClient>(pr: &str, client: &C) -> Result<ExitCode, CliErro
 }
 
 // ---------------------------------------------------------------------------
-// T005: poll-review
+// poll-review
 // ---------------------------------------------------------------------------
 
 /// Outcome of a poll-review operation for the review cycle.

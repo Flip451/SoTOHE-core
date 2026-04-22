@@ -2,32 +2,24 @@
 //!
 //! Verifies that sequential read-modify-write operations on metadata.json
 //! produce correct results.
+//!
+//! TrackMetadata is identity-only. Task-level sequential update tests cover
+//! impl-plan.json task transitions. The `status` field is removed from
+//! metadata.json; track status is derived on demand. Tests here verify
+//! `status_override` persistence.
 
 #![allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
 use domain::{
-    PlanSection, PlanView, TaskId, TaskTransition, TrackId, TrackMetadata, TrackReader,
-    TrackStatus, TrackTask, TrackWriter,
+    StatusOverride, TrackId, TrackMetadata, TrackReader, TrackWriter, derive_track_status,
 };
 use infrastructure::track::fs_store::FsTrackStore;
 
-fn make_track(num_tasks: usize) -> TrackMetadata {
-    let tasks: Vec<TrackTask> = (1..=num_tasks)
-        .map(|i| {
-            let id = TaskId::try_new(format!("T{i}")).unwrap();
-            TrackTask::new(id, format!("Task {i}")).unwrap()
-        })
-        .collect();
-
-    let task_ids: Vec<TaskId> = tasks.iter().map(|t| t.id().clone()).collect();
-    let section = PlanSection::new("S1", "All tasks", Vec::new(), task_ids).unwrap();
-    let plan = PlanView::new(Vec::new(), vec![section]);
-
+fn make_track() -> TrackMetadata {
+    // Identity-only; no tasks/plan/status fields.
     TrackMetadata::new(
         TrackId::try_new("concurrency-test").unwrap(),
         "Concurrency Test Track",
-        tasks,
-        plan,
         None,
     )
     .unwrap()
@@ -36,75 +28,58 @@ fn make_track(num_tasks: usize) -> TrackMetadata {
 #[test]
 fn sequential_updates_are_applied_correctly() {
     let dir = tempfile::tempdir().unwrap();
-
     let store = FsTrackStore::new(dir.path());
 
-    let num_tasks = 5;
-    let track = make_track(num_tasks);
+    let track = make_track();
     let track_id = track.id().clone();
 
     store.save(&track).unwrap();
 
-    // Sequentially transition each task to in_progress.
-    for i in 1..=num_tasks {
-        let task_id = TaskId::try_new(format!("T{i}")).unwrap();
-        store
-            .update(&track_id, |t| {
-                t.transition_task(&task_id, TaskTransition::Start)?;
-                Ok(())
-            })
-            .unwrap();
-    }
+    // Status is derived on demand; test that status_override is persisted correctly.
+    store
+        .update(&track_id, |t| {
+            t.set_status_override(Some(StatusOverride::blocked("testing sequential").unwrap()));
+            Ok(())
+        })
+        .unwrap();
 
-    // Verify: all tasks should be in_progress.
     let final_track = store.find(&track_id).unwrap().unwrap();
-    assert_eq!(final_track.status(), TrackStatus::InProgress);
-
-    for task in final_track.tasks() {
-        assert_eq!(
-            task.status().kind(),
-            domain::TaskStatusKind::InProgress,
-            "task {} should be in_progress",
-            task.id()
-        );
-    }
+    assert!(
+        final_track.status_override().is_some(),
+        "status_override must be persisted after sequential update"
+    );
+    assert_eq!(derive_track_status(None, final_track.status_override()).to_string(), "blocked");
 }
 
 #[test]
-fn sequential_updates_then_complete_all_results_in_done() {
+fn sequential_updates_then_clear_override_derives_planned() {
     let dir = tempfile::tempdir().unwrap();
-
     let store = FsTrackStore::new(dir.path());
 
-    let num_tasks = 3;
-    let track = make_track(num_tasks);
+    let track = make_track();
     let track_id = track.id().clone();
 
     store.save(&track).unwrap();
 
-    // Phase 1: Start all tasks sequentially.
-    for i in 1..=num_tasks {
-        let task_id = TaskId::try_new(format!("T{i}")).unwrap();
-        store
-            .update(&track_id, |t| {
-                t.transition_task(&task_id, TaskTransition::Start)?;
-                Ok(())
-            })
-            .unwrap();
-    }
+    // Set and then clear override; derived status should return to Planned.
+    store
+        .update(&track_id, |t| {
+            t.set_status_override(Some(StatusOverride::blocked("temporary block").unwrap()));
+            Ok(())
+        })
+        .unwrap();
+    store
+        .update(&track_id, |t| {
+            t.set_status_override(None);
+            Ok(())
+        })
+        .unwrap();
 
-    // Phase 2: Complete all tasks sequentially.
-    for i in 1..=num_tasks {
-        let task_id = TaskId::try_new(format!("T{i}")).unwrap();
-        store
-            .update(&track_id, |t| {
-                t.transition_task(&task_id, TaskTransition::Complete { commit_hash: None })?;
-                Ok(())
-            })
-            .unwrap();
-    }
-
-    // Verify: track should be done (all tasks resolved).
     let final_track = store.find(&track_id).unwrap().unwrap();
-    assert_eq!(final_track.status(), TrackStatus::Done);
+    assert!(final_track.status_override().is_none(), "override must be cleared");
+    assert_eq!(
+        derive_track_status(None, final_track.status_override()).to_string(),
+        "planned",
+        "no override + no impl-plan → Planned"
+    );
 }

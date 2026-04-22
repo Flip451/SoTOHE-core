@@ -26,6 +26,13 @@ pub enum ValidationError {
     InvalidTimestamp(String),
     #[error("track branch '{0}' must match the pattern track/<slug>")]
     InvalidTrackBranch(String),
+    #[error("branch '{branch}' slug does not match track id '{id}'")]
+    BranchIdMismatch { id: String, branch: String },
+    #[error(
+        "status_override kind '{override_kind}' requires status '{required}', \
+         but status is '{actual}'"
+    )]
+    StatusOverrideMismatch { override_kind: String, required: String, actual: String },
     #[error("track title must not be empty")]
     EmptyTrackTitle,
     #[error("task description must not be empty")]
@@ -66,11 +73,28 @@ pub enum ValidationError {
     TaskDescriptionMutated { task_id: String },
     #[error("task '{task_id}' was removed; existing tasks cannot be deleted via save")]
     TaskRemoved { task_id: String },
+    #[error("duplicate spec element id '{0}' — ids must be unique across all sections")]
+    DuplicateElementId(String),
     #[error(
         "layer id '{0}' must be a non-empty ASCII identifier starting with a letter \
          (allowed: letters, digits, `_`, `-`)"
     )]
     InvalidLayerId(String),
+    #[error(
+        "spec element id '{0}' must match the pattern <UPPER>{{2,}}-<digits>+ \
+         (e.g. IN-01, AC-02, CO-03)"
+    )]
+    InvalidSpecElementId(String),
+    #[error("ADR anchor must not be empty")]
+    EmptyAdrAnchor,
+    #[error("convention anchor must not be empty")]
+    EmptyConventionAnchor,
+    #[error("content hash '{0}' must be 64 lowercase hex characters (SHA-256)")]
+    InvalidContentHash(String),
+    #[error("informal ground summary must not be empty")]
+    EmptyInformalGroundSummary,
+    #[error("informal ground summary must be a single line (no line breaks)")]
+    MultiLineInformalGroundSummary,
 }
 
 /// Errors from invalid task state transitions.
@@ -106,6 +130,14 @@ pub enum TrackWriteError {
 
     #[error(transparent)]
     Repository(#[from] RepositoryError),
+}
+
+impl From<TrackReadError> for TrackWriteError {
+    fn from(e: TrackReadError) -> Self {
+        match e {
+            TrackReadError::Repository(repo_err) => TrackWriteError::Repository(repo_err),
+        }
+    }
 }
 
 /// Error type for `WorktreeReader` port operations.

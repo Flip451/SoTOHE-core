@@ -92,7 +92,7 @@ pub struct CodexLocalArgs {
 
 /// Validated auto-record arguments ready for use after Codex completes.
 #[derive(Debug)]
-#[allow(dead_code)] // expected_groups used by v1 test stubs (T007 cleanup)
+#[allow(dead_code)] // expected_groups used by v1 test stubs (pending cleanup)
 pub(super) struct ValidatedAutoRecordArgs {
     pub(super) track_id: domain::TrackId,
     pub(super) round_type: domain::RoundType,

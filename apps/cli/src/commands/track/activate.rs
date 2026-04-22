@@ -1,4 +1,5 @@
 use crate::CliError;
+use domain::ImplPlanReader;
 
 use super::*;
 
@@ -77,13 +78,35 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     }
 
     let resume_allowed = if already_materialized && mode == BranchMode::Auto {
+        // Derive the track status on demand from impl-plan.json + status_override.
+        // v5 tracks no longer store a status field in metadata.json, so reading
+        // `track_record.status` (which is `None` for v5) and defaulting to "planned"
+        // would allow `activation_resume_allowed` to skip its early-return guard
+        // for done/blocked/cancelled tracks. Instead, derive the status properly.
+        let (track_meta, _) = super::resolve::read_track_metadata(&items_dir, &track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let store = FsTrackStore::new(items_dir.clone());
+        let impl_plan_for_status = store
+            .load_impl_plan(&track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let derived_status = domain::derive_track_status(
+            impl_plan_for_status.as_ref(),
+            track_meta.status_override(),
+        );
+        // Fail-closed: route through the domain API so the activation invariant
+        // has a single source of truth. Activation is identified by branch
+        // materialization only; an override on a branchless planning track
+        // does not imply activation.
+        domain::check_impl_plan_presence(&track_meta, impl_plan_for_status.as_ref())
+            .map_err(|e| CliError::Message(format!("activation preflight failed: {e}")))?;
+        let status_str = derived_status.to_string();
         activation_resume_allowed(
             &repo,
             &project_root,
             &items_dir,
             &track_id,
             &branch_name,
-            track_record.status.as_deref().unwrap_or("planned"),
+            &status_str,
             current_branch.as_deref(),
         )
         .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?
@@ -116,6 +139,27 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     let branch_exists =
         preflight_branch_operation(&repo, &branch_name, mode, !already_materialized)
             .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+
+    // Fail-closed: for a not-yet-materialized track, derive status from impl-plan +
+    // status_override. If the track already has a non-Planned status (e.g., someone
+    // added an impl-plan directly without going through the branch workflow), reject
+    // activation rather than allowing materialization of a non-planning track.
+    if !already_materialized {
+        let (track_meta, _) = super::resolve::read_track_metadata(&items_dir, &track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let activation_store = FsTrackStore::new(items_dir.clone());
+        let preflight_plan = activation_store
+            .load_impl_plan(&track_id)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
+        let preflight_status =
+            domain::derive_track_status(preflight_plan.as_ref(), track_meta.status_override());
+        if preflight_status != domain::TrackStatus::Planned {
+            return Err(CliError::Message(format!(
+                "activation preflight failed: track '{track_id}' has derived status \
+                 '{preflight_status}' (not Planned); cannot activate a non-planning track"
+            )));
+        }
+    }
 
     let materialized_now = if already_materialized {
         false
@@ -612,8 +656,14 @@ fn activation_rejects_invalid_source_branch(
     }
 }
 
-pub(super) fn uses_legacy_branch_mode(mode: BranchMode, schema_version: u32) -> bool {
-    schema_version != 3 && !matches!(mode, BranchMode::Auto)
+pub(super) fn uses_legacy_branch_mode(_mode: BranchMode, _schema_version: u32) -> bool {
+    // The legacy branch-mode path is retired. The only supported metadata
+    // schemas are v4/v5 (identity-only); legacy schemas (v1 / v2 / v3)
+    // are frozen history and have no backward-compat route. All branch ops
+    // — regardless of mode or schema — flow through the full activation
+    // path, which materializes metadata properly and fails explicitly on an
+    // unsupported schema rather than silently succeeding with stale state.
+    false
 }
 
 /// Fetches dirty worktree paths via git, delegating parsing to the usecase layer.
@@ -865,9 +915,12 @@ mod tests {
 
     fn write_track_metadata(
         root: &Path,
-        schema_version: u32,
+        _schema_version: u32,
         branch: Option<&str>,
     ) -> std::path::PathBuf {
+        // All new tracks are schema_version 5 (no status/tasks/plan fields).
+        // The _schema_version argument is kept for call-site compatibility but
+        // always writes v5 since legacy schemas are no longer accepted by FsTrackStore.
         let track_dir = root.join("track/items/demo");
         fs::create_dir_all(&track_dir).unwrap();
         let branch_json = match branch {
@@ -878,31 +931,12 @@ mod tests {
             track_dir.join("metadata.json"),
             format!(
                 r#"{{
-  "schema_version": {schema_version},
+  "schema_version": 5,
   "id": "demo",
   "branch": {branch_json},
   "title": "Demo",
-  "status": "planned",
   "created_at": "2026-03-14T00:00:00Z",
-  "updated_at": "2026-03-14T00:00:00Z",
-  "tasks": [
-    {{
-      "id": "T1",
-      "description": "Implement activation guard",
-      "status": "todo"
-    }}
-  ],
-  "plan": {{
-    "summary": [],
-    "sections": [
-      {{
-        "id": "S1",
-        "title": "Build",
-        "description": [],
-        "task_ids": ["T1"]
-      }}
-    ]
-  }}
+  "updated_at": "2026-03-14T00:00:00Z"
 }}
 "#
             ),
@@ -983,34 +1017,35 @@ mod tests {
     }
 
     #[test]
-    fn reject_branchless_guard_allows_legacy_v2_branchless_tracks_via_fs_store() {
-        let dir = tempfile::tempdir().unwrap();
-        write_track_metadata(dir.path(), 2, None);
-
-        let items_dir = dir.path().join("track/items");
-        let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
-
-        let result = usecase::track_resolution::reject_branchless_guard(
-            &store,
-            &TrackId::try_new("demo").unwrap(),
-            "in_progress",
+    fn reject_branchless_guard_allows_legacy_v2_branchless_tracks_via_direct_call() {
+        // v2 tracks cannot be read via FsTrackStore (codec now requires v5).
+        // Test the underlying guard directly: schema_version 2 branchless tracks
+        // are allowed by `reject_branchless_implementation_transition` because
+        // the guard only fires for schema_version >= 3.
+        let id = TrackId::try_new("demo").unwrap();
+        let result = usecase::track_resolution::reject_branchless_implementation_transition(
             2,
+            None, // branchless
+            &id,
+            "in_progress",
         );
-
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "v2 branchless tracks must not be blocked by the guard");
     }
 
     #[rstest]
-    #[case::create_v2(BranchMode::Create, 2, true)]
-    #[case::switch_v2(BranchMode::Switch, 2, true)]
-    #[case::auto_v2(BranchMode::Auto, 2, false)]
-    #[case::create_v3(BranchMode::Create, 3, false)]
-    fn uses_legacy_branch_mode_only_for_non_auto_v2_paths(
-        #[case] mode: BranchMode,
-        #[case] schema_version: u32,
-        #[case] expected: bool,
-    ) {
-        assert_eq!(uses_legacy_branch_mode(mode, schema_version), expected);
+    #[case::create_v2(BranchMode::Create, 2)]
+    #[case::switch_v2(BranchMode::Switch, 2)]
+    #[case::auto_v2(BranchMode::Auto, 2)]
+    #[case::create_v3(BranchMode::Create, 3)]
+    #[case::switch_v3(BranchMode::Switch, 3)]
+    #[case::create_v4(BranchMode::Create, 4)]
+    #[case::switch_v4(BranchMode::Switch, 4)]
+    #[case::auto_v4(BranchMode::Auto, 4)]
+    fn uses_legacy_branch_mode_is_retired(#[case] mode: BranchMode, #[case] schema_version: u32) {
+        assert!(
+            !uses_legacy_branch_mode(mode, schema_version),
+            "legacy branch-mode dispatch is retired; all ops must flow through the activation path"
+        );
     }
 
     #[rstest]

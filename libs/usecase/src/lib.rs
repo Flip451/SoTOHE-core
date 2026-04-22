@@ -18,8 +18,9 @@ pub mod worktree_guard;
 use std::sync::Arc;
 
 use domain::{
-    CommitHash, StatusOverride, TaskId, TaskTransition, TrackId, TrackMetadata, TrackReadError,
-    TrackReader, TrackWriteError, TrackWriter, TransitionError, ValidationError,
+    CommitHash, ImplPlanReader, ImplPlanWriter, RepositoryError, StatusOverride, TaskId,
+    TaskTransition, TrackId, TrackMetadata, TrackReadError, TrackReader, TrackWriteError,
+    TrackWriter, ValidationError,
 };
 
 /// Persists a track aggregate.
@@ -63,43 +64,88 @@ impl<R: TrackReader> LoadTrackUseCase<R> {
 }
 
 /// Applies a state transition to a task within a track and persists the result.
-/// Uses `TrackWriter::update` for atomic read-modify-write (no find/save race).
-pub struct TransitionTaskUseCase<W: TrackWriter> {
-    writer: Arc<W>,
+///
+/// Reads `impl-plan.json` via [`ImplPlanReader`], applies the transition on the
+/// `ImplPlanDocument` aggregate, persists via [`ImplPlanWriter`].
+/// Returns the (unchanged) [`TrackMetadata`] from the initial read.
+///
+/// `metadata.json` is **not** written — track status is derived on demand from
+/// `impl-plan.json` via `domain::derive_track_status`. This eliminates the
+/// two-file non-atomic write (impl-plan.json + metadata.json) that was flagged
+/// in PR #107.
+pub struct TransitionTaskUseCase<S>
+where
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
+{
+    store: Arc<S>,
 }
 
-impl<W: TrackWriter> TransitionTaskUseCase<W> {
+impl<S> TransitionTaskUseCase<S>
+where
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
+{
     #[must_use]
-    pub fn new(writer: Arc<W>) -> Self {
-        Self { writer }
+    pub fn new(store: Arc<S>) -> Self {
+        Self { store }
     }
 
-    /// Transitions a task and persists the updated track atomically.
+    /// Transitions a task by an explicit [`TaskTransition`] and persists the result.
+    ///
+    /// Only `impl-plan.json` is written. `metadata.json` is not touched.
+    ///
+    /// # Concurrency note
+    /// This performs a non-serialized read-modify-write on `impl-plan.json`. Concurrent
+    /// callers operating against the same track directory are not supported — the CLI is
+    /// designed for sequential single-process execution, consistent with
+    /// `FsTrackStore::with_locked_document`'s documented assumption that "concurrent
+    /// callers are not supported — parallel access will be handled by worktree isolation".
     ///
     /// # Errors
-    /// Returns `TrackWriteError` if the track is not found, the task is not found,
-    /// or the transition is invalid.
+    /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
+    /// Returns `TrackWriteError::Repository(Message)` if `impl-plan.json` is missing or
+    /// cannot be read/written.
+    /// Returns `TrackWriteError::Domain` if the transition is invalid or the task is not found.
     pub fn execute(
         &self,
         track_id: &TrackId,
         task_id: &TaskId,
         transition: TaskTransition,
     ) -> Result<TrackMetadata, TrackWriteError> {
-        self.writer.update(track_id, |track| {
-            track.transition_task(task_id, transition)?;
-            Ok(())
-        })
+        // Verify the track exists.
+        let track = self.store.find(track_id).map_err(TrackWriteError::from)?.ok_or_else(|| {
+            TrackWriteError::Repository(RepositoryError::TrackNotFound(track_id.to_string()))
+        })?;
+
+        // Load impl-plan.json (required for transition).
+        let mut impl_plan =
+            self.store.load_impl_plan(track_id).map_err(TrackWriteError::from)?.ok_or_else(
+                || {
+                    TrackWriteError::Repository(RepositoryError::Message(format!(
+                        "impl-plan.json not found for track '{track_id}'"
+                    )))
+                },
+            )?;
+
+        // Apply transition on the domain aggregate.
+        impl_plan.apply_transition(task_id, transition).map_err(TrackWriteError::from)?;
+
+        // Persist impl-plan.json ONLY (single-file atomic write).
+        self.store.save_impl_plan(track_id, &impl_plan).map_err(TrackWriteError::from)?;
+
+        // Return the (unchanged) metadata — callers derive status on demand.
+        Ok(track)
     }
 
     /// Resolves a target status string to the correct transition and applies it.
     ///
-    /// This is a higher-level entry point that encapsulates the
-    /// task-lookup → resolve-transition → transition-task flow so that the CLI
-    /// only needs to pass the raw `target_status` string and optional commit hash.
+    /// Only `impl-plan.json` is written. `metadata.json` is not touched.
     ///
     /// # Errors
-    /// Returns `TrackWriteError` if the track/task is not found, the target status
-    /// is unrecognised, or the transition is invalid for the current task state.
+    /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
+    /// Returns `TrackWriteError::Repository(Message)` if `impl-plan.json` is missing or
+    /// cannot be read/written.
+    /// Returns `TrackWriteError::Domain` if the target status is unrecognised, the task
+    /// is not found, or the transition is invalid for the current state.
     pub fn execute_by_status(
         &self,
         track_id: &TrackId,
@@ -107,44 +153,72 @@ impl<W: TrackWriter> TransitionTaskUseCase<W> {
         target_status: &str,
         commit_hash: Option<CommitHash>,
     ) -> Result<TrackMetadata, TrackWriteError> {
-        self.writer.update(track_id, |track| {
-            let task =
-                track.tasks().iter().find(|t| *t.id() == *task_id).ok_or_else(|| {
-                    TransitionError::TaskNotFound { task_id: task_id.to_string() }
-                })?;
-            let current_status = task.status();
+        // Verify the track exists.
+        let track = self.store.find(track_id).map_err(TrackWriteError::from)?.ok_or_else(|| {
+            TrackWriteError::Repository(RepositoryError::TrackNotFound(track_id.to_string()))
+        })?;
 
-            let transition =
-                track_resolution::resolve_transition(target_status, current_status, commit_hash)
-                    .map_err(|e| match e {
-                        track_resolution::TrackResolutionError::UnsupportedTargetStatus(s) => {
-                            ValidationError::UnsupportedTargetStatus(s)
-                        }
-                        other => ValidationError::UnsupportedTargetStatus(other.to_string()),
-                    })?;
+        // Load impl-plan.json (required for transition).
+        let mut impl_plan =
+            self.store.load_impl_plan(track_id).map_err(TrackWriteError::from)?.ok_or_else(
+                || {
+                    TrackWriteError::Repository(RepositoryError::Message(format!(
+                        "impl-plan.json not found for track '{track_id}'"
+                    )))
+                },
+            )?;
 
-            track.transition_task(task_id, transition)?;
-            Ok(())
-        })
+        // Apply transition by status string on the domain aggregate.
+        impl_plan
+            .apply_transition_by_status(task_id, target_status, commit_hash)
+            .map_err(TrackWriteError::from)?;
+
+        // Persist impl-plan.json ONLY (single-file atomic write).
+        self.store.save_impl_plan(track_id, &impl_plan).map_err(TrackWriteError::from)?;
+
+        // Return the (unchanged) metadata — callers derive status on demand.
+        Ok(track)
     }
 }
 
-/// Adds a new task to a track and persists the result atomically.
-pub struct AddTaskUseCase<W: TrackWriter> {
-    writer: Arc<W>,
+/// Adds a new task to a track's `impl-plan.json` and persists the result.
+///
+/// Reads `impl-plan.json` via [`ImplPlanReader`], delegates to
+/// [`domain::ImplPlanDocument::add_task`], persists via [`ImplPlanWriter`].
+/// Returns the (unchanged) [`TrackMetadata`] and the newly-allocated [`TaskId`].
+///
+/// `metadata.json` is **not** written — track status is derived on demand from
+/// `impl-plan.json` via `domain::derive_track_status`.
+pub struct AddTaskUseCase<S>
+where
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
+{
+    store: Arc<S>,
 }
 
-impl<W: TrackWriter> AddTaskUseCase<W> {
+impl<S> AddTaskUseCase<S>
+where
+    S: TrackReader + ImplPlanReader + ImplPlanWriter,
+{
     #[must_use]
-    pub fn new(writer: Arc<W>) -> Self {
-        Self { writer }
+    pub fn new(store: Arc<S>) -> Self {
+        Self { store }
     }
 
-    /// Adds a task to the track and persists atomically.
+    /// Adds a task to the track and persists the result.
+    ///
+    /// Only `impl-plan.json` is written. `metadata.json` is not touched.
+    ///
+    /// # Concurrency note
+    /// This performs a non-serialized read-modify-write on `impl-plan.json`. See
+    /// [`TransitionTaskUseCase::execute`] for the documented single-process assumption.
     ///
     /// # Errors
-    /// Returns `TrackWriteError` if the track is not found, description is empty,
-    /// or the target section does not exist.
+    /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
+    /// Returns `TrackWriteError::Repository(Message)` if `impl-plan.json` is missing or
+    /// cannot be read/written.
+    /// Returns `TrackWriteError::Domain` if `description` is empty or the target section
+    /// does not exist.
     pub fn execute(
         &self,
         track_id: &TrackId,
@@ -152,41 +226,76 @@ impl<W: TrackWriter> AddTaskUseCase<W> {
         section_id: Option<&str>,
         after_task_id: Option<&TaskId>,
     ) -> Result<(TrackMetadata, TaskId), TrackWriteError> {
-        let captured_id = std::cell::Cell::new(None);
-        let track = self.writer.update(track_id, |track| {
-            let tid = track.add_task(description, section_id, after_task_id)?;
-            captured_id.set(Some(tid));
-            Ok(())
+        // Validate description early (mirrors domain validation for clear early error).
+        if description.trim().is_empty() {
+            return Err(TrackWriteError::Domain(ValidationError::EmptyTaskDescription.into()));
+        }
+
+        // Verify the track exists.
+        let track = self.store.find(track_id).map_err(TrackWriteError::from)?.ok_or_else(|| {
+            TrackWriteError::Repository(RepositoryError::TrackNotFound(track_id.to_string()))
         })?;
-        let tid = captured_id
-            .into_inner()
-            .ok_or_else(|| TrackWriteError::Domain(ValidationError::EmptyTaskDescription.into()))?;
-        Ok((track, tid))
+
+        // Load impl-plan.json (required for task management).
+        let mut impl_plan =
+            self.store.load_impl_plan(track_id).map_err(TrackWriteError::from)?.ok_or_else(
+                || {
+                    TrackWriteError::Repository(RepositoryError::Message(format!(
+                        "impl-plan.json not found for track '{track_id}'"
+                    )))
+                },
+            )?;
+
+        // Add the task on the domain aggregate.
+        let new_task_id = impl_plan
+            .add_task(description, section_id, after_task_id)
+            .map_err(TrackWriteError::from)?;
+
+        // Persist impl-plan.json ONLY (single-file atomic write).
+        self.store.save_impl_plan(track_id, &impl_plan).map_err(TrackWriteError::from)?;
+
+        // Return the (unchanged) metadata — callers derive status on demand.
+        Ok((track, new_task_id))
     }
 }
 
 /// Sets or clears a status override on a track and persists the result atomically.
-pub struct SetOverrideUseCase<W: TrackWriter> {
-    writer: Arc<W>,
+///
+/// This is a genuine identity mutation (not a derived-status sync): it updates
+/// `status_override` in `metadata.json`. Track status is derived on demand
+/// from `impl-plan.json` + `status_override` by callers.
+pub struct SetOverrideUseCase<S>
+where
+    S: TrackWriter,
+{
+    store: Arc<S>,
 }
 
-impl<W: TrackWriter> SetOverrideUseCase<W> {
+impl<S> SetOverrideUseCase<S>
+where
+    S: TrackWriter,
+{
     #[must_use]
-    pub fn new(writer: Arc<W>) -> Self {
-        Self { writer }
+    pub fn new(store: Arc<S>) -> Self {
+        Self { store }
     }
 
-    /// Sets a status override on the track and persists atomically.
+    /// Sets or clears a status override on the track and persists atomically.
+    ///
+    /// * `status_override = Some(ov)` — sets the override (Blocked/Cancelled + reason).
+    /// * `status_override = None` — clears the override.
+    ///
+    /// Only `metadata.json` is written. `impl-plan.json` is not touched.
     ///
     /// # Errors
-    /// Returns `TrackWriteError` if the track is not found or override is incompatible.
+    /// Returns `TrackWriteError` if the track is not found or the underlying writer fails.
     pub fn execute(
         &self,
         track_id: &TrackId,
         status_override: Option<StatusOverride>,
     ) -> Result<TrackMetadata, TrackWriteError> {
-        self.writer.update(track_id, |track| {
-            track.set_status_override(status_override)?;
+        self.store.update(track_id, |track| {
+            track.set_status_override(status_override);
             Ok(())
         })
     }
@@ -199,12 +308,11 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use domain::{
-        DomainError, PlanSection, PlanView, RepositoryError, TaskId, TaskTransition, TrackId,
+        DomainError, ImplPlanDocument, ImplPlanReader, ImplPlanWriter, PlanSection, PlanView,
+        RepositoryError, StatusOverride, TaskId, TaskStatus, TaskTransition, TrackId,
         TrackMetadata, TrackReadError, TrackReader, TrackStatus, TrackTask, TrackWriteError,
-        TrackWriter,
+        TrackWriter, ValidationError, derive_track_status,
     };
-
-    use domain::StatusOverride;
 
     use super::{
         AddTaskUseCase, LoadTrackUseCase, SaveTrackUseCase, SetOverrideUseCase,
@@ -214,6 +322,7 @@ mod tests {
     #[derive(Default)]
     struct StubTrackStore {
         tracks: Mutex<HashMap<TrackId, TrackMetadata>>,
+        impl_plans: Mutex<HashMap<TrackId, ImplPlanDocument>>,
     }
 
     impl TrackReader for StubTrackStore {
@@ -251,146 +360,130 @@ mod tests {
         }
     }
 
-    fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Implement the domain aggregate").unwrap();
-        let section = PlanSection::new("S1", "Domain", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
+    impl ImplPlanReader for StubTrackStore {
+        fn load_impl_plan(
+            &self,
+            id: &TrackId,
+        ) -> Result<Option<ImplPlanDocument>, RepositoryError> {
+            let plans = self
+                .impl_plans
+                .lock()
+                .map_err(|_| RepositoryError::Message("lock error".to_owned()))?;
+            Ok(plans.get(id).cloned())
+        }
+    }
 
+    impl ImplPlanWriter for StubTrackStore {
+        fn save_impl_plan(
+            &self,
+            id: &TrackId,
+            doc: &ImplPlanDocument,
+        ) -> Result<(), RepositoryError> {
+            let mut plans = self
+                .impl_plans
+                .lock()
+                .map_err(|_| RepositoryError::Message("lock error".to_owned()))?;
+            plans.insert(id.clone(), doc.clone());
+            Ok(())
+        }
+    }
+
+    fn sample_track() -> TrackMetadata {
+        // Identity-only TrackMetadata; tasks/plan live in impl-plan.json.
+        // Status is derived on demand via derive_track_status.
         TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            vec![task],
-            plan,
             None,
         )
         .unwrap()
     }
 
-    #[test]
-    fn save_and_load_round_trip_track() {
-        let store = Arc::new(StubTrackStore::default());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let load = LoadTrackUseCase::new(Arc::clone(&store));
-        let track = sample_track();
-
-        save.execute(&track).unwrap();
-        let loaded = load.execute(track.id()).unwrap().unwrap();
-
-        assert_eq!(loaded, track);
+    fn sample_impl_plan() -> ImplPlanDocument {
+        let task = TrackTask::new(TaskId::try_new("T001").unwrap(), "First task").unwrap();
+        let section =
+            PlanSection::new("S1", "Impl", vec![], vec![TaskId::try_new("T001").unwrap()]).unwrap();
+        ImplPlanDocument::new(vec![task], PlanView::new(vec![], vec![section])).unwrap()
     }
 
     #[test]
-    fn transition_usecase_persists_updated_track() {
+    fn transition_usecase_missing_impl_plan_returns_repository_error() {
+        // When impl-plan.json is not present, TransitionTaskUseCase returns a
+        // RepositoryError (not a Domain error) explaining the missing document.
         let store = Arc::new(StubTrackStore::default());
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
+        let task_id = TaskId::try_new("T001").unwrap();
 
         save.execute(&track).unwrap();
-        let updated = transition.execute(track.id(), &task_id, TaskTransition::Start).unwrap();
+        let result = transition.execute(track.id(), &task_id, TaskTransition::Start);
+        assert!(result.is_err());
+        assert!(
+            matches!(result, Err(TrackWriteError::Repository(_))),
+            "expected RepositoryError when impl-plan.json is missing"
+        );
+    }
 
-        assert_eq!(updated.status(), TrackStatus::InProgress);
-        assert_eq!(store.find(track.id()).unwrap().unwrap().status(), TrackStatus::InProgress);
+    #[test]
+    fn transition_usecase_execute_by_status_transitions_task_and_updates_impl_plan_only() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let impl_plan = sample_impl_plan();
+        let task_id = TaskId::try_new("T001").unwrap();
+
+        save.execute(&track).unwrap();
+        store.save_impl_plan(track.id(), &impl_plan).unwrap();
+
+        let result = transition.execute_by_status(track.id(), &task_id, "in_progress", None);
+        assert!(result.is_ok(), "transition to in_progress must succeed: {result:?}");
+
+        // Verify the impl-plan task was updated.
+        let updated_plan = store.load_impl_plan(track.id()).unwrap().unwrap();
+        assert!(
+            matches!(updated_plan.tasks()[0].status(), TaskStatus::InProgress),
+            "task must be InProgress after transition"
+        );
+
+        // Status is derived on demand — metadata.json is NOT written by transition.
+        // Verify derived status reflects the updated impl-plan.
+        assert_eq!(
+            derive_track_status(Some(&updated_plan), None),
+            TrackStatus::InProgress,
+            "derived status must be InProgress when a task is in_progress"
+        );
+    }
+
+    #[test]
+    fn transition_usecase_execute_with_explicit_transition_updates_impl_plan_only() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let impl_plan = sample_impl_plan();
+        let task_id = TaskId::try_new("T001").unwrap();
+
+        save.execute(&track).unwrap();
+        store.save_impl_plan(track.id(), &impl_plan).unwrap();
+
+        let result = transition.execute(track.id(), &task_id, TaskTransition::Start);
+        assert!(result.is_ok(), "explicit Start transition must succeed: {result:?}");
+
+        // metadata.json is NOT written — derive status from updated impl-plan.
+        let updated_plan = store.load_impl_plan(track.id()).unwrap().unwrap();
+        assert_eq!(derive_track_status(Some(&updated_plan), None), TrackStatus::InProgress);
     }
 
     #[test]
     fn transition_usecase_returns_error_for_missing_track() {
         let store = Arc::new(StubTrackStore::default());
-        let transition = TransitionTaskUseCase::new(store);
-        let track_id = TrackId::try_new("nonexistent-track").unwrap();
-        let task_id = TaskId::try_new("T1").unwrap();
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
+        let track_id = TrackId::try_new("nonexistent").unwrap();
+        let task_id = TaskId::try_new("T001").unwrap();
 
         let result = transition.execute(&track_id, &task_id, TaskTransition::Start);
-
-        assert!(matches!(
-            result,
-            Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
-        ));
-    }
-
-    #[test]
-    fn execute_by_status_resolves_and_transitions() {
-        let store = Arc::new(StubTrackStore::default());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
-        let track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
-
-        save.execute(&track).unwrap();
-        let updated =
-            transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
-
-        assert_eq!(updated.status(), TrackStatus::InProgress);
-    }
-
-    #[test]
-    fn execute_by_status_rejects_unsupported_status() {
-        let store = Arc::new(StubTrackStore::default());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
-        let track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
-
-        save.execute(&track).unwrap();
-        let err = transition.execute_by_status(track.id(), &task_id, "invalid", None).unwrap_err();
-
-        let msg = err.to_string();
-        assert!(
-            msg.contains("unsupported target status"),
-            "expected 'unsupported target status' in: {msg}"
-        );
-        assert!(msg.contains("invalid"), "expected 'invalid' in: {msg}");
-        // Verify no double-prefixing
-        assert_eq!(msg.matches("unsupported target status").count(), 1, "double-prefix in: {msg}");
-    }
-
-    #[test]
-    fn execute_by_status_reopens_done_task() {
-        let store = Arc::new(StubTrackStore::default());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
-        let track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
-
-        save.execute(&track).unwrap();
-        transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
-        transition.execute_by_status(track.id(), &task_id, "done", None).unwrap();
-        let updated =
-            transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
-
-        assert_eq!(updated.status(), TrackStatus::InProgress);
-    }
-
-    // --- AddTaskUseCase tests ---
-
-    #[test]
-    fn add_task_usecase_appends_task_and_persists() {
-        let store = Arc::new(StubTrackStore::default());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let add_task = AddTaskUseCase::new(Arc::clone(&store));
-        let track = sample_track();
-
-        save.execute(&track).unwrap();
-        let (updated, new_id) =
-            add_task.execute(track.id(), "New task from usecase", None, None).unwrap();
-
-        assert_eq!(new_id.as_ref(), "T002");
-        assert_eq!(updated.tasks().len(), 2);
-        assert_eq!(updated.tasks()[1].description(), "New task from usecase");
-        // Verify persistence
-        let loaded = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(loaded.tasks().len(), 2);
-    }
-
-    #[test]
-    fn add_task_usecase_returns_error_for_missing_track() {
-        let store = Arc::new(StubTrackStore::default());
-        let add_task = AddTaskUseCase::new(store);
-        let track_id = TrackId::try_new("nonexistent-track").unwrap();
-
-        let result = add_task.execute(&track_id, "Some task", None, None);
         assert!(matches!(
             result,
             Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
@@ -407,6 +500,46 @@ mod tests {
         save.execute(&track).unwrap();
         let result = add_task.execute(track.id(), "", None, None);
         assert!(result.is_err());
+        assert!(matches!(
+            result,
+            Err(TrackWriteError::Domain(domain::DomainError::Validation(
+                ValidationError::EmptyTaskDescription
+            )))
+        ));
+    }
+
+    #[test]
+    fn add_task_usecase_adds_task_to_impl_plan() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let add_task = AddTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let impl_plan = sample_impl_plan();
+
+        save.execute(&track).unwrap();
+        store.save_impl_plan(track.id(), &impl_plan).unwrap();
+
+        let result = add_task.execute(track.id(), "New task description", None, None);
+        assert!(result.is_ok(), "add_task must succeed: {result:?}");
+        let (_, new_id) = result.unwrap();
+        assert_eq!(new_id.as_ref(), "T002", "new task must get next ID T002");
+
+        // Verify the impl-plan was updated.
+        let updated_plan = store.load_impl_plan(track.id()).unwrap().unwrap();
+        assert_eq!(updated_plan.tasks().len(), 2, "impl-plan must now have 2 tasks");
+    }
+
+    #[test]
+    fn add_task_usecase_returns_error_for_missing_impl_plan() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let add_task = AddTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+
+        save.execute(&track).unwrap();
+        // No impl_plan saved → should return RepositoryError
+        let result = add_task.execute(track.id(), "New task", None, None);
+        assert!(matches!(result, Err(TrackWriteError::Repository(_))));
     }
 
     // --- SetOverrideUseCase tests ---
@@ -423,9 +556,11 @@ mod tests {
             .execute(track.id(), Some(StatusOverride::blocked("blocker reason").unwrap()))
             .unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::Blocked);
+        // Status is derived from status_override.
+        assert_eq!(derive_track_status(None, updated.status_override()), TrackStatus::Blocked);
         let loaded = store.find(track.id()).unwrap().unwrap();
-        assert_eq!(loaded.status(), TrackStatus::Blocked);
+        assert!(loaded.status_override().is_some());
+        assert_eq!(derive_track_status(None, loaded.status_override()), TrackStatus::Blocked);
     }
 
     #[test]
@@ -439,7 +574,8 @@ mod tests {
         set_override.execute(track.id(), Some(StatusOverride::blocked("reason").unwrap())).unwrap();
         let updated = set_override.execute(track.id(), None).unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::Planned);
+        // Override cleared → derived status from impl-plan (None) + no override = Planned
+        assert_eq!(derive_track_status(None, updated.status_override()), TrackStatus::Planned);
     }
 
     #[test]
@@ -457,43 +593,6 @@ mod tests {
     }
 
     #[test]
-    fn add_task_usecase_returns_error_for_unknown_section() {
-        let store = Arc::new(StubTrackStore::default());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let add_task = AddTaskUseCase::new(Arc::clone(&store));
-        let track = sample_track();
-
-        save.execute(&track).unwrap();
-        let result = add_task.execute(track.id(), "Some task", Some("NONEXISTENT"), None);
-        assert!(result.is_err());
-        let msg = result.unwrap_err().to_string();
-        assert!(msg.contains("not found"), "expected 'not found' in: {msg}");
-    }
-
-    #[test]
-    fn set_override_usecase_rejects_override_on_resolved_track() {
-        let store = Arc::new(StubTrackStore::default());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
-        let set_override = SetOverrideUseCase::new(Arc::clone(&store));
-        let track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
-
-        save.execute(&track).unwrap();
-        // Move task to done to make all tasks resolved
-        transition.execute(track.id(), &task_id, TaskTransition::Start).unwrap();
-        transition
-            .execute(track.id(), &task_id, TaskTransition::Complete { commit_hash: None })
-            .unwrap();
-
-        let result =
-            set_override.execute(track.id(), Some(StatusOverride::blocked("reason").unwrap()));
-        assert!(result.is_err());
-        let msg = result.unwrap_err().to_string();
-        assert!(msg.contains("incompatible"), "expected 'incompatible' in: {msg}");
-    }
-
-    #[test]
     fn load_usecase_returns_none_for_missing_track() {
         let store = Arc::new(StubTrackStore::default());
         let load = LoadTrackUseCase::new(store);
@@ -502,5 +601,18 @@ mod tests {
         let result = load.execute(&track_id).unwrap();
 
         assert!(result.is_none());
+    }
+
+    #[test]
+    fn save_and_load_round_trip_track() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let load = LoadTrackUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+
+        save.execute(&track).unwrap();
+        let loaded = load.execute(track.id()).unwrap().unwrap();
+
+        assert_eq!(loaded, track);
     }
 }

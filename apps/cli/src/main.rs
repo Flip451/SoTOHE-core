@@ -4,11 +4,9 @@ use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Parser, Subcommand};
-use domain::{
-    DomainError, PlanSection, PlanView, TaskId, TaskTransition, TrackId, TrackMetadata, TrackTask,
-};
+use domain::{DomainError, TrackId, TrackMetadata, derive_track_status};
 use infrastructure::InMemoryTrackStore;
-use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
+use usecase::SaveTrackUseCase;
 
 mod commands;
 mod error;
@@ -70,11 +68,6 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::file::FileCommand,
     },
-    /// Spec operations (approve, etc.).
-    Spec {
-        #[command(subcommand)]
-        cmd: commands::spec::SpecCommand,
-    },
     /// Verification checks for CI validation.
     Verify {
         #[command(subcommand)]
@@ -99,7 +92,6 @@ fn main() -> ExitCode {
         Some(CliCommand::Plan { cmd }) => commands::plan::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
-        Some(CliCommand::Spec { cmd }) => commands::spec::execute(cmd),
         Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
         Some(CliCommand::Make(args)) => commands::make::execute(args),
         Some(CliCommand::Demo) | None => match run_demo() {
@@ -115,40 +107,21 @@ fn main() -> ExitCode {
 fn run_demo() -> Result<ExitCode, CliError> {
     let store = Arc::new(InMemoryTrackStore::new());
     let save = SaveTrackUseCase::new(Arc::clone(&store));
-    let transition = TransitionTaskUseCase::new(Arc::clone(&store));
 
     let track = example_track()
         .map_err(|e| CliError::Message(format!("failed to build example track: {e}")))?;
-    let track_id = track.id().clone();
 
     save.execute(&track)
         .map_err(|e| CliError::Message(format!("failed to save example track: {e}")))?;
 
-    let task_id = TaskId::try_new("T1")
-        .map_err(|e| CliError::Message(format!("failed to build example task id: {e}")))?;
-
-    let updated = transition
-        .execute(&track_id, &task_id, TaskTransition::Start)
-        .map_err(|e| CliError::Message(format!("failed to transition example task: {e}")))?;
-
-    println!("SoTOHE-core CLI stub: '{}' is {}", updated.id(), updated.status());
+    let status = derive_track_status(None, track.status_override());
+    println!("SoTOHE-core CLI stub: '{}' is {status}", track.id());
     Ok(ExitCode::SUCCESS)
 }
 
 fn example_track() -> Result<TrackMetadata, DomainError> {
-    let task_id = TaskId::try_new("T1")?;
-    let task = TrackTask::new(task_id.clone(), "Implement the track aggregate")?;
-    let section = PlanSection::new("S1", "Domain model", Vec::new(), vec![task_id])?;
-    let plan =
-        PlanView::new(vec!["Track status is derived from task state.".to_owned()], vec![section]);
-
-    TrackMetadata::new(
-        TrackId::try_new("track-state-machine")?,
-        "Track state machine",
-        vec![task],
-        plan,
-        None,
-    )
+    // TrackMetadata is identity-only; status is derived on demand.
+    TrackMetadata::new(TrackId::try_new("track-state-machine")?, "Track state machine", None)
 }
 
 #[cfg(test)]
@@ -156,23 +129,22 @@ fn example_track() -> Result<TrackMetadata, DomainError> {
 mod tests {
     use std::sync::Arc;
 
-    use domain::{TaskId, TaskTransition, TrackStatus};
+    use domain::derive_track_status;
     use infrastructure::InMemoryTrackStore;
-    use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
+    use usecase::SaveTrackUseCase;
 
     use super::example_track;
 
     #[test]
-    fn example_cli_flow_moves_track_into_in_progress() {
+    fn example_cli_flow_saves_track_successfully() {
+        // Status is derived on demand from impl-plan + override.
+        // A freshly created track with no impl-plan and no override → Planned.
         let store = Arc::new(InMemoryTrackStore::new());
         let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = example_track().unwrap();
-        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
-        let updated = transition.execute(track.id(), &task_id, TaskTransition::Start).unwrap();
 
-        assert_eq!(updated.status(), TrackStatus::InProgress);
+        assert_eq!(derive_track_status(None, track.status_override()).to_string(), "planned");
     }
 }

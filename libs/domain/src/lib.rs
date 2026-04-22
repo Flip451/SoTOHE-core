@@ -8,13 +8,16 @@ pub mod git_ref;
 pub mod guard;
 pub mod hook;
 mod ids;
+pub mod impl_plan;
 mod plan;
+pub mod plan_ref;
 mod repository;
 pub mod review_v2;
 pub mod schema;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
+pub mod task_coverage;
 pub mod tddd;
 mod timestamp;
 mod track;
@@ -28,18 +31,26 @@ pub use error::{
 };
 pub use git_ref::{RefValidationError, validate_branch_ref};
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
+pub use impl_plan::{
+    IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument, ImplPlanPresenceError, check_impl_plan_presence,
+};
 pub use plan::{PlanSection, PlanView};
-pub use repository::{TrackReader, TrackWriter, WorktreeReader};
+pub use plan_ref::{
+    AdrAnchor, AdrRef, ContentHash, ConventionAnchor, ConventionRef, InformalGroundKind,
+    InformalGroundRef, InformalGroundSummary, SpecElementId, SpecRef,
+};
+pub use repository::{ImplPlanReader, ImplPlanWriter, TrackReader, TrackWriter, WorktreeReader};
 pub use review_v2::RoundType;
 pub use schema::{TraitImplEntry, TraitNode, TypeGraph, TypeNode};
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };
 pub use spec::{
-    CoverageResult, HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot,
-    SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError,
+    HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot, SpecDocument,
+    SpecRequirement, SpecScope, SpecSection, SpecValidationError, check_spec_doc_signals,
     evaluate_requirement_signal,
 };
+pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
     MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
@@ -56,7 +67,7 @@ pub use tddd::type_signals_doc::{
 pub use timestamp::Timestamp;
 pub use track::{
     StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,
-    TrackStatus, TrackTask,
+    TrackStatus, TrackTask, derive_track_status,
 };
 
 #[cfg(test)]
@@ -68,20 +79,6 @@ mod tests {
 
     fn task(id: &str, description: &str) -> TrackTask {
         TrackTask::new(TaskId::try_new(id).unwrap(), description).unwrap()
-    }
-
-    fn section(id: &str, title: &str, task_ids: &[&str]) -> PlanSection {
-        PlanSection::new(
-            id,
-            title,
-            Vec::new(),
-            task_ids.iter().map(|task_id| TaskId::try_new(*task_id).unwrap()).collect(),
-        )
-        .unwrap()
-    }
-
-    fn plan(task_ids: &[&str]) -> PlanView {
-        PlanView::new(Vec::new(), vec![section("S1", "Build", task_ids)])
     }
 
     #[test]
@@ -118,62 +115,39 @@ mod tests {
         assert_eq!(task.status().kind(), TaskStatusKind::Done);
     }
 
+    // TrackMetadata is identity-only; status is derived on demand via
+    // derive_track_status(impl_plan, status_override). Task-level state machine tests
+    // stay in track.rs; the lib integration tests verify the public API surface.
+
     #[test]
-    fn track_status_is_derived_from_task_states() {
+    fn track_status_derives_to_planned_with_no_plan_no_override() {
+        let track = TrackMetadata::new(
+            TrackId::try_new("track-state-machine").unwrap(),
+            "Track state machine",
+            None,
+        )
+        .unwrap();
+        // No impl-plan, no override → Planned
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Planned);
+    }
+
+    #[test]
+    fn track_status_override_sets_blocked() {
         let mut track = TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
-            vec![task("T1", "Write domain model"), task("T2", "Write tests")],
-            plan(&["T1", "T2"]),
             None,
         )
         .unwrap();
 
-        assert_eq!(track.status(), TrackStatus::Planned);
+        track.set_status_override(Some(StatusOverride::blocked("waiting on review").unwrap()));
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Blocked);
+        assert!(track.status_override().is_some());
 
-        track.transition_task(&TaskId::try_new("T1").unwrap(), TaskTransition::Start).unwrap();
-        assert_eq!(track.status(), TrackStatus::InProgress);
-
-        track
-            .transition_task(
-                &TaskId::try_new("T1").unwrap(),
-                TaskTransition::Complete { commit_hash: None },
-            )
-            .unwrap();
-        track.transition_task(&TaskId::try_new("T2").unwrap(), TaskTransition::Start).unwrap();
-        track
-            .transition_task(
-                &TaskId::try_new("T2").unwrap(),
-                TaskTransition::Complete { commit_hash: None },
-            )
-            .unwrap();
-
-        assert_eq!(track.status(), TrackStatus::Done);
-    }
-
-    #[test]
-    fn resolving_every_task_auto_clears_override() {
-        let mut track = TrackMetadata::new(
-            TrackId::try_new("track-state-machine").unwrap(),
-            "Track state machine",
-            vec![task("T1", "Write domain model")],
-            plan(&["T1"]),
-            Some(StatusOverride::blocked("waiting on review").unwrap()),
-        )
-        .unwrap();
-
-        assert_eq!(track.status(), TrackStatus::Blocked);
-
-        track.transition_task(&TaskId::try_new("T1").unwrap(), TaskTransition::Start).unwrap();
-        track
-            .transition_task(
-                &TaskId::try_new("T1").unwrap(),
-                TaskTransition::Complete { commit_hash: None },
-            )
-            .unwrap();
-
+        // Clearing override → Planned
+        track.set_status_override(None);
         assert_eq!(track.status_override(), None);
-        assert_eq!(track.status(), TrackStatus::Done);
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Planned);
     }
 
     #[rstest]
@@ -192,23 +166,6 @@ mod tests {
                 "expected {input:?} to be rejected"
             );
         }
-    }
-
-    #[test]
-    fn plan_must_reference_each_task_exactly_once() {
-        let track = TrackMetadata::new(
-            TrackId::try_new("track-state-machine").unwrap(),
-            "Track state machine",
-            vec![task("T1", "Write domain model"), task("T2", "Write tests")],
-            plan(&["T1"]),
-            None,
-        );
-
-        assert!(matches!(
-            track,
-            Err(DomainError::Validation(ValidationError::UnreferencedTask(task_id)))
-                if task_id == "T2"
-        ));
     }
 
     #[test]
@@ -268,8 +225,6 @@ mod tests {
             TrackId::try_new("my-track").unwrap(),
             Some(TrackBranch::try_new("track/my-track").unwrap()),
             "My Track",
-            vec![task("T1", "Task one")],
-            plan(&["T1"]),
             None,
         )
         .unwrap();
@@ -278,14 +233,8 @@ mod tests {
 
     #[test]
     fn track_metadata_without_branch_returns_none() {
-        let track = TrackMetadata::new(
-            TrackId::try_new("my-track").unwrap(),
-            "My Track",
-            vec![task("T1", "Task one")],
-            plan(&["T1"]),
-            None,
-        )
-        .unwrap();
+        let track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
         assert!(track.branch().is_none());
     }
 }

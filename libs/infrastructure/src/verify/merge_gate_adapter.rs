@@ -17,7 +17,7 @@
 
 use std::path::PathBuf;
 
-use domain::TrackMetadata;
+use domain::ImplPlanDocument;
 use domain::TypeCatalogueDocument;
 use domain::spec::SpecDocument;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
@@ -149,7 +149,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         track_id: &str,
         layer_id: &str,
     ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
-        // T007: resolve the catalogue filename from the PR branch's
+        // Resolve the catalogue filename from the PR branch's
         // `architecture-rules.json` so that layers with an explicit
         // `tddd.catalogue_file` override are handled consistently between
         // the CI path (`verify_from_spec_json`) and the merge gate.
@@ -175,12 +175,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         };
 
         // ADR 2026-04-18-1400 §D5: Stage 2 signal data lives in the companion
-        // `<layer>-type-signals.json` (T001–T007). Merge gate must hydrate
-        // `doc.signals()` from that file before calling `check_type_signals`
-        // — otherwise every migrated track would fail-closed with
-        // "type signals not yet evaluated". Fail-closed when:
-        // - signal file is absent (T005-equivalent Missing, symmetric on
-        //   both CI and merge gate paths per §D5),
+        // `<layer>-type-signals.json`. Merge gate must hydrate `doc.signals()`
+        // from that file before calling `check_type_signals` — otherwise every
+        // migrated track would fail-closed with "type signals not yet
+        // evaluated". Fail-closed when:
+        // - signal file is absent (symmetric with the CI path per §D5),
         // - signal file is present but `declaration_hash` does not match
         //   the declaration blob bytes (stale),
         // - signal file decode error.
@@ -221,12 +220,12 @@ impl TrackBlobReader for GitShowTrackBlobReader {
     }
 
     fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>> {
-        // T007: read `architecture-rules.json` from the PR branch blob so
-        // that tracks which modify the rules file itself are evaluated
-        // against their own layer definitions (not the local workspace).
-        // An empty binding list (legacy rules file, or a PR that disables
-        // every layer) is returned verbatim — the usecase gate is the
-        // fail-closed authority and will reject an empty set explicitly.
+        // Read `architecture-rules.json` from the PR branch blob so that
+        // tracks which modify the rules file itself are evaluated against
+        // their own layer definitions (not the local workspace). An empty
+        // binding list (legacy rules file, or a PR that disables every layer)
+        // is returned verbatim — the usecase gate is the fail-closed authority
+        // and will reject an empty set explicitly.
         let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
             Ok(s) => s,
             Err(result) => return result,
@@ -242,16 +241,16 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         BlobFetchResult::Found(bindings.iter().map(|b| b.layer_id().to_owned()).collect())
     }
 
-    fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata> {
-        let path = Self::blob_path(track_id, "metadata.json");
-        let text = match self.fetch_string::<TrackMetadata>(branch, &path) {
+    fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument> {
+        let path = Self::blob_path(track_id, "impl-plan.json");
+        let text = match self.fetch_string::<ImplPlanDocument>(branch, &path) {
             Ok(s) => s,
             Err(result) => return result,
         };
-        match crate::track::codec::decode(&text) {
-            Ok((track, _meta)) => BlobFetchResult::Found(track),
+        match crate::impl_plan_codec::decode(&text) {
+            Ok(doc) => BlobFetchResult::Found(doc),
             Err(e) => {
-                BlobFetchResult::FetchError(format!("{path}: metadata.json decode error: {e}"))
+                BlobFetchResult::FetchError(format!("{path}: impl-plan.json decode error: {e}"))
             }
         }
     }
@@ -325,8 +324,7 @@ mod tests {
     // --- Spec document fixtures ---
 
     const SPEC_JSON_MINIMAL: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },
@@ -347,7 +345,7 @@ mod tests {
     /// matches the SHA-256 of the given declaration file bytes and whose
     /// `signals` mirrors the legacy inline payload in
     /// [`DOMAIN_TYPES_MINIMAL`]. Used by adapter tests to construct the
-    /// companion signal blob the T007 codec strip made mandatory.
+    /// companion signal blob required by the declaration/signal split.
     fn signal_file_matching(declaration_bytes: &[u8]) -> Vec<u8> {
         let hash = crate::tddd::type_signals_codec::declaration_hash(declaration_bytes);
         let body = format!(
@@ -364,27 +362,21 @@ mod tests {
         body.into_bytes()
     }
 
-    fn metadata_json_minimal(track_id: &str) -> String {
-        format!(
-            r#"{{
-  "schema_version": 3,
-  "id": "{track_id}",
-  "branch": "track/{track_id}",
-  "title": "Test",
-  "status": "planned",
-  "created_at": "2026-04-12T00:00:00Z",
-  "updated_at": "2026-04-12T00:00:00Z",
+    fn impl_plan_json_minimal() -> String {
+        // schema_version 1: minimal impl-plan with one todo task
+        r#"{
+  "schema_version": 1,
   "tasks": [
-    {{"id": "T001", "description": "Test task", "status": "todo", "commit_hash": null}}
+    { "id": "T001", "description": "Test task", "status": "todo" }
   ],
-  "plan": {{
-    "summary": ["Test plan"],
+  "plan": {
+    "summary": [],
     "sections": [
-      {{"id": "S1", "title": "Section", "description": ["D"], "task_ids": ["T001"]}}
+      { "id": "S1", "title": "Section", "description": [], "task_ids": ["T001"] }
     ]
-  }}
-}}"#
-        )
+  }
+}"#
+        .to_owned()
     }
 
     // --- read_spec_document ---
@@ -460,10 +452,10 @@ mod tests {
             BlobFetchResult::Found((doc, filename)) => {
                 assert_eq!(doc.entries().len(), 1);
                 assert_eq!(filename, "domain-types.json");
-                // T007 post-merge: the adapter must hydrate `doc.signals()`
-                // from the companion signal file so the downstream
-                // `check_type_signals` call in `check_strict_merge_gate`
-                // sees the evaluated Blue signal instead of `None`.
+                // The adapter must hydrate `doc.signals()` from the companion
+                // signal file so the downstream `check_type_signals` call in
+                // `check_strict_merge_gate` sees the evaluated Blue signal
+                // instead of `None`.
                 let signals = doc.signals().expect("signals must be hydrated from signal file");
                 assert_eq!(signals.len(), 1);
                 assert_eq!(signals[0].type_name(), "TrackId");
@@ -604,33 +596,34 @@ mod tests {
         }
     }
 
-    // --- read_track_metadata ---
+    // --- read_impl_plan ---
 
     #[test]
-    fn test_read_track_metadata_found() {
-        let metadata = metadata_json_minimal("foo");
-        let dir = setup_repo_with_track("foo", &[("metadata.json", metadata.as_bytes())]);
+    fn test_read_impl_plan_found() {
+        let impl_plan = impl_plan_json_minimal();
+        let dir = setup_repo_with_track("foo", &[("impl-plan.json", impl_plan.as_bytes())]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_track_metadata("main", "foo") {
-            BlobFetchResult::Found(track) => {
-                assert_eq!(track.tasks().len(), 1);
+        match reader.read_impl_plan("main", "foo") {
+            BlobFetchResult::Found(doc) => {
+                assert_eq!(doc.tasks().len(), 1);
+                assert_eq!(doc.tasks()[0].id().to_string(), "T001");
             }
             other => panic!("expected Found, got {other:?}"),
         }
     }
 
     #[test]
-    fn test_read_track_metadata_not_found() {
+    fn test_read_impl_plan_not_found() {
         let dir = setup_repo_with_track("foo", &[]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        assert!(matches!(reader.read_track_metadata("main", "foo"), BlobFetchResult::NotFound));
+        assert!(matches!(reader.read_impl_plan("main", "foo"), BlobFetchResult::NotFound));
     }
 
     #[test]
-    fn test_read_track_metadata_decode_error() {
-        let dir = setup_repo_with_track("foo", &[("metadata.json", b"not json")]);
+    fn test_read_impl_plan_decode_error() {
+        let dir = setup_repo_with_track("foo", &[("impl-plan.json", b"not json")]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_track_metadata("main", "foo") {
+        match reader.read_impl_plan("main", "foo") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("decode error"), "{msg}");
             }
@@ -691,22 +684,22 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_read_track_metadata_rejects_symlink() {
+    fn test_read_impl_plan_rejects_symlink() {
         let dir = tempfile::tempdir().unwrap();
         let repo = dir.path();
         git(repo, &["init", "--quiet", "--initial-branch=main"]);
         let track_dir = repo.join("track/items/foo");
         std::fs::create_dir_all(&track_dir).unwrap();
-        let metadata = metadata_json_minimal("foo");
-        std::fs::write(track_dir.join("target.json"), metadata).unwrap();
-        std::os::unix::fs::symlink("target.json", track_dir.join("metadata.json")).unwrap();
+        let impl_plan = impl_plan_json_minimal();
+        std::fs::write(track_dir.join("target.json"), impl_plan).unwrap();
+        std::os::unix::fs::symlink("target.json", track_dir.join("impl-plan.json")).unwrap();
         git(repo, &["add", "track"]);
         git(repo, &["commit", "--quiet", "-m", "add symlink"]);
         git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
         git(repo, &["fetch", "--quiet", "origin"]);
 
         let reader = GitShowTrackBlobReader::new(repo.to_path_buf());
-        match reader.read_track_metadata("main", "foo") {
+        match reader.read_impl_plan("main", "foo") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("symlink"), "{msg}");
             }

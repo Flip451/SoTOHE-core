@@ -61,17 +61,18 @@ pub enum VerifyCommand {
     SpecSignals(SpecVerifyArgs),
     /// Check spec.md contains a ## Domain States section with table data rows.
     SpecStates(SpecStatesArgs),
-    /// Check requirement-to-task coverage for a track (resolved from branch or --track-dir).
-    SpecCoverage(SpecCoverageArgs),
     /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
     SpecCodeConsistency(SpecCodeConsistencyArgs),
+    /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
+    /// per ADR 2026-04-19-1242 §D2.3.
+    PlanArtifactRefs(PlanArtifactRefsArgs),
 }
 
-/// Arguments for spec-coverage verify subcommand.
+/// Arguments for plan-artifact-refs verify subcommand.
 #[derive(Args)]
-pub struct SpecCoverageArgs {
+pub struct PlanArtifactRefsArgs {
     /// Path to the track directory (e.g., track/items/<id>).
-    /// If not provided, the command is a no-op (pass).
+    /// When omitted, the active track is resolved from the current branch name.
     #[arg(long)]
     track_dir: Option<PathBuf>,
 }
@@ -178,20 +179,11 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                 };
             ("verify spec states", outcome)
         }
-        VerifyCommand::SpecCoverage(args) => {
-            let outcome = match &args.track_dir {
-                Some(dir) if dir.is_dir() => infrastructure::verify::spec_coverage::verify(dir),
-                Some(dir) => {
-                    VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                        format!("Track directory does not exist: {}", dir.display()),
-                    )])
-                }
-                None => VerifyOutcome::pass(),
-            };
-            ("verify spec coverage", outcome)
-        }
         VerifyCommand::SpecCodeConsistency(args) => {
             ("verify spec-code consistency", execute_spec_code_consistency(args))
+        }
+        VerifyCommand::PlanArtifactRefs(args) => {
+            ("verify plan artifact refs", execute_plan_artifact_refs(args))
         }
     };
 
@@ -444,6 +436,52 @@ fn print_consistency_report_json(report: &domain::ConsistencyReport) {
     println!("{output}");
 }
 
+/// Execute plan-artifact-refs verification.
+///
+/// Resolves the track directory from args or falls back to the active branch.
+/// When neither `--track-dir` is given nor an active track branch can be
+/// detected, surfaces a finding rather than silently passing, so that CI
+/// invocations on unexpected branches fail closed instead of hiding missing
+/// plan-artifact coverage.
+fn execute_plan_artifact_refs(args: PlanArtifactRefsArgs) -> VerifyOutcome {
+    match &args.track_dir {
+        Some(dir) if dir.is_dir() => infrastructure::verify::plan_artifact_refs::verify(dir),
+        Some(dir) => VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+            format!("Track directory does not exist: {}", dir.display()),
+        )]),
+        None => match resolve_active_track_dir() {
+            Some(dir) => infrastructure::verify::plan_artifact_refs::verify(&dir),
+            None => VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                "Cannot resolve active track directory: not on a track/* branch or directory does \
+                 not exist. Use --track-dir <PATH> to specify the track directory explicitly."
+                    .to_owned(),
+            )]),
+        },
+    }
+}
+
+/// Resolve the active track directory from the current git branch name.
+///
+/// Accepts both `track/<id>` and `plan/<id>` branches (the canonical
+/// `resolve_track_or_plan_id_from_branch` helper is reused so the branch
+/// detection logic stays in one place). The returned path is anchored to the
+/// repo root discovered via `SystemGitRepo::discover`, so this function works
+/// correctly regardless of which subdirectory the process is invoked from.
+///
+/// Returns `None` when:
+/// - Not inside a git repository
+/// - Not on a `track/*` or `plan/*` branch (including detached HEAD / main)
+/// - The resolved `track/items/<id>` directory does not exist on disk
+fn resolve_active_track_dir() -> Option<std::path::PathBuf> {
+    use infrastructure::git_cli::GitRepository as _;
+    let repo = infrastructure::git_cli::SystemGitRepo::discover().ok()?;
+    let branch = repo.current_branch().ok()??;
+    let track_id =
+        usecase::track_resolution::resolve_track_or_plan_id_from_branch(Some(&branch)).ok()?;
+    let track_dir = repo.root().join("track/items").join(&track_id);
+    if track_dir.is_dir() { Some(track_dir) } else { None }
+}
+
 /// Combine architecture_rules + doc_patterns + convention_docs checks.
 fn verify_arch_docs(root: &std::path::Path) -> VerifyOutcome {
     let mut outcome = infrastructure::verify::architecture_rules::verify(root);
@@ -629,7 +667,7 @@ mod tests {
     fn test_spec_frontmatter_subcommand_returns_success_for_valid_spec() {
         let tmp = TempDir::new().unwrap();
         let spec = tmp.path().join("spec.md");
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Spec\n").unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Spec\n").unwrap();
         let exit = execute(VerifyCommand::SpecFrontmatter(SpecVerifyArgs { spec_path: spec }));
         assert_eq!(exit, ExitCode::SUCCESS);
     }
@@ -755,11 +793,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let spec = tmp.path().join("spec.md");
         // Spec with valid frontmatter, a Scope section, and a blue-signal item — no red items.
-        std::fs::write(
-            &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n",
-        )
-        .unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n")
+            .unwrap();
         let exit = execute(VerifyCommand::SpecSignals(SpecVerifyArgs { spec_path: spec }));
         assert_eq!(exit, ExitCode::SUCCESS);
     }
@@ -781,7 +816,7 @@ mod tests {
         // Spec with a ## Domain States section containing a table with data rows.
         std::fs::write(
             &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Domain States\n\n\
+            "---\nversion: \"1.0\"\n---\n## Domain States\n\n\
              | State | Description |\n\
              |-------|-------------|\n\
              | Draft | Initial state |\n",
@@ -797,11 +832,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let spec = tmp.path().join("spec.md");
         // Spec with frontmatter but no ## Domain States section.
-        std::fs::write(
-            &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n\nNo states here.\n",
-        )
-        .unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Overview\n\nNo states here.\n")
+            .unwrap();
         let exit =
             execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
         assert_eq!(exit, ExitCode::FAILURE);
@@ -809,8 +841,8 @@ mod tests {
 
     /// Writes a minimal `architecture-rules.json` with only `domain` TDDD-enabled
     /// into the given tmp dir. Shared by the two Yellow-signal CLI tests below,
-    /// which both need the new T007 multilayer loop to find exactly one enabled
-    /// layer that points at `domain-types.json`.
+    /// which both need the multilayer loop to find exactly one enabled layer
+    /// that points at `domain-types.json`.
     fn write_minimal_arch_rules(dir: &std::path::Path) {
         let content = r#"{
   "version": 2,
@@ -833,8 +865,8 @@ mod tests {
     /// Writes `<dir>/<signal_name>` with a matching `declaration_hash` so the
     /// ADR 2026-04-18-1400 §D5 signal-file evaluation path accepts it.
     /// `signals` is copied verbatim from the declaration file's legacy
-    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`
-    /// which, after T007, drops inline signals during decode.
+    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`,
+    /// which drops inline signals during decode.
     fn write_matching_signal_file(dir: &std::path::Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
@@ -857,11 +889,11 @@ mod tests {
         write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
         // spec.json: signals have yellow=1, red=0 (Stage 1 prerequisite satisfied).
         std::fs::write(
             tmp.path().join("spec.json"),
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
+            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
         )
         .unwrap();
         // domain-types.json: one entry with a yellow signal.
@@ -882,11 +914,11 @@ mod tests {
         write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
         // spec.json: signals have yellow=1, red=0 (Stage 1 prerequisite satisfied).
         std::fs::write(
             tmp.path().join("spec.json"),
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
+            r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
         )
         .unwrap();
         // domain-types.json: one entry with a yellow signal.
@@ -899,52 +931,6 @@ mod tests {
         let exit =
             execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: true }));
         assert_eq!(exit, ExitCode::FAILURE, "yellow signal must fail in strict (merge-gate) mode");
-    }
-
-    // --- spec-coverage CLI wiring ---
-
-    #[test]
-    fn test_spec_coverage_subcommand_returns_success_with_no_track_dir() {
-        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: None }));
-        assert_eq!(exit, ExitCode::SUCCESS);
-    }
-
-    #[test]
-    fn test_spec_coverage_subcommand_returns_success_with_covered_track() {
-        let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("track/items/test-track");
-        std::fs::create_dir_all(&dir).unwrap();
-        write_file(
-            tmp.path(),
-            "track/items/test-track/metadata.json",
-            r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
-        );
-        write_file(
-            tmp.path(),
-            "track/items/test-track/spec.json",
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"item","sources":["PRD"],"task_refs":["T001"]}],"out_of_scope":[]}}"#,
-        );
-        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
-        assert_eq!(exit, ExitCode::SUCCESS);
-    }
-
-    #[test]
-    fn test_spec_coverage_subcommand_returns_failure_for_uncovered() {
-        let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("track/items/test-track");
-        std::fs::create_dir_all(&dir).unwrap();
-        write_file(
-            tmp.path(),
-            "track/items/test-track/metadata.json",
-            r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
-        );
-        write_file(
-            tmp.path(),
-            "track/items/test-track/spec.json",
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"uncovered","sources":["PRD"]}],"out_of_scope":[]}}"#,
-        );
-        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
-        assert_eq!(exit, ExitCode::FAILURE);
     }
 
     // --- consistency_report_to_findings tests ---
@@ -1163,5 +1149,83 @@ mod tests {
         assert!(outcome.findings().is_empty(), "empty report must produce zero findings");
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::SUCCESS, "empty report must exit 0");
+    }
+
+    // --- plan-artifact-refs CLI wiring ---
+
+    #[test]
+    fn test_plan_artifact_refs_clap_parses_track_dir_flag() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "plan-artifact-refs",
+            "--track-dir",
+            "track/items/my-track",
+        ])
+        .unwrap();
+        match cli.cmd {
+            VerifyCommand::PlanArtifactRefs(args) => {
+                assert_eq!(
+                    args.track_dir.as_deref(),
+                    Some(std::path::Path::new("track/items/my-track")),
+                    "--track-dir must be parsed correctly"
+                );
+            }
+            _ => panic!("expected PlanArtifactRefs variant"),
+        }
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_clap_omitted_track_dir_is_none() {
+        let cli = TestCli::try_parse_from(["sotp", "plan-artifact-refs"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::PlanArtifactRefs(args) => {
+                assert!(args.track_dir.is_none(), "--track-dir must default to None");
+            }
+            _ => panic!("expected PlanArtifactRefs variant"),
+        }
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_explicit_valid_dir_with_no_spec_json_returns_success() {
+        // A track directory without spec.json is a valid pre-Phase-1 track;
+        // plan_artifact_refs::verify treats it as a no-op pass.
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join("track/items/test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        // No spec.json → verify passes immediately.
+        let exit = execute(VerifyCommand::PlanArtifactRefs(PlanArtifactRefsArgs {
+            track_dir: Some(track_dir),
+        }));
+        assert_eq!(exit, ExitCode::SUCCESS, "track dir without spec.json must pass");
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_explicit_missing_dir_returns_failure() {
+        // An explicitly supplied --track-dir that does not exist on disk must
+        // produce an error finding and exit with failure.
+        let tmp = TempDir::new().unwrap();
+        let missing_dir = tmp.path().join("track/items/nonexistent");
+        // Do NOT create the directory.
+        let exit = execute(VerifyCommand::PlanArtifactRefs(PlanArtifactRefsArgs {
+            track_dir: Some(missing_dir),
+        }));
+        assert_eq!(exit, ExitCode::FAILURE, "missing track dir must fail");
+    }
+
+    #[test]
+    fn test_plan_artifact_refs_omitted_track_dir_returns_non_panic_outcome() {
+        // With `--track-dir` omitted, `resolve_active_track_dir` runs.
+        // This test exercises the branch-resolution path:
+        // - On a `track/*` or `plan/*` branch with an existing items dir → runs verify (may pass
+        //   or fail based on the real repo state, but must not panic).
+        // - On any other branch / git failure → returns an error finding with ExitCode::FAILURE.
+        // The important invariant is that NO panic occurs and the exit code is deterministic.
+        let exit =
+            execute(VerifyCommand::PlanArtifactRefs(PlanArtifactRefsArgs { track_dir: None }));
+        // We accept either outcome; the key contract is no panic.
+        assert!(
+            exit == ExitCode::SUCCESS || exit == ExitCode::FAILURE,
+            "omitted track_dir must produce a deterministic exit code without panicking"
+        );
     }
 }

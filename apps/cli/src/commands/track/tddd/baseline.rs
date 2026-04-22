@@ -1,7 +1,12 @@
 //! `sotp track baseline-capture` — capture TypeGraph snapshot as baseline.
 //!
 //! Generates `<layer>-types-baseline.json` from the current TypeGraph.
-//! Skips if baseline already exists (idempotent). Use `--force` to regenerate.
+//! Always idempotent: if the baseline file already exists it is kept as-is.
+//! Re-capturing the baseline after implementation has started would overwrite
+//! the pre-implementation snapshot with the current state, collapsing the
+//! signal semantics (new `add` entries become `AddButAlreadyInBaseline` noise).
+//! If a genuine re-capture is required, delete the stale
+//! `<layer>-types-baseline.json` file manually first.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -22,12 +27,15 @@ use crate::commands::track::tddd::signals::resolve_layers;
 /// Steps:
 /// 1. Resolve the set of TDDD-enabled layers to process (all enabled, or just the
 ///    specified `--layer`).
-/// 2. For each layer binding, check if the baseline already exists (skip unless `--force`).
+/// 2. For each layer binding, check if the baseline already exists (skip if so).
 /// 3. Export the target crate schema via rustdoc JSON.
 /// 4. Build TypeGraph and convert to TypeBaseline.
 /// 5. Encode and write to `<layer>-types-baseline.json`.
 ///
 /// When `--layer` is omitted, all TDDD-enabled layers are processed in `layers[]` order.
+///
+/// Always idempotent: existing baseline files are preserved. To re-capture, delete
+/// the stale file manually first.
 ///
 /// # Errors
 ///
@@ -37,7 +45,6 @@ pub fn execute_baseline_capture(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
-    force: bool,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
     // Resolve the set of TDDD-enabled layers to process. When
@@ -80,7 +87,7 @@ pub fn execute_baseline_capture(
     }
 
     for binding in &bindings {
-        capture_baseline_for_layer(&items_dir, &track_id, &workspace_root, force, binding)?;
+        capture_baseline_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
     }
 
     Ok(ExitCode::SUCCESS)
@@ -94,7 +101,6 @@ fn capture_baseline_for_layer(
     items_dir: &std::path::Path,
     track_id: &str,
     workspace_root: &std::path::Path,
-    force: bool,
     binding: &TdddLayerBinding,
 ) -> Result<(), CliError> {
     let catalogue_filename = binding.catalogue_file();
@@ -107,13 +113,13 @@ fn capture_baseline_for_layer(
     reject_symlinks_below(&baseline_path, items_dir)
         .map_err(|e| CliError::Message(format!("symlink guard: {e}")))?;
 
-    // Idempotent: skip if baseline already exists as a regular file (unless --force).
+    // Idempotent: skip if baseline already exists as a regular file.
     // Use is_file() rather than exists() so that a directory or other non-file node at
     // that path does not silently produce a spurious success — it falls through and will
     // fail at the write step with a meaningful error instead.
-    if baseline_path.is_file() && !force {
+    if baseline_path.is_file() {
         println!(
-            "[OK] baseline-capture: {baseline_filename} already exists for '{track_id}' (use --force to regenerate)"
+            "[OK] baseline-capture: {baseline_filename} already exists for '{track_id}' (delete the file manually to re-capture)"
         );
         return Ok(());
     }
@@ -226,13 +232,8 @@ mod tests {
         let items_dir = dir.path().join("track/items");
         std::fs::create_dir_all(&items_dir).unwrap();
 
-        let result = execute_baseline_capture(
-            items_dir,
-            "../evil".to_owned(),
-            dir.path().into(),
-            false,
-            None,
-        );
+        let result =
+            execute_baseline_capture(items_dir, "../evil".to_owned(), dir.path().into(), None);
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
 
@@ -246,38 +247,9 @@ mod tests {
         // Write a dummy baseline file (domain layer — default when no architecture-rules.json).
         std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
 
-        let result = execute_baseline_capture(
-            items_dir,
-            "test-track".to_owned(),
-            dir.path().into(),
-            false,
-            None,
-        );
+        let result =
+            execute_baseline_capture(items_dir, "test-track".to_owned(), dir.path().into(), None);
         assert!(result.is_ok(), "should skip existing baseline without error");
-    }
-
-    /// `--force` bypasses the skip check and proceeds to rustdoc export.
-    ///
-    /// In a test environment nightly rustdoc is not available, so the call fails
-    /// with a schema export error rather than returning `Ok(SUCCESS)`.
-    #[test]
-    fn test_baseline_capture_force_flag_bypasses_skip() {
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-
-        // Pre-existing baseline — would trigger skip without --force.
-        std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
-
-        let result = execute_baseline_capture(
-            items_dir,
-            "test-track".to_owned(),
-            dir.path().into(),
-            true,
-            None,
-        );
-        assert!(result.is_err(), "--force must bypass skip and attempt export");
     }
 
     #[test]
@@ -320,7 +292,6 @@ mod tests {
             items_dir,
             "test-track".to_owned(),
             dir.path().into(),
-            false,
             Some("usecase".to_owned()),
         );
 
@@ -369,13 +340,8 @@ mod tests {
         std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
         // do NOT write usecase-types-baseline.json
 
-        let result = execute_baseline_capture(
-            items_dir,
-            "test-track".to_owned(),
-            dir.path().into(),
-            false,
-            None,
-        );
+        let result =
+            execute_baseline_capture(items_dir, "test-track".to_owned(), dir.path().into(), None);
 
         assert!(
             result.is_err(),

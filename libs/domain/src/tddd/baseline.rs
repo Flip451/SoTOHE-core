@@ -4,11 +4,11 @@
 //! During signal evaluation, types present in the baseline with unchanged
 //! structure are skipped (not flagged as Red), filtering out existing-type noise.
 //!
-//! T005 (TDDD-01 Phase 1 Task 5): baseline schema v2 replaces the flat
-//! `Vec<String>` members / method_return_types / methods representation with
-//! structured `Vec<MemberDeclaration>` and `Vec<MethodDeclaration>` so that
-//! the baseline captures full L1 signatures. Legacy `method_return_types` /
-//! `method_names` fields are removed.
+//! Baseline schema v2 replaces the flat `Vec<String>` members /
+//! method_return_types / methods representation with structured
+//! `Vec<MemberDeclaration>` and `Vec<MethodDeclaration>` so that the baseline
+//! captures full L1 signatures. Legacy `method_return_types` / `method_names`
+//! fields are removed.
 
 use std::collections::HashMap;
 

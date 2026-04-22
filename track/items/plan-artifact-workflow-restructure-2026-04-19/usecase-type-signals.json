@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-22T03:03:14Z",
+  "declaration_hash": "9a7992f7ed77cdd501b8887f5274f373280b9d69d5fb2ea6a9f816ab846d8949",
+  "signals": [
+    {
+      "type_name": "ActivateTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AddTaskUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TransitionTaskUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SetOverrideUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>",
+        "fn read_type_catalogue(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument>",
+        "fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>>"
+      ]
+    }
+  ]
+}

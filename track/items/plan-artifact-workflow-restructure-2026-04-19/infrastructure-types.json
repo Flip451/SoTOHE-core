@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ImplPlanDocumentDto",
+      "description": "Infrastructure serde DTO for `impl-plan.json`. Mirrors domain::ImplPlanDocument (`schema_version + tasks + plan`) with 1:1 field naming, following the same pattern as track/codec.rs::TrackDocumentV2. The `tasks` field uses `Vec<ImplPlanTaskDto>` and the `plan` field uses `ImplPlanPlanDto` (which wraps `Vec<ImplPlanSectionDto>`); these codec-local DTOs are introduced alongside this type rather than reusing `PlanDocument`/`PlanSectionDocument`/`TrackTaskDocument` from track/codec.rs, so that `deny_unknown_fields` is enforced at every nesting level. Introduced by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "ImplPlanCodecError",
+      "description": "Public error enum for the impl-plan.json codec. Variants follow existing codec conventions (Json for serde failures; UnsupportedSchemaVersion for version mismatches; Validation for domain construction errors). Introduced alongside the new codec by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ]
+    },
+    {
+      "name": "TaskCoverageDocumentDto",
+      "description": "Infrastructure serde DTO for `task-coverage.json`. Holds four per-section maps (in_scope / out_of_scope / constraints / acceptance_criteria) from SpecElementId to Vec<TaskId>. Mirrors domain::TaskCoverageDocument. Introduced by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "TaskCoverageCodecError",
+      "description": "Public error enum for the task-coverage.json codec. Variants follow existing codec conventions. Introduced alongside the new codec by ADR 2026-04-19-1242 §D1.4 / T004.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ]
+    },
+    {
+      "name": "PlanArtifactRefsError",
+      "description": "Public error enum for the `sotp verify plan-artifact-refs` CLI verifier (libs/infrastructure/src/verify/plan_artifact_refs.rs). Surfaces ref-field schema / file-existence / anchor-resolution / hash-mismatch / and task-coverage failures as fatal error variants that cause CI failure. Canonical-block suspicion is warning-only per ADR 2026-04-19-1242 §D2.3 (details deferred to Q14): it is reported as a `VerifyFinding` (warning-level output), not as an error variant in this enum, so the CLI does not fail on canonical-block suspicion alone. Introduced by ADR 2026-04-19-1242 §D2.3 / T010 / T011.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "Io",
+        "UnresolvedSpecRef",
+        "SpecHashMismatch",
+        "InvalidAnchor",
+        "CoverageViolation"
+      ]
+    },
+    {
+      "name": "TrackDocumentV2",
+      "description": "Infrastructure serde DTO for `metadata.json` (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005 + T013: drop `tasks`, `plan`, and `status` fields. The v5 (identity-only) shape carries: `schema_version` (int, = 5), `id` (string), `branch` (Option<string>), `title` (string), `created_at` / `updated_at` (strings via `DocumentMeta`), and `status_override` (optional sub-object, skipped when absent, for Blocked/Cancelled reason — identity metadata, not Phase 3 plan data). `status` is absent from v5; track status is derived on demand via `domain::derive_track_status`. `codec::decode` requires schema_version = 5 and rejects legacy v4 (which still carried an explicit `status` field).",
+      "approved": true,
+      "action": "modify",
+      "kind": "dto"
+    },
+    {
+      "name": "DocumentMeta",
+      "description": "Infrastructure-layer codec metadata struct (track/codec.rs). Modified per ADR 2026-04-19-1242 §D1.4 / T005: `original_status: Option<String>` and `extra: serde_json::Map<...>` fields removed; retained fields are `schema_version`, `created_at`, `updated_at` only.",
+      "approved": true,
+      "action": "modify",
+      "kind": "dto"
+    },
+    {
+      "name": "PlanDocument",
+      "description": "Infrastructure serde DTO for the `plan` field inside the old metadata.json shape (track/codec.rs). Deleted per ADR 2026-04-19-1242 §D1.4 / T005: plan data moves to `impl-plan.json` (ImplPlanPlanDto). This type is no longer present in codec.rs.",
+      "approved": true,
+      "action": "delete",
+      "kind": "dto"
+    },
+    {
+      "name": "PlanSectionDocument",
+      "description": "Infrastructure serde DTO for a single plan section inside the old metadata.json shape (track/codec.rs). Deleted per ADR 2026-04-19-1242 §D1.4 / T005: section data moves to `impl-plan.json` (ImplPlanSectionDto). This type is no longer present in codec.rs.",
+      "approved": true,
+      "action": "delete",
+      "kind": "dto"
+    },
+    {
+      "name": "TrackTaskDocument",
+      "description": "Infrastructure serde DTO for a single task inside the old metadata.json shape (track/codec.rs). Deleted per ADR 2026-04-19-1242 §D1.4 / T005: task data moves to `impl-plan.json` (ImplPlanTaskDto). This type is no longer present in codec.rs.",
+      "approved": true,
+      "action": "delete",
+      "kind": "dto"
+    },
+    {
+      "name": "SpecCodecError",
+      "description": "Public error enum for the spec.json codec (libs/infrastructure/src/spec/codec.rs). Modified by T003 to add `DomainValidation` variant that surfaces `domain::ValidationError` failures produced when plan_ref newtypes (SpecElementId / AdrAnchor / ConventionAnchor / ContentHash / InformalGroundSummary) reject their input during DTO-to-domain conversion. Pre-existing variants (Json / Validation / UnsupportedSchemaVersion / InvalidField) are preserved.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "Validation",
+        "UnsupportedSchemaVersion",
+        "InvalidField",
+        "DomainValidation"
+      ]
+    },
+    {
+      "name": "ImplPlanTaskDto",
+      "description": "Nested DTO representing a single task inside `impl-plan.json`. Introduced by T004 (alongside ImplPlanDocumentDto) as a codec-local type rather than reusing `track::codec::TrackTaskDocument` so that `deny_unknown_fields` is enforced at this nesting level. Mirrors the domain `TrackTask` shape (id, description, status, optional commit_hash).",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "ImplPlanPlanDto",
+      "description": "Nested DTO for the `plan` field of `impl-plan.json`. Introduced by T004 alongside ImplPlanDocumentDto to obtain a codec-local `deny_unknown_fields` contract that the track codec's `PlanDocument` does not provide. Wraps an optional summary list and a section vector of ImplPlanSectionDto.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "ImplPlanSectionDto",
+      "description": "Nested DTO for a single plan section inside `impl-plan.json`. Introduced by T004 alongside ImplPlanDocumentDto / ImplPlanPlanDto to propagate `deny_unknown_fields` through the whole impl-plan object tree. Mirrors `domain::PlanSection` (id, title, optional description bullets, task ids).",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "TrackSnapshot",
+      "description": "Render-layer aggregate that bundles TrackMetadata, DocumentMeta, and a pre-computed derived_status string. The derived_status field was added in T005+T007+T008: it is computed at snapshot construction time from impl-plan.json task state + status_override via domain::derive_track_status, replacing the explicit status field that metadata.json v5 no longer persists. For the registry/plan.md display path only: legacy v2/v3/v4 tracks that still carry an explicit status field fall back to reading the stored value directly from raw JSON (bypassing codec::decode, which rejects v4; the ADR migration policy skips v4 in verify-track-metadata-local but allows the render path to display them read-only).",
+      "approved": true,
+      "action": "modify",
+      "kind": "dto",
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "eed4c9cb026146fd2f5b7c7a7ec2cd212833de5700858431d4b089b4680a46fc"
+        },
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-13",
+          "hash": "2fae03dfc82a31a8c4b135b96034eeed492d200249195ef8acd32e26d3178051"
+        }
+      ]
+    }
+  ]
+}

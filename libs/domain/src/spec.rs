@@ -2,86 +2,63 @@
 //!
 //! `SpecDocument` is the aggregate root for a feature specification.
 //! `spec.json` is the SSoT; `spec.md` is a read-only rendered view.
+//!
+//! ADR 2026-04-19-1242 §D1.2 / §D2.1: the approved-lifecycle (`status` /
+//! `approved_at` / `content_hash`) is removed; each requirement gains a
+//! required `id: SpecElementId`; `sources: Vec<String>` is replaced by three
+//! typed ref fields; `task_refs` moves to `task-coverage.json`.
 
 use std::collections::HashSet;
 use std::fmt;
 
-use crate::{ConfidenceSignal, SignalCounts, TaskId, Timestamp, classify_source_tag};
-
-// ---------------------------------------------------------------------------
-// SpecStatus enum
-// ---------------------------------------------------------------------------
-
-/// Approval status of a specification document.
-///
-/// - `Draft`: specification is being authored or was auto-demoted after content change.
-/// - `Approved`: explicitly approved; valid only while `content_hash` matches.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum SpecStatus {
-    Draft,
-    Approved,
-}
-
-impl SpecStatus {
-    /// Returns the canonical string representation.
-    #[must_use]
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::Draft => "draft",
-            Self::Approved => "approved",
-        }
-    }
-}
-
-impl fmt::Display for SpecStatus {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.as_str())
-    }
-}
+use crate::plan_ref::{AdrRef, ConventionRef, InformalGroundRef, SpecElementId};
+use crate::{ConfidenceSignal, SignalCounts, Timestamp};
 
 // ---------------------------------------------------------------------------
 // Value objects
 // ---------------------------------------------------------------------------
 
-/// A single requirement item with provenance sources.
+/// A single requirement item with typed provenance references.
 ///
-/// Used in Scope (in/out), Constraints, and Acceptance Criteria.
+/// Used in goal-items, Scope (in/out), Constraints, and Acceptance Criteria.
 ///
 /// # Errors
 ///
 /// Returns `SpecValidationError::EmptyRequirementText` if text is empty.
+/// Returns `SpecValidationError::MissingElementId` if id construction fails.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpecRequirement {
+    id: SpecElementId,
     text: String,
-    sources: Vec<String>,
-    task_refs: Vec<TaskId>,
+    adr_refs: Vec<AdrRef>,
+    convention_refs: Vec<ConventionRef>,
+    informal_grounds: Vec<InformalGroundRef>,
 }
 
 impl SpecRequirement {
-    /// Creates a new requirement with empty task_refs.
+    /// Creates a new requirement with typed provenance references.
     ///
     /// # Errors
     ///
     /// Returns error if `text` is empty or whitespace-only.
-    pub fn new(text: impl Into<String>, sources: Vec<String>) -> Result<Self, SpecValidationError> {
-        Self::with_task_refs(text, sources, vec![])
-    }
-
-    /// Creates a new requirement with explicit task references.
-    ///
-    /// # Errors
-    ///
-    /// Returns error if `text` is empty or whitespace-only.
-    pub fn with_task_refs(
+    pub fn new(
+        id: SpecElementId,
         text: impl Into<String>,
-        sources: Vec<String>,
-        task_refs: Vec<TaskId>,
+        adr_refs: Vec<AdrRef>,
+        convention_refs: Vec<ConventionRef>,
+        informal_grounds: Vec<InformalGroundRef>,
     ) -> Result<Self, SpecValidationError> {
         let text = text.into();
         if text.trim().is_empty() {
             return Err(SpecValidationError::EmptyRequirementText);
         }
-        Ok(Self { text, sources, task_refs })
+        Ok(Self { id, text, adr_refs, convention_refs, informal_grounds })
+    }
+
+    /// Returns the element identifier.
+    #[must_use]
+    pub fn id(&self) -> &SpecElementId {
+        &self.id
     }
 
     /// Returns the requirement text.
@@ -90,25 +67,35 @@ impl SpecRequirement {
         &self.text
     }
 
-    /// Returns the provenance sources.
+    /// Returns the ADR references (formal grounding → Blue).
     #[must_use]
-    pub fn sources(&self) -> &[String] {
-        &self.sources
+    pub fn adr_refs(&self) -> &[AdrRef] {
+        &self.adr_refs
     }
 
-    /// Returns the task references linking this requirement to plan tasks.
+    /// Returns the convention references (formal grounding → Blue).
     #[must_use]
-    pub fn task_refs(&self) -> &[TaskId] {
-        &self.task_refs
+    pub fn convention_refs(&self) -> &[ConventionRef] {
+        &self.convention_refs
+    }
+
+    /// Returns the informal ground references (unpersisted → Yellow).
+    #[must_use]
+    pub fn informal_grounds(&self) -> &[InformalGroundRef] {
+        &self.informal_grounds
     }
 
     /// Evaluates the confidence signal for this requirement.
     ///
-    /// Multi-source policy: the signal is the highest confidence among all sources.
-    /// Empty sources → Red (MissingSource).
+    /// Signal rules (ADR 2026-04-19-1242 §D3.1):
+    /// - `adr_refs[]` non-empty → 🔵 Blue (formal ADR grounding)
+    /// - `adr_refs[]` empty + `informal_grounds[]` non-empty → 🟡 Yellow (unpersisted grounding)
+    /// - both empty → 🔴 Red
+    ///
+    /// `convention_refs[]` is outside the signal evaluation scope (D3.1: "signal 評価対象外").
     #[must_use]
     pub fn signal(&self) -> ConfidenceSignal {
-        evaluate_requirement_signal(&self.sources)
+        evaluate_requirement_signal(&self.adr_refs, &self.informal_grounds)
     }
 }
 
@@ -181,20 +168,21 @@ impl SpecSection {
 // ---------------------------------------------------------------------------
 
 /// The aggregate root for a feature specification (spec.json SSoT).
+///
+/// ADR 2026-04-19-1242 §D1.2: removed `status`, `approved_at`, `content_hash`.
+/// `related_conventions` is now `Vec<ConventionRef>`. HearingRecord history
+/// is retained.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpecDocument {
     title: String,
-    status: SpecStatus,
     version: String,
-    goal: Vec<String>,
+    goal: Vec<SpecRequirement>,
     scope: SpecScope,
     constraints: Vec<SpecRequirement>,
     acceptance_criteria: Vec<SpecRequirement>,
     additional_sections: Vec<SpecSection>,
-    related_conventions: Vec<String>,
+    related_conventions: Vec<ConventionRef>,
     signals: Option<SignalCounts>,
-    approved_at: Option<Timestamp>,
-    content_hash: Option<String>,
     hearing_history: Vec<HearingRecord>,
 }
 
@@ -203,21 +191,19 @@ impl SpecDocument {
     ///
     /// # Errors
     ///
-    /// Returns error if `title` or `version` is empty.
+    /// Returns error if `title` or `version` is empty, or if element ids are
+    /// not unique across all requirement sections.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         title: impl Into<String>,
-        status: SpecStatus,
         version: impl Into<String>,
-        goal: Vec<String>,
+        goal: Vec<SpecRequirement>,
         scope: SpecScope,
         constraints: Vec<SpecRequirement>,
         acceptance_criteria: Vec<SpecRequirement>,
         additional_sections: Vec<SpecSection>,
-        related_conventions: Vec<String>,
+        related_conventions: Vec<ConventionRef>,
         signals: Option<SignalCounts>,
-        approved_at: Option<Timestamp>,
-        content_hash: Option<String>,
     ) -> Result<Self, SpecValidationError> {
         let title = title.into();
         let version = version.into();
@@ -227,22 +213,25 @@ impl SpecDocument {
         if version.trim().is_empty() {
             return Err(SpecValidationError::EmptyVersion);
         }
-        // Enforce status/metadata invariant:
-        // - Draft must NOT carry approval metadata
-        // - Approved must have both approved_at and content_hash
-        let (approved_at, content_hash) = match status {
-            SpecStatus::Draft => (None, None),
-            SpecStatus::Approved => {
-                let hash = content_hash.as_deref().unwrap_or("");
-                if approved_at.is_none() || hash.trim().is_empty() {
-                    return Err(SpecValidationError::ApprovalMetadataMissing);
-                }
-                (approved_at, content_hash)
+
+        // Validate element id uniqueness across all requirement sections.
+        let mut seen_ids: HashSet<String> = HashSet::new();
+        let all_reqs = goal
+            .iter()
+            .chain(scope.in_scope.iter())
+            .chain(scope.out_of_scope.iter())
+            .chain(constraints.iter())
+            .chain(acceptance_criteria.iter());
+
+        for req in all_reqs {
+            let id_str = req.id().as_ref().to_owned();
+            if !seen_ids.insert(id_str.clone()) {
+                return Err(SpecValidationError::DuplicateElementId(id_str));
             }
-        };
+        }
+
         Ok(Self {
             title,
-            status,
             version,
             goal,
             scope,
@@ -251,8 +240,6 @@ impl SpecDocument {
             additional_sections,
             related_conventions,
             signals,
-            approved_at,
-            content_hash,
             hearing_history: vec![],
         })
     }
@@ -260,23 +247,6 @@ impl SpecDocument {
     #[must_use]
     pub fn title(&self) -> &str {
         &self.title
-    }
-
-    #[must_use]
-    pub fn status(&self) -> SpecStatus {
-        self.status
-    }
-
-    /// Returns the approval timestamp, if approved.
-    #[must_use]
-    pub fn approved_at(&self) -> Option<&Timestamp> {
-        self.approved_at.as_ref()
-    }
-
-    /// Returns the content hash recorded at approval time.
-    #[must_use]
-    pub fn content_hash(&self) -> Option<&str> {
-        self.content_hash.as_deref()
     }
 
     /// Returns the hearing history (append-only audit trail).
@@ -290,56 +260,13 @@ impl SpecDocument {
         self.hearing_history.push(record);
     }
 
-    /// Marks this spec as approved with the given timestamp and content hash.
-    ///
-    /// # Errors
-    ///
-    /// Returns `SpecValidationError::ApprovalMetadataMissing` if `content_hash` is empty.
-    pub fn approve(
-        &mut self,
-        timestamp: Timestamp,
-        content_hash: String,
-    ) -> Result<(), SpecValidationError> {
-        if content_hash.trim().is_empty() {
-            return Err(SpecValidationError::ApprovalMetadataMissing);
-        }
-        self.status = SpecStatus::Approved;
-        self.approved_at = Some(timestamp);
-        self.content_hash = Some(content_hash);
-        Ok(())
-    }
-
-    /// Demotes this spec to draft, clearing approval metadata.
-    pub fn demote(&mut self) {
-        self.status = SpecStatus::Draft;
-        self.approved_at = None;
-        self.content_hash = None;
-    }
-
-    /// Checks whether the current approval is still valid given the current content hash.
-    ///
-    /// Returns `true` only if status is `Approved` AND the stored content hash
-    /// matches `current_hash`.
-    #[must_use]
-    pub fn is_approval_valid(&self, current_hash: &str) -> bool {
-        self.status == SpecStatus::Approved && self.content_hash.as_deref() == Some(current_hash)
-    }
-
-    /// Returns the effective status considering content hash integrity.
-    ///
-    /// If status is `Approved` but the content hash does not match, returns `Draft`.
-    #[must_use]
-    pub fn effective_status(&self, current_hash: &str) -> SpecStatus {
-        if self.is_approval_valid(current_hash) { SpecStatus::Approved } else { SpecStatus::Draft }
-    }
-
     #[must_use]
     pub fn version(&self) -> &str {
         &self.version
     }
 
     #[must_use]
-    pub fn goal(&self) -> &[String] {
+    pub fn goal(&self) -> &[SpecRequirement] {
         &self.goal
     }
 
@@ -364,7 +291,7 @@ impl SpecDocument {
     }
 
     #[must_use]
-    pub fn related_conventions(&self) -> &[String] {
+    pub fn related_conventions(&self) -> &[ConventionRef] {
         &self.related_conventions
     }
 
@@ -373,14 +300,14 @@ impl SpecDocument {
         self.signals.as_ref()
     }
 
-    /// Updates the cached signal counts (Stage 1).
+    /// Updates the cached signal counts.
     pub fn set_signals(&mut self, signals: SignalCounts) {
         self.signals = Some(signals);
     }
 
     /// Evaluates signal counts from all evaluable requirements.
     ///
-    /// Evaluable sections: scope (in + out), constraints, acceptance criteria.
+    /// Evaluable sections: goal, scope (in + out), constraints, acceptance criteria.
     #[must_use]
     pub fn evaluate_signals(&self) -> SignalCounts {
         let mut blue: u32 = 0;
@@ -388,9 +315,9 @@ impl SpecDocument {
         let mut red: u32 = 0;
 
         let all_requirements = self
-            .scope
-            .in_scope
+            .goal
             .iter()
+            .chain(self.scope.in_scope.iter())
             .chain(self.scope.out_of_scope.iter())
             .chain(self.constraints.iter())
             .chain(self.acceptance_criteria.iter());
@@ -405,102 +332,34 @@ impl SpecDocument {
 
         SignalCounts::new(blue, yellow, red)
     }
-
-    /// Evaluates requirement-to-task coverage for CI gate enforcement.
-    ///
-    /// Checks in_scope and acceptance_criteria requirements (enforced sections).
-    /// Constraints are NOT enforced — their coverage is not checked here.
-    ///
-    /// Validates that:
-    /// 1. Every enforced requirement has at least one task_ref.
-    /// 2. Every task_ref references a valid task ID from the provided set.
-    #[must_use]
-    pub fn evaluate_coverage(&self, valid_task_ids: &HashSet<TaskId>) -> CoverageResult {
-        let mut covered: u32 = 0;
-        let mut uncovered: Vec<String> = Vec::new();
-        let mut invalid_refs: Vec<String> = Vec::new();
-        let mut seen_invalid: HashSet<String> = HashSet::new();
-
-        let enforced = self.scope.in_scope.iter().chain(self.acceptance_criteria.iter());
-
-        for req in enforced {
-            let mut has_valid_ref = false;
-
-            for task_ref in &req.task_refs {
-                if valid_task_ids.contains(task_ref) {
-                    has_valid_ref = true;
-                } else {
-                    let ref_str = task_ref.to_string();
-                    if seen_invalid.insert(ref_str.clone()) {
-                        invalid_refs.push(ref_str);
-                    }
-                }
-            }
-
-            if has_valid_ref {
-                covered += 1;
-            } else {
-                uncovered.push(req.text.clone());
-            }
-        }
-
-        CoverageResult::new(covered, uncovered, invalid_refs)
-    }
-
-    /// Validates referential integrity of task_refs across ALL sections.
-    ///
-    /// Returns task_ref IDs that do not exist in the provided task set.
-    /// Unlike `evaluate_coverage()` which only checks enforced sections,
-    /// this checks constraints and out_of_scope as well.
-    #[must_use]
-    pub fn validate_all_task_refs(&self, valid_task_ids: &HashSet<TaskId>) -> Vec<String> {
-        let mut invalid: Vec<String> = Vec::new();
-        let mut seen: HashSet<String> = HashSet::new();
-
-        let all_requirements = self
-            .scope
-            .in_scope
-            .iter()
-            .chain(self.scope.out_of_scope.iter())
-            .chain(self.constraints.iter())
-            .chain(self.acceptance_criteria.iter());
-
-        for req in all_requirements {
-            for task_ref in &req.task_refs {
-                if !valid_task_ids.contains(task_ref) {
-                    let ref_str = task_ref.to_string();
-                    if seen.insert(ref_str.clone()) {
-                        invalid.push(ref_str);
-                    }
-                }
-            }
-        }
-
-        invalid
-    }
 }
 
 // ---------------------------------------------------------------------------
 // Multi-source signal evaluation
 // ---------------------------------------------------------------------------
 
-/// Evaluates the confidence signal for a requirement's sources.
+/// Evaluates the confidence signal for a requirement's typed references.
 ///
-/// Multi-source policy: the signal is the **highest** confidence among all sources
-/// (`Blue > Yellow > Red`). Empty sources → `Red`.
+/// Rules (ADR 2026-04-19-1242 §D3.1):
+/// - `adr_refs[]` non-empty → 🔵 Blue (formal ADR grounding)
+/// - `adr_refs[]` empty + `informal_grounds[]` non-empty → 🟡 Yellow (unpersisted grounding)
+/// - both empty → 🔴 Red
+///
+/// `convention_refs[]` is outside the signal evaluation scope per ADR D3.1
+/// ("signal 評価対象外"). The presence of convention references does not
+/// affect the signal; only `adr_refs` and `informal_grounds` are evaluated.
 #[must_use]
-pub fn evaluate_requirement_signal(sources: &[String]) -> ConfidenceSignal {
-    if sources.is_empty() {
-        return ConfidenceSignal::Red;
+pub fn evaluate_requirement_signal(
+    adr_refs: &[AdrRef],
+    informal_grounds: &[InformalGroundRef],
+) -> ConfidenceSignal {
+    if !adr_refs.is_empty() {
+        return ConfidenceSignal::Blue;
     }
-
-    sources
-        .iter()
-        .map(|tag| {
-            classify_source_tag(tag).map(|basis| basis.signal()).unwrap_or(ConfidenceSignal::Red)
-        })
-        .max()
-        .unwrap_or(ConfidenceSignal::Red)
+    if !informal_grounds.is_empty() {
+        return ConfidenceSignal::Yellow;
+    }
+    ConfidenceSignal::Red
 }
 
 // ---------------------------------------------------------------------------
@@ -545,14 +404,14 @@ pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify
 
     if counts.has_red() {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "spec signals have red={} (source attribution missing — every requirement must carry a `[source: ...]` tag)",
+            "spec signals have red={} (source attribution missing — every requirement must carry typed refs)",
             counts.red()
         ))]);
     }
 
     if counts.yellow() > 0 {
         let message = format!(
-            "spec.json: {} yellow signal(s) detected — merge gate will block these until upgraded to Blue. Upgrade by creating an ADR or convention document and referencing it via `[source: ...]` tag.",
+            "spec.json: {} yellow signal(s) detected — merge gate will block these until upgraded to Blue. Upgrade by creating an ADR and referencing it via adr_refs[] (convention_refs[] are outside signal evaluation scope per ADR D3.1 and do not affect the signal).",
             counts.yellow()
         );
         if strict {
@@ -565,57 +424,6 @@ pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify
 }
 
 // ---------------------------------------------------------------------------
-// Coverage evaluation
-// ---------------------------------------------------------------------------
-
-/// Result of evaluating requirement-to-task coverage.
-///
-/// Produced by `SpecDocument::evaluate_coverage()`.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CoverageResult {
-    covered: u32,
-    uncovered: Vec<String>,
-    invalid_refs: Vec<String>,
-}
-
-impl CoverageResult {
-    /// Creates a new coverage result.
-    #[must_use]
-    pub fn new(covered: u32, uncovered: Vec<String>, invalid_refs: Vec<String>) -> Self {
-        Self { covered, uncovered, invalid_refs }
-    }
-
-    /// Returns the count of requirements that have at least one task_ref.
-    #[must_use]
-    pub fn covered(&self) -> u32 {
-        self.covered
-    }
-
-    /// Returns the texts of requirements missing task_refs (in_scope + acceptance_criteria only).
-    #[must_use]
-    pub fn uncovered(&self) -> &[String] {
-        &self.uncovered
-    }
-
-    /// Returns task_ref IDs that do not exist in the provided task set.
-    #[must_use]
-    pub fn invalid_refs(&self) -> &[String] {
-        &self.invalid_refs
-    }
-
-    /// Returns `true` if all evaluable requirements are covered and no invalid refs exist.
-    #[must_use]
-    pub fn is_fully_covered(&self) -> bool {
-        self.uncovered.is_empty() && self.invalid_refs.is_empty()
-    }
-
-    /// Returns the total number of evaluable requirements.
-    #[must_use]
-    pub fn total(&self) -> u32 {
-        self.covered + self.uncovered.len() as u32
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Hearing record types (TSUMIKI-07)
 // ---------------------------------------------------------------------------
@@ -763,14 +571,16 @@ pub enum SpecValidationError {
     EmptyTitle,
     #[error("spec version must not be empty")]
     EmptyVersion,
-    #[error("approved spec must have both approved_at and content_hash")]
-    ApprovalMetadataMissing,
     #[error("requirement text must not be empty")]
     EmptyRequirementText,
     #[error("domain state name must not be empty")]
     EmptyDomainStateName,
     #[error("section title must not be empty")]
     EmptySectionTitle,
+    #[error("requirement element id must not be empty")]
+    MissingElementId,
+    #[error("duplicate element id '{0}' — ids must be unique across all requirement sections")]
+    DuplicateElementId(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -778,85 +588,180 @@ pub enum SpecValidationError {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::path::PathBuf;
+
+    use crate::plan_ref::{
+        AdrAnchor, AdrRef, ConventionAnchor, ConventionRef, InformalGroundKind, InformalGroundRef,
+        InformalGroundSummary, SpecElementId,
+    };
+
     use super::*;
+
+    // --- helpers ---
+
+    fn make_adr_ref(file: &str, anchor: &str) -> AdrRef {
+        AdrRef::new(PathBuf::from(file), AdrAnchor::try_new(anchor).unwrap())
+    }
+
+    fn make_conv_ref(file: &str, anchor: &str) -> ConventionRef {
+        ConventionRef::new(PathBuf::from(file), ConventionAnchor::try_new(anchor).unwrap())
+    }
+
+    fn make_informal(kind: InformalGroundKind, summary: &str) -> InformalGroundRef {
+        InformalGroundRef::new(kind, InformalGroundSummary::try_new(summary).unwrap())
+    }
+
+    fn id(s: &str) -> SpecElementId {
+        SpecElementId::try_new(s).unwrap()
+    }
+
+    fn req_blue(id_s: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(
+            id(id_s),
+            text,
+            vec![make_adr_ref("knowledge/adr/2026-04-19-1242.md", "D1.2")],
+            vec![],
+            vec![],
+        )
+        .unwrap()
+    }
+
+    fn req_blue_conv(id_s: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(
+            id(id_s),
+            text,
+            vec![],
+            vec![make_conv_ref(".claude/rules/04-coding-principles.md", "newtype-pattern")],
+            vec![],
+        )
+        .unwrap()
+    }
+
+    fn req_yellow(id_s: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(
+            id(id_s),
+            text,
+            vec![],
+            vec![],
+            vec![make_informal(InformalGroundKind::Discussion, "agreed in spec review")],
+        )
+        .unwrap()
+    }
+
+    fn req_red(id_s: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(id(id_s), text, vec![], vec![], vec![]).unwrap()
+    }
+
+    fn make_doc() -> SpecDocument {
+        SpecDocument::new(
+            "Feature X",
+            "1.0",
+            vec![],
+            SpecScope::new(
+                vec![req_blue("IN-01", "in scope")],
+                vec![req_yellow("OS-01", "out scope")],
+            ),
+            vec![req_blue("CO-01", "constraint")],
+            vec![req_red("AC-01", "AC 1")],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap()
+    }
 
     // --- SpecRequirement ---
 
     #[test]
     fn test_requirement_with_valid_text_succeeds() {
-        let req = SpecRequirement::new("Enable feature X", vec!["PRD §3.2".into()]).unwrap();
+        let req = req_blue("IN-01", "Enable feature X");
         assert_eq!(req.text(), "Enable feature X");
-        assert_eq!(req.sources(), &["PRD §3.2"]);
+        assert_eq!(req.adr_refs().len(), 1);
+        assert!(req.convention_refs().is_empty());
+        assert!(req.informal_grounds().is_empty());
     }
 
     #[test]
     fn test_requirement_with_empty_text_returns_error() {
-        let result = SpecRequirement::new("", vec![]);
+        let result = SpecRequirement::new(id("IN-01"), "", vec![], vec![], vec![]);
         assert!(matches!(result, Err(SpecValidationError::EmptyRequirementText)));
     }
 
     #[test]
     fn test_requirement_with_whitespace_text_returns_error() {
-        let result = SpecRequirement::new("   ", vec![]);
+        let result = SpecRequirement::new(id("IN-01"), "   ", vec![], vec![], vec![]);
         assert!(matches!(result, Err(SpecValidationError::EmptyRequirementText)));
     }
 
-    // --- SpecRequirement task_refs ---
+    // --- Signal evaluation ---
 
     #[test]
-    fn test_requirement_new_has_empty_task_refs_by_default() {
-        let req = SpecRequirement::new("Enable feature X", vec!["PRD §3.2".into()]).unwrap();
-        assert!(req.task_refs().is_empty());
-    }
-
-    #[test]
-    fn test_requirement_with_task_refs_stores_refs() {
-        let req = SpecRequirement::with_task_refs(
-            "Enable feature X",
-            vec!["PRD §3.2".into()],
-            vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()],
-        )
-        .unwrap();
-        assert_eq!(req.task_refs().len(), 2);
-        assert_eq!(req.task_refs()[0].as_ref(), "T001");
-        assert_eq!(req.task_refs()[1].as_ref(), "T002");
-    }
-
-    #[test]
-    fn test_requirement_with_task_refs_empty_text_returns_error() {
-        let result = SpecRequirement::with_task_refs("", vec![], vec![]);
-        assert!(matches!(result, Err(SpecValidationError::EmptyRequirementText)));
-    }
-
-    // --- SpecRequirement signal evaluation ---
-
-    #[test]
-    fn test_requirement_signal_with_document_source_is_blue() {
-        let req = SpecRequirement::new("req", vec!["PRD §3.2".into()]).unwrap();
+    fn test_requirement_signal_with_adr_refs_is_blue() {
+        let req = req_blue("IN-01", "req");
         assert_eq!(req.signal(), ConfidenceSignal::Blue);
     }
 
     #[test]
-    fn test_requirement_signal_with_empty_sources_is_red() {
-        let req = SpecRequirement::new("req", vec![]).unwrap();
+    fn test_requirement_signal_with_convention_refs_only_is_red() {
+        // convention_refs are outside signal evaluation scope per ADR D3.1;
+        // convention-only requirement must evaluate to Red.
+        let req = req_blue_conv("IN-01", "req");
         assert_eq!(req.signal(), ConfidenceSignal::Red);
     }
 
     #[test]
-    fn test_requirement_signal_multi_source_takes_highest() {
-        let req = SpecRequirement::new("req", vec!["inference — guess".into(), "PRD §3.2".into()])
-            .unwrap();
-        assert_eq!(req.signal(), ConfidenceSignal::Blue);
+    fn test_requirement_signal_with_informal_grounds_only_is_yellow() {
+        let req = req_yellow("IN-01", "req");
+        assert_eq!(req.signal(), ConfidenceSignal::Yellow);
     }
 
     #[test]
-    fn test_requirement_signal_multi_source_all_yellow() {
-        let req =
-            SpecRequirement::new("req", vec!["discussion".into(), "inference — guess".into()])
-                .unwrap();
-        assert_eq!(req.signal(), ConfidenceSignal::Yellow);
+    fn test_requirement_signal_with_no_refs_is_red() {
+        let req = req_red("IN-01", "req");
+        assert_eq!(req.signal(), ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn test_requirement_signal_adr_refs_take_priority_over_informal() {
+        let req = SpecRequirement::new(
+            id("IN-01"),
+            "req",
+            vec![make_adr_ref("knowledge/adr/x.md", "D1")],
+            vec![],
+            vec![make_informal(InformalGroundKind::Discussion, "fallback")],
+        )
+        .unwrap();
+        assert_eq!(req.signal(), ConfidenceSignal::Blue);
+    }
+
+    // --- evaluate_requirement_signal ---
+
+    #[test]
+    fn test_evaluate_requirement_signal_adr_refs_gives_blue() {
+        let adr = vec![make_adr_ref("knowledge/adr/x.md", "D1")];
+        assert_eq!(evaluate_requirement_signal(&adr, &[]), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_requirement_signal_convention_refs_gives_red() {
+        // convention_refs are outside signal evaluation scope per ADR D3.1;
+        // convention-only arguments must evaluate to Red (no adr_refs, no informal_grounds).
+        // Note: convention_refs are not a parameter; this test verifies via req_blue_conv.
+        let req = req_blue_conv("IN-01", "req");
+        assert_eq!(req.signal(), ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn test_evaluate_requirement_signal_informal_only_gives_yellow() {
+        let informal = vec![make_informal(InformalGroundKind::Discussion, "summary")];
+        assert_eq!(evaluate_requirement_signal(&[], &informal), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_evaluate_requirement_signal_empty_gives_red() {
+        assert_eq!(evaluate_requirement_signal(&[], &[]), ConfidenceSignal::Red);
     }
 
     // --- SpecSection ---
@@ -876,132 +781,18 @@ mod tests {
 
     // --- SpecDocument ---
 
-    fn make_doc() -> SpecDocument {
-        SpecDocument::new(
-            "Feature X",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal line".into()],
-            SpecScope::new(
-                vec![SpecRequirement::new("in scope", vec!["PRD §1".into()]).unwrap()],
-                vec![
-                    SpecRequirement::new("out scope", vec!["inference — excluded".into()]).unwrap(),
-                ],
-            ),
-            vec![SpecRequirement::new("constraint", vec!["convention — hex.md".into()]).unwrap()],
-            vec![SpecRequirement::new("AC 1", vec![]).unwrap()],
-            vec![],
-            vec!["knowledge/conventions/hex.md".into()],
-            None,
-            None,
-            None,
-        )
-        .unwrap()
-    }
-
     #[test]
     fn test_document_creation_succeeds() {
         let doc = make_doc();
         assert_eq!(doc.title(), "Feature X");
-        assert_eq!(doc.status(), SpecStatus::Draft);
         assert_eq!(doc.version(), "1.0");
         assert!(doc.signals().is_none());
-        assert!(doc.approved_at().is_none());
-        assert!(doc.content_hash().is_none());
-    }
-
-    // --- SpecStatus ---
-
-    #[test]
-    fn test_spec_status_display() {
-        assert_eq!(SpecStatus::Draft.to_string(), "draft");
-        assert_eq!(SpecStatus::Approved.to_string(), "approved");
-    }
-
-    #[test]
-    fn test_spec_status_as_str() {
-        assert_eq!(SpecStatus::Draft.as_str(), "draft");
-        assert_eq!(SpecStatus::Approved.as_str(), "approved");
-    }
-
-    // --- SpecDocument approve / demote ---
-
-    #[test]
-    fn test_document_approve_sets_status_and_metadata() {
-        let mut doc = make_doc();
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts.clone(), "sha256:abc123".into()).unwrap();
-
-        assert_eq!(doc.status(), SpecStatus::Approved);
-        assert_eq!(doc.approved_at().unwrap(), &ts);
-        assert_eq!(doc.content_hash(), Some("sha256:abc123"));
-    }
-
-    #[test]
-    fn test_document_demote_clears_approval() {
-        let mut doc = make_doc();
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts, "sha256:abc123".into()).unwrap();
-        doc.demote();
-
-        assert_eq!(doc.status(), SpecStatus::Draft);
-        assert!(doc.approved_at().is_none());
-        assert!(doc.content_hash().is_none());
-    }
-
-    #[test]
-    fn test_is_approval_valid_with_matching_hash() {
-        let mut doc = make_doc();
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts, "sha256:abc123".into()).unwrap();
-
-        assert!(doc.is_approval_valid("sha256:abc123"));
-    }
-
-    #[test]
-    fn test_is_approval_valid_with_mismatched_hash() {
-        let mut doc = make_doc();
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts, "sha256:abc123".into()).unwrap();
-
-        assert!(!doc.is_approval_valid("sha256:different"));
-    }
-
-    #[test]
-    fn test_is_approval_valid_when_draft() {
-        let doc = make_doc();
-        assert!(!doc.is_approval_valid("sha256:abc123"));
-    }
-
-    #[test]
-    fn test_effective_status_approved_with_matching_hash() {
-        let mut doc = make_doc();
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts, "sha256:abc123".into()).unwrap();
-
-        assert_eq!(doc.effective_status("sha256:abc123"), SpecStatus::Approved);
-    }
-
-    #[test]
-    fn test_effective_status_draft_with_mismatched_hash() {
-        let mut doc = make_doc();
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        doc.approve(ts, "sha256:abc123".into()).unwrap();
-
-        assert_eq!(doc.effective_status("sha256:different"), SpecStatus::Draft);
-    }
-
-    #[test]
-    fn test_effective_status_draft_when_never_approved() {
-        let doc = make_doc();
-        assert_eq!(doc.effective_status("sha256:anything"), SpecStatus::Draft);
     }
 
     #[test]
     fn test_document_with_empty_title_returns_error() {
         let result = SpecDocument::new(
             "",
-            SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -1009,19 +800,16 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            None,
-            None,
             None,
         );
         assert!(matches!(result, Err(SpecValidationError::EmptyTitle)));
     }
 
     #[test]
-    fn test_document_approved_without_metadata_returns_error() {
+    fn test_document_with_empty_version_returns_error() {
         let result = SpecDocument::new(
             "T",
-            SpecStatus::Approved,
-            "1.0",
+            "",
             vec![],
             SpecScope::new(vec![], vec![]),
             vec![],
@@ -1029,109 +817,33 @@ mod tests {
             vec![],
             vec![],
             None,
-            None, // no approved_at
-            None, // no content_hash
         );
-        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
+        assert!(matches!(result, Err(SpecValidationError::EmptyVersion)));
     }
 
     #[test]
-    fn test_document_approved_with_only_timestamp_returns_error() {
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+    fn test_document_duplicate_element_id_returns_error() {
+        // Two requirements in different sections share the same id.
         let result = SpecDocument::new(
             "T",
-            SpecStatus::Approved,
             "1.0",
             vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
+            SpecScope::new(vec![req_blue("IN-01", "in scope")], vec![]),
+            vec![req_red("IN-01", "constraint with duplicate id")], // duplicate!
             vec![],
             vec![],
             vec![],
             None,
-            Some(ts),
-            None, // no content_hash
         );
-        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
-    }
-
-    #[test]
-    fn test_document_approved_with_only_hash_returns_error() {
-        let result = SpecDocument::new(
-            "T",
-            SpecStatus::Approved,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None, // no approved_at
-            Some("sha256:abc".into()),
-        );
-        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
-    }
-
-    #[test]
-    fn test_document_approved_with_empty_hash_returns_error() {
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        let result = SpecDocument::new(
-            "T",
-            SpecStatus::Approved,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            Some(ts),
-            Some("".into()),
-        );
-        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
-    }
-
-    #[test]
-    fn test_approve_rejects_empty_hash() {
-        let mut doc = make_doc();
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        let result = doc.approve(ts, "".into());
-        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
-        assert_eq!(doc.status(), SpecStatus::Draft, "should remain Draft on error");
-    }
-
-    #[test]
-    fn test_document_draft_with_metadata_strips_it() {
-        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
-        let doc = SpecDocument::new(
-            "T",
-            SpecStatus::Draft,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            Some(ts),
-            Some("sha256:abc".into()),
-        )
-        .unwrap();
-        // Draft silently strips approval metadata
-        assert!(doc.approved_at().is_none());
-        assert!(doc.content_hash().is_none());
+        assert!(matches!(result, Err(SpecValidationError::DuplicateElementId(_))));
     }
 
     #[test]
     fn test_document_evaluate_signals() {
         let doc = make_doc();
         let signals = doc.evaluate_signals();
-        // in_scope: Blue (PRD), out_scope: Yellow (inference),
-        // constraint: Blue (convention), AC1: Red (no sources)
+        // in_scope: Blue (adr_ref), out_scope: Yellow (informal),
+        // constraint: Blue (convention_ref), AC1: Red (no refs)
         assert_eq!(signals.blue(), 2);
         assert_eq!(signals.yellow(), 1);
         assert_eq!(signals.red(), 1);
@@ -1145,377 +857,42 @@ mod tests {
         assert_eq!(doc.signals(), Some(&SignalCounts::new(10, 2, 0)));
     }
 
-    // --- evaluate_requirement_signal ---
-
     #[test]
-    fn test_evaluate_requirement_signal_empty_is_red() {
-        assert_eq!(evaluate_requirement_signal(&[]), ConfidenceSignal::Red);
-    }
-
-    #[test]
-    fn test_evaluate_requirement_signal_single_document_is_blue() {
-        assert_eq!(evaluate_requirement_signal(&["PRD §3.2".into()]), ConfidenceSignal::Blue);
-    }
-
-    #[test]
-    fn test_evaluate_requirement_signal_mixed_takes_highest() {
-        assert_eq!(
-            evaluate_requirement_signal(&["discussion".into(), "PRD §1".into()]),
-            ConfidenceSignal::Blue
-        );
-    }
-
-    #[test]
-    fn test_evaluate_requirement_signal_all_inference_is_yellow() {
-        assert_eq!(
-            evaluate_requirement_signal(&["inference — a".into(), "inference — b".into()]),
-            ConfidenceSignal::Yellow
-        );
-    }
-
-    // --- CoverageResult ---
-
-    #[test]
-    fn test_coverage_result_accessors() {
-        let result = CoverageResult::new(3, vec!["uncov".into()], vec!["T999".into()]);
-        assert_eq!(result.covered(), 3);
-        assert_eq!(result.uncovered(), &["uncov"]);
-        assert_eq!(result.invalid_refs(), &["T999"]);
-        assert!(!result.is_fully_covered());
-        assert_eq!(result.total(), 4);
-    }
-
-    #[test]
-    fn test_coverage_result_fully_covered() {
-        let result = CoverageResult::new(5, vec![], vec![]);
-        assert!(result.is_fully_covered());
-        assert_eq!(result.total(), 5);
-    }
-
-    // --- SpecDocument::evaluate_coverage ---
-
-    fn make_task_id_set(ids: &[&str]) -> HashSet<TaskId> {
-        ids.iter().map(|id| TaskId::try_new(*id).unwrap()).collect()
-    }
-
-    #[test]
-    fn test_evaluate_coverage_all_covered() {
+    fn test_document_goal_is_included_in_signals() {
         let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
+            "T",
             "1.0",
-            vec!["Goal".into()],
-            SpecScope::new(
-                vec![
-                    SpecRequirement::with_task_refs(
-                        "in scope item",
-                        vec!["PRD §1".into()],
-                        vec![TaskId::try_new("T001").unwrap()],
-                    )
-                    .unwrap(),
-                ],
-                vec![],
-            ),
-            vec![],
-            vec![
-                SpecRequirement::with_task_refs(
-                    "AC item",
-                    vec!["discussion".into()],
-                    vec![TaskId::try_new("T002").unwrap()],
-                )
-                .unwrap(),
-            ],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-
-        let valid = make_task_id_set(&["T001", "T002"]);
-        let result = doc.evaluate_coverage(&valid);
-        assert!(result.is_fully_covered());
-        assert_eq!(result.covered(), 2);
-        assert_eq!(result.total(), 2);
-    }
-
-    #[test]
-    fn test_evaluate_coverage_missing_task_refs() {
-        let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal".into()],
-            SpecScope::new(
-                vec![SpecRequirement::new("uncovered in scope", vec!["PRD §1".into()]).unwrap()],
-                vec![],
-            ),
-            vec![],
-            vec![SpecRequirement::new("uncovered AC", vec!["discussion".into()]).unwrap()],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-
-        let valid = make_task_id_set(&["T001"]);
-        let result = doc.evaluate_coverage(&valid);
-        assert!(!result.is_fully_covered());
-        assert_eq!(result.covered(), 0);
-        assert_eq!(result.uncovered().len(), 2);
-        assert!(result.uncovered().contains(&"uncovered in scope".to_string()));
-        assert!(result.uncovered().contains(&"uncovered AC".to_string()));
-    }
-
-    #[test]
-    fn test_evaluate_coverage_invalid_task_ref() {
-        let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal".into()],
-            SpecScope::new(
-                vec![
-                    SpecRequirement::with_task_refs(
-                        "in scope",
-                        vec!["PRD §1".into()],
-                        vec![TaskId::try_new("T999").unwrap()],
-                    )
-                    .unwrap(),
-                ],
-                vec![],
-            ),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-
-        let valid = make_task_id_set(&["T001"]);
-        let result = doc.evaluate_coverage(&valid);
-        assert!(!result.is_fully_covered());
-        assert_eq!(result.covered(), 0); // only invalid refs → uncovered
-        assert_eq!(result.uncovered(), &["in scope"]);
-        assert_eq!(result.invalid_refs(), &["T999"]);
-    }
-
-    #[test]
-    fn test_evaluate_coverage_mixed_valid_and_invalid_refs() {
-        let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal".into()],
-            SpecScope::new(
-                vec![
-                    SpecRequirement::with_task_refs(
-                        "in scope",
-                        vec!["PRD §1".into()],
-                        vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T999").unwrap()],
-                    )
-                    .unwrap(),
-                ],
-                vec![],
-            ),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-
-        let valid = make_task_id_set(&["T001"]);
-        let result = doc.evaluate_coverage(&valid);
-        // Has at least one valid ref → covered, but also has invalid ref
-        assert!(!result.is_fully_covered());
-        assert_eq!(result.covered(), 1);
-        assert!(result.uncovered().is_empty());
-        assert_eq!(result.invalid_refs(), &["T999"]);
-    }
-
-    #[test]
-    fn test_evaluate_coverage_constraints_not_enforced() {
-        let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal".into()],
+            vec![req_blue("GL-01", "goal item")],
             SpecScope::new(vec![], vec![]),
-            // Constraint with NO task_refs — should NOT appear in uncovered
-            vec![SpecRequirement::new("constraint", vec!["convention — hex.md".into()]).unwrap()],
             vec![],
             vec![],
             vec![],
-            None,
-            None,
+            vec![],
             None,
         )
         .unwrap();
-
-        let valid = make_task_id_set(&[]);
-        let result = doc.evaluate_coverage(&valid);
-        assert!(result.is_fully_covered());
-        assert_eq!(result.covered(), 0);
-        assert_eq!(result.total(), 0);
+        let signals = doc.evaluate_signals();
+        assert_eq!(signals.blue(), 1);
     }
 
     #[test]
-    fn test_evaluate_coverage_deduplicates_invalid_refs() {
+    fn test_document_related_conventions_is_convention_refs() {
         let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
+            "T",
             "1.0",
-            vec!["Goal".into()],
-            SpecScope::new(
-                vec![
-                    SpecRequirement::with_task_refs(
-                        "item 1",
-                        vec!["PRD §1".into()],
-                        vec![TaskId::try_new("T999").unwrap()],
-                    )
-                    .unwrap(),
-                    SpecRequirement::with_task_refs(
-                        "item 2",
-                        vec!["PRD §2".into()],
-                        vec![TaskId::try_new("T999").unwrap()],
-                    )
-                    .unwrap(),
-                ],
-                vec![],
-            ),
             vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-
-        let valid = make_task_id_set(&["T001"]);
-        let result = doc.evaluate_coverage(&valid);
-        // T999 appears twice in different requirements but should be deduplicated
-        assert_eq!(result.invalid_refs().len(), 1);
-        assert_eq!(result.invalid_refs()[0], "T999");
-    }
-
-    // --- validate_all_task_refs ---
-
-    #[test]
-    fn test_validate_all_task_refs_catches_constraint_invalid_ref() {
-        let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal".into()],
             SpecScope::new(vec![], vec![]),
-            vec![
-                SpecRequirement::with_task_refs(
-                    "constraint",
-                    vec!["convention — hex.md".into()],
-                    vec![TaskId::try_new("T999").unwrap()],
-                )
-                .unwrap(),
-            ],
             vec![],
             vec![],
             vec![],
-            None,
-            None,
+            vec![make_conv_ref("knowledge/conventions/source-attribution.md", "intro")],
             None,
         )
         .unwrap();
-
-        let valid = make_task_id_set(&["T001"]);
-        let invalid = doc.validate_all_task_refs(&valid);
-        assert_eq!(invalid, &["T999"]);
+        assert_eq!(doc.related_conventions().len(), 1);
     }
 
-    #[test]
-    fn test_validate_all_task_refs_catches_out_of_scope_invalid_ref() {
-        let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal".into()],
-            SpecScope::new(
-                vec![],
-                vec![
-                    SpecRequirement::with_task_refs(
-                        "excluded",
-                        vec!["inference — not needed".into()],
-                        vec![TaskId::try_new("T888").unwrap()],
-                    )
-                    .unwrap(),
-                ],
-            ),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-
-        let valid = make_task_id_set(&["T001"]);
-        let invalid = doc.validate_all_task_refs(&valid);
-        assert_eq!(invalid, &["T888"]);
-    }
-
-    #[test]
-    fn test_validate_all_task_refs_empty_when_all_valid() {
-        let doc = SpecDocument::new(
-            "Feature",
-            SpecStatus::Draft,
-            "1.0",
-            vec!["Goal".into()],
-            SpecScope::new(
-                vec![
-                    SpecRequirement::with_task_refs(
-                        "in scope",
-                        vec!["PRD §1".into()],
-                        vec![TaskId::try_new("T001").unwrap()],
-                    )
-                    .unwrap(),
-                ],
-                vec![],
-            ),
-            vec![
-                SpecRequirement::with_task_refs(
-                    "constraint",
-                    vec!["convention".into()],
-                    vec![TaskId::try_new("T001").unwrap()],
-                )
-                .unwrap(),
-            ],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-
-        let valid = make_task_id_set(&["T001"]);
-        let invalid = doc.validate_all_task_refs(&valid);
-        assert!(invalid.is_empty());
-    }
-
-    // --- HearingRecord (TSUMIKI-07) ---
+    // --- HearingRecord ---
 
     #[test]
     fn test_hearing_mode_as_str() {
@@ -1567,24 +944,17 @@ mod tests {
     }
 
     // --- check_spec_doc_signals (Stage 1 signal gate) ---
-    //
-    // These tests cover the pure function that both the CI path
-    // (`verify_from_spec_json`) and the merge gate (via `usecase::merge_gate`)
-    // delegate to. Cases mirror the D1–D6 rows in the ADR Test Matrix.
 
     fn doc_with_signals(signals: Option<SignalCounts>) -> SpecDocument {
         let mut doc = SpecDocument::new(
             "Feature",
-            SpecStatus::Draft,
             "1.0",
-            vec!["Goal line".to_owned()],
+            vec![],
             SpecScope::new(Vec::new(), Vec::new()),
             Vec::new(),
             Vec::new(),
             Vec::new(),
             Vec::new(),
-            None,
-            None,
             None,
         )
         .unwrap();
@@ -1596,7 +966,6 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_none_returns_error() {
-        // D1: signals=None → BLOCKED (unevaluated)
         let doc = doc_with_signals(None);
         let outcome = check_spec_doc_signals(&doc, false);
         assert!(outcome.has_errors(), "None signals must be an error");
@@ -1609,7 +978,6 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_all_zero_returns_error() {
-        // D2: signals=(0,0,0) → BLOCKED (evaluated but empty — treated as unevaluated)
         let doc = doc_with_signals(Some(SignalCounts::new(0, 0, 0)));
         let outcome = check_spec_doc_signals(&doc, false);
         assert!(outcome.has_errors(), "all-zero signals must be an error");
@@ -1618,7 +986,6 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_red_is_error_in_interim_mode() {
-        // D3a: red>0, strict=false → BLOCKED (red is always an error)
         let doc = doc_with_signals(Some(SignalCounts::new(1, 0, 2)));
         let outcome = check_spec_doc_signals(&doc, false);
         assert!(outcome.has_errors(), "red>0 must be an error in interim mode");
@@ -1627,7 +994,6 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_red_is_error_in_strict_mode() {
-        // D3b: red>0, strict=true → BLOCKED
         let doc = doc_with_signals(Some(SignalCounts::new(1, 0, 2)));
         let outcome = check_spec_doc_signals(&doc, true);
         assert!(outcome.has_errors(), "red>0 must be an error in strict mode");
@@ -1635,7 +1001,6 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_yellow_is_warning_in_interim_mode() {
-        // D4: yellow>0, strict=false → PASS with VerifyFinding::warning
         let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
         let outcome = check_spec_doc_signals(&doc, false);
         assert!(!outcome.has_errors(), "yellow in interim mode must not be an error: {outcome:?}");
@@ -1649,7 +1014,6 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_yellow_is_error_in_strict_mode() {
-        // D5: yellow>0, strict=true → BLOCKED with VerifyFinding::error
         let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
         let outcome = check_spec_doc_signals(&doc, true);
         assert!(outcome.has_errors(), "yellow in strict mode must be an error");
@@ -1661,7 +1025,6 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_all_blue_passes_in_both_modes() {
-        // D6: all Blue → PASS (no findings) in both modes
         let doc = doc_with_signals(Some(SignalCounts::new(10, 0, 0)));
 
         let outcome_interim = check_spec_doc_signals(&doc, false);
@@ -1677,5 +1040,36 @@ mod tests {
             outcome_strict.findings().is_empty(),
             "all-Blue must produce zero findings in strict mode"
         );
+    }
+
+    // --- New signal tests: adr_refs → Blue, informal → Yellow, empty → Red ---
+
+    #[test]
+    fn test_signal_non_empty_adr_refs_gives_blue() {
+        let req = req_blue("IN-01", "req with adr");
+        assert_eq!(req.signal(), ConfidenceSignal::Blue, "non-empty adr_refs must give Blue");
+    }
+
+    #[test]
+    fn test_signal_convention_refs_only_gives_red() {
+        // convention_refs are outside signal evaluation scope per ADR D3.1.
+        let req = req_blue_conv("IN-01", "req with conv");
+        assert_eq!(
+            req.signal(),
+            ConfidenceSignal::Red,
+            "convention_refs alone must give Red (outside signal evaluation scope per ADR D3.1)"
+        );
+    }
+
+    #[test]
+    fn test_signal_empty_adr_refs_non_empty_informal_gives_yellow() {
+        let req = req_yellow("IN-01", "req with informal");
+        assert_eq!(req.signal(), ConfidenceSignal::Yellow, "informal only must give Yellow");
+    }
+
+    #[test]
+    fn test_signal_all_empty_gives_red() {
+        let req = req_red("IN-01", "req with no refs");
+        assert_eq!(req.signal(), ConfidenceSignal::Red, "all empty must give Red");
     }
 }

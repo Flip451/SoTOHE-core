@@ -1,0 +1,1137 @@
+{
+  "schema_version": 2,
+  "captured_at": "2026-04-20T16:15:53Z",
+  "types": {
+    "ActivateTrackOutcome": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Materialized"
+        }
+      ],
+      "methods": [
+        {
+          "name": "track",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TrackMetadata",
+          "is_async": false
+        }
+      ]
+    },
+    "ActivateTrackUseCase": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "branch",
+              "ty": "&TrackBranch"
+            },
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            }
+          ],
+          "returns": "Result<ActivateTrackOutcome, TrackWriteError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "writer",
+              "ty": "Arc<W>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "AddTaskUseCase": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "description",
+              "ty": "&str"
+            },
+            {
+              "name": "section_id",
+              "ty": "Option<&str>"
+            },
+            {
+              "name": "after_task_id",
+              "ty": "Option<&TaskId>"
+            }
+          ],
+          "returns": "Result<(TrackMetadata, TaskId), TrackWriteError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "writer",
+              "ty": "Arc<W>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "BlobFetchResult": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "FetchError"
+        },
+        {
+          "kind": "variant",
+          "name": "Found"
+        },
+        {
+          "kind": "variant",
+          "name": "NotFound"
+        }
+      ],
+      "methods": []
+    },
+    "CheckSummary": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "AllPassed"
+        },
+        {
+          "kind": "variant",
+          "name": "Failed"
+        },
+        {
+          "kind": "variant",
+          "name": "Pending"
+        }
+      ],
+      "methods": []
+    },
+    "DiffGetError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Failed"
+        }
+      ],
+      "methods": []
+    },
+    "ExplicitTrackBranch": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "display_path",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "expected_branch",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "schema_version",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "Option<String>"
+        }
+      ],
+      "methods": []
+    },
+    "GitWorkflowError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "BranchMismatch"
+        },
+        {
+          "kind": "variant",
+          "name": "DetachedHead"
+        },
+        {
+          "kind": "variant",
+          "name": "Message"
+        },
+        {
+          "kind": "variant",
+          "name": "NoBranch"
+        },
+        {
+          "kind": "variant",
+          "name": "Validation"
+        }
+      ],
+      "methods": []
+    },
+    "GuardHookHandler": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "parser",
+          "ty": "Arc<dyn ShellParser>"
+        }
+      ],
+      "methods": []
+    },
+    "LoadTrackUseCase": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<Option<TrackMetadata>, TrackReadError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "reader",
+              "ty": "Arc<R>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "PrBranchContext": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "branch",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "is_plan_branch",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "PrCheckStatus": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Failed"
+        },
+        {
+          "kind": "variant",
+          "name": "Passed"
+        },
+        {
+          "kind": "variant",
+          "name": "Pending"
+        }
+      ],
+      "methods": []
+    },
+    "PrCheckView": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "name",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "PrCheckStatus"
+        }
+      ],
+      "methods": []
+    },
+    "PrReviewError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "UnsupportedProvider"
+        }
+      ],
+      "methods": []
+    },
+    "PrReviewFinding": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "body",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "end_line",
+          "ty": "Option<u32>"
+        },
+        {
+          "kind": "field",
+          "name": "line",
+          "ty": "Option<u32>"
+        },
+        {
+          "kind": "field",
+          "name": "path",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "rule_id",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "severity",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "PrReviewResult": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "actionable_count",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "body",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "findings",
+          "ty": "Vec<PrReviewFinding>"
+        },
+        {
+          "kind": "field",
+          "name": "inline_comment_count",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "passed",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "review_id",
+          "ty": "u64"
+        },
+        {
+          "kind": "field",
+          "name": "state",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "PrWorkflowError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Message"
+        }
+      ],
+      "methods": []
+    },
+    "RenderContractMapCommand": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "kind_filter",
+          "ty": "Option<Vec<TypeDefinitionKind>>"
+        },
+        {
+          "kind": "field",
+          "name": "layer_filter",
+          "ty": "Option<Vec<LayerId>>"
+        },
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "TrackId"
+        }
+      ],
+      "methods": []
+    },
+    "RenderContractMapError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "CatalogueLoaderFailed"
+        },
+        {
+          "kind": "variant",
+          "name": "ContractMapWriterFailed"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyCatalogue"
+        },
+        {
+          "kind": "variant",
+          "name": "LayerNotFound"
+        }
+      ],
+      "methods": []
+    },
+    "RenderContractMapInteractor": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "loader",
+              "ty": "L"
+            },
+            {
+              "name": "writer",
+              "ty": "W"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "RenderContractMapOutput": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "rendered_layer_count",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "total_entry_count",
+          "ty": "usize"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewCycle": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "fast_review",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "returns": "Result<ReviewOutcome<FastVerdict>, ReviewCycleError>",
+          "is_async": false
+        },
+        {
+          "name": "get_review_states",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "reader",
+              "ty": "&impl ReviewReader"
+            }
+          ],
+          "returns": "Result<HashMap<ScopeName, ReviewState>, ReviewCycleError>",
+          "is_async": false
+        },
+        {
+          "name": "get_review_targets",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<HashMap<ScopeName, ReviewTarget>, ReviewCycleError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "base",
+              "ty": "CommitHash"
+            },
+            {
+              "name": "scope_config",
+              "ty": "ReviewScopeConfig"
+            },
+            {
+              "name": "reviewer",
+              "ty": "R"
+            },
+            {
+              "name": "diff_getter",
+              "ty": "D"
+            },
+            {
+              "name": "hasher",
+              "ty": "H"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "review",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "returns": "Result<ReviewOutcome<Verdict>, ReviewCycleError>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewCycleError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Diff"
+        },
+        {
+          "kind": "variant",
+          "name": "FileChangedDuringReview"
+        },
+        {
+          "kind": "variant",
+          "name": "Hash"
+        },
+        {
+          "kind": "variant",
+          "name": "Reader"
+        },
+        {
+          "kind": "variant",
+          "name": "Reviewer"
+        },
+        {
+          "kind": "variant",
+          "name": "UnknownScope"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewFinalMessageState": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Invalid"
+        },
+        {
+          "kind": "variant",
+          "name": "Missing"
+        },
+        {
+          "kind": "variant",
+          "name": "Parsed"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewFinalPayload": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "findings",
+          "ty": "Vec<ReviewFinding>"
+        },
+        {
+          "kind": "field",
+          "name": "verdict",
+          "ty": "ReviewPayloadVerdict"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewFinding": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "category",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "file",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "line",
+          "ty": "Option<u64>"
+        },
+        {
+          "kind": "field",
+          "name": "message",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "severity",
+          "ty": "Option<String>"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewHasherError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Failed"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewPayloadVerdict": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "FindingsRemain"
+        },
+        {
+          "kind": "variant",
+          "name": "ZeroFindings"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewVerdict": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "FindingsRemain"
+        },
+        {
+          "kind": "variant",
+          "name": "LastMessageMissing"
+        },
+        {
+          "kind": "variant",
+          "name": "ProcessFailed"
+        },
+        {
+          "kind": "variant",
+          "name": "Timeout"
+        },
+        {
+          "kind": "variant",
+          "name": "ZeroFindings"
+        }
+      ],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewWorkflowError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Serialize"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewerError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "IllegalVerdict"
+        },
+        {
+          "kind": "variant",
+          "name": "ReviewerAbort"
+        },
+        {
+          "kind": "variant",
+          "name": "Timeout"
+        },
+        {
+          "kind": "variant",
+          "name": "Unexpected"
+        },
+        {
+          "kind": "variant",
+          "name": "UserAbort"
+        }
+      ],
+      "methods": []
+    },
+    "SaveTrackUseCase": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track",
+              "ty": "&TrackMetadata"
+            }
+          ],
+          "returns": "Result<(), TrackWriteError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "writer",
+              "ty": "Arc<W>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "SetOverrideUseCase": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "status_override",
+              "ty": "Option<StatusOverride>"
+            }
+          ],
+          "returns": "Result<TrackMetadata, TrackWriteError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "writer",
+              "ty": "Arc<W>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "TestFileDeletionGuardHandler": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "parser",
+          "ty": "Arc<dyn ShellParser>"
+        }
+      ],
+      "methods": []
+    },
+    "TrackBranchClaim": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "branch",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "schema_version",
+          "ty": "u32"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "track_name",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TrackResolutionError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "DetachedHead"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidTrackId"
+        },
+        {
+          "kind": "variant",
+          "name": "NoBranch"
+        },
+        {
+          "kind": "variant",
+          "name": "NotActivated"
+        },
+        {
+          "kind": "variant",
+          "name": "NotTrackBranch"
+        },
+        {
+          "kind": "variant",
+          "name": "ReadError"
+        },
+        {
+          "kind": "variant",
+          "name": "TrackNotFound"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedTargetStatus"
+        }
+      ],
+      "methods": []
+    },
+    "TransitionTaskUseCase": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            },
+            {
+              "name": "transition",
+              "ty": "TaskTransition"
+            }
+          ],
+          "returns": "Result<TrackMetadata, TrackWriteError>",
+          "is_async": false
+        },
+        {
+          "name": "execute_by_status",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            },
+            {
+              "name": "target_status",
+              "ty": "&str"
+            },
+            {
+              "name": "commit_hash",
+              "ty": "Option<CommitHash>"
+            }
+          ],
+          "returns": "Result<TrackMetadata, TrackWriteError>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "writer",
+              "ty": "Arc<W>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "WaitDecision": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "FailChecks"
+        },
+        {
+          "kind": "variant",
+          "name": "MergeNow"
+        },
+        {
+          "kind": "variant",
+          "name": "Timeout"
+        },
+        {
+          "kind": "variant",
+          "name": "Wait"
+        }
+      ],
+      "methods": []
+    },
+    "WorktreeGuardError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Validation"
+        },
+        {
+          "kind": "variant",
+          "name": "WorktreeStatus"
+        }
+      ],
+      "methods": []
+    }
+  },
+  "traits": {
+    "DiffGetter": {
+      "methods": [
+        {
+          "name": "list_diff_files",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "base",
+              "ty": "&CommitHash"
+            }
+          ],
+          "returns": "Result<Vec<FilePath>, DiffGetError>",
+          "is_async": false
+        }
+      ]
+    },
+    "HookHandler": {
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "ctx",
+              "ty": "&HookContext"
+            },
+            {
+              "name": "input",
+              "ty": "&HookInput"
+            }
+          ],
+          "returns": "Result<HookVerdict, HookError>",
+          "is_async": false
+        }
+      ]
+    },
+    "RenderContractMap": {
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RenderContractMapCommand"
+            }
+          ],
+          "returns": "Result<RenderContractMapOutput, RenderContractMapError>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewHasher": {
+      "methods": [
+        {
+          "name": "calc",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&ReviewTarget"
+            }
+          ],
+          "returns": "Result<ReviewHash, ReviewHasherError>",
+          "is_async": false
+        }
+      ]
+    },
+    "Reviewer": {
+      "methods": [
+        {
+          "name": "fast_review",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&ReviewTarget"
+            }
+          ],
+          "returns": "Result<(FastVerdict, LogInfo), ReviewerError>",
+          "is_async": false
+        },
+        {
+          "name": "review",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&ReviewTarget"
+            }
+          ],
+          "returns": "Result<(Verdict, LogInfo), ReviewerError>",
+          "is_async": false
+        }
+      ]
+    },
+    "TrackBlobReader": {
+      "methods": [
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false
+        },
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<SpecDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_track_metadata",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<TrackMetadata>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+          "is_async": false
+        }
+      ]
+    }
+  }
+}

@@ -1,9 +1,8 @@
-use std::collections::{HashMap, HashSet};
 use std::fmt;
 
 use crate::{
-    CommitHash, DomainError, NonEmptyString, PlanView, TaskId, TrackBranch, TrackId,
-    TransitionError, ValidationError,
+    CommitHash, DomainError, ImplPlanDocument, NonEmptyString, PlanView, TaskId, TrackBranch,
+    TrackId, TransitionError, ValidationError,
 };
 
 /// Derived status of a track, computed from its task states and optional override.
@@ -254,52 +253,70 @@ impl TrackTask {
     }
 }
 
-/// Root aggregate for a track: tasks, plan, and optional status override.
+/// Identity-only aggregate for a track (metadata.json SSoT after ADR 2026-04-19-1242 §D1.4).
+///
+/// Retains only: `id`, `branch`, `title`,
+/// `created_at`, `updated_at` (handled at DTO layer in `DocumentMeta`).
+///
+/// `tasks` and `plan` have moved to `ImplPlanDocument` (`impl-plan.json`).
+/// `status` is now **derived on demand** via `derive_track_status`; it is no longer
+/// stored in `metadata.json`.
+/// `status_override` is retained as an optional sub-field for Blocked/Cancelled semantics.
+///
+/// Branch validation: when a branch is present it must begin with `"track/"` and
+/// the slug after the prefix must match the track id exactly.
+/// Constructor validates: non-empty title, valid id (caller responsibility),
+/// branch format and branch-id consistency if provided.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackMetadata {
     id: TrackId,
     branch: Option<TrackBranch>,
     title: NonEmptyString,
-    tasks: Vec<TrackTask>,
-    plan: PlanView,
+    /// Optional override sub-field: Blocked/Cancelled with reason.
+    /// Feeds into derived status via `derive_track_status`.
     status_override: Option<StatusOverride>,
 }
 
 impl TrackMetadata {
-    /// Creates a new `TrackMetadata`, validating plan-task referential integrity.
+    /// Creates a new identity-only `TrackMetadata`.
     ///
     /// # Errors
-    /// Returns `DomainError` on empty title, duplicate tasks/sections, or plan-task mismatch.
+    /// Returns `DomainError::Validation(ValidationError::EmptyTrackTitle)` if title is empty.
     pub fn new(
         id: TrackId,
         title: impl Into<String>,
-        tasks: Vec<TrackTask>,
-        plan: PlanView,
         status_override: Option<StatusOverride>,
     ) -> Result<Self, DomainError> {
-        Self::with_branch(id, None, title, tasks, plan, status_override)
+        Self::with_branch(id, None, title, status_override)
     }
 
     /// Creates a new `TrackMetadata` with an optional branch field.
     ///
+    /// When `branch` is present, its slug (the portion after `"track/"`) must
+    /// match the track `id` exactly. This ensures that branch-based readers and
+    /// activation logic cannot be misrouted.
+    ///
     /// # Errors
-    /// Returns `DomainError` on empty title, duplicate tasks/sections, or plan-task mismatch.
+    /// - `DomainError::Validation(ValidationError::EmptyTrackTitle)` if title is empty.
+    /// - `DomainError::Validation(ValidationError::BranchIdMismatch)` if the branch
+    ///   slug does not match the track id.
     pub fn with_branch(
         id: TrackId,
         branch: Option<TrackBranch>,
         title: impl Into<String>,
-        tasks: Vec<TrackTask>,
-        plan: PlanView,
         status_override: Option<StatusOverride>,
     ) -> Result<Self, DomainError> {
+        if let Some(ref b) = branch {
+            let expected_prefix = format!("track/{}", id.as_ref());
+            if b.as_ref() != expected_prefix {
+                return Err(DomainError::Validation(ValidationError::BranchIdMismatch {
+                    id: id.to_string(),
+                    branch: b.to_string(),
+                }));
+            }
+        }
         let title = NonEmptyString::try_new(title).map_err(|_| ValidationError::EmptyTrackTitle)?;
-
-        validate_plan_invariants(&tasks, &plan)?;
-
-        let track = Self { id, branch, title, tasks, plan, status_override };
-        track.ensure_override_is_compatible()?;
-
-        Ok(track)
+        Ok(Self { id, branch, title, status_override })
     }
 
     #[must_use]
@@ -312,8 +329,40 @@ impl TrackMetadata {
         self.branch.as_ref()
     }
 
-    pub fn set_branch(&mut self, branch: Option<TrackBranch>) {
+    /// Returns `true` iff the track has been activated (its branch has been
+    /// materialized). Activation is identified by branch materialization
+    /// ONLY — `status_override`, derived status, and schema version are
+    /// explicitly NOT part of the activation predicate. A branchless
+    /// planning track carrying `status_override = blocked / cancelled` is
+    /// NOT activated.
+    ///
+    /// Use together with [`crate::check_impl_plan_presence`] to enforce the
+    /// invariant "activated track ↔ impl-plan.json present".
+    #[must_use]
+    pub fn is_activated(&self) -> bool {
+        self.branch.is_some()
+    }
+
+    /// Sets or clears the branch field, enforcing branch-id consistency.
+    ///
+    /// When `branch` is `Some`, its slug (the portion after `"track/"`) must
+    /// match the track id exactly.
+    ///
+    /// # Errors
+    /// Returns `DomainError::Validation(ValidationError::BranchIdMismatch)` if the
+    /// branch slug does not match the track id.
+    pub fn set_branch(&mut self, branch: Option<TrackBranch>) -> Result<(), DomainError> {
+        if let Some(ref b) = branch {
+            let expected_prefix = format!("track/{}", self.id.as_ref());
+            if b.as_ref() != expected_prefix {
+                return Err(DomainError::Validation(ValidationError::BranchIdMismatch {
+                    id: self.id.to_string(),
+                    branch: b.to_string(),
+                }));
+            }
+        }
         self.branch = branch;
+        Ok(())
     }
 
     #[must_use]
@@ -322,254 +371,63 @@ impl TrackMetadata {
     }
 
     #[must_use]
-    pub fn tasks(&self) -> &[TrackTask] {
-        &self.tasks
-    }
-
-    #[must_use]
-    pub fn plan(&self) -> &PlanView {
-        &self.plan
-    }
-
-    #[must_use]
     pub fn status_override(&self) -> Option<&StatusOverride> {
         self.status_override.as_ref()
     }
 
-    #[must_use]
-    pub fn status(&self) -> TrackStatus {
-        if let Some(status_override) = &self.status_override {
-            return status_override.track_status();
-        }
-
-        if self.tasks.is_empty()
-            || self.tasks.iter().all(|task| task.status.kind() == TaskStatusKind::Todo)
-        {
-            return TrackStatus::Planned;
-        }
-
-        if self.tasks_are_resolved() {
-            return TrackStatus::Done;
-        }
-
-        TrackStatus::InProgress
-    }
-
-    /// Sets or clears the status override.
-    ///
-    /// # Errors
-    /// Returns `DomainError` if all tasks are resolved and override is incompatible.
-    pub fn set_status_override(
-        &mut self,
-        status_override: Option<StatusOverride>,
-    ) -> Result<(), DomainError> {
-        if let Some(status_override) = &status_override {
-            if self.tasks_are_resolved() {
-                return Err(ValidationError::OverrideIncompatibleWithResolvedTasks(
-                    status_override.track_status(),
-                )
-                .into());
-            }
-        }
-
+    /// Sets or clears the status override sub-field.
+    pub fn set_status_override(&mut self, status_override: Option<StatusOverride>) {
         self.status_override = status_override;
-        Ok(())
-    }
-
-    /// Transitions a task and auto-clears override if all tasks become resolved.
-    ///
-    /// # Errors
-    /// Returns `DomainError` if the task is not found or the transition is invalid.
-    pub fn transition_task(
-        &mut self,
-        task_id: &TaskId,
-        transition: TaskTransition,
-    ) -> Result<(), DomainError> {
-        let task = self
-            .tasks
-            .iter_mut()
-            .find(|task| task.id == *task_id)
-            .ok_or_else(|| TransitionError::TaskNotFound { task_id: task_id.to_string() })?;
-
-        task.transition(transition)?;
-        self.clear_override_if_resolved();
-        Ok(())
-    }
-
-    #[must_use]
-    pub fn next_open_task(&self) -> Option<&TrackTask> {
-        let task_map: HashMap<&TaskId, &TrackTask> =
-            self.tasks.iter().map(|task| (task.id(), task)).collect();
-
-        for task_id in self.ordered_task_ids() {
-            if let Some(task) = task_map.get(task_id) {
-                if task.status.kind() == TaskStatusKind::InProgress {
-                    return Some(*task);
-                }
-            }
-        }
-
-        for task_id in self.ordered_task_ids() {
-            if let Some(task) = task_map.get(task_id) {
-                if task.status.kind() == TaskStatusKind::Todo {
-                    return Some(*task);
-                }
-            }
-        }
-
-        None
-    }
-
-    /// Returns `true` if the task list is non-empty and every task has status `Done` or `Skipped`.
-    ///
-    /// An empty task list returns `false` — a track with no tasks should not bypass the guard.
-    /// Used by the PR push guard to ensure all tasks are resolved before pushing.
-    #[must_use]
-    pub fn all_tasks_resolved(&self) -> bool {
-        !self.tasks.is_empty()
-            && self.tasks.iter().all(|t| {
-                matches!(
-                    t.status(),
-                    TaskStatus::DonePending | TaskStatus::DoneTraced { .. } | TaskStatus::Skipped
-                )
-            })
-    }
-
-    fn tasks_are_resolved(&self) -> bool {
-        !self.tasks.is_empty() && self.tasks.iter().all(|task| task.status.is_resolved())
-    }
-
-    fn clear_override_if_resolved(&mut self) {
-        if self.tasks_are_resolved() {
-            self.status_override = None;
-        }
-    }
-
-    fn ensure_override_is_compatible(&self) -> Result<(), ValidationError> {
-        if let Some(status_override) = &self.status_override {
-            if self.tasks_are_resolved() {
-                return Err(ValidationError::OverrideIncompatibleWithResolvedTasks(
-                    status_override.track_status(),
-                ));
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Generates the next sequential `TaskId` based on existing tasks.
-    ///
-    /// Scans all tasks for the highest numeric suffix and returns `T<max+1>` zero-padded to 3 digits.
-    ///
-    /// # Errors
-    /// Returns `ValidationError::InvalidTaskId` if the generated ID is invalid (should not happen).
-    pub fn next_task_id(&self) -> Result<TaskId, ValidationError> {
-        // TaskId validates that the numeric suffix fits in u64, so parse is infallible here.
-        let max_num: u64 = self
-            .tasks
-            .iter()
-            .filter_map(|t| {
-                t.id().as_ref().strip_prefix('T').and_then(|d: &str| d.parse::<u64>().ok())
-            })
-            .max()
-            .unwrap_or(0);
-        let next = max_num.checked_add(1).ok_or_else(|| {
-            ValidationError::InvalidTaskId(
-                "task ID overflow: max T-number exceeded u64".to_string(),
-            )
-        })?;
-        TaskId::try_new(format!("T{next:03}"))
-    }
-
-    /// Adds a new task to this track.
-    ///
-    /// The task is created in `Todo` status with the next sequential ID.
-    /// It is appended to the tasks list and inserted into the specified section
-    /// (or the first section if `section_id` is `None`).
-    ///
-    /// # Errors
-    /// - `ValidationError::EmptyTaskDescription` if description is empty.
-    /// - `ValidationError::SectionNotFound` if the specified section does not exist.
-    /// - `ValidationError::NoSectionsAvailable` if no sections exist.
-    pub fn add_task(
-        &mut self,
-        description: impl Into<String>,
-        section_id: Option<&str>,
-        after_task_id: Option<&TaskId>,
-    ) -> Result<TaskId, DomainError> {
-        let task_id = self.next_task_id()?;
-        let task = TrackTask::new(task_id.clone(), description)?;
-
-        self.plan.insert_task_into_section(task_id.clone(), section_id, after_task_id)?;
-        self.tasks.push(task);
-
-        Ok(task_id)
-    }
-
-    /// Validates that existing task descriptions have not been modified.
-    ///
-    /// Tasks that exist in both `self` and `previous` (matched by ID) must
-    /// have identical descriptions. New tasks (IDs not in `previous`) are allowed.
-    ///
-    /// # Errors
-    /// Returns `ValidationError::TaskDescriptionMutated` if a description changed.
-    pub fn validate_descriptions_unchanged(
-        &self,
-        previous: &TrackMetadata,
-    ) -> Result<(), ValidationError> {
-        let prev_map: HashMap<&TaskId, &str> =
-            previous.tasks.iter().map(|t| (t.id(), t.description())).collect();
-
-        for task in &self.tasks {
-            if let Some(prev_desc) = prev_map.get(task.id()) {
-                if task.description() != *prev_desc {
-                    return Err(ValidationError::TaskDescriptionMutated {
-                        task_id: task.id().to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-
-    /// Validates that no previously existing tasks have been removed.
-    ///
-    /// Every task ID in `previous` must still exist in `self`.
-    /// New tasks (IDs not in `previous`) are allowed.
-    ///
-    /// # Errors
-    /// Returns `ValidationError::TaskRemoved` if a previously existing task is absent.
-    pub fn validate_no_tasks_removed(
-        &self,
-        previous: &TrackMetadata,
-    ) -> Result<(), ValidationError> {
-        let new_ids: HashSet<&TaskId> = self.tasks.iter().map(|t| t.id()).collect();
-
-        for prev_task in &previous.tasks {
-            if !new_ids.contains(prev_task.id()) {
-                return Err(ValidationError::TaskRemoved { task_id: prev_task.id().to_string() });
-            }
-        }
-        Ok(())
-    }
-
-    fn ordered_task_ids(&self) -> Vec<&TaskId> {
-        let mut ordered = Vec::new();
-        let mut seen = HashSet::new();
-
-        for section in self.plan.sections() {
-            for task_id in section.task_ids() {
-                if seen.insert(task_id) {
-                    ordered.push(task_id);
-                }
-            }
-        }
-
-        ordered
     }
 }
 
-fn validate_plan_invariants(tasks: &[TrackTask], plan: &PlanView) -> Result<(), ValidationError> {
+/// Derives `TrackStatus` on demand from an optional `ImplPlanDocument` and an optional
+/// `StatusOverride`.
+///
+/// This is the single source of truth for computing track status from the two authoritative
+/// sources (`impl-plan.json` and `status_override` in `metadata.json`).
+///
+/// Rules:
+/// - `Some(override)` → the override wins: `Blocked` or `Cancelled`.
+/// - No impl-plan (planning-only track) → `Planned`.
+/// - All tasks resolved (done/skipped) → `Done`.
+/// - Any task `InProgress`, or a mix of resolved + unresolved → `InProgress`.
+/// - All tasks `Todo` → `Planned`.
+#[must_use]
+pub fn derive_track_status(
+    impl_plan: Option<&ImplPlanDocument>,
+    status_override: Option<&StatusOverride>,
+) -> TrackStatus {
+    if let Some(ov) = status_override {
+        return ov.track_status();
+    }
+    let Some(plan) = impl_plan else {
+        return TrackStatus::Planned;
+    };
+    if plan.tasks().is_empty() {
+        return TrackStatus::Planned;
+    }
+    if plan.all_tasks_resolved() {
+        return TrackStatus::Done;
+    }
+    let any_in_progress =
+        plan.tasks().iter().any(|t| matches!(t.status().kind(), TaskStatusKind::InProgress));
+    let any_resolved = plan
+        .tasks()
+        .iter()
+        .any(|t| matches!(t.status().kind(), TaskStatusKind::Done | TaskStatusKind::Skipped));
+    if any_in_progress || any_resolved { TrackStatus::InProgress } else { TrackStatus::Planned }
+}
+
+/// Re-exported for `impl_plan.rs` which still needs plan validation.
+///
+/// Remains public within the crate for `impl_plan::ImplPlanDocument::new`.
+pub(crate) fn validate_plan_invariants(
+    tasks: &[TrackTask],
+    plan: &PlanView,
+) -> Result<(), ValidationError> {
+    use std::collections::{HashMap, HashSet};
+
     let mut task_ids = HashSet::new();
     for task in tasks {
         if !task_ids.insert(task.id().clone()) {
@@ -609,373 +467,113 @@ fn validate_plan_invariants(tasks: &[TrackTask], plan: &PlanView) -> Result<(), 
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
-    use crate::PlanSection;
-    use rstest::rstest;
 
-    fn make_track(task_ids: &[&str], section_task_ids: &[&str]) -> TrackMetadata {
-        let tasks: Vec<TrackTask> = task_ids
-            .iter()
-            .map(|id| TrackTask::new(TaskId::try_new(*id).unwrap(), format!("Task {id}")).unwrap())
-            .collect();
-        let section = PlanSection::new(
-            "S1",
-            "Section 1",
-            vec![],
-            section_task_ids.iter().map(|id| TaskId::try_new(*id).unwrap()).collect(),
-        )
-        .unwrap();
-        let plan = PlanView::new(vec![], vec![section]);
-        TrackMetadata::new(TrackId::try_new("test-track").unwrap(), "Test Track", tasks, plan, None)
-            .unwrap()
+    // --- Identity-only TrackMetadata construction ---
+
+    #[test]
+    fn test_track_metadata_new_with_valid_title_succeeds() {
+        let track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        assert_eq!(track.id().as_ref(), "my-track");
+        assert_eq!(track.title(), "My Track");
+        assert!(track.branch().is_none());
+        assert!(track.status_override().is_none());
     }
 
     #[test]
-    fn test_next_task_id_with_no_tasks_returns_t001() {
-        let plan = PlanView::new(vec![], vec![]);
-        let track = TrackMetadata {
-            id: TrackId::try_new("test-track").unwrap(),
-            branch: None,
-            title: NonEmptyString::try_new("Test").unwrap(),
-            tasks: vec![],
-            plan,
-            status_override: None,
-        };
-        assert_eq!(track.next_task_id().unwrap().as_ref(), "T001");
+    fn test_track_metadata_new_with_empty_title_returns_error() {
+        let result = TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "", None);
+        assert!(matches!(result, Err(DomainError::Validation(ValidationError::EmptyTrackTitle))));
     }
 
     #[test]
-    fn test_next_task_id_with_existing_tasks_returns_next() {
-        let track = make_track(&["T001", "T002", "T003"], &["T001", "T002", "T003"]);
-        assert_eq!(track.next_task_id().unwrap().as_ref(), "T004");
-    }
-
-    #[test]
-    fn test_next_task_id_with_gaps_uses_max() {
-        let track = make_track(&["T001", "T010"], &["T001", "T010"]);
-        assert_eq!(track.next_task_id().unwrap().as_ref(), "T011");
-    }
-
-    #[test]
-    fn test_add_task_appends_to_first_section_by_default() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let new_id = track.add_task("New task", None, None).unwrap();
-        assert_eq!(new_id.as_ref(), "T002");
-        assert_eq!(track.tasks().len(), 2);
-        assert_eq!(track.tasks()[1].description(), "New task");
-        assert_eq!(track.plan().sections()[0].task_ids().len(), 2);
-        assert_eq!(track.plan().sections()[0].task_ids()[1], new_id);
-    }
-
-    #[test]
-    fn test_add_task_inserts_after_specified_task() {
-        let mut track = make_track(&["T001", "T002"], &["T001", "T002"]);
-        let after = TaskId::try_new("T001").unwrap();
-        let new_id = track.add_task("Inserted task", None, Some(&after)).unwrap();
-        assert_eq!(new_id.as_ref(), "T003");
-        let section_ids: Vec<&str> =
-            track.plan().sections()[0].task_ids().iter().map(|id| id.as_ref()).collect();
-        assert_eq!(section_ids, vec!["T001", "T003", "T002"]);
-    }
-
-    #[test]
-    fn test_add_task_with_unknown_after_appends_to_end() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let unknown = TaskId::try_new("T999").unwrap();
-        let new_id = track.add_task("Appended task", None, Some(&unknown)).unwrap();
-        let section_ids: Vec<&str> =
-            track.plan().sections()[0].task_ids().iter().map(|id| id.as_ref()).collect();
-        assert_eq!(section_ids, vec!["T001", new_id.as_ref()]);
-    }
-
-    #[test]
-    fn test_add_task_to_named_section() {
-        let tasks = vec![TrackTask::new(TaskId::try_new("T001").unwrap(), "Task 1").unwrap()];
-        let s1 =
-            PlanSection::new("S1", "Section 1", vec![], vec![TaskId::try_new("T001").unwrap()])
-                .unwrap();
-        let s2 = PlanSection::new("S2", "Section 2", vec![], vec![]).unwrap();
-        let plan = PlanView::new(vec![], vec![s1, s2]);
-        let mut track = TrackMetadata {
-            id: TrackId::try_new("test-track").unwrap(),
-            branch: None,
-            title: NonEmptyString::try_new("Test").unwrap(),
-            tasks,
-            plan,
-            status_override: None,
-        };
-        let new_id = track.add_task("Task in S2", Some("S2"), None).unwrap();
-        assert_eq!(track.plan().sections()[1].task_ids().len(), 1);
-        assert_eq!(track.plan().sections()[1].task_ids()[0], new_id);
-    }
-
-    #[test]
-    fn test_add_task_with_unknown_section_returns_error() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let result = track.add_task("Bad section", Some("S999"), None);
-        assert!(matches!(
-            result,
-            Err(DomainError::Validation(ValidationError::SectionNotFound(s))) if s == "S999"
-        ));
-    }
-
-    #[test]
-    fn test_add_task_with_empty_description_returns_error() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let result = track.add_task("", None, None);
-        assert!(matches!(
-            result,
-            Err(DomainError::Validation(ValidationError::EmptyTaskDescription))
-        ));
-    }
-
-    #[rstest]
-    #[case(&["T001", "T002", "T003"], "T004")]
-    #[case(&["T099"], "T100")]
-    #[case(&[], "T001")]
-    fn test_next_task_id_parametrized(#[case] existing: &[&str], #[case] expected: &str) {
-        let tasks: Vec<TrackTask> = existing
-            .iter()
-            .map(|id| TrackTask::new(TaskId::try_new(*id).unwrap(), format!("Task {id}")).unwrap())
-            .collect();
-        let section_ids: Vec<TaskId> =
-            existing.iter().map(|id| TaskId::try_new(*id).unwrap()).collect();
-        let sections = if existing.is_empty() {
-            vec![]
-        } else {
-            vec![PlanSection::new("S1", "Section 1", vec![], section_ids).unwrap()]
-        };
-        let plan = PlanView::new(vec![], sections);
-        let track = TrackMetadata {
-            id: TrackId::try_new("test-track").unwrap(),
-            branch: None,
-            title: NonEmptyString::try_new("Test").unwrap(),
-            tasks,
-            plan,
-            status_override: None,
-        };
-        assert_eq!(track.next_task_id().unwrap().as_ref(), expected);
-    }
-
-    #[test]
-    fn test_add_task_with_no_sections_returns_error() {
-        let plan = PlanView::new(vec![], vec![]);
-        let mut track = TrackMetadata {
-            id: TrackId::try_new("test-track").unwrap(),
-            branch: None,
-            title: NonEmptyString::try_new("Test").unwrap(),
-            tasks: vec![],
-            plan,
-            status_override: None,
-        };
-        let result = track.add_task("Some task", None, None);
-        assert!(matches!(
-            result,
-            Err(DomainError::Validation(ValidationError::NoSectionsAvailable))
-        ));
-    }
-
-    #[test]
-    fn test_validate_descriptions_unchanged_rejects_mutation() {
-        let original = make_track(&["T001", "T002"], &["T001", "T002"]);
-
-        let t1 = TrackTask::new(TaskId::try_new("T001").unwrap(), "CHANGED description").unwrap();
-        let t2 = TrackTask::new(TaskId::try_new("T002").unwrap(), "Task T002").unwrap();
-        let section = PlanSection::new(
-            "S1",
-            "Section 1",
-            vec![],
-            vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()],
-        )
-        .unwrap();
-        let plan = PlanView::new(vec![], vec![section]);
-        let modified = TrackMetadata::new(
-            TrackId::try_new("test-track").unwrap(),
-            "Test Track",
-            vec![t1, t2],
-            plan,
+    fn test_track_metadata_with_branch_stores_branch() {
+        let track = TrackMetadata::with_branch(
+            TrackId::try_new("my-track").unwrap(),
+            Some(TrackBranch::try_new("track/my-track").unwrap()),
+            "My Track",
             None,
         )
         .unwrap();
+        assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
+    }
 
-        let result = modified.validate_descriptions_unchanged(&original);
+    #[test]
+    fn test_track_metadata_with_branch_rejects_id_mismatch() {
+        let result = TrackMetadata::with_branch(
+            TrackId::try_new("my-track").unwrap(),
+            Some(TrackBranch::try_new("track/other-track").unwrap()),
+            "My Track",
+            None,
+        );
         assert!(
-            matches!(result, Err(ValidationError::TaskDescriptionMutated { ref task_id }) if task_id == "T001"),
-            "expected TaskDescriptionMutated for T001, got: {result:?}"
+            matches!(
+                result,
+                Err(DomainError::Validation(ValidationError::BranchIdMismatch { .. }))
+            ),
+            "expected BranchIdMismatch but got: {result:?}"
         );
     }
 
     #[test]
-    fn test_validate_descriptions_unchanged_accepts_unchanged() {
-        let track = make_track(&["T001", "T002"], &["T001", "T002"]);
-        let result = track.validate_descriptions_unchanged(&track);
-        assert!(result.is_ok(), "expected Ok for unchanged descriptions, got: {result:?}");
+    fn test_track_metadata_without_branch_returns_none() {
+        let track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        assert!(track.branch().is_none());
     }
 
     #[test]
-    fn test_validate_descriptions_unchanged_accepts_new_task() {
-        let original = make_track(&["T001"], &["T001"]);
+    fn test_track_metadata_set_branch_updates_branch() {
+        let mut track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        assert!(track.branch().is_none());
+        track.set_branch(Some(TrackBranch::try_new("track/my-track").unwrap())).unwrap();
+        assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
+    }
 
-        let t1 = TrackTask::new(TaskId::try_new("T001").unwrap(), "Task T001").unwrap();
-        let t2 = TrackTask::new(TaskId::try_new("T002").unwrap(), "Brand new task").unwrap();
-        let section = PlanSection::new(
-            "S1",
-            "Section 1",
-            vec![],
-            vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()],
+    #[test]
+    fn test_track_metadata_stores_blocked_override() {
+        let track = TrackMetadata::new(
+            TrackId::try_new("blocked-track").unwrap(),
+            "Blocked Track",
+            Some(StatusOverride::blocked("waiting on review").unwrap()),
         )
         .unwrap();
-        let plan = PlanView::new(vec![], vec![section]);
-        let updated = TrackMetadata::new(
-            TrackId::try_new("test-track").unwrap(),
-            "Test Track",
-            vec![t1, t2],
-            plan,
-            None,
-        )
-        .unwrap();
-
-        let result = updated.validate_descriptions_unchanged(&original);
-        assert!(result.is_ok(), "expected Ok when adding a new task, got: {result:?}");
+        // Derived status from override = Blocked
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Blocked);
+        assert!(track.status_override().is_some());
     }
 
     #[test]
-    fn test_validate_no_tasks_removed_rejects_task_removal() {
-        let original = make_track(&["T001", "T002"], &["T001", "T002"]);
-
-        // New state has only T001 — T002 was removed.
-        let updated = make_track(&["T001"], &["T001"]);
-
-        let result = updated.validate_no_tasks_removed(&original);
-        assert!(
-            matches!(result, Err(ValidationError::TaskRemoved { ref task_id }) if task_id == "T002"),
-            "expected TaskRemoved for T002, got: {result:?}"
-        );
+    fn test_track_metadata_set_status_override_stores_override() {
+        let mut track =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        track.set_status_override(Some(StatusOverride::blocked("dep issue").unwrap()));
+        assert!(track.status_override().is_some());
+        // derive_track_status returns Blocked when override is set
+        assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Blocked);
     }
 
-    // --- all_tasks_resolved tests ---
+    // --- derive_track_status tests ---
 
     #[test]
-    fn test_all_tasks_resolved_returns_false_with_todo_tasks() {
-        let track = make_track(&["T001", "T002"], &["T001", "T002"]);
-        assert!(!track.all_tasks_resolved());
+    fn test_derive_track_status_no_override_no_plan_returns_planned() {
+        assert_eq!(derive_track_status(None, None), TrackStatus::Planned);
     }
 
     #[test]
-    fn test_all_tasks_resolved_returns_false_with_in_progress_tasks() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let task_id = TaskId::try_new("T001").unwrap();
-        track.transition_task(&task_id, TaskTransition::Start).unwrap();
-        assert!(!track.all_tasks_resolved());
+    fn test_derive_track_status_override_wins_over_plan() {
+        let ov = StatusOverride::blocked("reason").unwrap();
+        assert_eq!(derive_track_status(None, Some(&ov)), TrackStatus::Blocked);
     }
 
     #[test]
-    fn test_all_tasks_resolved_returns_true_with_all_done() {
-        let mut track = make_track(&["T001", "T002"], &["T001", "T002"]);
-        for id_str in &["T001", "T002"] {
-            let task_id = TaskId::try_new(*id_str).unwrap();
-            track.transition_task(&task_id, TaskTransition::Start).unwrap();
-            track
-                .transition_task(&task_id, TaskTransition::Complete { commit_hash: None })
-                .unwrap();
-        }
-        assert!(track.all_tasks_resolved());
+    fn test_derive_track_status_cancelled_override() {
+        let ov = StatusOverride::cancelled("reason").unwrap();
+        assert_eq!(derive_track_status(None, Some(&ov)), TrackStatus::Cancelled);
     }
 
-    #[test]
-    fn test_all_tasks_resolved_returns_true_with_done_and_skipped() {
-        let mut track = make_track(&["T001", "T002"], &["T001", "T002"]);
-        let t1 = TaskId::try_new("T001").unwrap();
-        let t2 = TaskId::try_new("T002").unwrap();
-        track.transition_task(&t1, TaskTransition::Start).unwrap();
-        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
-        track.transition_task(&t2, TaskTransition::Skip).unwrap();
-        assert!(track.all_tasks_resolved());
-    }
-
-    #[test]
-    fn test_all_tasks_resolved_returns_false_with_empty_tasks() {
-        let plan = PlanView::new(vec![], vec![]);
-        let track = TrackMetadata {
-            id: TrackId::try_new("test-track").unwrap(),
-            branch: None,
-            title: NonEmptyString::try_new("Test").unwrap(),
-            tasks: vec![],
-            plan,
-            status_override: None,
-        };
-        assert!(!track.all_tasks_resolved());
-    }
-
-    // --- DonePending / DoneTraced / BackfillHash tests ---
-
-    #[test]
-    fn test_complete_without_hash_yields_done_pending() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let t1 = TaskId::try_new("T001").unwrap();
-        track.transition_task(&t1, TaskTransition::Start).unwrap();
-        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
-        assert!(matches!(track.tasks()[0].status(), TaskStatus::DonePending));
-    }
-
-    #[test]
-    fn test_complete_with_hash_yields_done_traced() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let t1 = TaskId::try_new("T001").unwrap();
-        let hash = CommitHash::try_new("abc1234").unwrap();
-        track.transition_task(&t1, TaskTransition::Start).unwrap();
-        track.transition_task(&t1, TaskTransition::Complete { commit_hash: Some(hash) }).unwrap();
-        assert!(matches!(track.tasks()[0].status(), TaskStatus::DoneTraced { .. }));
-    }
-
-    #[test]
-    fn test_backfill_hash_on_done_pending_yields_done_traced() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let t1 = TaskId::try_new("T001").unwrap();
-        let hash = CommitHash::try_new("abc1234").unwrap();
-        track.transition_task(&t1, TaskTransition::Start).unwrap();
-        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
-        track
-            .transition_task(&t1, TaskTransition::BackfillHash { commit_hash: hash.clone() })
-            .unwrap();
-        assert_eq!(track.tasks()[0].status(), &TaskStatus::DoneTraced { commit_hash: hash });
-    }
-
-    #[test]
-    fn test_backfill_hash_on_done_traced_is_rejected() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let t1 = TaskId::try_new("T001").unwrap();
-        let hash = CommitHash::try_new("abc1234").unwrap();
-        track.transition_task(&t1, TaskTransition::Start).unwrap();
-        track
-            .transition_task(&t1, TaskTransition::Complete { commit_hash: Some(hash.clone()) })
-            .unwrap();
-        let result = track.transition_task(&t1, TaskTransition::BackfillHash { commit_hash: hash });
-        assert!(matches!(
-            result,
-            Err(DomainError::Transition(TransitionError::InvalidTaskTransition { .. }))
-        ));
-    }
-
-    #[test]
-    fn test_done_pending_reopen_yields_in_progress() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let t1 = TaskId::try_new("T001").unwrap();
-        track.transition_task(&t1, TaskTransition::Start).unwrap();
-        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
-        track.transition_task(&t1, TaskTransition::Reopen).unwrap();
-        assert!(matches!(track.tasks()[0].status(), TaskStatus::InProgress));
-    }
-
-    #[test]
-    fn test_done_traced_reopen_yields_in_progress() {
-        let mut track = make_track(&["T001"], &["T001"]);
-        let t1 = TaskId::try_new("T001").unwrap();
-        let hash = CommitHash::try_new("abc1234").unwrap();
-        track.transition_task(&t1, TaskTransition::Start).unwrap();
-        track.transition_task(&t1, TaskTransition::Complete { commit_hash: Some(hash) }).unwrap();
-        track.transition_task(&t1, TaskTransition::Reopen).unwrap();
-        assert!(matches!(track.tasks()[0].status(), TaskStatus::InProgress));
-    }
+    // --- TaskStatus and TrackStatus tests (standalone) ---
 
     #[test]
     fn test_done_pending_is_resolved() {
@@ -1018,149 +616,23 @@ mod tests {
         assert_eq!(t.target_kind(), TaskStatusKind::Done);
     }
 
+    // --- TrackStatus display ---
+
     #[test]
-    fn test_next_task_id_overflow_returns_error() {
-        // Create a task with the max u64 value
-        let max_id = format!("T{}", u64::MAX);
-        let task = TrackTask::new(TaskId::try_new(&max_id).unwrap(), "Max task").unwrap();
-        let section =
-            PlanSection::new("S1", "Section 1", vec![], vec![TaskId::try_new(&max_id).unwrap()])
-                .unwrap();
-        let plan = PlanView::new(vec![], vec![section]);
-        let track = TrackMetadata {
-            id: TrackId::try_new("test-track").unwrap(),
-            branch: None,
-            title: NonEmptyString::try_new("Test").unwrap(),
-            tasks: vec![task],
-            plan,
-            status_override: None,
-        };
-        let result = track.next_task_id();
-        assert!(matches!(result, Err(ValidationError::InvalidTaskId(_))));
-    }
-
-    // --- T006: TrackMetadata::status() derivation tests ---
-
-    fn make_track_with_statuses(statuses: &[(&str, TaskStatus)]) -> TrackMetadata {
-        let tasks: Vec<TrackTask> = statuses
-            .iter()
-            .map(|(id, status)| {
-                TrackTask::with_status(
-                    TaskId::try_new(*id).unwrap(),
-                    format!("Task {id}"),
-                    status.clone(),
-                )
-                .unwrap()
-            })
-            .collect();
-        let section_task_ids: Vec<TaskId> =
-            statuses.iter().map(|(id, _)| TaskId::try_new(*id).unwrap()).collect();
-        let plan = if section_task_ids.is_empty() {
-            PlanView::new(vec![], vec![])
-        } else {
-            let section = PlanSection::new("S1", "Section 1", vec![], section_task_ids).unwrap();
-            PlanView::new(vec![], vec![section])
-        };
-        TrackMetadata::new(
-            TrackId::try_new("status-test").unwrap(),
-            "Status Test",
-            tasks,
-            plan,
-            None,
-        )
-        .unwrap()
-    }
-
-    fn done_traced(hash: &str) -> TaskStatus {
-        TaskStatus::DoneTraced { commit_hash: CommitHash::try_new(hash).unwrap() }
+    fn test_track_status_planned_displays_correctly() {
+        assert_eq!(TrackStatus::Planned.to_string(), "planned");
     }
 
     #[test]
-    fn test_status_empty_tasks_is_planned() {
-        let track = make_track_with_statuses(&[]);
-        assert_eq!(track.status(), TrackStatus::Planned);
+    fn test_track_status_archived_displays_correctly() {
+        assert_eq!(TrackStatus::Archived.to_string(), "archived");
     }
 
     #[test]
-    fn test_status_all_todo_is_planned() {
-        let track =
-            make_track_with_statuses(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::Todo)]);
-        assert_eq!(track.status(), TrackStatus::Planned);
-    }
-
-    #[test]
-    fn test_status_any_in_progress_is_in_progress() {
-        let track = make_track_with_statuses(&[
-            ("T001", TaskStatus::Todo),
-            ("T002", TaskStatus::InProgress),
-        ]);
-        assert_eq!(track.status(), TrackStatus::InProgress);
-    }
-
-    #[test]
-    fn test_status_mixed_done_and_todo_is_in_progress() {
-        let track = make_track_with_statuses(&[
-            ("T001", done_traced("abc1234")),
-            ("T002", TaskStatus::Todo),
-        ]);
-        assert_eq!(track.status(), TrackStatus::InProgress);
-    }
-
-    #[test]
-    fn test_status_all_done_is_done() {
-        let track = make_track_with_statuses(&[
-            ("T001", done_traced("abc1234")),
-            ("T002", done_traced("def5678")),
-        ]);
-        assert_eq!(track.status(), TrackStatus::Done);
-    }
-
-    #[test]
-    fn test_status_all_skipped_is_done() {
-        let track = make_track_with_statuses(&[
-            ("T001", TaskStatus::Skipped),
-            ("T002", TaskStatus::Skipped),
-        ]);
-        assert_eq!(track.status(), TrackStatus::Done);
-    }
-
-    #[test]
-    fn test_status_mixed_done_and_skipped_is_done() {
-        let track = make_track_with_statuses(&[
-            ("T001", done_traced("abc1234")),
-            ("T002", TaskStatus::Skipped),
-        ]);
-        assert_eq!(track.status(), TrackStatus::Done);
-    }
-
-    #[test]
-    fn test_status_mixed_skipped_and_todo_is_in_progress() {
-        // Not all "todo" (so not Planned) and not all resolved (so not Done);
-        // the derivation falls through to InProgress.
-        let track =
-            make_track_with_statuses(&[("T001", TaskStatus::Skipped), ("T002", TaskStatus::Todo)]);
-        assert_eq!(track.status(), TrackStatus::InProgress);
-    }
-
-    #[test]
-    fn test_status_override_blocked_wins_over_derived() {
-        let mut track = make_track_with_statuses(&[
-            ("T001", TaskStatus::InProgress),
-            ("T002", TaskStatus::Todo),
-        ]);
-        track
-            .set_status_override(Some(StatusOverride::blocked("waiting on upstream").unwrap()))
-            .unwrap();
-        assert_eq!(track.status(), TrackStatus::Blocked);
-    }
-
-    #[test]
-    fn test_status_override_cancelled_wins_over_derived() {
-        let mut track =
-            make_track_with_statuses(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::Todo)]);
-        track
-            .set_status_override(Some(StatusOverride::cancelled("de-prioritized").unwrap()))
-            .unwrap();
-        assert_eq!(track.status(), TrackStatus::Cancelled);
+    fn test_track_status_all_variants_display() {
+        assert_eq!(TrackStatus::InProgress.to_string(), "in_progress");
+        assert_eq!(TrackStatus::Done.to_string(), "done");
+        assert_eq!(TrackStatus::Blocked.to_string(), "blocked");
+        assert_eq!(TrackStatus::Cancelled.to_string(), "cancelled");
     }
 }

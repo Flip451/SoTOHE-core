@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ActivateTrackUseCase",
+      "description": "Generic bound widened to S: TrackWriter + ImplPlanReader; loads impl-plan.json before writer.update and passes it to derive_track_status so activation blocks on in_progress / done task state",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case",
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-18",
+          "hash": "b19eac565985a4bf18e7cafaf36ea3d47534982db62b3bc7757c652c40f73cb7"
+        }
+      ]
+    },
+    {
+      "name": "AddTaskUseCase",
+      "description": "Usecase-layer struct that adds a new task to a track's impl-plan.json. Implemented per ADR 2026-04-19-1242 §D1.4 / T007: reads ImplPlanDocument via ImplPlanReader, delegates to ImplPlanDocument::add_task, persists via ImplPlanWriter, then returns the current TrackMetadata and the newly-allocated TaskId.",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case"
+    },
+    {
+      "name": "TransitionTaskUseCase",
+      "description": "Usecase-layer struct that applies a state transition to a task in impl-plan.json. Implemented per ADR 2026-04-19-1242 §D1.4 / T007: reads ImplPlanDocument via ImplPlanReader, delegates to ImplPlanDocument::apply_transition_by_status, persists via ImplPlanWriter, then returns the current TrackMetadata.",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case"
+    },
+    {
+      "name": "SetOverrideUseCase",
+      "description": "Simplified in T013 (status removal): execute now only mutates status_override on TrackMetadata and returns the updated metadata; it no longer writes a derived status field (status was removed from metadata.json per IN-09).",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case",
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "eed4c9cb026146fd2f5b7c7a7ec2cd212833de5700858431d4b089b4680a46fc"
+        }
+      ]
+    },
+    {
+      "name": "TrackBlobReader",
+      "description": "Usecase-layer secondary port that reads PR branch blobs (spec.json / <layer>-types.json / impl-plan.json / architecture-rules.json) and decodes them into domain aggregates. Modified per ADR 2026-04-19-1242 §D6.2 / T007: `read_track_metadata` is replaced by `read_impl_plan` returning `BlobFetchResult<ImplPlanDocument>` so the task-completion merge gate drives off impl-plan.json instead of the identity-only metadata.json.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<SpecDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_impl_plan",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<ImplPlanDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false
+        }
+      ]
+    }
+  ]
+}

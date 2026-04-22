@@ -16,11 +16,19 @@
       "provider": "claude",
       "model": "claude-opus-4-7"
     },
-    "planner": {
+    "spec-designer": {
       "provider": "claude",
       "model": "claude-opus-4-7"
     },
-    "designer": {
+    "impl-planner": {
+      "provider": "claude",
+      "model": "claude-opus-4-7"
+    },
+    "type-designer": {
+      "provider": "claude",
+      "model": "claude-opus-4-7"
+    },
+    "adr-editor": {
       "provider": "claude",
       "model": "claude-opus-4-7"
     },

@@ -133,10 +133,10 @@ pub fn verify_from_spec_json(
 /// Loads `architecture-rules.json` from `trusted_root` and returns the list
 /// of enabled TDDD layer bindings.
 ///
-/// T007 alignment (round 5): fails closed when the rules file is absent or
-/// contains no `tddd.enabled` layers. Both conditions match the strict
-/// merge-gate behavior in `check_strict_merge_gate`, so a dev who sees CI
-/// pass can be sure the merge gate will also pass (and vice-versa).
+/// Fails closed when the rules file is absent or contains no `tddd.enabled`
+/// layers. Both conditions match the strict merge-gate behavior in
+/// `check_strict_merge_gate`, so a dev who sees CI pass can be sure the
+/// merge gate will also pass (and vice-versa).
 ///
 /// The symlink guard (`reject_symlinks_below`, D4.3) is applied before reading
 /// the file, consistent with how `spec.json` and per-layer catalogues are read.
@@ -163,7 +163,7 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Verify
         .map_err(|e| VerifyFinding::error(format!("cannot read {}: {e}", path.display())))?;
     let bindings = parse_tddd_layers(&content)
         .map_err(|e| VerifyFinding::error(format!("{}: {e}", path.display())))?;
-    // T007 fail-closed: a parsed-but-empty binding list (every layer
+    // Fail-closed: a parsed-but-empty binding list (every layer
     // `tddd.enabled = false`, or a rules file without any `tddd` blocks)
     // is treated as a configuration error. Silently skipping Stage 2 would
     // let CI pass on a rules file that disabled every layer, which breaks
@@ -506,10 +506,10 @@ mod tests {
     // `declaration_hash` matches the on-disk bytes of the companion
     // `<layer>-types.json` file. The `signals` field is copied verbatim from
     // the declaration file's legacy `signals` array (raw JSON) — this is
-    // independent of `catalogue_codec::decode`, which after T007 silently
-    // drops the legacy inline signals. Tests that write fixture declaration
-    // files with inline signals still exercise the intended Blue/Yellow/Red
-    // paths in `check_type_signals` via the signal file.
+    // independent of `catalogue_codec::decode`, which silently drops legacy
+    // inline signals. Tests that write fixture declaration files with inline
+    // signals still exercise the intended Blue/Yellow/Red paths in
+    // `check_type_signals` via the signal file.
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
@@ -704,7 +704,7 @@ mod tests {
     /// Writes a minimal `architecture-rules.json` with only `domain` TDDD-enabled
     /// into the given tmp dir. All `verify_from_spec_json` tests that expect
     /// Stage 2 evaluation must call this helper so that the multi-layer loop
-    /// (T007) finds exactly one enabled layer pointing at `domain-types.json`.
+    /// finds exactly one enabled layer pointing at `domain-types.json`.
     fn write_minimal_arch_rules(dir: &Path) {
         let content = r#"{
   "version": 2,
@@ -725,8 +725,7 @@ mod tests {
     }
 
     const SPEC_JSON_MINIMAL: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },
@@ -734,8 +733,7 @@ mod tests {
 }"#;
 
     const SPEC_JSON_WITH_YELLOW_SIGNALS: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },

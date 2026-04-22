@@ -1184,11 +1184,11 @@ mod tests {
         )
         .unwrap();
 
-        // T005: `outgoing` is the sole source of truth for typestate
-        // transitions; there is no separate `method_return_types` field
-        // that could smuggle non-typestate extras through to the Draft
-        // signal. This test now constructs `outgoing` directly with only
-        // the typestate target and asserts that the evaluation is Blue and
+        // `outgoing` is the sole source of truth for typestate transitions;
+        // there is no separate `method_return_types` field that could smuggle
+        // non-typestate extras through to the Draft signal. This test
+        // constructs `outgoing` directly with only the typestate target and
+        // asserts that the evaluation is Blue and
         // reports no extras.
         let mut types = HashMap::new();
         let outgoing: HashSet<String> = ["Published".to_string()].into();
@@ -1242,7 +1242,7 @@ mod tests {
         assert!(signals[0].found_type());
     }
 
-    // --- TDDD-05 T005: SecondaryAdapter evaluator tests ---
+    // --- TDDD-05: SecondaryAdapter evaluator tests ---
 
     /// Build a `TypeGraph` with a struct that has trait impls.
     fn make_profile_with_adapter(type_name: &str, trait_impls: Vec<TraitImplEntry>) -> TypeGraph {

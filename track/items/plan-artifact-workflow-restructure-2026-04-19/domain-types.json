@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SpecElementId",
+      "description": "Validated newtype for spec.json element identifiers (e.g. IN-\\d+, AC-\\d+, CO-\\d+). Constructor enforces non-empty + ID naming rules so downstream codec / verify / signal paths do not pass bare `String`. Introduced by ADR 2026-04-19-1242 §D2.1 under `libs/domain/src/plan_ref/spec_ref.rs` to make each spec requirement uniquely addressable for SpecRef.anchor resolution.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "AdrAnchor",
+      "description": "Validated newtype for ADR in-document anchors (heading slug / section marker). Constructor applies loose validation (non-empty) only; strict anchor semantics (heading slug vs HTML marker) are deferred to Q15. Introduced by ADR 2026-04-19-1242 §D2.1 under `libs/domain/src/plan_ref/adr_ref.rs`.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "ConventionAnchor",
+      "description": "Validated newtype for convention in-document anchors, symmetric to AdrAnchor. Constructor applies loose validation (non-empty) only; strict semantics deferred to Q15. Introduced by ADR 2026-04-19-1242 §D2.1 under `libs/domain/src/plan_ref/convention_ref.rs`.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "ContentHash",
+      "description": "Validated newtype for SHA-256 content hashes. Internally stores a normalized 32-byte buffer (`[u8; 32]`); the constructor accepts both a raw 32-byte slice and a 64-character lowercase hex string but always stores the canonical byte form. Used by SpecRef to pin a spec element's canonical JSON subtree. Introduced by ADR 2026-04-19-1242 §D2.1 under `libs/domain/src/plan_ref/spec_ref.rs`.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "InformalGroundKind",
+      "description": "Finite enum classifying the source of an unpersisted ground (Discussion / Feedback / Memory / UserDirective). Enum-first per .claude/rules/04-coding-principles.md — no transitions, fixed variant set. Introduced by ADR 2026-04-19-1242 §D2.1 under `libs/domain/src/plan_ref/informal_ground_ref.rs`; drives 🟡 signal evaluation (D3.1 / D3.2).",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Discussion",
+        "Feedback",
+        "Memory",
+        "UserDirective"
+      ]
+    },
+    {
+      "name": "InformalGroundSummary",
+      "description": "Validated newtype for one-line summaries of an unpersisted ground. Constructor enforces non-empty. Paired with InformalGroundKind inside InformalGroundRef. Introduced by ADR 2026-04-19-1242 §D2.1 under `libs/domain/src/plan_ref/informal_ground_ref.rs`.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "AdrRef",
+      "description": "Structured reference to an ADR section. Fields: `file: PathBuf`, `anchor: AdrAnchor`. Independent struct (no shared trait / discriminated union per ADR 2026-04-19-1242 §D2.1); the containing field name determines reference direction. Used in spec.json `adr_refs[]` only. Type catalogue → ADR direct references are forbidden per ADR D1.5 (catalogue must reference spec, not ADR directly).",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "ConventionRef",
+      "description": "Structured reference to a convention document section. Fields: `file: PathBuf`, `anchor: ConventionAnchor`. Independent struct, symmetric to AdrRef. Used in spec.json `convention_refs[]` and top-level `related_conventions[]`. Type catalogue → convention references are allowed in principle but the `convention_refs[]` field on catalogue entries is intentionally deferred to Q8 / a follow-up ADR (ADR D1.5); this struct is NOT used in type catalogue entries under the current ADR scope. Introduced by ADR 2026-04-19-1242 §D2.1.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "SpecRef",
+      "description": "Structured reference to a spec.json element. Fields: `file: PathBuf`, `anchor: SpecElementId`, `hash: ContentHash`. Anchor pins the target element; hash pins its canonical JSON subtree for staleness detection. Used in type catalogue entries' `spec_refs[]` to realise SoT Chain ②. Introduced by ADR 2026-04-19-1242 §D2.1.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "InformalGroundRef",
+      "description": "Structured reference to an unpersisted ground (discussion / feedback / memory / user directive). Fields: `kind: InformalGroundKind`, `summary: InformalGroundSummary`. No file path — the ground is not yet persisted. Non-empty `informal_grounds[]` → 🟡 (per ADR 2026-04-19-1242 §D3.1 / §D3.2); must be promoted to a formal ref before merge.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "ImplPlanDocument",
+      "description": "Aggregate root for `track/items/<id>/impl-plan.json`. Fields: `schema_version`, `tasks: Vec<TrackTask>`, `plan: PlanView`. Created in Phase 3 (planner) and read by the merge-gate task-completion check. Replaces the tasks / plan portion historically embedded in metadata.json. Introduced by ADR 2026-04-19-1242 §D1.4.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "TaskCoverageDocument",
+      "description": "Aggregate root for `track/items/<id>/task-coverage.json`. Holds per-section (in_scope / out_of_scope / constraints / acceptance_criteria) mappings from SpecElementId to `Vec<TaskId>`, extracted from the previous `spec.acceptance_criteria[].task_refs` location. Verified by the `sotp verify plan-artifact-refs` CLI. Introduced by ADR 2026-04-19-1242 §D1.4.",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "SpecDocument",
+      "description": "Aggregate root for spec.json. Modified per ADR 2026-04-19-1242 §D1.2: remove `status` / `approved_at` / `content_hash` fields; each requirement (goal / scope / constraints / acceptance_criteria) gains a required `id: SpecElementId`; the previous `sources: Vec<String>` is split into `adr_refs: Vec<AdrRef>` + `convention_refs: Vec<ConventionRef>` + `informal_grounds: Vec<InformalGroundRef>`; `task_refs[]` is removed (moves to task-coverage.json); top-level `related_conventions` becomes `Vec<ConventionRef>`. HearingRecord history is retained.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
+    },
+    {
+      "name": "SpecRequirement",
+      "description": "Single requirement item used in goal / scope / constraints / acceptance_criteria (all four spec sections share this struct per ADR 2026-04-19-1242 §D1.2). Modified per ADR 2026-04-19-1242 §D1.2 / §D2.1: add required `id: SpecElementId`; split `sources: Vec<String>` into `adr_refs: Vec<AdrRef>` + `convention_refs: Vec<ConventionRef>` + `informal_grounds: Vec<InformalGroundRef>`; remove `task_refs: Vec<TaskId>` (moves to task-coverage.json).",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
+    },
+    {
+      "name": "SpecValidationError",
+      "description": "Validation error enum for spec / catalogue value objects. Modified per ADR 2026-04-19-1242 §D1.2 / §D3: `ApprovalMetadataMissing` variant is removed (approved gate is eliminated). New variants may be added by the implementer to surface SpecElementId / ref / anchor validation failures.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "EmptyTitle",
+        "EmptyVersion",
+        "EmptyRequirementText",
+        "EmptyDomainStateName",
+        "EmptySectionTitle"
+      ]
+    },
+    {
+      "name": "ValidationError",
+      "description": "Shared domain validation error enum. Modified by T002: add six new variants surfacing the plan_ref module's validation failures (InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary). Pre-existing variants (TrackId / TaskId / CommitHash / etc.) are preserved.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidSpecElementId",
+        "EmptyAdrAnchor",
+        "EmptyConventionAnchor",
+        "InvalidContentHash",
+        "EmptyInformalGroundSummary",
+        "MultiLineInformalGroundSummary"
+      ]
+    },
+    {
+      "name": "ImplPlanReader",
+      "description": "Domain port trait (`libs/domain/src/repository.rs`) for loading `impl-plan.json` from the local track store (filesystem). Single method: `load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError>`. Returns `None` for planning-only tracks that have not yet produced an impl-plan. Introduced by T007 (ADR 2026-04-19-1242 §D1.4) to allow `TransitionTaskUseCase` and `AddTaskUseCase` to read task state from the local store without directly accessing the filesystem. Note: the PR-branch task-completion gate (`check_tasks_resolved_from_git_ref`) uses the separate `TrackBlobReader` port (git-ref-based, usecase layer), not this domain port.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "load_impl_plan",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<Option<ImplPlanDocument>, RepositoryError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "ImplPlanWriter",
+      "description": "Domain port trait (`libs/domain/src/repository.rs`) for persisting an updated `impl-plan.json` to the track store. Single method: `save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError>`. Paired with `ImplPlanReader`; both are implemented by `FsTrackStore` in the infrastructure layer. Introduced by T007 (ADR 2026-04-19-1242 §D1.4) to allow `TransitionTaskUseCase` and `AddTaskUseCase` to mutate and persist task state without directly accessing the filesystem.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "save_impl_plan",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "doc",
+              "ty": "&ImplPlanDocument"
+            }
+          ],
+          "returns": "Result<(), RepositoryError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "TrackMetadata",
+      "description": "Track identity aggregate in `libs/domain/src/track.rs`. Reduced to pure identity per ADR 2026-04-19-1242 §D1.4 + follow-up invariant codification: retained domain fields are `id`, `branch`, `title`, `status_override` (optional — Blocked/Cancelled reason). `created_at` / `updated_at` are persistence timestamps handled at the DTO layer (`DocumentMeta`), not stored in the domain aggregate. The prior `status` field is removed; track status is now DERIVED on demand from `ImplPlanDocument` via `derive_track_status`. Exposes `is_activated(&self) -> bool` (= `branch().is_some()`) as the single source of truth for the activation predicate — `status_override`, derived status, and schema version are explicitly NOT part of activation. `PlanView` / `PlanSection` remain in domain and are reused by ImplPlanDocument.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
+    },
+    {
+      "name": "ImplPlanPresenceError",
+      "description": "Domain error emitted by `check_impl_plan_presence(track, impl_plan)` when an activated track (branch materialized) is missing `impl-plan.json`. Enforces the forward implication `is_activated() → impl-plan.json present`: planning-only tracks (no branch) legitimately have no impl-plan, so `impl_plan == None` without branch is OK; branch materialized + `impl_plan == None` is a corruption state. Single variant `MissingForActivatedTrack { track_id: String }` lets callers format the error consistently. Introduced to give every CLI corruption-check call site one authoritative validator so activation cannot be heuristically re-derived (override-sensitive) at each call site.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "MissingForActivatedTrack"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "eed4c9cb026146fd2f5b7c7a7ec2cd212833de5700858431d4b089b4680a46fc"
+        }
+      ]
+    },
+    {
+      "name": "TypeCatalogueEntry",
+      "description": "Single entry in a `<layer>-types.json` catalogue (libs/domain/src/tddd/catalogue.rs). Modified per ADR 2026-04-19-1242 §D1.3 / §D2.1: add `spec_refs: Vec<SpecRef>` (SoT Chain ② reference to spec elements) and `informal_grounds: Vec<InformalGroundRef>` (unpersisted ground citations; non-empty → 🟡 advisory). `convention_refs[]` on catalogue entries is intentionally deferred to Q8 / a follow-up ADR (D1.5 table).",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
+    },
+    {
+      "name": "SpecStatus",
+      "description": "Legacy two-variant enum (Draft / Approved) that gated spec approval. Deleted per ADR 2026-04-19-1242 §D1.2 / §D3 together with `cargo make spec-approve` (T009). All downstream reliance on approved-status transitions is replaced by signal-based gating (spec → ADR signal in D3.1).",
+      "approved": true,
+      "action": "delete",
+      "kind": "enum",
+      "expected_variants": [
+        "Draft",
+        "Approved"
+      ]
+    },
+    {
+      "name": "CoverageResult",
+      "description": "Legacy domain value object returned by `SpecDocument::evaluate_coverage()` / `validate_all_task_refs`. Deleted per ADR 2026-04-19-1242 §D2.3 / T012: requirement-to-task coverage now lives in `task-coverage.json` and is verified exclusively by the `sotp verify plan-artifact-refs` CLI, which emits `VerifyFinding`s rather than a structured CoverageResult.",
+      "approved": true,
+      "action": "delete",
+      "kind": "value_object"
+    }
+  ]
+}

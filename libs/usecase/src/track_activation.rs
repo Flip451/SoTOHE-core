@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
 use domain::{
-    TrackBranch, TrackId, TrackMetadata, TrackStatus, TrackWriteError, TrackWriter, ValidationError,
+    ImplPlanReader, TrackBranch, TrackId, TrackMetadata, TrackStatus, TrackWriteError, TrackWriter,
+    ValidationError, derive_track_status,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -18,14 +19,20 @@ impl ActivateTrackOutcome {
     }
 }
 
-pub struct ActivateTrackUseCase<W: TrackWriter> {
-    writer: Arc<W>,
+pub struct ActivateTrackUseCase<S>
+where
+    S: TrackWriter + ImplPlanReader,
+{
+    store: Arc<S>,
 }
 
-impl<W: TrackWriter> ActivateTrackUseCase<W> {
+impl<S> ActivateTrackUseCase<S>
+where
+    S: TrackWriter + ImplPlanReader,
+{
     #[must_use]
-    pub fn new(writer: Arc<W>) -> Self {
-        Self { writer }
+    pub fn new(store: Arc<S>) -> Self {
+        Self { store }
     }
 
     pub fn execute(
@@ -34,7 +41,15 @@ impl<W: TrackWriter> ActivateTrackUseCase<W> {
         branch: &TrackBranch,
         schema_version: u32,
     ) -> Result<ActivateTrackOutcome, TrackWriteError> {
-        let updated = self.writer.update(track_id, |track| {
+        // Load impl-plan.json (if present) BEFORE the writer transaction so that
+        // `derive_track_status` sees the real task state. A branchless planning
+        // track with a populated impl-plan.json whose tasks are already
+        // `in_progress` or `done` must NOT be re-materialised; passing `None`
+        // here would misclassify such a track as `Planned` and bypass the
+        // planning-only activation precondition.
+        let impl_plan = self.store.load_impl_plan(track_id).map_err(TrackWriteError::from)?;
+
+        let updated = self.store.update(track_id, |track| {
             if let Some(existing) = track.branch() {
                 return Err(ValidationError::TrackAlreadyMaterialized {
                     track_id: track.id().to_string(),
@@ -43,7 +58,10 @@ impl<W: TrackWriter> ActivateTrackUseCase<W> {
                 .into());
             }
 
-            if schema_version != 3 {
+            // Schema versions 4 and 5 are the identity-only shapes (v4 has status,
+            // v5 removes it). Accept 3, 4, or 5. The error variant name is kept
+            // as-is for compatibility; the display message covers all versions.
+            if !matches!(schema_version, 3..=5) {
                 return Err(ValidationError::TrackActivationRequiresSchemaV3 {
                     track_id: track.id().to_string(),
                     schema_version,
@@ -51,15 +69,19 @@ impl<W: TrackWriter> ActivateTrackUseCase<W> {
                 .into());
             }
 
-            if track.status() != TrackStatus::Planned {
+            // Validate activation precondition against the REAL derived status:
+            // derive from impl_plan + status_override (not `None` + override),
+            // so in_progress/done tasks in impl-plan.json block activation.
+            let derived = derive_track_status(impl_plan.as_ref(), track.status_override());
+            if derived != TrackStatus::Planned {
                 return Err(ValidationError::TrackActivationRequiresPlanningOnly {
                     track_id: track.id().to_string(),
-                    status: track.status(),
+                    status: derived,
                 }
                 .into());
             }
 
-            track.set_branch(Some(branch.clone()));
+            track.set_branch(Some(branch.clone()))?;
             Ok(())
         })?;
 
@@ -74,8 +96,9 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use domain::{
-        DomainError, PlanSection, PlanView, RepositoryError, TaskId, TrackBranch, TrackId,
-        TrackMetadata, TrackReader, TrackTask, TrackWriteError, TrackWriter, ValidationError,
+        DomainError, ImplPlanDocument, ImplPlanReader, RepositoryError, StatusOverride,
+        TrackBranch, TrackId, TrackMetadata, TrackReader, TrackWriteError, TrackWriter,
+        ValidationError,
     };
 
     use super::{ActivateTrackOutcome, ActivateTrackUseCase};
@@ -83,6 +106,13 @@ mod tests {
     #[derive(Default)]
     struct StubTrackStore {
         tracks: Mutex<HashMap<TrackId, TrackMetadata>>,
+        impl_plans: Mutex<HashMap<TrackId, ImplPlanDocument>>,
+    }
+
+    impl StubTrackStore {
+        fn set_impl_plan(&self, id: &TrackId, doc: ImplPlanDocument) {
+            self.impl_plans.lock().unwrap().insert(id.clone(), doc);
+        }
     }
 
     impl TrackReader for StubTrackStore {
@@ -92,6 +122,19 @@ mod tests {
                 .lock()
                 .map_err(|_| RepositoryError::Message("lock error".to_owned()))?;
             Ok(tracks.get(id).cloned())
+        }
+    }
+
+    impl ImplPlanReader for StubTrackStore {
+        fn load_impl_plan(
+            &self,
+            id: &TrackId,
+        ) -> Result<Option<ImplPlanDocument>, RepositoryError> {
+            let plans = self
+                .impl_plans
+                .lock()
+                .map_err(|_| RepositoryError::Message("lock error".to_owned()))?;
+            Ok(plans.get(id).cloned())
         }
     }
 
@@ -121,19 +164,9 @@ mod tests {
     }
 
     fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::try_new("T1").unwrap();
-        let task = TrackTask::new(task_id.clone(), "Implement activation").unwrap();
-        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
-        let plan = PlanView::new(Vec::new(), vec![section]);
-
-        TrackMetadata::new(
-            TrackId::try_new("activation-track").unwrap(),
-            "Activation Track",
-            vec![task],
-            plan,
-            None,
-        )
-        .unwrap()
+        // TrackMetadata is identity-only; status derived from impl-plan + override.
+        TrackMetadata::new(TrackId::try_new("activation-track").unwrap(), "Activation Track", None)
+            .unwrap()
     }
 
     #[test]
@@ -156,7 +189,7 @@ mod tests {
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let branch = TrackBranch::try_new("track/activation-track").unwrap();
         let mut track = sample_track();
-        track.set_branch(Some(branch.clone()));
+        track.set_branch(Some(branch.clone())).unwrap();
 
         store.save(&track).unwrap();
         let err = usecase.execute(track.id(), &branch, 3).unwrap_err();
@@ -171,16 +204,64 @@ mod tests {
     }
 
     #[test]
+    fn activation_rejects_branchless_track_with_in_progress_impl_plan() {
+        // A branchless planning-track with an already-populated impl-plan.json
+        // (e.g. tasks in `in_progress` or `done`) must NOT be activatable.
+        // `derive_track_status(Some(impl_plan), None)` returns `InProgress` /
+        // `Done`, which breaks the planning-only activation precondition.
+        use domain::{ImplPlanDocument, PlanSection, PlanView, TaskId, TaskStatus, TrackTask};
+
+        let store = Arc::new(StubTrackStore::default());
+        let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
+
+        // Construct impl-plan with one in-progress task so derive returns InProgress.
+        // The task must be referenced in a PlanSection — ImplPlanDocument::new enforces
+        // referential integrity (every task must appear in exactly one section).
+        let task = TrackTask::with_status(
+            TaskId::try_new("T001").unwrap(),
+            "work in progress",
+            TaskStatus::InProgress,
+        )
+        .unwrap();
+        let section = PlanSection::new(
+            "S1",
+            "Implementation",
+            vec![],
+            vec![TaskId::try_new("T001").unwrap()],
+        )
+        .unwrap();
+        let impl_plan =
+            ImplPlanDocument::new(vec![task], PlanView::new(vec![], vec![section])).unwrap();
+
+        store.save(&track).unwrap();
+        store.set_impl_plan(track.id(), impl_plan);
+
+        let err = usecase.execute(track.id(), &branch, 5).unwrap_err();
+        assert!(
+            matches!(
+                err,
+                TrackWriteError::Domain(domain::DomainError::Validation(
+                    ValidationError::TrackActivationRequiresPlanningOnly { .. }
+                ))
+            ),
+            "expected TrackActivationRequiresPlanningOnly, got {err:?}"
+        );
+    }
+
+    #[test]
     fn activation_rejects_non_planning_only_track() {
         let store = Arc::new(StubTrackStore::default());
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let mut track = sample_track();
-        let task_id = TaskId::try_new("T1").unwrap();
         let branch = TrackBranch::try_new("track/activation-track").unwrap();
 
-        track.transition_task(&task_id, domain::TaskTransition::Start).unwrap();
+        // Status is derived; set status_override to Blocked to simulate
+        // a track that is not planning-only.
+        track.set_status_override(Some(StatusOverride::blocked("testing").unwrap()));
         store.save(&track).unwrap();
-        let err = usecase.execute(track.id(), &branch, 3).unwrap_err();
+        let err = usecase.execute(track.id(), &branch, 5).unwrap_err();
 
         assert!(matches!(
             err,
@@ -208,5 +289,38 @@ mod tests {
             ))
         ));
         assert!(err.to_string().contains("schema_version"));
+    }
+
+    #[test]
+    fn activation_accepts_schema_version_4_identity_only_track() {
+        // Schema version 4 is the identity-only shape (without derived-status
+        // semantics). Activation must accept v4 tracks so that /track:activate
+        // works for newly created tracks.
+        let store = Arc::new(StubTrackStore::default());
+        let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
+
+        store.save(&track).unwrap();
+        let outcome = usecase.execute(track.id(), &branch, 4).unwrap();
+
+        assert!(matches!(outcome, ActivateTrackOutcome::Materialized(_)));
+        assert_eq!(outcome.track().branch().unwrap(), &branch);
+    }
+
+    #[test]
+    fn activation_accepts_schema_version_5_derived_status_track() {
+        // Schema version 5 removes the status field; activation must accept
+        // v5 tracks (the canonical current format).
+        let store = Arc::new(StubTrackStore::default());
+        let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
+
+        store.save(&track).unwrap();
+        let outcome = usecase.execute(track.id(), &branch, 5).unwrap();
+
+        assert!(matches!(outcome, ActivateTrackOutcome::Materialized(_)));
+        assert_eq!(outcome.track().branch().unwrap(), &branch);
     }
 }

@@ -1,12 +1,11 @@
 //! Builds a `TypeBaseline` from a `TypeGraph`.
 //!
-//! T005 (TDDD-01 Phase 1 Task 5): baseline schema v2 — members are captured
-//! as `Vec<MemberDeclaration>` (struct fields / enum variants) and methods as
-//! `Vec<MethodDeclaration>` (L1 signatures). Previously the baseline stored
-//! only a flat `Vec<String>` for members and `Vec<String>` return type names.
-//! The `outgoing` field is still excluded (derivable from
-//! `methods_with_self_receiver ∩ typestate_names`), and `module_path` stays
-//! excluded (module moves are not structural changes).
+//! Baseline schema v2 — members are captured as `Vec<MemberDeclaration>`
+//! (struct fields / enum variants) and methods as `Vec<MethodDeclaration>`
+//! (L1 signatures). Previously the baseline stored only a flat `Vec<String>`
+//! for members and `Vec<String>` return type names. The `outgoing` field is
+//! excluded (derivable from `methods_with_self_receiver ∩ typestate_names`),
+//! and `module_path` is excluded (module moves are not structural changes).
 
 use std::collections::HashMap;
 

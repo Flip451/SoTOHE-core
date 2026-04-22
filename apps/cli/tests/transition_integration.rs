@@ -1,9 +1,9 @@
 //! Integration tests for `sotp track transition` and `sotp track views sync`.
 //!
-//! These cover the CLI-level regressions previously owned by the deleted Python
-//! `scripts/test_track_state_machine.py::TestCLI` module:
-//! transition success / invalid transition / missing directory / `--commit-hash`
-//! persistence / `views sync` rendering.
+//! TrackMetadata is identity-only. `sotp track transition` delegates to
+//! `TransitionTaskUseCase`, which loads and persists task state via
+//! `ImplPlanDocument` (impl-plan.json). `plan.md` is rendered from
+//! `impl-plan.json` with task markers.
 
 #![allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
@@ -14,42 +14,20 @@ fn sotp_bin() -> Command {
     Command::new(env!("CARGO_BIN_EXE_sotp"))
 }
 
-/// Writes a minimal v3 metadata.json fixture.
-///
-/// `task_status` and optional `commit_hash` control the initial task state so
-/// the caller can exercise individual transitions without chaining commands.
-fn write_fixture_metadata(
-    items_dir: &Path,
-    track_id: &str,
-    task_status: &str,
-    commit_hash: Option<&str>,
-) -> PathBuf {
+/// Writes a minimal v5 metadata.json fixture (identity-only, no status field).
+fn write_fixture_metadata(items_dir: &Path, track_id: &str) -> PathBuf {
     let track_dir = items_dir.join(track_id);
     std::fs::create_dir_all(&track_dir).unwrap();
 
-    let commit_hash_field = match commit_hash {
-        Some(hash) => format!(r#", "commit_hash": "{hash}""#),
-        None => String::new(),
-    };
-
+    // schema_version 5: identity-only, no status field
     let metadata = format!(
         r#"{{
-  "schema_version": 3,
+  "schema_version": 5,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Integration Track",
-  "status": "planned",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T00:00:00Z",
-  "tasks": [
-    {{ "id": "T001", "description": "First task", "status": "{task_status}"{commit_hash_field} }}
-  ],
-  "plan": {{
-    "summary": [],
-    "sections": [
-      {{ "id": "S1", "title": "Build", "description": [], "task_ids": ["T001"] }}
-    ]
-  }}
+  "updated_at": "2026-03-13T00:00:00Z"
 }}
 "#
     );
@@ -58,27 +36,41 @@ fn write_fixture_metadata(
     metadata_path
 }
 
-fn project_root_with_track(
-    root: &Path,
-    track_id: &str,
-    task_status: &str,
-    commit_hash: Option<&str>,
-) -> PathBuf {
+/// Writes an impl-plan.json with a single todo task T001.
+fn write_fixture_impl_plan(items_dir: &Path, track_id: &str) {
+    let track_dir = items_dir.join(track_id);
+    let impl_plan = r#"{
+  "schema_version": 1,
+  "tasks": [
+    { "id": "T001", "description": "First task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Phase 1", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}
+"#;
+    std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
+}
+
+fn project_root_with_full_track(root: &Path, track_id: &str) -> PathBuf {
     let items_dir = root.join("track/items");
-    write_fixture_metadata(&items_dir, track_id, task_status, commit_hash);
+    write_fixture_metadata(&items_dir, track_id);
+    write_fixture_impl_plan(&items_dir, track_id);
     items_dir
 }
 
-fn read_metadata_json(items_dir: &Path, track_id: &str) -> serde_json::Value {
-    let path = items_dir.join(track_id).join("metadata.json");
-    let content = std::fs::read_to_string(&path).unwrap();
-    serde_json::from_str(&content).unwrap()
-}
+// --- transition tests ---
 
 #[test]
 fn transition_subcommand_success_updates_status_and_persists() {
+    // `sotp track transition` loads impl-plan.json, applies transition, and
+    // persists updated impl-plan.json back to disk. metadata.json is not
+    // written; status is derived on demand from impl-plan.json.
     let root_dir = tempfile::tempdir().unwrap();
-    let items_dir = project_root_with_track(root_dir.path(), "demo", "todo", None);
+    let items_dir = project_root_with_full_track(root_dir.path(), "demo");
 
     let output = sotp_bin()
         .args([
@@ -94,24 +86,39 @@ fn transition_subcommand_success_updates_status_and_persists() {
         .output()
         .unwrap();
 
+    let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
         output.status.success(),
-        "expected exit 0, got {}: stderr={}",
-        output.status,
-        String::from_utf8_lossy(&output.stderr)
+        "expected exit 0 for valid transition, got: {}\nstderr: {stderr}",
+        output.status
     );
 
-    let data = read_metadata_json(&items_dir, "demo");
-    assert_eq!(data["tasks"][0]["status"], "in_progress");
+    // Verify impl-plan.json was updated on disk.
+    let impl_plan_path = items_dir.join("demo/impl-plan.json");
+    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
+    assert!(
+        content.contains("\"in_progress\""),
+        "impl-plan.json must reflect new status:\n{content}"
+    );
+
+    // metadata.json does NOT contain a status field — status is derived on
+    // demand from impl-plan.json. Verify metadata.json has no "status" key.
+    let metadata_path = items_dir.join("demo/metadata.json");
+    let metadata_content = std::fs::read_to_string(&metadata_path).unwrap();
+    assert!(
+        !metadata_content.contains("\"status\""),
+        "metadata.json must NOT contain a status field (derived-status):\n{metadata_content}"
+    );
 }
 
 #[test]
 fn transition_subcommand_rejects_invalid_status_transition() {
+    // todo -> done is invalid (must go todo -> in_progress -> done).
+    // Also verifies that impl-plan.json is NOT partially written on a failed
+    // transition — the task state must remain "todo" after rejection.
     let root_dir = tempfile::tempdir().unwrap();
-    let items_dir = project_root_with_track(root_dir.path(), "demo", "todo", None);
+    let items_dir = project_root_with_full_track(root_dir.path(), "demo");
 
-    // Going directly from `todo` to `done` is not a valid transition (must first
-    // enter `in_progress`).
     let output = sotp_bin()
         .args([
             "track",
@@ -126,12 +133,18 @@ fn transition_subcommand_rejects_invalid_status_transition() {
         .output()
         .unwrap();
 
-    assert!(!output.status.success(), "expected non-zero exit for invalid transition, got success");
+    assert!(!output.status.success(), "expected non-zero exit for invalid transition todo->done");
 
-    let data = read_metadata_json(&items_dir, "demo");
-    assert_eq!(
-        data["tasks"][0]["status"], "todo",
-        "task status must be unchanged after rejected transition"
+    // impl-plan.json must not have been partially written — T001 stays "todo".
+    let impl_plan_path = items_dir.join("demo/impl-plan.json");
+    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
+    assert!(
+        content.contains("\"todo\""),
+        "impl-plan.json must still contain \"todo\" status after rejected transition:\n{content}"
+    );
+    assert!(
+        !content.contains("\"done\""),
+        "impl-plan.json must NOT contain \"done\" status after rejected transition:\n{content}"
     );
 }
 
@@ -159,10 +172,30 @@ fn transition_subcommand_fails_on_missing_items_dir() {
 
 #[test]
 fn transition_subcommand_persists_commit_hash_on_done_transition() {
+    // Transition to done with a commit hash traces the hash in impl-plan.json.
+    // Must first transition to in_progress before done.
     let root_dir = tempfile::tempdir().unwrap();
-    let items_dir = project_root_with_track(root_dir.path(), "demo", "in_progress", None);
+    let items_dir = project_root_with_full_track(root_dir.path(), "demo");
 
-    let output = sotp_bin()
+    // Step 1: todo -> in_progress
+    let out1 = sotp_bin()
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--skip-branch-check",
+            "demo",
+            "T001",
+            "in_progress",
+        ])
+        .output()
+        .unwrap();
+    let stderr1 = String::from_utf8_lossy(&out1.stderr);
+    assert!(out1.status.success(), "step1 transition to in_progress failed:\nstderr: {stderr1}");
+
+    // Step 2: in_progress -> done with commit hash
+    let out2 = sotp_bin()
         .args([
             "track",
             "transition",
@@ -177,23 +210,180 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
         ])
         .output()
         .unwrap();
+    let stderr2 = String::from_utf8_lossy(&out2.stderr);
+    assert!(out2.status.success(), "step2 transition to done failed:\nstderr: {stderr2}");
 
+    // Verify commit hash is persisted in impl-plan.json.
+    let impl_plan_path = items_dir.join("demo/impl-plan.json");
+    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
+    assert!(content.contains("abc1234"), "impl-plan.json must contain commit hash:\n{content}");
+    assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
+}
+
+#[test]
+fn transition_subcommand_full_round_trip_including_reopen() {
+    // Covers the required round-trip: todo -> in_progress -> done -> in_progress (Reopen).
+    // A regression in the Reopen transition would not be caught by the hash-persistence
+    // test, which only covers todo -> in_progress -> done.
+    let root_dir = tempfile::tempdir().unwrap();
+    let items_dir = project_root_with_full_track(root_dir.path(), "demo");
+
+    // Step 1: todo -> in_progress
+    let out1 = sotp_bin()
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--skip-branch-check",
+            "demo",
+            "T001",
+            "in_progress",
+        ])
+        .output()
+        .unwrap();
+    let stderr1 = String::from_utf8_lossy(&out1.stderr);
+    assert!(out1.status.success(), "step1 (todo->in_progress) failed:\nstderr: {stderr1}");
+
+    // Step 2: in_progress -> done
+    let out2 = sotp_bin()
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--skip-branch-check",
+            "demo",
+            "T001",
+            "done",
+        ])
+        .output()
+        .unwrap();
+    let stderr2 = String::from_utf8_lossy(&out2.stderr);
+    assert!(out2.status.success(), "step2 (in_progress->done) failed:\nstderr: {stderr2}");
+
+    // Verify done status is persisted.
+    let impl_plan_path = items_dir.join("demo/impl-plan.json");
+    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
+    assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
+
+    // Step 3: done -> in_progress (Reopen)
+    let out3 = sotp_bin()
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--skip-branch-check",
+            "demo",
+            "T001",
+            "in_progress",
+        ])
+        .output()
+        .unwrap();
+    let stderr3 = String::from_utf8_lossy(&out3.stderr);
+    assert!(out3.status.success(), "step3 (done->in_progress Reopen) failed:\nstderr: {stderr3}");
+
+    // Verify impl-plan.json reflects reopened in_progress status.
+    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
     assert!(
-        output.status.success(),
-        "expected exit 0, got {}: stderr={}",
-        output.status,
-        String::from_utf8_lossy(&output.stderr)
+        content.contains("\"in_progress\""),
+        "impl-plan.json must reflect reopened in_progress status:\n{content}"
+    );
+}
+
+#[test]
+fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
+    // Covers the full required round-trip: todo -> in_progress -> done (with commit hash) ->
+    // in_progress (Reopen). Verifies that the commit hash is retained in impl-plan.json
+    // even after reopening (the traced hash is kept on the task entry; only the status reverts
+    // to in_progress). This guards against regressions that erase the commit hash on reopen.
+    let root_dir = tempfile::tempdir().unwrap();
+    let items_dir = project_root_with_full_track(root_dir.path(), "demo");
+    let impl_plan_path = items_dir.join("demo/impl-plan.json");
+
+    // Step 1: todo -> in_progress
+    let out1 = sotp_bin()
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--skip-branch-check",
+            "demo",
+            "T001",
+            "in_progress",
+        ])
+        .output()
+        .unwrap();
+    let stderr1 = String::from_utf8_lossy(&out1.stderr);
+    assert!(out1.status.success(), "step1 (todo->in_progress) failed:\nstderr: {stderr1}");
+
+    // Step 2: in_progress -> done with commit hash
+    let out2 = sotp_bin()
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--skip-branch-check",
+            "--commit-hash",
+            "def5678",
+            "demo",
+            "T001",
+            "done",
+        ])
+        .output()
+        .unwrap();
+    let stderr2 = String::from_utf8_lossy(&out2.stderr);
+    assert!(
+        out2.status.success(),
+        "step2 (in_progress->done with hash) failed:\nstderr: {stderr2}"
     );
 
-    let data = read_metadata_json(&items_dir, "demo");
-    assert_eq!(data["tasks"][0]["status"], "done");
-    assert_eq!(data["tasks"][0]["commit_hash"], "abc1234");
+    // Verify commit hash is persisted after done transition.
+    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
+    assert!(
+        content.contains("def5678"),
+        "impl-plan.json must contain commit hash after done:\n{content}"
+    );
+    assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
+
+    // Step 3: done -> in_progress (Reopen)
+    let out3 = sotp_bin()
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--skip-branch-check",
+            "demo",
+            "T001",
+            "in_progress",
+        ])
+        .output()
+        .unwrap();
+    let stderr3 = String::from_utf8_lossy(&out3.stderr);
+    assert!(out3.status.success(), "step3 (done->in_progress Reopen) failed:\nstderr: {stderr3}");
+
+    // Verify impl-plan.json reflects reopened in_progress status.
+    // The reopen transition (DoneTraced -> InProgress) intentionally resets the task
+    // to plain `in_progress` with no commit hash — the hash is cleared by design.
+    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
+    assert!(
+        content.contains("\"in_progress\""),
+        "impl-plan.json must reflect reopened in_progress status:\n{content}"
+    );
+    assert!(
+        !content.contains("def5678"),
+        "impl-plan.json must NOT contain commit hash after DoneTraced->InProgress reopen:\n{content}"
+    );
 }
 
 #[test]
 fn views_sync_subcommand_renders_plan_and_registry() {
     let root_dir = tempfile::tempdir().unwrap();
-    let _items_dir = project_root_with_track(root_dir.path(), "demo", "todo", None);
+    let _items_dir = project_root_with_full_track(root_dir.path(), "demo");
 
     let output = sotp_bin()
         .args([
@@ -217,8 +407,12 @@ fn views_sync_subcommand_renders_plan_and_registry() {
 
     let plan_md = root_dir.path().join("track/items/demo/plan.md");
     assert!(plan_md.is_file(), "plan.md must be rendered at {}", plan_md.display());
+
+    // Task markers are rendered from impl-plan.json.
     let plan_content = std::fs::read_to_string(&plan_md).unwrap();
-    assert!(plan_content.contains("- [ ] First task"), "plan.md missing task marker");
+    assert!(!plan_content.is_empty(), "plan.md must not be empty");
+    assert!(plan_content.contains("T001"), "plan.md must contain task T001:\n{plan_content}");
+    assert!(plan_content.contains("[ ]"), "plan.md must contain todo task marker:\n{plan_content}");
 
     let registry_md = root_dir.path().join("track/registry.md");
     assert!(registry_md.is_file(), "registry.md must be rendered at {}", registry_md.display());

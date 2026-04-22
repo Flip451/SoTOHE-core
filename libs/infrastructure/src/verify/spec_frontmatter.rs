@@ -14,6 +14,7 @@ use std::path::Path;
 /// The domain type is serde-free (no serde dependency in domain layer).
 /// This struct validates the frontmatter `signals` field via deserialization.
 #[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 #[allow(dead_code)] // Fields are validated by deserialization, not read directly.
 struct SignalCountsDto {
     blue: u32,
@@ -23,13 +24,21 @@ struct SignalCountsDto {
 
 /// Frontmatter structure for YAML deserialization.
 ///
-/// Required fields (`status`, `version`) are non-optional.
+/// `status` is optional because schema-v2 `spec.md` no longer emits it.
+/// `version` remains required for both v1 and v2 formats.
 /// Optional fields (`signals`) use `Option` and are validated when present.
 /// Unknown fields are silently ignored via `#[serde(flatten)]`.
+///
+/// NOTE: Enforcing `deny_unknown_fields` to reject legacy v1 fields (`status`,
+/// `approved_at`, `content_hash`) requires updating the CLI test at
+/// `apps/cli/src/commands/verify.rs` (out of infrastructure scope). Until that
+/// update is in scope, unknown fields are accepted to prevent CI breakage.
+/// See the full-model review finding for context.
 #[derive(serde::Deserialize)]
 #[allow(dead_code)] // Fields are validated by deserialization, not read directly.
 struct SpecFrontmatterDto {
-    status: String,
+    #[serde(default)]
+    status: Option<String>,
     version: serde_yaml::Value, // Accept both string "1.0" and number 1.0
     #[serde(default)]
     signals: Option<SignalCountsDto>,
@@ -76,7 +85,8 @@ fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
         .map(|dir| dir.join("spec.json"))
 }
 
-/// Verifies spec.md has YAML frontmatter with `status` and `version`.
+/// Verifies spec.md has YAML frontmatter with `version` (required).
+/// `status` is accepted when present (v1 format) but not required (v2 omits it).
 ///
 /// When a sibling `spec.json` exists next to `spec_path`, delegates to
 /// `verify_spec_schema` (decode-based check). Otherwise falls back to the
@@ -137,22 +147,14 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
             let err_str = e.to_string();
             let mut findings = Vec::new();
 
-            let missing_status = err_str.contains("missing field `status`");
+            // `status` is optional (schema v2 no longer emits it); only `version` is required.
             let missing_version = err_str.contains("missing field `version`");
 
-            if missing_status || missing_version {
-                if missing_status {
-                    findings.push(VerifyFinding::error(format!(
-                        "{}: YAML frontmatter missing required field 'status'",
-                        spec_path.display()
-                    )));
-                }
-                if missing_version {
-                    findings.push(VerifyFinding::error(format!(
-                        "{}: YAML frontmatter missing required field 'version'",
-                        spec_path.display()
-                    )));
-                }
+            if missing_version {
+                findings.push(VerifyFinding::error(format!(
+                    "{}: YAML frontmatter missing required field 'version'",
+                    spec_path.display()
+                )));
             } else {
                 findings.push(VerifyFinding::error(format!(
                     "{}: invalid YAML frontmatter: {e}",
@@ -189,12 +191,13 @@ mod tests {
     }
 
     #[test]
-    fn test_spec_frontmatter_fails_missing_status() {
+    fn test_spec_frontmatter_passes_without_status() {
+        // Schema v2 spec.md no longer emits `status`; `status` is now optional.
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Content\n").unwrap();
         let outcome = verify(&spec);
-        assert!(outcome.has_errors());
+        assert!(!outcome.has_errors(), "v2 format without status must pass");
     }
 
     #[test]
@@ -229,7 +232,7 @@ mod tests {
     fn test_spec_frontmatter_fails_without_closing_delimiter() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n").unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n").unwrap();
         let outcome = verify(&spec);
         assert!(outcome.has_errors());
     }
@@ -238,7 +241,7 @@ mod tests {
     fn test_spec_frontmatter_rejects_malformed_opening_delimiter() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
-        std::fs::write(&spec, "---yaml\nstatus: draft\nversion: \"1.0\"\n---\n").unwrap();
+        std::fs::write(&spec, "---yaml\nversion: \"1.0\"\n---\n").unwrap();
         let outcome = verify(&spec);
         assert!(outcome.has_errors(), "---yaml is not a valid frontmatter delimiter");
     }
@@ -254,6 +257,10 @@ mod tests {
 
     #[test]
     fn test_spec_frontmatter_passes_with_extra_fields() {
+        // Extra fields (like `author`) are silently ignored — `status` was preserved
+        // for backward compatibility with v1 spec.md files. Full v2 enforcement
+        // (deny_unknown_fields) requires also updating apps/cli/src/commands/verify.rs
+        // (out of infrastructure scope).
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(
@@ -312,9 +319,10 @@ mod tests {
     fn test_spec_frontmatter_passes_without_signals() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Content\n").unwrap();
+        // v2 format: only `version`, no `status`
+        std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Content\n").unwrap();
         let outcome = verify(&spec);
-        assert!(!outcome.has_errors(), "spec with status+version and no signals must pass");
+        assert!(!outcome.has_errors(), "spec with version and no signals must pass");
     }
 
     #[test]
@@ -323,7 +331,7 @@ mod tests {
         let spec = dir.path().join("spec.md");
         std::fs::write(
             &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\nsignals: { blue: 0, yellow: 0, red: 0 }\n---\n# Content\n",
+            "---\nversion: \"1.0\"\nsignals: { blue: 0, yellow: 0, red: 0 }\n---\n# Content\n",
         )
         .unwrap();
         let outcome = verify(&spec);
@@ -336,7 +344,7 @@ mod tests {
         let spec = dir.path().join("spec.md");
         std::fs::write(
             &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\nsignals:\n  blue: 12\n  yellow: 1\n  red: 0\n---\n# Content\n",
+            "---\nversion: \"1.0\"\nsignals:\n  blue: 12\n  yellow: 1\n  red: 0\n---\n# Content\n",
         )
         .unwrap();
         let outcome = verify(&spec);
@@ -349,7 +357,7 @@ mod tests {
         let spec = dir.path().join("spec.md");
         std::fs::write(
             &spec,
-            "---\nstatus: approved\nversion: \"1.2\"\nsignals: { blue: 12, yellow: 1, red: 0 }\n---\n# Content\n",
+            "---\nversion: \"1.2\"\nsignals: { blue: 12, yellow: 1, red: 0 }\n---\n# Content\n",
         )
         .unwrap();
         let outcome = verify(&spec);
@@ -377,11 +385,8 @@ mod tests {
     fn test_spec_frontmatter_fails_with_malformed_signals_scalar_value() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
-        std::fs::write(
-            &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\nsignals: not_a_mapping\n---\n# Content\n",
-        )
-        .unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\nsignals: not_a_mapping\n---\n# Content\n")
+            .unwrap();
         let outcome = verify(&spec);
         assert!(outcome.has_errors(), "malformed signals value must produce an error");
     }
@@ -390,8 +395,7 @@ mod tests {
     fn test_spec_frontmatter_fails_with_signals_empty_value() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
-        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\nsignals:\n---\n# Content\n")
-            .unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\nsignals:\n---\n# Content\n").unwrap();
         let outcome = verify(&spec);
         assert!(outcome.has_errors(), "signals with empty value must produce an error");
     }
@@ -400,11 +404,8 @@ mod tests {
     fn test_spec_frontmatter_fails_with_signals_mismatched_braces() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
-        std::fs::write(
-            &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\nsignals: { blue: [1, 2 }\n---\n# Content\n",
-        )
-        .unwrap();
+        std::fs::write(&spec, "---\nversion: \"1.0\"\nsignals: { blue: [1, 2 }\n---\n# Content\n")
+            .unwrap();
         let outcome = verify(&spec);
         assert!(
             outcome.has_errors(),
@@ -418,7 +419,7 @@ mod tests {
         let spec = dir.path().join("spec.md");
         std::fs::write(
             &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\nsignals: { blue: -1, yellow: 0, red: 0 }\n---\n# Content\n",
+            "---\nversion: \"1.0\"\nsignals: { blue: -1, yellow: 0, red: 0 }\n---\n# Content\n",
         )
         .unwrap();
         let outcome = verify(&spec);
@@ -431,7 +432,7 @@ mod tests {
         let spec = dir.path().join("spec.md");
         std::fs::write(
             &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\nsignals: { blue: 0, yellow: 0 }\n---\n# Content\n",
+            "---\nversion: \"1.0\"\nsignals: { blue: 0, yellow: 0 }\n---\n# Content\n",
         )
         .unwrap();
         let outcome = verify(&spec);
@@ -441,8 +442,7 @@ mod tests {
     // --- verify_spec_schema() tests ---
 
     const VALID_SPEC_JSON: &str = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -478,9 +478,10 @@ mod tests {
     fn test_verify_spec_schema_with_wrong_schema_version_fails() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("spec.json");
+        // schema_version 99 is unsupported (valid is 2); codec must reject it.
         std::fs::write(
             &path,
-            r#"{"schema_version":2,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+            r#"{"schema_version":99,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
         )
         .unwrap();
         let outcome = verify_spec_schema(&path);
@@ -491,9 +492,10 @@ mod tests {
     fn test_verify_spec_schema_with_empty_title_fails() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("spec.json");
+        // schema v2 with empty title must fail domain validation.
         std::fs::write(
             &path,
-            r#"{"schema_version":1,"status":"s","version":"1","title":"","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+            r#"{"schema_version":2,"version":"1","title":"","scope":{"in_scope":[],"out_of_scope":[]}}"#,
         )
         .unwrap();
         let outcome = verify_spec_schema(&path);
@@ -521,11 +523,8 @@ mod tests {
     fn test_verify_spec_json_invalid_propagates_failure_through_verify() {
         let dir = tempfile::tempdir().unwrap();
         std::fs::write(dir.path().join("spec.json"), "{not json}").unwrap();
-        std::fs::write(
-            dir.path().join("spec.md"),
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Content\n",
-        )
-        .unwrap();
+        std::fs::write(dir.path().join("spec.md"), "---\nversion: \"1.0\"\n---\n# Content\n")
+            .unwrap();
         let outcome = verify(&dir.path().join("spec.md"));
         assert!(outcome.has_errors(), "invalid spec.json should propagate failure");
     }
@@ -533,13 +532,10 @@ mod tests {
     #[test]
     fn test_verify_falls_back_to_markdown_when_no_spec_json() {
         let dir = tempfile::tempdir().unwrap();
-        // No spec.json — legacy path
-        std::fs::write(
-            dir.path().join("spec.md"),
-            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Content\n",
-        )
-        .unwrap();
+        // No spec.json — legacy path uses v2-only frontmatter
+        std::fs::write(dir.path().join("spec.md"), "---\nversion: \"1.0\"\n---\n# Content\n")
+            .unwrap();
         let outcome = verify(&dir.path().join("spec.md"));
-        assert!(!outcome.has_errors(), "legacy markdown path should pass: {outcome:?}");
+        assert!(!outcome.has_errors(), "v2 markdown path should pass: {outcome:?}");
     }
 }

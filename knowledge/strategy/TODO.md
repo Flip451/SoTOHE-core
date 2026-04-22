@@ -846,6 +846,18 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **CLI-01** (HIGH): `pr.rs` (1964行) の review polling/parsing を usecase 層に移動 → 目標 ~500行
 - [x] ~~**CLI-02** (HIGH): `review.rs` (~2300行) の record-round/check-approved/resolve-escalation を usecase 層に移動 → 目標 ~700行~~ ✅ review-usecase-extraction-2026-03-20 + cli-review-module-split-2026-03-22 で完了。4ファイル分割、port traits を usecase に配置、hexagonal architecture convention 追加
 - [ ] **CLI-03** (LOW): CLI-01/02 完了後のコーディング原則適合チェック
+- [ ] **CLI-04** (HIGH): TDDD 信号機 orchestration を infrastructure adapter から usecase 層へ引き上げる
+  - **課題**: `tddd-ci-gate-and-signals-separation-2026-04-18` (PR #106) で、PR review サイクル中に発見された P0/P1 を短納期で修正するため、以下 2 箇所に usecase レベルの orchestration が infrastructure 層へ流出した
+    1. `libs/infrastructure/src/verify/merge_gate_adapter.rs::read_type_catalogue` — `<layer>-types.json` + `<layer>-type-signals.json` を両方読んで `declaration_hash` を検証し `doc.set_signals(...)` を呼ぶ。「2 blob 整合 + aggregate hydrate」は usecase orchestration
+    2. `libs/infrastructure/src/track/render.rs::sync_rendered_views` + `render_contract_map_view` — 信号ファイル読取 / hash 検証 / 条件付き `set_signals` を render 合成内でインライン実装。stale-signal 検出が `spec_states::evaluate_layer_catalogue` (T005) と重複
+  - **提案**:
+    1. `TrackBlobReader` trait (usecase) に `read_type_signals(branch, track_id, layer_id) -> BlobFetchResult<TypeSignalsDocument>` を追加
+    2. hash-compare + `set_signals` を `usecase::merge_gate::check_strict_merge_gate` に移す
+    3. `usecase::render_track_views` interactor を新設し、「catalogue 取得 + signals 取得 + hash 検証 + render 委譲」シーケンスを所有（`contract_map_workflow.rs` と同じ pure-orchestrator パターン: usecase は secondary port (I/O trait) のみ呼び出し、Markdown 生成はドメイン純粋関数、file write は domain 定義 port の infra adapter が担当）。infra adapter は read-only bytes + write のみに戻す
+    4. stale-signal 検出を `spec_states::evaluate_layer_catalogue` と新 render usecase で共通化（usecase or domain に helper）
+  - **当該コミット**: `0b08a716` (merge-gate), `baaece83` / `12f69d59` / `2d58bc04` (render)
+  - **出典**: memory `project_tddd_adapter_logic_leak` (2026-04-19 PR #106 レビュー中決定、option B 選択)
+  - **追加日**: 2026-04-19
 
 ---
 

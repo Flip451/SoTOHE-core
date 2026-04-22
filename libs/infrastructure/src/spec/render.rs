@@ -3,14 +3,38 @@
 //! `spec.md` is a read-only rendered view generated from `spec.json` (the SSoT).
 //! The first line of the rendered output is a machine-readable comment that marks
 //! the file as generated, preventing accidental direct edits.
+//!
+//! ADR 2026-04-19-1242 §D1.2: `status` / `approved_at` removed from frontmatter;
+//! `goal` items rendered as bullet requirements; `related_conventions` rendered as
+//! structured refs; requirement annotations show typed refs (adr_refs /
+//! convention_refs / informal_grounds) instead of the legacy `sources: Vec<String>`.
 
-use domain::{SpecDocument, SpecRequirement};
+use domain::{SpecDocument, SpecRequirement, TaskCoverageDocument, TaskId};
 
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
 /// Renders the contents of `spec.md` from a [`SpecDocument`].
+///
+/// This is the backward-compatible entry point: requirements are rendered
+/// without task-coverage annotations. Use [`render_spec_with_coverage`] when
+/// a sibling `task-coverage.json` is available.
+///
+/// The output always ends with a trailing newline.
+#[must_use]
+pub fn render_spec(doc: &SpecDocument) -> String {
+    render_spec_with_coverage(doc, None)
+}
+
+/// Renders the contents of `spec.md` from a [`SpecDocument`] and an optional
+/// [`TaskCoverageDocument`].
+///
+/// When `coverage` is `Some`, each requirement in the `in_scope`,
+/// `out_of_scope`, `constraints`, and `acceptance_criteria` sections is
+/// annotated with its implementing task IDs from `task-coverage.json`.
+/// When `coverage` is `None`, requirements are rendered without coverage
+/// annotations (backward-compatible with pre-T004 tracks).
 ///
 /// The output always ends with a trailing newline.
 ///
@@ -19,7 +43,6 @@ use domain::{SpecDocument, SpecRequirement};
 /// ```text
 /// <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 /// ---
-/// status: draft
 /// version: "1.0"
 /// signals: { blue: 15, yellow: 0, red: 0 }
 /// ---
@@ -28,48 +51,41 @@ use domain::{SpecDocument, SpecRequirement};
 ///
 /// ## Goal
 ///
-/// Goal paragraph line 1
+/// - Goal item [adr: knowledge/adr/x.md#D1.2]
 ///
 /// ## Scope
 ///
 /// ### In Scope
-/// - Requirement text [source: PRD §3.2]
+/// - [IN-01] Requirement text [adr: knowledge/adr/x.md#D1.2] [tasks: T001, T002]
 ///
 /// ### Out of Scope
-/// - Excluded item [source: inference — not needed]
+/// - [OO-01] Excluded item [informal: discussion — agreed out of scope]
 ///
 /// ## Constraints
-/// - Constraint 1 [source: convention — hex.md]
-///
-/// ## Domain States
-///
-/// | State | Description |
-/// |-------|-------------|
-/// | Draft | Initial state |
+/// - [CN-01] Constraint 1 [conv: .claude/rules/04-coding-principles.md#newtype-pattern]
 ///
 /// ## Acceptance Criteria
-/// - [ ] AC text [source: PRD §4.1]
+/// - [ ] [AC-01] AC text [adr: knowledge/adr/x.md#D3.1] [tasks: T003]
 ///
 /// ## Custom Section Title
 ///
 /// Free-form line 1
 ///
 /// ## Related Conventions (Required Reading)
-/// - knowledge/conventions/source-attribution.md
+/// - knowledge/conventions/source-attribution.md#intro
 /// ```
 #[must_use]
-pub fn render_spec(doc: &SpecDocument) -> String {
+pub fn render_spec_with_coverage(
+    doc: &SpecDocument,
+    coverage: Option<&TaskCoverageDocument>,
+) -> String {
     let mut out = String::new();
 
     // Header comment
     out.push_str("<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->\n");
 
-    // YAML frontmatter
+    // YAML frontmatter — no status/approved_at in schema v2
     out.push_str("---\n");
-    out.push_str(&format!("status: {}\n", doc.status()));
-    if let Some(ts) = doc.approved_at() {
-        out.push_str(&format!("approved_at: \"{}\"\n", ts));
-    }
     out.push_str(&format!("version: \"{}\"\n", doc.version()));
     if let Some(signals) = doc.signals() {
         out.push_str(&format!(
@@ -86,14 +102,13 @@ pub fn render_spec(doc: &SpecDocument) -> String {
     out.push_str(&format!("# {}\n", doc.title()));
     out.push('\n');
 
-    // Goal
+    // Goal (now Vec<SpecRequirement>)
     let goal = doc.goal();
     if !goal.is_empty() {
         out.push_str("## Goal\n");
         out.push('\n');
-        for line in goal {
-            out.push_str(line);
-            out.push('\n');
+        for req in goal {
+            out.push_str(&render_requirement_with_tasks(req, None));
         }
         out.push('\n');
     }
@@ -106,14 +121,16 @@ pub fn render_spec(doc: &SpecDocument) -> String {
 
         out.push_str("### In Scope\n");
         for req in scope.in_scope() {
-            out.push_str(&render_requirement(req));
+            let task_refs = coverage.and_then(|c| c.in_scope().get(req.id()));
+            out.push_str(&render_requirement_with_tasks(req, task_refs));
         }
         out.push('\n');
 
         if !scope.out_of_scope().is_empty() {
             out.push_str("### Out of Scope\n");
             for req in scope.out_of_scope() {
-                out.push_str(&render_requirement(req));
+                let task_refs = coverage.and_then(|c| c.out_of_scope().get(req.id()));
+                out.push_str(&render_requirement_with_tasks(req, task_refs));
             }
             out.push('\n');
         }
@@ -124,7 +141,8 @@ pub fn render_spec(doc: &SpecDocument) -> String {
     if !constraints.is_empty() {
         out.push_str("## Constraints\n");
         for req in constraints {
-            out.push_str(&render_requirement(req));
+            let task_refs = coverage.and_then(|c| c.constraints().get(req.id()));
+            out.push_str(&render_requirement_with_tasks(req, task_refs));
         }
         out.push('\n');
     }
@@ -134,7 +152,8 @@ pub fn render_spec(doc: &SpecDocument) -> String {
     if !ac.is_empty() {
         out.push_str("## Acceptance Criteria\n");
         for req in ac {
-            out.push_str(&render_acceptance_criterion(req));
+            let task_refs = coverage.and_then(|c| c.acceptance_criteria().get(req.id()));
+            out.push_str(&render_acceptance_criterion_with_tasks(req, task_refs));
         }
         out.push('\n');
     }
@@ -150,21 +169,22 @@ pub fn render_spec(doc: &SpecDocument) -> String {
         out.push('\n');
     }
 
-    // Related Conventions
+    // Related Conventions — now Vec<ConventionRef>
     let conventions = doc.related_conventions();
     if !conventions.is_empty() {
         out.push_str("## Related Conventions (Required Reading)\n");
-        for path in conventions {
-            out.push_str(&format!("- {path}\n"));
+        for conv in conventions {
+            let display = format!("{}#{}", conv.file.to_string_lossy(), conv.anchor.as_ref());
+            out.push_str(&format!("- {display}\n"));
         }
         out.push('\n');
     }
 
-    // Signal Summary (Stage 1 + Stage 2) — appended after all content sections.
+    // Signal Summary — appended after all content sections.
     let summary = render_signal_summary(doc);
     out.push_str(&summary);
 
-    // Hearing History (TSUMIKI-07) — last 5 entries, most recent first.
+    // Hearing History — last 5 entries, most recent first.
     let history = doc.hearing_history();
     if !history.is_empty() {
         out.push_str("## Hearing History\n");
@@ -191,43 +211,68 @@ pub fn render_spec(doc: &SpecDocument) -> String {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-/// Renders a requirement as a bullet item with optional source and task_refs annotations.
+/// Renders a requirement as a bullet item with typed ref annotations and optional
+/// task coverage tags.
 ///
-/// Single source:  `- text [source: tag]`
-/// Multiple:       `- text [source: tag1, tag2]`
-/// With tasks:     `- text [source: tag] [tasks: T001, T002]`
-/// No sources:     `- text`
-fn render_requirement(req: &SpecRequirement) -> String {
-    let mut line = format!("- {}", req.text());
-    append_source_tag(&mut line, req);
-    append_task_refs_tag(&mut line, req);
+/// Format:
+/// - `- [id] text [adr: file#anchor, ...] [conv: file#anchor, ...] [informal: kind — summary, ...] [tasks: T001, T002]`
+/// - When `task_refs` is `None` or empty: no `[tasks: ...]` tag.
+fn render_requirement_with_tasks(req: &SpecRequirement, task_refs: Option<&Vec<TaskId>>) -> String {
+    let mut line = format!("- [{}] {}", req.id(), req.text());
+    append_typed_refs(&mut line, req);
+    append_task_refs(&mut line, task_refs);
     line.push('\n');
     line
 }
 
-/// Renders an acceptance criterion as a checkbox bullet item.
+/// Renders an acceptance criterion as a checkbox bullet item with optional task coverage.
 ///
-/// Format: `- [ ] text [source: tag] [tasks: T001]`
-fn render_acceptance_criterion(req: &SpecRequirement) -> String {
-    let mut line = format!("- [ ] {}", req.text());
-    append_source_tag(&mut line, req);
-    append_task_refs_tag(&mut line, req);
+/// Format: `- [ ] [id] text [adr: file#anchor] [tasks: T001]`
+fn render_acceptance_criterion_with_tasks(
+    req: &SpecRequirement,
+    task_refs: Option<&Vec<TaskId>>,
+) -> String {
+    let mut line = format!("- [ ] [{}] {}", req.id(), req.text());
+    append_typed_refs(&mut line, req);
+    append_task_refs(&mut line, task_refs);
     line.push('\n');
     line
 }
 
-fn append_source_tag(line: &mut String, req: &SpecRequirement) {
-    let sources = req.sources();
-    if !sources.is_empty() {
-        line.push_str(&format!(" [source: {}]", sources.join(", ")));
+/// Appends `[tasks: T001, T002]` to `line` when `task_refs` is non-empty.
+fn append_task_refs(line: &mut String, task_refs: Option<&Vec<TaskId>>) {
+    if let Some(refs) = task_refs {
+        if !refs.is_empty() {
+            let tags: Vec<String> = refs.iter().map(|t| t.to_string()).collect();
+            line.push_str(&format!(" [tasks: {}]", tags.join(", ")));
+        }
     }
 }
 
-fn append_task_refs_tag(line: &mut String, req: &SpecRequirement) {
-    let task_refs = req.task_refs();
-    if !task_refs.is_empty() {
-        let refs: Vec<&str> = task_refs.iter().map(|id| id.as_ref()).collect();
-        line.push_str(&format!(" [tasks: {}]", refs.join(", ")));
+fn append_typed_refs(line: &mut String, req: &SpecRequirement) {
+    let adr_refs = req.adr_refs();
+    if !adr_refs.is_empty() {
+        let tags: Vec<String> = adr_refs
+            .iter()
+            .map(|r| format!("{}#{}", r.file.to_string_lossy(), r.anchor.as_ref()))
+            .collect();
+        line.push_str(&format!(" [adr: {}]", tags.join(", ")));
+    }
+
+    let conv_refs = req.convention_refs();
+    if !conv_refs.is_empty() {
+        let tags: Vec<String> = conv_refs
+            .iter()
+            .map(|r| format!("{}#{}", r.file.to_string_lossy(), r.anchor.as_ref()))
+            .collect();
+        line.push_str(&format!(" [conv: {}]", tags.join(", ")));
+    }
+
+    let informals = req.informal_grounds();
+    if !informals.is_empty() {
+        let tags: Vec<String> =
+            informals.iter().map(|r| format!("{} — {}", r.kind, r.summary.as_ref())).collect();
+        line.push_str(&format!(" [informal: {}]", tags.join(", ")));
     }
 }
 
@@ -270,7 +315,13 @@ pub fn render_signal_summary(doc: &SpecDocument) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use domain::{SignalCounts, SpecDocument, SpecRequirement, SpecScope, SpecSection};
+    use std::path::PathBuf;
+
+    use domain::{
+        AdrAnchor, AdrRef, ConventionAnchor, ConventionRef, InformalGroundKind, InformalGroundRef,
+        InformalGroundSummary, SignalCounts, SpecDocument, SpecElementId, SpecRequirement,
+        SpecScope, SpecSection,
+    };
 
     use super::*;
 
@@ -278,14 +329,46 @@ mod tests {
     // Helpers
     // ---------------------------------------------------------------------------
 
-    fn req(text: &str, sources: &[&str]) -> SpecRequirement {
-        SpecRequirement::new(text, sources.iter().map(|s| s.to_string()).collect()).unwrap()
+    fn id(s: &str) -> SpecElementId {
+        SpecElementId::try_new(s).unwrap()
+    }
+
+    fn adr_ref(file: &str, anchor: &str) -> AdrRef {
+        AdrRef::new(PathBuf::from(file), AdrAnchor::try_new(anchor).unwrap())
+    }
+
+    fn conv_ref(file: &str, anchor: &str) -> ConventionRef {
+        ConventionRef::new(PathBuf::from(file), ConventionAnchor::try_new(anchor).unwrap())
+    }
+
+    fn informal(kind: InformalGroundKind, summary: &str) -> InformalGroundRef {
+        InformalGroundRef::new(kind, InformalGroundSummary::try_new(summary).unwrap())
+    }
+
+    fn req_with_adr(id_s: &str, text: &str, file: &str, anchor: &str) -> SpecRequirement {
+        SpecRequirement::new(id(id_s), text, vec![adr_ref(file, anchor)], vec![], vec![]).unwrap()
+    }
+
+    fn req_with_conv(id_s: &str, text: &str, file: &str, anchor: &str) -> SpecRequirement {
+        SpecRequirement::new(id(id_s), text, vec![], vec![conv_ref(file, anchor)], vec![]).unwrap()
+    }
+
+    fn req_with_informal(
+        id_s: &str,
+        text: &str,
+        kind: InformalGroundKind,
+        summary: &str,
+    ) -> SpecRequirement {
+        SpecRequirement::new(id(id_s), text, vec![], vec![], vec![informal(kind, summary)]).unwrap()
+    }
+
+    fn req_bare(id_s: &str, text: &str) -> SpecRequirement {
+        SpecRequirement::new(id(id_s), text, vec![], vec![], vec![]).unwrap()
     }
 
     fn make_minimal_doc() -> SpecDocument {
         SpecDocument::new(
             "Feature X",
-            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -294,8 +377,6 @@ mod tests {
             vec![],
             vec![],
             None,
-            None,
-            None,
         )
         .unwrap()
     }
@@ -303,22 +384,29 @@ mod tests {
     fn make_full_doc() -> SpecDocument {
         SpecDocument::new(
             "Feature Title",
-            domain::SpecStatus::Draft,
             "1.0",
-            vec!["Goal paragraph line 1".into()],
+            vec![req_with_adr("GL-01", "Goal paragraph line 1", "knowledge/adr/x.md", "D1.2")],
             SpecScope::new(
-                vec![req("Requirement text", &["PRD §3.2"])],
-                vec![req("Excluded item", &["inference — not needed"])],
+                vec![req_with_adr("IN-01", "Requirement text", "knowledge/adr/x.md", "D1.2")],
+                vec![req_with_informal(
+                    "OS-01",
+                    "Excluded item",
+                    InformalGroundKind::Discussion,
+                    "agreed out of scope",
+                )],
             ),
-            vec![req("Constraint 1", &["convention — hex.md"])],
-            vec![req("AC text", &["PRD §4.1"])],
+            vec![req_with_conv(
+                "CO-01",
+                "Constraint 1",
+                ".claude/rules/04-coding-principles.md",
+                "newtype-pattern",
+            )],
+            vec![req_with_adr("AC-01", "AC text", "knowledge/adr/x.md", "D3.1")],
             vec![
                 SpecSection::new("Custom Section Title", vec!["Free-form line 1".into()]).unwrap(),
             ],
-            vec!["knowledge/conventions/source-attribution.md".into()],
-            Some(SignalCounts::new(15, 0, 0)),
-            None,
-            None,
+            vec![conv_ref("knowledge/conventions/source-attribution.md", "intro")],
+            Some(SignalCounts::new(3, 1, 0)),
         )
         .unwrap()
     }
@@ -336,11 +424,12 @@ mod tests {
     }
 
     #[test]
-    fn test_render_spec_frontmatter_contains_status_and_version() {
+    fn test_render_spec_frontmatter_contains_version_but_not_status() {
         let doc = make_minimal_doc();
         let output = render_spec(&doc);
-        assert!(output.contains("status: draft\n"));
         assert!(output.contains("version: \"1.0\"\n"));
+        assert!(!output.contains("status:"), "schema v2 must not emit status in frontmatter");
+        assert!(!output.contains("approved_at:"), "schema v2 must not emit approved_at");
     }
 
     #[test]
@@ -362,7 +451,6 @@ mod tests {
     fn test_render_spec_frontmatter_delimited_by_triple_dashes() {
         let doc = make_minimal_doc();
         let output = render_spec(&doc);
-        // Should have exactly two "---" lines (open and close of frontmatter)
         let dash_count = output.lines().filter(|l| *l == "---").count();
         assert_eq!(dash_count, 2);
     }
@@ -379,7 +467,7 @@ mod tests {
     }
 
     // ---------------------------------------------------------------------------
-    // render_spec: goal section
+    // render_spec: goal section (now Vec<SpecRequirement>)
     // ---------------------------------------------------------------------------
 
     #[test]
@@ -387,7 +475,9 @@ mod tests {
         let doc = make_full_doc();
         let output = render_spec(&doc);
         assert!(output.contains("## Goal\n"));
-        assert!(output.contains("Goal paragraph line 1\n"));
+        // Goal item has id GL-01 and adr ref
+        assert!(output.contains("- [GL-01] Goal paragraph line 1"));
+        assert!(output.contains("[adr: knowledge/adr/x.md#D1.2]"));
     }
 
     #[test]
@@ -395,27 +485,6 @@ mod tests {
         let doc = make_minimal_doc();
         let output = render_spec(&doc);
         assert!(!output.contains("## Goal\n"));
-    }
-
-    #[test]
-    fn test_render_spec_goal_multiple_lines_each_on_own_line() {
-        let doc = SpecDocument::new(
-            "F",
-            domain::SpecStatus::Draft,
-            "1.0",
-            vec!["Line A".into(), "Line B".into()],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-        let output = render_spec(&doc);
-        assert!(output.contains("Line A\nLine B\n"));
     }
 
     // ---------------------------------------------------------------------------
@@ -431,10 +500,10 @@ mod tests {
     }
 
     #[test]
-    fn test_render_spec_in_scope_requirement_with_single_source() {
+    fn test_render_spec_in_scope_requirement_with_adr_ref() {
         let doc = make_full_doc();
         let output = render_spec(&doc);
-        assert!(output.contains("- Requirement text [source: PRD §3.2]\n"));
+        assert!(output.contains("- [IN-01] Requirement text [adr: knowledge/adr/x.md#D1.2]\n"));
     }
 
     #[test]
@@ -442,7 +511,10 @@ mod tests {
         let doc = make_full_doc();
         let output = render_spec(&doc);
         assert!(output.contains("### Out of Scope\n"));
-        assert!(output.contains("- Excluded item [source: inference — not needed]\n"));
+        assert!(
+            output
+                .contains("- [OS-01] Excluded item [informal: discussion — agreed out of scope]\n")
+        );
     }
 
     #[test]
@@ -453,46 +525,45 @@ mod tests {
     }
 
     #[test]
-    fn test_render_spec_requirement_with_no_sources_has_no_source_tag() {
+    fn test_render_spec_requirement_with_no_refs_has_no_ref_tags() {
         let doc = SpecDocument::new(
             "F",
-            domain::SpecStatus::Draft,
             "1.0",
             vec![],
-            SpecScope::new(vec![req("bare item", &[])], vec![]),
+            SpecScope::new(vec![req_bare("IN-01", "bare item")], vec![]),
             vec![],
             vec![],
             vec![],
             vec![],
-            None,
-            None,
             None,
         )
         .unwrap();
         let output = render_spec(&doc);
-        assert!(output.contains("- bare item\n"));
-        assert!(!output.contains("[source:"));
+        assert!(output.contains("- [IN-01] bare item\n"));
+        assert!(!output.contains("[adr:"));
+        assert!(!output.contains("[conv:"));
+        assert!(!output.contains("[informal:"));
     }
 
     #[test]
-    fn test_render_spec_requirement_with_multiple_sources_joined_by_comma() {
+    fn test_render_spec_requirement_with_convention_ref() {
         let doc = SpecDocument::new(
             "F",
-            domain::SpecStatus::Draft,
             "1.0",
             vec![],
-            SpecScope::new(vec![req("multi", &["PRD §1", "discussion"])], vec![]),
+            SpecScope::new(
+                vec![req_with_conv("IN-01", "req with conv", ".claude/rules/04.md", "newtype")],
+                vec![],
+            ),
             vec![],
             vec![],
             vec![],
             vec![],
-            None,
-            None,
             None,
         )
         .unwrap();
         let output = render_spec(&doc);
-        assert!(output.contains("- multi [source: PRD §1, discussion]\n"));
+        assert!(output.contains("- [IN-01] req with conv [conv: .claude/rules/04.md#newtype]\n"));
     }
 
     // ---------------------------------------------------------------------------
@@ -504,7 +575,9 @@ mod tests {
         let doc = make_full_doc();
         let output = render_spec(&doc);
         assert!(output.contains("## Constraints\n"));
-        assert!(output.contains("- Constraint 1 [source: convention — hex.md]\n"));
+        assert!(output.contains(
+            "- [CO-01] Constraint 1 [conv: .claude/rules/04-coding-principles.md#newtype-pattern]\n"
+        ));
     }
 
     #[test]
@@ -523,29 +596,26 @@ mod tests {
         let doc = make_full_doc();
         let output = render_spec(&doc);
         assert!(output.contains("## Acceptance Criteria\n"));
-        assert!(output.contains("- [ ] AC text [source: PRD §4.1]\n"));
+        assert!(output.contains("- [ ] [AC-01] AC text [adr: knowledge/adr/x.md#D3.1]\n"));
     }
 
     #[test]
-    fn test_render_spec_acceptance_criteria_no_source_has_no_tag() {
+    fn test_render_spec_acceptance_criteria_no_refs_has_no_tags() {
         let doc = SpecDocument::new(
             "F",
-            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
             vec![],
-            vec![req("plain AC", &[])],
+            vec![req_bare("AC-01", "plain AC")],
             vec![],
             vec![],
-            None,
-            None,
             None,
         )
         .unwrap();
         let output = render_spec(&doc);
-        assert!(output.contains("- [ ] plain AC\n"));
-        assert!(!output.contains("[source:"));
+        assert!(output.contains("- [ ] [AC-01] plain AC\n"));
+        assert!(!output.contains("[adr:"));
     }
 
     #[test]
@@ -571,49 +641,21 @@ mod tests {
     fn test_render_spec_additional_sections_omitted_when_empty() {
         let doc = make_minimal_doc();
         let output = render_spec(&doc);
-        // Should only have fixed known sections, no extra ## headers from additional_sections
         let h2_count = output.lines().filter(|l| l.starts_with("## ")).count();
         // minimal doc: ## Scope only
         assert_eq!(h2_count, 1, "expected only ## Scope, got:\n{output}");
     }
 
-    #[test]
-    fn test_render_spec_multiple_additional_sections_all_rendered() {
-        let doc = SpecDocument::new(
-            "F",
-            domain::SpecStatus::Draft,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![],
-            vec![
-                SpecSection::new("Alpha", vec!["line alpha".into()]).unwrap(),
-                SpecSection::new("Beta", vec!["line beta".into()]).unwrap(),
-            ],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-        let output = render_spec(&doc);
-        assert!(output.contains("## Alpha\n"));
-        assert!(output.contains("line alpha\n"));
-        assert!(output.contains("## Beta\n"));
-        assert!(output.contains("line beta\n"));
-    }
-
     // ---------------------------------------------------------------------------
-    // render_spec: related conventions
+    // render_spec: related conventions (now Vec<ConventionRef>)
     // ---------------------------------------------------------------------------
 
     #[test]
-    fn test_render_spec_related_conventions_rendered_when_present() {
+    fn test_render_spec_related_conventions_rendered_as_file_hash_anchor() {
         let doc = make_full_doc();
         let output = render_spec(&doc);
         assert!(output.contains("## Related Conventions (Required Reading)\n"));
-        assert!(output.contains("- knowledge/conventions/source-attribution.md\n"));
+        assert!(output.contains("- knowledge/conventions/source-attribution.md#intro\n"));
     }
 
     #[test]
@@ -624,7 +666,7 @@ mod tests {
     }
 
     // ---------------------------------------------------------------------------
-    // render_spec: trailing newline and full exact output
+    // render_spec: trailing newline
     // ---------------------------------------------------------------------------
 
     #[test]
@@ -635,63 +677,12 @@ mod tests {
     }
 
     #[test]
-    fn test_render_spec_full_doc_exact_output() {
-        let doc = make_full_doc();
-        let output = render_spec(&doc);
-        // make_full_doc() sets signals = Some(SignalCounts::new(15, 0, 0)) so
-        // render_spec() appends the Stage 1 Signal Summary block at the end.
-        let expected = "\
-<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
----
-status: draft
-version: \"1.0\"
-signals: { blue: 15, yellow: 0, red: 0 }
----
-
-# Feature Title
-
-## Goal
-
-Goal paragraph line 1
-
-## Scope
-
-### In Scope
-- Requirement text [source: PRD §3.2]
-
-### Out of Scope
-- Excluded item [source: inference — not needed]
-
-## Constraints
-- Constraint 1 [source: convention — hex.md]
-
-## Acceptance Criteria
-- [ ] AC text [source: PRD §4.1]
-
-## Custom Section Title
-
-Free-form line 1
-
-## Related Conventions (Required Reading)
-- knowledge/conventions/source-attribution.md
-
-## Signal Summary
-
-### Stage 1: Spec Signals
-\u{1f535} 15  \u{1f7e1} 0  \u{1f534} 0
-
-";
-        assert_eq!(output, expected);
-    }
-
-    #[test]
     fn test_render_spec_minimal_doc_exact_output() {
         let doc = make_minimal_doc();
         let output = render_spec(&doc);
         let expected = "\
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
-status: draft
 version: \"1.0\"
 ---
 
@@ -706,19 +697,7 @@ version: \"1.0\"
     }
 
     // ---------------------------------------------------------------------------
-    // render_spec: signals with non-zero yellow/red
-    // ---------------------------------------------------------------------------
-
-    #[test]
-    fn test_render_spec_signals_with_yellow_and_red() {
-        let mut doc = make_minimal_doc();
-        doc.set_signals(SignalCounts::new(3, 2, 1));
-        let output = render_spec(&doc);
-        assert!(output.contains("signals: { blue: 3, yellow: 2, red: 1 }\n"));
-    }
-
-    // ---------------------------------------------------------------------------
-    // render_spec: ordering — sections appear in defined order
+    // render_spec: ordering
     // ---------------------------------------------------------------------------
 
     #[test]
@@ -751,10 +730,9 @@ version: \"1.0\"
     // render_signal_summary tests
     // ---------------------------------------------------------------------------
 
-    fn make_doc_stage1_only() -> SpecDocument {
+    fn make_doc_with_signals() -> SpecDocument {
         let mut doc = SpecDocument::new(
             "Feature X",
-            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -762,8 +740,6 @@ version: \"1.0\"
             vec![],
             vec![],
             vec![],
-            None,
-            None,
             None,
         )
         .unwrap();
@@ -773,28 +749,14 @@ version: \"1.0\"
 
     #[test]
     fn test_render_signal_summary_empty_when_no_signals() {
-        let doc = SpecDocument::new(
-            "Feature X",
-            domain::SpecStatus::Draft,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-        )
-        .unwrap();
+        let doc = make_minimal_doc();
         let output = render_signal_summary(&doc);
         assert_eq!(output, "");
     }
 
     #[test]
     fn test_render_signal_summary_stage1_only() {
-        let doc = make_doc_stage1_only();
+        let doc = make_doc_with_signals();
         let output = render_signal_summary(&doc);
         assert!(output.contains("## Signal Summary\n"), "missing header");
         assert!(output.contains("### Stage 1: Spec Signals\n"), "missing stage1 header");
@@ -806,45 +768,41 @@ version: \"1.0\"
 
     #[test]
     fn test_render_signal_summary_output_ends_with_trailing_newline() {
-        let doc = make_doc_stage1_only();
+        let doc = make_doc_with_signals();
         let output = render_signal_summary(&doc);
         assert!(output.ends_with('\n'), "output must end with trailing newline");
     }
 
-    // --- task_refs rendering ---
+    // ---------------------------------------------------------------------------
+    // multiple typed refs on single requirement
+    // ---------------------------------------------------------------------------
 
     #[test]
-    fn test_render_requirement_with_task_refs() {
-        let req = SpecRequirement::with_task_refs(
-            "Enable feature",
-            vec!["PRD §1".into()],
-            vec![
-                domain::TaskId::try_new("T001").unwrap(),
-                domain::TaskId::try_new("T002").unwrap(),
-            ],
+    fn test_render_requirement_with_multiple_adr_refs() {
+        let req = SpecRequirement::new(
+            id("IN-01"),
+            "multi-ref req",
+            vec![adr_ref("adr/a.md", "D1"), adr_ref("adr/b.md", "D2")],
+            vec![],
+            vec![],
         )
         .unwrap();
-        let line = render_requirement(&req);
-        assert_eq!(line, "- Enable feature [source: PRD §1] [tasks: T001, T002]\n");
+        let line = render_requirement_with_tasks(&req, None);
+        assert_eq!(line, "- [IN-01] multi-ref req [adr: adr/a.md#D1, adr/b.md#D2]\n");
     }
 
     #[test]
-    fn test_render_requirement_without_task_refs() {
-        let req = SpecRequirement::new("Enable feature", vec!["PRD §1".into()]).unwrap();
-        let line = render_requirement(&req);
-        assert_eq!(line, "- Enable feature [source: PRD §1]\n");
-        assert!(!line.contains("[tasks:"));
-    }
-
-    #[test]
-    fn test_render_acceptance_criterion_with_task_refs() {
-        let req = SpecRequirement::with_task_refs(
-            "AC item",
-            vec!["discussion".into()],
-            vec![domain::TaskId::try_new("T003").unwrap()],
+    fn test_render_requirement_with_adr_and_informal_refs() {
+        let req = SpecRequirement::new(
+            id("IN-01"),
+            "mixed refs",
+            vec![adr_ref("adr/x.md", "D1")],
+            vec![],
+            vec![informal(InformalGroundKind::UserDirective, "user asked for it")],
         )
         .unwrap();
-        let line = render_acceptance_criterion(&req);
-        assert_eq!(line, "- [ ] AC item [source: discussion] [tasks: T003]\n");
+        let line = render_requirement_with_tasks(&req, None);
+        assert!(line.contains("[adr: adr/x.md#D1]"));
+        assert!(line.contains("[informal: user_directive — user asked for it]"));
     }
 }

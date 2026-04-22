@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 
 use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
-use domain::{TaskStatus, TrackId, TrackMetadata};
+use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, derive_track_status};
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
@@ -13,25 +13,64 @@ use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers_from_path};
 
+/// Loads `impl-plan.json` from a track directory, returning `None` when the file
+/// does not exist. Propagates I/O and decode errors as `RenderError::Io`.
+fn load_impl_plan_opt(track_dir: &Path) -> Result<Option<ImplPlanDocument>, RenderError> {
+    let path = track_dir.join("impl-plan.json");
+    if !path.is_file() {
+        return Ok(None);
+    }
+    let json = std::fs::read_to_string(&path)?;
+    crate::impl_plan_codec::decode(&json).map(Some).map_err(|e| {
+        RenderError::Io(std::io::Error::other(format!(
+            "impl-plan.json decode error at {}: {e}",
+            path.display()
+        )))
+    })
+}
+
+/// Loads `task-coverage.json` from a track directory, returning `None` when the
+/// file does not exist. Propagates I/O and decode errors as `RenderError::Io`.
+fn load_task_coverage_opt(track_dir: &Path) -> Result<Option<TaskCoverageDocument>, RenderError> {
+    let path = track_dir.join("task-coverage.json");
+    if !path.is_file() {
+        return Ok(None);
+    }
+    let json = std::fs::read_to_string(&path)?;
+    crate::task_coverage_codec::decode(&json).map(Some).map_err(|e| {
+        RenderError::Io(std::io::Error::other(format!(
+            "task-coverage.json decode error at {}: {e}",
+            path.display()
+        )))
+    })
+}
+
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
 const RESERVED_ID_SEGMENTS: &[&str] = &["git"];
 const VALID_TRACK_STATUSES: &[&str] =
     &["planned", "in_progress", "done", "blocked", "cancelled", "archived"];
-const REQUIRED_V3_METADATA_FIELDS: &[&str] = &[
-    "schema_version",
-    "branch",
-    "id",
-    "title",
-    "status",
-    "created_at",
-    "updated_at",
-    "tasks",
-    "plan",
-];
+// `tasks` and `plan` fields moved to impl-plan.json; removed from required list.
+const REQUIRED_V3_METADATA_FIELDS: &[&str] =
+    &["schema_version", "branch", "id", "title", "status", "created_at", "updated_at"];
 
 fn rendered_matches(actual: &str, expected: &str) -> bool {
     actual == expected || actual.trim_end_matches('\n') == expected.trim_end_matches('\n')
+}
+
+/// Minimal DTO for peeking at a metadata.json's schema_version + identity
+/// before dispatching to a version-specific decoder. This is intentionally
+/// loose (no `deny_unknown_fields`) so that legacy v2/v3/v4 metadata — which
+/// still carries removed fields like `status`, `tasks`, `plan` — can be
+/// identified and routed through the legacy path. The strict v5 DTO
+/// (`codec::TrackDocumentV2`) is only applied in the v5 branch via
+/// `codec::decode`.
+#[derive(Debug, Clone, serde::Deserialize)]
+struct TrackSchemaPeek {
+    schema_version: u32,
+    id: String,
+    #[serde(default)]
+    branch: Option<String>,
 }
 
 /// Track aggregate plus metadata-only fields required for view rendering.
@@ -41,15 +80,19 @@ pub struct TrackSnapshot {
     pub track: TrackMetadata,
     pub meta: DocumentMeta,
     pub schema_version: u32,
+    /// Derived track status string: computed from `impl-plan.json` +
+    /// `status_override` at construction time via `domain::derive_track_status`.
+    /// For legacy v2/v3 tracks that still carry an explicit `status` field,
+    /// the stored value from the raw JSON is used directly.
+    pub derived_status: String,
 }
 
 impl TrackSnapshot {
     #[must_use]
     pub fn status(&self) -> String {
-        match self.meta.original_status.as_deref() {
-            Some("archived") => "archived".to_owned(),
-            _ => self.track.status().to_string(),
-        }
+        // Status is not stored in `TrackMetadata`; it is derived on demand
+        // and cached at snapshot construction time.
+        self.derived_status.clone()
     }
 
     #[must_use]
@@ -81,13 +124,112 @@ pub enum RenderError {
     InvalidTrackMetadata { path: PathBuf, reason: String },
 }
 
+/// Decodes a legacy v2/v3/v4 metadata JSON value into a `(TrackMetadata, DocumentMeta)` pair.
+///
+/// Legacy format includes a `status` field and (in v2/v3) `tasks`/`plan` fields that are
+/// no longer part of the v5 schema. This function extracts the identity fields (id, branch,
+/// title) and, for v4 tracks, the `status_override` sub-field (introduced in v4).
+///
+/// # Errors
+///
+/// Returns `CodecError::InvalidField` when required fields are missing or malformed.
+fn decode_legacy_metadata(
+    raw: &serde_json::Value,
+    metadata_path: &Path,
+) -> Result<(TrackMetadata, DocumentMeta), codec::CodecError> {
+    use domain::{StatusOverride, TrackBranch, TrackId};
+
+    let schema_version_u64 = raw.get("schema_version").and_then(|v| v.as_u64()).unwrap_or(0);
+    let schema_version = u32::try_from(schema_version_u64).map_err(|_| {
+        codec::CodecError::Validation(format!("schema_version {schema_version_u64} overflows u32"))
+    })?;
+    let id_str =
+        raw.get("id").and_then(|v| v.as_str()).ok_or_else(|| codec::CodecError::InvalidField {
+            field: "id".to_owned(),
+            reason: "missing or not a string".to_owned(),
+        })?;
+    let branch_str = raw.get("branch").and_then(|v| v.as_str());
+    let title_str = raw.get("title").and_then(|v| v.as_str()).ok_or_else(|| {
+        codec::CodecError::InvalidField {
+            field: "title".to_owned(),
+            reason: "missing or not a string".to_owned(),
+        }
+    })?;
+    let created_at = raw
+        .get("created_at")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| codec::CodecError::InvalidField {
+            field: "created_at".to_owned(),
+            reason: "missing or not a string".to_owned(),
+        })?
+        .to_owned();
+    let updated_at = raw
+        .get("updated_at")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| codec::CodecError::InvalidField {
+            field: "updated_at".to_owned(),
+            reason: "missing or not a string".to_owned(),
+        })?
+        .to_owned();
+
+    let id = TrackId::try_new(id_str).map_err(domain::DomainError::from)?;
+    let branch = branch_str
+        .map(TrackBranch::try_new)
+        .transpose()
+        .map_err(|e| codec::CodecError::Domain(domain::DomainError::from(e)))?;
+
+    // v2/v3 tracks do not have `status_override` — the field was introduced in v4.
+    // For v4 tracks, read `status_override` from the JSON so that the override reason
+    // is available in the rendered registry (e.g., "Reason: …" for blocked tracks).
+    // v2 and v3 metadata is always treated as having no override.
+    let status_override: Option<StatusOverride> = if schema_version >= 4 {
+        if let Some(obj) = raw.get("status_override").and_then(|v| v.as_object()) {
+            let status_str = obj.get("status").and_then(|v| v.as_str()).ok_or_else(|| {
+                codec::CodecError::InvalidField {
+                    field: "status_override.status".to_owned(),
+                    reason: "missing or not a string".to_owned(),
+                }
+            })?;
+            let reason = obj.get("reason").and_then(|v| v.as_str()).unwrap_or("").to_owned();
+            let ov = match status_str {
+                "blocked" => StatusOverride::blocked(reason)
+                    .map_err(|e| codec::CodecError::Domain(domain::DomainError::from(e)))?,
+                "cancelled" => StatusOverride::cancelled(reason)
+                    .map_err(|e| codec::CodecError::Domain(domain::DomainError::from(e)))?,
+                other => {
+                    return Err(codec::CodecError::InvalidField {
+                        field: "status_override.status".to_owned(),
+                        reason: format!("unknown override status: {other}"),
+                    });
+                }
+            };
+            Some(ov)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    let track = TrackMetadata::with_branch(id, branch, title_str, status_override)
+        .map_err(codec::CodecError::Domain)?;
+    let meta = DocumentMeta { schema_version, created_at, updated_at };
+
+    let _ = metadata_path; // used for error context by callers
+    Ok((track, meta))
+}
+
 /// Collects all valid track snapshots from active and archive directories.
 ///
 /// # Errors
 /// Returns `RenderError` if a metadata file cannot be read or decoded.
 pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, RenderError> {
-    let mut track_dirs = Vec::new();
-    for rel in [TRACK_ITEMS_DIR, TRACK_ARCHIVE_DIR] {
+    // Collect (path, is_archive) pairs so that the archive flag is preserved per
+    // directory. v5 tracks under `track/archive/` must have `derived_status =
+    // "archived"` because `derive_track_status` cannot return that value — archived
+    // state is encoded by directory location rather than a status field in the v5 schema.
+    let mut track_dirs: Vec<(PathBuf, bool)> = Vec::new();
+    for (rel, is_archive) in [(TRACK_ITEMS_DIR, false), (TRACK_ARCHIVE_DIR, true)] {
         let base = root.join(rel);
         if !base.is_dir() {
             continue;
@@ -96,26 +238,35 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
             let entry = entry?;
             let path = entry.path();
             if path.is_dir() {
-                track_dirs.push(path);
+                track_dirs.push((path, is_archive));
             }
         }
     }
-    track_dirs.sort();
+    track_dirs.sort_by(|(a, _), (b, _)| a.cmp(b));
 
     let mut snapshots = Vec::new();
-    for track_dir in track_dirs {
+    for (track_dir, is_archive) in track_dirs {
         let metadata_path = track_dir.join("metadata.json");
         if !metadata_path.is_file() {
             continue;
         }
 
         let json = std::fs::read_to_string(&metadata_path)?;
-        let parsed: codec::TrackDocumentV2 =
+        // Peek at schema_version + identity through a loose DTO that does not
+        // enforce `deny_unknown_fields`; this is required because legacy
+        // v2/v3/v4 metadata still carries removed fields (`status`, `tasks`,
+        // `plan`) that the strict `codec::TrackDocumentV2` DTO rejects. The
+        // strict DTO is applied inside the v5 branch via `codec::decode`.
+        let parsed: TrackSchemaPeek =
             serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
                 path: metadata_path.clone(),
                 source: codec::CodecError::Json(source),
             })?;
-        if !matches!(parsed.schema_version, 2 | 3) {
+        // Schema version 5 is the identity-only format (no `status` field).
+        // Legacy v2/v3 tracks that still carry a `status` field are accepted for
+        // rendering purposes (registry.md, plan.md) but are not validated for
+        // plan.md freshness — that guard only runs for v4+ (see `validate_track_snapshots`).
+        if !matches!(parsed.schema_version, 2..=5) {
             return Err(RenderError::UnsupportedSchemaVersion {
                 path: metadata_path,
                 schema_version: parsed.schema_version,
@@ -123,16 +274,62 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
         }
         validate_track_document(&metadata_path, track_dir.file_name(), &parsed)?;
 
-        let decoded = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
-            path: metadata_path.clone(),
-            source,
-        })?;
-        let (track, meta) = decoded;
+        // For v5 tracks: use `codec::decode` (schema v5 required).
+        // For legacy v2/v3: parse raw JSON for the `status` field and construct
+        // `TrackMetadata` directly without calling `codec::decode`, which would
+        // reject the old schema.
+        let (track, meta, derived_status) = if parsed.schema_version == 5 {
+            let (t, m) = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
+                path: metadata_path.clone(),
+                source,
+            })?;
+            // Tracks under `track/archive/` are archived regardless of impl-plan
+            // state. `derive_track_status` cannot return `archived` (that state is
+            // encoded by directory location in the v5 schema, not by a status field),
+            // so we set `derived_status` explicitly before calling the derive function.
+            let status = if is_archive {
+                "archived".to_owned()
+            } else {
+                let impl_plan = load_impl_plan_opt(&track_dir)?;
+                derive_track_status(impl_plan.as_ref(), t.status_override()).to_string()
+            };
+            (t, m, status)
+        } else {
+            // Legacy v2/v3/v4: read `status` from raw JSON; decode only identity
+            // fields (branch, title, id) via the legacy decode path.
+            let raw: serde_json::Value =
+                serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
+                    path: metadata_path.clone(),
+                    source: codec::CodecError::Json(source),
+                })?;
+            // `status` is a required field in all legacy schemas (v2/v3/v4); failing
+            // closed here mirrors the old codec::decode validation behaviour.
+            let legacy_status = raw
+                .get("status")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| RenderError::InvalidTrackMetadata {
+                    path: metadata_path.clone(),
+                    reason: "legacy metadata.json is missing required 'status' field".to_owned(),
+                })?
+                .to_owned();
+            if !VALID_TRACK_STATUSES.contains(&legacy_status.as_str()) {
+                return Err(RenderError::InvalidTrackMetadata {
+                    path: metadata_path.clone(),
+                    reason: format!("invalid legacy track status '{legacy_status}'"),
+                });
+            }
+            let (t, m) = decode_legacy_metadata(&raw, &metadata_path).map_err(|source| {
+                RenderError::InvalidMetadata { path: metadata_path.clone(), source }
+            })?;
+            (t, m, legacy_status)
+        };
+
         snapshots.push(TrackSnapshot {
             dir: track_dir,
             track,
             meta,
             schema_version: parsed.schema_version,
+            derived_status,
         });
     }
 
@@ -144,54 +341,81 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
     Ok(snapshots)
 }
 
-/// Renders `plan.md` content from a track snapshot.
+/// Renders `plan.md` content from track identity metadata and an optional
+/// `ImplPlanDocument`.
+///
+/// When `impl_plan` is `Some`, renders the full task list and plan sections
+/// from the document. When `None`, emits a placeholder stub (used for
+/// planning-only tracks that have not yet generated `impl-plan.json`).
 #[must_use]
-pub fn render_plan(track: &TrackMetadata) -> String {
+pub fn render_plan(track: &TrackMetadata, impl_plan: Option<&ImplPlanDocument>) -> String {
     let mut lines = Vec::new();
-    lines.push("<!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->".to_owned());
+    lines.push(
+        "<!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->".to_owned(),
+    );
     lines.push(format!("# {}", track.title()));
     lines.push(String::new());
 
-    for summary in track.plan().summary() {
-        lines.push(summary.clone());
-    }
-    if !track.plan().summary().is_empty() {
+    let Some(doc) = impl_plan else {
+        lines.push(
+            "> **Note**: `impl-plan.json` not yet generated. \
+             Run `/track:implement` to generate the implementation plan."
+                .to_owned(),
+        );
         lines.push(String::new());
-    }
+        return lines.join("\n");
+    };
 
-    let task_map = track
-        .tasks()
-        .iter()
-        .map(|task| (task.id().as_ref(), task))
-        .collect::<std::collections::HashMap<_, _>>();
-
-    for section in track.plan().sections() {
-        lines.push(format!("## {}", section.title()));
+    // Summary lines (if any).
+    if !doc.plan().summary().is_empty() {
+        lines.push("## Summary".to_owned());
         lines.push(String::new());
-
-        for desc in section.description() {
-            lines.push(desc.clone());
+        for line in doc.plan().summary() {
+            lines.push(line.clone());
         }
+        lines.push(String::new());
+    }
+
+    // Task list per section.
+    let total = doc.tasks().len();
+    let done_count = doc.tasks().iter().filter(|t| t.status().is_resolved()).count();
+    lines.push(format!("## Tasks ({done_count}/{total} resolved)"));
+    lines.push(String::new());
+
+    for section in doc.plan().sections() {
+        lines.push(format!("### {} — {}", section.id(), section.title()));
+        lines.push(String::new());
         if !section.description().is_empty() {
+            for desc_line in section.description() {
+                lines.push(format!("> {desc_line}"));
+            }
             lines.push(String::new());
         }
-
         for task_id in section.task_ids() {
-            if let Some(task) = task_map.get(task_id.as_ref()) {
-                let marker = match task.status() {
-                    TaskStatus::Todo => " ",
-                    TaskStatus::InProgress => "~",
-                    TaskStatus::DonePending | TaskStatus::DoneTraced { .. } => "x",
-                    TaskStatus::Skipped => "-",
+            if let Some(task) = doc.tasks().iter().find(|t| t.id() == task_id) {
+                let status_label = match task.status() {
+                    domain::TaskStatus::Todo => "[ ]",
+                    domain::TaskStatus::InProgress => "[~]",
+                    domain::TaskStatus::DonePending | domain::TaskStatus::DoneTraced { .. } => {
+                        "[x]"
+                    }
+                    domain::TaskStatus::Skipped => "[-]",
                 };
-                let suffix = match task.status() {
-                    TaskStatus::DoneTraced { commit_hash } => format!(" {commit_hash}"),
+                let hash_note = match task.status() {
+                    domain::TaskStatus::DoneTraced { commit_hash } => {
+                        format!(" (`{}`)", commit_hash)
+                    }
                     _ => String::new(),
                 };
-                lines.push(format!("- [{marker}] {}{suffix}", task.description()));
+                lines.push(format!(
+                    "- {} **{}**: {}{}",
+                    status_label,
+                    task_id,
+                    task.description(),
+                    hash_note
+                ));
             }
         }
-
         lines.push(String::new());
     }
 
@@ -199,8 +423,34 @@ pub fn render_plan(track: &TrackMetadata) -> String {
 }
 
 fn next_command_for_track(track: &TrackSnapshot) -> String {
-    let raw = domain::track_phase::next_command(&track.track, track.schema_version);
-    format!("`{raw}`")
+    // Status is derived and cached in `derived_status`; use `resolve_phase_from_record`
+    // to avoid re-loading impl-plan.json. Parse the status string into `TrackStatus`.
+    let status = parse_track_status_str(track.derived_status.as_str());
+    let override_reason = track.track.status_override().map(|o| o.reason()).filter(|_| {
+        matches!(status, domain::TrackStatus::Blocked | domain::TrackStatus::Cancelled)
+    });
+    let info = domain::track_phase::resolve_phase_from_record(
+        track.track.id().as_ref(),
+        status,
+        track.track.branch().is_some(),
+        track.schema_version,
+        override_reason,
+    );
+    format!("`{}`", info.next_command)
+}
+
+/// Parses a track status string into `domain::TrackStatus`.
+/// Returns `TrackStatus::Planned` for unrecognized values.
+fn parse_track_status_str(s: &str) -> domain::TrackStatus {
+    match s {
+        "planned" => domain::TrackStatus::Planned,
+        "in_progress" => domain::TrackStatus::InProgress,
+        "done" => domain::TrackStatus::Done,
+        "blocked" => domain::TrackStatus::Blocked,
+        "cancelled" => domain::TrackStatus::Cancelled,
+        "archived" => domain::TrackStatus::Archived,
+        _ => domain::TrackStatus::Planned,
+    }
 }
 
 fn format_date(iso_timestamp: &str) -> &str {
@@ -216,8 +466,15 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
             matches!(track.status().as_ref(), "planned" | "in_progress" | "blocked" | "cancelled")
         })
         .collect();
+    // Deprioritise branchless planning-only tracks (schema_version 3, 4, or 5) so that
+    // an actual in-progress track wins the "Latest active track" slot.
+    // schema_version 2 branchless planned tracks are legacy pre-planning-only behaviour
+    // and are left in normal position (their branch semantics differ).
+    // Branchless planning-only shapes: schema versions 3, 4, and 5.
     active.sort_by_key(|track| {
-        track.schema_version == 3 && track.status() == "planned" && track.track.branch().is_none()
+        matches!(track.schema_version, 3..=5)
+            && track.status() == "planned"
+            && track.track.branch().is_none()
     });
     let completed: Vec<_> = tracks.iter().filter(|track| track.status() == "done").collect();
     let archived: Vec<_> = tracks.iter().filter(|track| track.status() == "archived").collect();
@@ -319,9 +576,18 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
 pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
     let snapshots = collect_track_snapshots(root)?;
     for snapshot in &snapshots {
+        // Only validate v5 (identity-only) tracks. Legacy v2/v3/v4 tracks
+        // predate the current renderer and their committed plan.md reflects
+        // whatever renderer shipped at their commit time. We intentionally
+        // don't touch them; re-validating would create a false OutOfSync for
+        // every legacy track without any actionable fix.
+        if snapshot.schema_version < 5 {
+            continue;
+        }
         let plan_path = snapshot.dir.join("plan.md");
         let actual = std::fs::read_to_string(&plan_path)?;
-        let expected = render_plan(&snapshot.track);
+        let impl_plan = load_impl_plan_opt(&snapshot.dir)?;
+        let expected = render_plan(&snapshot.track, impl_plan.as_ref());
         if !rendered_matches(&actual, &expected) {
             return Err(RenderError::OutOfSync {
                 path: plan_path,
@@ -350,7 +616,7 @@ pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
 fn validate_track_document(
     metadata_path: &Path,
     dir_name: Option<&std::ffi::OsStr>,
-    doc: &codec::TrackDocumentV2,
+    doc: &TrackSchemaPeek,
 ) -> Result<(), RenderError> {
     let Some(dir_name) = dir_name.and_then(std::ffi::OsStr::to_str) else {
         return Err(RenderError::InvalidTrackMetadata {
@@ -376,13 +642,6 @@ fn validate_track_document(
         }
     }
 
-    if !VALID_TRACK_STATUSES.contains(&doc.status.as_ref()) {
-        return Err(RenderError::InvalidTrackMetadata {
-            path: metadata_path.to_path_buf(),
-            reason: format!("Invalid track status '{}'", doc.status),
-        });
-    }
-
     let raw_json = std::fs::read_to_string(metadata_path).map_err(RenderError::Io)?;
     let raw_doc: serde_json::Value = serde_json::from_str(&raw_json).map_err(|source| {
         RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source: source.into() }
@@ -402,44 +661,32 @@ fn validate_track_document(
                 reason: format!("Missing required field '{missing}'"),
             });
         }
-    }
-
-    let (track, meta) = codec::decode(&raw_json).map_err(|source| {
-        RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source }
-    })?;
-
-    let derived = track.status().to_string();
-    if doc.status == "archived" {
-        if derived != "done" {
+        // For v3 tracks, validate the explicit `status` field from raw JSON.
+        let status_str = raw_doc.get("status").and_then(|v| v.as_str()).unwrap_or("");
+        if !VALID_TRACK_STATUSES.contains(&status_str) {
             return Err(RenderError::InvalidTrackMetadata {
                 path: metadata_path.to_path_buf(),
-                reason: format!(
-                    "Status drift: archived track must have all tasks resolved (done/skipped), but derived='{derived}'"
-                ),
+                reason: format!("Invalid track status '{status_str}'"),
             });
         }
-    } else if doc.status != derived {
-        return Err(RenderError::InvalidTrackMetadata {
-            path: metadata_path.to_path_buf(),
-            reason: format!(
-                "Status drift: metadata.status='{}' but derived='{}'",
-                doc.status, derived
-            ),
-        });
+        // For v3 planning-only tracks (no branch), only `planned` status is valid.
+        if doc.branch.is_none() && status_str != "planned" {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: metadata_path.to_path_buf(),
+                reason: "'branch' is required for v3 tracks unless the track is planning-only"
+                    .to_owned(),
+            });
+        }
     }
 
-    if doc.schema_version == 3
-        && doc.branch.is_none()
-        && !(doc.status == "planned" && derived == "planned")
-    {
-        return Err(RenderError::InvalidTrackMetadata {
-            path: metadata_path.to_path_buf(),
-            reason: "'branch' is required for v3 tracks unless the track is planning-only"
-                .to_owned(),
-        });
+    // For v5 tracks: decode via the authoritative codec and verify fields round-trip.
+    // `status` field absent in v5 — no drift check needed.
+    if doc.schema_version == 5 {
+        let (_track, _meta) = codec::decode(&raw_json).map_err(|source| {
+            RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source }
+        })?;
     }
 
-    let _ = meta;
     Ok(())
 }
 
@@ -483,12 +730,15 @@ pub fn sync_rendered_views(
             continue;
         }
         let json = std::fs::read_to_string(&metadata_path)?;
-        let parsed: codec::TrackDocumentV2 =
+        // Loose peek (same rationale as `collect_track_snapshots_inner`).
+        let parsed: TrackSchemaPeek =
             serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
                 path: metadata_path.clone(),
                 source: codec::CodecError::Json(source),
             })?;
-        if !matches!(parsed.schema_version, 2 | 3) {
+        // Schema version 5 is the identity-only format (no `status` field).
+        // Legacy v2/v3 tracks are also accepted for rendering.
+        if !matches!(parsed.schema_version, 2..=5) {
             return Err(RenderError::UnsupportedSchemaVersion {
                 path: metadata_path,
                 schema_version: parsed.schema_version,
@@ -505,13 +755,37 @@ pub fn sync_rendered_views(
         // protected because this function only looks at
         // `track/items/<track_id>` — passing an archived id resolves to a
         // missing metadata file and is silently skipped.
-        let is_done_or_archived = matches!(parsed.status.as_str(), "done" | "archived");
-
-        let (track, _) = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
-            path: metadata_path.clone(),
-            source,
-        })?;
-        let rendered = render_plan(&track);
+        //
+        // For v5 tracks, derive status from impl-plan.json + status_override.
+        // For legacy v2/v3 tracks, read the `status` field from raw JSON.
+        let (track, _) = if parsed.schema_version == 5 {
+            codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
+                path: metadata_path.clone(),
+                source,
+            })?
+        } else {
+            let raw: serde_json::Value =
+                serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
+                    path: metadata_path.clone(),
+                    source: codec::CodecError::Json(source),
+                })?;
+            decode_legacy_metadata(&raw, &metadata_path).map_err(|source| {
+                RenderError::InvalidMetadata { path: metadata_path.clone(), source }
+            })?
+        };
+        let impl_plan_for_status = load_impl_plan_opt(&track_dir)?;
+        let derived_status = if parsed.schema_version == 5 {
+            derive_track_status(impl_plan_for_status.as_ref(), track.status_override()).to_string()
+        } else {
+            // Legacy v2/v3: read explicit `status` from raw JSON.
+            serde_json::from_str::<serde_json::Value>(&json)
+                .ok()
+                .and_then(|v| v.get("status").and_then(|s| s.as_str()).map(str::to_owned))
+                .unwrap_or_else(|| "planned".to_owned())
+        };
+        let is_done_or_archived = matches!(derived_status.as_str(), "done" | "archived");
+        let impl_plan = load_impl_plan_opt(&track_dir)?;
+        let rendered = render_plan(&track, impl_plan.as_ref());
         let plan_path = track_dir.join("plan.md");
         let old = match std::fs::read_to_string(&plan_path) {
             Ok(content) => Some(content),
@@ -533,7 +807,11 @@ pub fn sync_rendered_views(
             let spec_json_content = std::fs::read_to_string(&spec_json_path)?;
             match spec::codec::decode(&spec_json_content) {
                 Ok(spec_doc) => {
-                    let rendered_spec = spec::render::render_spec(&spec_doc);
+                    // Load sibling task-coverage.json when present so that spec.md
+                    // aggregates task coverage annotations.
+                    let task_coverage = load_task_coverage_opt(&track_dir)?;
+                    let rendered_spec =
+                        spec::render::render_spec_with_coverage(&spec_doc, task_coverage.as_ref());
                     let spec_md_path = track_dir.join("spec.md");
                     // Read existing spec.md: propagate real I/O errors, treat NotFound as absent.
                     let old_spec = match std::fs::read_to_string(&spec_md_path) {
@@ -549,13 +827,26 @@ pub fn sync_rendered_views(
                         changed.push(spec_md_path);
                     }
                 }
-                Err(spec::codec::SpecCodecError::Json(_)) => {
-                    // Warn and continue only on JSON parse errors — file may be mid-edit.
-                    // Schema version and validation errors are hard failures that should surface.
+                Err(spec::codec::SpecCodecError::Json(ref json_err))
+                    if json_err.classify() == serde_json::error::Category::Syntax
+                        || json_err.classify() == serde_json::error::Category::Eof =>
+                {
+                    // Warn and continue only on JSON SYNTAX errors — file may be mid-edit.
+                    // Data errors (unknown field, wrong type, deny_unknown_fields violations)
+                    // are schema failures and must surface as hard errors. A v1 spec.json
+                    // with legacy fields like `status` now produces a Data error here.
                     eprintln!(
-                        "warning: skipping spec.md render for {} (malformed JSON)",
+                        "warning: skipping spec.md render for {} (malformed JSON syntax)",
                         track_dir.display()
                     );
+                }
+                Err(spec::codec::SpecCodecError::Json(_)) => {
+                    // JSON data/type error (unknown field, deny_unknown_fields, wrong type) —
+                    // this is a schema failure, not a syntax issue. Propagate as a hard error.
+                    return Err(RenderError::Io(std::io::Error::other(format!(
+                        "spec.json schema error at {}: JSON data error (v1 fields or unknown schema elements present)",
+                        track_dir.display()
+                    ))));
                 }
                 Err(e) => {
                     // Unsupported schema version or domain validation failure — propagate as I/O error
@@ -630,16 +921,16 @@ pub fn sync_rendered_views(
                         // file so the rendered markdown shows the evaluated Blue/Yellow/Red
                         // emojis instead of `—` placeholders. ADR 2026-04-18-1400 §D1
                         // moved signals out of the declaration file into the signal file;
-                        // the declaration codec (post-T007) returns `doc.signals() = None`,
-                        // so we have to read the signal file here and call `set_signals`
+                        // the declaration codec returns `doc.signals() = None`, so we
+                        // have to read the signal file here and call `set_signals`
                         // before rendering.
                         //
                         // Failure modes (missing / malformed / symlinked signal file) are
                         // non-fatal for view rendering — the resulting markdown just
-                        // falls back to `—` placeholders, consistent with the pre-T008
-                        // transitional state. The authoritative fail-closed path for
-                        // Missing/Stale lives in `spec_states::evaluate_layer_catalogue`
-                        // (T005), which is the verification gate, not the view renderer.
+                        // falls back to `—` placeholders. The authoritative fail-closed
+                        // path for Missing/Stale lives in
+                        // `spec_states::evaluate_layer_catalogue`, which is the
+                        // verification gate, not the view renderer.
                         let signal_path = track_dir.join(binding.signal_file());
                         // Use `symlink_metadata()` to detect symlinks: `is_file()` follows
                         // symlinks, which would allow a crafted symlink to inject arbitrary
@@ -661,8 +952,7 @@ pub fn sync_rendered_views(
                                     // evaluation. Fall back to `—` placeholders
                                     // on mismatch — the authoritative fail-closed
                                     // response to stale signals lives in
-                                    // `spec_states::evaluate_layer_catalogue`
-                                    // (T005).
+                                    // `spec_states::evaluate_layer_catalogue`.
                                     let current_hash = type_signals_codec::declaration_hash(
                                         catalogue_content.as_bytes(),
                                     );
@@ -723,8 +1013,8 @@ pub fn sync_rendered_views(
             // are non-fatal for this view: log to stderr and continue without
             // aborting the wider sync. The authoritative fail-closed path for
             // TDDD semantic correctness lives in
-            // `spec_states::evaluate_layer_catalogue` (T005) and the
-            // merge-gate adapter (T007 follow-up).
+            // `spec_states::evaluate_layer_catalogue` and the merge-gate
+            // adapter.
             render_contract_map_view(root, &track_dir, track_id, &mut changed);
         } // end if !is_done_or_archived
     }
@@ -820,27 +1110,40 @@ fn render_contract_map_view(
 mod tests {
     use super::*;
 
-    fn sample_metadata_json(id: &str, status: &str, updated_at: &str, tasks_json: &str) -> String {
+    /// Generates a v5 metadata.json string (no `status` field).
+    /// The `status` parameter is accepted for API compatibility but is ignored
+    /// since v5 derives status from impl-plan.json at runtime.
+    /// The `tasks_json` parameter is also ignored (tasks live in impl-plan.json).
+    fn sample_metadata_json(
+        id: &str,
+        _status: &str,
+        updated_at: &str,
+        _tasks_json: &str,
+    ) -> String {
         sample_metadata_json_with_schema_and_branch(
-            3,
+            5,
             id,
-            status,
+            _status,
             updated_at,
-            tasks_json,
+            _tasks_json,
             Some(&format!("track/{id}")),
         )
     }
 
     fn sample_metadata_json_with_branch(
         id: &str,
-        status: &str,
+        _status: &str,
         updated_at: &str,
-        tasks_json: &str,
+        _tasks_json: &str,
         branch: Option<&str>,
     ) -> String {
-        sample_metadata_json_with_schema_and_branch(3, id, status, updated_at, tasks_json, branch)
+        sample_metadata_json_with_schema_and_branch(5, id, _status, updated_at, _tasks_json, branch)
     }
 
+    /// Generates a metadata.json string.
+    ///
+    /// For `schema_version == 5`: emits v5 format (no `status`, no `tasks`/`plan`).
+    /// For `schema_version < 5`: emits legacy format with `status`, `tasks`, and `plan`.
     fn sample_metadata_json_with_schema_and_branch(
         schema_version: u32,
         id: &str,
@@ -853,8 +1156,23 @@ mod tests {
             Some(branch) => format!(r#""branch": "{branch}","#),
             None => r#""branch": null,"#.to_owned(),
         };
-        format!(
-            r#"{{
+        if schema_version >= 5 {
+            // v5: no `status`, no `tasks`, no `plan`
+            format!(
+                r#"{{
+  "schema_version": {schema_version},
+  "id": "{id}",
+  {branch_field}
+  "title": "Title {id}",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "{updated_at}"
+}}
+"#
+            )
+        } else {
+            // Legacy v2/v3: include `status`, `tasks`, `plan`
+            format!(
+                r#"{{
   "schema_version": {schema_version},
   "id": "{id}",
   {branch_field}
@@ -876,11 +1194,84 @@ mod tests {
   }}
 }}
 "#
-        )
+            )
+        }
+    }
+
+    /// Build an `ImplPlanDocument` from flat task + section specs.
+    ///
+    /// - `tasks`: `(id, description, status_str, commit_hash_opt)` where
+    ///   status_str is `"todo" | "in_progress" | "done_pending" | "done_traced" | "skipped"`
+    /// - `sections`: `(section_id, section_title, task_ids_slice)`
+    fn make_impl_plan_with_tasks(
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str])],
+    ) -> domain::ImplPlanDocument {
+        make_impl_plan_with_summary_and_tasks(&[], tasks, sections)
+    }
+
+    fn make_impl_plan_with_summary_and_tasks(
+        summary: &[&str],
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str])],
+    ) -> domain::ImplPlanDocument {
+        let sections_with_desc: Vec<(&str, &str, &[&str], &[&str])> = sections
+            .iter()
+            .map(|(id, title, task_ids)| (*id, *title, *task_ids, [].as_slice()))
+            .collect();
+        make_impl_plan_inner(summary, tasks, &sections_with_desc)
+    }
+
+    fn make_impl_plan_with_desc_and_tasks(
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str], &[&str])],
+    ) -> domain::ImplPlanDocument {
+        make_impl_plan_inner(&[], tasks, sections)
+    }
+
+    fn make_impl_plan_inner(
+        summary: &[&str],
+        tasks: &[(&str, &str, &str, Option<&str>)],
+        sections: &[(&str, &str, &[&str], &[&str])],
+    ) -> domain::ImplPlanDocument {
+        use domain::{CommitHash, PlanSection, PlanView, TaskId, TaskStatus, TrackTask};
+
+        let domain_tasks: Vec<TrackTask> = tasks
+            .iter()
+            .map(|(id, desc, status_str, hash)| {
+                let task_id = TaskId::try_new(id.to_string()).unwrap();
+                let status = match *status_str {
+                    "todo" => TaskStatus::Todo,
+                    "in_progress" => TaskStatus::InProgress,
+                    "done_pending" => TaskStatus::DonePending,
+                    "done_traced" => {
+                        let h = CommitHash::try_new(hash.unwrap_or("abc1234")).unwrap();
+                        TaskStatus::DoneTraced { commit_hash: h }
+                    }
+                    "skipped" => TaskStatus::Skipped,
+                    other => panic!("unknown status: {other}"),
+                };
+                TrackTask::with_status(task_id, *desc, status).unwrap()
+            })
+            .collect();
+
+        let domain_sections: Vec<PlanSection> = sections
+            .iter()
+            .map(|(sid, stitle, task_ids, desc)| {
+                let tids: Vec<TaskId> =
+                    task_ids.iter().map(|t| TaskId::try_new(t.to_string()).unwrap()).collect();
+                PlanSection::new(*sid, *stitle, desc.iter().map(|s| s.to_string()).collect(), tids)
+                    .unwrap()
+            })
+            .collect();
+
+        let plan = PlanView::new(summary.iter().map(|s| s.to_string()).collect(), domain_sections);
+        domain::ImplPlanDocument::new(domain_tasks, plan).unwrap()
     }
 
     #[test]
     fn render_plan_matches_expected_layout() {
+        // render_plan with None impl_plan renders header, title, and impl-plan stub note.
         let json = sample_metadata_json(
             "track-a",
             "planned",
@@ -895,18 +1286,18 @@ mod tests {
         );
         let (track, _) = codec::decode(&json).unwrap();
 
-        let rendered = render_plan(&track);
+        let rendered = render_plan(&track, None);
 
-        assert!(rendered.contains("<!-- Generated from metadata.json"));
+        assert!(rendered.contains("<!-- Generated from metadata.json + impl-plan.json"));
         assert!(rendered.contains("# Title track-a"));
-        assert!(rendered.contains("## Section"));
-        assert!(rendered.contains("- [ ] First task"));
+        assert!(rendered.contains("impl-plan.json"), "None case must mention impl-plan.json");
     }
 
-    // --- T008/T009: render_plan marker tests ---
+    // --- render_plan marker tests ---
 
     #[test]
     fn render_plan_marks_in_progress_task_with_tilde() {
+        // With an impl-plan containing an in-progress task, [~] marker appears.
         let json = sample_metadata_json(
             "track-a",
             "in_progress",
@@ -916,15 +1307,21 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Working task", "in_progress", None)],
+            &[("S1", "Section", &["T001"])],
+        );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
         assert!(
-            rendered.contains("- [~] Working task"),
-            "expected in_progress marker `[~]` for in_progress task:\n{rendered}"
+            rendered.contains("[~]"),
+            "[~] marker must appear for in_progress task:\n{rendered}"
         );
     }
 
     #[test]
     fn render_plan_marks_done_task_with_short_commit_hash() {
+        // Done task with commit hash renders [x] marker and hash note.
         let json = sample_metadata_json(
             "track-a",
             "done",
@@ -939,15 +1336,19 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
-        assert!(
-            rendered.contains("- [x] Completed task abc1234"),
-            "expected done marker `[x] <desc> <hash>`:\n{rendered}"
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Completed task", "done_traced", Some("abc1234"))],
+            &[("S1", "Section", &["T001"])],
         );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
+        assert!(rendered.contains("[x]"), "[x] marker must appear for done task:\n{rendered}");
+        assert!(rendered.contains("abc1234"), "commit hash must appear:\n{rendered}");
     }
 
     #[test]
     fn render_plan_done_without_commit_hash_omits_literal_none() {
+        // Done task without commit hash renders [x] but no "None" string.
         let json = sample_metadata_json(
             "track-a",
             "done",
@@ -957,19 +1358,24 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Untraced done", "done_pending", None)],
+            &[("S1", "Section", &["T001"])],
+        );
+        let rendered = render_plan(&track, Some(&impl_plan));
         assert!(
-            rendered.contains("- [x] Untraced done"),
-            "expected done marker `[x] <desc>`:\n{rendered}"
+            !rendered.contains("None"),
+            "literal 'None' must never appear in rendered plan:\n{rendered}"
         );
         assert!(
-            !rendered.contains("- [x] Untraced done None"),
-            "literal 'None' must not be rendered for done without commit_hash:\n{rendered}"
+            rendered.contains("[x]"),
+            "[x] marker must appear for done_pending task:\n{rendered}"
         );
     }
 
     #[test]
     fn render_plan_marks_skipped_task_with_dash() {
+        // Skipped task renders with [-] marker.
         let json = sample_metadata_json(
             "track-a",
             "done",
@@ -979,109 +1385,86 @@ mod tests {
   ]"#,
         );
         let (track, _) = codec::decode(&json).unwrap();
-        let rendered = render_plan(&track);
-        assert!(
-            rendered.contains("- [-] Skipped task"),
-            "expected skipped marker `[-] <desc>`:\n{rendered}"
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Skipped task", "skipped", None)],
+            &[("S1", "Section", &["T001"])],
         );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
+        assert!(rendered.contains("[-]"), "[-] marker must appear for skipped task:\n{rendered}");
     }
 
     #[test]
     fn render_plan_preserves_multi_section_order() {
-        // Two sections S1 and S2; S1 must render before S2.
+        // Sections rendered in order (S1 before S2).
+        // Uses v5 metadata JSON (no `status`/`tasks`/`plan` fields).
         let json = r#"{
-  "schema_version": 3,
+  "schema_version": 5,
   "id": "track-a",
   "branch": "track/track-a",
   "title": "Title track-a",
-  "status": "planned",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T01:00:00Z",
-  "tasks": [
-    { "id": "T001", "description": "Task one",   "status": "todo" },
-    { "id": "T002", "description": "Task two",   "status": "todo" }
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      { "id": "S1", "title": "First Section",  "description": [], "task_ids": ["T001"] },
-      { "id": "S2", "title": "Second Section", "description": [], "task_ids": ["T002"] }
-    ]
-  }
+  "updated_at": "2026-03-13T01:00:00Z"
 }"#;
         let (track, _) = codec::decode(json).unwrap();
-        let rendered = render_plan(&track);
-        let first_idx = rendered.find("## First Section").expect("S1 header missing");
-        let second_idx = rendered.find("## Second Section").expect("S2 header missing");
-        assert!(
-            first_idx < second_idx,
-            "section order not preserved: S1 at {first_idx}, S2 at {second_idx}"
+        let impl_plan = make_impl_plan_with_tasks(
+            &[("T001", "Task one", "todo", None), ("T002", "Task two", "todo", None)],
+            &[("S1", "First Section", &["T001"]), ("S2", "Second Section", &["T002"])],
         );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
+        let s1_pos = rendered.find("First Section").expect("S1 not found");
+        let s2_pos = rendered.find("Second Section").expect("S2 not found");
+        assert!(s1_pos < s2_pos, "S1 must appear before S2:\n{rendered}");
     }
 
     #[test]
     fn render_plan_places_summary_after_generated_header() {
+        // Summary lines appear after the header and before task sections.
+        // Uses v5 metadata JSON.
         let json = r#"{
-  "schema_version": 3,
+  "schema_version": 5,
   "id": "track-a",
   "branch": "track/track-a",
   "title": "Title track-a",
-  "status": "planned",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T01:00:00Z",
-  "tasks": [
-    { "id": "T001", "description": "Task", "status": "todo" }
-  ],
-  "plan": {
-    "summary": ["Summary line one", "Summary line two"],
-    "sections": [
-      { "id": "S1", "title": "Section", "description": [], "task_ids": ["T001"] }
-    ]
-  }
+  "updated_at": "2026-03-13T01:00:00Z"
 }"#;
         let (track, _) = codec::decode(json).unwrap();
-        let rendered = render_plan(&track);
-        let header_idx =
-            rendered.find("<!-- Generated from metadata.json").expect("generated header missing");
-        let summary_idx = rendered.find("Summary line one").expect("summary line missing");
-        let section_idx = rendered.find("## Section").expect("section header missing");
-        assert!(
-            header_idx < summary_idx,
-            "summary must follow the generated header: header={header_idx}, summary={summary_idx}"
+        let impl_plan = make_impl_plan_with_summary_and_tasks(
+            &["Summary line one", "Summary line two"],
+            &[("T001", "Task", "todo", None)],
+            &[("S1", "Section", &["T001"])],
         );
-        assert!(
-            summary_idx < section_idx,
-            "summary must precede sections: summary={summary_idx}, section={section_idx}"
-        );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        let header_idx = rendered
+            .find("<!-- Generated from metadata.json + impl-plan.json")
+            .expect("generated header missing");
+        let summary_idx = rendered.find("Summary line one").expect("summary not found");
+        let tasks_idx = rendered.find("## Tasks").expect("tasks section not found");
+        assert!(header_idx < summary_idx, "header must precede summary:\n{rendered}");
+        assert!(summary_idx < tasks_idx, "summary must precede tasks:\n{rendered}");
     }
 
     #[test]
     fn render_plan_renders_section_description_lines() {
+        // Section description lines appear as blockquotes under the section heading.
+        // Uses v5 metadata JSON.
         let json = r#"{
-  "schema_version": 3,
+  "schema_version": 5,
   "id": "track-a",
   "branch": "track/track-a",
   "title": "Title track-a",
-  "status": "planned",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T01:00:00Z",
-  "tasks": [
-    { "id": "T001", "description": "Task", "status": "todo" }
-  ],
-  "plan": {
-    "summary": [],
-    "sections": [
-      {
-        "id": "S1",
-        "title": "Section",
-        "description": ["Describe the section goal", "Additional context"],
-        "task_ids": ["T001"]
-      }
-    ]
-  }
+  "updated_at": "2026-03-13T01:00:00Z"
 }"#;
         let (track, _) = codec::decode(json).unwrap();
-        let rendered = render_plan(&track);
+        let impl_plan = make_impl_plan_with_desc_and_tasks(
+            &[("T001", "Task", "todo", None)],
+            &[("S1", "Section", &["T001"], &["Describe the section goal", "Additional context"])],
+        );
+        let rendered = render_plan(&track, Some(&impl_plan));
+        assert!(rendered.contains("# Title track-a"), "title must appear:\n{rendered}");
         assert!(
             rendered.contains("Describe the section goal"),
             "first description line missing:\n{rendered}"
@@ -1092,69 +1475,63 @@ mod tests {
         );
     }
 
+    /// Decodes v5 metadata JSON and returns a `TrackSnapshot` with a specified `derived_status`.
+    /// For test use only: allows setting an explicit `derived_status` without impl-plan.json I/O.
+    fn make_snapshot_v5(
+        json: &str,
+        derived_status: &str,
+        schema_version: u32,
+        dir: PathBuf,
+    ) -> TrackSnapshot {
+        let (track, meta) = codec::decode(json).unwrap();
+        TrackSnapshot {
+            dir,
+            track,
+            meta,
+            schema_version,
+            derived_status: derived_status.to_owned(),
+        }
+    }
+
+    /// Decodes legacy v2/v3 metadata JSON and returns a `TrackSnapshot`.
+    /// The `derived_status` is read from the raw JSON `status` field.
+    fn make_snapshot_legacy(json: &str, schema_version: u32, dir: PathBuf) -> TrackSnapshot {
+        let raw: serde_json::Value = serde_json::from_str(json).unwrap();
+        let status = raw.get("status").and_then(|v| v.as_str()).unwrap_or("planned").to_owned();
+        let (track, meta) = decode_legacy_metadata(&raw, std::path::Path::new("test")).unwrap();
+        TrackSnapshot { dir, track, meta, schema_version, derived_status: status }
+    }
+
     #[test]
     fn render_registry_places_active_completed_and_archived() {
-        let active_json = sample_metadata_json(
-            "track-a",
-            "planned",
-            "2026-03-13T02:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
-        );
-        let done_json = sample_metadata_json(
+        // Active track is v5 (no `status` field; derived status = "planned").
+        // Done and archived tracks use legacy v3 JSON (status field present).
+        let active_json = sample_metadata_json("track-a", "planned", "2026-03-13T02:00:00Z", "[]");
+        let done_json = sample_metadata_json_with_schema_and_branch(
+            3,
             "track-b",
             "done",
             "2026-03-13T01:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "done",
-      "commit_hash": "abc1234"
-    }
-  ]"#,
+            r#"[{"id":"T001","description":"First task","status":"done","commit_hash":"abc1234"}]"#,
+            Some("track/track-b"),
         );
-        let archived_json = sample_metadata_json(
+        let archived_json = sample_metadata_json_with_schema_and_branch(
+            3,
             "track-c",
             "archived",
             "2026-03-13T00:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            Some("track/track-c"),
         );
 
-        let (active_track, active_meta) = codec::decode(&active_json).unwrap();
-        let (done_track, done_meta) = codec::decode(&done_json).unwrap();
-        let (archived_track, archived_meta) = codec::decode(&archived_json).unwrap();
-        let rendered = render_registry(&[
-            TrackSnapshot {
-                dir: PathBuf::from("track/items/track-a"),
-                track: active_track,
-                meta: active_meta,
-                schema_version: 3,
-            },
-            TrackSnapshot {
-                dir: PathBuf::from("track/items/track-b"),
-                track: done_track,
-                meta: done_meta,
-                schema_version: 3,
-            },
-            TrackSnapshot {
-                dir: PathBuf::from("track/archive/track-c"),
-                track: archived_track,
-                meta: archived_meta,
-                schema_version: 3,
-            },
-        ]);
+        let active_snapshot =
+            make_snapshot_v5(&active_json, "planned", 5, PathBuf::from("track/items/track-a"));
+        let done_snapshot =
+            make_snapshot_legacy(&done_json, 3, PathBuf::from("track/items/track-b"));
+        let archived_snapshot =
+            make_snapshot_legacy(&archived_json, 3, PathBuf::from("track/archive/track-c"));
+
+        let rendered = render_registry(&[active_snapshot, done_snapshot, archived_snapshot]);
 
         assert!(rendered.contains("| track-a | planned | `/track:implement` | 2026-03-13 |"));
         assert!(rendered.contains("| track-b | Done | 2026-03-13 |"));
@@ -1163,26 +1540,17 @@ mod tests {
 
     #[test]
     fn render_registry_routes_branchless_planning_track_to_activate() {
+        // v5 branchless planned track → no branch, derived_status = "planned"
         let plan_only_json = sample_metadata_json_with_branch(
             "track-a",
             "planned",
             "2026-03-13T02:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+            "[]",
             None,
         );
-        let (plan_only_track, plan_only_meta) = codec::decode(&plan_only_json).unwrap();
-        let rendered = render_registry(&[TrackSnapshot {
-            dir: PathBuf::from("track/items/track-a"),
-            track: plan_only_track,
-            meta: plan_only_meta,
-            schema_version: 3,
-        }]);
+        let snapshot =
+            make_snapshot_v5(&plan_only_json, "planned", 5, PathBuf::from("track/items/track-a"));
+        let rendered = render_registry(&[snapshot]);
 
         assert!(rendered.contains("/track:activate track-a"));
         assert!(rendered.contains("/track:plan-only <feature>"));
@@ -1190,27 +1558,17 @@ mod tests {
 
     #[test]
     fn render_registry_keeps_legacy_v2_branchless_planned_track_on_implement() {
+        // Legacy v2 track uses the legacy decode path.
         let legacy_json = sample_metadata_json_with_schema_and_branch(
             2,
             "track-a",
             "planned",
             "2026-03-13T02:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
             None,
         );
-        let (legacy_track, legacy_meta) = codec::decode(&legacy_json).unwrap();
-        let rendered = render_registry(&[TrackSnapshot {
-            dir: PathBuf::from("track/items/track-a"),
-            track: legacy_track,
-            meta: legacy_meta,
-            schema_version: 2,
-        }]);
+        let snapshot = make_snapshot_legacy(&legacy_json, 2, PathBuf::from("track/items/track-a"));
+        let rendered = render_registry(&[snapshot]);
 
         assert!(rendered.contains("/track:implement"));
         assert!(!rendered.contains("/track:activate track-a"));
@@ -1218,47 +1576,29 @@ mod tests {
 
     #[test]
     fn render_registry_prefers_materialized_active_track_in_current_focus() {
+        // Both are v5: no branch (plan-only) vs with branch (materialized).
         let plan_only_json = sample_metadata_json_with_branch(
             "track-plan-only",
             "planned",
             "2026-03-13T03:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+            "[]",
             None,
         );
-        let materialized_json = sample_metadata_json(
-            "track-materialized",
+        let materialized_json =
+            sample_metadata_json("track-materialized", "planned", "2026-03-13T02:00:00Z", "[]");
+        let plan_only_snap = make_snapshot_v5(
+            &plan_only_json,
             "planned",
-            "2026-03-13T02:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+            5,
+            PathBuf::from("track/items/track-plan-only"),
         );
-        let (plan_only_track, plan_only_meta) = codec::decode(&plan_only_json).unwrap();
-        let (materialized_track, materialized_meta) = codec::decode(&materialized_json).unwrap();
-        let rendered = render_registry(&[
-            TrackSnapshot {
-                dir: PathBuf::from("track/items/track-plan-only"),
-                track: plan_only_track,
-                meta: plan_only_meta,
-                schema_version: 3,
-            },
-            TrackSnapshot {
-                dir: PathBuf::from("track/items/track-materialized"),
-                track: materialized_track,
-                meta: materialized_meta,
-                schema_version: 3,
-            },
-        ]);
+        let materialized_snap = make_snapshot_v5(
+            &materialized_json,
+            "planned",
+            5,
+            PathBuf::from("track/items/track-materialized"),
+        );
+        let rendered = render_registry(&[plan_only_snap, materialized_snap]);
 
         assert!(rendered.contains("- Latest active track: `track-materialized`"));
         assert!(rendered.contains("- Next recommended command: `/track:implement`"));
@@ -1266,49 +1606,32 @@ mod tests {
 
     #[test]
     fn render_registry_prefers_legacy_v2_planned_track_over_newer_plan_only() {
+        // Legacy v2 (no branch) vs v5 plan-only (no branch, schema_version 5).
+        // The v2 legacy track should be preferred (lower priority sort key).
         let legacy_json = sample_metadata_json_with_schema_and_branch(
             2,
             "track-legacy",
             "planned",
             "2026-03-13T02:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
             None,
         );
         let plan_only_json = sample_metadata_json_with_branch(
             "track-plan-only",
             "planned",
             "2026-03-13T03:00:00Z",
-            r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+            "[]",
             None,
         );
-        let (legacy_track, legacy_meta) = codec::decode(&legacy_json).unwrap();
-        let (plan_only_track, plan_only_meta) = codec::decode(&plan_only_json).unwrap();
-        let rendered = render_registry(&[
-            TrackSnapshot {
-                dir: PathBuf::from("track/items/track-plan-only"),
-                track: plan_only_track,
-                meta: plan_only_meta,
-                schema_version: 3,
-            },
-            TrackSnapshot {
-                dir: PathBuf::from("track/items/track-legacy"),
-                track: legacy_track,
-                meta: legacy_meta,
-                schema_version: 2,
-            },
-        ]);
+        let legacy_snap =
+            make_snapshot_legacy(&legacy_json, 2, PathBuf::from("track/items/track-legacy"));
+        let plan_only_snap = make_snapshot_v5(
+            &plan_only_json,
+            "planned",
+            5,
+            PathBuf::from("track/items/track-plan-only"),
+        );
+        let rendered = render_registry(&[plan_only_snap, legacy_snap]);
 
         assert!(rendered.contains("- Latest active track: `track-legacy`"));
         assert!(rendered.contains("- Next recommended command: `/track:implement`"));
@@ -1344,7 +1667,7 @@ mod tests {
         assert!(dir.path().join("track/registry.md").is_file());
     }
 
-    // --- T011/T012: registry / snapshot boundary tests ---
+    // --- registry / snapshot boundary tests ---
 
     #[test]
     fn collect_track_snapshots_ignores_plain_files_under_items() {
@@ -1527,19 +1850,17 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
+        // v5 identity-only metadata — v2/v3/v4 legacy tracks are intentionally
+        // skipped by `validate_track_snapshots` so only v5 mismatches surface.
         std::fs::write(
             track_dir.join("metadata.json"),
-            sample_metadata_json(
+            sample_metadata_json_with_schema_and_branch(
+                5,
                 "track-a",
                 "planned",
                 "2026-03-13T02:00:00Z",
-                r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+                "[]",
+                Some("track/track-a"),
             ),
         )
         .unwrap();
@@ -1588,26 +1909,23 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // v5 identity-only metadata so the plan.md freshness check runs and
+        // passes before we reach the registry.md check.
         std::fs::write(
-            track_dir.join("metadata.json"),
-            sample_metadata_json(
+            &metadata_path,
+            sample_metadata_json_with_schema_and_branch(
+                5,
                 "track-a",
                 "planned",
                 "2026-03-13T02:00:00Z",
-                r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+                "[]",
+                Some("track/track-a"),
             ),
         )
         .unwrap();
-        let (track, _) =
-            codec::decode(&std::fs::read_to_string(track_dir.join("metadata.json")).unwrap())
-                .unwrap();
-        std::fs::write(track_dir.join("plan.md"), render_plan(&track)).unwrap();
+        let (track, _) = codec::decode(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        std::fs::write(track_dir.join("plan.md"), render_plan(&track, None)).unwrap();
         std::fs::create_dir_all(dir.path().join("track")).unwrap();
         std::fs::write(dir.path().join("track/registry.md"), "# stale registry\n").unwrap();
 
@@ -1617,23 +1935,20 @@ mod tests {
 
     #[test]
     fn validate_track_document_accepts_planning_only_v3_without_branch() {
+        // Validates legacy v3 behavior. Uses explicit v3 JSON (with `status`
+        // field) since `sample_metadata_json_with_branch` now generates v5.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
         std::fs::write(
             &metadata_path,
-            sample_metadata_json_with_branch(
+            sample_metadata_json_with_schema_and_branch(
+                3,
                 "track-a",
                 "planned",
                 "2026-03-13T02:00:00Z",
-                r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "todo"
-    }
-  ]"#,
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
                 None,
             ),
         )
@@ -1648,23 +1963,19 @@ mod tests {
 
     #[test]
     fn validate_track_document_rejects_non_planning_v3_without_branch() {
+        // Validates legacy v3 behavior. Uses explicit v3 JSON.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
         std::fs::write(
             &metadata_path,
-            sample_metadata_json_with_branch(
+            sample_metadata_json_with_schema_and_branch(
+                3,
                 "track-a",
                 "in_progress",
                 "2026-03-13T02:00:00Z",
-                r#"[
-    {
-      "id": "T001",
-      "description": "First task",
-      "status": "in_progress"
-    }
-  ]"#,
+                r#"[{"id":"T001","description":"First task","status":"in_progress"}]"#,
                 None,
             ),
         )
@@ -1724,6 +2035,9 @@ mod tests {
 
     #[test]
     fn validate_track_document_rejects_v3_track_missing_tasks_field() {
+        // tasks/plan fields are stripped by codec::decode() during the v2/v3 migration window.
+        // A v3 document missing 'tasks' still decodes successfully (stripped) → Ok.
+        // The "Missing required field 'tasks'" check is not enforced (tasks moved to ImplPlanDocument).
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -1754,18 +2068,21 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        assert!(err.to_string().contains("Missing required field 'tasks'"));
+        assert!(
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "v3 doc missing 'tasks' field is accepted (tasks stripped during migration)"
+        );
     }
 
     #[test]
     fn validate_track_document_rejects_unreferenced_task() {
+        // tasks/plan fields are stripped by codec::decode() during the v2/v3 migration window.
+        // An unreferenced task in a v3 doc no longer causes a validate error (tasks moved to ImplPlanDocument).
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // T002 is declared in tasks but not referenced from any plan section.
+        // T002 is declared in tasks but not referenced from any plan section (legacy v3 doc).
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1791,22 +2108,21 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
         assert!(
-            message.contains("T002"),
-            "error should reference unreferenced task id T002: {message}"
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "v3 doc with unreferenced task is accepted (tasks/plan stripped during migration)"
         );
     }
 
     #[test]
     fn validate_track_document_rejects_duplicate_task_reference() {
+        // Duplicate task_ids in plan sections are an ImplPlanDocument concern.
+        // validate_track_document strips tasks/plan fields via codec::decode(); no error expected.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // T001 is referenced by both S1 and S2 sections.
+        // T001 is referenced by both S1 and S2 sections (legacy v3 format).
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1832,22 +2148,23 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
+        // Duplicate plan references are no longer checked at this layer.
+        // Document should decode successfully (tasks/plan stripped by codec).
         assert!(
-            message.contains("T001"),
-            "error should reference duplicated task id T001: {message}"
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "duplicate plan ref check moved to ImplPlanDocument"
         );
     }
 
     #[test]
     fn validate_track_document_rejects_status_drift_in_progress_vs_done() {
+        // Status is stored explicitly in legacy tracks (not task-derived).
+        // The stored metadata.status is the authoritative source; task states are ignored.
+        // The old task-derived drift check is gone — this document now passes validation.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // metadata.status is "in_progress" but all tasks are done (derived = "done").
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1877,19 +2194,24 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
-        assert!(message.contains("Status drift"), "error should mention status drift: {message}");
+        // Task-derived status drift check removed; stored status is authoritative.
+        // doc.status="in_progress" → decoded status="in_progress" → no drift → Ok.
+        assert!(
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "task-derived status drift check removed; stored status is authoritative"
+        );
     }
 
     #[test]
     fn validate_track_document_rejects_archived_with_incomplete_tasks() {
+        // "archived must have all tasks resolved" is now an ImplPlanDocument concern.
+        // validate_track_document no longer checks task states (stripped by codec::decode()).
+        // A v3 archived track with a todo task decodes correctly with the identity-only semantics.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata_path = track_dir.join("metadata.json");
-        // metadata.status is "archived" but one task is still "todo".
+        // metadata.status is "archived" — tasks are ignored under identity-only semantics.
         std::fs::write(
             &metadata_path,
             r#"{
@@ -1914,12 +2236,11 @@ mod tests {
         .unwrap();
 
         let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
-        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
-
-        let message = err.to_string();
+        // Task-completion check for archived tracks moved to ImplPlanDocument.
+        // Document should now decode without error (status=archived is valid; tasks stripped).
         assert!(
-            message.contains("archived track must have all tasks resolved"),
-            "error should mention archived+incomplete rejection: {message}"
+            validate_track_document(&metadata_path, track_dir.file_name(), &doc).is_ok(),
+            "archived+incomplete check moved to ImplPlanDocument"
         );
     }
 
@@ -1969,12 +2290,11 @@ mod tests {
         )
         .unwrap();
 
-        // Write a minimal spec.json
+        // Write a minimal spec.json (schema v2: no status field)
         std::fs::write(
             track_dir.join("spec.json"),
             r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Alpha",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -2041,8 +2361,7 @@ mod tests {
         .unwrap();
 
         let spec_json = r#"{
-  "schema_version": 1,
-  "status": "draft",
+  "schema_version": 2,
   "version": "1.0",
   "title": "Feature Beta",
   "scope": { "in_scope": [], "out_of_scope": [] }
@@ -2106,10 +2425,12 @@ mod tests {
         )
         .unwrap();
 
-        // Valid JSON but unsupported schema version — must propagate as an error
+        // Valid JSON but unsupported schema version — must propagate as an error.
+        // Note: no legacy fields (e.g. "status") here; deny_unknown_fields would turn those
+        // into a Json error, which is warn-and-continue. This tests the version gate path.
         std::fs::write(
             track_dir.join("spec.json"),
-            r#"{"schema_version":99,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+            r#"{"schema_version":99,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
         )
         .unwrap();
 
@@ -2160,12 +2481,11 @@ mod tests {
 
     #[test]
     fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
-        // Regression guard for the T007 codec-strip follow-up: after the
-        // declaration codec stopped surfacing inline signals, the rendered
-        // `<layer>-types.md` lost its signal-column emojis and fell back to
-        // `—`. `sync_rendered_views` must read the companion
-        // `<layer>-type-signals.json` file and populate `doc.signals()`
-        // before rendering so the markdown reflects the evaluated state.
+        // Regression guard: after the declaration codec stopped surfacing inline
+        // signals, the rendered `<layer>-types.md` lost its signal-column emojis
+        // and fell back to `—`. `sync_rendered_views` must read the companion
+        // `<layer>-type-signals.json` file and populate `doc.signals()` before
+        // rendering so the markdown reflects the evaluated state.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -2220,8 +2540,8 @@ mod tests {
         // `<layer>-types.md` must NOT paint misleading Blue emojis from the
         // old evaluation. Fall back to `—` placeholders instead. The
         // authoritative fail-closed behavior for stale signals lives in
-        // `spec_states::evaluate_layer_catalogue` (T005); the renderer
-        // just avoids misrepresenting the state to a reviewer.
+        // `spec_states::evaluate_layer_catalogue`; the renderer just avoids
+        // misrepresenting the state to a reviewer.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -2438,8 +2758,9 @@ mod tests {
         // explicitly asked to render that track. The done/archived skip is a
         // bulk-sync-only protection and must NOT apply to single-track sync,
         // otherwise the final `in_progress → done` transition of an active
-        // track freezes plan.md in its pre-done state (task checkboxes do not
-        // flip to `[x]`).
+        // track freezes plan.md in its pre-done state.
+        //
+        // Verify that single-track sync overwrites stale plan.md and renders the title.
         let dir = tempfile::tempdir().unwrap();
 
         let done_dir = dir.path().join("track/items/track-done");
@@ -2463,7 +2784,8 @@ mod tests {
         // plan.md must be freshly rendered (sentinel overwritten).
         let plan = std::fs::read_to_string(done_dir.join("plan.md")).unwrap();
         assert_ne!(plan, "STALE_SENTINEL_MUST_BE_OVERWRITTEN");
-        assert!(plan.contains("Done task"));
+        // Verify title and stub note are present.
+        assert!(plan.contains("# Title track-done"), "title must appear in plan.md:\n{plan}");
         assert!(changed.iter().any(|p| p.ends_with("track-done/plan.md")));
     }
 
@@ -2478,20 +2800,26 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let done_dir = dir.path().join("track/items/track-done-spec");
         std::fs::create_dir_all(&done_dir).unwrap();
+        // v5 identity-only metadata. Derived status comes from impl-plan.json
+        // below (all tasks done → status = Done).
         std::fs::write(
             done_dir.join("metadata.json"),
-            sample_metadata_json(
-                "track-done-spec",
-                "done",
-                "2026-03-10T00:00:00Z",
-                r#"[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}]"#,
-            ),
+            sample_metadata_json("track-done-spec", "done", "2026-03-10T00:00:00Z", "[]"),
         )
         .unwrap();
-        // Minimal spec.json so the render code path is reachable.
+        // impl-plan.json with an all-done task list so the derived track status
+        // resolves to Done and the done-branch render path is exercised.
+        std::fs::write(
+            done_dir.join("impl-plan.json"),
+            r#"{"schema_version":1,"tasks":[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"All","task_ids":["T001"]}]}}"#,
+        )
+        .unwrap();
+        // Done tracks intentionally do not require spec.json to be re-decoded
+        // (it is never re-rendered for a frozen track). Writing a minimal v2
+        // spec.json here is fine; an absent spec.json would also work.
         std::fs::write(
             done_dir.join("spec.json"),
-            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"Done Feature","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+            r#"{"schema_version":2,"version":"1.0","title":"Done Feature","goal":[],"scope":{"in_scope":[],"out_of_scope":[]},"constraints":[],"acceptance_criteria":[]}"#,
         )
         .unwrap();
         // Sentinel spec.md that must stay intact.
@@ -2518,12 +2846,14 @@ mod tests {
         std::fs::create_dir_all(&done_dir).unwrap();
         std::fs::write(
             done_dir.join("metadata.json"),
-            sample_metadata_json(
-                "track-done-domain",
-                "done",
-                "2026-03-10T00:00:00Z",
-                r#"[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}]"#,
-            ),
+            sample_metadata_json("track-done-domain", "done", "2026-03-10T00:00:00Z", "[]"),
+        )
+        .unwrap();
+        // impl-plan.json with an all-done task list so the derived track status
+        // resolves to Done.
+        std::fs::write(
+            done_dir.join("impl-plan.json"),
+            r#"{"schema_version":1,"tasks":[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"All","task_ids":["T001"]}]}}"#,
         )
         .unwrap();
         std::fs::write(done_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
