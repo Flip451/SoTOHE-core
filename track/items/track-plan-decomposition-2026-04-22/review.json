@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:06:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:09:25Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -125,6 +107,109 @@
           "findings": [],
           "hash": "rvw1:sha256:bbbde2b33ccc6b6bc25ed9af653e40463a45f3d1c7bd8bf1e0a111f91e12b010",
           "at": "2026-04-22T10:12:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The wrapper still performs local pre-check orchestration (`spec.json` existence and `architecture-rules.json` validation) before invoking `type-designer`. Round 3 explicitly narrowed this command to subagent invocation plus result receipt only, so these checks reintroduce workflow logic outside the subagent and break the intended minimal wrapper shape.",
+              "severity": "P1",
+              "file": ".claude/commands/track/type-design.md",
+              "line": 18,
+              "category": "workflow_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:bb3eeb8330f8b4d902f0eba5e42e34351ad07c77a01840cfda57b05f2be269cb",
+          "at": "2026-04-22T10:19:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:609659b6db190c85fa9e284ba761d13e37d9d331290237543612de1beefc7ace",
+          "at": "2026-04-22T10:21:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/type-design.md` still tells the subagent to accept an optional `--layer` filter. That reintroduces the argument-handling the briefing explicitly removed and conflicts with the new always-process-all-layers contract for Phase 2.",
+              "severity": "P1",
+              "file": ".claude/commands/track/type-design.md",
+              "line": 25,
+              "category": "behavior"
+            }
+          ],
+          "hash": "rvw1:sha256:695cd69b426e22484cf1f99676a64e84756416ddad2f9eac476f37e4133424d9",
+          "at": "2026-04-22T10:28:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7efddd290df768e14652f6ce07f039b3ed13ed9629fa3e7c7283f9789c7d8986",
+          "at": "2026-04-22T10:30:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `.claude/commands/track/design.md` and replacing it with `type-design.md` changes the slash-command name to `/track:type-design`, but the rest of the workflow still invokes and documents `/track:design`. That leaves the documented Phase 2 entry point unreachable unless a compatibility alias is kept.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 1,
+              "category": "workflow regression"
+            }
+          ],
+          "hash": "rvw1:sha256:eb47608968be40a47eebf8210a0fef0485a82d0bcd63dc538dbcdaf1e04e11a1",
+          "at": "2026-04-22T10:34:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `.claude/commands/track/design.md` and replacing it with `.claude/commands/track/type-design.md` changes the slash-command name, but the workflow still has live `/track:design` call sites. Without a compatibility alias or a repo-wide update in the same change, Phase 2 becomes unreachable from those existing entry points.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": null,
+              "category": "regression"
+            }
+          ],
+          "hash": "rvw1:sha256:eb47608968be40a47eebf8210a0fef0485a82d0bcd63dc538dbcdaf1e04e11a1",
+          "at": "2026-04-22T10:36:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
+          "at": "2026-04-22T10:40:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The diff deletes the tracked `.claude/commands/track/design.md` and updates the orchestrator to call `/track:type-design`, but `.claude/commands/track/type-design.md` is untracked and therefore not part of the patch shown by `git diff`. If this is committed as-is, Phase 2 will point at a command file that is not added to the repository, breaking the planning workflow for type-design.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 70,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
+          "at": "2026-04-22T10:42:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:568725b0c442e4f582b8b9150547194eeba3c80ca2e7409b409dcdb12ef50107",
+          "at": "2026-04-22T10:43:53Z"
         }
       ]
     },
@@ -450,6 +535,38 @@
           "findings": [],
           "hash": "rvw1:sha256:23c8df48dec90c6b888ed10afd86472121b5e441d02f17757c1cf6ec5db715d4",
           "at": "2026-04-22T10:09:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2398531d94e5fcf75a083b77233860d03e7318a30a164fadee01644b9c13fb0d",
+          "at": "2026-04-22T10:17:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2398531d94e5fcf75a083b77233860d03e7318a30a164fadee01644b9c13fb0d",
+          "at": "2026-04-22T10:18:57Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:09:25Z"
         }
       ]
     },

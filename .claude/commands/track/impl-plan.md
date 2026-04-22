@@ -4,15 +4,9 @@ description: Author the track's impl-plan.json + task-coverage.json via the impl
 
 Canonical command for Phase 3 implementation-plan authoring.
 
-Writer: impl-planner subagent. Per CN-10 / CN-13, the command body contains only
-(a) the subagent invocation and (b) the receipt of its gate-evaluation result.
-All file writes (impl-plan.json, task-coverage.json) and the task-coverage
-binary gate run **inside** the impl-planner subagent.
+Writer: impl-planner subagent. The command body contains only (a) the subagent invocation and (b) the receipt of its gate-evaluation result. All file writes (impl-plan.json, task-coverage.json) and the task-coverage binary gate run **inside** the impl-planner subagent.
 
-Arguments:
-
-- Use `$ARGUMENTS` as the track id if specified.
-- If empty, resolve the track id from the current branch (`track/<id>`).
+Resolve the track id from the current branch (`track/<id>`).
 
 Pre-check:
 

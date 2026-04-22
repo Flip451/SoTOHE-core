@@ -4,10 +4,7 @@ description: Initialize a new track directory and materialize its branch (Phase 
 
 Canonical command for Phase 0 track initialization.
 
-Writer: main. `/track:init` is the only phase command whose writer is main (CN-13 exception).
-The other three phase commands (`/track:spec-design` / `/track:type-design` / `/track:impl-plan`)
-delegate to subagents that own their respective SSoT files; `/track:init` runs the
-identity-only bootstrap directly from main.
+Writer: main. `/track:init` is the only phase command whose writer is main. The other three phase commands (`/track:spec-design` / `/track:type-design` / `/track:impl-plan`) delegate to subagents that own their respective SSoT files; `/track:init` runs the identity-only bootstrap directly from main.
 
 Arguments:
 
@@ -47,5 +44,5 @@ Report:
 
 Behavior:
 
-- No subagent invocation — main is the writer for `/track:init` (CN-13 exception).
+- No subagent invocation — main is the writer for `/track:init`. It is the only phase command whose writer is main; the other three phase commands delegate to subagents.
 - `/track:init` is single-shot: invoke it once and it terminates. It does not loop, retry, or trigger further phase commands.

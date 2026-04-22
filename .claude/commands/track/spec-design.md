@@ -4,15 +4,9 @@ description: Author the track's spec.json via the spec-designer subagent (Phase 
 
 Canonical command for Phase 1 spec authoring.
 
-Writer: spec-designer subagent. Per CN-10 / CN-13, the command body contains only
-(a) the subagent invocation and (b) the receipt of its signal-evaluation result.
-All file writes (spec.json), rendered views (spec.md), and spec → ADR signal
-evaluation run **inside** the spec-designer subagent.
+Writer: spec-designer subagent. The command body contains only (a) the subagent invocation and (b) the receipt of its signal-evaluation result. All file writes (spec.json), rendered views (spec.md), and spec → ADR signal evaluation run **inside** the spec-designer subagent.
 
-Arguments:
-
-- Use `$ARGUMENTS` as the track id if specified.
-- If empty, resolve the track id from the current branch (`track/<id>`).
+Resolve the track id from the current branch (`track/<id>`).
 
 Pre-check:
 

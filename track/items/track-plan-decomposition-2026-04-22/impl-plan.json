@@ -16,12 +16,14 @@
     {
       "id": "T002",
       "description": ".claude/commands/track/spec-design.md を Phase 1 独立 command として新規作成する。CN-10 v3 / CN-13 に従い command 定義本文は (a) spec-designer subagent を Agent tool (subagent_type: spec-designer) 経由で invoke、(b) subagent が返した signal 評価結果を受け取って /track:plan に surface する、の 2 要素のみ。spec.json の Write、spec.md render (sotp track views sync 等)、信号機評価 (sotp verify plan-artifact-refs 等) はすべて spec-designer 内部で完結。command 定義本文に sotp CLI 呼び出しを含めない (AC-22)。pre-check: metadata.json の存在確認。state machine 遷移 / ceremony 文言は含まない。単独 invoke 可能 (IN-02 / AC-02 / AC-10 / AC-13 / AC-15 / AC-16 / AC-18 / AC-22)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "9264a4a9be96dbd2380c5147d81667aa4ab91938"
     },
     {
       "id": "T003",
       "description": ".claude/commands/track/impl-plan.md を Phase 3 独立 command として新規作成する。CN-10 v3 / CN-13 に従い command 定義本文は (a) impl-planner subagent を Agent tool (subagent_type: impl-planner) 経由で invoke、(b) subagent が返した gate 結果を受け取って /track:plan に surface する、の 2 要素のみ。impl-plan.json + task-coverage.json の Write、gate 評価 (sotp verify plan-artifact-refs) はすべて impl-planner 内部で完結。command 定義本文に sotp CLI 呼び出しを含めない (AC-22)。pre-check: spec.json および <layer>-types.json の存在確認。state machine 遷移 / ceremony 文言は含まない。単独 invoke 可能 (IN-03 / AC-03 / AC-10 / AC-13 / AC-15 / AC-16 / AC-18 / AC-22)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "9264a4a9be96dbd2380c5147d81667aa4ab91938"
     },
     {
       "id": "T004",

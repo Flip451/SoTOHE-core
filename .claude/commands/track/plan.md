@@ -67,7 +67,7 @@ Conventions are cross-track auxiliary information shared by every layer and may 
   │         🟡 → log a warning and proceed (commit allowed, must be resolved before merge)
   │         🔵 → proceed to the next phase
   │
-  ├─ Phase 2: /track:design
+  ├─ Phase 2: /track:type-design
   │   ├─ Writer: type-designer subagent
   │   ├─ Output: track/items/<id>/<layer>-types.json (per TDDD-enabled layer)
   │   ├─ Inputs: spec (SoT Chain ②)
@@ -143,7 +143,7 @@ While `/track:init`, `/track:spec`, and `/track:impl-plan` are not yet implement
 
 - Phase 0 equivalent: main writes `track/items/<id>/metadata.json` (identity fields only)
 - Phase 1 equivalent: invoke the spec-designer subagent to produce `spec.json`
-- Phase 2 equivalent: invoke `/track:design` (the existing command dedicated to Phase 2)
+- Phase 2 equivalent: invoke `/track:type-design` (the existing command dedicated to Phase 2)
 - Phase 3 equivalent: invoke the impl-planner subagent to produce `impl-plan.json` + `task-coverage.json`
 
 Once the independent phase commands are in place, `/track:plan` becomes a thin orchestrator that simply invokes the four commands in order.
@@ -186,7 +186,7 @@ Cross-track analyses (version baselines, ecosystem surveys) continue to live und
 
 ### Invoking type-designer
 
-`/track:design` invokes the type-designer subagent internally. Do not invoke type-designer directly from `/track:plan`; route through `/track:design`.
+`/track:type-design` invokes the type-designer subagent internally. Do not invoke type-designer directly from `/track:plan`; route through `/track:type-design`.
 
 ## Pre-flight checks (before `/track:plan` runs)
 
