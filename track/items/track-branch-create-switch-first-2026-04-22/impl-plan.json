@@ -10,7 +10,8 @@
     {
       "id": "T002",
       "description": "Run `cargo make ci` (fmt / clippy / nextest / deny / verify-* suite) and confirm all checks pass; report any regressions introduced by T001",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "33de49a72c4fed1f5a0e05befeeb952b36d03850"
     }
   ],
   "plan": {

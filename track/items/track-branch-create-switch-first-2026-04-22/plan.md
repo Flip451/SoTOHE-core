@@ -23,4 +23,4 @@ T002: cargo make ci 全体 gate を通過させ、回帰がないことを確認
 > cargo make ci (fmt / clippy / nextest / deny / verify-* 一式) を実行して全チェックが pass することを確認する
 > T001 実装後の回帰 (clippy lint / フォーマット崩れ / 既存テスト失敗) を検出して報告する
 
-- [x] **T002**: Run `cargo make ci` (fmt / clippy / nextest / deny / verify-* suite) and confirm all checks pass; report any regressions introduced by T001
+- [x] **T002**: Run `cargo make ci` (fmt / clippy / nextest / deny / verify-* suite) and confirm all checks pass; report any regressions introduced by T001 (`33de49a72c4fed1f5a0e05befeeb952b36d03850`)
