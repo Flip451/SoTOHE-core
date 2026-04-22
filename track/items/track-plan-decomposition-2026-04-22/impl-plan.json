@@ -40,7 +40,8 @@
     {
       "id": "T006",
       "description": ".claude/agents/adr-editor.md の Invocation contract セクションを /track:plan state machine の back-and-forth 呼び出し経路 (T007/T008 で確立) と整合させる: (a) 呼び出し条件 (Phase 1 gate 🔴 かつ ADR に commit 履歴あり → auto-invoke、履歴なし → user pause)、(b) briefing 必須項目 (🔴 を発火した spec 要素 + 対象 ADR パス + 'edit working tree only; do not commit inside the loop' 指示)、(c) working-tree-only 制約、(d) loop 中 no commit を確認または追記する。既に 4 項目をすべて満たしていれば confirmatory note のみ記録して変更なしで完了してもよい (IN-05 / AC-06 / AC-09 / AC-11)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "0d70a387522386e34ca27e1560883fa330d74ce3"
     },
     {
       "id": "T007",

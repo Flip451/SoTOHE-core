@@ -85,7 +85,7 @@ Opus is chosen because behavioral-contract mistakes (missing acceptance criteria
 
 1. **## Context** — brief restatement of the feature intent, citing the ADR by directory reference (not by specific filename embedded in the template)
 2. **## Spec summary** — bullet list of written `spec.json` elements (element id → one-line purpose) and the updated `related_conventions[]` entries
-3. **## Signal evaluation** — blue / yellow / red counts per spec section (in_scope / out_of_scope / constraints / acceptance_criteria / goal) and a short note on any yellow / red elements the orchestrator should review
+3. **## Signal evaluation** — blue / yellow / red counts per spec section (in_scope / out_of_scope / constraints / acceptance_criteria / goal). For every 🔴 element, also list the spec element id and the target ADR path cited by that element so the orchestrator can brief `adr-editor` without reading `spec.json`. A short note on yellow elements is also useful.
 4. **## Open Questions** — items requiring user or ADR clarification
 5. **## Ref integrity notes** — citations the orchestrator should double-check against the ADR / convention contents post-write
 

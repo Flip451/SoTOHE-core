@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:05:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
-          "at": "2026-04-22T06:07:25Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -383,24 +365,56 @@
           "findings": [],
           "hash": "rvw1:sha256:6ac82afdd17eb96aa65082ad4285a482b405fcacd49b72640804b4c7e8b35508",
           "at": "2026-04-22T11:21:00Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
-          "at": "2026-04-22T06:05:50Z"
+          "hash": "rvw1:sha256:043d02497865b9377d8b67baeab1ef05db5e01d2b3e7f21821e3b430404fd744",
+          "at": "2026-04-22T11:25:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
-          "at": "2026-04-22T06:07:52Z"
+          "hash": "rvw1:sha256:043d02497865b9377d8b67baeab1ef05db5e01d2b3e7f21821e3b430404fd744",
+          "at": "2026-04-22T11:27:23Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:05:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b020332d7517e46a36d7de3a8e03090117ca93c7b4e4387c44e507ba9d8e34bb",
+          "at": "2026-04-22T06:07:25Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
+          "at": "2026-04-22T06:09:25Z"
         }
       ]
     },
@@ -749,24 +763,126 @@
           "findings": [],
           "hash": "rvw1:sha256:4ab5335e151a0f27f0f6d477ddf767913750609cbd4f192fafbff6d6fb220c99",
           "at": "2026-04-22T11:21:06Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2's red path only resumes `/track:type-design` when the follow-up `/track:spec-design` result is 🔵. The parent workflow allows 🟡 here as well (it should return to the Phase 2 loop head), so a yellow spec rerun currently leaves the state machine with no next transition.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "line": 95,
+              "category": "workflow"
+            },
+            {
+              "message": "The writer-ownership table does not list the type-designer's baseline artifact (`track/items/<id>/<catalogue-stem>-baseline.json`), even though the phase 2 agent explicitly captures and writes that file. Leaving it out makes the Phase 2 write scope incomplete and can let another writer touch an owned artifact.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "line": 143,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:44c1da908a5d5216e082b49dd6b2aaf7ac264373a6f9ce99d9770b5b8cefbb03",
+          "at": "2026-04-22T11:29:26Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:06:08Z"
+          "hash": "rvw1:sha256:f6817710f4695e0fad7aa4c3b183f4a9bd2da28e9746a86bf26310b60a7fa9eb",
+          "at": "2026-04-22T11:30:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2 still documents `type contract → spec` as doing only schema/file-existence checks until the signal is implemented. That reintroduces transitional/interim behavior and contradicts the new Phase 2 loop, which depends on real 🔵/🟡/🔴 signal results to decide whether to re-invoke `/track:spec-design` and escalate through the ADR loop.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 46,
+              "category": "architecture"
+            },
+            {
+              "message": "The Phase 1 contract says `/track:spec-design` returns only blue/yellow/red counts, but the 🔴 escalation path requires `/track:plan` to know the specific red spec elements and target ADR path for the `adr-editor` briefing. With only counts, the orchestrator either cannot invoke `adr-editor` correctly or must read/manipulate artifacts itself, which this same policy forbids.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 75,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f6817710f4695e0fad7aa4c3b183f4a9bd2da28e9746a86bf26310b60a7fa9eb",
+          "at": "2026-04-22T11:32:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:386329895caeac293d3094e7cedbc408b1b7320b46c5b83438ea745583622fc4",
+          "at": "2026-04-22T11:35:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2 is documented as falling back to schema/file-existence checks “until the signal is implemented,” but this rewrite’s loop logic depends on `/track:type-design` returning the type -> spec 🔵/🟡/🔴 signal and re-invoking `/track:spec-design` on 🔴. Leaving this stale fallback in the SoT Chain section weakens the gate contract and can cause the orchestrator to skip the required Phase 2 back-and-forth escalation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 46,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:386329895caeac293d3094e7cedbc408b1b7320b46c5b83438ea745583622fc4",
+          "at": "2026-04-22T11:36:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3891c22e90012dc3e8db64da9cf2ea09cc068b8c17b7482ef6f769a1150bb8e4",
+          "at": "2026-04-22T11:39:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Phase 1 red-signal contract depends on data that normal red elements cannot provide. Existing spec signal semantics make an element red when it has no `adr_refs[]` (or only convention refs), but this line requires every 🔴 element to return “the target ADR path cited by that element” so `/track:plan` can check commit history and brief `adr-editor`. For the common missing-ADR-ref red case there is no target ADR path to report, so the back-and-forth loop either has to fabricate a path or cannot escalate.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 75,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3891c22e90012dc3e8db64da9cf2ea09cc068b8c17b7482ef6f769a1150bb8e4",
+          "at": "2026-04-22T11:42:04Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:871fb097f3960cf82ee8123fc250c0e8599371bfbdbdc02fb0506e21dba98660",
-          "at": "2026-04-22T06:09:25Z"
+          "hash": "rvw1:sha256:3891c22e90012dc3e8db64da9cf2ea09cc068b8c17b7482ef6f769a1150bb8e4",
+          "at": "2026-04-22T11:43:12Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
+          "at": "2026-04-22T06:05:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16a8272373cb310bb53c0339f246a1d6c2568576851759ab2d8a5d0231a36572",
+          "at": "2026-04-22T06:07:52Z"
         }
       ]
     }
