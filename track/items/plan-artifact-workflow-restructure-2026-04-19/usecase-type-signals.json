@@ -1,8 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-22T01:40:34Z",
-  "declaration_hash": "fa227583f2e7f3b53465ca96cb271bc25402d4e820a79a6199c9183e56d6c26c",
+  "generated_at": "2026-04-22T02:47:06Z",
+  "declaration_hash": "9a7992f7ed77cdd501b8887f5274f373280b9d69d5fb2ea6a9f816ab846d8949",
   "signals": [
+    {
+      "type_name": "ActivateTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "AddTaskUseCase",
       "kind_tag": "use_case",

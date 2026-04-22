@@ -10,6 +10,7 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
+| ActivateTrackUseCase | use_case | modify | — | 🔵 |
 | AddTaskUseCase | use_case | modify | — | 🔵 |
 | TransitionTaskUseCase | use_case | modify | — | 🔵 |
 | SetOverrideUseCase | use_case | modify | — | 🔵 |

@@ -30,6 +30,7 @@ flowchart LR
         L6_domain_CoverageResult(CoverageResult)
     end
     subgraph usecase [usecase]
+        L7_usecase_ActivateTrackUseCase[/ActivateTrackUseCase/]
         L7_usecase_AddTaskUseCase[/AddTaskUseCase/]
         L7_usecase_TransitionTaskUseCase[/TransitionTaskUseCase/]
         L7_usecase_SetOverrideUseCase[/SetOverrideUseCase/]

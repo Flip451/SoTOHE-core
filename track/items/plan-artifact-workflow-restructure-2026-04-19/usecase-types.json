@@ -2,6 +2,20 @@
   "schema_version": 2,
   "type_definitions": [
     {
+      "name": "ActivateTrackUseCase",
+      "description": "Generic bound widened to S: TrackWriter + ImplPlanReader; loads impl-plan.json before writer.update and passes it to derive_track_status so activation blocks on in_progress / done task state",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case",
+      "spec_refs": [
+        {
+          "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/spec.json",
+          "anchor": "IN-18",
+          "hash": "b19eac565985a4bf18e7cafaf36ea3d47534982db62b3bc7757c652c40f73cb7"
+        }
+      ]
+    },
+    {
       "name": "AddTaskUseCase",
       "description": "Usecase-layer struct that adds a new task to a track's impl-plan.json. Implemented per ADR 2026-04-19-1242 §D1.4 / T007: reads ImplPlanDocument via ImplPlanReader, delegates to ImplPlanDocument::add_task, persists via ImplPlanWriter, then returns the current TrackMetadata and the newly-allocated TaskId.",
       "approved": true,

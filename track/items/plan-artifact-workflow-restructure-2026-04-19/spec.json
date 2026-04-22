@@ -170,6 +170,14 @@
           {"file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md", "anchor": "D2.3"},
           {"file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md", "anchor": "D3.3"}
         ]
+      },
+      {
+        "id": "IN-18",
+        "text": "domain::TrackMetadata::is_activated() + domain::check_impl_plan_presence() で activation 不変条件を codify し、ActivateTrackUseCase を ImplPlanReader と組み合わせて impl-plan.json の task 状態 (in_progress / done) を activation preflight の精査対象に含め、CLI 呼び出し側の ad-hoc 判定 (branch.is_some() || derive != Planned) を single SSoT に置き換える",
+        "adr_refs": [
+          {"file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md", "anchor": "D1.4"},
+          {"file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md", "anchor": "Follow-up"}
+        ]
       }
     ],
     "out_of_scope": [
