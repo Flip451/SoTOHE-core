@@ -1,0 +1,8 @@
+{
+  "branch": "track/signal-eval-drift-fix-2026-04-23",
+  "created_at": "2026-04-23T00:54:40Z",
+  "id": "signal-eval-drift-fix-2026-04-23",
+  "schema_version": 5,
+  "title": "Spec signal evaluation: align implementation with ADR §D3.1 / §D3.2 (informal-priority)",
+  "updated_at": "2026-04-23T00:54:40Z"
+}

@@ -88,8 +88,10 @@ impl SpecRequirement {
     /// Evaluates the confidence signal for this requirement.
     ///
     /// Signal rules (ADR 2026-04-19-1242 §D3.1):
-    /// - `adr_refs[]` non-empty → 🔵 Blue (formal ADR grounding)
-    /// - `adr_refs[]` empty + `informal_grounds[]` non-empty → 🟡 Yellow (unpersisted grounding)
+    /// - `informal_grounds[]` non-empty → 🟡 Yellow (takes priority regardless of
+    ///   `adr_refs[]`; any remaining informal ground requires promotion to a
+    ///   formal ref before merge)
+    /// - `informal_grounds[]` empty + `adr_refs[]` non-empty → 🔵 Blue
     /// - both empty → 🔴 Red
     ///
     /// `convention_refs[]` is outside the signal evaluation scope (D3.1: "signal 評価対象外").
@@ -341,8 +343,11 @@ impl SpecDocument {
 /// Evaluates the confidence signal for a requirement's typed references.
 ///
 /// Rules (ADR 2026-04-19-1242 §D3.1):
-/// - `adr_refs[]` non-empty → 🔵 Blue (formal ADR grounding)
-/// - `adr_refs[]` empty + `informal_grounds[]` non-empty → 🟡 Yellow (unpersisted grounding)
+/// - `informal_grounds[]` non-empty → 🟡 Yellow (unpersisted grounding; takes
+///   priority regardless of `adr_refs[]` because any remaining informal ground
+///   means the element still needs promotion to a formal ref before merge)
+/// - `informal_grounds[]` empty + `adr_refs[]` non-empty → 🔵 Blue (formal
+///   ADR grounding with no pending promotion)
 /// - both empty → 🔴 Red
 ///
 /// `convention_refs[]` is outside the signal evaluation scope per ADR D3.1
@@ -353,11 +358,11 @@ pub fn evaluate_requirement_signal(
     adr_refs: &[AdrRef],
     informal_grounds: &[InformalGroundRef],
 ) -> ConfidenceSignal {
-    if !adr_refs.is_empty() {
-        return ConfidenceSignal::Blue;
-    }
     if !informal_grounds.is_empty() {
         return ConfidenceSignal::Yellow;
+    }
+    if !adr_refs.is_empty() {
+        return ConfidenceSignal::Blue;
     }
     ConfidenceSignal::Red
 }
@@ -724,7 +729,10 @@ mod tests {
     }
 
     #[test]
-    fn test_requirement_signal_adr_refs_take_priority_over_informal() {
+    fn test_requirement_signal_informal_takes_priority_over_adr_refs() {
+        // Per ADR 2026-04-19-1242 §D3.1, informal_grounds[] non-empty forces Yellow
+        // regardless of adr_refs, because any remaining informal ground means the
+        // element still needs promotion to a formal ref before merge.
         let req = SpecRequirement::new(
             id("IN-01"),
             "req",
@@ -733,15 +741,25 @@ mod tests {
             vec![make_informal(InformalGroundKind::Discussion, "fallback")],
         )
         .unwrap();
-        assert_eq!(req.signal(), ConfidenceSignal::Blue);
+        assert_eq!(req.signal(), ConfidenceSignal::Yellow);
     }
 
     // --- evaluate_requirement_signal ---
 
     #[test]
-    fn test_evaluate_requirement_signal_adr_refs_gives_blue() {
+    fn test_evaluate_requirement_signal_adr_refs_only_gives_blue() {
         let adr = vec![make_adr_ref("knowledge/adr/x.md", "D1")];
         assert_eq!(evaluate_requirement_signal(&adr, &[]), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_requirement_signal_adr_refs_plus_informal_gives_yellow() {
+        // Regression guard for the informal-priority rule: even when adr_refs is
+        // non-empty, a remaining informal_grounds entry yields Yellow (merge still
+        // blocked until the informal ground is promoted to a formal ref).
+        let adr = vec![make_adr_ref("knowledge/adr/x.md", "D1")];
+        let informal = vec![make_informal(InformalGroundKind::Discussion, "pending")];
+        assert_eq!(evaluate_requirement_signal(&adr, &informal), ConfidenceSignal::Yellow);
     }
 
     #[test]

@@ -97,7 +97,37 @@ Apply `.claude/rules/04-coding-principles.md` at the **contract level only**:
 
 - Enum-first / typestate / newtype principles are the type-designer's concern; the spec can cite them by name when writing constraints (e.g., the constraint "use newtype for boundary primitives") but does not enumerate concrete type choices
 - Hexagonal layer placement is the ADR's concern; the spec can cite the layer assignment as a constraint
-- No panics in library code, sync-first: encoded into `constraints[]` when they apply to this feature
+- No panics in library code, sync-first: cite once in top-level `related_conventions[]` (these are universal rules — see Signal Evaluation Decision Criteria §(1)); do not encode them as per-element `constraints[]` entries
+
+## Signal Evaluation Decision Criteria
+
+These three criteria let the spec-designer resolve citation-placement and yellow-resolution questions autonomously, without round-tripping to the orchestrator. They mirror the signal evaluation rules documented in the plan-artifact workflow ADR (§D3.1).
+
+### (1) Universal coding principles belong at the top level, not per element
+
+Universal rules that apply to **every track** (for example, no-panics in library code, hexagonal layer dependency direction, the enum-first / typestate / newtype principles, or any rule from `.claude/rules/*.md` coding discipline) belong in the spec's **top-level `related_conventions[]`** — not in a per-element `constraints[]` / `acceptance_criteria[]` / `in_scope[]` entry, and not in a per-element `convention_refs[]`.
+
+Use per-element `convention_refs[]` only when the convention is bound to a specific element's behaviour (rare). If the only grounding you can find for a constraint is a universal coding rule, cite it once at the track top and drop the per-element entry.
+
+### (2) `convention_refs[]` does not contribute to Blue
+
+Per ADR §D3.1 (`convention_refs[]`: signal 評価対象外), convention references are intentionally excluded from the signal calculation. Signal is computed from `adr_refs[]` + `informal_grounds[]` only:
+
+- `informal_grounds[]` non-empty → 🟡 Yellow (takes priority regardless of adr_refs)
+- `informal_grounds[]` empty + `adr_refs[]` non-empty → 🔵 Blue
+- both empty → 🔴 Red
+
+An element whose only grounding is `convention_refs[]` (with empty `adr_refs[]` and empty `informal_grounds[]`) therefore evaluates to 🔴 Red, not 🔵 Blue. Never rely solely on `convention_refs[]` for an element's grounding; either pair it with a formal `adr_refs[]` anchor or move the element to top-level `related_conventions[]`.
+
+### (3) Three options to resolve a Yellow element
+
+When an element carries non-empty `informal_grounds[]` (producing 🟡 Yellow), resolve it before merge via one of:
+
+- (a) **Promote to `adr_refs[]`**: add the rationale to an existing or new ADR and cite its anchor. The informal ground is then superseded and removed from the element.
+- (b) **Move to top-level `related_conventions[]`**: if the ground is a universal coding rule that applies to every track, cite the convention at the spec top and remove the per-element entry entirely.
+- (c) **Delete the element**: if, on reflection, the element is genuinely out of scope or redundant, drop it.
+
+Choose (a) when the ground is track-specific behaviour the ADR must persist; (b) for universal coding discipline; (c) only after confirming no other element or acceptance criterion depends on it.
 
 ## Scope Ownership
 

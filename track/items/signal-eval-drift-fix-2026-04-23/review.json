@@ -1,0 +1,331 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Path::is_file()` here treats any metadata/stat failure or non-regular `plan.md` as if the file were simply absent, so a dangling symlink, directory named `plan.md`, or permission error now silently skips the freshness check instead of failing closed. That regresses the previous I/O error path and can let corrupted tracks bypass `validate_track_snapshots`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 602,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:60600b5f65d0c47f7dae14792aaf6cb7af0e25bf1c78ffe670555a19512d1a65",
+          "at": "2026-04-23T02:35:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan_path.is_file()` treats unreadable or broken `plan.md` paths the same as a missing file, so validation will now silently skip tracks whose plan exists but cannot be accessed instead of surfacing the filesystem error or an out-of-sync state. The Phase 0 exception should only cover the file being absent.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 602,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:60600b5f65d0c47f7dae14792aaf6cb7af0e25bf1c78ffe670555a19512d1a65",
+          "at": "2026-04-23T02:36:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guard skips validation for any non-regular `plan.md`, not just a missing file. A directory, FIFO, or other malformed path named `plan.md` will now be treated as absent and bypass the freshness check instead of surfacing an error, which can let corrupted tracks pass validation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 605,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c7f312d61d08e630adf8f7e7b6b30cb20e92bdb5d08aaff429ade5714bcd47f6",
+          "at": "2026-04-23T02:41:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `NotFound => continue` path skips validation for every v5 snapshot with a missing `plan.md`, so a later-phase track whose rendered plan was deleted or never regenerated now passes `validate_track_snapshots` instead of failing. This only makes sense for the intended Phase 0 case when the plan artifact is not supposed to exist yet; as written, the check fails open for any v5 track lacking `plan.md`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 607,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:58dc0ebd4421a82f4352477531ee19e7491be32ff9b337c66828412d05041828",
+          "at": "2026-04-23T02:43:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl_plan_path.is_file()` silently folds permission errors, broken symlinks, and other metadata failures into “absent”, so a v5 snapshot with no `plan.md` can now pass validation even when `impl-plan.json` is present but inaccessible/corrupted. That makes the new Phase 0 escape hatch fail open for later-phase tracks; it should propagate filesystem errors instead of treating every non-regular path as missing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 613,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:94db522d70a18570efa92318c024f498d6cdda7c55febf79a4bc828a311a87e2",
+          "at": "2026-04-23T02:46:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new missing-plan guard only skips validation when `impl-plan.json` is also absent. That narrows the intended Phase 0 compatibility too far: any v5 track where `plan.md` has not been rendered yet but `impl-plan.json` is already present will now fail with `OutOfSync`, even though the requested behavior was to tolerate a missing `plan.md` and just skip the content check.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 607,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b65abb4e9338035a71142514d1bbdcf122249c896e9f59d24fcc2ae89ea99122",
+          "at": "2026-04-23T02:49:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3b15f650997878678557bfcbb85033ea75b478c718ec40727d51d6409a5aec",
+          "at": "2026-04-23T02:52:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3b15f650997878678557bfcbb85033ea75b478c718ec40727d51d6409a5aec",
+          "at": "2026-04-23T02:53:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ad2d30f43132079a3e40b738afa8199f09accda5e5c2ebbbf6bf6581b7fe763",
+          "at": "2026-04-23T03:24:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ad2d30f43132079a3e40b738afa8199f09accda5e5c2ebbbf6bf6581b7fe763",
+          "at": "2026-04-23T03:25:17Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
+          "at": "2026-04-23T03:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new rule says universal coding principles such as no-panics must be cited only in top-level `related_conventions[]` and dropped from per-element entries, but the immediately preceding existing guidance still tells the agent to encode “No panics in library code” into per-element `constraints[]` when applicable. That leaves the spec-designer with contradictory placement instructions, so it can still make the exact no-panics placement decision this change is intended to eliminate.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 108,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
+          "at": "2026-04-23T03:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c46df11121ce241bad1a6f2614bc0a4cce8143c8c6da331f869931c236e080f",
+          "at": "2026-04-23T03:04:25Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b299b4a3f8918c8c834c3ee8410e7471cd80169dad2e089418a8c16dd6611f5",
+          "at": "2026-04-23T02:22:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRequirement::signal()` still documents the old ADR-first rule, saying non-empty `adr_refs[]` returns Blue and only ADR-empty informal grounds return Yellow. The implementation now delegates to `evaluate_requirement_signal`, where informal grounds take priority even when ADR refs are present, so the public API rustdoc advertises the wrong domain rule for callers of this method.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 91,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5b299b4a3f8918c8c834c3ee8410e7471cd80169dad2e089418a8c16dd6611f5",
+          "at": "2026-04-23T02:23:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ec284150f9e8d80c415547721c80a03e5a1a87c795f37944fbcb536517bdd44",
+          "at": "2026-04-23T02:27:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ec284150f9e8d80c415547721c80a03e5a1a87c795f37944fbcb536517bdd44",
+          "at": "2026-04-23T02:29:22Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23487c254c9d1f54241deaf0f60d91864193f207aa257db77d0f788f80e3c092",
+          "at": "2026-04-23T01:49:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23487c254c9d1f54241deaf0f60d91864193f207aa257db77d0f788f80e3c092",
+          "at": "2026-04-23T01:51:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3378ad8ce00e837258572d06a8d41d7d43679c1b4ca214de08313cfa28dc0b1",
+          "at": "2026-04-23T02:14:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3378ad8ce00e837258572d06a8d41d7d43679c1b4ca214de08313cfa28dc0b1",
+          "at": "2026-04-23T02:16:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` no longer conforms to the documented `ImplPlanDocument` task shape: each task is supposed to carry `{id, description, status, commit_hash}`, but the updated file drops `commit_hash` from every task. That breaks the schema contract for downstream readers.",
+              "severity": "P1",
+              "file": "track/items/signal-eval-drift-fix-2026-04-23/impl-plan.json",
+              "line": 5,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a2adf58b14d29d6b324bb7f607a84200d6092df18f157a29d78a5697b4a9530e",
+          "at": "2026-04-23T02:21:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2adf58b14d29d6b324bb7f607a84200d6092df18f157a29d78a5697b4a9530e",
+          "at": "2026-04-23T02:23:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2adf58b14d29d6b324bb7f607a84200d6092df18f157a29d78a5697b4a9530e",
+          "at": "2026-04-23T02:24:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9aa5e4d5a8fd75e72381a34a33fa4dffc05dc4541e537471fb0edac208c5f82",
+          "at": "2026-04-23T02:35:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9aa5e4d5a8fd75e72381a34a33fa4dffc05dc4541e537471fb0edac208c5f82",
+          "at": "2026-04-23T02:36:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b71047105e096ea939daad9acfc8e4b17f3ef5876a7bce79cf65e7f553bcabfa",
+          "at": "2026-04-23T02:57:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b71047105e096ea939daad9acfc8e4b17f3ef5876a7bce79cf65e7f553bcabfa",
+          "at": "2026-04-23T02:59:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be93b498411ca262261e87521901ec001b789a6daa28a684917e699264fefcd9",
+          "at": "2026-04-23T03:02:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be93b498411ca262261e87521901ec001b789a6daa28a684917e699264fefcd9",
+          "at": "2026-04-23T03:03:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:655d4a966f4fc833e140290bb3084a07e4239aa76849465dfcd588a094ba944a",
+          "at": "2026-04-23T03:07:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:655d4a966f4fc833e140290bb3084a07e4239aa76849465dfcd588a094ba944a",
+          "at": "2026-04-23T03:08:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16fa7eae05f6b65802279bda8a7eedd1e8431b7ca80bd633301cdfe5acce71a0",
+          "at": "2026-04-23T03:10:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16fa7eae05f6b65802279bda8a7eedd1e8431b7ca80bd633301cdfe5acce71a0",
+          "at": "2026-04-23T03:11:28Z"
+        }
+      ]
+    }
+  }
+}

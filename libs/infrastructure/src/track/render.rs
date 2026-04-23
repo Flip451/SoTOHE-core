@@ -573,6 +573,19 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
 ///
 /// # Errors
 /// Returns `RenderError` if any metadata file cannot be read or decoded.
+///
+/// # Phase 0 compatibility (ADR 2026-04-19-1242 §D0.0 / §D1.4 / §D6.1)
+///
+/// Per ADR §D6.1, the plan.md freshness gate fires only "when plan.md is
+/// rendered"; if `plan.md` is absent the check is skipped regardless of
+/// whether `impl-plan.json` is present. A Phase 0 track (just after
+/// `/track:init`) has a freshly created `metadata.json` but no rendered
+/// `plan.md` yet — the view is generated after later phases populate
+/// `impl-plan.json`. Previously this function unconditionally read `plan.md`
+/// and failed with an I/O error for Phase 0 tracks; it now uses
+/// `std::fs::metadata()` to distinguish a missing file (NotFound → skip)
+/// from a permission error or other I/O failure (propagated), mirroring the
+/// presence-conditional pattern used for the optional `registry.md` check.
 pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
     let snapshots = collect_track_snapshots(root)?;
     for snapshot in &snapshots {
@@ -585,6 +598,54 @@ pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
             continue;
         }
         let plan_path = snapshot.dir.join("plan.md");
+        // Phase 0 compat: skip content check when plan.md has not been
+        // rendered yet. Per ADR 2026-04-19-1242 §D6.1, the gate fires only
+        // "when plan.md is rendered"; if the file is absent, skip regardless
+        // of whether impl-plan.json exists.
+        //
+        // Presence is probed in two layers to disambiguate "absent" from
+        // "corrupted":
+        //   1. `symlink_metadata` checks whether any entry exists at the
+        //      path without following symlinks. `NotFound` here means the
+        //      file is genuinely absent (Phase 0 — skip). Other errors
+        //      (permission, etc.) are propagated rather than silently
+        //      treated as absent.
+        //   2. If the entry is a symlink, follow it via `metadata`. A
+        //      dangling symlink surfaces as `NotFound` from the follow
+        //      path; treat that as corrupted track state (the file
+        //      appears to exist but the target is gone) rather than as
+        //      "plan.md absent" — otherwise the freshness check would be
+        //      silently bypassed.
+        //   3. Any non-regular-file target (directory, FIFO, dangling
+        //      symlink, etc.) is rejected as corrupted track state.
+        let sym_meta = match std::fs::symlink_metadata(&plan_path) {
+            Ok(m) => m,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(e) => return Err(RenderError::Io(e)),
+        };
+        if sym_meta.file_type().is_symlink() {
+            match std::fs::metadata(&plan_path) {
+                Ok(target) if target.is_file() => {}
+                Ok(_) => {
+                    return Err(RenderError::InvalidTrackMetadata {
+                        path: plan_path.clone(),
+                        reason: "plan.md symlink target is not a regular file".to_owned(),
+                    });
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    return Err(RenderError::InvalidTrackMetadata {
+                        path: plan_path.clone(),
+                        reason: "plan.md is a dangling symlink (target missing)".to_owned(),
+                    });
+                }
+                Err(e) => return Err(RenderError::Io(e)),
+            }
+        } else if !sym_meta.is_file() {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: plan_path.clone(),
+                reason: "plan.md exists but is not a regular file".to_owned(),
+            });
+        }
         let actual = std::fs::read_to_string(&plan_path)?;
         let impl_plan = load_impl_plan_opt(&snapshot.dir)?;
         let expected = render_plan(&snapshot.track, impl_plan.as_ref());
@@ -1843,6 +1904,67 @@ mod tests {
 
         let err = validate_track_snapshots(dir.path()).unwrap_err();
         assert!(err.to_string().contains("unsupported schema_version 99"));
+    }
+
+    #[test]
+    fn validate_track_snapshots_tolerates_phase_zero_missing_plan_md() {
+        // Phase 0 compat (ADR 2026-04-19-1242 §D0.0 / §D1.4): a freshly-created
+        // v5 track directory containing only `metadata.json` (no `plan.md` yet,
+        // because the view is rendered in later phases) must pass validation.
+        // The previous behaviour failed with an I/O error on the missing file.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json_with_schema_and_branch(
+                5,
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                "[]",
+                Some("track/track-a"),
+            ),
+        )
+        .unwrap();
+        // NOTE: no `plan.md` on purpose — this mirrors the state right after
+        // `/track:init` before any downstream view rendering has occurred.
+        assert!(validate_track_snapshots(dir.path()).is_ok());
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn validate_track_snapshots_rejects_dangling_plan_md_symlink() {
+        // Regression guard (Codex review #110, 2026-04-23): a `plan.md` that
+        // exists as a symlink pointing at a non-existent target must NOT be
+        // treated as "Phase 0 plan.md absent". Previously `std::fs::metadata`
+        // followed the symlink and returned NotFound, so the branch
+        // swallowed the dangling-symlink case and reported success for a
+        // corrupted track directory.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json_with_schema_and_branch(
+                5,
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                "[]",
+                Some("track/track-a"),
+            ),
+        )
+        .unwrap();
+        // Create a symlink whose target does not exist.
+        let link = track_dir.join("plan.md");
+        std::os::unix::fs::symlink(track_dir.join("missing-target.md"), &link).unwrap();
+
+        let err = validate_track_snapshots(dir.path()).unwrap_err();
+        assert!(
+            err.to_string().contains("dangling symlink"),
+            "expected dangling-symlink rejection, got: {err}"
+        );
     }
 
     #[test]
