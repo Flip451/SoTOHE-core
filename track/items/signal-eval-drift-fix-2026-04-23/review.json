@@ -106,6 +106,53 @@
           "findings": [],
           "hash": "rvw1:sha256:7e3b15f650997878678557bfcbb85033ea75b478c718ec40727d51d6409a5aec",
           "at": "2026-04-23T02:53:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ad2d30f43132079a3e40b738afa8199f09accda5e5c2ebbbf6bf6581b7fe763",
+          "at": "2026-04-23T03:24:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ad2d30f43132079a3e40b738afa8199f09accda5e5c2ebbbf6bf6581b7fe763",
+          "at": "2026-04-23T03:25:17Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
+          "at": "2026-04-23T03:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new rule says universal coding principles such as no-panics must be cited only in top-level `related_conventions[]` and dropped from per-element entries, but the immediately preceding existing guidance still tells the agent to encode “No panics in library code” into per-element `constraints[]` when applicable. That leaves the spec-designer with contradictory placement instructions, so it can still make the exact no-panics placement decision this change is intended to eliminate.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 108,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
+          "at": "2026-04-23T03:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c46df11121ce241bad1a6f2614bc0a4cce8143c8c6da331f869931c236e080f",
+          "at": "2026-04-23T03:04:25Z"
         }
       ]
     },
@@ -146,39 +193,6 @@
           "findings": [],
           "hash": "rvw1:sha256:3ec284150f9e8d80c415547721c80a03e5a1a87c795f37944fbcb536517bdd44",
           "at": "2026-04-23T02:29:22Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
-          "at": "2026-04-23T03:02:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new rule says universal coding principles such as no-panics must be cited only in top-level `related_conventions[]` and dropped from per-element entries, but the immediately preceding existing guidance still tells the agent to encode “No panics in library code” into per-element `constraints[]` when applicable. That leaves the spec-designer with contradictory placement instructions, so it can still make the exact no-panics placement decision this change is intended to eliminate.",
-              "severity": "P1",
-              "file": ".claude/agents/spec-designer.md",
-              "line": 108,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
-          "at": "2026-04-23T03:03:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c46df11121ce241bad1a6f2614bc0a4cce8143c8c6da331f869931c236e080f",
-          "at": "2026-04-23T03:04:25Z"
         }
       ]
     },
