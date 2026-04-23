@@ -806,7 +806,7 @@ command = "cargo"
 args = ["nextest", "run", "--run-ignored", "ignored-only", "-E", "package(infrastructure)"]
 
 [tasks.track-branch-create]
-description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
+description = "[wrapper] Create a track branch from main and switch to it (branch only; no metadata, no commit). (usage: cargo make track-branch-create '<track-id>')"
 command = "bin/sotp"
 args = ["make", "track-branch-create", "${@}"]
 

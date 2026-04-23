@@ -6,8 +6,9 @@
 `execute_branch(BranchAction::Create)` と `execute_activate` の code path を切り離し、branch create が activation commit を main 上に生成する regression を構造的に排除する (ADR: knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md §D1-D3)
 T001: activate.rs 単一ファイル内で実装変更 (D1 path 分離 + D2 BranchMode::Create 退役) + ユニットテスト追加/更新を 1 commit にまとめる (コンパイル可能 + テスト green を各 commit で維持)
 T002: cargo make ci 全体 gate を通過させ、回帰がないことを確認して track を完了状態にする
+T003: /track:init を 3 step 構成 (branch 作成 + switch → metadata.json 作成 → verify-track-metadata) に整理し、Makefile.toml description 更新。execute_activate / sotp track activate は無変更。PR review で検出された P1 finding (workflow 破綻) に対応する
 
-## Tasks (2/2 resolved)
+## Tasks (2/3 resolved)
 
 ### S1 — S1 — branch create path 分離 + BranchMode::Create 退役 + テスト (D1/D2/D3)
 
@@ -24,3 +25,11 @@ T002: cargo make ci 全体 gate を通過させ、回帰がないことを確認
 > T001 実装後の回帰 (clippy lint / フォーマット崩れ / 既存テスト失敗) を検出して報告する
 
 - [x] **T002**: Run `cargo make ci` (fmt / clippy / nextest / deny / verify-* suite) and confirm all checks pass; report any regressions introduced by T001 (`33de49a72c4fed1f5a0e05befeeb952b36d03850`)
+
+### S3 — S3 — /track:init workflow 完成 (IN-04 / AC-05)
+
+> .claude/commands/track/init.md を 3 step 構成 (1. `cargo make track-branch-create` で branch 作成 + switch、2. `metadata.json` を `branch: "track/<track-id>"` で作成、3. `cargo make verify-track-metadata`) に整理する
+> Makefile.toml の `track-branch-create` description を branch 作成 + switch のみ (no metadata, no commit) に更新する
+> `execute_activate` / `sotp track activate` は無変更。`cargo make ci` で全チェックが pass することを確認する
+
+- [~] **T003**: Rewrite `.claude/commands/track/init.md` to 3 steps (`cargo make track-branch-create` → create metadata.json with `branch: "track/<track-id>"` → `cargo make verify-track-metadata`). Update `Makefile.toml` `[tasks.track-branch-create]` description to 'branch only; no metadata, no commit'. Leave `execute_activate` / `sotp track activate` unchanged. Run `cargo make ci`.

@@ -67,6 +67,20 @@
             "anchor": "D2"
           }
         ]
+      },
+      {
+        "id": "IN-04",
+        "text": "`.claude/commands/track/init.md` を 3 step 構成 (1. `cargo make track-branch-create` で branch 作成 + switch、2. `metadata.json` を `branch: \"track/<track-id>\"` で作成、3. `cargo make verify-track-metadata`) に整理し、`Makefile.toml` の `track-branch-create` description を branch 作成 + switch のみ (no metadata, no commit) に更新する。`execute_activate` / `sotp track activate` は無変更",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -101,16 +115,6 @@
           {
             "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
             "anchor": "D2"
-          }
-        ]
-      },
-      {
-        "id": "OS-04",
-        "text": "`/track:init` command 定義本文の変更: `sotp track branch create` の責務が branch 作成 + switch のみに限定される (D3) ことで `/track:init` の後続 step 設計は既に整合している。command definition のテキスト変更は不要",
-        "adr_refs": [
-          {
-            "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
-            "anchor": "D3"
           }
         ]
       }
@@ -214,6 +218,16 @@
           "anchor": "Pre-commit Checklist"
         }
       ]
+    },
+    {
+      "id": "AC-05",
+      "text": "`/track:init <feature>` が 3 step (branch 作成 + switch → metadata.json を `branch: \"track/<track-id>\"` で作成 → verify-track-metadata) で完走する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md",
+          "anchor": "D3"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -231,7 +245,7 @@
     }
   ],
   "signals": {
-    "blue": 16,
+    "blue": 17,
     "yellow": 0,
     "red": 0
   }
