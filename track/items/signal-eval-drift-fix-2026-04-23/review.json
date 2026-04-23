@@ -149,6 +149,39 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
+          "at": "2026-04-23T03:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new rule says universal coding principles such as no-panics must be cited only in top-level `related_conventions[]` and dropped from per-element entries, but the immediately preceding existing guidance still tells the agent to encode “No panics in library code” into per-element `constraints[]` when applicable. That leaves the spec-designer with contradictory placement instructions, so it can still make the exact no-panics placement decision this change is intended to eliminate.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 108,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:86e7f04d351a25b72337b297feb88a66c40ccee204f0a7fdaac5668826d2fca1",
+          "at": "2026-04-23T03:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c46df11121ce241bad1a6f2614bc0a4cce8143c8c6da331f869931c236e080f",
+          "at": "2026-04-23T03:04:25Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -235,6 +268,20 @@
           "findings": [],
           "hash": "rvw1:sha256:b71047105e096ea939daad9acfc8e4b17f3ef5876a7bce79cf65e7f553bcabfa",
           "at": "2026-04-23T02:59:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be93b498411ca262261e87521901ec001b789a6daa28a684917e699264fefcd9",
+          "at": "2026-04-23T03:02:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be93b498411ca262261e87521901ec001b789a6daa28a684917e699264fefcd9",
+          "at": "2026-04-23T03:03:11Z"
         }
       ]
     }

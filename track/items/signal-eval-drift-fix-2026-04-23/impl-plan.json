@@ -21,12 +21,13 @@
     {
       "id": "T004",
       "description": "Remove the max(adr_refs, informal_grounds) line from ADR §D3.1 and the max(spec_refs, informal_grounds) line from ADR §D3.2; preserve all other lines and anchors (IN-03)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "ba31bb802bb815b6e0007694171efe56e2e272fc"
     },
     {
       "id": "T005",
       "description": "Append three signal-evaluation decision criteria to .claude/agents/spec-designer.md: (1) universal coding principles belong in related_conventions[] not per-element refs, (2) convention_refs[] do not contribute to signal evaluation so adr_refs[]+informal_grounds[] both empty means Red, (3) Yellow informal_grounds[] must be resolved before merge via one of three options (IN-06)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",

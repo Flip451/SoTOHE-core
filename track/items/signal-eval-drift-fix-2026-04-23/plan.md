@@ -7,7 +7,7 @@ Fix two drifts within the same ADR 2026-04-19-1242: (a) evaluate_requirement_sig
 Also codify three signal-evaluation decision criteria in .claude/agents/spec-designer.md to let spec-designer judge universal convention / per-element constraint / Yellow resolution autonomously (avoiding the round-trip observed in this track's Phase 1).
 T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift in tddd/signals.rs (expected: no drift). T003 relaxes validate_track_snapshots to skip missing plan.md. T004 removes the now-incorrect max() lines from the ADR. T005 updates the spec-designer agent. T006 runs cargo make ci regression gate.
 
-## Tasks (3/6 resolved)
+## Tasks (4/6 resolved)
 
 ### S1 — Domain signal logic fix
 
@@ -26,13 +26,13 @@ T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift
 
 > Remove the now-incorrect max() composite-signal expressions from ADR §D3.1 and §D3.2, leaving all other definitions and anchors intact.
 
-- [~] **T004**: Remove the max(adr_refs, informal_grounds) line from ADR §D3.1 and the max(spec_refs, informal_grounds) line from ADR §D3.2; preserve all other lines and anchors (IN-03)
+- [x] **T004**: Remove the max(adr_refs, informal_grounds) line from ADR §D3.1 and the max(spec_refs, informal_grounds) line from ADR §D3.2; preserve all other lines and anchors (IN-03) (`ba31bb802bb815b6e0007694171efe56e2e272fc`)
 
 ### S4 — Agent guidance update
 
 > Codify three signal-evaluation decision criteria in the spec-designer agent definition so future spec sessions converge without back-and-forth.
 
-- [ ] **T005**: Append three signal-evaluation decision criteria to .claude/agents/spec-designer.md: (1) universal coding principles belong in related_conventions[] not per-element refs, (2) convention_refs[] do not contribute to signal evaluation so adr_refs[]+informal_grounds[] both empty means Red, (3) Yellow informal_grounds[] must be resolved before merge via one of three options (IN-06)
+- [~] **T005**: Append three signal-evaluation decision criteria to .claude/agents/spec-designer.md: (1) universal coding principles belong in related_conventions[] not per-element refs, (2) convention_refs[] do not contribute to signal evaluation so adr_refs[]+informal_grounds[] both empty means Red, (3) Yellow informal_grounds[] must be resolved before merge via one of three options (IN-06)
 
 ### S5 — CI regression gate
 
