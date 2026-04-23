@@ -16,7 +16,8 @@
     {
       "id": "T003",
       "description": "Rewrite `.claude/commands/track/init.md` to 3 steps (`cargo make track-branch-create` → create metadata.json with `branch: \"track/<track-id>\"` → `cargo make verify-track-metadata`). Update `Makefile.toml` `[tasks.track-branch-create]` description to 'branch only; no metadata, no commit'. Leave `execute_activate` / `sotp track activate` unchanged. Run `cargo make ci`.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "268ab2f60d52d15d303d987f2ef4cc0d0ae41f00"
     }
   ],
   "plan": {
