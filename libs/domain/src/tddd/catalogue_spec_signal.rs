@@ -16,8 +16,15 @@
 
 use std::path::PathBuf;
 
+use crate::ConfidenceSignal;
 use crate::plan_ref::{ContentHash, SpecElementId};
 use crate::tddd::layer_id::LayerId;
+
+/// Schema version of `<layer>-catalogue-spec-signals.json` — pinned to `1`
+/// per ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D2.2.
+/// Bump requires an accompanying codec migration and a schema-version gate
+/// (see the parent ADR §D1.4 for the standard workflow).
+pub const CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION: u32 = 1;
 
 /// Discriminant for the three catalogue-spec integrity violations recognised
 /// by ADR 2026-04-23-0344 §D1.5.
@@ -93,6 +100,74 @@ impl SpecRefFinding {
     /// This constructor is infallible; it always returns `Self`.
     pub fn new(layer: LayerId, kind: SpecRefFindingKind) -> Self {
         Self { layer, kind }
+    }
+}
+
+/// Per-entry signal record stored in `<layer>-catalogue-spec-signals.json`.
+///
+/// Each record pairs a catalogue entry name with the
+/// [`ConfidenceSignal`] computed by the informal-priority rule (ADR
+/// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.1). A catalogue
+/// entry with multiple `spec_refs[]` collapses to a single signal — the
+/// per-ref hash validation is reported separately as a [`SpecRefFinding`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CatalogueSpecSignal {
+    /// Name of the catalogue entry (matches `TypeCatalogueEntry.name`).
+    pub type_name: String,
+    /// Per-entry signal computed by the informal-priority rule.
+    pub signal: ConfidenceSignal,
+}
+
+impl CatalogueSpecSignal {
+    /// Construct a new per-entry signal record.
+    pub fn new(type_name: impl Into<String>, signal: ConfidenceSignal) -> Self {
+        Self { type_name: type_name.into(), signal }
+    }
+}
+
+/// Aggregate root for `<layer>-catalogue-spec-signals.json`.
+///
+/// Holds:
+///
+/// * `schema_version` — pinned to [`CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION`]
+///   (= 1); see ADR §D2.2 for the bump protocol.
+/// * `catalogue_declaration_hash` — SHA-256 of the input `<layer>-types.json`
+///   canonical bytes. Used by `sotp verify catalogue-spec-refs` (T009) for
+///   stale detection (§D2.2 / §D2.3). Declared as [`ContentHash`] so the
+///   hash representation cannot drift from other SoT Chain hashes.
+/// * `signals` — one [`CatalogueSpecSignal`] per catalogue entry, in
+///   catalogue-declared order.
+///
+/// **Deterministic output**: no `generated_at` timestamp or other
+/// wall-clock-derived field. With identical input `<layer>-types.json`, the
+/// document round-trips byte-identical — a prerequisite for CN-06 / §D2.2.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CatalogueSpecSignalsDocument {
+    /// Schema version; always [`CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION`] (= 1).
+    /// Private to enforce the pinning invariant — use [`Self::schema_version`]
+    /// to read and [`Self::new`] to construct.
+    schema_version: u32,
+    /// SHA-256 of the canonical `<layer>-types.json` bytes used to compute
+    /// the signals.
+    pub catalogue_declaration_hash: ContentHash,
+    /// Per-entry signal records, in catalogue-declared order.
+    pub signals: Vec<CatalogueSpecSignal>,
+}
+
+impl CatalogueSpecSignalsDocument {
+    /// Construct a document with `schema_version` pre-filled to
+    /// [`CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION`].
+    pub fn new(catalogue_declaration_hash: ContentHash, signals: Vec<CatalogueSpecSignal>) -> Self {
+        Self {
+            schema_version: CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION,
+            catalogue_declaration_hash,
+            signals,
+        }
+    }
+
+    /// Returns the schema version (always [`CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION`]).
+    pub fn schema_version(&self) -> u32 {
+        self.schema_version
     }
 }
 
@@ -215,5 +290,80 @@ mod tests {
             },
         );
         assert_ne!(a, b);
+    }
+
+    #[test]
+    fn catalogue_spec_signal_stores_name_and_signal() {
+        let s = CatalogueSpecSignal::new("SpecRefFinding", ConfidenceSignal::Blue);
+        assert_eq!(s.type_name, "SpecRefFinding");
+        assert_eq!(s.signal, ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn catalogue_spec_signal_equality_compares_all_fields() {
+        let a = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Yellow);
+        let b = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Yellow);
+        let c = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Red);
+        let d = CatalogueSpecSignal::new("Bar", ConfidenceSignal::Yellow);
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+        assert_ne!(a, d);
+    }
+
+    #[test]
+    fn document_new_pins_schema_version_to_one() {
+        let doc = CatalogueSpecSignalsDocument::new(
+            hash(0xcd),
+            vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Blue)],
+        );
+        assert_eq!(doc.schema_version(), CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION);
+        assert_eq!(doc.schema_version(), 1);
+    }
+
+    #[test]
+    fn document_preserves_catalogue_declaration_hash() {
+        let h = hash(0xa1);
+        let doc = CatalogueSpecSignalsDocument::new(h.clone(), vec![]);
+        assert_eq!(doc.catalogue_declaration_hash, h);
+    }
+
+    #[test]
+    fn document_preserves_signals_in_order() {
+        let signals = vec![
+            CatalogueSpecSignal::new("First", ConfidenceSignal::Blue),
+            CatalogueSpecSignal::new("Second", ConfidenceSignal::Yellow),
+            CatalogueSpecSignal::new("Third", ConfidenceSignal::Red),
+        ];
+        let doc = CatalogueSpecSignalsDocument::new(hash(0x00), signals.clone());
+        assert_eq!(doc.signals, signals);
+        assert_eq!(doc.signals.len(), 3);
+    }
+
+    #[test]
+    fn document_equality_detects_any_field_drift() {
+        let signals = vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Blue)];
+        let a = CatalogueSpecSignalsDocument::new(hash(0x01), signals.clone());
+        let b = CatalogueSpecSignalsDocument::new(hash(0x01), signals.clone());
+        let c = CatalogueSpecSignalsDocument::new(hash(0x02), signals.clone());
+        let d = CatalogueSpecSignalsDocument::new(hash(0x01), vec![]);
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+        assert_ne!(a, d);
+    }
+
+    #[test]
+    fn document_round_trips_byte_identical_via_clone() {
+        // Determinism precondition (CN-06 / §D2.2): with identical input the
+        // document value is the same. Encoding round-trip lives in the
+        // infrastructure codec test once that task lands.
+        let doc = CatalogueSpecSignalsDocument::new(
+            hash(0x77),
+            vec![
+                CatalogueSpecSignal::new("Alpha", ConfidenceSignal::Blue),
+                CatalogueSpecSignal::new("Beta", ConfidenceSignal::Yellow),
+            ],
+        );
+        let clone = doc.clone();
+        assert_eq!(doc, clone);
     }
 }

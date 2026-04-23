@@ -10,7 +10,7 @@
     {
       "id": "T002",
       "description": "domain 層に CatalogueSpecSignal 値オブジェクト (type_name: String, signal: ConfidenceSignal) と CatalogueSpecSignalsDocument 値オブジェクト (schema_version: u32=1, catalogue_declaration_hash: ContentHash, signals: Vec<CatalogueSpecSignal>) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。schema_version=1 固定値、generated_at なし (deterministic output、CN-06) を確認する。unit test でドキュメント構造の構築と field アクセスを検証する (IN-11、domain 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T003",
