@@ -28,12 +28,13 @@
     {
       "id": "T005",
       "description": "domain 層に check_catalogue_spec_signals 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。strict: bool を受け取り、strict=true では Yellow/Red → Finding::error (BLOCKED)、strict=false では Yellow → Finding::warning (PASS)、Red → Finding::error (BLOCKED) の挙動を提供する。既存 check_spec_doc_signals / check_type_signals と同型の signature で統一する。unit test で strict=true / strict=false × Yellow / Red / Blue の組み合わせを検証する (IN-03、domain 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "d635f21"
     },
     {
       "id": "T006",
       "description": "usecase 層の TrackBlobReader secondary port に 2 つの新規メソッドを追加する: read_catalogue_for_spec_ref_check (branch/track_id/layer_id → BlobFetchResult<(TypeCatalogueDocument, String)>; String は raw bytes の SHA-256 hash、stale 検出の catalogue_declaration_hash 比較に必須; 既存 read_type_catalogue と同パターン) と read_catalogue_spec_signals_document (branch/track_id/layer_id → BlobFetchResult<CatalogueSpecSignalsDocument>)。libs/usecase/src/merge_gate.rs の trait 定義を更新する (IN-07、usecase 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T007",

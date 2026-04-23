@@ -17,7 +17,7 @@
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::validate_branch_ref;
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{ImplPlanDocument, TrackId};
+use domain::{CatalogueSpecSignalsDocument, ImplPlanDocument, TrackId};
 use domain::{TypeCatalogueDocument, check_type_signals};
 
 /// Result of a port-level blob fetch.
@@ -95,6 +95,63 @@ pub trait TrackBlobReader {
     /// compatibility with mocks that have not been updated.
     fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
         BlobFetchResult::Found(vec!["domain".to_string()])
+    }
+
+    /// Reads and decodes the `<layer>-types.json` catalogue for the purpose
+    /// of catalogue-spec ref integrity checking (ADR
+    /// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D2.2).
+    ///
+    /// The `Found` variant returns `(doc, raw_bytes_sha256_hex)` where the
+    /// 64-character lowercase hex SHA-256 is computed over the canonical
+    /// on-disk bytes of the catalogue. Callers convert this into a
+    /// [`ContentHash`](domain::ContentHash) via
+    /// [`ContentHash::try_from_hex`](domain::ContentHash::try_from_hex) and
+    /// pass it to
+    /// [`check_catalogue_spec_ref_integrity`](domain::check_catalogue_spec_ref_integrity)
+    /// as `current_catalogue_hash` for stale detection.
+    ///
+    /// Note: the `String` return here is the **raw-bytes SHA-256 hash**, not
+    /// a resolved filename (the `read_type_catalogue` port returns a filename
+    /// in the same tuple slot). The stale-detection use case requires the
+    /// hash, so the two ports are kept distinct even though both read the
+    /// same catalogue file.
+    ///
+    /// A default implementation returns `FetchError` so adapters that opt into
+    /// the new port surface the gap explicitly. Implementations in
+    /// `libs/infrastructure/` override this method in T011.
+    fn read_catalogue_for_spec_ref_check(
+        &self,
+        _branch: &str,
+        _track_id: &str,
+        _layer_id: &str,
+    ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        BlobFetchResult::FetchError(
+            "read_catalogue_for_spec_ref_check not implemented for this TrackBlobReader".to_owned(),
+        )
+    }
+
+    /// Reads and decodes the `<layer>-catalogue-spec-signals.json` file for
+    /// the given layer on the target branch.
+    ///
+    /// Returns `NotFound` when the signals file has not been generated yet
+    /// (expected for tracks before `sotp track catalogue-spec-signals` runs
+    /// or for layers whose `catalogue_spec_signal.enabled` flag is false).
+    /// Callers (verify / merge-gate) decide whether `NotFound` short-circuits
+    /// to a finding or to `pass`.
+    ///
+    /// A default implementation returns `FetchError` so adapters that opt into
+    /// the new port surface the gap explicitly. Implementations in
+    /// `libs/infrastructure/` override this method in T011.
+    fn read_catalogue_spec_signals_document(
+        &self,
+        _branch: &str,
+        _track_id: &str,
+        _layer_id: &str,
+    ) -> BlobFetchResult<CatalogueSpecSignalsDocument> {
+        BlobFetchResult::FetchError(
+            "read_catalogue_spec_signals_document not implemented for this TrackBlobReader"
+                .to_owned(),
+        )
     }
 }
 

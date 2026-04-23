@@ -312,26 +312,26 @@ pub fn check_catalogue_spec_ref_integrity(
 /// Evaluates catalogue-spec signal gate rules against a
 /// [`CatalogueSpecSignalsDocument`].
 ///
-/// Symmetric with [`check_spec_doc_signals`](crate::check_spec_doc_signals)
-/// (Phase 1) and [`check_type_signals`](crate::check_type_signals) (SoT
-/// Chain ③): shared 3-signal gate shape so the merge-gate assembly can
-/// treat every SoT Chain layer uniformly.
+/// Symmetric with `check_spec_doc_signals` (Phase 1, in
+/// `libs/domain/src/spec.rs`) and `check_type_signals` (SoT Chain ③, in
+/// `libs/domain/src/tddd/consistency.rs`): shared 3-signal gate shape so
+/// the merge-gate assembly can treat every SoT Chain layer uniformly.
 ///
 /// # Rules
 ///
-/// - `signals.signals` is empty → [`VerifyOutcome::pass`] (a layer with no
+/// - `signals.signals` is empty → `VerifyOutcome::pass` (a layer with no
 ///   declared catalogue entries has no catalogue-spec signal to block on)
-/// - any [`ConfidenceSignal::Red`] entry → [`VerifyFinding::error`]
+/// - any [`ConfidenceSignal::Red`] entry → `VerifyFinding::error`
 ///   (always blocks, regardless of `strict`)
 /// - any [`ConfidenceSignal::Yellow`] entry:
-///   - `strict = true` → [`VerifyFinding::error`] (merge gate blocks)
-///   - `strict = false` → [`VerifyFinding::warning`] (CI interim mode visualises)
-/// - all [`ConfidenceSignal::Blue`] → [`VerifyOutcome::pass`]
+///   - `strict = true` → `VerifyFinding::error` (merge gate blocks)
+///   - `strict = false` → `VerifyFinding::warning` (CI interim mode visualises)
+/// - all [`ConfidenceSignal::Blue`] → `VerifyOutcome::pass`
 ///
 /// Red takes precedence over Yellow: a document with both Red and Yellow
 /// entries reports the Red finding only. This matches the precedent set by
-/// [`check_spec_doc_signals`] / [`check_type_signals`] where Red is the
-/// terminal state and Yellow is only inspected when Red is absent.
+/// the Phase 1 / SoT Chain ③ sibling gates where Red is the terminal state
+/// and Yellow is only inspected when Red is absent.
 ///
 /// # Parameters
 ///
@@ -347,8 +347,8 @@ pub fn check_catalogue_spec_ref_integrity(
 /// # Reference
 ///
 /// - ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D4 (strict / interim behaviour)
-/// - Sibling: [`check_spec_doc_signals`] (Phase 1 spec signal gate)
-/// - Sibling: [`check_type_signals`] (SoT Chain ③ type signal gate)
+/// - Sibling: `check_spec_doc_signals` in `libs/domain/src/spec.rs` (Phase 1 spec signal gate)
+/// - Sibling: `check_type_signals` in `libs/domain/src/tddd/consistency.rs` (SoT Chain ③ type signal gate)
 #[must_use]
 pub fn check_catalogue_spec_signals(
     signals: &CatalogueSpecSignalsDocument,
