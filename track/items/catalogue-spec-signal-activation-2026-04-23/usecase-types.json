@@ -14,6 +14,64 @@
       ]
     },
     {
+      "name": "RefreshCatalogueSpecSignals",
+      "description": "Primary (driving) port trait implemented by RefreshCatalogueSpecSignalsInteractor. Exposes a single `execute(&RefreshCatalogueSpecSignalsCommand) -> Result<(), RefreshCatalogueSpecSignalsError>` method so CLI / integration code can depend on the trait rather than the concrete interactor struct. Follows the same trait+interactor pattern used by RenderContractMap / RenderContractMapInteractor (libs/usecase/src/contract_map_workflow.rs). Send + Sync bounds. Authored alongside the interactor in T008.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RefreshCatalogueSpecSignalsCommand"
+            }
+          ],
+          "returns": "Result<(), RefreshCatalogueSpecSignalsError>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T008 implementation-time: adjacent application_service trait co-located with the interactor so the CLI depends on the trait; pattern follows RenderContractMap precedent"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignalsCommand",
+      "description": "Command input value-object for RefreshCatalogueSpecSignals::execute. Fields: branch (String — current git branch for CN-07 guard), track_id (TrackId — target track), layer_id (String — layer whose catalogue is being refreshed). #[derive(Debug, Clone, PartialEq, Eq)] for ergonomic CLI dispatch + tests.",
+      "approved": true,
+      "kind": "command",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T008 implementation-time: command input co-located with interactor, consistent with RenderContractMapCommand precedent"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignalsError",
+      "description": "Failure-mode enum for RefreshCatalogueSpecSignals::execute. Six variants cover: NonActiveTrack (CN-07 branch guard), BranchTrackMismatch (branch/track_id disagreement), CatalogueNotFound (layer file absent), FetchError (blob-fetch I/O / decode), InvalidCatalogueHash (raw-bytes hash not canonical SHA-256 hex), WriteFailed (writer port failure). thiserror::Error + #[source] for chained diagnostics.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "FetchError",
+        "InvalidCatalogueHash",
+        "WriteFailed"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T008 implementation-time: error taxonomy captures the 6 concrete failure modes of the 5-step pipeline + 2-stage guard; enum-first per 04-coding-principles.md"
+        }
+      ]
+    },
+    {
       "name": "VerifyCatalogueSpecRefsInteractor",
       "description": "Usecase-layer struct implementing the sotp verify catalogue-spec-refs command logic. Orchestrates: (1) read <layer>-types.json, spec.json, and optionally <layer>-catalogue-spec-signals.json via TrackBlobReader, (2) call domain check_catalogue_spec_ref_integrity for each layer, (3) aggregate Vec<SpecRefFinding> and return. Supports --skip-stale flag (when true, StaleSignals detection is skipped — used in pre-commit path where signals file is re-generated in the next step). Applies active-track guard per CN-07 / ADR D3.2. Placed in libs/usecase/src/catalogue_spec_refs.rs per D3.7.",
       "approved": true,

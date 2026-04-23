@@ -1,13 +1,42 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-23T23:18:55Z",
-  "declaration_hash": "2d30c400d390a2ae8273900255d091e59ce9bd16d26f851eb0307563bee36045",
+  "generated_at": "2026-04-23T23:40:41Z",
+  "declaration_hash": "36db2538379879b756d5ab8b5d9f7cc6010c4fb4ef5fc8edd19a02c696c8e59d",
   "signals": [
     {
       "type_name": "RefreshCatalogueSpecSignalsInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignals",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: &RefreshCatalogueSpecSignalsCommand) -> Result<(), RefreshCatalogueSpecSignalsError>"
+      ]
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "FetchError",
+        "InvalidCatalogueHash",
+        "WriteFailed"
+      ]
     },
     {
       "type_name": "VerifyCatalogueSpecRefsInteractor",

@@ -13,6 +13,9 @@ flowchart LR
     end
     subgraph usecase [usecase]
         L7_usecase_RefreshCatalogueSpecSignalsInteractor[\RefreshCatalogueSpecSignalsInteractor/]
+        L7_usecase_RefreshCatalogueSpecSignals[/RefreshCatalogueSpecSignals\]
+        L7_usecase_RefreshCatalogueSpecSignalsCommand[RefreshCatalogueSpecSignalsCommand]:::command
+        L7_usecase_RefreshCatalogueSpecSignalsError>RefreshCatalogueSpecSignalsError]
         L7_usecase_VerifyCatalogueSpecRefsInteractor[\VerifyCatalogueSpecRefsInteractor/]
         L7_usecase_TrackBlobReader[[TrackBlobReader]]
         L7_usecase_CatalogueSpecSignalsWriter[[CatalogueSpecSignalsWriter]]
@@ -27,5 +30,7 @@ flowchart LR
     L14_infrastructure_GitShowTrackBlobReader -->|"read_catalogue_spec_signals_document"| L6_domain_CatalogueSpecSignalsDocument
     L14_infrastructure_GitShowTrackBlobReader -.impl.-> L7_usecase_TrackBlobReader
     L7_usecase_CatalogueSpecSignalsWriter -->|"write_catalogue_spec_signals(doc)"| L6_domain_CatalogueSpecSignalsDocument
+    L7_usecase_RefreshCatalogueSpecSignals -->|"execute"| L7_usecase_RefreshCatalogueSpecSignalsError
+    L7_usecase_RefreshCatalogueSpecSignals -->|"execute(cmd)"| L7_usecase_RefreshCatalogueSpecSignalsCommand
     L7_usecase_TrackBlobReader -->|"read_catalogue_spec_signals_document"| L6_domain_CatalogueSpecSignalsDocument
 ```

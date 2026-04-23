@@ -40,12 +40,13 @@
     {
       "id": "T007",
       "description": "usecase 層に CatalogueSpecSignalsWriter secondary port を新設する。single method: write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>。TrackWriter / ImplPlanWriter / ReviewWriter と同パターンで libs/usecase/src/catalogue_spec_signals.rs に配置する (IN-05 の port 要件、usecase 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "4548d03"
     },
     {
       "id": "T008",
       "description": "usecase 層に RefreshCatalogueSpecSignalsInteractor を libs/usecase/src/catalogue_spec_signals.rs に実装する。TrackBlobReader / CatalogueSpecSignalsWriter port を依存注入で受け取り、(1) read_catalogue_for_spec_ref_check で <layer>-types.json を読み込み (TypeCatalogueDocument, String) を取得 (String = raw bytes SHA-256 = catalogue_declaration_hash; read_type_catalogue の String は resolved filename であり hash 用途に使えないため read_catalogue_for_spec_ref_check を使う)、(2) domain evaluate_catalogue_entry_signal で entry 単位 signal 算出、(3) step 1 の String を catalogue_declaration_hash として使用、(4) CatalogueSpecSignalsDocument 構築、(5) atomic write の 5 ステップを実行する。active-track guard (CN-07) を適用する。unit test でモックポートを使って正常系 + 非アクティブ reject を検証する (IN-05、usecase 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T009",
