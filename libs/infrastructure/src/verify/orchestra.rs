@@ -102,6 +102,11 @@ const EXPECTED_OTHER_ALLOW: &[(&str, &str)] = &[
     ("Bash(head :*)", "head read-only permission"),
     ("Bash(tail :*)", "tail read-only permission"),
     ("Bash(wc :*)", "wc read-only permission"),
+    ("Bash(grep:*)", "grep read-only permission"),
+    ("Bash(uniq:*)", "uniq write-capable but exec-incapable permission"),
+    ("Bash(diff:*)", "diff read-only permission"),
+    ("Bash(jq:*)", "jq read-only permission"),
+    ("Bash(pwd:*)", "pwd read-only permission"),
 ];
 
 const EXPECTED_GIT_ALLOW: &[(&str, &str)] = &[
@@ -214,14 +219,25 @@ const FORBIDDEN_ALLOW: &[&str] = &[
     "Bash(git tag:*)",
     "Bash(cat:*)",
     "Bash(ls:*)",
+    // find は `-exec` / `-execdir` で任意 utility を exec する wrap-execute 脆弱性を持つ
+    // (env と同型)。`-delete` / `-fprint FILE` / `-fls FILE` で destructive 操作も可能。
+    // したがって env と同じ理由で FORBIDDEN 維持。
     "Bash(find:*)",
-    "Bash(grep:*)",
-    // head, tail, wc are read-only — moved to allow (WF-35)
+    // sort は GNU sort の `--compress-program=PROG` で temporary files 処理時に任意
+    // プログラムを exec する wrap-execute 脆弱性を持つ (env / find -exec と同型)。
+    // したがって FORBIDDEN 維持 (2026-04-23 reviewer P0 finding で確定)。
     "Bash(sort:*)",
-    "Bash(uniq:*)",
-    "Bash(diff:*)",
+    // grep / uniq / diff / jq / pwd は baseline の EXPECTED_ALLOW に移行した
+    // (2026-04-23 user 判断)。専用 tool (Glob / Grep / Read) が使える範囲は UX 上そちらを
+    // 優先するが、GNU grep の独自 flag、jq の JSON filter 等、専用 tool で完全置換できない
+    // 場面もあるため一律禁止を解除する。head/tail/wc も同様に allow 済 (WF-35)。
+    // uniq は第 2 引数で write 可能だが exec 機構は持たないため、Write tool と同等権限の
+    // 範囲内として allow する。
+    //
+    // env は `env [name=value ...] [utility [argument ...]]` 形式で任意 utility を exec
+    // する wrapper として機能するため、allow すると `env git commit` 等で本 FORBIDDEN_ALLOW を
+    // bypass できる。したがって env も引き続き FORBIDDEN を維持。
     "Bash(echo:*)",
-    "Bash(pwd:*)",
     "Bash(cd:*)",
     "Bash(mkdir:*)",
     "Bash(touch:*)",
@@ -235,7 +251,6 @@ const FORBIDDEN_ALLOW: &[&str] = &[
     "Bash(docker-compose:*)",
     "Bash(rustup:*)",
     "Bash(rustfmt:*)",
-    "Bash(jq:*)",
     "Bash(sed:*)",
     "Bash(awk:*)",
     "Bash(env:*)",

@@ -94,6 +94,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [計画成果物ワークフローの再構築 — SoT Chain に沿ったフェーズ分離](2026-04-19-1242-plan-artifact-workflow-restructure.md) | — | 2026-04-19 |
 | [Phase command 共通構造 + subagent 内部 pipeline 決定](2026-04-22-0829-plan-command-structural-refinements.md) | — | 2026-04-22 |
+| [sotp track branch create: main 上の activation commit regression 修正](2026-04-22-1432-branch-create-commit-ordering.md) | — | 2026-04-22 |
 
 ### ADR 運用
 
