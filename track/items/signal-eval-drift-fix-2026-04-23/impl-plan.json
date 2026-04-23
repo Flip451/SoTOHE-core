@@ -27,12 +27,13 @@
     {
       "id": "T005",
       "description": "Append three signal-evaluation decision criteria to .claude/agents/spec-designer.md: (1) universal coding principles belong in related_conventions[] not per-element refs, (2) convention_refs[] do not contribute to signal evaluation so adr_refs[]+informal_grounds[] both empty means Red, (3) Yellow informal_grounds[] must be resolved before merge via one of three options (IN-06)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9cb014ba176699219692012c4c44d34f63626c80"
     },
     {
       "id": "T006",
       "description": "Run cargo make ci regression gate; confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, check-layers, verify-track-metadata, verify-plan-artifact-refs, all others) (CN-01, AC-04)",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {

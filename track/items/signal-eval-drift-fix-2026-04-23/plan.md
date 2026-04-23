@@ -7,7 +7,7 @@ Fix two drifts within the same ADR 2026-04-19-1242: (a) evaluate_requirement_sig
 Also codify three signal-evaluation decision criteria in .claude/agents/spec-designer.md to let spec-designer judge universal convention / per-element constraint / Yellow resolution autonomously (avoiding the round-trip observed in this track's Phase 1).
 T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift in tddd/signals.rs (expected: no drift). T003 relaxes validate_track_snapshots to skip missing plan.md. T004 removes the now-incorrect max() lines from the ADR. T005 updates the spec-designer agent. T006 runs cargo make ci regression gate.
 
-## Tasks (4/6 resolved)
+## Tasks (6/6 resolved)
 
 ### S1 — Domain signal logic fix
 
@@ -32,10 +32,10 @@ T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift
 
 > Codify three signal-evaluation decision criteria in the spec-designer agent definition so future spec sessions converge without back-and-forth.
 
-- [~] **T005**: Append three signal-evaluation decision criteria to .claude/agents/spec-designer.md: (1) universal coding principles belong in related_conventions[] not per-element refs, (2) convention_refs[] do not contribute to signal evaluation so adr_refs[]+informal_grounds[] both empty means Red, (3) Yellow informal_grounds[] must be resolved before merge via one of three options (IN-06)
+- [x] **T005**: Append three signal-evaluation decision criteria to .claude/agents/spec-designer.md: (1) universal coding principles belong in related_conventions[] not per-element refs, (2) convention_refs[] do not contribute to signal evaluation so adr_refs[]+informal_grounds[] both empty means Red, (3) Yellow informal_grounds[] must be resolved before merge via one of three options (IN-06) (`9cb014ba176699219692012c4c44d34f63626c80`)
 
 ### S5 — CI regression gate
 
 > Full cargo make ci run to confirm that all quality checks pass after the above changes.
 
-- [ ] **T006**: Run cargo make ci regression gate; confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, check-layers, verify-track-metadata, verify-plan-artifact-refs, all others) (CN-01, AC-04)
+- [x] **T006**: Run cargo make ci regression gate; confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, check-layers, verify-track-metadata, verify-plan-artifact-refs, all others) (CN-01, AC-04)

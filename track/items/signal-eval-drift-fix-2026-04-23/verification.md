@@ -60,8 +60,50 @@
 
 ## 結果 / 未解決事項
 
-(実装完了時に記録)
+### T001 結果 (commit 1c5011c1)
+
+- `evaluate_requirement_signal` を informal-priority logic に修正
+- branch 順序: `informal_grounds.is_empty()` check 先 → `adr_refs.is_empty()` check 後
+- rustdoc comment を `SpecRequirement::signal()` / standalone 関数両方で新 rule に更新
+- 既存 test rename (`adr_refs_take_priority_over_informal` → `informal_takes_priority_over_adr_refs`) + assert を Yellow に変更
+- 新 regression guard test `test_evaluate_requirement_signal_adr_refs_plus_informal_gives_yellow` 追加
+- `cargo make test`: 2349 tests pass
+
+### T002 結果 (skipped)
+
+- `tddd/signals.rs::evaluate_type_signals` / `evaluate_single` は rustdoc TypeGraph との構造比較のみで `adr_refs` / `informal_grounds` を参照しない。drift なし
+- catalogue entry の `spec_refs` + `informal_grounds` を合成する `ConfidenceSignal` 評価関数は codebase 内に存在せず、spec 側の `evaluate_requirement_signal` と同型の drift は type catalogue には無い
+- 実装変更なしで skipped close
+
+### T003 結果 (commit a457865a)
+
+- `validate_track_snapshots` に `std::fs::metadata()` match ガード追加
+- NotFound → content check を skip (Phase 0 正常系)
+- その他 I/O error → propagate、non-file path → `InvalidTrackMetadata` で reject
+- 新 test `validate_track_snapshots_tolerates_phase_zero_missing_plan_md` 追加、既存 5 test 継続 pass
+- Phase 0 直後 (plan.md 未 render) で `cargo make verify-track-metadata` が pass するようになった
+
+### T004 結果 (commit ba31bb80)
+
+- ADR 2026-04-19-1242 §D3.1 line 495 の `max(adr_refs, informal_grounds)` 表現を削除
+- 同 §D3.2 line 515 の `max(spec_refs, informal_grounds)` 表現を削除
+- 他 line (field 単位 signal 定義、section anchor) は保持
+
+### T005 結果 (commit 9cb014ba)
+
+- `.claude/agents/spec-designer.md` に `## Signal Evaluation Decision Criteria` セクション追加 (3 subsection)
+- `## Design Principles` の no-panics 項目を新方針に整合させ訂正
+- 本 track Phase 1 の CN-04 round-trip が再発しないよう agent 定義に判断基準を embed
+
+### T006 結果 (cargo make ci 回帰ゲート)
+
+- `cargo make ci` (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-*) 全項目 PASS
+- nextest: 2350 tests pass (既存 + T001 新 1 + T003 新 1)、regression ゼロ
+
+### 未解決事項
+
+なし。AC-01 〜 AC-04 全て満たす。
 
 ## verified_at
 
-(実装完了時に記録)
+2026-04-23
