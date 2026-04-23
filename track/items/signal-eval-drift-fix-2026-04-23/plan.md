@@ -38,4 +38,4 @@ T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift
 
 > Full cargo make ci run to confirm that all quality checks pass after the above changes.
 
-- [x] **T006**: Run cargo make ci regression gate; confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, check-layers, verify-track-metadata, verify-plan-artifact-refs, all others) (CN-01, AC-04)
+- [x] **T006**: Run cargo make ci regression gate; confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, check-layers, verify-track-metadata, verify-plan-artifact-refs, all others) (CN-01, AC-04) (`4f99cc23e68261f0e499735923008d8a95db7bd3`)

@@ -33,7 +33,8 @@
     {
       "id": "T006",
       "description": "Run cargo make ci regression gate; confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, check-layers, verify-track-metadata, verify-plan-artifact-refs, all others) (CN-01, AC-04)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "4f99cc23e68261f0e499735923008d8a95db7bd3"
     }
   ],
   "plan": {
