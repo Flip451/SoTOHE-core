@@ -58,7 +58,7 @@ pub use tddd::catalogue::{
 };
 pub use tddd::catalogue_spec_signal::{
     CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION, CatalogueSpecSignal, CatalogueSpecSignalsDocument,
-    SpecRefFinding, SpecRefFindingKind,
+    SpecRefFinding, SpecRefFindingKind, evaluate_catalogue_entry_signal,
 };
 pub use tddd::consistency::{
     ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,

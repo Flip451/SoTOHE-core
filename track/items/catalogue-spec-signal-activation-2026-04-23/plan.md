@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # 型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ② の実装)
 
-## Tasks (3/25 resolved)
+## Tasks (4/25 resolved)
 
 ### S1 — S1 — Domain primitives: types + pure functions
 
@@ -13,8 +13,8 @@
 > 全て libs/domain/src/tddd/catalogue_spec_signal.rs に配置、I/O なし (CN-05)
 
 - [x] **T001**: domain 層に SpecRefFinding 値オブジェクトと SpecRefFindingKind enum (DanglingAnchor / HashMismatch / StaleSignals の 3 variant) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。各フィールド (layer, catalogue_entry, ref_index, spec_file, kind) の型と可視性を決定し、#[derive] 設定 (Debug, Clone 等) を付与する。unit test で 3 variant を構築・比較できることを確認する (IN-04、domain 層) (`ed205c9`)
-- [x] **T002**: domain 層に CatalogueSpecSignal 値オブジェクト (type_name: String, signal: ConfidenceSignal) と CatalogueSpecSignalsDocument 値オブジェクト (schema_version: u32=1, catalogue_declaration_hash: ContentHash, signals: Vec<CatalogueSpecSignal>) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。schema_version=1 固定値、generated_at なし (deterministic output、CN-06) を確認する。unit test でドキュメント構造の構築と field アクセスを検証する (IN-11、domain 層)
-- [ ] **T003**: domain 層に evaluate_catalogue_entry_signal 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。informal-priority rule (informal_grounds[] 非空 → Yellow / spec_refs[] 非空 + informal_grounds[] 空 → Blue / 両方空 → Red) を Phase 1 evaluate_requirement_signal と対称なシグネチャで提供する。unit test で 3 ケース (Blue / Yellow / Red) を網羅し、I/O を持たないことを確認する (IN-01、domain 層)
+- [x] **T002**: domain 層に CatalogueSpecSignal 値オブジェクト (type_name: String, signal: ConfidenceSignal) と CatalogueSpecSignalsDocument 値オブジェクト (schema_version: u32=1, catalogue_declaration_hash: ContentHash, signals: Vec<CatalogueSpecSignal>) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。schema_version=1 固定値、generated_at なし (deterministic output、CN-06) を確認する。unit test でドキュメント構造の構築と field アクセスを検証する (IN-11、domain 層) (`ed8c52d`)
+- [x] **T003**: domain 層に evaluate_catalogue_entry_signal 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。informal-priority rule (informal_grounds[] 非空 → Yellow / spec_refs[] 非空 + informal_grounds[] 空 → Blue / 両方空 → Red) を Phase 1 evaluate_requirement_signal と対称なシグネチャで提供する。unit test で 3 ケース (Blue / Yellow / Red) を網羅し、I/O を持たないことを確認する (IN-01、domain 層)
 - [ ] **T004**: domain 層に check_catalogue_spec_ref_integrity 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。シグネチャ: check_catalogue_spec_ref_integrity(catalogue: &TypeCatalogueDocument, spec: &SpecDocument, current_catalogue_hash: Option<&ContentHash>, signals_opt: Option<&CatalogueSpecSignalsDocument>) -> Vec<SpecRefFinding>。current_catalogue_hash は usecase 層が read_catalogue_for_spec_ref_check の返値 (TypeCatalogueDocument, String) の String 部から ContentHash として渡す (stale 検出用; None の場合は stale check をスキップ)。実施する検証: (1) SpecRef.anchor (SpecElementId) の spec.json 内存在確認 (dangling 検出)、(2) SpecRef.hash の canonical serialization SHA-256 一致検証 (drift 検出)、(3) signals_opt + current_catalogue_hash が両方 Some の場合の catalogue_declaration_hash vs current_catalogue_hash 比較 (stale 検出)。Vec<SpecRefFinding> を返す (空 = ok)。unit test で dangling / drift / stale / 全通過の 4 ケースを検証する。I/O を持たない (IN-02、domain 層)
 - [ ] **T005**: domain 層に check_catalogue_spec_signals 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。strict: bool を受け取り、strict=true では Yellow/Red → Finding::error (BLOCKED)、strict=false では Yellow → Finding::warning (PASS)、Red → Finding::error (BLOCKED) の挙動を提供する。既存 check_spec_doc_signals / check_type_signals と同型の signature で統一する。unit test で strict=true / strict=false × Yellow / Red / Blue の組み合わせを検証する (IN-03、domain 層)
 

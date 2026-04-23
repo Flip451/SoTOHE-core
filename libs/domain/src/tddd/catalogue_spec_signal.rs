@@ -17,7 +17,7 @@
 use std::path::PathBuf;
 
 use crate::ConfidenceSignal;
-use crate::plan_ref::{ContentHash, SpecElementId};
+use crate::plan_ref::{ContentHash, InformalGroundRef, SpecElementId, SpecRef};
 use crate::tddd::layer_id::LayerId;
 
 /// Schema version of `<layer>-catalogue-spec-signals.json` — pinned to `1`
@@ -169,6 +169,38 @@ impl CatalogueSpecSignalsDocument {
     pub fn schema_version(&self) -> u32 {
         self.schema_version
     }
+}
+
+/// Evaluates the catalogue-spec confidence signal for a single catalogue entry.
+///
+/// Implements the **informal-priority rule** (ADR
+/// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.1). The rule is
+/// the per-layer analogue of Phase 1's
+/// [`evaluate_requirement_signal`](crate::evaluate_requirement_signal):
+///
+/// - `informal_grounds[]` non-empty → 🟡 Yellow (unpersisted ground; takes
+///   priority regardless of `spec_refs[]` because any remaining informal ground
+///   still requires promotion to a formal `SpecRef` before merge)
+/// - `informal_grounds[]` empty + `spec_refs[]` non-empty → 🔵 Blue (formal
+///   spec grounding with no pending promotion)
+/// - both empty → 🔴 Red
+///
+/// Per-`SpecRef` integrity (dangling `anchor`, hash drift, stale signals) is
+/// outside this signal's scope and is reported via [`SpecRefFinding`] by the
+/// binary gate (`check_catalogue_spec_ref_integrity`, authored in T004). This
+/// function is pure and I/O-free.
+#[must_use]
+pub fn evaluate_catalogue_entry_signal(
+    spec_refs: &[SpecRef],
+    informal_grounds: &[InformalGroundRef],
+) -> ConfidenceSignal {
+    if !informal_grounds.is_empty() {
+        return ConfidenceSignal::Yellow;
+    }
+    if !spec_refs.is_empty() {
+        return ConfidenceSignal::Blue;
+    }
+    ConfidenceSignal::Red
 }
 
 #[cfg(test)]
@@ -365,5 +397,49 @@ mod tests {
         );
         let clone = doc.clone();
         assert_eq!(doc, clone);
+    }
+
+    // ---------------------------------------------------------------------------
+    // evaluate_catalogue_entry_signal (T003, IN-01)
+    // ---------------------------------------------------------------------------
+
+    use crate::plan_ref::{InformalGroundKind, InformalGroundRef, InformalGroundSummary, SpecRef};
+
+    fn informal(kind: InformalGroundKind, summary: &str) -> InformalGroundRef {
+        InformalGroundRef::new(kind, InformalGroundSummary::try_new(summary).unwrap())
+    }
+
+    fn spec_ref(anchor_id: &str) -> SpecRef {
+        SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(0x00))
+    }
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_returns_red_when_both_refs_empty() {
+        let signal = evaluate_catalogue_entry_signal(&[], &[]);
+        assert_eq!(signal, ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_returns_blue_when_only_spec_refs_present() {
+        let refs = vec![spec_ref("IN-01")];
+        let signal = evaluate_catalogue_entry_signal(&refs, &[]);
+        assert_eq!(signal, ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_returns_yellow_when_informal_grounds_present() {
+        let grounds = vec![informal(InformalGroundKind::UserDirective, "pending promotion")];
+        let signal = evaluate_catalogue_entry_signal(&[], &grounds);
+        assert_eq!(signal, ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_yellow_takes_priority_over_spec_refs() {
+        let refs = vec![spec_ref("IN-01"), spec_ref("IN-02")];
+        let grounds = vec![informal(InformalGroundKind::Discussion, "still iterating")];
+        let signal = evaluate_catalogue_entry_signal(&refs, &grounds);
+        // Informal-priority rule: any informal ground → Yellow regardless of
+        // spec_refs count. Promotion to Blue requires clearing informal_grounds.
+        assert_eq!(signal, ConfidenceSignal::Yellow);
     }
 }

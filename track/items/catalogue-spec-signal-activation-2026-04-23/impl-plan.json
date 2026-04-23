@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "domain 層に CatalogueSpecSignal 値オブジェクト (type_name: String, signal: ConfidenceSignal) と CatalogueSpecSignalsDocument 値オブジェクト (schema_version: u32=1, catalogue_declaration_hash: ContentHash, signals: Vec<CatalogueSpecSignal>) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。schema_version=1 固定値、generated_at なし (deterministic output、CN-06) を確認する。unit test でドキュメント構造の構築と field アクセスを検証する (IN-11、domain 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ed8c52d"
     },
     {
       "id": "T003",
       "description": "domain 層に evaluate_catalogue_entry_signal 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。informal-priority rule (informal_grounds[] 非空 → Yellow / spec_refs[] 非空 + informal_grounds[] 空 → Blue / 両方空 → Red) を Phase 1 evaluate_requirement_signal と対称なシグネチャで提供する。unit test で 3 ケース (Blue / Yellow / Red) を網羅し、I/O を持たないことを確認する (IN-01、domain 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T004",
