@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "domain 層に SpecRefFinding 値オブジェクトと SpecRefFindingKind enum (DanglingAnchor / HashMismatch / StaleSignals の 3 variant) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。各フィールド (layer, catalogue_entry, ref_index, spec_file, kind) の型と可視性を決定し、#[derive] 設定 (Debug, Clone 等) を付与する。unit test で 3 variant を構築・比較できることを確認する (IN-04、domain 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ed205c9"
     },
     {
       "id": "T002",
