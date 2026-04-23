@@ -4,38 +4,32 @@
     {
       "id": "T001",
       "description": "Fix evaluate_requirement_signal in spec.rs to implement informal-priority: return Yellow when adr_refs non-empty and informal_grounds non-empty; update and extend existing unit tests to cover the corrected logic (IN-01, IN-05)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "in_progress"
     },
     {
       "id": "T002",
       "description": "Investigate tddd/signals.rs for the same drift as IN-01: confirm whether evaluate_type_signals or any peer function ignores informal_grounds when adr_refs are non-empty, and apply the same informal-priority fix if found; record the outcome (IN-02 — expected: no drift, task closes as skipped or with a no-op commit)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T003",
       "description": "Fix validate_track_snapshots in render.rs to skip plan.md content check when plan.md is absent (Phase 0 compatible); add a unit test that passes when the snapshot directory contains only metadata.json (IN-04, IN-05)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "Remove the max(adr_refs, informal_grounds) line from ADR §D3.1 and the max(spec_refs, informal_grounds) line from ADR §D3.2; preserve all other lines and anchors (IN-03)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "Append three signal-evaluation decision criteria to .claude/agents/spec-designer.md: (1) universal coding principles belong in related_conventions[] not per-element refs, (2) convention_refs[] do not contribute to signal evaluation so adr_refs[]+informal_grounds[] both empty means Red, (3) Yellow informal_grounds[] must be resolved before merge via one of three options (IN-06)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T006",
       "description": "Run cargo make ci regression gate; confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, check-layers, verify-track-metadata, verify-plan-artifact-refs, all others) (CN-01, AC-04)",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
@@ -51,7 +45,10 @@
         "description": [
           "Correct the informal-priority rule in evaluate_requirement_signal (spec.rs) and verify no analogous drift exists in the type catalogue signal evaluator. Tests are co-located with each fix."
         ],
-        "task_ids": ["T001", "T002"]
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
       },
       {
         "id": "S2",
@@ -59,7 +56,9 @@
         "description": [
           "Make validate_track_snapshots resilient to Phase-0 tracks (metadata.json only, no plan.md yet) so that verify-track-metadata passes immediately after /track:init."
         ],
-        "task_ids": ["T003"]
+        "task_ids": [
+          "T003"
+        ]
       },
       {
         "id": "S3",
@@ -67,7 +66,9 @@
         "description": [
           "Remove the now-incorrect max() composite-signal expressions from ADR §D3.1 and §D3.2, leaving all other definitions and anchors intact."
         ],
-        "task_ids": ["T004"]
+        "task_ids": [
+          "T004"
+        ]
       },
       {
         "id": "S4",
@@ -75,7 +76,9 @@
         "description": [
           "Codify three signal-evaluation decision criteria in the spec-designer agent definition so future spec sessions converge without back-and-forth."
         ],
-        "task_ids": ["T005"]
+        "task_ids": [
+          "T005"
+        ]
       },
       {
         "id": "S5",
@@ -83,7 +86,9 @@
         "description": [
           "Full cargo make ci run to confirm that all quality checks pass after the above changes."
         ],
-        "task_ids": ["T006"]
+        "task_ids": [
+          "T006"
+        ]
       }
     ]
   }

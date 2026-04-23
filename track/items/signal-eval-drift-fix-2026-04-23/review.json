@@ -1,6 +1,46 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b299b4a3f8918c8c834c3ee8410e7471cd80169dad2e089418a8c16dd6611f5",
+          "at": "2026-04-23T02:22:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRequirement::signal()` still documents the old ADR-first rule, saying non-empty `adr_refs[]` returns Blue and only ADR-empty informal grounds return Yellow. The implementation now delegates to `evaluate_requirement_signal`, where informal grounds take priority even when ADR refs are present, so the public API rustdoc advertises the wrong domain rule for callers of this method.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec.rs",
+              "line": 91,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5b299b4a3f8918c8c834c3ee8410e7471cd80169dad2e089418a8c16dd6611f5",
+          "at": "2026-04-23T02:23:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ec284150f9e8d80c415547721c80a03e5a1a87c795f37944fbcb536517bdd44",
+          "at": "2026-04-23T02:27:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ec284150f9e8d80c415547721c80a03e5a1a87c795f37944fbcb536517bdd44",
+          "at": "2026-04-23T02:29:22Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -30,6 +70,35 @@
           "findings": [],
           "hash": "rvw1:sha256:f3378ad8ce00e837258572d06a8d41d7d43679c1b4ca214de08313cfa28dc0b1",
           "at": "2026-04-23T02:16:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` no longer conforms to the documented `ImplPlanDocument` task shape: each task is supposed to carry `{id, description, status, commit_hash}`, but the updated file drops `commit_hash` from every task. That breaks the schema contract for downstream readers.",
+              "severity": "P1",
+              "file": "track/items/signal-eval-drift-fix-2026-04-23/impl-plan.json",
+              "line": 5,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a2adf58b14d29d6b324bb7f607a84200d6092df18f157a29d78a5697b4a9530e",
+          "at": "2026-04-23T02:21:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2adf58b14d29d6b324bb7f607a84200d6092df18f157a29d78a5697b4a9530e",
+          "at": "2026-04-23T02:23:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2adf58b14d29d6b324bb7f607a84200d6092df18f157a29d78a5697b4a9530e",
+          "at": "2026-04-23T02:24:06Z"
         }
       ]
     }

@@ -13,7 +13,7 @@ T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift
 
 > Correct the informal-priority rule in evaluate_requirement_signal (spec.rs) and verify no analogous drift exists in the type catalogue signal evaluator. Tests are co-located with each fix.
 
-- [ ] **T001**: Fix evaluate_requirement_signal in spec.rs to implement informal-priority: return Yellow when adr_refs non-empty and informal_grounds non-empty; update and extend existing unit tests to cover the corrected logic (IN-01, IN-05)
+- [~] **T001**: Fix evaluate_requirement_signal in spec.rs to implement informal-priority: return Yellow when adr_refs non-empty and informal_grounds non-empty; update and extend existing unit tests to cover the corrected logic (IN-01, IN-05)
 - [ ] **T002**: Investigate tddd/signals.rs for the same drift as IN-01: confirm whether evaluate_type_signals or any peer function ignores informal_grounds when adr_refs are non-empty, and apply the same informal-priority fix if found; record the outcome (IN-02 — expected: no drift, task closes as skipped or with a no-op commit)
 
 ### S2 — Infrastructure phase-boundary fix
