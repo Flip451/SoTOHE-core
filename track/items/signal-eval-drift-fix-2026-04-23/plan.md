@@ -7,7 +7,7 @@ Fix two drifts within the same ADR 2026-04-19-1242: (a) evaluate_requirement_sig
 Also codify three signal-evaluation decision criteria in .claude/agents/spec-designer.md to let spec-designer judge universal convention / per-element constraint / Yellow resolution autonomously (avoiding the round-trip observed in this track's Phase 1).
 T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift in tddd/signals.rs (expected: no drift). T003 relaxes validate_track_snapshots to skip missing plan.md. T004 removes the now-incorrect max() lines from the ADR. T005 updates the spec-designer agent. T006 runs cargo make ci regression gate.
 
-## Tasks (2/6 resolved)
+## Tasks (3/6 resolved)
 
 ### S1 — Domain signal logic fix
 
@@ -20,13 +20,13 @@ T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift
 
 > Make validate_track_snapshots resilient to Phase-0 tracks (metadata.json only, no plan.md yet) so that verify-track-metadata passes immediately after /track:init.
 
-- [~] **T003**: Fix validate_track_snapshots in render.rs to skip plan.md content check when plan.md is absent (Phase 0 compatible); add a unit test that passes when the snapshot directory contains only metadata.json (IN-04, IN-05)
+- [x] **T003**: Fix validate_track_snapshots in render.rs to skip plan.md content check when plan.md is absent (Phase 0 compatible); add a unit test that passes when the snapshot directory contains only metadata.json (IN-04, IN-05) (`a457865a0a42eff070bdab4d32a5fb074db54d89`)
 
 ### S3 — ADR text alignment
 
 > Remove the now-incorrect max() composite-signal expressions from ADR §D3.1 and §D3.2, leaving all other definitions and anchors intact.
 
-- [ ] **T004**: Remove the max(adr_refs, informal_grounds) line from ADR §D3.1 and the max(spec_refs, informal_grounds) line from ADR §D3.2; preserve all other lines and anchors (IN-03)
+- [~] **T004**: Remove the max(adr_refs, informal_grounds) line from ADR §D3.1 and the max(spec_refs, informal_grounds) line from ADR §D3.2; preserve all other lines and anchors (IN-03)
 
 ### S4 — Agent guidance update
 

@@ -15,12 +15,13 @@
     {
       "id": "T003",
       "description": "Fix validate_track_snapshots in render.rs to skip plan.md content check when plan.md is absent (Phase 0 compatible); add a unit test that passes when the snapshot directory contains only metadata.json (IN-04, IN-05)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "a457865a0a42eff070bdab4d32a5fb074db54d89"
     },
     {
       "id": "T004",
       "description": "Remove the max(adr_refs, informal_grounds) line from ADR §D3.1 and the max(spec_refs, informal_grounds) line from ADR §D3.2; preserve all other lines and anchors (IN-03)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",
