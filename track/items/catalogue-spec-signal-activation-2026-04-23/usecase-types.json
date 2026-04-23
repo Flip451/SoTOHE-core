@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RefreshCatalogueSpecSignalsInteractor",
+      "description": "Usecase-layer struct implementing the sotp track catalogue-spec-signals command logic. Orchestrates: (1) read <layer>-types.json via read_catalogue_for_spec_ref_check (returns (TypeCatalogueDocument, String) where String = raw-bytes SHA-256 used as catalogue_declaration_hash; read_type_catalogue cannot be used here since its String is the resolved filename, not the hash), (2) call domain evaluate_catalogue_entry_signal for each entry, (3) use the SHA-256 String from step 1 as catalogue_declaration_hash, (4) write <layer>-catalogue-spec-signals.json via CatalogueSpecSignalsWriter (atomic write). Applies active-track guard (non-active → reject, exit non-zero) per CN-07 / ADR D3.1. Placed in libs/usecase/src/catalogue_spec_signals.rs per D3.7.",
+      "approved": true,
+      "kind": "interactor",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-05 (ADR D3.1 / D3.7) defines RefreshCatalogueSpecSignals interactor responsibilities; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefsInteractor",
+      "description": "Usecase-layer struct implementing the sotp verify catalogue-spec-refs command logic. Orchestrates: (1) read <layer>-types.json, spec.json, and optionally <layer>-catalogue-spec-signals.json via TrackBlobReader, (2) call domain check_catalogue_spec_ref_integrity for each layer, (3) aggregate Vec<SpecRefFinding> and return. Supports --skip-stale flag (when true, StaleSignals detection is skipped — used in pre-commit path where signals file is re-generated in the next step). Applies active-track guard per CN-07 / ADR D3.2. Placed in libs/usecase/src/catalogue_spec_refs.rs per D3.7.",
+      "approved": true,
+      "kind": "interactor",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-06 (ADR D3.2 / D3.7) defines VerifyCatalogueSpecRefs interactor responsibilities including --skip-stale support; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "TrackBlobReader",
+      "description": "Usecase secondary port extended by this track to add two new methods required by the merge gate SoT Chain bottom-up reorder (ADR D3.6): read_catalogue_for_spec_ref_check (reads <layer>-types.json for binary gate anchor/hash verification; returns BlobFetchResult<(TypeCatalogueDocument, String)> where the String is the SHA-256 hex digest of the raw file bytes, used by the usecase layer to construct ContentHash for stale detection; this is a DISTINCT method from read_type_catalogue — read_type_catalogue's String is the resolved catalogue filename for diagnostics, read_catalogue_for_spec_ref_check's String is the raw-bytes SHA-256; the same Rust type (String) carries different domain semantics in each method) and read_catalogue_spec_signals_document (reads <layer>-catalogue-spec-signals.json for stale detection and signal check). action=modify because the trait already exists in libs/usecase/src/merge_gate.rs.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<SpecDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_impl_plan",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<ImplPlanDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false
+        },
+        {
+          "name": "read_catalogue_for_spec_ref_check",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_catalogue_spec_signals_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<CatalogueSpecSignalsDocument>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-07 (ADR D3.6) adds read_catalogue_for_spec_ref_check (returns (TypeCatalogueDocument, String) where String = SHA-256 hex digest of raw file bytes for stale detection; distinct from read_type_catalogue whose String is the resolved catalogue filename for diagnostics) and read_catalogue_spec_signals_document to TrackBlobReader; existing methods preserved in baseline; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsWriter",
+      "description": "New usecase secondary port for atomic write of <layer>-catalogue-spec-signals.json. Single method: write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>. Follows the same pattern as TrackWriter / ImplPlanWriter / ReviewWriter ports. Implemented by FsCatalogueSpecSignalsStore in the infrastructure layer. Placed in libs/usecase/src/catalogue_spec_signals.rs alongside RefreshCatalogueSpecSignalsInteractor.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "write_catalogue_spec_signals",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            },
+            {
+              "name": "doc",
+              "ty": "&CatalogueSpecSignalsDocument"
+            }
+          ],
+          "returns": "Result<(), RepositoryError>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-05 (ADR D3.1 / D3.7) requires atomic write of <layer>-catalogue-spec-signals.json; a dedicated writer port is needed for hexagonal separation — the port name CatalogueSpecSignalsWriter is inferred from the existing TrackWriter / ImplPlanWriter / ReviewWriter pattern since ADR D3.7 only names FsCatalogueSpecSignalsStore as the infrastructure adapter; the port itself is an implicit design requirement of D3.7's hexagonal separation mandate"
+        }
+      ]
+    }
+  ]
+}

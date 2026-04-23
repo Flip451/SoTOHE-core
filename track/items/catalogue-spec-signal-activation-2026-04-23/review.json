@@ -1,0 +1,1969 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D3.6` only adds the new `catalogue-spec refs integrity check`, but `D4.1`/`D4.3` require the merge gate to also execute `check_catalogue_spec_signals(..., strict=true)` and fold that result into the final verdict. As written, the new catalogue-spec signal can never block a merge, so the merge-gate design is internally inconsistent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 492,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85f8a19afbe1f96a2d83dccdf3afa3a772d336c822cde3ba8411d6a431593304",
+          "at": "2026-04-23T13:37:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D3.3` says every path (pre-commit, CI, and merge gate) runs `sotp verify catalogue-spec-refs` followed by `sotp track catalogue-spec-signals`, but `D3.5` explicitly omits signal recomputation from CI and `D3.6` makes merge gate consume the pre-generated signals file instead. Those sections conflict on whether CI/merge are refreshers or validators, so the execution flow is not internally coherent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 435,
+              "category": "contradiction"
+            },
+            {
+              "message": "`D2.2` introduces `catalogue_declaration_hash` specifically for stale detection, but the concrete verification paths in `D3.2`, `D3.5`, and `D3.6` never actually compare that hash against the current catalogue. As written, a commit that bypasses pre-commit can leave a stale `<layer>-catalogue-spec-signals.json` with no mandatory enforcement path to catch it.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 311,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:88f3f6bec7025101649d982274cdc4b727c1134ff9c6f674c92e5f01b1718d3e",
+          "at": "2026-04-23T13:41:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.4 says hash drift is handled through the existing `sotp verify plan-artifact-refs` path, but D1.2 immediately above says that command is not reused and a new `sotp verify catalogue-spec-refs` gate is introduced. The binary-gate boundary is therefore self-contradictory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 198,
+              "category": "contradiction"
+            },
+            {
+              "message": "D3.3 marks CI as skipping signal verification, but D4.1 later defines the CI/pre-commit interim path to run `check_catalogue_spec_signals(strict=false)`. The same CI path is both required and omitted in different sections.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 462,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6d843a90a58b427cea6443e34d56b11fcf153c82ccd4cd626cddbc503f63d613",
+          "at": "2026-04-23T13:46:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3.6's merge-gate step 3 only reads the catalogue blob, but D3.2 says the binary gate must also compare against `spec.json` and, in CI/merge gate, the signals file for stale detection. As written the merge-gate path cannot perform the full hash/anchor/stale validation that this ADR promises.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 532,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e32feb1e47efc4d9ce33af4b303b3694ef933ee63a64500a4818cd391c69fc83",
+          "at": "2026-04-23T13:49:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D3.1` defines `sotp track catalogue-spec-signals` as operating on every `tddd.enabled` layer, but `D5.2` later says layers with `catalogue_spec_signal.enabled: false` must be skipped on all paths. As written, the writer CLI would still regenerate signals for opted-out layers, which conflicts with the layer-level opt-in model.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 407,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3798e779486703b6d76115497f1e9c143a1288987e9a59de721a00ddad4a53ab",
+          "at": "2026-04-23T13:51:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e44cbb76c8d3dfbeff866727a5e7c69c6b3de2ca215355f571cd55043bb50065",
+          "at": "2026-04-23T13:54:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rollout requirements contradict each other: D5.3 says SoTOHE-core must enable `catalogue_spec_signal.enabled: true` for every `tddd.enabled` layer when this implementation track completes, while D5.4 later allows merging with other `tddd.enabled` layers left `false` if their `spec_refs[]` are incomplete. Implementers cannot tell whether completion requires full-layer backfill or permits partial opt-in.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 766,
+              "category": "contradiction"
+            },
+            {
+              "message": "The same CLI command, `sotp verify catalogue-spec-refs [--track <id>]`, is specified for both pre-commit and CI, but the required stale-signal behavior differs by path: pre-commit must skip stale detection so it can regenerate the signals file afterward, while CI must fail on stale signals. With no mode flag or separate command/task contract, the implementation has no specified way to distinguish these cases; if the CLI enforces stale checks unconditionally, pre-commit cannot refresh stale files, and if it skips them, CI misses the mandatory gate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 432,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e44cbb76c8d3dfbeff866727a5e7c69c6b3de2ca215355f571cd55043bb50065",
+          "at": "2026-04-23T13:57:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.2 makes stale detection part of the `sotp verify catalogue-spec-refs` verification items without any path restriction, while the same gate is defined as firing on pre-commit, CI, and merge paths. Later D3.2/D3.3 says stale detection is CI/merge-only and explicitly skipped in pre-commit. That leaves implementers with conflicting requirements about whether the pre-commit invocation must read `<layer>-catalogue-spec-signals.json` and fail on `catalogue_declaration_hash` mismatch, or skip that check before regenerating the signals file.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 165,
+              "category": "contradiction"
+            },
+            {
+              "message": "D5.3 says SoTOHE-core must enable `catalogue_spec_signal.enabled: true` for every `tddd.enabled` layer when the implementation track completes, but D5.4 later permits other `tddd.enabled` layers with incomplete `spec_refs[]` to remain `false` and still merge. Those are incompatible rollout criteria, so the implementation plan cannot tell whether completion requires all SoTOHE layers to be enforced or only the initially dogfooded layer.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 766,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e44cbb76c8d3dfbeff866727a5e7c69c6b3de2ca215355f571cd55043bb50065",
+          "at": "2026-04-23T13:59:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc31e23bda0cf22cb6943b4cd5e99047b8734b4ba261234e0b47d46d3feb7acc",
+          "at": "2026-04-23T14:01:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan requires the same CLI invocation, `sotp verify catalogue-spec-refs`, to behave differently by caller path: pre-commit must skip stale-signal checking before it regenerates the signals file, while CI must enforce stale checking to catch bypassed pre-commit updates. The CLI spec only exposes `[--track <id>]` and does not define any mode/flag or other input that lets the command distinguish those paths. If the command always checks stale state, normal pre-commit can block before step 3 can refresh the file; if it never checks stale state, CI cannot catch stale signal files as required. Add an explicit mode/flag or split the CI/pre-commit entry points so the implementation is executable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 435,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:cc31e23bda0cf22cb6943b4cd5e99047b8734b4ba261234e0b47d46d3feb7acc",
+          "at": "2026-04-23T14:03:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace1fcf2a7ec5e4ecd98a18137cd322cf4f97dd146218be00faa267b7cbad506",
+          "at": "2026-04-23T14:06:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Context claims `sotp verify plan-artifact-refs` can already detect `SpecRef.hash` mismatches for catalogue-to-spec refs, but D1.2 later says that command targets spec-side ref fields and must not be reused because the catalogue schema is different. This leaves the ADR with conflicting design intent about whether catalogue `SpecRef` drift is already covered or requires the new `sotp verify catalogue-spec-refs` gate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 78,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ace1fcf2a7ec5e4ecd98a18137cd322cf4f97dd146218be00faa267b7cbad506",
+          "at": "2026-04-23T14:08:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3.3 says the pre-commit path does not run signal validation (`—`), but D3.4 inserts `cargo make ci` into the same pre-commit flow and D3.5 adds `check-catalogue-spec-signals` to `cargo make ci`. As written, pre-commit both skips and runs the validation step, so the commit flow is internally inconsistent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 471,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2b41f160ed2405d0c92edb8c61c8efe06115ebdc9a8d49e731fa643c6a041380",
+          "at": "2026-04-23T14:10:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ddd9e1d4e85afc5dac2a6060126814d579caa7428df288d6655a730cb1f2c6c",
+          "at": "2026-04-23T14:12:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3.2/D3.6 require the merge-gate `catalogue-spec-refs` check to include stale-signal detection, but the merge-gate failure-condition subsection narrows the binary gate failures to only hash mismatch and dangling anchor. That gives conflicting implementation guidance and could let a stale `<layer>-catalogue-spec-signals.json` pass strict merge even though earlier sections say stale must fail closed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 587,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1ddd9e1d4e85afc5dac2a6060126814d579caa7428df288d6655a730cb1f2c6c",
+          "at": "2026-04-23T14:14:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0abb50736551c0158a1d7ce0d4108bc1dd028ae1b8584979bfa4258c3e1f6cb7",
+          "at": "2026-04-23T14:16:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0abb50736551c0158a1d7ce0d4108bc1dd028ae1b8584979bfa4258c3e1f6cb7",
+          "at": "2026-04-23T14:17:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` still says `impl-plan.json` is not yet generated, but this artifact set already includes a populated implementation plan. The rendered plan is stale and gives readers the wrong phase state.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 4,
+              "category": "contradiction"
+            },
+            {
+              "message": "`RefreshCatalogueSpecSignalsInteractor` is described as reading `<layer>-types.json` via `TrackBlobReader or local fs path`, which conflicts with the usecase-layer port-only orchestration stated elsewhere in the plan and reintroduces direct filesystem access in the usecase layer.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 6,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:90321b1babffc286fc3a497533a7330d37301449fc0cd361228a9366c715a328",
+          "at": "2026-04-23T14:59:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1.5 says `check_catalogue_spec_ref_integrity(catalogue, spec, signals_opt)` returns `Result<(), Vec<SpecRefFinding>>`, but the track artifacts define the same gate as returning/aggregating `Vec<SpecRefFinding>` (`spec.json` IN-02/IN-06, `impl-plan.json` T004/T009). That is a contract-level contradiction: implementation cannot satisfy both shapes without an explicit amendment.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 218,
+              "category": "contradiction"
+            },
+            {
+              "message": "T017's merge-gate step 3 cannot perform the stated hash-drift check as written: it lists the catalogue blob and signals blob, but omits the spec document input that D3.6 requires to compare `SpecRef.hash` against the canonical subtree hash. Add the existing `read_spec_document` dependency (or equivalent) to make the binary gate executable.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
+              "line": 102,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:87cb6d2eec438af1db8de4c857555e7f229f7f19c097564cf07cf81c24418f83",
+          "at": "2026-04-23T15:04:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T023 says that populating every `spec_refs[].hash` will promote catalogue-spec signals from Yellow to Blue. That conflicts with ADR D1.1, where catalogue-spec signal color depends only on `informal_grounds[]` vs `spec_refs[]`; hash/anchor checks are a separate binary gate. The same assumption is repeated in `verification.md:38`.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
+              "line": 230,
+              "category": "factual error"
+            },
+            {
+              "message": "IN-14 describes merge-gate step 3 as `read_catalogue_for_spec_ref_check + check_catalogue_spec_ref_integrity`, but the ADR’s D3.6/T017 flow also requires loading `read_spec_document` and `read_catalogue_spec_signals_document` before the pure checker can validate anchor, hash, and stale state. As written, the step omits required inputs for the gate it is meant to define.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+              "line": 253,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:231c8ea340251a56bfda1221030001702c0cf4e38fd466b22ac1cab03a68ec93",
+          "at": "2026-04-23T16:43:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-14` is internally unexecutable as written: it schedules `check_catalogue_spec_ref_integrity` in step 3 without `read_spec_document`, but `IN-02` defines that function over `spec.json` data. `plan.md:66` and ADR D3.6 include the missing spec read, so the generated plan and the acceptance criterion disagree on the required inputs.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.md",
+              "line": 32,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The manual verification step points at `bin/sotp track type-signals` for T023, but that command validates the phase-2 type/implementation signal chain, not the new catalogue-spec signal artifact this track is introducing. As written, the step cannot actually observe the `catalogue-spec-signals` state transition it claims to verify.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 37,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:b5c8516c0feec12082721ffd6fb712a85667238f062c2f2328dd6573b71f9edd",
+          "at": "2026-04-23T16:48:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6d9cb60cbf1b11a9d96f09745bc519616665371af636343bd57cb0155bb8b24",
+          "at": "2026-04-23T16:51:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` says the Phase 2 evaluator Yellow-fix will be \"reorganized later as T025-equivalent\", but `impl-plan.json` already assigns `T025` to the unrelated `check_impl_plan_presence` / `ImplPlanPresenceError` removal. That leaves the recorded back-and-forth fix without a coherent task mapping and points reviewers at the wrong implementation work item.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 57,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR index still lists `2026-04-11-0003-type-action-declarations.md` as `Proposed`, while the ADR itself was changed in this scope to `Accepted`. Leaving the README index stale makes the repository report two different statuses for the same decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 82,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ImplPlanPresenceError` is described as being removed because the invariant was \"undocumented\", but the amended parent ADR in this same scope explicitly records that invariant as a follow-up change and then adds a 2026-04-23 correction reverting it. The rationale here is therefore semantically inaccurate.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/domain-types.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:c6d9cb60cbf1b11a9d96f09745bc519616665371af636343bd57cb0155bb8b24",
+          "at": "2026-04-23T16:55:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce037abfce2b7d57ae6bdd452d014c1ffaa40d5655376c5ba1865cf6a7a25d87",
+          "at": "2026-04-23T16:59:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_catalogue_for_spec_ref_check` is specified to return only a decoded `TypeCatalogueDocument`, but the same plan also requires `catalogue_declaration_hash` / stale detection to compare against the exact `<layer>-types.json` SHA-256. With no raw declaration bytes or precomputed hash flowing through the port, T008/T009/T017 cannot implement the byte-level hash semantics promised by IN-11 and D2.2; at best they would hash a re-serialized document and silently change the meaning of stale detection.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 116,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T023 says the Yellow→Blue cleanup covers `domain-types.json / usecase-types.json / infrastructure-types.json` as `4+4+4 = 12` entries, but `domain-types.json` currently has a fifth entry (`ImplPlanPresenceError`, action=`delete`) that is also Yellow. Leaving that delete entry out means the plan's own 'all catalogue entries become Blue before strict merge' story cannot be completed by T023 as written.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
+              "line": 138,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ce037abfce2b7d57ae6bdd452d014c1ffaa40d5655376c5ba1865cf6a7a25d87",
+          "at": "2026-04-23T17:03:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T011` describes `read_catalogue_for_spec_ref_check` as only decoding `TypeCatalogueDocument`, but `T006`/`IN-07` require that port to return the current `<layer>-types.json` SHA-256 alongside the decoded document so stale-signal validation can work. The same omission appears in the ADR's TrackBlobReader example (`knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md:560-566`), so the infra adapter contract and the usecase/spec contract do not line up.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:be81566c954bf856c5a218974616e7f93ad94cbba893f4ae9e461134893319f6",
+          "at": "2026-04-23T17:07:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_catalogue_for_spec_ref_check` is declared here as returning only `BlobFetchResult<TypeCatalogueDocument>`, but the usecase port and plan require `BlobFetchResult<(TypeCatalogueDocument, String)>` so the raw-byte SHA-256 hash is available for stale detection. As written, the adapter boundary drops the hash that `IN-07`/`T006`/`T017` depend on, so the binary-gate path cannot satisfy the design as documented.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/infrastructure-types.json",
+              "line": 95,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:299917e75ce5a3c527a89e71b7198ef1a8636d413432d56c4a83218f8f6d51ef",
+          "at": "2026-04-23T17:10:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rendered contract is stale: `read_catalogue_for_spec_ref_check` is shown here as `BlobFetchResult<TypeCatalogueDocument>`, but the track spec and `usecase-types.json` require `BlobFetchResult<(TypeCatalogueDocument, String)>` so the raw-hash side channel is available for stale detection. Implementers reading the generated markdown would miss the hash-bearing half of the port.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:59869945d321f64ce8ad2e927d32313a6d0efb2b2123b356034f018c4b5c3a12",
+          "at": "2026-04-23T17:13:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4084872a206d72ec2e8e21962037009a7bff8e1ac1e7215f827e12bcceb4e5",
+          "at": "2026-04-23T17:15:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The parent ADR still says that, after signal implementation, `spec_refs[]` itself evaluates to blue/red based on anchor/hash resolution. That contradicts this track’s documented split where anchor/hash/stale checks moved into the binary gate and the signal only reflects grounding quality (`informal_grounds[]` vs `spec_refs[]`). As written, `knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md` does not satisfy T021 / IN-18 / AC-08 in the plan artifacts.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 510,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dc4084872a206d72ec2e8e21962037009a7bff8e1ac1e7215f827e12bcceb4e5",
+          "at": "2026-04-23T17:19:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004/T006/T017 describe stale detection as comparing `catalogue_declaration_hash` against the current `<layer>-types.json` hash, but the domain API here only takes `check_catalogue_spec_ref_integrity(catalogue, spec, signals_opt)` and the orchestration never threads the current hash through. As written, the stale path cannot actually be implemented without hidden I/O or an extra parameter, so the binary gate is under-specified and infeasible.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 18,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c0514f549b2caaf234759eae215fd860682dcf4a53403a5f06ff2ee15dd1c95e",
+          "at": "2026-04-23T17:26:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_catalogue_spec_ref_integrity` is defined here as `check_catalogue_spec_ref_integrity(catalogue, spec, signals_opt)`, but the track plan threads an extra `current_catalogue_hash` through T004/T009/T017 so stale detection can compare the persisted `catalogue_declaration_hash` against the current `types.json` hash. As written, the contract and the implementation plan disagree on the function inputs, so the stale-check path is under-specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 218,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ede3479c360bdbcd1003c09d4c8589fb18359eff74901296b8d1549266462e3c",
+          "at": "2026-04-23T17:32:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af571d4acea498bf90c0e95e9a556ec17556fb155043bb692f007c0edf78e34a",
+          "at": "2026-04-23T17:35:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` tells implementers to validate the new Stage 2 signal with `bin/sotp track catalogue-spec-signals <id>`, but the ADR/spec define that CLI as `sotp track catalogue-spec-signals [--layer <layer_id>]` with no positional track-id argument. Because the verification scaffold points to an invalid invocation, anyone following it will exercise the wrong command path instead of the designed acceptance flow.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 37,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:af571d4acea498bf90c0e95e9a556ec17556fb155043bb692f007c0edf78e34a",
+          "at": "2026-04-23T17:38:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T017` treats the raw `String` from `read_catalogue_for_spec_ref_check` as if it could be passed directly into `check_catalogue_spec_ref_integrity` via `Some(&hash)`, but the domain contract in `D1.5`/`T004` is `Option<&ContentHash>`. As written, this merge-gate step is type-inconsistent and omits the required `String` → `ContentHash` conversion, so the orchestration cannot be implemented literally.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
+              "line": 102,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:5372e2d5f5a0cba7b4018397911e2a8febf726a0cb782084caa1c94a26b06659",
+          "at": "2026-04-23T17:41:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:653e2a158d3ff969b3abe586444c2d05a6ef7bbcace1f4f4d235d1912ea207e1",
+          "at": "2026-04-23T17:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`2026-04-19-1242` still says `sotp verify plan-artifact-refs` walks catalogue `spec_refs[]` and owns their anchor/hash validation, but `2026-04-23-0344` and this track’s spec/plan move that responsibility to the new `sotp verify catalogue-spec-refs` gate. Leaving D2.3 in the parent ADR unchanged means the two ADRs give conflicting instructions about which binary gate actually owns catalogue→spec drift checking.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 469,
+              "category": "contradiction"
+            },
+            {
+              "message": "T018 changes the rollout from the spec’s staged dogfood model to an all-layers requirement: `spec.json` IN-15 and ADR `2026-04-23-0344` D5.3/D5.4 say this track only needs to enable the target layer(s), but the impl plan now requires `catalogue_spec_signal.enabled: true` on every `tddd.enabled` layer immediately. That makes the completion scope ambiguous for anyone implementing from `impl-plan.json`.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
+              "line": 108,
+              "category": "contradiction"
+            },
+            {
+              "message": "`verification.md` records the Phase 2 evaluator Yellow-fix as work already done in this track and says it will be reorganized into an independent implementation task later, but the current `impl-plan.json`/`task-coverage.json` contain no such task. As written, the verification log points at real track work that the formal plan cannot schedule or trace.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:653e2a158d3ff969b3abe586444c2d05a6ef7bbcace1f4f4d235d1912ea207e1",
+          "at": "2026-04-23T17:50:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T018` defers setting `catalogue_spec_signal.enabled: true` until after `T023`, but ADR `2026-04-23-0344` §D5.4 says the flag is enabled first and then the layer's `spec_refs[]` are populated. Because `AC-06` / `sotp verify catalogue-spec-refs` only run on enabled layers, this creates a circular dependency: the task that is supposed to validate the rollout cannot run until the rollout flag is already on.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 67,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ab338dacfa1e16547a975d7fcc91d6aab88ad70dc481611adb7f3b780d8d05e7",
+          "at": "2026-04-23T17:54:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This note points to `knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md` §D1.4 as the place where the `check_impl_plan_presence` invariant was reverted, but that section is about metadata/Phase 3 responsibility split; the revert note is in the later 2026-04-23 correction/follow-up block. The section reference is wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 5,
+              "category": "broken reference"
+            },
+            {
+              "message": "`verification.md` says T025 (`check_impl_plan_presence` / `ImplPlanPresenceError` removal) was already completed and therefore should not be listed in `impl-plan.json`, but the scaffold still lists `T025` as a todo task and still carries `ImplPlanPresenceError` in the domain catalogue. That leaves the plan artifacts in two incompatible states.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:28f159b60b69412f06986b962e0d369103d8970ced01baae126d6686920edaeb",
+          "at": "2026-04-23T17:58:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This sentence still says `sotp verify plan-artifact-refs` performs `SpecRef.anchor` / `SpecRef.hash` validation, but the amended D2.3 scope above explicitly moved `spec_refs[]` out of `plan-artifact-refs` and assigned that work to `sotp verify catalogue-spec-refs`. The ADR is internally inconsistent until this leftover claim is updated.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 503,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e24325f7e8934c067a34c204fc8b1573a0e599e7eb3b4edc3315c95ea1e3035a",
+          "at": "2026-04-23T18:01:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c09d3311001f6a10c84704a7cb41d2e61ec8653e0fc8e98b1eb3e2df7d12e13a",
+          "at": "2026-04-23T18:03:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-21` grounds the `check_impl_plan_presence` removal in `2026-04-19-1242` §D1.4, but that section now only defines metadata/status semantics; the actual revert was moved to the later `2026-04-23 Correction` follow-up block. Other scoped artifacts (`verification.md`, `domain-types.json`) already point readers at that correction, so the plan artifacts disagree about where the deletion decision lives.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+              "line": 346,
+              "category": "contradiction"
+            },
+            {
+              "message": "The rationale for introducing `CatalogueSpecSignalsWriter` says the port name is inferred and tells readers to \"see Open Questions\", but no `Open Questions` section exists in the scoped ADR or track artifacts. That leaves the only narrative justification for this extra port dangling, so reviewers cannot trace why this adapter/port split is part of the design.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 177,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:c09d3311001f6a10c84704a7cb41d2e61ec8653e0fc8e98b1eb3e2df7d12e13a",
+          "at": "2026-04-23T18:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f14b8042be2cda7b1aa9285a08180799250f850049e5932c7439079b81ba12c4",
+          "at": "2026-04-23T18:10:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The amended parent ADR still says `sotp verify plan-artifact-refs` handles catalogue `spec_refs` schema/drift verification here, but the same ADR now says in §D3.2 that catalogue `SpecRef.anchor`/`hash` checks belong to the new `sotp verify catalogue-spec-refs` gate. That leaves two incompatible descriptions of which CLI owns catalogue ref validation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 1073,
+              "category": "contradiction"
+            },
+            {
+              "message": "`plan.md` still marks T021 as unresolved even though `knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md` already contains the exact §D3.2 rewrite that T021 describes. This makes the plan state internally inconsistent: readers cannot tell whether the ADR amendment is still pending or already landed.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 75,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f14b8042be2cda7b1aa9285a08180799250f850049e5932c7439079b81ba12c4",
+          "at": "2026-04-23T18:16:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated summary still says `0/25 resolved`, but this same plan already marks `T021` as done. That makes the progress snapshot inconsistent with the task table and stale relative to `impl-plan.json`.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 4,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d8f0e60ce929b74acd2fe20924f5a63099ba7ee7b4f7a8a294ded79107cea4a",
+          "at": "2026-04-23T18:22:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2.3 still says this ADR decides `SpecRef.anchor` / `SpecRef.hash` resolution logic, but the amended scope below excludes catalogue `spec_refs[]` from `sotp verify plan-artifact-refs` and assigns them to the later `sotp verify catalogue-spec-refs` gate. That leaves the ADR internally inconsistent about which document owns catalogue spec-ref drift checking.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 480,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:59f0901595e7b521785fc1fc0ceba044c081869f49248ce5ff4e9f4014753cf7",
+          "at": "2026-04-23T18:24:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cc25491dbf726c6c3d27d62788e7a693de93a8e41db764a02af1a3212d2f919",
+          "at": "2026-04-23T18:28:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`2026-04-19-1242` was amended so catalogue `SpecRef.anchor`/`SpecRef.hash` validation moved out of `sotp verify plan-artifact-refs` and into the later `sotp verify catalogue-spec-refs` gate, but this rollout section still says Phase 2 implements `plan-artifact-refs` with `SpecRef.anchor`/`SpecRef.hash` checking. Together with the unchanged risk text later in the file, the ADR now gives two different answers about which gate owns catalogue drift validation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 1005,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-14/T017 says the Chain ③ merge-gate step reads `read_domain_types_document`, but the same plan's `TrackBlobReader` contract still defines the catalogue reader as `read_type_catalogue` and only adds the two new Chain ② methods. Because there is no rename task anywhere in scope, the plan is internally inconsistent about which existing API Step 2 is supposed to call.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+              "line": 253,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9cc25491dbf726c6c3d27d62788e7a693de93a8e41db764a02af1a3212d2f919",
+          "at": "2026-04-23T18:34:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` says this review scope includes the `2026-04-11-0003` parent ADR amendment, but the checklist immediately narrows the tracked scope to `AC-01..AC-10` plus `IN-21`, and there is no checkbox for the 2026-04-11 status/WIP-Yellow amendment anywhere below. That leaves one declared in-scope amendment with no verification hook, so it can regress without ever being marked unverified.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 5,
+              "category": "contradiction"
+            },
+            {
+              "message": "`usecase-types.json` describes `RefreshCatalogueSpecSignalsInteractor` as reading `<layer>-types.json` via an unnamed \"local catalogue reader\", but the spec and impl plan define that interactor in terms of `TrackBlobReader` plus `CatalogueSpecSignalsWriter` and never introduce any separate reader port. This contradiction leaves the usecase contract ambiguous: either the implementation must add an unplanned extra port, or the generated usecase catalogue is wrong.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4fa169d882f965f13c61ed883afcb7e5a889d0ad1eb3bdf1ef7684ec74219253",
+          "at": "2026-04-23T18:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This scope shift contradicts the earlier D2.1/D2.2 wording in the same ADR, which still presents `SpecRef.hash` checking as part of this ADR's CI validation. Here `spec_refs[]` is moved out of `plan-artifact-refs`, but the document never fully removes the earlier hash-check responsibility, so implementers are left with two incompatible owners for the same drift check.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 469,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0282c590b35f5e57ed4f1dc576854bb2b0124ae15e926bad7b1e2ca9cda6f03f",
+          "at": "2026-04-23T18:44:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3ea27be36484405a23bcbe08ccfb8ae379825d8cd76150724fce172b6e469d7",
+          "at": "2026-04-23T18:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The parent ADR still says the advisory period already has catalogue `spec_refs[]` protected by D2.3 (`SpecRef.anchor`/`hash` schema+drift validation), but the amended D2.3/D3.2 text elsewhere in the same ADR now explicitly moves catalogue `spec_refs[]` validation out of `sotp verify plan-artifact-refs` and into the follow-up `sotp verify catalogue-spec-refs` gate. This leftover bullet misstates what protections exist before ADR 2026-04-23-0344 is implemented.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 828,
+              "category": "contradiction"
+            },
+            {
+              "message": "`verification.md` introduces a checked `IN-22` item even though this track's canonical scope is AC-01..AC-10 plus IN-21, and `spec.json`/`task-coverage.json` define no `IN-22`. That makes the verification checklist diverge from the governing plan artifacts and can mislead reviewers into treating an untracked extra scope item as formally part of the plan.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 31,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:c3ea27be36484405a23bcbe08ccfb8ae379825d8cd76150724fce172b6e469d7",
+          "at": "2026-04-23T18:51:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecb3811de0f37d26efab8937fdd44c07dda3187f944e780427655aa10345f06a",
+          "at": "2026-04-23T18:55:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3.6 now names the existing Chain-③ reader as `read_domain_types_document`, but the same ADR elsewhere and every track artifact in this scope model that baseline API as `read_type_catalogue`. Leaving two different method names in the authoritative design makes the TrackBlobReader extension ambiguous and gives implementers contradictory guidance about which existing path is being reused.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "line": 541,
+              "category": "contradiction"
+            },
+            {
+              "message": "The appendix summary says `sotp verify plan-artifact-refs` provides \"schema / drift\" validation for spec/task-coverage refs, but D2.3 explicitly limits that command to file existence / loose anchor / summary checks and defers drift detection to other mechanisms (`AdrRef`/`ConventionRef` do not even have hash fields here). This reintroduces a guarantee the amendment removed, so readers no longer have a coherent picture of what `plan-artifact-refs` actually enforces.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 1073,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ecb3811de0f37d26efab8937fdd44c07dda3187f944e780427655aa10345f06a",
+          "at": "2026-04-23T18:59:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea4a74f53643d1b416c445024c9810f105804560c6a09287299af6606fd64e87",
+          "at": "2026-04-23T19:02:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplPlanPresenceError`'s deletion rationale still cites `2026-04-19-1242 §D1.4` as the source of the `/track:init` conflict, but the amended parent ADR now records that revert in the later `Follow-up`/`2026-04-23 Correction` block, and `spec.json` IN-21 already points readers there instead. Leaving the type catalogue on `§D1.4` gives related plan artifacts two different design references for the same deletion decision.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/domain-types.json",
+              "line": 6,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ea4a74f53643d1b416c445024c9810f105804560c6a09287299af6606fd64e87",
+          "at": "2026-04-23T19:05:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T018` turns on `layers[].tddd.catalogue_spec_signal.enabled` before `T023` clears `informal_grounds[]` and fills `spec_refs[]`. Because the new pre-commit/CI/merge gates are enforced immediately, any commit boundary between those tasks will fail on the still-yellow entries, so this ordering is not physically executable as written.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 67,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f9c4a5bd5f9654a5c816eab2a7c22bdaf9c40617918149e7b493eeeccf15567e",
+          "at": "2026-04-23T19:09:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab652b65f89afb5cd6d1e4a1d253823dbf865b4677efca92d91c899c2c208ff5",
+          "at": "2026-04-23T19:12:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `TrackBlobReader` contract says `read_catalogue_for_spec_ref_check` uses the same `(TypeCatalogueDocument, String)` pattern as existing `read_type_catalogue`, with the `String` carrying a SHA-256. In the actual merge-gate API, `read_type_catalogue`'s `String` is the resolved catalogue filename used for diagnostics (`libs/usecase/src/merge_gate.rs:66-70`, `libs/infrastructure/src/verify/merge_gate_adapter.rs:152-163`). Leaving this as a 'same pattern' extension gives the identical tuple type two incompatible meanings and is likely to drive the new port/adapter design in the wrong direction.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 30,
+              "category": "factual error"
+            },
+            {
+              "message": "This verification scaffold first declares the 2026-04-11 change as a parent ADR amendment for the track, then reclassifies it as an out-of-scope amendment and gives it no checkbox at all. That internal contradiction leaves one declared amendment without any verification hook, so it can regress while the checklist still appears complete.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 33,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AC-10` is defined in `spec.json` as 'cargo make ci passes', and `IN-13`/`T016` explicitly keep CI in interim mode where Yellow catalogue-spec signals only warn. Mapping `AC-10` to `T023` anyway makes the acceptance coverage semantically wrong: T023 is about clearing Yellow for the strict merge gate, not about satisfying the CI-only acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/task-coverage.json",
+              "line": 47,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ab652b65f89afb5cd6d1e4a1d253823dbf865b4677efca92d91c899c2c208ff5",
+          "at": "2026-04-23T19:17:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa54ee5cdf4d251d56af390be30e00323f2b84b71ad40fae486699ab2bcbf71",
+          "at": "2026-04-23T19:20:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-10 coverage is internally inconsistent: `task-coverage.json` maps it only to `T024`, but `impl-plan.json` (`T023` says it is an AC-10 prerequisite) and the rendered `spec.md` both treat `T023` as part of satisfying AC-10. Leaving the canonical coverage map at `T024` only means reviewers/automation can consider AC-10 fully covered while the plan still says the Yellow→Blue cleanup work is part of that acceptance path.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/task-coverage.json",
+              "line": 47,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8aa54ee5cdf4d251d56af390be30e00323f2b84b71ad40fae486699ab2bcbf71",
+          "at": "2026-04-23T19:24:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5a9a7e4464f8211ceda359ed3681e1139378ceebcbdd48b54387c0b367643fb",
+          "at": "2026-04-23T19:26:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` narrows the track’s formal verification scope to AC-01..AC-10 plus IN-21 and explicitly relegates the `2026-04-11-0003` ADR amendment to “out-of-scope” informational status, even though that ADR file is part of this review scope and the track changed it materially. Because there is no IN/AC/checkbox anywhere for the 2026-04-11 status/WIP-Yellow amendment, the plan artifacts provide no way to verify that change, so one in-scope amendment can regress without ever being marked unverified.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 5,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a5a9a7e4464f8211ceda359ed3681e1139378ceebcbdd48b54387c0b367643fb",
+          "at": "2026-04-23T19:30:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 says hash drift, dangling anchors, and stale signals must all fail closed in every path, including pre-commit, but the explicit pre-commit flow in IN-12/T015 uses `sotp verify catalogue-spec-refs --skip-stale` because the signals file is regenerated immediately afterward. Those requirements conflict on whether pre-commit is allowed to skip stale detection.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+              "line": 455,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1dbc8f0b989ca88b2aae81c662dab09385925feb83cfd13cd447555d335f595d",
+          "at": "2026-04-23T19:34:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d0d4a20d15e87f74d8160e31c0ed380a606ca0739a0b65f824dfd55f3ea53ed",
+          "at": "2026-04-23T19:37:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T023` is described as an `AC-10` prerequisite because CI now includes `verify-catalogue-spec-refs`, but the spec/ADR define CI in interim mode: `verify-catalogue-spec-refs` fails only on dangling/drift/stale, while Yellow catalogue-spec signals merely warn. Since `T023` only promotes Yellow entries to Blue, this task is not actually required for `cargo make ci` to pass, so the plan now overstates the dependency for AC-10.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
+              "line": 138,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The canonical coverage map says `AC-06` is covered only by `T018`, but `AC-06` requires the enabled SoTOHE-core layers to have already 'dogfood passed'. `T018` itself says merge-gate passage is still deferred until `T023`, so marking AC-06 as fully covered by the flag-flip task alone makes the acceptance coverage internally inconsistent with the rollout described in the plan.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/task-coverage.json",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d0d4a20d15e87f74d8160e31c0ed380a606ca0739a0b65f824dfd55f3ea53ed",
+          "at": "2026-04-23T19:40:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader` assigns two incompatible meanings to the `String` in the `(TypeCatalogueDocument, String)` tuple. This file says `read_type_catalogue` returns the resolved catalogue filename for diagnostics, but the new gate/adapter docs treat the same tuple shape as a raw-bytes SHA-256 for stale detection. That makes `read_catalogue_for_spec_ref_check` ambiguous and leaves the port contract internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:512f5f9f13c05a5180bd2d3832d590a47800e0b008843c36c6af7c74492ea9aa",
+          "at": "2026-04-23T19:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Within the `TrackBlobReader` entry, the `String` half of `BlobFetchResult<(TypeCatalogueDocument, String)>` is given two incompatible meanings: the main description says `read_type_catalogue` uses a resolved catalogue filename for diagnostics and `read_catalogue_for_spec_ref_check` uses a raw SHA-256 hash, but the `informal_grounds` summary later says the new method's `String` is the SHA-256 of raw bytes, \"same as read_type_catalogue\". That leaves the port contract ambiguous about what the tuple's second element represents.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4f2e00b89606161b95a5c5eec8c46f34cd9713d5274d196f25696ed068738fe4",
+          "at": "2026-04-23T19:47:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0708adf3874ea1a25826af466b7b61d6ef3327b054bc8eb95451ccdf6e262f61",
+          "at": "2026-04-23T19:50:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.md` now includes `[tasks: ...]` annotations sourced from `task-coverage.json`, but the header still says it is generated from `spec.json` alone. That provenance is semantically wrong: anyone regenerating or auditing the view from only `spec.json` will lose the task mapping that this document is supposed to surface after the workflow split.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.md",
+              "line": 1,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:0708adf3874ea1a25826af466b7b61d6ef3327b054bc8eb95451ccdf6e262f61",
+          "at": "2026-04-23T19:54:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0708adf3874ea1a25826af466b7b61d6ef3327b054bc8eb95451ccdf6e262f61",
+          "at": "2026-04-23T19:59:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The amended parent ADR still says `sotp verify plan-artifact-refs` checks generic `anchor` resolution here, even though the same document’s updated D2.3/D3.2 text moves catalogue `SpecRef.anchor`/`SpecRef.hash` validation to the later `sotp verify catalogue-spec-refs` gate and leaves `AdrRef`/`ConventionRef` at loose validation only. As written, the ADR still gives contradictory guidance about what `plan-artifact-refs` actually resolves.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 421,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0708adf3874ea1a25826af466b7b61d6ef3327b054bc8eb95451ccdf6e262f61",
+          "at": "2026-04-23T20:05:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8406ac88282e614697af8f8f9438b9aa2ec3d873a75b2c5c4dfd18d798aa9c72",
+          "at": "2026-04-23T20:07:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `action` table says any `modify`/`reference` declaration mismatch is Yellow, but the paragraph immediately below says reverse-direction extras must stay Red. That gives two different outcomes for the same 'code contains undeclared methods' case.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 34,
+              "category": "contradiction"
+            },
+            {
+              "message": "`RefreshCatalogueSpecSignalsInteractor` is specified to read the catalogue via existing `read_type_catalogue` and then compute `catalogue_declaration_hash`, but this same artifact defines `read_type_catalogue`'s `String` as the resolved filename while only `read_catalogue_for_spec_ref_check` carries the raw-bytes SHA-256. As written, T008 has no way to obtain the hash it must persist.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "line": 6,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`verification.md` scopes the 2026-04-11 ADR change inconsistently: the header lists it as a parent ADR amendment for this track, but the body moves it under 'Out-of-Scope Amendments'. That leaves the review record ambiguous about whether this amendment is part of the scope being verified or merely incidental work.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8406ac88282e614697af8f8f9438b9aa2ec3d873a75b2c5c4dfd18d798aa9c72",
+          "at": "2026-04-23T20:13:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:387d7295b35c3990f10bf6554429dbc9cd04bfc6c8766e8e39c86ef8521cd262",
+          "at": "2026-04-23T20:17:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The checklist requires `cargo make ci` after every individual task, but the plan intentionally splits compile-coupled changes across multiple tasks. For example, T006 adds new required `TrackBlobReader` methods while T011 does not update `GitShowTrackBlobReader` until later, so CI cannot realistically stay green after T006 alone. The prescribed per-task CI verification is therefore impossible to execute as written.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 40,
+              "category": "infeasibility"
+            },
+            {
+              "message": "Step 5 says both `bin/sotp track catalogue-spec-signals` and `bin/sotp verify catalogue-spec-refs` should be validated in the pre-commit, CI, and merge-gate paths, but the plan explicitly keeps `track catalogue-spec-signals` out of CI and merge gate. T016 says CI must not recalculate signals, and T017 describes merge gate consuming the precomputed signals file. This checklist therefore validates a different workflow than the spec/impl-plan actually define.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:387d7295b35c3990f10bf6554429dbc9cd04bfc6c8766e8e39c86ef8521cd262",
+          "at": "2026-04-23T20:22:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFindingKind` is reduced to three bare discriminants here, but ADR D1.5 defines the findings as carrying the anchor/hash details needed by the `catalogue-spec-refs` gate. As written, the planned domain model no longer matches the approved diagnostic shape for hash drift / dangling / stale failures.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/domain-types.json",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:825746dae5a5df2f3eae6da54ef2d637b03007e5544eb78191a43cded0c9fe85",
+          "at": "2026-04-23T20:26:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この行だけ `SpecRef` の解決責務を `sotp verify plan-artifact-refs` に残していますが、同じ ADR の D2.3 / D1.2 では catalogue `spec_refs[]` の検証を `sotp verify catalogue-spec-refs` に移しています。残留文が gate の責務を二重定義しており、どちらの CLI が `SpecRef` を検証するのか読者を誤誘導します。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 958,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:798a0ddb9c492d9a7a8ed0ed3962f879e402a8629dbfb20deaa25658a1d4dee8",
+          "at": "2026-04-23T20:30:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bef17750e35b7851f857db1d54e9baf627a973122ac7e297e42493f1a149a5b2",
+          "at": "2026-04-23T20:31:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The amended `action` table now says `add`/`modify`/`reference` are Yellow whenever the declaration and code mismatch, but the paragraph immediately below says reverse-direction extra methods must still be Red. Those two passages assign different outcomes to the same \"code contains undeclared methods\" case, so the ADR no longer defines a coherent evaluator rule.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bef17750e35b7851f857db1d54e9baf627a973122ac7e297e42493f1a149a5b2",
+          "at": "2026-04-23T20:35:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e164f37f9752b75dc471ab12b7271e37a69668674f5848ffc641ce35d0e235e",
+          "at": "2026-04-23T20:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still leaves `AC-08` unchecked, but `task-coverage.json` maps `AC-08` only to `T021`, and both `impl-plan.json`/`plan.md` already mark `T021` done. That makes the verification record internally contradictory and misreports whether the 2026-04-19-1242 amendment has actually been completed.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e164f37f9752b75dc471ab12b7271e37a69668674f5848ffc641ce35d0e235e",
+          "at": "2026-04-23T20:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7684ea6795987b9bdf9669914d4a7381581d79881b0ea2c4e3f1350d227e0237",
+          "at": "2026-04-23T20:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OS-05` narrows the parent-ADR amendment scope to only `2026-04-19-1242` §D3.2 and `2026-04-12-1200` §D5, but this same track now depends on additional `2026-04-19-1242` amendments in §D1.4 / `Follow-up` for `IN-21` (`check_impl_plan_presence` revert). `verification.md` and the review briefing both treat that correction as in-scope, so the spec currently gives reviewers and implementers conflicting scope boundaries for the same ADR file.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+              "line": 402,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7684ea6795987b9bdf9669914d4a7381581d79881b0ea2c4e3f1350d227e0237",
+          "at": "2026-04-23T20:52:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7997f2123c2dadacd0bfa2e1b25513c8d490daed3efe062c1d399853e5932102",
+          "at": "2026-04-23T20:54:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.md` is out of sync with `spec.json` for `OS-05`: the rendered view still says the only parent-ADR amendments in scope are `2026-04-19-1242 §D3.2` and `2026-04-12-1200 §D5`, but the source spec now also includes `2026-04-19-1242`'s `§Follow-up` / `2026-04-23 Correction` as the basis for `IN-21`. Because reviewers consume `spec.md`, this stale generated view gives a narrower and conflicting scope definition for the same track.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.md",
+              "line": 46,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7997f2123c2dadacd0bfa2e1b25513c8d490daed3efe062c1d399853e5932102",
+          "at": "2026-04-23T20:58:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` tasks in this track are serialized with `todo`/`done`, but this merge-gate rule still treats completion as `DonePending` / `DoneTraced` / `Skipped`. No translation between the two vocabularies is defined, so the gate cannot reliably recognize a completed impl-plan as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 601,
+              "category": "contradiction"
+            },
+            {
+              "message": "T023 claims to promote \"all catalogue entries\" to Blue, but it explicitly excludes `ImplPlanPresenceError` while no rule exempts `action: delete` entries from catalogue-spec signal evaluation. That leaves one Yellow entry in the catalogue until T025 runs, so the cleanup task does not actually satisfy its stated scope on its own.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 87,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1ba80b9f3bcc5ebb8d4f26b871cb16db45c75fc910a5746e1f3edf27ee9d7749",
+          "at": "2026-04-23T21:02:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` already diagrams the catalogue-spec signal overlay (`CatalogueSpecSignals*` nodes and edges), but `spec.json` explicitly marks Contract Map / Type Graph View overlay integration as out of scope. The same view is also incomplete for this track because it never shows the `read_catalogue_for_spec_ref_check` path that T006/T011/T017 depend on, so the generated contract map is scope-inconsistent and misleading.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/contract-map.md",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:16e91fc6c11c5be87ffd98f1760f6239ff8e93ea7c5d23b7c31a248351fc4bce",
+          "at": "2026-04-23T21:07:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e91fc6c11c5be87ffd98f1760f6239ff8e93ea7c5d23b7c31a248351fc4bce",
+          "at": "2026-04-23T21:11:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` explicitly says the 2026-04-11 ADR amendment was performed within this track but is not recorded in `spec.json`/`task-coverage.json`, while the formal amendment goal/scope in the plan artifacts only traces the 2026-04-19 and 2026-04-12 ADRs. That leaves one real track change outside the track’s own IN/AC/task coverage model, so the planning SSoT no longer fully describes the work this track is carrying.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "line": 35,
+              "category": "contradiction"
+            },
+            {
+              "message": "The amended parent ADR now says `sotp verify plan-artifact-refs` provides schema/file/anchor validation for 'task-coverage.json の plan artifact ref', but `task-coverage.json` is defined earlier in the same ADR as a task-id coverage/integrity map, not a file/anchor-based ref structure. This gives readers the wrong contract for what that CLI is supposed to validate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "line": 1073,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:16e91fc6c11c5be87ffd98f1760f6239ff8e93ea7c5d23b7c31a248351fc4bce",
+          "at": "2026-04-23T21:15:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The layer-separation constraint coverage is incomplete: `CN-08` stops at `T012`, so the new CLI wrapper tasks `T013`/`T014` are not covered even though the spec says new work must preserve the full `domain / usecase / infrastructure / cli` split. That leaves the CLI layer outside the constraint gate, so a regression there would not be caught by task-coverage validation.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/task-coverage.json",
+              "line": 35,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:dde493ba734f3ef049ecd7bc8b41ac189f86b3120df5cc70dffddd80f503cae9",
+          "at": "2026-04-23T21:19:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8292669a9cb6369ed2391051906084aa719303abc6f33b7137532eca344227",
+          "at": "2026-04-23T21:22:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8292669a9cb6369ed2391051906084aa719303abc6f33b7137532eca344227",
+          "at": "2026-04-23T21:26:13Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 449,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:44:18Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17bcee0f5b45b2d963af80b406102b41a57b5d5ad96ac5f716a2ec673607d9d8",
+          "at": "2026-04-23T13:36:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The convention establishes a rule that every new rule proposal must include an enforcement mechanism design or, if not yet implemented, a Reassess When trigger. This file is itself introducing that project rule, but it only documents the policy and provides no concrete mechanism design or Reassess trigger for enforcing this convention, leaving the rule dependent on the documentation/review path it says is drift-prone.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 25,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:17bcee0f5b45b2d963af80b406102b41a57b5d5ad96ac5f716a2ec673607d9d8",
+          "at": "2026-04-23T13:38:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception is internally inconsistent: it says the convention is enforced via Rules §3's 4th tier as \"documentation + review\", but Rules §3 defines the 4th tier as \"lint / static analysis\". That leaves the document disagreeing with itself about which mechanism is responsible for enforcing this convention.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 65,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:e623a6c8431292baed2168e3155842e5fe5620b2c73f861fbe9e549f8229a79d",
+          "at": "2026-04-23T14:21:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c658e6af17004d818ae0ad1db7c5a65c4d37b99f3a73fd52d552b5e936eca",
+          "at": "2026-04-23T14:23:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c658e6af17004d818ae0ad1db7c5a65c4d37b99f3a73fd52d552b5e936eca",
+          "at": "2026-04-23T14:25:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new facts-only briefing rule conflicts with the adr-editor invocation below it: this briefing still requires the imperative `edit the working tree only; do not commit inside the loop`. Because the same file tells harness-policy reviewers to flag briefing violations, legitimate Phase 1 back-and-forth invocations will now trip the new rule by construction.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "line": 222,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:5b233c94c4ee3f0161ef66a2e234beba8482f791e40aff15a21736a8214e413c",
+          "at": "2026-04-23T16:40:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new \"facts only\" briefing rule conflicts with the existing adr-editor invocation contract later in this file: line 222 still requires the caller to include the imperative \"edit the working tree only; do not commit inside the loop\" in the briefing body. As written, the rule cannot be applied uniformly to all listed track sub-agents.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 148,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5b233c94c4ee3f0161ef66a2e234beba8482f791e40aff15a21736a8214e413c",
+          "at": "2026-04-23T16:43:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14435fd4b698365adea1f5004fd2fbf7bb960e2b8bd4e402185478f859413ab8",
+          "at": "2026-04-23T16:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The self-enforcement exception claims that new ADRs are semantically checked by the reviewer capability when they pass through `/track:plan` or `/adr:add`, but neither workflow actually invokes reviewer tooling. `.claude/commands/adr/add.md` only authors the ADR, and `.claude/commands/track/plan.md` only points the user to run `/track:review` later. That means the convention currently overstates its own tier-5 enforcement and leaves ADR additions unguarded unless a separate review step is run.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 69,
+              "category": "grounding_gap"
+            },
+            {
+              "message": "`Rules` require non-active tracks to be rejected by the write path itself, but the `security-critical` exception says fixes may still be retroactively applied to non-active tracks. Because the document never defines any override path or narrowed guard for that exception, the rule set is internally contradictory: an implementation cannot both hard-reject all non-active writes and also permit the documented emergency backport case.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 21,
+              "category": "internal_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:14435fd4b698365adea1f5004fd2fbf7bb960e2b8bd4e402185478f859413ab8",
+          "at": "2026-04-23T16:49:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ff85c9a060e2201601c52cd5055c8c3863ff91b2b117765a7c47e8fe7f593ef",
+          "at": "2026-04-23T16:51:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception points new ADRs at the wrong review scope. It says \"new ADR / convention changes\" are reviewed through `harness-policy`, but `track/review-scope.json` classifies `knowledge/adr/**` under `plan-artifacts`, not `harness-policy`. That means the documented safeguard for ADRs is grounded in a scope that will never see ADR diffs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 69,
+              "category": "policy"
+            },
+            {
+              "message": "The reviewer obligation is not actually enforceable for the Codex-heavy path it is trying to cover. It requires harness-policy reviewers to flag violating briefings in `tmp/reviewer-runtime/briefing-*.md`, but harness-policy review is driven from `git diff` over tracked scope files and `track/review-scope.json` does not include `tmp/**`; those briefing files are runtime-only and untracked. In the normal review loop, the reviewer will never see the offending briefing.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:4ff85c9a060e2201601c52cd5055c8c3863ff91b2b117765a7c47e8fe7f593ef",
+          "at": "2026-04-23T16:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new 'facts-only' rule is only documented in the command text, but the real runtime input to sub-agents is `tmp/reviewer-runtime/briefing-*.md`. This section explicitly exempts those files from harness-policy review and defers prompt-body checks to plan-artifacts, so the artifact that actually drives the sub-agent still has no fail-closed enforcement. That leaves the biased-briefing failure mode this change is meant to prevent still reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:183afe1c6b490a9b0a649a143a63fecfa717e08c96ac558a24d93ed92bd252b4",
+          "at": "2026-04-23T16:56:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:366c9e1a89ce13c5dd0e730585ea3ecec78371c1bd1e72c07ced1efec6e6b125",
+          "at": "2026-04-23T16:58:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new no-prescription rule still leaves the actual runtime briefings unchecked. Line 167 explicitly limits harness-policy review to the command text and excludes `tmp/reviewer-runtime/briefing-*.md`, but those gitignored files are the artifacts sub-agents actually consume. As a result, an orchestrator can still generate a biased briefing in normal use and no reviewer operating on tracked scope will ever see it, so the failure mode this section is meant to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "mechanism_gap"
+            },
+            {
+              "message": "The self-enforcement exception only documents review coverage for `knowledge/conventions/**` and `knowledge/adr/**`, even though this round introduces a new behavioral rule in `.claude/commands/track/plan.md`. `Rules` require every new rule proposal to carry an enforcement design, so narrowing the convention's own tier-5 safeguard to conventions/ADRs leaves policy-bearing command files outside the documented enforcement path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 69,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:366c9e1a89ce13c5dd0e730585ea3ecec78371c1bd1e72c07ced1efec6e6b125",
+          "at": "2026-04-23T17:02:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fac548784cc08862a85693f7a7f28b75060cfc564bfcad6e2cd9b02b2b3ecebb",
+          "at": "2026-04-23T17:04:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/conventions/enforce-by-mechanism.md` reserves tier-5-only enforcement for **that convention's own** self-referential rules, but this section uses the self-enforcement exception to justify the new no-prescription briefing rule. That opens a loophole where ordinary operational rules can skip designing a real mechanism just by citing the exception, which contradicts the convention's fail-closed priority order.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": null
+            },
+            {
+              "message": "This section says the no-prescription constraint applies to \"any caller invoking\" `spec-designer` / `type-designer` / `impl-planner` / `adr-editor`, but the rule is only documented here. There is no shared convention or parallel rule in the other command/agent docs, so the documented scope is broader than the review mechanism that is supposed to enforce it: a future caller can violate the rule without any local authoritative text for harness-policy review to anchor on.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 150,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:fac548784cc08862a85693f7a7f28b75060cfc564bfcad6e2cd9b02b2b3ecebb",
+          "at": "2026-04-23T17:08:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new 'facts only' rule is incompatible with the required Phase 1 adr-editor briefing: this same plan file still requires the imperative 'edit the working tree only; do not commit inside the loop' in the briefing body. That instruction is not a fact, so either every valid adr-editor escalation now violates the rule or the safety guardrail gets dropped.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 150,
+              "category": "logic"
+            },
+            {
+              "message": "The enforcement here only reviews the static command text, but the sub-agents actually consume untracked `tmp/reviewer-runtime/briefing-*.md` prompts. Because those runtime briefings are outside tracked harness-policy scope, a biased briefing can still be emitted and no reviewer will ever see the offending artifact, so the failure mode this section is meant to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "mechanism"
+            }
+          ],
+          "hash": "rvw1:sha256:2cf5287ff41070dc92682f2c48309f3daf298296ce3942e8a4dd59451dccb45e",
+          "at": "2026-04-23T17:10:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new \"facts-only\" briefing rule is only enforced in the tracked command text, but the actual sub-agent briefing bodies are generated at runtime as `tmp/reviewer-runtime/briefing-*.md` files, which are outside the tracked review scope. As a result, harness-policy review can inspect the policy but not the prompt bodies that may still contain prescription, so the failure mode this section is trying to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 150,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
+          "at": "2026-04-23T17:14:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The enforcement note is grounded on `tmp/reviewer-runtime/`, but `/track:plan` actually emits its planner briefings through runtime files such as `tmp/spec-designer-briefing.md` and `tmp/impl-planner-briefing.md` via `track-local-plan`. As written, the rule reviews the policy text while leaving the generated briefing artifacts that can carry prescription outside the stated enforcement path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0e4589e21d878bc76b2854676bb73fc361aece3fa0b334015a1eb01c07513402",
+          "at": "2026-04-23T17:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The enforcement claim here is incomplete: the rule only reviews the tracked command text, while the actual sub-agent prompt bodies are emitted to transient `tmp/*-briefing.md` files or inline Agent prompts that this scope cannot inspect. That leaves biased briefing content unobservable to the harness-policy reviewer, so the new no-prescription rule does not actually prevent the failure mode it is meant to block.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism gap"
+            }
+          ],
+          "hash": "rvw1:sha256:8c654f9b2cac4e3260ad268fe511dcb4ec6fdac4e35771fb48d6b9aa371090fb",
+          "at": "2026-04-23T17:19:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guard only covers the source command file, but `/track:plan` actually emits the prompts sent to sub-agents into runtime files like `tmp/spec-designer-briefing.md` and `tmp/impl-planner-briefing.md`. Those generated briefings are outside the harness-policy review scope, so a later change can still inject prescriptive text into the delivered prompt without any finding. The new enforcement path therefore misses the artifact it is meant to constrain.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:cd903a160e76797007e4210f28c3f87fd97d5c168278119da97c5c21bbe18a2a",
+          "at": "2026-04-23T17:22:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
+          "at": "2026-04-23T17:25:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Sub-agent briefing rules` section defines author-side MUST/MUST NOT content, but it never states that harness-policy review must treat biased briefings as a reportable violation. That leaves the change without the reviewer-side semantic-review backstop described in the design intent, so the rule is still advisory and future prescriptive briefing edits can slip through review without any policy text saying they are failures.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 148,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
+          "at": "2026-04-23T17:28:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cf9a08c80fb630f088057d6712d06e2aed7846ff0156d19ff58503dabcb59df",
+          "at": "2026-04-23T17:29:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception says ADR changes are checked for compliance with this convention via `plan-artifacts` review, but the review workflow only auto-loads conventions from the current `spec.md`/`plan.md`, and the `plan-artifacts` severity policy is just generic semantic review. That means an ADR that simply omits citing `enforce-by-mechanism.md` can bypass the exact mechanism this paragraph claims will catch it, so ADR-side self-enforcement is not actually closed here.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 75,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0cf9a08c80fb630f088057d6712d06e2aed7846ff0156d19ff58503dabcb59df",
+          "at": "2026-04-23T17:31:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:883d85bec861cc3b641745ce272a4fc66d3d96697b3c21c9f0b6fcfd0c881c55",
+          "at": "2026-04-23T17:33:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Line 165 makes the tracked command file the enforcement surface for the new no-prescription rule, but the sub-agents actually consume transient briefings (`tmp/*-briefing.md` in Codex-heavy flows, inline Agent prompts elsewhere). Because those runtime prompt bodies are outside harness-policy scope and `tmp/` is gitignored, a biased briefing can still reach a sub-agent without any reviewer ever seeing the offending artifact, so the stated mechanism does not close the failure mode this section is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:883d85bec861cc3b641745ce272a4fc66d3d96697b3c21c9f0b6fcfd0c881c55",
+          "at": "2026-04-23T17:36:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This rule only constrains the source command text, but the actual sub-agent prompts are generated into runtime briefing files outside harness-policy review scope. A later change can still inject prescriptive instructions into those delivered prompts without any review finding, so the new prohibition is still advisory rather than actually enforced on the artifact that matters.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:299874dd11bc2c183ac818dd002be8b585e81d9f2659e563bea8ffb483994b23",
+          "at": "2026-04-23T17:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b18170416a39baa0021db1aec08bad7eede2493d2e592f8a5a5941b91e195d55",
+          "at": "2026-04-23T17:41:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new tier-5 enforcement claim still does not cover the artifact that actually reaches the planner sub-agents. `/track:plan` says harness-policy review of `.claude/commands/**` is the mechanism here, but the codex-heavy path delivers the prompt through transient `tmp/*-briefing.md` files (`.claude/commands/track/plan.md` lines 198 and 215), and `apps/cli/src/commands/plan/codex_local.rs` turns `--briefing-file` into a runtime-only `Read ... and perform the task described there.` prompt. Because those briefing files are gitignored and outside harness-policy scope, a biased briefing can still be emitted without any reviewer ever seeing it, so the failure mode this section is meant to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b18170416a39baa0021db1aec08bad7eede2493d2e592f8a5a5941b91e195d55",
+          "at": "2026-04-23T17:44:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new \"facts-only, no prescription\" rule is internally inconsistent with the rest of this file: the `adr-editor` briefing still must include the imperative \"edit the working tree only; do not commit inside the loop\" later in the same command. As written, the rule cannot be applied uniformly to the listed sub-agents.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 148,
+              "category": "logic"
+            },
+            {
+              "message": "The enforcement claim still only covers the tracked command text, but the Codex-heavy path emits the actual sub-agent prompt through untracked `tmp/*-briefing.md` files (`tmp/spec-designer-briefing.md`, `tmp/impl-planner-briefing.md`). A later change can still inject prescriptive text into the delivered prompt without any harness-policy review finding, so the biased-briefing failure mode remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:081b29d1bf78bea0d599cd5ad0be75f10a981d5e854346538c11536a9e0db0d0",
+          "at": "2026-04-23T17:47:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6083d9262add8025017de31844cbe40926667ce9ff76698ca635b365449b59ea",
+          "at": "2026-04-23T17:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception makes missing citations a reassess trigger, but the review path it defines explicitly does not check whether ADRs cite this convention. Because `plan-artifacts` review only looks for contradiction/factual errors/infeasibility, trigger (a) is not actually observable through the stated mechanism and the convention will not escalate when that failure mode occurs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 75,
+              "category": null
+            },
+            {
+              "message": "The new security-fix exception allows an `admin-only flag` as a write-guard bypass example for non-active tracks. A generic admin override re-opens the very write path that Rules §2 says must reject non-active tracks, and the exception does not require the bypass mechanism itself to enforce the 'security-critical only' condition. As written, this creates a permanent loophole rather than a narrowly scoped emergency path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 53,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6083d9262add8025017de31844cbe40926667ce9ff76698ca635b365449b59ea",
+          "at": "2026-04-23T17:51:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This \"documentation + semantic review\" rule is only attached to the tracked command file, but the sub-agents actually consume transient briefing files (`tmp/spec-designer-briefing.md`, `tmp/impl-planner-briefing.md`, etc.) that are outside `harness-policy` scope. A biased runtime briefing can still be emitted without any reviewer seeing the offending artifact, so the new mechanism does not close the failure mode it is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5ef3ba385c6eb94c0e4025180f612c201cca975132724e0124fb7b83cd94d3ed",
+          "at": "2026-04-23T17:53:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
+          "at": "2026-04-23T17:57:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reassess trigger `(a) 本 convention を cite しない新 ADR が複数観測` is broader than the rule it is supposed to monitor. `enforce-by-mechanism` only requires mechanism discussion when an ADR introduces a new rule, but this trigger counts every new ADR that omits the citation, including ADRs that do not define any rule at all. In practice that will generate false positives and make the escalation signal meaningless. Scope the trigger to ADRs that actually introduce rules/mechanisms, or to a missing required section, so it stays observable and actionable.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 78,
+              "category": "logic"
+            },
+            {
+              "message": "The security-fix exception now says retroactive application requires \"write guard のバイパス経路\" in a separate ADR, but the rule above defines non-active protection as a stack of `filesystem / codec / CLI / active-track guard` checks. Referring to a singular \"write guard\" leaves the override point undefined: an implementer can satisfy this literally by bypassing only one layer (so the emergency path still does not work) or by punching through the lowest layer without constraining the others. The exception needs to identify the canonical override surface or require coordinated handling across all relevant guard layers.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 53,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
+          "at": "2026-04-23T18:01:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR-side self-enforcement path fails open for uncited ADRs. This paragraph says `knowledge/adr/**` changes are protected by `plan-artifacts` semantic review, but `/track:review` only loads convention files that the current `spec.md`/`plan.md` already names, and `track/review-prompts/plan-artifacts.md` does not treat missing convention citations as a reportable issue. A new ADR that simply omits `enforce-by-mechanism.md` can therefore pass the stated review path unchanged, so trigger (a) ('new ADRs that do not cite this convention') is not actually observable through the mechanism this section defines.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 75,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
+          "at": "2026-04-23T18:05:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new no-prescription rule is still enforced only on the tracked command text, but the prompts that sub-agents actually consume are emitted through transient `tmp/*-briefing.md` files in the Codex-heavy paths and inline Agent prompts elsewhere. Because those runtime prompt bodies are outside `harness-policy` scope, a biased briefing can still reach a sub-agent without any reviewer seeing the offending artifact, so this mechanism does not actually close the failure mode it is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:34363795cc3b74da034784fa7cbf78fdfaa4e2f359ad53ae8a67fd59c8c1a3b6",
+          "at": "2026-04-23T18:07:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The self-enforcement reassess trigger dropped the case where multiple new ADRs appear without citing this convention. That was the only observable signal for silent drift before a violating merge lands, so the current trigger set can let the convention decay without ever escalating to higher-tier enforcement.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 78,
+              "category": "mechanism-gap"
+            },
+            {
+              "message": "The security-fix exception is under-specified because it says to define a \"write guard\" bypass, but the base rule protects non-active tracks with layered filesystem / codec / CLI / active-track guards. As written, the override surface is ambiguous and can either fail to bypass all relevant checks or create a broader escape hatch than intended.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 53,
+              "category": "security-mechanism"
+            }
+          ],
+          "hash": "rvw1:sha256:fbf6163ef89b0eff111cfa046c723629d9138af81980b9ae14976520da60f189",
+          "at": "2026-04-23T18:09:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This only constrains the tracked command text, not the prompt bodies that actually reach the sub-agents. The same file still uses transient `tmp/*-briefing.md` paths for the Codex-heavy flow later on, so a future edit can inject prescriptive briefing content into those generated files without any harness-policy review finding.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:54c143a5756566b16e96b889c1e2e019ac983470f866327b6cde04480a20cb21",
+          "at": "2026-04-23T18:12:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new security-critical exception adds two review-sensitive constraints (`override ADR` required before bypassing write guards, and the bypass must stay scoped to security fixes) but `## Review Checklist` was not updated to verify either one. Since this convention layer is enforced only through tier-5 semantic review, that omission leaves the new safeguard effectively unenforced: a future generic admin bypass could satisfy the written exception in practice without reviewers being prompted to check for the required ADR or scope restriction.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 52,
+              "category": "mechanism gap"
+            }
+          ],
+          "hash": "rvw1:sha256:54c143a5756566b16e96b889c1e2e019ac983470f866327b6cde04480a20cb21",
+          "at": "2026-04-23T18:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
+          "at": "2026-04-23T18:16:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
+          "at": "2026-04-23T18:18:52Z"
+        }
+      ]
+    }
+  }
+}

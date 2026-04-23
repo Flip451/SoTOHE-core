@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "domain 層に SpecRefFinding 値オブジェクトと SpecRefFindingKind enum (DanglingAnchor / HashMismatch / StaleSignals の 3 variant) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。各フィールド (layer, catalogue_entry, ref_index, spec_file, kind) の型と可視性を決定し、#[derive] 設定 (Debug, Clone 等) を付与する。unit test で 3 variant を構築・比較できることを確認する (IN-04、domain 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "domain 層に CatalogueSpecSignal 値オブジェクト (type_name: String, signal: ConfidenceSignal) と CatalogueSpecSignalsDocument 値オブジェクト (schema_version: u32=1, catalogue_declaration_hash: ContentHash, signals: Vec<CatalogueSpecSignal>) を libs/domain/src/tddd/catalogue_spec_signal.rs に定義する。schema_version=1 固定値、generated_at なし (deterministic output、CN-06) を確認する。unit test でドキュメント構造の構築と field アクセスを検証する (IN-11、domain 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "domain 層に evaluate_catalogue_entry_signal 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。informal-priority rule (informal_grounds[] 非空 → Yellow / spec_refs[] 非空 + informal_grounds[] 空 → Blue / 両方空 → Red) を Phase 1 evaluate_requirement_signal と対称なシグネチャで提供する。unit test で 3 ケース (Blue / Yellow / Red) を網羅し、I/O を持たないことを確認する (IN-01、domain 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "domain 層に check_catalogue_spec_ref_integrity 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。シグネチャ: check_catalogue_spec_ref_integrity(catalogue: &TypeCatalogueDocument, spec: &SpecDocument, current_catalogue_hash: Option<&ContentHash>, signals_opt: Option<&CatalogueSpecSignalsDocument>) -> Vec<SpecRefFinding>。current_catalogue_hash は usecase 層が read_catalogue_for_spec_ref_check の返値 (TypeCatalogueDocument, String) の String 部から ContentHash として渡す (stale 検出用; None の場合は stale check をスキップ)。実施する検証: (1) SpecRef.anchor (SpecElementId) の spec.json 内存在確認 (dangling 検出)、(2) SpecRef.hash の canonical serialization SHA-256 一致検証 (drift 検出)、(3) signals_opt + current_catalogue_hash が両方 Some の場合の catalogue_declaration_hash vs current_catalogue_hash 比較 (stale 検出)。Vec<SpecRefFinding> を返す (空 = ok)。unit test で dangling / drift / stale / 全通過の 4 ケースを検証する。I/O を持たない (IN-02、domain 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "domain 層に check_catalogue_spec_signals 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。strict: bool を受け取り、strict=true では Yellow/Red → Finding::error (BLOCKED)、strict=false では Yellow → Finding::warning (PASS)、Red → Finding::error (BLOCKED) の挙動を提供する。既存 check_spec_doc_signals / check_type_signals と同型の signature で統一する。unit test で strict=true / strict=false × Yellow / Red / Blue の組み合わせを検証する (IN-03、domain 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "usecase 層の TrackBlobReader secondary port に 2 つの新規メソッドを追加する: read_catalogue_for_spec_ref_check (branch/track_id/layer_id → BlobFetchResult<(TypeCatalogueDocument, String)>; String は raw bytes の SHA-256 hash、stale 検出の catalogue_declaration_hash 比較に必須; 既存 read_type_catalogue と同パターン) と read_catalogue_spec_signals_document (branch/track_id/layer_id → BlobFetchResult<CatalogueSpecSignalsDocument>)。libs/usecase/src/merge_gate.rs の trait 定義を更新する (IN-07、usecase 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "usecase 層に CatalogueSpecSignalsWriter secondary port を新設する。single method: write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>。TrackWriter / ImplPlanWriter / ReviewWriter と同パターンで libs/usecase/src/catalogue_spec_signals.rs に配置する (IN-05 の port 要件、usecase 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "usecase 層に RefreshCatalogueSpecSignalsInteractor を libs/usecase/src/catalogue_spec_signals.rs に実装する。TrackBlobReader / CatalogueSpecSignalsWriter port を依存注入で受け取り、(1) read_catalogue_for_spec_ref_check で <layer>-types.json を読み込み (TypeCatalogueDocument, String) を取得 (String = raw bytes SHA-256 = catalogue_declaration_hash; read_type_catalogue の String は resolved filename であり hash 用途に使えないため read_catalogue_for_spec_ref_check を使う)、(2) domain evaluate_catalogue_entry_signal で entry 単位 signal 算出、(3) step 1 の String を catalogue_declaration_hash として使用、(4) CatalogueSpecSignalsDocument 構築、(5) atomic write の 5 ステップを実行する。active-track guard (CN-07) を適用する。unit test でモックポートを使って正常系 + 非アクティブ reject を検証する (IN-05、usecase 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "usecase 層に VerifyCatalogueSpecRefsInteractor を libs/usecase/src/catalogue_spec_refs.rs に実装する。TrackBlobReader port 経由で入力を収集: read_catalogue_for_spec_ref_check → (TypeCatalogueDocument, String); String は raw bytes SHA-256 hex digest で ContentHash::from_hex(hash_str)? または同等の変換で ContentHash に変換して domain 関数の current_catalogue_hash 引数に渡す。read_spec_document → SpecDocument; read_catalogue_spec_signals_document → CatalogueSpecSignalsDocument (--skip-stale=true の場合は読み込み不要)。domain check_catalogue_spec_ref_integrity(catalogue, spec, Some(&content_hash), Some(&signals)) を呼び出し Vec<SpecRefFinding> を aggregate して返す。--skip-stale flag (bool) を受け取り、true の場合は current_catalogue_hash=None かつ signals_opt=None で domain 関数を呼ぶ (stale 検出スキップ)。active-track guard (CN-07) を適用する。unit test でモックポートを使って dangling / drift / stale / skip-stale / 非アクティブ reject を検証する (IN-06、usecase 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "infrastructure 層に CatalogueSpecSignalsDocumentDto serde DTO (schema_version: u32, catalogue_declaration_hash: String, signals: Vec<CatalogueSpecSignalDto>) と CatalogueSpecSignalsCodecError error enum (Json / UnsupportedSchemaVersion / Validation の 3 variant) を libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs に実装する。deny_unknown_fields 全 nesting で適用。encode / decode round-trip と unsupported schema version エラー / field 不正エラーを unit test で検証する。generated_at なし (CN-06) を確認する (IN-11、infrastructure 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T011",
+      "description": "infrastructure 層に GitShowTrackBlobReader への method 追加を libs/infrastructure/src/verify/merge_gate_adapter.rs に実装する。read_catalogue_for_spec_ref_check (git show origin/<branch>:track/items/<id>/<layer>-types.json → (TypeCatalogueDocument, String) decode; String は raw bytes の SHA-256 hash で stale 検出に必須; 既存 read_type_catalogue と同パターン) と read_catalogue_spec_signals_document (git show origin/<branch>:track/items/<id>/<layer>-catalogue-spec-signals.json → CatalogueSpecSignalsDocument decode) の 2 メソッドを TrackBlobReader trait 実装として追加する。既存 symlink guard / LANG=C fixation / BlobResult / path-not-found stderr 解析パターンを流用する。unit test で mock git-show 出力を使って正常 decode / path-not-found / symlink reject を検証する (IN-08、infrastructure 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T012",
+      "description": "infrastructure 層に FsCatalogueSpecSignalsStore を libs/infrastructure/src/tddd/ (新モジュール) に実装する。CatalogueSpecSignalsWriter port を実装し、track/items/<track_id>/<layer>-catalogue-spec-signals.json への atomic write を FsTrackStore / FsReviewStore と同パターンで提供する。workspace root path + CatalogueSpecSignalsDocumentDto を介した serde_json serialize を使用する。unit test でファイル書き込みと overwrite 冪等性を検証する (IN-08、infrastructure 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T013",
+      "description": "CLI 層に sotp track catalogue-spec-signals サブコマンドを apps/cli/src/commands/track/catalogue_spec_signals.rs に追加する。引数 --layer <layer_id> (省略時は全 tddd.enabled + catalogue_spec_signal.enabled 層)。RefreshCatalogueSpecSignalsInteractor を dispatch し、exit 0 (成功) / non-zero (schema 違反・decode 失敗・active-track guard 失敗等) を返す。integration test で end-to-end (フィクスチャ types.json → signals.json 生成 + exit code) を検証する (IN-09、CLI 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T014",
+      "description": "CLI 層に sotp verify catalogue-spec-refs サブコマンドを apps/cli/src/commands/verify/catalogue_spec_refs.rs に追加する。引数 --track <id> / --skip-stale。VerifyCatalogueSpecRefsInteractor を dispatch し、SpecRefFinding を D1.5 の形式で stderr に 1 行ずつ出力する。違反ゼロ → exit 0 / 1 件以上 → non-zero。integration test で dangling / drift / stale / skip-stale ケースの exit code + stderr 出力形式を検証する (IN-10、CLI 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T015",
+      "description": "pre-commit フロー (dispatch_track_commit_message) に 2 step を挿入する。挿入順 (D3.4): (既存 1) Stage 2 type-signals 再計算 → (新規 2) sotp verify catalogue-spec-refs --skip-stale (binary gate、ERROR で block + 後段スキップ) → (新規 3) sotp track catalogue-spec-signals (signal 再計算) → (既存 4+) cargo make ci / review guard / commit。active track の tddd.enabled + catalogue_spec_signal.enabled 層のみ gate を発火する。integration test で binary gate ERROR 時に commit が block されることを確認する (IN-12、integration 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T016",
+      "description": "cargo make ci (Makefile.toml + sotp CLI 内部実装) に 2 つの新 task を追加する: verify-catalogue-spec-refs (dangling / drift / stale 全 3 検証、既存 verify-plan-artifact-refs と並列実行可能) と check-catalogue-spec-signals (check_catalogue_spec_signals(strict=false) 呼び出し、Red → BLOCKED / Yellow → warning)。sotp track catalogue-spec-signals の再計算は CI task に含めない (D3.5)。integration test で両 task が stale / Red 時に ci を fail させることを確認する (IN-13、integration 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T017",
+      "description": "merge gate (check_strict_merge_gate) を SoT Chain bottom-up reorder する。新順序 (D3.6): (1) branch validation / plan/* skip → (2) read_type_catalogue + check_type_signals (Chain ③; 既存 API、rename なし) → (3) read_catalogue_for_spec_ref_check → (TypeCatalogueDocument, String); String は raw bytes SHA-256 hex digest で ContentHash::from_hex(hash_str)? または同等の変換で ContentHash に変換。read_spec_document → SpecDocument; read_catalogue_spec_signals_document → CatalogueSpecSignalsDocument; check_catalogue_spec_ref_integrity(catalogue, spec, Some(&content_hash), Some(&signals)) を呼び出し Vec<SpecRefFinding> を検査 (Chain ② binary gate; dangling/drift/stale 全 3 検証; read_spec_document は anchor/hash 比較のため D3.6 で必須) → (4) check_catalogue_spec_signals(strict=true) (Chain ② signal check; step 3 取得済みの signals を再利用可) → (5) check_spec_doc_signals (Chain ①; step 3 取得済みの spec blob を再利用可)。TrackBlobReader T006 で追加した新メソッドを step 3/4 で使用する。unit test で strict=true 時の Yellow block を検証する (IN-14、integration 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T018",
+      "description": "architecture-rules.json の layers[].tddd に catalogue_spec_signal サブ block (enabled: bool、省略時 false) を追加する。schema version v2 維持 (optional field 追加、破壊的変更なし)。SoTOHE-core 本リポジトリの本 track 対象 layer (domain / usecase / infrastructure の 3 層; 全 tddd.enabled 層が本 track の実装対象であるため、D5.4 の段階適用原則に従い flag 先行 true 設定: まず catalogue_spec_signal.enabled: true に設定し、その後 T023 で spec_refs[] を記入する順序) を catalogue_spec_signal.enabled: true に設定する。T018 と T023 の間でも pre-commit / CI は interim モード (D4.1: Yellow → Finding::warning、PASS) で動作するため commit はブロックされない; Yellow がブロックするのは strict=true の merge gate のみであり、T023 完了 (spec_refs[] 記入 → Blue) まで merge gate 通過は保留する。他の tddd.enabled 層が将来追加された場合は後続 track で layer 別に記入 + flag flip 可能 (D5.3 段階適用)。integration test で enabled: false の層が全 gate でスキップされることを確認する (IN-15、integration 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T019",
+      "description": "track/review-scope.json の review_operational 配列に track/items/<track-id>/*-catalogue-spec-signals.json の glob パターンを追加する。既存 *-type-signals.json と同型の一括除外パターンを踏襲する (IN-16、D2.4)。sotp verify review-scope 等の既存 review scope 検証 task が通ることを確認する (IN-16、integration 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T020",
+      "description": "<layer>-types.md レンダラー (libs/infrastructure/src/type_catalogue_render.rs) を拡張し、catalogue-spec signal (新規) を entry セクション内に type→implementation signal (既存) と並置表示する。<layer>-catalogue-spec-signals.json が存在する場合は signal 列を entry ヘッダー行に追記し、存在しない場合は従来表示を維持する。表示レイアウト (列配置、フォーマット) は実装時に proposal を確定する (IN-17、D2.5)。unit test でシグナルあり / なしの 2 ケースの markdown 出力を検証する (IN-17、infrastructure 層)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T021",
+      "description": "親 ADR 2026-04-19-1242 §D3.2 amendment を adr-editor back-and-forth で実施する。「spec_refs[]: 🔵 (全 SpecRef が anchor 解決 + hash 一致) / 🔴 (1 件でも失敗)」記述を本 ADR D1 (hash binary gate 分離、signal 評価は grounding 品質のみ) に整合させる (IN-18)。plan-artifacts レビューサイクル内で review-fix-lead が実施済み。",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T022",
+      "description": "親 ADR 2026-04-12-1200 §D5 amendment を adr-editor back-and-forth で実施する。check_strict_merge_gate の既存順序 (Chain ① → Chain ③) 記述を本 ADR D3.6 の bottom-up reorder (Chain ③ → ② → ①) に整合させる (IN-19)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T023",
+      "description": "Yellow (informal_grounds[] 非空) の catalogue entries を Blue (informal_grounds[] 空 + spec_refs[] 非空) へ昇格させる。対象: domain-types.json の新規 4 エントリ (SpecRefFinding / SpecRefFindingKind / CatalogueSpecSignal / CatalogueSpecSignalsDocument) + usecase-types.json の 4 エントリ + infrastructure-types.json の 4 エントリ = 計 12 エントリ。domain-types.json の 5 件目 ImplPlanPresenceError (action=delete) は T025 でコード削除と同時にカタログエントリごと除去するため T023 の対象外とする。ADR D1.1 の informal-priority rule に従い: (1) 各エントリの spec_refs[] に参照先 spec 要素の anchor + canonical serialization SHA-256 hash を記入し、(2) 対応する informal_grounds[] を空配列に清書する。sotp verify catalogue-spec-refs が exit 0 を返すことを確認する (AC-05 の merge gate strict=true 通過前提条件: Yellow がブロックされるため; AC-06 の SoTOHE-core dogfood 通過前提条件: full gate 発火環境での pass に必要)。CI (interim mode) は Yellow を warning 扱いのため T023 なしでも cargo make ci は pass する (AC-10 は T024 単独で充足)。signal 色判定は hash 値ではなく informal_grounds[] の有無で決まる (D1.1) ため、hash populate 単独では Blue に昇格しない点に注意する",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T024",
+      "description": "cargo make ci の全項目 (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* + verify-catalogue-spec-refs + check-catalogue-spec-signals) が pass することを確認する。新規追加した domain 純粋関数 / usecase interactor / infrastructure adapter / CLI wrapper の全 unit test および integration test が pass する。verification.md に最終確認結果を記録する (AC-10、IN-20 の全テスト pass 確認)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T025",
+      "description": "libs/domain/src/impl_plan.rs から check_impl_plan_presence 関数および ImplPlanPresenceError 型を削除する。呼び出し元 2 箇所 (libs/infrastructure/src/verify/latest_track.rs および apps/cli/src/commands/make.rs) の call site を合わせて除去し、is_activated() ↔ impl-plan.json present invariant の enforcement を完全に削除する。derive_track_status の「impl-plan.json 不在 → Planned」graceful fallback が既に semantic の正しさを担保しているため、削除後に runtime の挙動変化はない。cargo make ci が pass することを確認する (IN-21、domain 層 + infrastructure 層 + cli 層)",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "S1 — Domain primitives: types + pure functions",
+        "description": [
+          "SpecRefFinding / SpecRefFindingKind の型定義 (T001)",
+          "CatalogueSpecSignal / CatalogueSpecSignalsDocument の型定義 + schema v1 構造 (T002)",
+          "evaluate_catalogue_entry_signal 純粋関数 + informal-priority rule (T003)",
+          "check_catalogue_spec_ref_integrity 純粋関数 + dangling / drift / stale 3 検証 (T004)",
+          "check_catalogue_spec_signals 純粋関数 + strict/interim 挙動 (T005)",
+          "全て libs/domain/src/tddd/catalogue_spec_signal.rs に配置、I/O なし (CN-05)"
+        ],
+        "task_ids": ["T001", "T002", "T003", "T004", "T005"]
+      },
+      {
+        "id": "S2",
+        "title": "S2 — Usecase orchestration: ports + interactors",
+        "description": [
+          "TrackBlobReader port に read_catalogue_for_spec_ref_check + read_catalogue_spec_signals_document を追加 (T006)",
+          "CatalogueSpecSignalsWriter port 新設 (T007)",
+          "RefreshCatalogueSpecSignalsInteractor 実装 + active-track guard (T008)",
+          "VerifyCatalogueSpecRefsInteractor 実装 + --skip-stale flag (T009)",
+          "hexagonal 分離: port 経由 I/O + domain 純粋関数呼び出し orchestration (CN-05 / CN-08)"
+        ],
+        "task_ids": ["T006", "T007", "T008", "T009"]
+      },
+      {
+        "id": "S3",
+        "title": "S3 — Infrastructure adapters: codec + store + git-show extension",
+        "description": [
+          "CatalogueSpecSignalsDocumentDto + CatalogueSpecSignalsCodecError codec 実装 (T010)",
+          "GitShowTrackBlobReader 拡張: 2 新メソッド実装 + 既存 guard 流用 (T011)",
+          "FsCatalogueSpecSignalsStore 実装: atomic write (T012)",
+          "<layer>-types.md レンダラー拡張: dual-signal 並置表示 (T020)",
+          "libs/infrastructure/src/tddd/ 新モジュール + libs/infrastructure/src/verify/merge_gate_adapter.rs 拡張"
+        ],
+        "task_ids": ["T010", "T011", "T012", "T020"]
+      },
+      {
+        "id": "S4",
+        "title": "S4 — CLI wrappers",
+        "description": [
+          "sotp track catalogue-spec-signals サブコマンド (T013)",
+          "sotp verify catalogue-spec-refs サブコマンド + --skip-stale (T014)",
+          "apps/cli/src/commands/track/ + apps/cli/src/commands/verify/ 配置"
+        ],
+        "task_ids": ["T013", "T014"]
+      },
+      {
+        "id": "S5",
+        "title": "S5 — Integration wiring: pre-commit / CI / merge gate / config",
+        "description": [
+          "dispatch_track_commit_message に 2 step 挿入 (binary gate → signal 再計算、D3.4) (T015)",
+          "cargo make ci に verify-catalogue-spec-refs + check-catalogue-spec-signals 追加 (D3.5) (T016)",
+          "check_strict_merge_gate を SoT Chain bottom-up reorder + step 3/4 追加 (D3.6) (T017)",
+          "architecture-rules.json に catalogue_spec_signal.enabled opt-in flag 追加 + SoTOHE-core 全層 true (D5) (T018)",
+          "track/review-scope.json review_operational に glob 追加 (D2.4) (T019)"
+        ],
+        "task_ids": ["T015", "T016", "T017", "T018", "T019"]
+      },
+      {
+        "id": "S6",
+        "title": "S6 — ADR amendments (adr-editor back-and-forth)",
+        "description": [
+          "2026-04-19-1242 §D3.2 amendment: hash binary gate 分離に整合 (T021)",
+          "2026-04-12-1200 §D5 amendment: merge gate bottom-up reorder 明記 (T022)"
+        ],
+        "task_ids": ["T021", "T022"]
+      },
+      {
+        "id": "S7",
+        "title": "S7 — Cleanup + Dogfood + quality gate",
+        "description": [
+          "check_impl_plan_presence + ImplPlanPresenceError 削除 + 呼び出し元 call site 除去 (T025、IN-21)",
+          "新規 12 catalogue entries の informal_grounds[] 清書 + spec_refs[] 形式化 (Yellow → Blue 昇格、D1.1) (T023); ImplPlanPresenceError エントリは T025 でコード削除と同時に除去するため T023 の対象外",
+          "cargo make ci 全通過確認 + verification.md 記録 (T024)",
+          "T025 は S1-S6 と並列実行可能 (削除のみ、新機能追加と干渉しない)",
+          "T023 が完了しないと merge gate strict mode で Yellow block される (AC-05 前提条件) かつ SoTOHE-core dogfood が通過しない (AC-06 前提条件); CI は interim mode で Yellow を warning 扱いのため cargo make ci は T023 なしでも pass する"
+        ],
+        "task_ids": ["T025", "T023", "T024"]
+      }
+    ]
+  }
+}

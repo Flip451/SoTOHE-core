@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ImplPlanPresenceError",
+      "description": "Error enum that enforced the is_activated() ↔ impl-plan.json present invariant. Removed because the invariant was deemed obstructive: /track:init creates the branch before impl-plan.json exists (ADR 2026-04-19-1242 §D1.4), and derive_track_status already handles impl-plan.json absence gracefully via Planned fallback. The invariant was recorded in parent ADR 2026-04-19-1242 §Follow-up (2026-04-22) then reverted via the 2026-04-23 Correction in the same ADR after the conflict with /track:init was identified in practice. Call sites in libs/infrastructure/src/verify/latest_track.rs and apps/cli/src/commands/make.rs are removed together with this type (IN-21).",
+      "approved": true,
+      "action": "delete",
+      "kind": "error_type",
+      "expected_variants": [
+        "MissingForActivatedTrack"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-21 (ADR 2026-04-19-1242 §Follow-up 末尾 2026-04-23 Correction) removes check_impl_plan_presence and ImplPlanPresenceError because the is_activated() ↔ impl-plan.json invariant conflicts with /track:init branch creation and Phase 0-2 progression; derive_track_status Planned fallback is sufficient; call sites in latest_track.rs and make.rs removed together"
+        }
+      ]
+    },
+    {
+      "name": "SpecRefFinding",
+      "description": "Structured finding produced by the domain pure function check_catalogue_spec_ref_integrity. Holds the layer id, optional catalogue entry name, optional spec_refs index, optional spec file path, and a SpecRefFindingKind discriminant. Emitted as Vec<SpecRefFinding> and consumed by the CLI layer for human-readable stderr formatting (D1.5). I/O-free — the struct is a plain data carrier in libs/domain/src/tddd/catalogue_spec_signal.rs.",
+      "approved": true,
+      "kind": "value_object",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-04 defines SpecRefFinding struct fields (layer, catalogue_entry, ref_index, spec_file, kind); IN-02 defines its production context (check_catalogue_spec_ref_integrity return type); hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "SpecRefFindingKind",
+      "description": "Enum discriminating the three categories of catalogue spec-ref integrity violations. Each variant carries associated diagnostic data per ADR D1.5: DanglingAnchor { anchor: SpecElementId } (SpecRef.anchor absent from spec.json; carries the failing anchor for CLI error output), HashMismatch { anchor: SpecElementId, declared: ContentHash, actual: ContentHash } (SpecRef.hash differs from canonical SHA-256 of spec element subtree; carries anchor + declared vs actual hashes for diff output), StaleSignals { declared_catalogue_hash: ContentHash, actual_catalogue_hash: ContentHash } (catalogue_declaration_hash in signals file differs from current layer-types.json SHA-256; layer-level finding, carries both hashes). Enum-first per 04-coding-principles.md — three fixed variants with no transitions. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs alongside SpecRefFinding.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "DanglingAnchor",
+        "HashMismatch",
+        "StaleSignals"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-04 (ADR D1.5) defines DanglingAnchor / HashMismatch / StaleSignals as the three required variants; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignal",
+      "description": "Per-entry signal record in the <layer>-catalogue-spec-signals.json output. Fields: type_name (String) and signal (ConfidenceSignal — blue / yellow / red). Produced by applying the informal-priority rule (D1.1) to a single TypeCatalogueEntry. 1 entry → 1 CatalogueSpecSignal; multiple spec_refs[] per entry are collapsed into 1 signal. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs.",
+      "approved": true,
+      "kind": "value_object",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-11 (ADR D2.3) defines CatalogueSpecSignal { type_name, signal } as the per-entry record in signals[]; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsDocument",
+      "description": "Aggregate root for <layer>-catalogue-spec-signals.json. Schema v1 fields: schema_version (1), catalogue_declaration_hash (SHA-256 hex of the input <layer>-types.json for stale detection), signals (Vec<CatalogueSpecSignal>). No generated_at field — deterministic output, byte-identical across multiple runs with the same input. Decoded by the infrastructure CatalogueSpecSignals codec; consumed by VerifyCatalogueSpecRefsInteractor and check_catalogue_spec_signals. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs.",
+      "approved": true,
+      "kind": "value_object",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-11 (ADR D2.2) defines schema v1 with schema_version / catalogue_declaration_hash / signals[]; no generated_at (deterministic); hash will be computed at implementation time"
+        }
+      ]
+    }
+  ]
+}

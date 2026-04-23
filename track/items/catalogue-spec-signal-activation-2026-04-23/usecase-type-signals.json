@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-23T21:37:47Z",
+  "declaration_hash": "2d30c400d390a2ae8273900255d091e59ce9bd16d26f851eb0307563bee36045",
+  "signals": [
+    {
+      "type_name": "RefreshCatalogueSpecSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>",
+        "fn read_type_catalogue(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument>",
+        "fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>>"
+      ],
+      "missing_items": [
+        "fn read_catalogue_for_spec_ref_check(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_catalogue_spec_signals_document(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<CatalogueSpecSignalsDocument>"
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecSignalsWriter",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

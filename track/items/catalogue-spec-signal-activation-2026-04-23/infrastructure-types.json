@@ -1,0 +1,175 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "GitShowTrackBlobReader",
+      "description": "Existing infrastructure secondary adapter implementing TrackBlobReader via git show. Extended by this track to implement the two new port methods added to TrackBlobReader: read_catalogue_for_spec_ref_check (git show origin/<branch>:track/items/<id>/<layer>-types.json → BlobFetchResult<(TypeCatalogueDocument, String)>; String = SHA-256 of raw bytes for stale detection, same tuple pattern as existing read_type_catalogue) and read_catalogue_spec_signals_document (git show origin/<branch>:track/items/<id>/<layer>-catalogue-spec-signals.json decoded as CatalogueSpecSignalsDocument). All existing guard patterns are reused: symlink rejection, LANG=C fixation, BlobResult, path-not-found stderr parsing per ADR 2026-04-12-1200 §D4. action=modify because the adapter struct already exists in libs/infrastructure/src/verify/merge_gate_adapter.rs.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "TrackBlobReader",
+          "expected_methods": [
+            {
+              "name": "read_spec_document",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<SpecDocument>",
+              "is_async": false
+            },
+            {
+              "name": "read_type_catalogue",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+              "is_async": false
+            },
+            {
+              "name": "read_impl_plan",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<ImplPlanDocument>",
+              "is_async": false
+            },
+            {
+              "name": "read_enabled_layers",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<Vec<String>>",
+              "is_async": false
+            },
+            {
+              "name": "read_catalogue_for_spec_ref_check",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+              "is_async": false
+            },
+            {
+              "name": "read_catalogue_spec_signals_document",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<CatalogueSpecSignalsDocument>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-08 (ADR D3.6) extends GitShowTrackBlobReader with two new git-show blob fetch methods; existing guard patterns are reused; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "FsCatalogueSpecSignalsStore",
+      "description": "New infrastructure secondary adapter implementing CatalogueSpecSignalsWriter via filesystem atomic write. Writes <layer>-catalogue-spec-signals.json to track/items/<track_id>/<layer>-catalogue-spec-signals.json using the same atomic write pattern as FsTrackStore / FsReviewStore. Placed in libs/infrastructure/src/tddd/ (new module). Takes a workspace root path and delegates serialization to CatalogueSpecSignalsDocumentDto via serde_json.",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "CatalogueSpecSignalsWriter"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-08 (ADR D3.1 / D3.7) requires atomic write of <layer>-catalogue-spec-signals.json; FsCatalogueSpecSignalsStore is the infrastructure adapter following the FsTrackStore / FsReviewStore pattern; implements CatalogueSpecSignalsWriter port (port name inferred from TrackWriter / ImplPlanWriter / ReviewWriter pattern; ADR D3.7 names only the infrastructure adapter, the port follows D3.7's hexagonal separation mandate); hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsDocumentDto",
+      "description": "Infrastructure serde DTO for <layer>-catalogue-spec-signals.json (schema v1). Fields: schema_version (u32, = 1), catalogue_declaration_hash (String, 64-char hex), signals (Vec<CatalogueSpecSignalDto>). deny_unknown_fields enforced at all nesting levels. No generated_at field (deterministic output per CN-06 / ADR D2.2). Used by the CatalogueSpecSignals codec (encode and decode) in libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs. Mirrors domain CatalogueSpecSignalsDocument.",
+      "approved": true,
+      "kind": "dto",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-11 (ADR D2.2) defines schema v1 fields (schema_version / catalogue_declaration_hash / signals[]); no generated_at; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsCodecError",
+      "description": "Error enum for the <layer>-catalogue-spec-signals.json codec. Variants follow existing codec conventions: Json (serde_json failures), UnsupportedSchemaVersion (version != 1), Validation (domain construction errors from CatalogueSpecSignal or ContentHash). Placed in libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs alongside CatalogueSpecSignalsDocumentDto.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "IN-11 (ADR D2.2) requires a codec for the new schema v1 file; error variants follow the ImplPlanCodecError / TaskCoverageCodecError pattern; hash will be computed at implementation time"
+        }
+      ]
+    }
+  ]
+}

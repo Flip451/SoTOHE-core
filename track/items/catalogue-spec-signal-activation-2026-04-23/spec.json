@@ -1,0 +1,700 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ② のリンク活性化、advisory → enforced 移行)",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "SoT Chain ② (型カタログ → 仕様書) の signal 評価機構を実装し、catalogue entry の spec_refs[] / informal_grounds[] を Phase 1 informal-priority rule と対称な評価関数で 🔵🟡🔴 にマップすることで、vision v6 §0.1 で Moat の中核として定義された 4 層 SoT Chain の中央リンクを活性化する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D1.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D3.2"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "2 本の新規 CLI (sotp track catalogue-spec-signals / sotp verify catalogue-spec-refs) を導入し、signal 再計算 (writer) と hash binary gate (validator) の責務を明確に分離した実装基盤を提供する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D1.2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "architecture-rules.json に catalogue_spec_signal.enabled opt-in flag を追加し、layer 単位の段階的 rollout を可能にすることで、template 採用者の設計自由度を保ちつつ SoTOHE-core 自身では全 tddd.enabled 層への dogfood 適用基盤を確立する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D5.2"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "親 ADR 2 本 (2026-04-19-1242 §D3.2 および 2026-04-12-1200 §D5) の記述を本 ADR の決定 (hash binary gate 分離 / merge gate SoT Chain bottom-up reorder) に整合させる adr-editor back-and-forth amendment を完了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D1.7"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.6"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "domain 層に catalogue entry の signal 評価純粋関数 evaluate_catalogue_entry_signal を実装する。informal-priority rule (informal_grounds[] 非空 → Yellow、空 + spec_refs[] 非空 → Blue、両方空 → Red) を Phase 1 evaluate_requirement_signal と対称なシグネチャで提供し、新規 module libs/domain/src/tddd/catalogue_spec_signal.rs に配置する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.7"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "domain 層に hash binary gate の純粋関数 check_catalogue_spec_ref_integrity を実装する。SpecRef.anchor (SpecElementId) の spec.json 内存在確認 (dangling 検出) と SpecRef.hash の canonical serialization SHA-256 一致検証 (drift 検出) を行い、違反を Vec<SpecRefFinding> で返す。I/O を持たない (signals_opt は stale 検出用で None の場合はスキップ)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.5"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.7"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "domain 層に signal check 純粋関数 check_catalogue_spec_signals を実装する。strict bool を受け取り、strict=true では Yellow/Red → Finding::error (BLOCKED)、strict=false では Yellow → Finding::warning (PASS)、Red → Finding::error (BLOCKED) の挙動を提供する。既存 check_spec_doc_signals / check_type_signals と同型の signature で統一する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D4.1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "SpecRefFinding 型 (SpecRefFindingKind enum: DanglingAnchor / HashMismatch / StaleSignals の 3 variant) を domain 層に定義する。各 Finding は layer、catalogue_entry (Option)、ref_index (Option)、spec_file (Option)、kind を持つ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.5"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "usecase 層に RefreshCatalogueSpecSignals interactor を実装する。TrackBlobReader port 経由で <layer>-types.json を読み込み、domain 純粋関数で entry 単位の signal を評価し、<layer>-catalogue-spec-signals.json を atomic write する。active-track guard を適用し非 active では reject する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.7"
+          },
+          {
+            "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "usecase 層に VerifyCatalogueSpecRefs interactor を実装する。TrackBlobReader port 経由で <layer>-types.json / spec.json / <layer>-catalogue-spec-signals.json を読み込み、domain の check_catalogue_spec_ref_integrity を呼び出し、Vec<SpecRefFinding> を aggregate して返す。--skip-stale flag で stale 検出をスキップする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.7"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "TrackBlobReader secondary port に 2 つの新規メソッドを追加する: read_catalogue_for_spec_ref_check (binary gate 用カタログ取得; BlobFetchResult<(TypeCatalogueDocument, String)> を返す — String は raw bytes の SHA-256 hash で stale 検出に必須、既存 read_type_catalogue と同パターン) と read_catalogue_spec_signals_document (signal check 用 signals file 取得; BlobFetchResult<CatalogueSpecSignalsDocument>)。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.6"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D2.2"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "infrastructure 層に GitShowTrackBlobReader への method 追加と FsCatalogueSpecSignalsStore の実装を行う。git show origin/<branch>:track/items/<id>/<layer>-catalogue-spec-signals.json 経由の blob 取得と、worktree 上の <layer>-catalogue-spec-signals.json への atomic write を提供する。既存 symlink guard / LANG=C fixation / BlobResult / path-not-found stderr 解析を流用する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.6"
+          },
+          {
+            "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "CLI に sotp track catalogue-spec-signals サブコマンドを追加する (apps/cli/src/commands/track/catalogue_spec_signals.rs)。引数 --layer <layer_id> (省略時は全 tddd.enabled + catalogue_spec_signal.enabled 層を対象)。RefreshCatalogueSpecSignals interactor を dispatch し、exit 0 (成功) / non-zero (schema 違反・decode 失敗等) を返す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.1"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "CLI に sotp verify catalogue-spec-refs サブコマンドを追加する (apps/cli/src/commands/verify/catalogue_spec_refs.rs)。引数 --track <id> / --skip-stale。VerifyCatalogueSpecRefs interactor を dispatch し、SpecRefFinding を D1.5 の形式で stderr に 1 行ずつ出力し、違反ゼロ → exit 0 / 1 件以上 → non-zero を返す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.5"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "<layer>-catalogue-spec-signals.json の schema v1 codec を実装する。フィールド: schema_version (1)、catalogue_declaration_hash (入力 <layer>-types.json の全体 SHA-256)、signals (type_name 単位の signal 配列)。generated_at は設けない (deterministic output、入力不変なら複数回実行でバイト一致)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D2.2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D2.3"
+          }
+        ]
+      },
+      {
+        "id": "IN-12",
+        "text": "pre-commit フロー (dispatch_track_commit_message) に 2 step を挿入する。挿入順: (既存 手順 1) Stage 2 type-signals 再計算 → (新規 手順 2) sotp verify catalogue-spec-refs --skip-stale (binary gate、ERROR で block) → (新規 手順 3) sotp track catalogue-spec-signals (signal 再計算) → (既存 手順 4+) cargo make ci / review guard / commit。binary gate ERROR 時は後段をスキップする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-13",
+        "text": "cargo make ci に 2 つの新 task を追加する: verify-catalogue-spec-refs (dangling / drift / stale 全 3 検証、既存 verify-plan-artifact-refs と並列実行可能) と check-catalogue-spec-signals (check_catalogue_spec_signals(strict=false) 呼び出し、Red → BLOCKED / Yellow → warning)。sotp track catalogue-spec-signals の再計算は CI task には含めない (pre-commit 経路で担保、stale は verify-catalogue-spec-refs で検出)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.5"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "merge gate (check_strict_merge_gate) を SoT Chain bottom-up reorder する。新順序: (1) branch validation / plan/* skip → (2) read_type_catalogue + check_type_signals (Chain ③; 既存 API、rename なし) → (3) read_catalogue_for_spec_ref_check + read_spec_document + read_catalogue_spec_signals_document + check_catalogue_spec_ref_integrity (Chain ② binary gate、dangling/drift/stale 全 3; read_spec_document は anchor/hash 比較に必須、D3.6) → (4) check_catalogue_spec_signals(strict=true) (Chain ② signal check; step 3 取得済みの signals 再利用可) → (5) check_spec_doc_signals (Chain ①; step 3 取得済みの spec blob 再利用可)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.6"
+          },
+          {
+            "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-15",
+        "text": "architecture-rules.json の layers[].tddd に catalogue_spec_signal サブ block を追加する。フィールド: enabled (bool、省略時 false)。tddd.enabled: false 層は無効 (skip)。SoTOHE-core 本リポジトリは本 track 対象 layer を enabled: true に設定し dogfood を完了する。schema version は v2 のまま (optional field 追加、破壊的変更なし)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D5.2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D5.3"
+          },
+          {
+            "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-16",
+        "text": "track/review-scope.json の review_operational 配列に track/items/<track-id>/*-catalogue-spec-signals.json の glob パターンを追加する。既存 *-type-signals.json と同型の一括除外パターンを踏襲する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D2.4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-17",
+        "text": "<layer>-types.md レンダラー (libs/infrastructure/src/type_catalogue_render.rs) を拡張し、catalogue-spec signal (新規) を entry セクション内に type→implementation signal (既存) と並置表示する。具体的なレイアウト (列配置、フォーマット) は実装時の proposal で確定する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D2.5"
+          }
+        ]
+      },
+      {
+        "id": "IN-18",
+        "text": "親 ADR 2026-04-19-1242 §D3.2 の「spec_refs[]: 🔵 (全 SpecRef が anchor 解決 + hash 一致) / 🔴 (1 件でも失敗)」記述を本 ADR D1 (hash binary gate 分離) に整合させる adr-editor back-and-forth amendment を実施する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.7"
+          },
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D3.2"
+          }
+        ]
+      },
+      {
+        "id": "IN-19",
+        "text": "親 ADR 2026-04-12-1200 §D5 の check_strict_merge_gate 既存順序 (Chain ① → Chain ③) 記述を本 ADR D3.6 の bottom-up reorder (Chain ③ → ② → ①) に整合させる adr-editor back-and-forth amendment を実施する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D3.6"
+          },
+          {
+            "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-20",
+        "text": "新規実装 (domain 純粋関数 / usecase interactor / infrastructure adapter / CLI wrapper) の unit test と integration test を追加する。domain 純粋関数はすべて unit test で検証し、CLI レベルの end-to-end は integration test で補完する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D6.1"
+          }
+        ]
+      },
+      {
+        "id": "IN-21",
+        "text": "libs/domain/src/impl_plan.rs::check_impl_plan_presence 関数および ImplPlanPresenceError 型を削除し、呼び出し元 (libs/infrastructure/src/verify/latest_track.rs および apps/cli/src/commands/make.rs) の call site を合わせて除去する。この invariant は /track:init がブランチ作成する設計 (ADR 2026-04-22-0829 §D3) および Phase 0-2 の自然な progression (metadata → spec → 型カタログ → impl-plan) と衝突するため revert する。derive_track_status の「impl-plan.json 不在 → Planned」graceful fallback が semantic の正しさを既に担保しており、invariant は redundant な defensive check であった",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "Follow-up"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "CLI-04 (既存 Stage 2 type→implementation signal orchestration の infrastructure 層から usecase 層への引き上げ): merge_gate_adapter.rs::read_type_catalogue の usecase 層引き上げ / render.rs::sync_rendered_views の usecase 層引き上げは別 track で実施する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D6.2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "Contract Map / Type Graph View への catalogue-spec signal overlay 統合 (2026-04-17-1528 §D5 signal_overlay の枠組み) は別 ADR / 別 track スコープ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D2.5"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "CatalogueEntryId の新設 (catalogue entry への explicit id フィールド追加): cross-artifact 参照要件が実証されたら別 track で段階導入する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D2.3"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "既存 <layer>-type-signals.json の generated_at フィールド削除: 既存 Stage 2 ファイルは本 ADR では無改変。generated_at clean pattern を既存ファイルにも波及させるかは将来の判断",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D2.6"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "親 ADR 2026-04-19-1242 および 2026-04-12-1200 の amendment 自体を除く他セクションの変更: amendment 対象は §D3.2 (hash binary gate 分離、親 ADR 2026-04-19-1242)、§Follow-up 末尾 2026-04-23 Correction (check_impl_plan_presence revert、IN-21 の根拠)、および §D5 (2026-04-12-1200) の該当記述のみ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.7"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "親 ADR §Q15 関連の markdown anchor 厳密化 (AdrRef.hash / ConventionRef.hash 追加、AdrAnchor の struct 化): Phase 1 spec signal の hash 対応拡張は §Q15 が別 ADR で確定してから",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+            "anchor": "D2.1"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "sotp verify catalogue-spec-refs への --json 構造化出力オプション追加: 将来 CI 集計 / review briefing 経由での消費要件が出たら別 track で追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+            "anchor": "D1.5"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "既存 <layer>-type-signals.json (Stage 2 type→implementation) の schema / CLI / 挙動は無改変とする。本 ADR の変更は新ファイル <layer>-catalogue-spec-signals.json および新 CLI 追加のみに限定し、既存 Stage 2 経路への副作用を与えない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D2.6"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "architecture-rules.json は schema version v2 のまま維持する。catalogue_spec_signal サブ block は optional field 追加であり破壊的変更ではない (省略時は enabled: false 扱い)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D5.2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "hash drift / dangling anchor はいずれの経路 (pre-commit / CI / merge gate) でも fail-closed (ERROR → non-zero exit) で処理する。strict / interim の別に関わらず binary gate は常時 ERROR。stale 検出は CI / merge gate 経路でのみ fail-closed (ERROR); pre-commit 経路は --skip-stale でスキップし直後の sotp track catalogue-spec-signals 再計算で解消する (D3.4 の 2 step 設計による意図的スキップ)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D4.2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D4.4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "pre-commit フローへの 2 step 追加 (binary gate + signal 再計算) は体感速度 < 0.1 秒/層 を目標とする。評価関数は domain 層の純粋関数として実装し、I/O を最小化する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.4"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "評価関数 (evaluate_catalogue_entry_signal / check_catalogue_spec_ref_integrity / check_catalogue_spec_signals) は domain 層の pure function として実装する。usecase 層が port 経由 I/O + domain 純粋関数呼び出しの orchestration を担い、infrastructure / CLI が I/O 実装と output format を担う (D3.7 層配置に準拠)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.7"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D1.5"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "<layer>-catalogue-spec-signals.json は deterministic output とする。入力 <layer>-types.json が不変であれば複数回実行でバイト一致する (generated_at timestamp なし、pure function の性質を保つ)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D2.2"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "非 active track で sotp track catalogue-spec-signals / sotp verify catalogue-spec-refs を呼んだ場合は reject (exit non-zero + エラーメッセージ) とする。silent skip (exit 0) は採用しない (2026-04-15-1012 §D1 の既存 active-track guard 挙動と統一)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "新規実装は最初から正しい層配置 (domain / usecase / infrastructure / cli の 4 層分離) で実装し、CLI-04 の既存負債に加担しない。既存 Stage 2 orchestration の引き上げは本 track の scope 外",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D6.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D6.2"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "sotp track catalogue-spec-signals が全 tddd.enabled + catalogue_spec_signal.enabled 層に対して <layer>-catalogue-spec-signals.json を生成し、informal-priority rule を正しく適用する: informal_grounds[] 非空 → yellow / spec_refs[] 非空 + informal_grounds[] 空 → blue / 両方空 → red。入力不変で複数回実行してもバイト一致する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D1.1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "sotp verify catalogue-spec-refs がすべての検証項目を正しく実行する: (1) dangling anchor 検出 (SpecRef.anchor が spec.json に存在しない場合 non-zero exit + stderr 出力)、(2) hash drift 検出 (SpecRef.hash が spec 要素 canonical SHA-256 と不一致の場合 non-zero exit + stderr 出力)、(3) stale 検出 (--skip-stale なしで <layer>-catalogue-spec-signals.json の catalogue_declaration_hash が現 <layer>-types.json SHA-256 と不一致の場合 non-zero exit + stderr 出力)。全検証通過時は exit 0",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D1.2"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "pre-commit フロー (dispatch_track_commit_message) で binary gate ERROR 時に commit がブロックされる。正常時は sotp track catalogue-spec-signals が実行され <layer>-catalogue-spec-signals.json が更新されてから commit が確定する。SoT Chain bottom-up 順序 (Stage 2 type-signals → catalogue-spec binary gate → catalogue-spec signals) が維持される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.4"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "cargo make ci が verify-catalogue-spec-refs (dangling / drift / stale 全 3 検証) と check-catalogue-spec-signals (interim: Red → BLOCKED / Yellow → warning) の 2 task を含み、いずれも pass する。stale 検出は CI / merge gate 経路で必ず発火する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.5"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "merge gate (check_strict_merge_gate) が SoT Chain bottom-up 順序 (Chain ③ → ② binary gate → ② signal check → ①) で実行される。strict mode で Yellow も BLOCKED にする。binary gate ERROR はいずれのモードでも BLOCKED",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.6"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D4.1"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "architecture-rules.json の layers[].tddd に catalogue_spec_signal.enabled field が追加されている。enabled: false の層は全経路 (pre-commit / CI / merge gate) でスキップされる。enabled: true の層は全 gate が発火する。SoTOHE-core の対象 layer は enabled: true で dogfood が通過している",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D5.2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D5.3"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "track/review-scope.json に track/items/<track-id>/*-catalogue-spec-signals.json の glob パターンが review_operational 配列に追加されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D2.4"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "親 ADR 2026-04-19-1242 §D3.2 の spec_refs[] 信号色記述が hash binary gate 分離に整合した内容に修正されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D1.7"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D3.2"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "親 ADR 2026-04-12-1200 §D5 の check_strict_merge_gate 順序記述が Chain ③ → ② → ① の bottom-up 順序に修正されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D3.6"
+        },
+        {
+          "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "cargo make ci の全項目 (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-*) が pass する。新規追加した domain 純粋関数・usecase interactor・infrastructure adapter・CLI の unit test および integration test がすべて pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+          "anchor": "D6.1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+          "anchor": "D6.2"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 50,
+    "yellow": 0,
+    "red": 0
+  }
+}

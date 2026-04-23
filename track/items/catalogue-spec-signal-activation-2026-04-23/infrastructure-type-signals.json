@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-23T21:37:48Z",
+  "declaration_hash": "5c1fd78c12431b19c1c94f0b3be66a2fed3b40a0a6cf71810f7929a1badccdf3",
+  "signals": [
+    {
+      "type_name": "GitShowTrackBlobReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>",
+        "fn read_type_catalogue(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument>",
+        "fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>>"
+      ],
+      "missing_items": [
+        "fn read_catalogue_for_spec_ref_check(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_catalogue_spec_signals_document(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<CatalogueSpecSignalsDocument>"
+      ]
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueSpecSignalsDocumentDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueSpecSignalsCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}
