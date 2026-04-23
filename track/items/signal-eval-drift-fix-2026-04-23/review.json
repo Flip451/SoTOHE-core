@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23487c254c9d1f54241deaf0f60d91864193f207aa257db77d0f788f80e3c092",
+          "at": "2026-04-23T01:49:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23487c254c9d1f54241deaf0f60d91864193f207aa257db77d0f788f80e3c092",
+          "at": "2026-04-23T01:51:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3378ad8ce00e837258572d06a8d41d7d43679c1b4ca214de08313cfa28dc0b1",
+          "at": "2026-04-23T02:14:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3378ad8ce00e837258572d06a8d41d7d43679c1b4ca214de08313cfa28dc0b1",
+          "at": "2026-04-23T02:16:42Z"
+        }
+      ]
+    }
+  }
+}
