@@ -56,6 +56,7 @@ pub use tddd::catalogue::{
     MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
     TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
 };
+pub use tddd::catalogue_spec_signal::{SpecRefFinding, SpecRefFindingKind};
 pub use tddd::consistency::{
     ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,
     check_type_signals,

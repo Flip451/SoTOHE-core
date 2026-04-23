@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-23T21:37:47Z",
+  "generated_at": "2026-04-23T22:02:53Z",
   "declaration_hash": "76991319b0ab2f6d290dc823727e0408e666318aae1befb5c481a6aee46e6909",
   "signals": [
     {
@@ -12,14 +12,19 @@
     {
       "type_name": "SpecRefFinding",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SpecRefFindingKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DanglingAnchor",
+        "HashMismatch",
+        "StaleSignals"
+      ]
     },
     {
       "type_name": "CatalogueSpecSignal",

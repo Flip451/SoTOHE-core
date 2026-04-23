@@ -4,13 +4,13 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| SpecRefFindingKind | enum | — | DanglingAnchor, HashMismatch, StaleSignals | 🟡 |
+| SpecRefFindingKind | enum | — | DanglingAnchor, HashMismatch, StaleSignals | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| SpecRefFinding | value_object | — | — | 🟡 |
+| SpecRefFinding | value_object | — | — | 🔵 |
 | CatalogueSpecSignal | value_object | — | — | 🟡 |
 | CatalogueSpecSignalsDocument | value_object | — | — | 🟡 |
 
