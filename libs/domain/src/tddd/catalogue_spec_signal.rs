@@ -14,10 +14,12 @@
 //! `catalogue-spec-signal-activation-2026-04-23` track (ADR
 //! `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.5 / §D3.7).
 
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use crate::ConfidenceSignal;
 use crate::plan_ref::{ContentHash, InformalGroundRef, SpecElementId, SpecRef};
+use crate::tddd::catalogue::TypeCatalogueDocument;
 use crate::tddd::layer_id::LayerId;
 
 /// Schema version of `<layer>-catalogue-spec-signals.json` — pinned to `1`
@@ -201,6 +203,110 @@ pub fn evaluate_catalogue_entry_signal(
         return ConfidenceSignal::Blue;
     }
     ConfidenceSignal::Red
+}
+
+/// Check catalogue-spec reference integrity for a single layer's catalogue.
+///
+/// Implements the binary gate defined in ADR
+/// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.5 / §D3.6. The
+/// function emits one [`SpecRefFinding`] per violation detected across the
+/// three categories:
+///
+/// 1. **DanglingAnchor** — a [`SpecRef::anchor`] that does not exist in the
+///    spec element universe.
+/// 2. **HashMismatch** — a [`SpecRef::hash`] that differs from the canonical
+///    SHA-256 of the anchor's spec element subtree.
+/// 3. **StaleSignals** — the `catalogue_declaration_hash` stored in
+///    `<layer>-catalogue-spec-signals.json` no longer matches the hash of the
+///    current `<layer>-types.json` (reported once at layer level when both
+///    `current_catalogue_hash` and `signals_opt` are provided).
+///
+/// # Parameters
+///
+/// * `layer` — the layer whose catalogue is being checked; used to tag every
+///   [`SpecRefFinding`] so the CLI can group findings per layer.
+/// * `catalogue` — the [`TypeCatalogueDocument`] to validate.
+/// * `spec_element_hashes` — pre-computed canonical SHA-256 per
+///   [`SpecElementId`]. The map's key set also serves as the anchor universe
+///   for the dangling check. Absence of a key ⇒ [`SpecRefFindingKind::DanglingAnchor`].
+///   The usecase layer builds this map from the spec.json file bytes using
+///   the infrastructure's canonical-JSON SHA-256 helper so the hash format
+///   matches the existing `sotp verify plan-artifact-refs` pipeline.
+/// * `current_catalogue_hash` — SHA-256 of the current `<layer>-types.json`
+///   bytes. Required for the stale check; pass `None` to skip staleness
+///   (e.g. `--skip-stale=true` in `sotp verify catalogue-spec-refs`).
+/// * `signals_opt` — the persisted signals document (if present). Required
+///   for the stale check; pass `None` when the signals file has not been
+///   generated yet.
+///
+/// # Returns
+///
+/// `Vec<SpecRefFinding>` containing every violation encountered. An empty
+/// vector denotes full integrity. Findings are emitted in catalogue-entry
+/// declaration order, then by `ref_index` within each entry, with the
+/// optional `StaleSignals` finding appended last.
+///
+/// # Determinism
+///
+/// Pure function. Deterministic across runs with identical inputs. No I/O,
+/// no panics, no unwrap outside `#[cfg(test)]`.
+#[must_use]
+pub fn check_catalogue_spec_ref_integrity(
+    layer: &LayerId,
+    catalogue: &TypeCatalogueDocument,
+    spec_element_hashes: &BTreeMap<SpecElementId, ContentHash>,
+    current_catalogue_hash: Option<&ContentHash>,
+    signals_opt: Option<&CatalogueSpecSignalsDocument>,
+) -> Vec<SpecRefFinding> {
+    let mut findings = Vec::new();
+
+    for entry in catalogue.entries() {
+        for (ref_index, spec_ref) in entry.spec_refs().iter().enumerate() {
+            match spec_element_hashes.get(&spec_ref.anchor) {
+                None => {
+                    findings.push(SpecRefFinding::new(
+                        layer.clone(),
+                        SpecRefFindingKind::DanglingAnchor {
+                            catalogue_entry: entry.name().to_owned(),
+                            ref_index,
+                            spec_file: spec_ref.file.clone(),
+                            anchor: spec_ref.anchor.clone(),
+                        },
+                    ));
+                }
+                Some(actual_hash) if actual_hash != &spec_ref.hash => {
+                    findings.push(SpecRefFinding::new(
+                        layer.clone(),
+                        SpecRefFindingKind::HashMismatch {
+                            catalogue_entry: entry.name().to_owned(),
+                            ref_index,
+                            spec_file: spec_ref.file.clone(),
+                            anchor: spec_ref.anchor.clone(),
+                            declared: spec_ref.hash.clone(),
+                            actual: actual_hash.clone(),
+                        },
+                    ));
+                }
+                Some(_) => {
+                    // anchor present, hash match — no finding.
+                }
+            }
+        }
+    }
+
+    if let (Some(current), Some(signals)) = (current_catalogue_hash, signals_opt) {
+        if &signals.catalogue_declaration_hash != current {
+            findings.push(SpecRefFinding::new(
+                layer.clone(),
+                SpecRefFindingKind::StaleSignals {
+                    declared_catalogue_hash: signals.catalogue_declaration_hash.clone(),
+                    actual_catalogue_hash: current.clone(),
+                },
+            ));
+        }
+    }
+
+    findings
 }
 
 #[cfg(test)]
@@ -441,5 +547,203 @@ mod tests {
         // Informal-priority rule: any informal ground → Yellow regardless of
         // spec_refs count. Promotion to Blue requires clearing informal_grounds.
         assert_eq!(signal, ConfidenceSignal::Yellow);
+    }
+
+    // ---------------------------------------------------------------------------
+    // check_catalogue_spec_ref_integrity (T004, IN-02)
+    // ---------------------------------------------------------------------------
+
+    use crate::tddd::catalogue::{
+        TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+    };
+
+    /// Build a catalogue entry with explicit spec_refs (no informal_grounds).
+    fn entry_with_refs(name: &str, spec_refs: Vec<SpecRef>) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::with_refs(
+            name,
+            "test entry",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+            spec_refs,
+            Vec::new(),
+        )
+        .unwrap()
+    }
+
+    /// Build a catalogue document from a list of entries.
+    fn catalogue(entries: Vec<TypeCatalogueEntry>) -> TypeCatalogueDocument {
+        TypeCatalogueDocument::new(1, entries)
+    }
+
+    /// Build a SpecRef with anchor + explicit hash (no file path customisation).
+    fn spec_ref_with_hash(anchor_id: &str, hash_byte: u8) -> SpecRef {
+        SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(hash_byte))
+    }
+
+    fn signals_with_hash(catalogue_hash: ContentHash) -> CatalogueSpecSignalsDocument {
+        CatalogueSpecSignalsDocument::new(catalogue_hash, Vec::new())
+    }
+
+    #[test]
+    fn integrity_check_returns_empty_when_all_refs_valid() {
+        let mut hashes = BTreeMap::new();
+        hashes.insert(anchor("IN-01"), hash(0xaa));
+        hashes.insert(anchor("IN-02"), hash(0xbb));
+
+        let cat = catalogue(vec![entry_with_refs(
+            "Foo",
+            vec![spec_ref_with_hash("IN-01", 0xaa), spec_ref_with_hash("IN-02", 0xbb)],
+        )]);
+
+        let findings = check_catalogue_spec_ref_integrity(&layer(), &cat, &hashes, None, None);
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn integrity_check_reports_dangling_anchor_when_anchor_missing() {
+        let hashes = BTreeMap::new(); // empty — every anchor is dangling
+        let cat = catalogue(vec![entry_with_refs("Foo", vec![spec_ref_with_hash("IN-99", 0x00)])]);
+
+        let findings = check_catalogue_spec_ref_integrity(&layer(), &cat, &hashes, None, None);
+        assert_eq!(findings.len(), 1);
+        match &findings[0].kind {
+            SpecRefFindingKind::DanglingAnchor {
+                anchor: a, catalogue_entry, ref_index, ..
+            } => {
+                assert_eq!(a, &anchor("IN-99"));
+                assert_eq!(catalogue_entry, "Foo");
+                assert_eq!(*ref_index, 0);
+            }
+            other => panic!("expected DanglingAnchor, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn integrity_check_reports_hash_mismatch_when_hashes_differ() {
+        let mut hashes = BTreeMap::new();
+        hashes.insert(anchor("IN-01"), hash(0xaa));
+
+        let cat = catalogue(vec![entry_with_refs(
+            "Foo",
+            vec![spec_ref_with_hash("IN-01", 0xbb)], // declared 0xbb, actual 0xaa
+        )]);
+
+        let findings = check_catalogue_spec_ref_integrity(&layer(), &cat, &hashes, None, None);
+        assert_eq!(findings.len(), 1);
+        match &findings[0].kind {
+            SpecRefFindingKind::HashMismatch { declared, actual, anchor: a, .. } => {
+                assert_eq!(a, &anchor("IN-01"));
+                assert_eq!(declared, &hash(0xbb));
+                assert_eq!(actual, &hash(0xaa));
+            }
+            other => panic!("expected HashMismatch, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn integrity_check_reports_stale_signals_when_catalogue_hashes_differ() {
+        let hashes = BTreeMap::new();
+        let cat = catalogue(vec![]);
+        let current = hash(0x33);
+        let signals = signals_with_hash(hash(0x44));
+
+        let findings = check_catalogue_spec_ref_integrity(
+            &layer(),
+            &cat,
+            &hashes,
+            Some(&current),
+            Some(&signals),
+        );
+        assert_eq!(findings.len(), 1);
+        match &findings[0].kind {
+            SpecRefFindingKind::StaleSignals { declared_catalogue_hash, actual_catalogue_hash } => {
+                assert_eq!(declared_catalogue_hash, &hash(0x44));
+                assert_eq!(actual_catalogue_hash, &hash(0x33));
+            }
+            other => panic!("expected StaleSignals, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn integrity_check_skips_stale_when_either_current_or_signals_is_none() {
+        let hashes = BTreeMap::new();
+        let cat = catalogue(vec![]);
+        let current = hash(0x33);
+        let signals = signals_with_hash(hash(0x44));
+
+        // current_catalogue_hash = None → skip
+        let findings =
+            check_catalogue_spec_ref_integrity(&layer(), &cat, &hashes, None, Some(&signals));
+        assert!(findings.is_empty());
+
+        // signals_opt = None → skip
+        let findings =
+            check_catalogue_spec_ref_integrity(&layer(), &cat, &hashes, Some(&current), None);
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn integrity_check_skips_stale_when_catalogue_hashes_match() {
+        let hashes = BTreeMap::new();
+        let cat = catalogue(vec![]);
+        let same_hash = hash(0x55);
+        let signals = signals_with_hash(same_hash.clone());
+
+        let findings = check_catalogue_spec_ref_integrity(
+            &layer(),
+            &cat,
+            &hashes,
+            Some(&same_hash),
+            Some(&signals),
+        );
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn integrity_check_preserves_catalogue_entry_and_ref_index_order() {
+        let hashes = BTreeMap::new(); // all anchors dangling so we get a finding per ref
+        let cat = catalogue(vec![
+            entry_with_refs(
+                "First",
+                vec![spec_ref_with_hash("IN-01", 0x00), spec_ref_with_hash("IN-02", 0x00)],
+            ),
+            entry_with_refs("Second", vec![spec_ref_with_hash("IN-03", 0x00)]),
+        ]);
+
+        let findings = check_catalogue_spec_ref_integrity(&layer(), &cat, &hashes, None, None);
+        assert_eq!(findings.len(), 3);
+
+        // Ordering: entries in declaration order, refs in ref_index order.
+        let ids: Vec<&str> = findings
+            .iter()
+            .map(|f| match &f.kind {
+                SpecRefFindingKind::DanglingAnchor { anchor, .. } => anchor.as_ref(),
+                _ => "",
+            })
+            .collect();
+        assert_eq!(ids, vec!["IN-01", "IN-02", "IN-03"]);
+
+        let entries: Vec<&str> = findings
+            .iter()
+            .map(|f| match &f.kind {
+                SpecRefFindingKind::DanglingAnchor { catalogue_entry, .. } => {
+                    catalogue_entry.as_str()
+                }
+                _ => "",
+            })
+            .collect();
+        assert_eq!(entries, vec!["First", "First", "Second"]);
+    }
+
+    #[test]
+    fn integrity_check_tags_findings_with_supplied_layer() {
+        let hashes = BTreeMap::new();
+        let cat = catalogue(vec![entry_with_refs("X", vec![spec_ref_with_hash("IN-01", 0x00)])]);
+        let custom_layer = LayerId::try_new("usecase").unwrap();
+
+        let findings = check_catalogue_spec_ref_integrity(&custom_layer, &cat, &hashes, None, None);
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].layer, custom_layer);
     }
 }
