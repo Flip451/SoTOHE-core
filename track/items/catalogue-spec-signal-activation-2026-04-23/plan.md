@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # 型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ② の実装)
 
-## Tasks (7/25 resolved)
+## Tasks (8/25 resolved)
 
 ### S1 — S1 — Domain primitives: types + pure functions
 
@@ -26,8 +26,8 @@
 > VerifyCatalogueSpecRefsInteractor 実装 + --skip-stale flag (T009)
 > hexagonal 分離: port 経由 I/O + domain 純粋関数呼び出し orchestration (CN-05 / CN-08)
 
-- [x] **T006**: usecase 層の TrackBlobReader secondary port に 2 つの新規メソッドを追加する: read_catalogue_for_spec_ref_check (branch/track_id/layer_id → BlobFetchResult<(TypeCatalogueDocument, String)>; String は raw bytes の SHA-256 hash、stale 検出の catalogue_declaration_hash 比較に必須; 既存 read_type_catalogue と同パターン) と read_catalogue_spec_signals_document (branch/track_id/layer_id → BlobFetchResult<CatalogueSpecSignalsDocument>)。libs/usecase/src/merge_gate.rs の trait 定義を更新する (IN-07、usecase 層)
-- [ ] **T007**: usecase 層に CatalogueSpecSignalsWriter secondary port を新設する。single method: write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>。TrackWriter / ImplPlanWriter / ReviewWriter と同パターンで libs/usecase/src/catalogue_spec_signals.rs に配置する (IN-05 の port 要件、usecase 層)
+- [x] **T006**: usecase 層の TrackBlobReader secondary port に 2 つの新規メソッドを追加する: read_catalogue_for_spec_ref_check (branch/track_id/layer_id → BlobFetchResult<(TypeCatalogueDocument, String)>; String は raw bytes の SHA-256 hash、stale 検出の catalogue_declaration_hash 比較に必須; 既存 read_type_catalogue と同パターン) と read_catalogue_spec_signals_document (branch/track_id/layer_id → BlobFetchResult<CatalogueSpecSignalsDocument>)。libs/usecase/src/merge_gate.rs の trait 定義を更新する (IN-07、usecase 層) (`86340d0`)
+- [x] **T007**: usecase 層に CatalogueSpecSignalsWriter secondary port を新設する。single method: write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>。TrackWriter / ImplPlanWriter / ReviewWriter と同パターンで libs/usecase/src/catalogue_spec_signals.rs に配置する (IN-05 の port 要件、usecase 層)
 - [ ] **T008**: usecase 層に RefreshCatalogueSpecSignalsInteractor を libs/usecase/src/catalogue_spec_signals.rs に実装する。TrackBlobReader / CatalogueSpecSignalsWriter port を依存注入で受け取り、(1) read_catalogue_for_spec_ref_check で <layer>-types.json を読み込み (TypeCatalogueDocument, String) を取得 (String = raw bytes SHA-256 = catalogue_declaration_hash; read_type_catalogue の String は resolved filename であり hash 用途に使えないため read_catalogue_for_spec_ref_check を使う)、(2) domain evaluate_catalogue_entry_signal で entry 単位 signal 算出、(3) step 1 の String を catalogue_declaration_hash として使用、(4) CatalogueSpecSignalsDocument 構築、(5) atomic write の 5 ステップを実行する。active-track guard (CN-07) を適用する。unit test でモックポートを使って正常系 + 非アクティブ reject を検証する (IN-05、usecase 層)
 - [ ] **T009**: usecase 層に VerifyCatalogueSpecRefsInteractor を libs/usecase/src/catalogue_spec_refs.rs に実装する。TrackBlobReader port 経由で入力を収集: read_catalogue_for_spec_ref_check → (TypeCatalogueDocument, String); String は raw bytes SHA-256 hex digest で ContentHash::from_hex(hash_str)? または同等の変換で ContentHash に変換して domain 関数の current_catalogue_hash 引数に渡す。read_spec_document → SpecDocument; read_catalogue_spec_signals_document → CatalogueSpecSignalsDocument (--skip-stale=true の場合は読み込み不要)。domain check_catalogue_spec_ref_integrity(catalogue, spec, Some(&content_hash), Some(&signals)) を呼び出し Vec<SpecRefFinding> を aggregate して返す。--skip-stale flag (bool) を受け取り、true の場合は current_catalogue_hash=None かつ signals_opt=None で domain 関数を呼ぶ (stale 検出スキップ)。active-track guard (CN-07) を適用する。unit test でモックポートを使って dangling / drift / stale / skip-stale / 非アクティブ reject を検証する (IN-06、usecase 層)
 

@@ -34,12 +34,13 @@
     {
       "id": "T006",
       "description": "usecase 層の TrackBlobReader secondary port に 2 つの新規メソッドを追加する: read_catalogue_for_spec_ref_check (branch/track_id/layer_id → BlobFetchResult<(TypeCatalogueDocument, String)>; String は raw bytes の SHA-256 hash、stale 検出の catalogue_declaration_hash 比較に必須; 既存 read_type_catalogue と同パターン) と read_catalogue_spec_signals_document (branch/track_id/layer_id → BlobFetchResult<CatalogueSpecSignalsDocument>)。libs/usecase/src/merge_gate.rs の trait 定義を更新する (IN-07、usecase 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "86340d0"
     },
     {
       "id": "T007",
       "description": "usecase 層に CatalogueSpecSignalsWriter secondary port を新設する。single method: write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>。TrackWriter / ImplPlanWriter / ReviewWriter と同パターンで libs/usecase/src/catalogue_spec_signals.rs に配置する (IN-05 の port 要件、usecase 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T008",

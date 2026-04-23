@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
-          "at": "2026-04-23T23:05:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
-          "at": "2026-04-23T23:06:13Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -608,212 +590,6 @@
           "findings": [],
           "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
           "at": "2026-04-23T18:18:52Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:40:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
-              "severity": "P0",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 449,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:43:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:44:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:50:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:53:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:54:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 84,
-              "category": "contract"
-            }
-          ],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T21:57:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T22:00:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "invariant"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:12:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:13:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:14:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:16:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:22:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:23:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:33:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:36:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:41:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:42:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:45:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:46:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:43Z"
         }
       ]
     },
@@ -2295,6 +2071,258 @@
           "findings": [],
           "hash": "rvw1:sha256:a9000ff918051bae4749dbf6abc7083524e9d393a9b26dc094074344528fe398",
           "at": "2026-04-23T23:10:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd6c58f47c6e6ec89743cdcbcc42b5b4d9395dd7842a1111e4f7f2f907c8fa32",
+          "at": "2026-04-23T23:16:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd6c58f47c6e6ec89743cdcbcc42b5b4d9395dd7842a1111e4f7f2f907c8fa32",
+          "at": "2026-04-23T23:18:04Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 449,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:44:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:53:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 84,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T21:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T22:00:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:12:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:13:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:22:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:23:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:33:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:36:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:41:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:42:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:46:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:43Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
+          "at": "2026-04-23T23:05:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
+          "at": "2026-04-23T23:06:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
+          "at": "2026-04-23T23:16:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
+          "at": "2026-04-23T23:17:38Z"
         }
       ]
     }

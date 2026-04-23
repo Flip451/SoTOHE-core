@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-23T23:12:41Z",
+  "generated_at": "2026-04-23T23:18:55Z",
   "declaration_hash": "2d30c400d390a2ae8273900255d091e59ce9bd16d26f851eb0307563bee36045",
   "signals": [
     {
@@ -32,8 +32,11 @@
     {
       "type_name": "CatalogueSpecSignalsWriter",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>"
+      ]
     }
   ]
 }
