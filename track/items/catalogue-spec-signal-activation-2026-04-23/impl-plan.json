@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "domain 層に check_catalogue_spec_ref_integrity 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。シグネチャ: check_catalogue_spec_ref_integrity(catalogue: &TypeCatalogueDocument, spec: &SpecDocument, current_catalogue_hash: Option<&ContentHash>, signals_opt: Option<&CatalogueSpecSignalsDocument>) -> Vec<SpecRefFinding>。current_catalogue_hash は usecase 層が read_catalogue_for_spec_ref_check の返値 (TypeCatalogueDocument, String) の String 部から ContentHash として渡す (stale 検出用; None の場合は stale check をスキップ)。実施する検証: (1) SpecRef.anchor (SpecElementId) の spec.json 内存在確認 (dangling 検出)、(2) SpecRef.hash の canonical serialization SHA-256 一致検証 (drift 検出)、(3) signals_opt + current_catalogue_hash が両方 Some の場合の catalogue_declaration_hash vs current_catalogue_hash 比較 (stale 検出)。Vec<SpecRefFinding> を返す (空 = ok)。unit test で dangling / drift / stale / 全通過の 4 ケースを検証する。I/O を持たない (IN-02、domain 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "be79f5b"
     },
     {
       "id": "T005",
       "description": "domain 層に check_catalogue_spec_signals 純粋関数を libs/domain/src/tddd/catalogue_spec_signal.rs に実装する。strict: bool を受け取り、strict=true では Yellow/Red → Finding::error (BLOCKED)、strict=false では Yellow → Finding::warning (PASS)、Red → Finding::error (BLOCKED) の挙動を提供する。既存 check_spec_doc_signals / check_type_signals と同型の signature で統一する。unit test で strict=true / strict=false × Yellow / Red / Blue の組み合わせを検証する (IN-03、domain 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",

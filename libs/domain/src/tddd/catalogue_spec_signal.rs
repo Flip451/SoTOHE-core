@@ -309,6 +309,93 @@ pub fn check_catalogue_spec_ref_integrity(
     findings
 }
 
+/// Evaluates catalogue-spec signal gate rules against a
+/// [`CatalogueSpecSignalsDocument`].
+///
+/// Symmetric with [`check_spec_doc_signals`](crate::check_spec_doc_signals)
+/// (Phase 1) and [`check_type_signals`](crate::check_type_signals) (SoT
+/// Chain ③): shared 3-signal gate shape so the merge-gate assembly can
+/// treat every SoT Chain layer uniformly.
+///
+/// # Rules
+///
+/// - `signals.signals` is empty → [`VerifyOutcome::pass`] (a layer with no
+///   declared catalogue entries has no catalogue-spec signal to block on)
+/// - any [`ConfidenceSignal::Red`] entry → [`VerifyFinding::error`]
+///   (always blocks, regardless of `strict`)
+/// - any [`ConfidenceSignal::Yellow`] entry:
+///   - `strict = true` → [`VerifyFinding::error`] (merge gate blocks)
+///   - `strict = false` → [`VerifyFinding::warning`] (CI interim mode visualises)
+/// - all [`ConfidenceSignal::Blue`] → [`VerifyOutcome::pass`]
+///
+/// Red takes precedence over Yellow: a document with both Red and Yellow
+/// entries reports the Red finding only. This matches the precedent set by
+/// [`check_spec_doc_signals`] / [`check_type_signals`] where Red is the
+/// terminal state and Yellow is only inspected when Red is absent.
+///
+/// # Parameters
+///
+/// * `signals` — the persisted signals document for one layer
+///   (`<layer>-catalogue-spec-signals.json`).
+/// * `strict` — `true` for the merge gate (Yellow blocks), `false` for CI
+///   interim (Yellow visualises as warning).
+/// * `catalogue_file` — human-readable layer identifier used in error
+///   messages (e.g. `"domain-types.json"`). Callers pass the source file
+///   name so the finding is self-describing without needing external
+///   context.
+///
+/// # Reference
+///
+/// - ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D4 (strict / interim behaviour)
+/// - Sibling: [`check_spec_doc_signals`] (Phase 1 spec signal gate)
+/// - Sibling: [`check_type_signals`] (SoT Chain ③ type signal gate)
+#[must_use]
+pub fn check_catalogue_spec_signals(
+    signals: &CatalogueSpecSignalsDocument,
+    strict: bool,
+    catalogue_file: &str,
+) -> crate::verify::VerifyOutcome {
+    use crate::verify::{VerifyFinding, VerifyOutcome};
+
+    if signals.signals.is_empty() {
+        return VerifyOutcome::pass();
+    }
+
+    let reds: Vec<&str> = signals
+        .signals
+        .iter()
+        .filter(|s| s.signal == ConfidenceSignal::Red)
+        .map(|s| s.type_name.as_str())
+        .collect();
+    if !reds.is_empty() {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{catalogue_file}: {} catalogue entry/entries have Red catalogue-spec signal (missing both spec_refs[] and informal_grounds[] — every entry must carry at least one grounding ref): {}",
+            reds.len(),
+            reds.join(", ")
+        ))]);
+    }
+
+    let yellows: Vec<&str> = signals
+        .signals
+        .iter()
+        .filter(|s| s.signal == ConfidenceSignal::Yellow)
+        .map(|s| s.type_name.as_str())
+        .collect();
+    if !yellows.is_empty() {
+        let message = format!(
+            "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal — merge gate will block these until upgraded to Blue. Upgrade by promoting informal_grounds[] to spec_refs[] with anchor + canonical SHA-256 hash: {}",
+            yellows.len(),
+            yellows.join(", ")
+        );
+        if strict {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]);
+        }
+        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]);
+    }
+
+    VerifyOutcome::pass()
+}
+
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
@@ -745,5 +832,104 @@ mod tests {
         let findings = check_catalogue_spec_ref_integrity(&custom_layer, &cat, &hashes, None, None);
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].layer, custom_layer);
+    }
+
+    // ---------------------------------------------------------------------------
+    // check_catalogue_spec_signals (T005, IN-03)
+    // ---------------------------------------------------------------------------
+
+    fn signals_doc(entries: Vec<CatalogueSpecSignal>) -> CatalogueSpecSignalsDocument {
+        CatalogueSpecSignalsDocument::new(hash(0x00), entries)
+    }
+
+    #[test]
+    fn check_signals_passes_when_document_is_empty() {
+        let doc = signals_doc(vec![]);
+        for &strict in &[true, false] {
+            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            assert!(outcome.is_ok());
+            assert!(outcome.findings().is_empty());
+        }
+    }
+
+    #[test]
+    fn check_signals_passes_when_all_blue() {
+        let doc = signals_doc(vec![
+            CatalogueSpecSignal::new("T1", ConfidenceSignal::Blue),
+            CatalogueSpecSignal::new("T2", ConfidenceSignal::Blue),
+        ]);
+        for &strict in &[true, false] {
+            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            assert!(outcome.is_ok());
+            assert!(outcome.findings().is_empty());
+        }
+    }
+
+    #[test]
+    fn check_signals_errors_when_red_regardless_of_strict() {
+        let doc = signals_doc(vec![
+            CatalogueSpecSignal::new("Ok", ConfidenceSignal::Blue),
+            CatalogueSpecSignal::new("Bad", ConfidenceSignal::Red),
+        ]);
+
+        for &strict in &[true, false] {
+            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            assert_eq!(outcome.findings().len(), 1);
+            assert!(outcome.has_errors());
+            let msg = outcome.findings()[0].message();
+            assert!(msg.contains("Red"));
+            assert!(msg.contains("Bad"));
+            assert!(msg.contains("domain-types.json"));
+        }
+    }
+
+    #[test]
+    fn check_signals_yellow_strict_true_returns_error() {
+        let doc = signals_doc(vec![CatalogueSpecSignal::new("Pending", ConfidenceSignal::Yellow)]);
+        let outcome = check_catalogue_spec_signals(&doc, true, "domain-types.json");
+        assert_eq!(outcome.findings().len(), 1);
+        assert!(outcome.has_errors());
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("Yellow"));
+        assert!(msg.contains("Pending"));
+    }
+
+    #[test]
+    fn check_signals_yellow_strict_false_returns_warning() {
+        use crate::verify::Severity;
+
+        let doc = signals_doc(vec![CatalogueSpecSignal::new("Pending", ConfidenceSignal::Yellow)]);
+        let outcome = check_catalogue_spec_signals(&doc, false, "domain-types.json");
+        assert_eq!(outcome.findings().len(), 1);
+        assert!(outcome.is_ok(), "warning should not set has_errors");
+        assert_eq!(outcome.findings()[0].severity(), Severity::Warning);
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("Yellow"));
+        assert!(msg.contains("Pending"));
+    }
+
+    #[test]
+    fn check_signals_red_takes_precedence_over_yellow() {
+        let doc = signals_doc(vec![
+            CatalogueSpecSignal::new("TY", ConfidenceSignal::Yellow),
+            CatalogueSpecSignal::new("TR", ConfidenceSignal::Red),
+        ]);
+        for &strict in &[true, false] {
+            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            assert_eq!(outcome.findings().len(), 1);
+            let msg = outcome.findings()[0].message();
+            assert!(msg.contains("Red"));
+            assert!(msg.contains("TR"));
+            // Yellow entry is NOT mentioned in the Red-only finding.
+            assert!(!msg.contains("TY"));
+        }
+    }
+
+    #[test]
+    fn check_signals_message_includes_catalogue_file() {
+        let doc = signals_doc(vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Yellow)]);
+        let outcome = check_catalogue_spec_signals(&doc, true, "usecase-types.json");
+        let msg = outcome.findings()[0].message();
+        assert!(msg.starts_with("usecase-types.json:"));
     }
 }
