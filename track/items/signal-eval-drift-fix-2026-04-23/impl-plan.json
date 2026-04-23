@@ -4,17 +4,18 @@
     {
       "id": "T001",
       "description": "Fix evaluate_requirement_signal in spec.rs to implement informal-priority: return Yellow when adr_refs non-empty and informal_grounds non-empty; update and extend existing unit tests to cover the corrected logic (IN-01, IN-05)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "1c5011c1e2d8345e279b51c9451d343c591892df"
     },
     {
       "id": "T002",
       "description": "Investigate tddd/signals.rs for the same drift as IN-01: confirm whether evaluate_type_signals or any peer function ignores informal_grounds when adr_refs are non-empty, and apply the same informal-priority fix if found; record the outcome (IN-02 — expected: no drift, task closes as skipped or with a no-op commit)",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "id": "T003",
       "description": "Fix validate_track_snapshots in render.rs to skip plan.md content check when plan.md is absent (Phase 0 compatible); add a unit test that passes when the snapshot directory contains only metadata.json (IN-04, IN-05)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",

@@ -573,6 +573,19 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
 ///
 /// # Errors
 /// Returns `RenderError` if any metadata file cannot be read or decoded.
+///
+/// # Phase 0 compatibility (ADR 2026-04-19-1242 §D0.0 / §D1.4 / §D6.1)
+///
+/// Per ADR §D6.1, the plan.md freshness gate fires only "when plan.md is
+/// rendered"; if `plan.md` is absent the check is skipped regardless of
+/// whether `impl-plan.json` is present. A Phase 0 track (just after
+/// `/track:init`) has a freshly created `metadata.json` but no rendered
+/// `plan.md` yet — the view is generated after later phases populate
+/// `impl-plan.json`. Previously this function unconditionally read `plan.md`
+/// and failed with an I/O error for Phase 0 tracks; it now uses
+/// `std::fs::metadata()` to distinguish a missing file (NotFound → skip)
+/// from a permission error or other I/O failure (propagated), mirroring the
+/// presence-conditional pattern used for the optional `registry.md` check.
 pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
     let snapshots = collect_track_snapshots(root)?;
     for snapshot in &snapshots {
@@ -585,6 +598,26 @@ pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
             continue;
         }
         let plan_path = snapshot.dir.join("plan.md");
+        // Phase 0 compat: skip content check when plan.md has not been
+        // rendered yet. Per ADR 2026-04-19-1242 §D6.1, the gate fires only
+        // "when plan.md is rendered"; if the file is absent, skip regardless
+        // of whether impl-plan.json exists. The freshness check is still
+        // applied whenever plan.md is present, so an out-of-sync plan.md is
+        // caught. Use `metadata()` rather than `is_file()` so that permission
+        // errors and other I/O failures are surfaced rather than silently
+        // treated as absent. A path that exists but is not a regular file
+        // (directory, FIFO, etc.) is rejected as corrupted track state.
+        match std::fs::metadata(&plan_path) {
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(e) => return Err(RenderError::Io(e)),
+            Ok(m) if !m.is_file() => {
+                return Err(RenderError::InvalidTrackMetadata {
+                    path: plan_path.clone(),
+                    reason: "plan.md exists but is not a regular file".to_owned(),
+                });
+            }
+            Ok(_) => {}
+        }
         let actual = std::fs::read_to_string(&plan_path)?;
         let impl_plan = load_impl_plan_opt(&snapshot.dir)?;
         let expected = render_plan(&snapshot.track, impl_plan.as_ref());
@@ -1843,6 +1876,32 @@ mod tests {
 
         let err = validate_track_snapshots(dir.path()).unwrap_err();
         assert!(err.to_string().contains("unsupported schema_version 99"));
+    }
+
+    #[test]
+    fn validate_track_snapshots_tolerates_phase_zero_missing_plan_md() {
+        // Phase 0 compat (ADR 2026-04-19-1242 §D0.0 / §D1.4): a freshly-created
+        // v5 track directory containing only `metadata.json` (no `plan.md` yet,
+        // because the view is rendered in later phases) must pass validation.
+        // The previous behaviour failed with an I/O error on the missing file.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json_with_schema_and_branch(
+                5,
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                "[]",
+                Some("track/track-a"),
+            ),
+        )
+        .unwrap();
+        // NOTE: no `plan.md` on purpose — this mirrors the state right after
+        // `/track:init` before any downstream view rendering has occurred.
+        assert!(validate_track_snapshots(dir.path()).is_ok());
     }
 
     #[test]

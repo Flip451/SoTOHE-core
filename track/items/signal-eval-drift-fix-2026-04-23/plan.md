@@ -7,20 +7,20 @@ Fix two drifts within the same ADR 2026-04-19-1242: (a) evaluate_requirement_sig
 Also codify three signal-evaluation decision criteria in .claude/agents/spec-designer.md to let spec-designer judge universal convention / per-element constraint / Yellow resolution autonomously (avoiding the round-trip observed in this track's Phase 1).
 T001 fixes the signal logic in spec.rs + tests. T002 investigates the same drift in tddd/signals.rs (expected: no drift). T003 relaxes validate_track_snapshots to skip missing plan.md. T004 removes the now-incorrect max() lines from the ADR. T005 updates the spec-designer agent. T006 runs cargo make ci regression gate.
 
-## Tasks (0/6 resolved)
+## Tasks (2/6 resolved)
 
 ### S1 — Domain signal logic fix
 
 > Correct the informal-priority rule in evaluate_requirement_signal (spec.rs) and verify no analogous drift exists in the type catalogue signal evaluator. Tests are co-located with each fix.
 
-- [~] **T001**: Fix evaluate_requirement_signal in spec.rs to implement informal-priority: return Yellow when adr_refs non-empty and informal_grounds non-empty; update and extend existing unit tests to cover the corrected logic (IN-01, IN-05)
-- [ ] **T002**: Investigate tddd/signals.rs for the same drift as IN-01: confirm whether evaluate_type_signals or any peer function ignores informal_grounds when adr_refs are non-empty, and apply the same informal-priority fix if found; record the outcome (IN-02 — expected: no drift, task closes as skipped or with a no-op commit)
+- [x] **T001**: Fix evaluate_requirement_signal in spec.rs to implement informal-priority: return Yellow when adr_refs non-empty and informal_grounds non-empty; update and extend existing unit tests to cover the corrected logic (IN-01, IN-05) (`1c5011c1e2d8345e279b51c9451d343c591892df`)
+- [-] **T002**: Investigate tddd/signals.rs for the same drift as IN-01: confirm whether evaluate_type_signals or any peer function ignores informal_grounds when adr_refs are non-empty, and apply the same informal-priority fix if found; record the outcome (IN-02 — expected: no drift, task closes as skipped or with a no-op commit)
 
 ### S2 — Infrastructure phase-boundary fix
 
 > Make validate_track_snapshots resilient to Phase-0 tracks (metadata.json only, no plan.md yet) so that verify-track-metadata passes immediately after /track:init.
 
-- [ ] **T003**: Fix validate_track_snapshots in render.rs to skip plan.md content check when plan.md is absent (Phase 0 compatible); add a unit test that passes when the snapshot directory contains only metadata.json (IN-04, IN-05)
+- [~] **T003**: Fix validate_track_snapshots in render.rs to skip plan.md content check when plan.md is absent (Phase 0 compatible); add a unit test that passes when the snapshot directory contains only metadata.json (IN-04, IN-05)
 
 ### S3 — ADR text alignment
 

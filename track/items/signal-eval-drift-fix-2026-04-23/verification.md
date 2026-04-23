@@ -18,12 +18,11 @@
 4. 新 test: `adr_refs 非空 + informal_grounds 非空 → Yellow` の明示 case 追加 (AC-01)
 5. `cargo make test` で既存 test 群が全 pass
 
-### T002 (tddd/signals.rs drift 調査)
+### T002 (tddd/signals.rs drift 調査) — 調査結果: drift なし
 
-1. `libs/domain/src/tddd/signals.rs` および関連 file 内の signal 評価関数を精査
-2. spec 要素の `adr_refs` + `informal_grounds` と同型の drift があるかを確認
-3. drift が存在する場合: 同じ informal-priority logic で修正
-4. drift が存在しない場合: 調査結果を commit の note / body に記述して close (no-op でも工数 trace として記録)
+1. `libs/domain/src/tddd/signals.rs::evaluate_type_signals` および `evaluate_single` は type catalogue entry (`TypeCatalogueEntry`) を rustdoc 由来の `TypeGraph` と **構造比較** する logic。`adr_refs` / `convention_refs` / `informal_grounds` を一切参照しない。signal 生成は spec/code mismatch の構造判定のみ (Blue/Yellow/Red は「仕様と実装の一致度」を表し、spec 要素の grounding 品質とは別ドメイン)。
+2. `libs/domain/src/tddd/catalogue.rs` の `TypeCatalogueEntry` は `spec_refs` + `informal_grounds` field を持ち `has_informal_grounds()` bool getter があるが、これらを合成して `ConfidenceSignal` を返す関数は codebase 内に存在しない (grep 済)。spec 要素側の `evaluate_requirement_signal` 相当は type catalogue には未実装。
+3. 結論: T001 で修正した informal-priority rule と同型の drift は type catalogue 側には **存在しない**。T002 は skipped で close (実装変更ゼロ、verification.md にこの調査結果を記録して trace を残す)。
 
 ### T003 (render.rs::validate_track_snapshots Phase 責務縮退)
 
