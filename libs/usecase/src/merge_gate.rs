@@ -155,6 +155,29 @@ pub trait TrackBlobReader {
         // the merge gate. Real infrastructure implementations override.
         BlobFetchResult::NotFound
     }
+
+    /// Returns the subset of TDDD-enabled layer ids that have also opted in
+    /// to Chain ② evaluation via `tddd.catalogue_spec_signal.enabled = true`
+    /// on the given branch.
+    ///
+    /// This is a strict subset of `read_enabled_layers`: every id returned
+    /// here is also `tddd.enabled`, but not every `tddd.enabled` layer is in
+    /// this set. The merge gate uses this list to avoid evaluating stale or
+    /// mismatched signals files for layers that have intentionally opted out
+    /// of Chain ② (for example a layer that previously generated a signals
+    /// file and later flipped the flag to `false`). Keying Chain ② behavior
+    /// on file presence alone would let such stale files block merges for a
+    /// disabled feature.
+    ///
+    /// The default implementation returns an empty set so mocks that have
+    /// not been updated simply skip Chain ②. Real infrastructure adapters
+    /// override this to parse `architecture-rules.json` on the branch blob.
+    fn read_catalogue_spec_signal_opted_in_layers(
+        &self,
+        _branch: &str,
+    ) -> BlobFetchResult<Vec<String>> {
+        BlobFetchResult::Found(Vec::new())
+    }
 }
 
 /// Evaluates the strict merge gate for the given branch using the provided
@@ -348,7 +371,33 @@ where
         }
     };
 
+    // Per-layer opt-in gate (ADR §D5.4 phased activation): only layers whose
+    // `tddd.catalogue_spec_signal.enabled = true` participate in Chain ②.
+    // Presence of a committed `<layer>-catalogue-spec-signals.json` on the
+    // branch is NOT sufficient on its own — a layer that was previously opted
+    // in and later flipped the flag back to `false` may still carry a stale
+    // signals file; blocking merges on it for a now-disabled feature would be
+    // wrong. FetchError here is fail-closed (architecture-rules.json already
+    // parsed once in `read_enabled_layers`, so a second-call failure is a
+    // systemic adapter issue — do NOT silently skip Chain ②).
+    let opted_in_layers: std::collections::HashSet<String> =
+        match reader.read_catalogue_spec_signal_opted_in_layers(branch) {
+            BlobFetchResult::Found(ids) => ids.into_iter().collect(),
+            BlobFetchResult::NotFound | BlobFetchResult::FetchError(_) => {
+                // An empty set triggers "no layer opted in → skip Chain ②"
+                // rather than a hard error, mirroring the default trait
+                // implementation's behavior for mocks. Real adapters that
+                // can read the file always return Found (possibly empty).
+                std::collections::HashSet::new()
+            }
+        };
+
     for layer_id in &layer_ids {
+        // Skip layers that have NOT opted in to Chain ② — mere presence of a
+        // signals file is insufficient (see the opted_in_layers comment above).
+        if !opted_in_layers.contains(layer_id) {
+            continue;
+        }
         // `LayerId::try_new` was validated in the pre-validation pass above and
         // any failures caused an early return, so this conversion cannot fail.
         let layer_id_newtype = match domain::tddd::LayerId::try_new(layer_id) {
@@ -1314,6 +1363,17 @@ mod tests {
             BlobFetchResult::Found(vec!["domain".to_string()])
         }
 
+        fn read_catalogue_spec_signal_opted_in_layers(
+            &self,
+            _branch: &str,
+        ) -> BlobFetchResult<Vec<String>> {
+            // These tests exercise Chain ② actively, so the mocked layer must be
+            // opted in. The real infrastructure adapter derives this subset from
+            // `architecture-rules.json` via
+            // `TdddLayerBinding::catalogue_spec_signal_enabled()`.
+            BlobFetchResult::Found(vec!["domain".to_string()])
+        }
+
         fn read_catalogue_spec_signals_document(
             &self,
             _branch: &str,
@@ -1420,6 +1480,123 @@ mod tests {
                 .iter()
                 .any(|f| f.message().contains("failed to read catalogue-spec signals")),
             "error must mention catalogue-spec signals read failure: {outcome:?}"
+        );
+    }
+
+    /// Mock variant of `ChainTwoMock` where the layer is `tddd.enabled` (Stage 2)
+    /// but NOT in `read_catalogue_spec_signal_opted_in_layers` (Chain ② opt-out).
+    /// Used by the regression test covering the PR #111 finding: a stale signals
+    /// file for an opted-out layer must not be re-evaluated by the merge gate.
+    struct ChainTwoOptOutMock {
+        signals: BlobFetchResult<domain::CatalogueSpecSignalsDocument>,
+    }
+
+    impl SpecElementHashReader for ChainTwoOptOutMock {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            BlobFetchResult::Found(std::collections::BTreeMap::new())
+        }
+    }
+
+    impl TrackBlobReader for ChainTwoOptOutMock {
+        fn read_spec_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<SpecDocument> {
+            BlobFetchResult::Found(all_blue_spec())
+        }
+
+        fn read_type_catalogue(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
+        }
+
+        fn read_impl_plan(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<domain::ImplPlanDocument> {
+            panic!("read_impl_plan must not be called")
+        }
+
+        fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+            // Layer IS `tddd.enabled` → included in Stage 2 iteration.
+            BlobFetchResult::Found(vec!["domain".to_string()])
+        }
+
+        fn read_catalogue_spec_signal_opted_in_layers(
+            &self,
+            _branch: &str,
+        ) -> BlobFetchResult<Vec<String>> {
+            // But NOT opted in for Chain ② → should be skipped in Stage 3.
+            BlobFetchResult::Found(Vec::new())
+        }
+
+        fn read_catalogue_spec_signals_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<domain::CatalogueSpecSignalsDocument> {
+            self.signals.clone()
+        }
+
+        /// Override to provide a valid catalogue+hash so the test is falsifiable:
+        /// if the opt-in guard were removed, Stage 3 would proceed past signals to
+        /// the catalogue read, parse the hash, run the signal gate, and then block
+        /// on the Yellow signal. Without this override the default `NotFound` causes
+        /// a `continue` before `check_catalogue_spec_signals` is ever called,
+        /// making `test_u36` pass vacuously even when the guard is absent.
+        fn read_catalogue_for_spec_ref_check(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            // Match the hash embedded in `all_yellow_signals()`:
+            // ContentHash::from_bytes([0xcd; 32]) → hex64(0xcd)
+            empty_catalogue_for_chain2()
+        }
+    }
+
+    #[test]
+    fn test_u36_chain2_opt_out_skips_even_when_signals_yellow() {
+        // Regression: PR #111 found that a layer which previously emitted a
+        // signals file and later flipped `catalogue_spec_signal.enabled = false`
+        // would still be evaluated on file presence, blocking merges on stale
+        // Yellow/Red findings for a disabled feature. The fix consults
+        // `read_catalogue_spec_signal_opted_in_layers` and skips layers that
+        // are not in the opt-in set — even when the signals file is Found and
+        // Yellow (which would otherwise block in strict mode per U32).
+        let reader = ChainTwoOptOutMock { signals: BlobFetchResult::Found(all_yellow_signals()) };
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "opted-out layer with stale Yellow signals must NOT block merge: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u37_chain2_opt_out_skips_even_when_signals_fetch_error() {
+        // Same opt-out gate: even a FetchError on a layer that is NOT opted in
+        // must not surface — the signals file is irrelevant to a disabled
+        // feature, so the adapter's fetch outcome should never be consulted.
+        let reader = ChainTwoOptOutMock {
+            signals: BlobFetchResult::FetchError("signals file corrupted".to_owned()),
+        };
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "opted-out layer signals FetchError must NOT surface: {outcome:?}"
         );
     }
 

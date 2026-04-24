@@ -244,6 +244,36 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         BlobFetchResult::Found(bindings.iter().map(|b| b.layer_id().to_owned()).collect())
     }
 
+    fn read_catalogue_spec_signal_opted_in_layers(
+        &self,
+        branch: &str,
+    ) -> BlobFetchResult<Vec<String>> {
+        // Mirrors `read_enabled_layers` but filters the binding set to layers
+        // whose `tddd.catalogue_spec_signal.enabled = true` (ADR §D5.4 phased
+        // activation). The merge gate's Stage 3 loop uses this subset so that
+        // a layer which flipped the flag to false after generating a signals
+        // file is not accidentally re-evaluated on presence alone.
+        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
+            Ok(s) => s,
+            Err(result) => return result,
+        };
+        let bindings = match super::tddd_layers::parse_tddd_layers(&text) {
+            Ok(b) => b,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "architecture-rules.json parse error: {e}"
+                ));
+            }
+        };
+        BlobFetchResult::Found(
+            bindings
+                .iter()
+                .filter(|b| b.catalogue_spec_signal_enabled())
+                .map(|b| b.layer_id().to_owned())
+                .collect(),
+        )
+    }
+
     fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument> {
         let path = Self::blob_path(track_id, "impl-plan.json");
         let text = match self.fetch_string::<ImplPlanDocument>(branch, &path) {
