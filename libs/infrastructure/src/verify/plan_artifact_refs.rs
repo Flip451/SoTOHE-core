@@ -552,7 +552,7 @@ fn load_spec_element_map<'c>(
 ///
 /// Walks: `goal[]`, `scope.in_scope[]`, `scope.out_of_scope[]`, `constraints[]`,
 /// `acceptance_criteria[]`.
-pub(crate) fn build_element_map(raw: &serde_json::Value) -> SpecElementMap {
+pub fn build_element_map(raw: &serde_json::Value) -> HashMap<String, String> {
     let mut map = HashMap::new();
 
     let sections: &[&str] = &["goal", "constraints", "acceptance_criteria"];
@@ -616,7 +616,7 @@ fn escape_json_string(s: &str) -> String {
 }
 
 /// Compute SHA-256 of a canonical JSON string and return a 64-char lowercase hex.
-pub(crate) fn canonical_json_sha256(json: &str) -> String {
+pub fn canonical_json_sha256(json: &str) -> String {
     use sha2::Digest as _;
     let mut hasher = sha2::Sha256::new();
     hasher.update(json.as_bytes());

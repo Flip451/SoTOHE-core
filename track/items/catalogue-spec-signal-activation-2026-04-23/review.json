@@ -111,6 +111,199 @@
           "findings": [],
           "hash": "rvw1:sha256:52d505863c808d6b83786bd0dcd8ffd965b2b401e3cb74b90b6fc0f0633f19d6",
           "at": "2026-04-24T01:39:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c196259e5a2383eddaf39a2ac29479145ebbf6b321807063a587e50bb815fa57",
+          "at": "2026-04-24T03:11:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c196259e5a2383eddaf39a2ac29479145ebbf6b321807063a587e50bb815fa57",
+          "at": "2026-04-24T03:11:40Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
+          "at": "2026-04-23T23:05:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
+          "at": "2026-04-23T23:06:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
+          "at": "2026-04-23T23:16:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
+          "at": "2026-04-23T23:17:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_id` is still a raw `String`, and `execute` never validates it with the existing `LayerId` domain type before handing it to the reader/writer ports. That lets malformed layer ids cross the usecase boundary and reach filesystem-backed adapters, which violates the repo's validated-input rule and can turn bad CLI input into adapter failures or path-safety issues.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6f19c10845140bece5962dd885d1833d95963abcd4a5313cc11dba17634f6534",
+          "at": "2026-04-23T23:29:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public `FetchError`/`WriteFailed` path forwards upstream error text verbatim into user-facing output. If the reader or writer adapter includes raw git stderr, filesystem paths, or other internal diagnostics in those messages, this use case will leak implementation details to CLI users instead of returning a sanitized failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 70,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
+          "at": "2026-04-23T23:34:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
+          "at": "2026-04-23T23:38:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
+          "at": "2026-04-23T23:39:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new test module does not exercise the public failure branches `CatalogueNotFound`, `CatalogueFetchError`, `SpecNotFound`, or `SpecFetchError`. Because `execute` now exposes these as part of its API contract, a regression in port-error mapping or the `NotFound` handling would ship without coverage.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 398,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
+          "at": "2026-04-23T23:49:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new usecase exposes several public failure branches, but this module only tests the happy path, the two branch guards, invalid catalogue hash parsing, and the three integrity findings. There are no tests for `CatalogueNotFound`/`CatalogueFetchError` from `read_catalogue_for_spec_ref_check` or `SpecNotFound`/`SpecFetchError` from `read_spec_element_hashes` and signals fetch failures, so regressions in the adapter/error mapping can ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 159,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
+          "at": "2026-04-23T23:51:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Failures from `read_spec_element_hashes` and `read_catalogue_spec_signals_document` are both collapsed into `SpecFetchError`, so callers cannot tell whether `spec.json` or the signals blob failed. That violates the distinct-failure-mode contract and makes remediation or targeted retries ambiguous.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 210,
+              "category": "error_handling"
+            },
+            {
+              "message": "`verify_skip_stale_bypasses_signals_read` does not actually prove the signals port is skipped: `FixedReader::new(..., None)` returns `NotFound`, so the test would still pass if the interactor accidentally called `read_catalogue_spec_signals_document`. Use a reader that fails on any signals access to cover the required skip-stale behavior.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 616,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:c284cf5a7ee8beb19dbceca811ef7d37cb78f5d5a620451b090983700257c00f",
+          "at": "2026-04-23T23:56:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
+          "at": "2026-04-23T23:59:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` parses `catalogue_hash_hex` unconditionally before the stale-check branch. That means `skip_stale=true` and the `signals NotFound` path can still fail with `InvalidCatalogueHash`, even though stale detection is supposed to be bypassed/no-op there and the hash is never consumed. In those cases the usecase should continue to report dangling/hash findings via `Ok(Vec<SpecRefFinding>)` instead of aborting on an unrelated stale-check input.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 198,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
+          "at": "2026-04-24T00:02:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`InvalidCatalogueHash` is only surfaced inside the `signals`-found branch, so a malformed `read_catalogue_for_spec_ref_check` hash is silently accepted whenever `skip_stale=true` or `<layer>-catalogue-spec-signals.json` is absent. That lets the usecase succeed even though the catalogue port violated its raw-hash contract.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 220,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:816885757158a17855495be846adaed7105dafa75c8e3f166e4322a9bf59c14e",
+          "at": "2026-04-24T00:04:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
+          "at": "2026-04-24T00:07:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
+          "at": "2026-04-24T00:11:06Z"
         }
       ]
     },
@@ -2015,610 +2208,20 @@
           "findings": [],
           "hash": "rvw1:sha256:f74b84cc8e61c8f5564c71b43952c43bde088a0c7211304c0fdd1dfcea20091a",
           "at": "2026-04-24T01:49:38Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
-          "at": "2026-04-23T23:05:19Z"
+          "hash": "rvw1:sha256:b594cc8fec90be051c96b0dcbed050cf27771dc1fbee19acac6200d8e3b6a9ce",
+          "at": "2026-04-24T03:11:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
-          "at": "2026-04-23T23:06:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
-          "at": "2026-04-23T23:16:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
-          "at": "2026-04-23T23:17:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`layer_id` is still a raw `String`, and `execute` never validates it with the existing `LayerId` domain type before handing it to the reader/writer ports. That lets malformed layer ids cross the usecase boundary and reach filesystem-backed adapters, which violates the repo's validated-input rule and can turn bad CLI input into adapter failures or path-safety issues.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
-              "line": 35,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6f19c10845140bece5962dd885d1833d95963abcd4a5313cc11dba17634f6534",
-          "at": "2026-04-23T23:29:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public `FetchError`/`WriteFailed` path forwards upstream error text verbatim into user-facing output. If the reader or writer adapter includes raw git stderr, filesystem paths, or other internal diagnostics in those messages, this use case will leak implementation details to CLI users instead of returning a sanitized failure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
-              "line": 70,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
-          "at": "2026-04-23T23:34:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
-          "at": "2026-04-23T23:38:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
-          "at": "2026-04-23T23:39:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new test module does not exercise the public failure branches `CatalogueNotFound`, `CatalogueFetchError`, `SpecNotFound`, or `SpecFetchError`. Because `execute` now exposes these as part of its API contract, a regression in port-error mapping or the `NotFound` handling would ship without coverage.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 398,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
-          "at": "2026-04-23T23:49:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new usecase exposes several public failure branches, but this module only tests the happy path, the two branch guards, invalid catalogue hash parsing, and the three integrity findings. There are no tests for `CatalogueNotFound`/`CatalogueFetchError` from `read_catalogue_for_spec_ref_check` or `SpecNotFound`/`SpecFetchError` from `read_spec_element_hashes` and signals fetch failures, so regressions in the adapter/error mapping can ship unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 159,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
-          "at": "2026-04-23T23:51:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Failures from `read_spec_element_hashes` and `read_catalogue_spec_signals_document` are both collapsed into `SpecFetchError`, so callers cannot tell whether `spec.json` or the signals blob failed. That violates the distinct-failure-mode contract and makes remediation or targeted retries ambiguous.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 210,
-              "category": "error_handling"
-            },
-            {
-              "message": "`verify_skip_stale_bypasses_signals_read` does not actually prove the signals port is skipped: `FixedReader::new(..., None)` returns `NotFound`, so the test would still pass if the interactor accidentally called `read_catalogue_spec_signals_document`. Use a reader that fails on any signals access to cover the required skip-stale behavior.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 616,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:c284cf5a7ee8beb19dbceca811ef7d37cb78f5d5a620451b090983700257c00f",
-          "at": "2026-04-23T23:56:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
-          "at": "2026-04-23T23:59:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` parses `catalogue_hash_hex` unconditionally before the stale-check branch. That means `skip_stale=true` and the `signals NotFound` path can still fail with `InvalidCatalogueHash`, even though stale detection is supposed to be bypassed/no-op there and the hash is never consumed. In those cases the usecase should continue to report dangling/hash findings via `Ok(Vec<SpecRefFinding>)` instead of aborting on an unrelated stale-check input.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 198,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
-          "at": "2026-04-24T00:02:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`InvalidCatalogueHash` is only surfaced inside the `signals`-found branch, so a malformed `read_catalogue_for_spec_ref_check` hash is silently accepted whenever `skip_stale=true` or `<layer>-catalogue-spec-signals.json` is absent. That lets the usecase succeed even though the catalogue port violated its raw-hash contract.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 220,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:816885757158a17855495be846adaed7105dafa75c8e3f166e4322a9bf59c14e",
-          "at": "2026-04-24T00:04:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
-          "at": "2026-04-24T00:07:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
-          "at": "2026-04-24T00:11:06Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This active-track preflight is missing the `check_impl_plan_presence` guard that `type-signals`/`type-graph`/`contract-map` use. Because `FsTrackStore::load_impl_plan` returns `None` on an absent file and `derive_track_status(None, ...)` becomes `Planned`, a branch-bearing track with a missing `impl-plan.json` will be treated as active enough and the command will regenerate catalogue-spec signals instead of failing closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 57,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:e69147a7450df9d465d190fda25cb653441deedcdc834e40235608394794871f",
-          "at": "2026-04-24T01:49:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The refresh reads the layer catalogue with `std::fs::read` but never applies the symlink guard used elsewhere for local catalogue inputs. A malicious workspace can replace `track/items/<track_id>/<layer>-types.json` with a symlink to an arbitrary file outside the track tree, and this command will still read/hash it. Reject symlinked catalogue paths before decoding, or the pre-commit refresh can be pointed at attacker-controlled files.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 127,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:cbb163a1d0f095e843fd7e36a169e31e26c4bc25292810e5e45aec7ff81155c8",
-          "at": "2026-04-24T01:52:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new command path has no test covering the frozen-track guard (`Done`/`Archived`), so the custom rejection in `ensure_active_track_catalogue` can regress without being caught. Add a focused integration test that builds a completed/archived track and asserts `execute_catalogue_spec_signals` fails before any write occurs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 45,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:b24aa9d71c0d3e9a2bfade7c7ec981e5f60ceb3f65736323bc216f359f67bf7f",
-          "at": "2026-04-24T01:57:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`items_dir` is used as a trusted filesystem root before any symlink/root validation. `read_track_metadata` and `FsTrackStore::load_impl_plan` will follow a symlinked or attacker-controlled `--items-dir`, so the command can be redirected to arbitrary metadata/impl-plan files before the active-track guard runs.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 56,
-              "category": "Security"
-            }
-          ],
-          "hash": "rvw1:sha256:aabcf41b58675165ec60a73c932a4b8eb9b9ea26fd80865fc382368aa9ae1b47",
-          "at": "2026-04-24T02:02:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_catalogue_spec_signals` reads tracks from `items_dir` but constructs `FsCatalogueSpecSignalsStore` from `workspace_root`. If a caller passes a non-default `--items-dir`, the command will silently write `<layer>-catalogue-spec-signals.json` under `workspace_root/track/items/...` instead of the requested items tree, so a successful run can update the wrong files.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 105,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
-          "at": "2026-04-24T02:08:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`reject_symlinks_below` is anchored at `track_dir`, which means a symlink placed on `track/items/<track_id>` itself is never inspected. That lets an attacker redirect the read/hash step to an out-of-tree `<layer>-types.json` and generate signals from attacker-controlled content. Anchor this guard at `items_dir` instead, as the baseline-capture path does.",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 152,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
-          "at": "2026-04-24T02:11:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The read-path guard only checks symlinks below `track_dir`; it never rejects `track_dir` itself being a symlink. A workspace can replace `track/items/<track-id>` with a symlink and make this command read/hash files outside the intended project tree.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 145,
-              "category": "security"
-            },
-            {
-              "message": "This test only asserts `is_err()`, so it would still pass if `TrackId::try_new` stopped rejecting `../evil` and the command failed later for some unrelated filesystem reason. It does not actually prove the path-traversal guard is enforced.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 371,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
-          "at": "2026-04-24T02:15:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:711db80117bd491d02fbaa19282bf205e8f68e2dca3839c97e4b52bd48385b87",
-          "at": "2026-04-24T02:29:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_catalogue_spec_signals` only checks whether `items_dir` itself is a symlink, then immediately calls `read_track_metadata` and `load_impl_plan` through `items_dir/<track_id>`. If the track directory is a symlink, those reads escape the trusted tree before `reject_symlinks_below` ever runs, so the new path guard is bypassed for the active-track check. Reject symlinked `track_dir` before loading metadata / impl-plan.",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 76,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:711db80117bd491d02fbaa19282bf205e8f68e2dca3839c97e4b52bd48385b87",
-          "at": "2026-04-24T02:32:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The explicit-layer test only uses a workspace with one enabled layer, so it would still pass if `--layer` were ignored and the command refreshed every enabled layer. Add a second enabled layer and assert only the requested layer is written.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 433,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
-          "at": "2026-04-24T02:38:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The symlink guard only `lstat`s the final `items_dir`/`track_dir` path, so a symlink in any parent component still escapes the trusted tree. A path like `<workspace>/symlinked-parent/track/items` will be treated as safe even though the subsequent catalogue read resolves outside the intended `track/items` root.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 59,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
-          "at": "2026-04-24T02:40:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
-          "at": "2026-04-24T02:43:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_catalogue_spec_signals` reads metadata and `<layer>-types.json` from the caller-supplied `items_dir`, but it creates `FsCatalogueSpecSignalsStore` from `workspace_root`, so the write path cannot follow a non-default `--items-dir`. On any invocation that points at a custom track-items root, the command will regenerate outputs in the default workspace tree instead of alongside the source track, leaving the requested track stale while writing stray files elsewhere.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 132,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
-          "at": "2026-04-24T02:45:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
-          "at": "2026-04-24T03:00:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_catalogue_spec_signals` reads metadata and source catalogues from `--items-dir`, but it always constructs `FsCatalogueSpecSignalsStore` from `workspace_root`. If a caller overrides `--items-dir` to point at a non-default track tree, the command will regenerate signals for that tree and then write the output into a different `track/items` directory, leaving the requested track stale and potentially overwriting another checkout's files.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 132,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
-          "at": "2026-04-24T03:02:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
-          "at": "2026-04-24T03:03:59Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:40:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
-              "severity": "P0",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 449,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:43:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:44:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:50:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:53:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:54:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 84,
-              "category": "contract"
-            }
-          ],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T21:57:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T22:00:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "invariant"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:12:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:13:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:14:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:16:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:22:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:23:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:33:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:36:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:41:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:42:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:45:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:46:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:43Z"
+          "hash": "rvw1:sha256:b594cc8fec90be051c96b0dcbed050cf27771dc1fbee19acac6200d8e3b6a9ce",
+          "at": "2026-04-24T03:12:16Z"
         }
       ]
     },
@@ -3211,6 +2814,872 @@
           "findings": [],
           "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
           "at": "2026-04-23T18:18:52Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This active-track preflight is missing the `check_impl_plan_presence` guard that `type-signals`/`type-graph`/`contract-map` use. Because `FsTrackStore::load_impl_plan` returns `None` on an absent file and `derive_track_status(None, ...)` becomes `Planned`, a branch-bearing track with a missing `impl-plan.json` will be treated as active enough and the command will regenerate catalogue-spec signals instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 57,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e69147a7450df9d465d190fda25cb653441deedcdc834e40235608394794871f",
+          "at": "2026-04-24T01:49:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The refresh reads the layer catalogue with `std::fs::read` but never applies the symlink guard used elsewhere for local catalogue inputs. A malicious workspace can replace `track/items/<track_id>/<layer>-types.json` with a symlink to an arbitrary file outside the track tree, and this command will still read/hash it. Reject symlinked catalogue paths before decoding, or the pre-commit refresh can be pointed at attacker-controlled files.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 127,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:cbb163a1d0f095e843fd7e36a169e31e26c4bc25292810e5e45aec7ff81155c8",
+          "at": "2026-04-24T01:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new command path has no test covering the frozen-track guard (`Done`/`Archived`), so the custom rejection in `ensure_active_track_catalogue` can regress without being caught. Add a focused integration test that builds a completed/archived track and asserts `execute_catalogue_spec_signals` fails before any write occurs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 45,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b24aa9d71c0d3e9a2bfade7c7ec981e5f60ceb3f65736323bc216f359f67bf7f",
+          "at": "2026-04-24T01:57:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir` is used as a trusted filesystem root before any symlink/root validation. `read_track_metadata` and `FsTrackStore::load_impl_plan` will follow a symlinked or attacker-controlled `--items-dir`, so the command can be redirected to arbitrary metadata/impl-plan files before the active-track guard runs.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 56,
+              "category": "Security"
+            }
+          ],
+          "hash": "rvw1:sha256:aabcf41b58675165ec60a73c932a4b8eb9b9ea26fd80865fc382368aa9ae1b47",
+          "at": "2026-04-24T02:02:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` reads tracks from `items_dir` but constructs `FsCatalogueSpecSignalsStore` from `workspace_root`. If a caller passes a non-default `--items-dir`, the command will silently write `<layer>-catalogue-spec-signals.json` under `workspace_root/track/items/...` instead of the requested items tree, so a successful run can update the wrong files.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 105,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
+          "at": "2026-04-24T02:08:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_below` is anchored at `track_dir`, which means a symlink placed on `track/items/<track_id>` itself is never inspected. That lets an attacker redirect the read/hash step to an out-of-tree `<layer>-types.json` and generate signals from attacker-controlled content. Anchor this guard at `items_dir` instead, as the baseline-capture path does.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 152,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
+          "at": "2026-04-24T02:11:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The read-path guard only checks symlinks below `track_dir`; it never rejects `track_dir` itself being a symlink. A workspace can replace `track/items/<track-id>` with a symlink and make this command read/hash files outside the intended project tree.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 145,
+              "category": "security"
+            },
+            {
+              "message": "This test only asserts `is_err()`, so it would still pass if `TrackId::try_new` stopped rejecting `../evil` and the command failed later for some unrelated filesystem reason. It does not actually prove the path-traversal guard is enforced.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 371,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
+          "at": "2026-04-24T02:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:711db80117bd491d02fbaa19282bf205e8f68e2dca3839c97e4b52bd48385b87",
+          "at": "2026-04-24T02:29:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` only checks whether `items_dir` itself is a symlink, then immediately calls `read_track_metadata` and `load_impl_plan` through `items_dir/<track_id>`. If the track directory is a symlink, those reads escape the trusted tree before `reject_symlinks_below` ever runs, so the new path guard is bypassed for the active-track check. Reject symlinked `track_dir` before loading metadata / impl-plan.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 76,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:711db80117bd491d02fbaa19282bf205e8f68e2dca3839c97e4b52bd48385b87",
+          "at": "2026-04-24T02:32:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The explicit-layer test only uses a workspace with one enabled layer, so it would still pass if `--layer` were ignored and the command refreshed every enabled layer. Add a second enabled layer and assert only the requested layer is written.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 433,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:38:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The symlink guard only `lstat`s the final `items_dir`/`track_dir` path, so a symlink in any parent component still escapes the trusted tree. A path like `<workspace>/symlinked-parent/track/items` will be treated as safe even though the subsequent catalogue read resolves outside the intended `track/items` root.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 59,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:40:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:43:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` reads metadata and `<layer>-types.json` from the caller-supplied `items_dir`, but it creates `FsCatalogueSpecSignalsStore` from `workspace_root`, so the write path cannot follow a non-default `--items-dir`. On any invocation that points at a custom track-items root, the command will regenerate outputs in the default workspace tree instead of alongside the source track, leaving the requested track stale while writing stray files elsewhere.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 132,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:45:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T03:00:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` reads metadata and source catalogues from `--items-dir`, but it always constructs `FsCatalogueSpecSignalsStore` from `workspace_root`. If a caller overrides `--items-dir` to point at a non-default track tree, the command will regenerate signals for that tree and then write the output into a different `track/items` directory, leaving the requested track stale and potentially overwriting another checkout's files.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 132,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T03:02:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T03:03:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_spec_element_hashes` bypasses the domain `spec_codec::decode()` validation and silently drops any `SpecElementId::try_new` failures, so malformed `spec.json` inputs (including duplicate element IDs that the domain codec rejects) can be reduced to a partial hash map instead of failing closed. That can make `sotp verify catalogue-spec-refs` report incorrect integrity results.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 87,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:09910a9a72166ed59143682721941f274e53643082208801ca984eeb27a1cc69",
+          "at": "2026-04-24T03:13:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_spec_element_hashes` silently drops any `SpecElementId` that fails validation instead of failing closed. If `spec.json` contains an invalid or duplicated element id, the CLI can build an incomplete hash map and report false dangling/hash results instead of surfacing a validation error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 90,
+              "category": "correctness"
+            },
+            {
+              "message": "The layer gate treats `catalogue_path.exists()` as the only presence check and then reads the file directly, with no symlink guard. A dangling symlink is therefore treated as \"absent\" and skipped, and a symlinked catalogue can be followed outside the workspace, which lets the verifier fail open on a manipulated worktree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 119,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:09910a9a72166ed59143682721941f274e53643082208801ca984eeb27a1cc69",
+          "at": "2026-04-24T03:15:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3be7bccc6878ee22298f6749f64cb19a3d2571aedf2845b62dc7effefafb40d3",
+          "at": "2026-04-24T03:21:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_spec_element_hashes` only does a raw `serde_json::Value` parse before calling `build_element_map`, so an invalid `spec.json` schema/domain payload can be treated as an empty or partial element map instead of a validation failure. That makes this command emit misleading dangling/hash findings, or even pass, where the merge-gate path would fail closed with a spec validation error.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 112,
+              "category": "correctness"
+            },
+            {
+              "message": "The added tests never exercise the two lenient branches called out in the checklist: `--skip-stale` must bypass reading `<layer>-catalogue-spec-signals.json`, and missing layer catalogue files must be skipped. A regression in either branch would currently ship unnoticed because the new suite only covers success/dangling/path-traversal/spec-missing/format cases.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 338,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:3be7bccc6878ee22298f6749f64cb19a3d2571aedf2845b62dc7effefafb40d3",
+          "at": "2026-04-24T03:25:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This passes `items_dir` straight into `reject_symlinks_below` as the trusted root without first rejecting a symlinked `items_dir`. If `--items-dir` points at a symlink, the guard only validates descendants of the symlink target, so reads of `spec.json`, catalogue files, and signals can escape the intended workspace.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 105,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:65dea6654a7a91318f9dd737abb1eb86a68082ede29d137e074ec3120e224fb4",
+          "at": "2026-04-24T03:30:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fb937ba9ad755cb6499ed11d8e23ccf438be53c9860d0ed36884878db9d2dc2",
+          "at": "2026-04-24T03:35:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_verify_catalogue_spec_refs` never enforces the active-track guard before reading `spec.json` and the layer catalogues. As written, the new `sotp verify catalogue-spec-refs` command will happily return success/failure for `Done` or `Archived` tracks, even though the ADR and the merge-gate/usecase path require non-active tracks to be rejected fail-closed. That leaves the local CLI behavior inconsistent with the rest of the feature and allows this gate to run on frozen tracks instead of exiting with an error.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5fb937ba9ad755cb6499ed11d8e23ccf438be53c9860d0ed36884878db9d2dc2",
+          "at": "2026-04-24T03:37:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Guard `items_dir/<track_id>` before the active-track preflight. As written, `read_track_metadata` and `load_impl_plan` run before any symlink check on `track_dir`, so a symlinked track directory can be followed and off-workspace `metadata.json` / `impl-plan.json` can be read before the later file guards fire.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 74,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:e78a2744384cd478d112683aa1ec13567b6ba3c6f58debf756c19542483a170d",
+          "at": "2026-04-24T03:43:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c83a6cb2955f0ccf331a864191a1c65cda0d068e47a9630d9d40e3b2f842bc2a",
+          "at": "2026-04-24T03:47:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new active-track preflight follows `metadata.json` and `impl-plan.json` symlinks. `items_dir` and the track directory are checked, but the leaf files read at this point are not guarded with `reject_symlinks_below`, so a repo-supplied symlink can bypass the intended fail-closed track-status check by pointing at another track's metadata/plan (or any external file) before the command reaches the guarded `spec.json`/catalogue reads.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 100,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:c83a6cb2955f0ccf331a864191a1c65cda0d068e47a9630d9d40e3b2f842bc2a",
+          "at": "2026-04-24T03:50:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5371e70ef21f425cb4f8c529077540481e3657c503d3388b36c8b2dbb4faaa2e",
+          "at": "2026-04-24T03:53:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_verify_catalogue_spec_refs` passes the user-supplied `workspace_root` straight into `resolve_layers` as the trusted root, but unlike `items_dir` it never preflights that root for symlinks. Because `reject_symlinks_below` only checks components below the trusted root, a symlinked `--workspace-root` can redirect `architecture-rules.json` to attacker-controlled contents and make the verifier skip real TDDD layers, hiding dangling/hash findings behind a false success.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 140,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5371e70ef21f425cb4f8c529077540481e3657c503d3388b36c8b2dbb4faaa2e",
+          "at": "2026-04-24T03:57:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This gate walks every `tddd.enabled` binding returned by `resolve_layers`, but the catalogue-spec-ref ADR requires skipping layers whose `catalogue_spec_signal.enabled` flag is false. As written, opt-out layers will still be verified and can fail the command even though they are explicitly disabled for this gate.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 161,
+              "category": "correctness"
+            },
+            {
+              "message": "The command emits extra `[OK]` / `[FAIL]` banners in addition to the per-finding stderr lines. That violates the documented output contract for this binary gate, which is supposed to stay quiet on success and only print `SpecRefFinding`-formatted lines for violations.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 185,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bedfaa06d79e32b40319a4d337b1ca52d7bcd4ff4bef8bc90ba706f51ddb2428",
+          "at": "2026-04-24T04:02:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_one_layer` looks for `<layer>-catalogue-spec-signals.json` under `items_dir/<track>`, but the existing `track catalogue-spec-signals` path contract writes that file under `workspace_root/track/items/<track>`. With a non-default `--items-dir`, the verifier will treat the signals file as absent and silently skip the stale-signals check, so stale catalogue-spec signals can pass with exit code 0.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 314,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bedfaa06d79e32b40319a4d337b1ca52d7bcd4ff4bef8bc90ba706f51ddb2428",
+          "at": "2026-04-24T04:06:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:570dcef03ac739fb838971c44fb7fd81e9e66fdda1e8d3725abf5b69b1744f67",
+          "at": "2026-04-24T04:11:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`skip_stale=false` reads `<layer>-catalogue-spec-signals.json` from `workspace_root/track/items/<track>` while the catalogue and `spec.json` are read from `--items-dir/<track>`. If those two roots diverge, the stale check compares different track trees and can either miss a stale signals file or report one against the wrong catalogue. This command should either enforce `items_dir == workspace_root/track/items` or load all three inputs from the same root.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 173,
+              "category": "correctness"
+            },
+            {
+              "message": "The new CLI tests do not exercise the two behaviors unique to this wrapper: a real hash-mismatch failure and the non-`--skip-stale` path that loads a signals file and returns a stale finding. AC-02 explicitly requires both, and without CLI-level coverage regressions in `read_spec_element_hashes` or the signals-path handling will pass this suite unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 404,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:570dcef03ac739fb838971c44fb7fd81e9e66fdda1e8d3725abf5b69b1744f67",
+          "at": "2026-04-24T04:15:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_layers` is driven by `--workspace-root` while all track/spec/catalogue reads are driven by `--items-dir`, and the command never checks that those roots belong to the same workspace. If they diverge, the verifier can run against the wrong `architecture-rules.json` and silently skip or include the wrong layers.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 161,
+              "category": "correctness"
+            },
+            {
+              "message": "`verify_skip_stale_bypasses_signals_read` only proves that a stale signals file does not change the exit code; it would still pass if the implementation opened and decoded `<layer>-catalogue-spec-signals.json` and then ignored it. The skip-stale contract is specifically about bypassing that read, so this test needs a fixture that fails on any signals-file access.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 581,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b28a0e1facae91f94cfaaa4b4754f1bb4b1148d0d720e8948a4bbb7ef6a6d3a3",
+          "at": "2026-04-24T04:23:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b28a0e1facae91f94cfaaa4b4754f1bb4b1148d0d720e8948a4bbb7ef6a6d3a3",
+          "at": "2026-04-24T04:26:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_verify_catalogue_spec_refs` derives the layer list entirely from `workspace_root` via `resolve_layers`, while all catalogue/spec/signals reads come from `items_dir`. Because `resolve_layers` silently falls back to a synthetic `domain` binding when `architecture-rules.json` is missing, and there is no check that `workspace_root` matches the `items_dir` tree, a mispointed `--workspace-root` can skip real non-domain catalogues and return success without ever verifying them.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 161,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b28a0e1facae91f94cfaaa4b4754f1bb4b1148d0d720e8948a4bbb7ef6a6d3a3",
+          "at": "2026-04-24T04:30:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `exists()` preflight is not atomic with `resolve_layers()`: if `architecture-rules.json` is deleted between the check and the call, `resolve_layers()` can fall back to the synthetic `domain` binding and the verifier may silently skip non-domain layers, returning a false success.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 168,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ef99dd9f792607ea68d21c03d935d3f072f0d90084cf8f36c6dc7a8950d30cc0",
+          "at": "2026-04-24T04:33:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new architecture-rules existence check is not actually fail-closed: `resolve_layers()` rereads the file immediately afterward and still falls back to the synthetic `domain` binding if `architecture-rules.json` disappears between the two calls. That leaves a TOCTOU window where this verifier can silently skip non-domain layers instead of rejecting the run.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 171,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f6dc33fd36cf7892ec54894bffbd21b643e1db7291c9942ac6f072979293a95a",
+          "at": "2026-04-24T04:36:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stderr formatter interpolates raw `catalogue_entry` and `spec_file` values into a supposedly one-line record without escaping. A malicious or malformed catalogue can put `\\n`/`\\r` in either field and forge extra findings or break log parsers that rely on one finding per line.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 401,
+              "category": "security"
+            },
+            {
+              "message": "The symlink guard is followed by a separate `read_to_string`/`read` call, so this path is still check-then-open rather than atomic. A concurrent swap of `spec.json`, a catalogue, or the signals file can race past the guard and make the verifier inspect a different file than the one it validated.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 258,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:aaa61c397ff61b37dd21f3631221dba12836052bc4e21fc28bf8f898329aebef",
+          "at": "2026-04-24T04:40:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new symlink guard only checks `workspace_root` itself with `symlink_metadata()`. It does not verify the ancestor chain, so a caller can still point `--workspace-root` at a path reached through a symlinked parent directory and make the verifier read an attacker-controlled `architecture-rules.json`. That can hide or fabricate TDDD layers and produce a false passing result.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 74,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:4b68ca866013e6aafebed8965f47d8d786b6954de23bc950ad2a8732efe60bf4",
+          "at": "2026-04-24T04:44:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Walking every ancestor with `symlink_metadata()` will also reject benign system symlinks such as `/tmp` on macOS, so this command can fail in normal workspaces even when no attacker-controlled symlink is present. This needs a trusted-root resolution approach rather than a blanket ancestor rejection.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 75,
+              "category": "correctness"
+            },
+            {
+              "message": "`items_dir` is only checked at the leaf, but every later `reject_symlinks_below(..., items_dir)` call trusts that path as the root. A symlinked parent like `/tmp/link/track/items` still passes this guard and can redirect catalogue/spec/signals reads outside the intended workspace.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 54,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:c07a8a6a122eb754fdcad9f5d3dcbe31f753e07df1e3c42b358c921cd7149a71",
+          "at": "2026-04-24T04:49:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f28e5cdbceab77b32f35e1bf007dc46e36e9a1bf7ef12b9c86ee894a966a734",
+          "at": "2026-04-24T04:53:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `--items-dir` is overridden, stale-signal verification looks in the wrong place. `verify_one_layer` reads `<layer>-catalogue-spec-signals.json` from `items_dir/<track>` here, but the companion `track catalogue-spec-signals` command still writes that file under `workspace_root/track/items/<track>`. In that supported configuration the verifier silently treats the refreshed signals as absent and skips the stale check, so CI can pass without validating the current catalogue-spec signals.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 362,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f28e5cdbceab77b32f35e1bf007dc46e36e9a1bf7ef12b9c86ee894a966a734",
+          "at": "2026-04-24T04:56:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:378e8072c41992cb334d232ef4e5d23c4df9c471b53aa165eb16ec8d034ad8b5",
+          "at": "2026-04-24T05:02:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--items-dir` no longer controls where stale-signal files are read. This code now builds `signals_dir` from `workspace_root/track/items/<track_id>` and treats a missing file as `(None, None)`, so any invocation that points `--items-dir` at a non-default track tree will silently skip stale-signal detection (or compare against an unrelated workspace file). The previous behavior read `<layer>-catalogue-spec-signals.json` next to the catalogue under `items_dir`, which matched the CLI contract in `CatalogueSpecRefsArgs`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:378e8072c41992cb334d232ef4e5d23c4df9c471b53aa165eb16ec8d034ad8b5",
+          "at": "2026-04-24T05:05:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62c675449af8f34f8e0d4f49ad7b8d8a1219418dbf6400a7dc0dedad36724965",
+          "at": "2026-04-24T05:11:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `--items-dir` is overridden, stale-signal checking becomes a false negative because this code looks for `<layer>-catalogue-spec-signals.json` under `items_dir/<track_id>`, but the paired `sotp track catalogue-spec-signals` command still writes that file under `workspace_root/track/items/<track_id>`. In that configuration `skip_stale=false` silently behaves as if the signals file were absent, so outdated signals pass the binary gate.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "line": 368,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:62c675449af8f34f8e0d4f49ad7b8d8a1219418dbf6400a7dc0dedad36724965",
+          "at": "2026-04-24T05:15:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62c675449af8f34f8e0d4f49ad7b8d8a1219418dbf6400a7dc0dedad36724965",
+          "at": "2026-04-24T05:17:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62c675449af8f34f8e0d4f49ad7b8d8a1219418dbf6400a7dc0dedad36724965",
+          "at": "2026-04-24T05:20:24Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 449,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:44:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:53:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 84,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T21:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T22:00:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:12:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:13:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:22:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:23:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:33:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:36:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:41:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:42:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:46:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:43Z"
         }
       ]
     }

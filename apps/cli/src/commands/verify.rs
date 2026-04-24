@@ -66,6 +66,33 @@ pub enum VerifyCommand {
     /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
     /// per ADR 2026-04-19-1242 §D2.3.
     PlanArtifactRefs(PlanArtifactRefsArgs),
+
+    /// Verify catalogue-spec ref integrity (SoT Chain ② binary gate):
+    /// detects dangling anchors, hash drift, and stale signals.
+    ///
+    /// ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.5 / §D3.2.
+    CatalogueSpecRefs(CatalogueSpecRefsArgs),
+}
+
+/// Arguments for `catalogue-spec-refs` verify subcommand.
+#[derive(Args)]
+pub struct CatalogueSpecRefsArgs {
+    /// Track ID (directory name under items_dir).
+    #[arg(long)]
+    track: String,
+
+    /// Path to the track items root directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
+
+    /// Workspace root directory (must contain `architecture-rules.json`).
+    #[arg(long, default_value = ".")]
+    workspace_root: PathBuf,
+
+    /// Skip the stale-signals check (used in pre-commit where signals are
+    /// regenerated in the next step after this verification).
+    #[arg(long)]
+    skip_stale: bool,
 }
 
 /// Arguments for plan-artifact-refs verify subcommand.
@@ -184,6 +211,23 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         }
         VerifyCommand::PlanArtifactRefs(args) => {
             ("verify plan artifact refs", execute_plan_artifact_refs(args))
+        }
+        VerifyCommand::CatalogueSpecRefs(args) => {
+            // This subcommand has its own exit code (no findings → 0, findings → 1)
+            // and emits formatted lines to stderr directly, so it bypasses
+            // the shared `VerifyOutcome` printing path.
+            return match crate::commands::verify_catalogue_spec_refs::execute_verify_catalogue_spec_refs(
+                args.items_dir,
+                args.track,
+                args.workspace_root,
+                args.skip_stale,
+            ) {
+                Ok(code) => code,
+                Err(err) => {
+                    eprintln!("{err}");
+                    err.exit_code()
+                }
+            };
         }
     };
 

@@ -11,3 +11,4 @@ pub mod pr;
 pub mod review;
 pub mod track;
 pub mod verify;
+pub mod verify_catalogue_spec_refs;
