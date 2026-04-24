@@ -176,6 +176,19 @@
       ]
     },
     {
+      "name": "TdddLayerBinding",
+      "description": "Existing infrastructure struct describing one TDDD-enabled layer's configuration (layer_id, catalogue_file, catalogue_spec_signal_enabled, targets). T018 adds the `catalogue_spec_signal_enabled: bool` field alongside a new `pub fn catalogue_spec_signal_enabled()` accessor, both derived from the `tddd.catalogue_spec_signal.enabled` flag in `architecture-rules.json` (ADR §D5.4 phased activation). action=modify — the struct already exists in `libs/infrastructure/src/verify/tddd_layers.rs`; only a field + accessor were added, no behavioural semantics changed for existing fields.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T018 implementation-time: TdddLayerBinding gains one additive field + accessor for the catalogue_spec_signal opt-in flag; declared as modify to acknowledge the baseline-drift"
+        }
+      ]
+    },
+    {
       "name": "CatalogueSpecSignalsCodecError",
       "description": "Error enum for the <layer>-catalogue-spec-signals.json codec. Variants follow existing codec conventions: Json (serde_json failures), UnsupportedSchemaVersion (version != 1), Validation (domain construction errors from CatalogueSpecSignal or ContentHash). Placed in libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs alongside CatalogueSpecSignalsDocumentDto.",
       "approved": true,

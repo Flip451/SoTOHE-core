@@ -864,6 +864,10 @@ fn execute_catalogue_spec_signals(
 
     let mut outcome = VerifyOutcome::pass();
     for binding in &bindings {
+        if !binding.catalogue_spec_signal_enabled() {
+            // ADR §D5.4 phased activation — skip layers that have not opted in.
+            continue;
+        }
         let layer_id = binding.layer_id();
         let signals_path = track_dir.join(format!("{layer_id}-catalogue-spec-signals.json"));
         // Security: reject symlinks in path components below items_dir before
@@ -1728,7 +1732,7 @@ mod tests {
                 "path": "libs/domain",
                 "may_depend_on": [],
                 "deny_reason": "",
-                "tddd": { "enabled": true, "catalogue_file": "domain-types.json" }
+                "tddd": { "enabled": true, "catalogue_file": "domain-types.json", "catalogue_spec_signal": { "enabled": true } }
             }]
         });
         std::fs::write(

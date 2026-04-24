@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-24T10:22:54Z",
-  "declaration_hash": "1a630f87b36317b1cbe4b35e7d5335fa77d7b00e49db3eb567da683825020c0d",
+  "generated_at": "2026-04-24T11:06:33Z",
+  "declaration_hash": "bdb4a9f9a3fc8262bb0619ae8942a959fe54d53c1344e5f7310e60037237ce00",
   "signals": [
     {
       "type_name": "GitShowTrackBlobReader",
@@ -30,6 +30,12 @@
     {
       "type_name": "CatalogueSpecSignalsDocumentDto",
       "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TdddLayerBinding",
+      "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
     },

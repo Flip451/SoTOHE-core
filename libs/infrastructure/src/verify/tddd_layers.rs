@@ -29,6 +29,7 @@ use serde::Deserialize;
 pub struct TdddLayerBinding {
     layer_id: String,
     catalogue_file: String,
+    catalogue_spec_signal_enabled: bool,
     targets: Vec<String>,
 }
 
@@ -86,6 +87,16 @@ impl TdddLayerBinding {
             format!("{stem}-signals")
         };
         format!("{signal_stem}.json")
+    }
+
+    /// Returns `true` when the layer has
+    /// `tddd.catalogue_spec_signal.enabled = true` in `architecture-rules.json`.
+    ///
+    /// Defaults to `false` when the subblock is absent (per ADR §D5.4
+    /// phased activation: catalogue-spec signal is opt-in per layer).
+    #[must_use]
+    pub fn catalogue_spec_signal_enabled(&self) -> bool {
+        self.catalogue_spec_signal_enabled
     }
 
     /// Returns the crate targets used by `schema_export`.
@@ -186,7 +197,15 @@ pub fn parse_tddd_layers(json: &str) -> Result<Vec<TdddLayerBinding>, TdddLayerP
         #[serde(default)]
         catalogue_file: Option<String>,
         #[serde(default)]
+        catalogue_spec_signal: Option<CatalogueSpecSignalBlock>,
+        #[serde(default)]
         schema_export: Option<SchemaExportBlock>,
+    }
+
+    #[derive(Deserialize, Default)]
+    struct CatalogueSpecSignalBlock {
+        #[serde(default)]
+        enabled: bool,
     }
 
     #[derive(Deserialize)]
@@ -248,7 +267,14 @@ pub fn parse_tddd_layers(json: &str) -> Result<Vec<TdddLayerBinding>, TdddLayerP
                 // `[layer_id]` per the layer binding contract.
                 vec![layer.crate_name.clone()]
             });
-        bindings.push(TdddLayerBinding { layer_id: layer.crate_name, catalogue_file, targets });
+        let catalogue_spec_signal_enabled =
+            tddd.catalogue_spec_signal.map(|b| b.enabled).unwrap_or(false);
+        bindings.push(TdddLayerBinding {
+            layer_id: layer.crate_name,
+            catalogue_file,
+            catalogue_spec_signal_enabled,
+            targets,
+        });
     }
 
     Ok(bindings)
@@ -375,6 +401,7 @@ mod tests {
         TdddLayerBinding {
             layer_id: "test".to_owned(),
             catalogue_file: catalogue_file.to_owned(),
+            catalogue_spec_signal_enabled: false,
             targets: vec!["test".to_owned()],
         }
     }
@@ -509,17 +536,71 @@ mod tests {
         assert!(matches!(parse_tddd_layers(json).unwrap_err(), TdddLayerParseError::Json(_)));
     }
 
+    // --- catalogue_spec_signal_enabled() accessor (T018) ---
+
+    #[test]
+    fn test_parse_tddd_layers_absent_catalogue_spec_signal_defaults_to_false() {
+        // When `tddd.catalogue_spec_signal` is omitted, the accessor must return
+        // `false` (opt-in semantics per ADR §D5.4).
+        let json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true } }
+          ]
+        }"#;
+        let bindings = parse_tddd_layers(json).unwrap();
+        assert!(!bindings[0].catalogue_spec_signal_enabled());
+    }
+
+    #[test]
+    fn test_parse_tddd_layers_catalogue_spec_signal_enabled_true_is_surfaced() {
+        // When `tddd.catalogue_spec_signal.enabled = true`, the accessor must
+        // return `true`.
+        let json = r#"{
+          "layers": [
+            {
+              "crate": "domain",
+              "tddd": {
+                "enabled": true,
+                "catalogue_spec_signal": { "enabled": true }
+              }
+            }
+          ]
+        }"#;
+        let bindings = parse_tddd_layers(json).unwrap();
+        assert!(bindings[0].catalogue_spec_signal_enabled());
+    }
+
+    #[test]
+    fn test_parse_tddd_layers_catalogue_spec_signal_enabled_false_explicit() {
+        // Explicit `enabled: false` is equivalent to the absent-subblock default.
+        let json = r#"{
+          "layers": [
+            {
+              "crate": "domain",
+              "tddd": {
+                "enabled": true,
+                "catalogue_spec_signal": { "enabled": false }
+              }
+            }
+          ]
+        }"#;
+        let bindings = parse_tddd_layers(json).unwrap();
+        assert!(!bindings[0].catalogue_spec_signal_enabled());
+    }
+
     #[test]
     fn test_find_binding_returns_matching() {
         let bindings = vec![
             TdddLayerBinding {
                 layer_id: "domain".to_string(),
                 catalogue_file: "domain-types.json".to_string(),
+                catalogue_spec_signal_enabled: false,
                 targets: vec!["domain".to_string()],
             },
             TdddLayerBinding {
                 layer_id: "usecase".to_string(),
                 catalogue_file: "usecase-types.json".to_string(),
+                catalogue_spec_signal_enabled: false,
                 targets: vec!["usecase".to_string()],
             },
         ];

@@ -132,6 +132,12 @@ pub fn execute_catalogue_spec_signals(
     let writer = FsCatalogueSpecSignalsStore::new(workspace_root.clone());
 
     for binding in &bindings {
+        if !binding.catalogue_spec_signal_enabled() {
+            // Per ADR §D5.4 phased activation: skip layers that have not
+            // opted in via `architecture-rules.json`
+            // `tddd.catalogue_spec_signal.enabled`.
+            continue;
+        }
         refresh_one_layer(&items_dir, &track_dir, &valid_id, binding, &writer)?;
     }
 
@@ -308,7 +314,10 @@ mod tests {
                     "deny_reason": "",
                     "tddd": {
                         "enabled": true,
-                        "catalogue_file": "test_layer-types.json"
+                        "catalogue_file": "test_layer-types.json",
+                        "catalogue_spec_signal": {
+                            "enabled": true
+                        }
                     }
                 }
             ]

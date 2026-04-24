@@ -215,6 +215,10 @@ pub fn execute_verify_catalogue_spec_refs(
 
     let mut all_findings: Vec<SpecRefFinding> = Vec::new();
     for binding in &bindings {
+        if !binding.catalogue_spec_signal_enabled() {
+            // ADR §D5.4 phased activation — skip layers that have not opted in.
+            continue;
+        }
         // Signals are read from `track_dir` (= `items_dir/<track_id>`) so that catalogue,
         // spec, and signals all come from the same directory tree. The CLI contract
         // (per `CatalogueSpecRefsArgs`) treats `--items-dir` as the root for all local
@@ -486,7 +490,10 @@ mod tests {
                     "deny_reason": "",
                     "tddd": {
                         "enabled": true,
-                        "catalogue_file": "test_layer-types.json"
+                        "catalogue_file": "test_layer-types.json",
+                        "catalogue_spec_signal": {
+                            "enabled": true
+                        }
                     }
                 }
             ]

@@ -109,11 +109,9 @@ pub trait TrackBlobReader {
     /// The `Found` variant returns `(doc, raw_bytes_sha256_hex)` where the
     /// 64-character lowercase hex SHA-256 is computed over the canonical
     /// on-disk bytes of the catalogue. Callers convert this into a
-    /// [`ContentHash`](domain::ContentHash) via
-    /// [`ContentHash::try_from_hex`](domain::ContentHash::try_from_hex) and
-    /// pass it to
-    /// [`check_catalogue_spec_ref_integrity`](domain::check_catalogue_spec_ref_integrity)
-    /// as `current_catalogue_hash` for stale detection.
+    /// [`ContentHash`] via [`ContentHash::try_from_hex`] and pass it to
+    /// [`check_catalogue_spec_ref_integrity`] as `current_catalogue_hash`
+    /// for stale detection.
     ///
     /// Note: the `String` return here is the **raw-bytes SHA-256 hash**, not
     /// a resolved filename (the `read_type_catalogue` port returns a filename
@@ -321,6 +319,22 @@ where
 
     // Per-layer Chain ② loop (ADR §D3.6 / briefing §Design Intent).
     //
+    // Layer-id validation runs first (before the spec-hash opt-out gate) so
+    // that a malformed layer id in `architecture-rules.json` is always reported,
+    // even when the spec-hash reader is unavailable. This prevents a PR from
+    // adding an invalid layer id that would silently bypass fail-closed checking
+    // regardless of the spec-hash opt-out state.
+    for layer_id in &layer_ids {
+        if let Err(e) = domain::tddd::LayerId::try_new(layer_id) {
+            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "invalid layer id '{layer_id}' in architecture-rules.json on origin/{branch}: {e}"
+            ))]));
+        }
+    }
+    if outcome.has_errors() {
+        return outcome;
+    }
+
     // Opt-out gate: `read_spec_element_hashes` NotFound/FetchError means the
     // spec hash codec is unavailable → SKIP the whole Chain ② block.
     // Per the briefing: "if NotFound / FetchError, SKIP the whole Chain ② block
@@ -335,17 +349,11 @@ where
     };
 
     for layer_id in &layer_ids {
+        // `LayerId::try_new` was validated in the pre-validation pass above and
+        // any failures caused an early return, so this conversion cannot fail.
         let layer_id_newtype = match domain::tddd::LayerId::try_new(layer_id) {
             Ok(id) => id,
-            Err(e) => {
-                // Fail-closed: a malformed layer id in architecture-rules.json
-                // must not silently skip Chain ② checks for that layer.
-                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "invalid layer id '{layer_id}' in architecture-rules.json on origin/{branch}: \
-                     {e}"
-                ))]));
-                continue;
-            }
+            Err(_) => continue, // unreachable: pre-validated above
         };
         // Step 1: read signals file — NotFound means layer not yet activated.
         let signals_doc = match reader
