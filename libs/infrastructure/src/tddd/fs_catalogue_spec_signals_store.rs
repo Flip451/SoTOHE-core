@@ -1,10 +1,14 @@
 //! Filesystem adapter implementing `CatalogueSpecSignalsWriter` via
-//! `track/items/<track_id>/<layer_id>-catalogue-spec-signals.json` atomic write.
+//! `<items_dir>/<track_id>/<layer_id>-catalogue-spec-signals.json` atomic write.
 //!
-//! Companion to `FsTrackStore` / `FsReviewStore`: workspace-root + atomic
+//! Companion to `FsTrackStore` / `FsReviewStore`: items-dir + atomic
 //! temp-file + fsync + rename pattern so partial writes cannot be observed
 //! by concurrent readers. The codec (schema_version 1 DTO, `deny_unknown_fields`,
 //! deterministic output) lives in `catalogue_spec_signals_codec.rs` (T010).
+//!
+//! Caller passes the items directory (typically `<workspace_root>/track/items`
+//! or a custom path via `--items-dir`) so read and write paths resolve against
+//! the same tree — matching `FsTrackStore::new(items_dir)`.
 //!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
 //! §D2 / §D3.1 / IN-08.
@@ -20,26 +24,23 @@ use crate::track::symlink_guard::reject_symlinks_below;
 
 /// Filesystem adapter for `<layer>-catalogue-spec-signals.json`.
 ///
-/// Construct with [`FsCatalogueSpecSignalsStore::new`] passing the workspace
-/// root. The adapter joins the workspace root with
-/// `track/items/<track_id>/<layer_id>-catalogue-spec-signals.json` at
-/// write time.
+/// Construct with [`FsCatalogueSpecSignalsStore::new`] passing the items
+/// directory. The adapter joins the items dir with
+/// `<track_id>/<layer_id>-catalogue-spec-signals.json` at write time.
 pub struct FsCatalogueSpecSignalsStore {
-    workspace_root: PathBuf,
+    items_dir: PathBuf,
 }
 
 impl FsCatalogueSpecSignalsStore {
-    /// Creates a new store rooted at the given workspace directory.
+    /// Creates a new store rooted at the given items directory.
     #[must_use]
-    pub fn new(workspace_root: PathBuf) -> Self {
-        Self { workspace_root }
+    pub fn new(items_dir: PathBuf) -> Self {
+        Self { items_dir }
     }
 
     /// Resolves the signals file path for a track + layer pair.
     fn resolve_path(&self, track_id: &TrackId, layer_id: &str) -> PathBuf {
-        self.workspace_root
-            .join("track")
-            .join("items")
+        self.items_dir
             .join(track_id.as_ref())
             .join(format!("{layer_id}-catalogue-spec-signals.json"))
     }
@@ -79,8 +80,8 @@ impl CatalogueSpecSignalsWriter for FsCatalogueSpecSignalsStore {
 
         let path = self.resolve_path(track_id, layer_id);
 
-        // Reject symlinks at any path component below workspace_root before writing.
-        reject_symlinks_below(&path, &self.workspace_root).map_err(|source| {
+        // Reject symlinks at any path component below items_dir before writing.
+        reject_symlinks_below(&path, &self.items_dir).map_err(|source| {
             RepositoryError::Message(format!(
                 "catalogue-spec signals symlink guard failed for layer '{layer_id}' at '{}': {source}",
                 path.display()
@@ -131,34 +132,33 @@ mod tests {
         )
     }
 
-    fn setup_track_dir(workspace: &std::path::Path, track_id: &str) {
-        let dir = workspace.join("track").join("items").join(track_id);
-        fs::create_dir_all(dir).unwrap();
+    /// Builds a fresh `items_dir` rooted at a tempdir and pre-creates the track
+    /// directory inside it. Returns `(tempdir, items_dir)`.
+    fn setup_items_dir(track_id: &str) -> (tempfile::TempDir, PathBuf) {
+        let dir = tempdir().unwrap();
+        let items_dir = dir.path().to_path_buf();
+        fs::create_dir_all(items_dir.join(track_id)).unwrap();
+        (dir, items_dir)
     }
 
     #[test]
     fn resolve_path_concatenates_track_and_layer() {
-        let store = FsCatalogueSpecSignalsStore::new(PathBuf::from("/ws"));
+        let store = FsCatalogueSpecSignalsStore::new(PathBuf::from("/items"));
         let track = TrackId::try_new("my-track").unwrap();
         let path = store.resolve_path(&track, "domain");
-        assert_eq!(
-            path,
-            PathBuf::from("/ws/track/items/my-track/domain-catalogue-spec-signals.json")
-        );
+        assert_eq!(path, PathBuf::from("/items/my-track/domain-catalogue-spec-signals.json"));
     }
 
     #[test]
     fn write_persists_document_to_filesystem() {
-        let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        setup_track_dir(&ws, "my-track");
-        let store = FsCatalogueSpecSignalsStore::new(ws.clone());
+        let (_tmp, items_dir) = setup_items_dir("my-track");
+        let store = FsCatalogueSpecSignalsStore::new(items_dir.clone());
         let track = TrackId::try_new("my-track").unwrap();
         let doc = sample_doc();
 
         store.write_catalogue_spec_signals(&track, "domain", &doc).unwrap();
 
-        let path = ws.join("track/items/my-track/domain-catalogue-spec-signals.json");
+        let path = items_dir.join("my-track/domain-catalogue-spec-signals.json");
         assert!(path.exists());
         let content = fs::read_to_string(&path).unwrap();
         assert!(content.contains("\"schema_version\": 1"));
@@ -168,16 +168,14 @@ mod tests {
 
     #[test]
     fn write_round_trips_via_codec() {
-        let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        setup_track_dir(&ws, "my-track");
-        let store = FsCatalogueSpecSignalsStore::new(ws.clone());
+        let (_tmp, items_dir) = setup_items_dir("my-track");
+        let store = FsCatalogueSpecSignalsStore::new(items_dir.clone());
         let track = TrackId::try_new("my-track").unwrap();
         let doc = sample_doc();
 
         store.write_catalogue_spec_signals(&track, "domain", &doc).unwrap();
 
-        let path = ws.join("track/items/my-track/domain-catalogue-spec-signals.json");
+        let path = items_dir.join("my-track/domain-catalogue-spec-signals.json");
         let content = fs::read_to_string(&path).unwrap();
         let decoded = catalogue_spec_signals_codec::decode(&content).unwrap();
         assert_eq!(decoded, doc);
@@ -185,16 +183,14 @@ mod tests {
 
     #[test]
     fn write_is_idempotent_on_repeated_calls() {
-        let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        setup_track_dir(&ws, "my-track");
-        let store = FsCatalogueSpecSignalsStore::new(ws.clone());
+        let (_tmp, items_dir) = setup_items_dir("my-track");
+        let store = FsCatalogueSpecSignalsStore::new(items_dir.clone());
         let track = TrackId::try_new("my-track").unwrap();
         let doc = sample_doc();
 
         // First write.
         store.write_catalogue_spec_signals(&track, "domain", &doc).unwrap();
-        let path = ws.join("track/items/my-track/domain-catalogue-spec-signals.json");
+        let path = items_dir.join("my-track/domain-catalogue-spec-signals.json");
         let first = fs::read_to_string(&path).unwrap();
 
         // Second write with identical document.
@@ -206,10 +202,8 @@ mod tests {
 
     #[test]
     fn write_overwrites_existing_file() {
-        let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        setup_track_dir(&ws, "my-track");
-        let store = FsCatalogueSpecSignalsStore::new(ws.clone());
+        let (_tmp, items_dir) = setup_items_dir("my-track");
+        let store = FsCatalogueSpecSignalsStore::new(items_dir.clone());
         let track = TrackId::try_new("my-track").unwrap();
 
         let first_doc = sample_doc();
@@ -221,7 +215,7 @@ mod tests {
         );
         store.write_catalogue_spec_signals(&track, "domain", &second_doc).unwrap();
 
-        let path = ws.join("track/items/my-track/domain-catalogue-spec-signals.json");
+        let path = items_dir.join("my-track/domain-catalogue-spec-signals.json");
         let content = fs::read_to_string(&path).unwrap();
         let decoded = catalogue_spec_signals_codec::decode(&content).unwrap();
         assert_eq!(decoded, second_doc);
@@ -249,10 +243,8 @@ mod tests {
 
     #[test]
     fn write_rejects_layer_id_with_path_separator() {
-        let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        setup_track_dir(&ws, "my-track");
-        let store = FsCatalogueSpecSignalsStore::new(ws);
+        let (_tmp, items_dir) = setup_items_dir("my-track");
+        let store = FsCatalogueSpecSignalsStore::new(items_dir);
         let track = TrackId::try_new("my-track").unwrap();
         let doc = sample_doc();
 
@@ -270,10 +262,8 @@ mod tests {
 
     #[test]
     fn write_rejects_empty_layer_id() {
-        let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        setup_track_dir(&ws, "my-track");
-        let store = FsCatalogueSpecSignalsStore::new(ws);
+        let (_tmp, items_dir) = setup_items_dir("my-track");
+        let store = FsCatalogueSpecSignalsStore::new(items_dir);
         let track = TrackId::try_new("my-track").unwrap();
         let doc = sample_doc();
 
@@ -293,19 +283,18 @@ mod tests {
     #[test]
     fn write_rejects_symlinked_track_dir() {
         let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
+        let items_dir = dir.path().to_path_buf();
 
         // Create a real track directory elsewhere.
         let real_track = dir.path().join("real-track-target");
         fs::create_dir_all(&real_track).unwrap();
 
         // Create a symlink at the expected track path pointing to the real directory.
-        let track_items = ws.join("track").join("items");
-        fs::create_dir_all(&track_items).unwrap();
-        let symlink_path = track_items.join("my-track");
+        fs::create_dir_all(&items_dir).unwrap();
+        let symlink_path = items_dir.join("my-track");
         std::os::unix::fs::symlink(&real_track, &symlink_path).unwrap();
 
-        let store = FsCatalogueSpecSignalsStore::new(ws);
+        let store = FsCatalogueSpecSignalsStore::new(items_dir);
         let track = TrackId::try_new("my-track").unwrap();
         let doc = sample_doc();
 
@@ -323,17 +312,15 @@ mod tests {
 
     #[test]
     fn multiple_layers_write_to_distinct_paths() {
-        let dir = tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        setup_track_dir(&ws, "my-track");
-        let store = FsCatalogueSpecSignalsStore::new(ws.clone());
+        let (_tmp, items_dir) = setup_items_dir("my-track");
+        let store = FsCatalogueSpecSignalsStore::new(items_dir.clone());
         let track = TrackId::try_new("my-track").unwrap();
         let doc = sample_doc();
 
         store.write_catalogue_spec_signals(&track, "domain", &doc).unwrap();
         store.write_catalogue_spec_signals(&track, "usecase", &doc).unwrap();
 
-        assert!(ws.join("track/items/my-track/domain-catalogue-spec-signals.json").exists());
-        assert!(ws.join("track/items/my-track/usecase-catalogue-spec-signals.json").exists());
+        assert!(items_dir.join("my-track/domain-catalogue-spec-signals.json").exists());
+        assert!(items_dir.join("my-track/usecase-catalogue-spec-signals.json").exists());
     }
 }

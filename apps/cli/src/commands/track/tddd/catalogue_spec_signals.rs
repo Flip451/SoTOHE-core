@@ -123,7 +123,12 @@ pub fn execute_catalogue_spec_signals(
         ));
     }
 
-    let writer = FsCatalogueSpecSignalsStore::new(workspace_root.clone());
+    // Pass `items_dir` (not `workspace_root`) so the store writes under the same
+    // tree the reader is using. The default resolution is `workspace_root/track/items`,
+    // but a `--items-dir` override must propagate to both read and write paths —
+    // the previous `workspace_root`-based wiring left the two tracking distinct
+    // trees when `--items-dir` diverged from the default (PR #111 P1 finding).
+    let writer = FsCatalogueSpecSignalsStore::new(items_dir.clone());
 
     for binding in &bindings {
         if !binding.catalogue_spec_signal_enabled() {

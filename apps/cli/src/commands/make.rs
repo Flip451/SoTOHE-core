@@ -677,6 +677,65 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
                     }
                 }
             }
+
+            // Step 3.5: sync rendered views (`<layer>-types.md`, `plan.md`, etc.)
+            //
+            // The signal compute steps (step 1 / step 3) intentionally do NOT touch
+            // `.md` views. Rendering is centralised here so both type-signals and
+            // catalogue-spec-signals are finalised before any view consumes them —
+            // this eliminates the former step-1 → step-3 reverse dependency that
+            // deadlocked commits when `<layer>-catalogue-spec-signals.json` went
+            // stale. See ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
+            // §D2.5 (view content) and §D3.4 (pre-commit ordering).
+            eprintln!(
+                "[track-commit-message] Pre-commit: syncing rendered views for '{track_id}'..."
+            );
+            let rendered_paths = infrastructure::track::render::sync_rendered_views(
+                &workspace_root_path,
+                Some(&track_id),
+            )
+            .map_err(|e| {
+                CliError::Message(format!(
+                    "[track-commit-message] BLOCKED: sync_rendered_views failed for \
+                             '{track_id}': {e}"
+                ))
+            })?;
+            for path in &rendered_paths {
+                // Skip git-ignored rendered views (e.g., `track/registry.md` is
+                // intentionally in `.gitignore` and must not be staged). `git
+                // check-ignore --quiet --no-index` exits 0 when the path is
+                // git-ignored, non-zero when it is not ignored (or git is
+                // unavailable). Spawn failures are treated as "not ignored" so a
+                // missing git binary falls through to the normal `git add` error.
+                let is_ignored = std::process::Command::new("git")
+                    .args(["check-ignore", "--quiet", "--no-index", "--"])
+                    .arg(path)
+                    .status()
+                    .map(|s| s.success())
+                    .unwrap_or(false);
+                if is_ignored {
+                    eprintln!(
+                        "[track-commit-message] Skipping git-ignored rendered view: {}",
+                        path.display()
+                    );
+                    continue;
+                }
+                let stage_status =
+                    std::process::Command::new("git").arg("add").arg(path).status().map_err(
+                        |e| {
+                            CliError::Message(format!(
+                                "pre-commit: git add {} failed to launch: {e}",
+                                path.display()
+                            ))
+                        },
+                    )?;
+                if !stage_status.success() {
+                    return Err(CliError::Message(format!(
+                        "pre-commit: git add {} returned non-zero",
+                        path.display()
+                    )));
+                }
+            }
         }
     }
 
