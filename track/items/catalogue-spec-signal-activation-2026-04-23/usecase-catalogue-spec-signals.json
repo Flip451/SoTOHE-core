@@ -1,50 +1,50 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "96d769d7c77aef8ef6820b1bf82af337f4086503d0d4ea662b18bda63dafd7cf",
+  "catalogue_declaration_hash": "da090f5a638582bc793820268cf6bbaf97ebef87ae8f1759d4c5aa885292bb73",
   "signals": [
     {
       "type_name": "RefreshCatalogueSpecSignalsInteractor",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "RefreshCatalogueSpecSignals",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "RefreshCatalogueSpecSignalsCommand",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "RefreshCatalogueSpecSignalsError",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "VerifyCatalogueSpecRefsInteractor",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "VerifyCatalogueSpecRefs",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "VerifyCatalogueSpecRefsCommand",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "VerifyCatalogueSpecRefsError",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "SpecElementHashReader",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "TrackBlobReader",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "CatalogueSpecSignalsWriter",
-      "signal": "yellow"
+      "signal": "blue"
     }
   ]
 }

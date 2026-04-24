@@ -22,10 +22,11 @@
       "description": "Structured finding produced by the domain pure function check_catalogue_spec_ref_integrity. Holds the layer id, optional catalogue entry name, optional spec_refs index, optional spec file path, and a SpecRefFindingKind discriminant. Emitted as Vec<SpecRefFinding> and consumed by the CLI layer for human-readable stderr formatting (D1.5). I/O-free — the struct is a plain data carrier in libs/domain/src/tddd/catalogue_spec_signal.rs.",
       "approved": true,
       "kind": "value_object",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-04 defines SpecRefFinding struct fields (layer, catalogue_entry, ref_index, spec_file, kind); IN-02 defines its production context (check_catalogue_spec_ref_integrity return type); hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-04",
+          "hash": "c0dd469adae762d592a1d692f307fbc96b0cce81b5e8b8e801d35fc7f4e2bc10"
         }
       ]
     },
@@ -39,10 +40,11 @@
         "HashMismatch",
         "StaleSignals"
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-04 (ADR D1.5) defines DanglingAnchor / HashMismatch / StaleSignals as the three required variants; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-04",
+          "hash": "c0dd469adae762d592a1d692f307fbc96b0cce81b5e8b8e801d35fc7f4e2bc10"
         }
       ]
     },
@@ -51,10 +53,11 @@
       "description": "Per-entry signal record in the <layer>-catalogue-spec-signals.json output. Fields: type_name (String) and signal (ConfidenceSignal — blue / yellow / red). Produced by applying the informal-priority rule (D1.1) to a single TypeCatalogueEntry. 1 entry → 1 CatalogueSpecSignal; multiple spec_refs[] per entry are collapsed into 1 signal. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs.",
       "approved": true,
       "kind": "value_object",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-11 (ADR D2.3) defines CatalogueSpecSignal { type_name, signal } as the per-entry record in signals[]; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
         }
       ]
     },
@@ -63,10 +66,11 @@
       "description": "Aggregate root for <layer>-catalogue-spec-signals.json. Schema v1 fields: schema_version (1), catalogue_declaration_hash (SHA-256 hex of the input <layer>-types.json for stale detection), signals (Vec<CatalogueSpecSignal>). No generated_at field — deterministic output, byte-identical across multiple runs with the same input. Decoded by the infrastructure CatalogueSpecSignals codec; consumed by VerifyCatalogueSpecRefsInteractor and check_catalogue_spec_signals. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs.",
       "approved": true,
       "kind": "value_object",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-11 (ADR D2.2) defines schema v1 with schema_version / catalogue_declaration_hash / signals[]; no generated_at (deterministic); hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
         }
       ]
     }

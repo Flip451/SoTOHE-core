@@ -139,10 +139,11 @@
           ]
         }
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-08 (ADR D3.6) extends GitShowTrackBlobReader with two new TrackBlobReader methods + SpecElementHashReader impl (T009); existing guard patterns are reused; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-08",
+          "hash": "6807711ae8659db5a0bc31fbc86f5d13b92d714174717bae24271ec497fd919c"
         }
       ]
     },
@@ -156,10 +157,11 @@
           "trait_name": "CatalogueSpecSignalsWriter"
         }
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-08 (ADR D3.1 / D3.7) requires atomic write of <layer>-catalogue-spec-signals.json; FsCatalogueSpecSignalsStore is the infrastructure adapter following the FsTrackStore / FsReviewStore pattern; implements CatalogueSpecSignalsWriter port (port name inferred from TrackWriter / ImplPlanWriter / ReviewWriter pattern; ADR D3.7 names only the infrastructure adapter, the port follows D3.7's hexagonal separation mandate); hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-08",
+          "hash": "6807711ae8659db5a0bc31fbc86f5d13b92d714174717bae24271ec497fd919c"
         }
       ]
     },
@@ -168,10 +170,11 @@
       "description": "Infrastructure serde DTO for <layer>-catalogue-spec-signals.json (schema v1). Fields: schema_version (u32, = 1), catalogue_declaration_hash (String, 64-char hex), signals (Vec<CatalogueSpecSignalDto>). deny_unknown_fields enforced at all nesting levels. No generated_at field (deterministic output per CN-06 / ADR D2.2). Used by the CatalogueSpecSignals codec (encode and decode) in libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs. Mirrors domain CatalogueSpecSignalsDocument.",
       "approved": true,
       "kind": "dto",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-11 (ADR D2.2) defines schema v1 fields (schema_version / catalogue_declaration_hash / signals[]); no generated_at; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
         }
       ]
     },
@@ -181,10 +184,11 @@
       "approved": true,
       "action": "modify",
       "kind": "value_object",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T018 implementation-time: TdddLayerBinding gains one additive field + accessor for the catalogue_spec_signal opt-in flag; declared as modify to acknowledge the baseline-drift"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-15",
+          "hash": "27a296b0dbe983ff1347aee7330db9c7a48516170c746bf168c881df4d90ecf3"
         }
       ]
     },
@@ -198,10 +202,11 @@
         "UnsupportedSchemaVersion",
         "Validation"
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-11 (ADR D2.2) requires a codec for the new schema v1 file; error variants follow the ImplPlanCodecError / TaskCoverageCodecError pattern; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
         }
       ]
     }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-24T12:51:32Z",
-  "declaration_hash": "bdb4a9f9a3fc8262bb0619ae8942a959fe54d53c1344e5f7310e60037237ce00",
+  "generated_at": "2026-04-24T13:23:03Z",
+  "declaration_hash": "f77871cf00ea36bd5c727799724ff21ef3629e31fa97636e781bb6922a441ee5",
   "signals": [
     {
       "type_name": "GitShowTrackBlobReader",

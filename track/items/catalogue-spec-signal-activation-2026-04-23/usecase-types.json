@@ -6,10 +6,11 @@
       "description": "Usecase-layer struct implementing the sotp track catalogue-spec-signals command logic. Orchestrates: (1) read <layer>-types.json via read_catalogue_for_spec_ref_check (returns (TypeCatalogueDocument, String) where String = raw-bytes SHA-256 used as catalogue_declaration_hash; read_type_catalogue cannot be used here since its String is the resolved filename, not the hash), (2) call domain evaluate_catalogue_entry_signal for each entry, (3) use the SHA-256 String from step 1 as catalogue_declaration_hash, (4) write <layer>-catalogue-spec-signals.json via CatalogueSpecSignalsWriter (atomic write). Applies active-track guard (non-active → reject, exit non-zero) per CN-07 / ADR D3.1. Placed in libs/usecase/src/catalogue_spec_signals.rs per D3.7.",
       "approved": true,
       "kind": "interactor",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-05 (ADR D3.1 / D3.7) defines RefreshCatalogueSpecSignals interactor responsibilities; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
         }
       ]
     },
@@ -32,10 +33,11 @@
           "is_async": false
         }
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T008 implementation-time: adjacent application_service trait co-located with the interactor so the CLI depends on the trait; pattern follows RenderContractMap precedent"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
         }
       ]
     },
@@ -44,10 +46,11 @@
       "description": "Command input value-object for RefreshCatalogueSpecSignals::execute. Fields: branch (String — current git branch for CN-07 guard), track_id (TrackId — target track), layer_id (String — layer whose catalogue is being refreshed). #[derive(Debug, Clone, PartialEq, Eq)] for ergonomic CLI dispatch + tests.",
       "approved": true,
       "kind": "command",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T008 implementation-time: command input co-located with interactor, consistent with RenderContractMapCommand precedent"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
         }
       ]
     },
@@ -64,10 +67,11 @@
         "InvalidCatalogueHash",
         "WriteFailed"
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T008 implementation-time: error taxonomy captures the 6 concrete failure modes of the 5-step pipeline + 2-stage guard; enum-first per 04-coding-principles.md"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
         }
       ]
     },
@@ -76,10 +80,11 @@
       "description": "Usecase-layer struct implementing the sotp verify catalogue-spec-refs command logic. Orchestrates: (1) read <layer>-types.json, spec.json element hashes, and optionally <layer>-catalogue-spec-signals.json via TrackBlobReader + SpecElementHashReader, (2) call domain check_catalogue_spec_ref_integrity, (3) return Vec<SpecRefFinding>. Supports --skip-stale flag (when true, StaleSignals detection is skipped — used in pre-commit path where signals file is re-generated in the next step). Applies active-track guard per CN-07 / ADR D3.2. Placed in libs/usecase/src/catalogue_spec_refs.rs per D3.7.",
       "approved": true,
       "kind": "interactor",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-06 (ADR D3.2 / D3.7) defines VerifyCatalogueSpecRefs interactor responsibilities including --skip-stale support; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
         }
       ]
     },
@@ -102,10 +107,11 @@
           "is_async": false
         }
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T009 implementation-time: adjacent application_service trait co-located with the interactor; pattern follows RefreshCatalogueSpecSignals"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
         }
       ]
     },
@@ -114,10 +120,11 @@
       "description": "Command input for VerifyCatalogueSpecRefs::execute. Fields: branch (String — current git branch for CN-07 guard), track_id (TrackId), layer_id (LayerId — validated newtype), skip_stale (bool — pre-commit path skips StaleSignals detection since the signals file is re-generated immediately after). #[derive(Debug, Clone, PartialEq, Eq)].",
       "approved": true,
       "kind": "command",
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T009 implementation-time: command input co-located with interactor"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
         }
       ]
     },
@@ -136,10 +143,11 @@
         "SpecFetchError",
         "SignalsFetchError"
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T009 implementation-time: error taxonomy captures guard + catalogue + spec I/O failures; integrity violations stay in the Ok(Vec<SpecRefFinding>) channel per ADR D1.5"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
         }
       ]
     },
@@ -166,10 +174,11 @@
           "is_async": false
         }
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "T009 implementation-time: split spec-element-hash reading from TrackBlobReader to keep T006 port surface stable; infrastructure adapter shares canonical_json_sha256 with sotp verify plan-artifact-refs"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
         }
       ]
     },
@@ -285,10 +294,11 @@
           "is_async": false
         }
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-07 (ADR D3.6) adds read_catalogue_for_spec_ref_check (returns (TypeCatalogueDocument, String) where String = SHA-256 hex digest of raw file bytes for stale detection; distinct from read_type_catalogue whose String is the resolved catalogue filename for diagnostics) and read_catalogue_spec_signals_document to TrackBlobReader; existing methods preserved in baseline; hash will be computed at implementation time"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-07",
+          "hash": "3b81088ea757f6c856f92cb8c52e4e7db665ae3501304865409899add66d25b6"
         }
       ]
     },
@@ -319,10 +329,11 @@
           "is_async": false
         }
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-05 (ADR D3.1 / D3.7) requires atomic write of <layer>-catalogue-spec-signals.json; a dedicated writer port is needed for hexagonal separation — the port name CatalogueSpecSignalsWriter is inferred from the existing TrackWriter / ImplPlanWriter / ReviewWriter pattern since ADR D3.7 only names FsCatalogueSpecSignalsStore as the infrastructure adapter; the port itself is an implicit design requirement of D3.7's hexagonal separation mandate"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
         }
       ]
     }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-24T12:51:30Z",
-  "declaration_hash": "76991319b0ab2f6d290dc823727e0408e666318aae1befb5c481a6aee46e6909",
+  "generated_at": "2026-04-24T13:23:01Z",
+  "declaration_hash": "0f2ee0e1f14adc751ef588c484159397600409c4b78a0baf559ab1363faaa694",
   "signals": [
     {
       "type_name": "ImplPlanPresenceError",
