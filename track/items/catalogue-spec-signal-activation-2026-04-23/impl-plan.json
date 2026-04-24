@@ -94,12 +94,13 @@
     {
       "id": "T016",
       "description": "cargo make ci (Makefile.toml + sotp CLI 内部実装) に 2 つの新 task を追加する: verify-catalogue-spec-refs (dangling / drift / stale 全 3 検証、既存 verify-plan-artifact-refs と並列実行可能) と check-catalogue-spec-signals (check_catalogue_spec_signals(strict=false) 呼び出し、Red → BLOCKED / Yellow → warning)。sotp track catalogue-spec-signals の再計算は CI task に含めない (D3.5)。integration test で両 task が stale / Red 時に ci を fail させることを確認する (IN-13、integration 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "51e0f90"
     },
     {
       "id": "T017",
       "description": "merge gate (check_strict_merge_gate) を SoT Chain bottom-up reorder する。新順序 (D3.6): (1) branch validation / plan/* skip → (2) read_type_catalogue + check_type_signals (Chain ③; 既存 API、rename なし) → (3) read_catalogue_for_spec_ref_check → (TypeCatalogueDocument, String); String は raw bytes SHA-256 hex digest で ContentHash::try_from_hex(hash_str)? で ContentHash に変換。SpecElementHashReader::read_spec_element_hashes → BTreeMap<SpecElementId, ContentHash> (spec.json の各要素の canonical SHA-256 を事前計算した形で取得; check_catalogue_spec_ref_integrity への入力として使用); read_catalogue_spec_signals_document → CatalogueSpecSignalsDocument; check_catalogue_spec_ref_integrity(layer, catalogue, &spec_element_hashes, Some(&content_hash), Some(&signals)) を呼び出し Vec<SpecRefFinding> を検査 (Chain ② binary gate; dangling/drift/stale 全 3 検証) → (4) check_catalogue_spec_signals(strict=true) (Chain ② signal check; step 3 取得済みの signals を再利用可) → (5) read_spec_document → SpecDocument; check_spec_doc_signals(&spec_doc, true) (Chain ①; SpecDocument は check_spec_doc_signals が必要とするため read_spec_document を引き続き呼び出す)。TrackBlobReader (T006 新メソッド) + SpecElementHashReader を step 3/4 で使用する。unit test で strict=true 時の Yellow block を検証する (IN-14、integration 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T018",

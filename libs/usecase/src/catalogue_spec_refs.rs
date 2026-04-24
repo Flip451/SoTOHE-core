@@ -34,7 +34,7 @@ use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
 /// Implementations are registered alongside [`TrackBlobReader`] in the
 /// infrastructure composition root. A real implementation is authored in
 /// T011 atop the existing `canonical_json_sha256` helper.
-pub trait SpecElementHashReader: Send + Sync {
+pub trait SpecElementHashReader {
     /// Reads `track/items/<track_id>/spec.json` on the given branch and
     /// returns the SHA-256 of each requirement's canonical JSON subtree.
     ///
@@ -158,7 +158,7 @@ where
 impl<R, H> VerifyCatalogueSpecRefs for VerifyCatalogueSpecRefsInteractor<R, H>
 where
     R: TrackBlobReader + Send + Sync,
-    H: SpecElementHashReader,
+    H: SpecElementHashReader + Send + Sync,
 {
     fn execute(
         &self,

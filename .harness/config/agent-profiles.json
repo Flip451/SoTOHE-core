@@ -39,7 +39,7 @@
     "reviewer": {
       "provider": "codex",
       "model": "gpt-5.5",
-      "fast_model": "gpt-5.4"
+      "fast_model": "gpt-5.4-mini"
     },
     "researcher": {
       "provider": "gemini"
