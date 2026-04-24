@@ -88,12 +88,13 @@
     {
       "id": "T015",
       "description": "pre-commit フロー (dispatch_track_commit_message) に 2 step を挿入する。挿入順 (D3.4): (既存 1) Stage 2 type-signals 再計算 → (新規 2) sotp verify catalogue-spec-refs --skip-stale (binary gate、ERROR で block + 後段スキップ) → (新規 3) sotp track catalogue-spec-signals (signal 再計算) → (既存 4+) cargo make ci / review guard / commit。active track の tddd.enabled + catalogue_spec_signal.enabled 層のみ gate を発火する。integration test で binary gate ERROR 時に commit が block されることを確認する (IN-12、integration 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "011b435"
     },
     {
       "id": "T016",
       "description": "cargo make ci (Makefile.toml + sotp CLI 内部実装) に 2 つの新 task を追加する: verify-catalogue-spec-refs (dangling / drift / stale 全 3 検証、既存 verify-plan-artifact-refs と並列実行可能) と check-catalogue-spec-signals (check_catalogue_spec_signals(strict=false) 呼び出し、Red → BLOCKED / Yellow → warning)。sotp track catalogue-spec-signals の再計算は CI task に含めない (D3.5)。integration test で両 task が stale / Red 時に ci を fail させることを確認する (IN-13、integration 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T017",

@@ -72,6 +72,29 @@ pub enum VerifyCommand {
     ///
     /// ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.5 / §D3.2.
     CatalogueSpecRefs(CatalogueSpecRefsArgs),
+
+    /// Check catalogue-spec signal gate results
+    /// (`check_catalogue_spec_signals`) for each tddd-enabled layer on the
+    /// current branch. `strict=false` CI interim mode: Red → error, Yellow
+    /// → warning. ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
+    /// §D4.1.
+    CatalogueSpecSignals(CatalogueSpecSignalsArgs),
+}
+
+/// Arguments for `catalogue-spec-signals` verify subcommand.
+#[derive(Args)]
+pub struct CatalogueSpecSignalsArgs {
+    /// Path to the track items root directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
+
+    /// Workspace root directory.
+    #[arg(long, default_value = ".")]
+    workspace_root: PathBuf,
+
+    /// Enable strict mode (Yellow also blocks). Default: CI interim mode.
+    #[arg(long)]
+    strict: bool,
 }
 
 /// Arguments for `catalogue-spec-refs` verify subcommand.
@@ -228,6 +251,9 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                     err.exit_code()
                 }
             };
+        }
+        VerifyCommand::CatalogueSpecSignals(args) => {
+            ("verify catalogue-spec signals", execute_catalogue_spec_signals_check(args))
         }
     };
 
@@ -524,6 +550,367 @@ fn resolve_active_track_dir() -> Option<std::path::PathBuf> {
         usecase::track_resolution::resolve_track_or_plan_id_from_branch(Some(&branch)).ok()?;
     let track_dir = repo.root().join("track/items").join(&track_id);
     if track_dir.is_dir() { Some(track_dir) } else { None }
+}
+
+/// Check catalogue-spec signal gate results for each tddd-enabled layer on
+/// the current branch. Resolves the active track via `track/*` branch name,
+/// loads `<layer>-catalogue-spec-signals.json` per enabled layer, and
+/// delegates to `domain::check_catalogue_spec_signals`. Absent signals file
+/// is silently skipped (lenient CI mode — the pre-commit refresh step will
+/// generate it before the next commit).
+#[allow(clippy::too_many_lines)]
+fn execute_catalogue_spec_signals_check(args: CatalogueSpecSignalsArgs) -> VerifyOutcome {
+    use infrastructure::git_cli::GitRepository as _;
+    use usecase::track_resolution::{TrackResolutionError, resolve_track_id_from_branch};
+
+    // Resolve the active track id from the current branch. SKIP (pass) on
+    // non-track/* branches (including plan/* and main) — consistent with the
+    // sibling `verify-spec-states-current` and `verify-catalogue-spec-refs`
+    // patterns. Uses the strict helper (resolve_track_id_from_branch) so that
+    // plan/* branches return the SKIP Info finding rather than running the check
+    // against a potentially absent signals file.
+    //
+    // An invalid track slug (e.g., `track/Bad Slug`) is NOT silently skipped —
+    // it fails closed as an error so CI reports the misconfiguration rather than
+    // passing without checking any signals.
+    //
+    // `SystemGitRepo::discover()` failure is fail-closed (not SKIP): if the
+    // git repository cannot be discovered, this gate has no safe basis for
+    // skipping and must surface the error in CI. Only a successful `discover()`
+    // + a `current_branch()` that returns `None` (detached HEAD) is treated as
+    // a SKIP, because detached HEAD is a well-defined non-branch state.
+    let repo = match infrastructure::git_cli::SystemGitRepo::discover() {
+        Ok(r) => r,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("[ERROR] cannot discover git repository: {e}"),
+            )]);
+        }
+    };
+    // `current_branch()` Err → fail closed (git spawn failure must not silently SKIP).
+    // `current_branch()` Ok(None) → git rev-parse exit non-zero → also fail closed.
+    // Detached HEAD returns Ok(Some("HEAD")) and is handled in the Some(b) arm below.
+    let branch = match repo.current_branch() {
+        Ok(Some(b)) => b,
+        Ok(None) => {
+            // `git rev-parse --abbrev-ref HEAD` exited non-zero: treat as git failure
+            // (fail closed) so CI does not silently pass without checking any signals.
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                "[ERROR] git rev-parse --abbrev-ref HEAD failed (non-zero exit)".to_owned(),
+            )]);
+        }
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("[ERROR] cannot read current branch: {e}"),
+            )]);
+        }
+    };
+    let track_id = match resolve_track_id_from_branch(Some(branch.as_str())) {
+        Ok(id) => id,
+        Err(TrackResolutionError::InvalidTrackId(slug, e)) => {
+            // Fail closed: malformed branch slug is an operator error, not a
+            // skip condition. Let it surface in CI.
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("[ERROR] invalid track id '{slug}' from branch '{branch}': {e}"),
+            )]);
+        }
+        Err(_) => {
+            // Not a track/* branch (plan/*, main, "HEAD" = detached, etc.) → SKIP.
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::new(
+                domain::verify::Severity::Info,
+                format!("[SKIP] not on a track branch (branch: {branch})"),
+            )]);
+        }
+    };
+
+    // Anchor relative default paths at the repo root so the command works
+    // correctly regardless of which subdirectory the process is invoked from.
+    // Mirrors `resolve_active_track_dir` and the sibling branch-bound helpers in
+    // this file. `resolve_repo_path` is a no-op for absolute paths.
+    let items_dir = infrastructure::git_cli::resolve_repo_path(repo.root(), &args.items_dir);
+    let workspace_root =
+        infrastructure::git_cli::resolve_repo_path(repo.root(), &args.workspace_root);
+
+    execute_catalogue_spec_signals(items_dir, track_id, workspace_root, args.strict)
+}
+
+/// Core catalogue-spec-signals check logic with explicit, resolved parameters.
+///
+/// Separated from `execute_catalogue_spec_signals_check` so the guard logic
+/// (symlink guards, active-track guard, per-layer signals loop) can be exercised
+/// from tests without requiring a real git environment.
+///
+/// # Errors
+///
+/// Returns a `VerifyOutcome` with error findings on symlink violations, missing
+/// `architecture-rules.json`, active-track guard failures, or signals decode errors.
+#[allow(clippy::too_many_lines)]
+fn execute_catalogue_spec_signals(
+    items_dir: std::path::PathBuf,
+    track_id: String,
+    workspace_root: std::path::PathBuf,
+    strict: bool,
+) -> VerifyOutcome {
+    use domain::ImplPlanReader as _;
+    use domain::check_catalogue_spec_signals;
+    use infrastructure::tddd::catalogue_spec_signals_codec;
+    use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
+    use infrastructure::track::symlink_guard::reject_symlinks_below;
+
+    // Security: `reject_symlinks_below` treats its second argument as the trusted
+    // root and only guards components *below* it.  A symlinked `items_dir` would
+    // therefore bypass all downstream symlink guards.  Guard `items_dir` itself
+    // with `symlink_metadata` before using it as the trusted root.
+    // Mirrors the pattern in `execute_verify_catalogue_spec_refs`.
+    match items_dir.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "symlink guard: refusing to follow symlink at items_dir: {}",
+                    items_dir.display()
+                ),
+            )]);
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("symlink guard: cannot stat items_dir {}: {e}", items_dir.display()),
+            )]);
+        }
+    }
+
+    // Security: guard `workspace_root` against a directly symlinked root directory.
+    match workspace_root.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "symlink guard: refusing to follow symlink at workspace_root: {}",
+                    workspace_root.display()
+                ),
+            )]);
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "symlink guard: cannot stat workspace_root {}: {e}",
+                    workspace_root.display()
+                ),
+            )]);
+        }
+    }
+
+    // Security: guard the track directory itself against a symlinked subdirectory
+    // below `items_dir`. A symlinked `items_dir/<track_id>` directory would escape
+    // the trusted tree before `reject_symlinks_below` (anchored at `items_dir`) can
+    // catch it. Mirrors the pattern in `execute_verify_catalogue_spec_refs`.
+    let track_dir = items_dir.join(&track_id);
+    match track_dir.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "symlink guard: refusing to follow symlink at track directory: {}",
+                    track_dir.display()
+                ),
+            )]);
+        }
+        Ok(_) => {}
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            // Fail closed: a valid `track/*` branch with a missing track directory
+            // means the checkout is broken or `--items-dir` is wrong. Mirrors the
+            // `check-catalogue-spec-signals-local` Makefile task which exits 1 in
+            // this case. Do not silently PASS — the gate would be disabled.
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "track directory not found: {} \
+                     (branch maps to missing track; check --items-dir)",
+                    track_dir.display()
+                ),
+            )]);
+        }
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("symlink guard: cannot stat track directory {}: {e}", track_dir.display()),
+            )]);
+        }
+    }
+
+    // Active-track guard (ADR §D3.2 / §D4.1): reject Done/Archived tracks fail-closed.
+    // Running the catalogue-spec-signals gate against a frozen track would produce
+    // misleading CI results — frozen tracks may not have current catalogues. Mirrors
+    // the guard in `execute_verify_catalogue_spec_refs`.
+    //
+    // Guard `metadata.json` leaf with `reject_symlinks_below` before reading; the
+    // `items_dir` and `track_dir` symlink checks above only cover the directory,
+    // not individual files within it.
+    let valid_id = match domain::TrackId::try_new(&track_id) {
+        Ok(id) => id,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("[ERROR] invalid track id '{track_id}': {e}"),
+            )]);
+        }
+    };
+    let metadata_path = track_dir.join("metadata.json");
+    match reject_symlinks_below(&metadata_path, &items_dir) {
+        Ok(true) | Ok(false) => {}
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("symlink guard: metadata.json at '{}': {e}", metadata_path.display()),
+            )]);
+        }
+    }
+    let (metadata, _doc_meta) = match read_track_metadata(&items_dir, &valid_id) {
+        Ok(m) => m,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("cannot load metadata for '{track_id}': {e}"),
+            )]);
+        }
+    };
+    let impl_plan_path = track_dir.join("impl-plan.json");
+    match reject_symlinks_below(&impl_plan_path, &items_dir) {
+        Ok(true) | Ok(false) => {}
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("symlink guard: impl-plan.json at '{}': {e}", impl_plan_path.display()),
+            )]);
+        }
+    }
+    let store = FsTrackStore::new(items_dir.clone());
+    let impl_plan: Option<domain::ImplPlanDocument> = match store.load_impl_plan(&valid_id) {
+        Ok(p) => p,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("cannot load impl-plan for '{track_id}': {e}"),
+            )]);
+        }
+    };
+    if let Err(e) = domain::check_impl_plan_presence(&metadata, impl_plan.as_ref()) {
+        return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(format!(
+            "cannot run catalogue-spec-signals on '{track_id}': {e}"
+        ))]);
+    }
+    let effective_status =
+        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
+    use crate::commands::track::tddd::signals::ensure_active_track;
+    if let Err(e) = ensure_active_track(effective_status, &track_id) {
+        return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(format!(
+            "cannot run catalogue-spec-signals on '{track_id}' \
+                 (status={effective_status}): {e}"
+        ))]);
+    }
+
+    // Enumerate tddd-enabled layers. Fail-closed: a missing `architecture-rules.json`
+    // means we cannot know which catalogues to check — do not fall back to a synthetic
+    // `domain` binding (which is the `load_tddd_layers_from_path` legacy-compat default).
+    // Mirrors the fail-closed logic in `execute_verify_catalogue_spec_refs`.
+    let rules_path = workspace_root.join("architecture-rules.json");
+    let bindings = match reject_symlinks_below(&rules_path, &workspace_root) {
+        Ok(true) => {
+            let content = match std::fs::read_to_string(&rules_path) {
+                Ok(s) => s,
+                Err(e) => {
+                    return VerifyOutcome::from_findings(vec![
+                        domain::verify::VerifyFinding::error(format!(
+                            "cannot read architecture-rules.json at '{}': {e}",
+                            rules_path.display()
+                        )),
+                    ]);
+                }
+            };
+            match infrastructure::verify::tddd_layers::parse_tddd_layers(&content) {
+                Ok(b) => b,
+                Err(e) => {
+                    return VerifyOutcome::from_findings(vec![
+                        domain::verify::VerifyFinding::error(format!(
+                            "architecture-rules.json parse error at '{}': {e}",
+                            rules_path.display()
+                        )),
+                    ]);
+                }
+            }
+        }
+        Ok(false) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "architecture-rules.json not found at '{}'; \
+                     cannot enumerate TDDD layers for verification",
+                    rules_path.display()
+                ),
+            )]);
+        }
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "symlink guard: architecture-rules.json at '{}': {e}",
+                    rules_path.display()
+                ),
+            )]);
+        }
+    };
+
+    // Fail closed: an empty bindings list means no TDDD-enabled layers were found.
+    // This could happen if all `tddd.enabled` flags were removed or `--workspace-root`
+    // points at a mismatched workspace. Return an error so the gate is not silently
+    // disabled. Mirrors the sibling `execute_verify_catalogue_spec_refs` guard.
+    if bindings.is_empty() {
+        return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(format!(
+            "no tddd.enabled layers found in architecture-rules.json at '{}'; \
+                 cannot verify catalogue-spec signals",
+            rules_path.display()
+        ))]);
+    }
+
+    let mut outcome = VerifyOutcome::pass();
+    for binding in &bindings {
+        let layer_id = binding.layer_id();
+        let signals_path = track_dir.join(format!("{layer_id}-catalogue-spec-signals.json"));
+        // Security: reject symlinks in path components below items_dir before
+        // checking file existence or reading. Returns Ok(false) when absent.
+        match reject_symlinks_below(&signals_path, &items_dir) {
+            Ok(false) => {
+                // Lenient CI: missing signals file is "layer not yet activated
+                // for catalogue-spec signals" — the pre-commit refresh will
+                // generate it before the commit, so CI does not block on absence.
+                continue;
+            }
+            Ok(true) => {}
+            Err(e) => {
+                outcome.add(domain::verify::VerifyFinding::error(format!(
+                    "symlink guard: {}: {e}",
+                    signals_path.display()
+                )));
+                continue;
+            }
+        }
+        let text = match std::fs::read_to_string(&signals_path) {
+            Ok(s) => s,
+            Err(e) => {
+                outcome.add(domain::verify::VerifyFinding::error(format!(
+                    "{}: {e}",
+                    signals_path.display()
+                )));
+                continue;
+            }
+        };
+        let doc = match catalogue_spec_signals_codec::decode(&text) {
+            Ok(d) => d,
+            Err(e) => {
+                outcome.add(domain::verify::VerifyFinding::error(format!(
+                    "{}: decode error: {e}",
+                    signals_path.display()
+                )));
+                continue;
+            }
+        };
+        let catalogue_file = binding.catalogue_file();
+        let layer_outcome = check_catalogue_spec_signals(&doc, strict, catalogue_file);
+        for finding in layer_outcome.findings() {
+            outcome.add(finding.clone());
+        }
+    }
+    outcome
 }
 
 /// Combine architecture_rules + doc_patterns + convention_docs checks.
@@ -1270,6 +1657,207 @@ mod tests {
         assert!(
             exit == ExitCode::SUCCESS || exit == ExitCode::FAILURE,
             "omitted track_dir must produce a deterministic exit code without panicking"
+        );
+    }
+
+    // --- catalogue-spec-signals CLI wiring ---
+
+    #[test]
+    fn test_catalogue_spec_signals_strict_flag_parsed_by_clap() {
+        let cli = TestCli::try_parse_from(["sotp", "catalogue-spec-signals", "--strict"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::CatalogueSpecSignals(args) => {
+                assert!(args.strict, "--strict must be parsed as true");
+            }
+            _ => panic!("expected CatalogueSpecSignals variant"),
+        }
+    }
+
+    #[test]
+    fn test_catalogue_spec_signals_without_strict_flag_defaults_to_false() {
+        let cli = TestCli::try_parse_from(["sotp", "catalogue-spec-signals"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::CatalogueSpecSignals(args) => {
+                assert!(!args.strict, "strict must default to false when --strict is absent");
+            }
+            _ => panic!("expected CatalogueSpecSignals variant"),
+        }
+    }
+
+    #[test]
+    fn test_catalogue_spec_signals_default_args_returns_non_panic_outcome() {
+        // Exercises the full git-based branch-resolution path with default args.
+        // - On a `track/*` branch with a valid track structure → runs signal check (may pass
+        //   or fail depending on the real repo state, but must not panic).
+        // - On a non-`track/*` branch → returns an Info finding and ExitCode::SUCCESS (SKIP).
+        // - On git failure → returns an error finding and ExitCode::FAILURE.
+        // The important invariant is no panic and a deterministic exit code.
+        let exit = execute(VerifyCommand::CatalogueSpecSignals(CatalogueSpecSignalsArgs {
+            items_dir: std::path::PathBuf::from("track/items"),
+            workspace_root: std::path::PathBuf::from("."),
+            strict: false,
+        }));
+        assert!(
+            exit == ExitCode::SUCCESS || exit == ExitCode::FAILURE,
+            "default catalogue-spec-signals invocation must produce a deterministic exit code without panicking"
+        );
+    }
+
+    // Helper: write a minimal non-activated metadata.json that the active-track guard accepts.
+    fn write_metadata_json_for_signals_test(track_dir: &std::path::Path, track_id: &str) {
+        let meta = serde_json::json!({
+            "schema_version": 5,
+            "id": track_id,
+            "title": "Test Track",
+            "created_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z"
+        });
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            serde_json::to_string_pretty(&meta).unwrap(),
+        )
+        .unwrap();
+    }
+
+    // Helper: write architecture-rules.json with one TDDD-enabled domain layer.
+    fn write_arch_rules_for_signals_test(workspace_root: &std::path::Path) {
+        let rules = serde_json::json!({
+            "version": 2,
+            "layers": [{
+                "crate": "domain",
+                "path": "libs/domain",
+                "may_depend_on": [],
+                "deny_reason": "",
+                "tddd": { "enabled": true, "catalogue_file": "domain-types.json" }
+            }]
+        });
+        std::fs::write(
+            workspace_root.join("architecture-rules.json"),
+            serde_json::to_string_pretty(&rules).unwrap(),
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn test_catalogue_spec_signals_missing_signals_file_is_lenient_skip() {
+        // Exercises the per-layer lenient-skip path: when architecture-rules.json
+        // lists a TDDD-enabled layer but the corresponding signals file is absent,
+        // `execute_catalogue_spec_signals` must return a pass outcome (exit 0 in
+        // CI interim mode). This is the "layer not yet activated" path that allows
+        // CI to pass before pre-commit generates the signals file for the first time.
+        let tmp = TempDir::new().unwrap();
+        let ws = tmp.path().to_path_buf();
+        let track_id = "test-track";
+        let items_dir = ws.join("track/items");
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_metadata_json_for_signals_test(&track_dir, track_id);
+        write_arch_rules_for_signals_test(&ws);
+        // NO domain-catalogue-spec-signals.json → lenient skip per layer.
+
+        let outcome = execute_catalogue_spec_signals(
+            items_dir,
+            track_id.to_owned(),
+            ws,
+            false, // strict=false
+        );
+        assert!(
+            !outcome.has_errors(),
+            "missing signals file must be a lenient skip (no errors): {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_catalogue_spec_signals_strict_false_yellow_is_warning_only() {
+        // Exercises the --strict=false path: a Yellow signal produces a Warning
+        // finding (not an Error), so `has_errors()` is false and CI stays green
+        // in interim mode.
+        let tmp = TempDir::new().unwrap();
+        let ws = tmp.path().to_path_buf();
+        let track_id = "test-track";
+        let items_dir = ws.join("track/items");
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_metadata_json_for_signals_test(&track_dir, track_id);
+        write_arch_rules_for_signals_test(&ws);
+        // Write a signals file with one Yellow entry (informal_grounds[] non-empty,
+        // spec_refs[] empty).
+        let signals_json = serde_json::json!({
+            "schema_version": 1,
+            "catalogue_declaration_hash": "a".repeat(64),
+            "signals": [
+                { "type_name": "MyType", "signal": "yellow" }
+            ]
+        });
+        std::fs::write(
+            track_dir.join("domain-catalogue-spec-signals.json"),
+            serde_json::to_string_pretty(&signals_json).unwrap(),
+        )
+        .unwrap();
+
+        let outcome = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws, false);
+        assert!(
+            !outcome.has_errors(),
+            "Yellow signal with strict=false must not be an error: {outcome:?}"
+        );
+        // There should be a warning finding describing the Yellow signal.
+        assert!(
+            !outcome.findings().is_empty(),
+            "Yellow signal must produce a warning finding: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_catalogue_spec_signals_strict_true_yellow_is_error() {
+        // Exercises the --strict=true path: a Yellow signal is promoted to an Error
+        // finding, so `has_errors()` returns true and the gate blocks. This is the
+        // merge-gate / strict-mode behavior.
+        let tmp = TempDir::new().unwrap();
+        let ws = tmp.path().to_path_buf();
+        let track_id = "test-track";
+        let items_dir = ws.join("track/items");
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_metadata_json_for_signals_test(&track_dir, track_id);
+        write_arch_rules_for_signals_test(&ws);
+        let signals_json = serde_json::json!({
+            "schema_version": 1,
+            "catalogue_declaration_hash": "a".repeat(64),
+            "signals": [
+                { "type_name": "MyType", "signal": "yellow" }
+            ]
+        });
+        std::fs::write(
+            track_dir.join("domain-catalogue-spec-signals.json"),
+            serde_json::to_string_pretty(&signals_json).unwrap(),
+        )
+        .unwrap();
+
+        let outcome = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws, true);
+        assert!(
+            outcome.has_errors(),
+            "Yellow signal with strict=true must be an error: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_catalogue_spec_signals_missing_arch_rules_returns_error() {
+        // Exercises the fail-closed architecture-rules.json guard: if
+        // workspace_root has no architecture-rules.json, the gate must
+        // return an error (not silently pass with no layers checked).
+        let tmp = TempDir::new().unwrap();
+        let ws = tmp.path().to_path_buf();
+        let track_id = "test-track";
+        let items_dir = ws.join("track/items");
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_metadata_json_for_signals_test(&track_dir, track_id);
+        // No architecture-rules.json → fail-closed error.
+
+        let outcome = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws, false);
+        assert!(
+            outcome.has_errors(),
+            "missing architecture-rules.json must produce an error finding: {outcome:?}"
         );
     }
 }
