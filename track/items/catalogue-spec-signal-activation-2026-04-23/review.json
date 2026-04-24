@@ -1,6 +1,691 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a `track/*` branch whose `track/items/<id>` directory is missing, this task prints `[SKIP]` and exits successfully instead of failing closed. That bypasses the new `catalogue-spec-refs` CI gate entirely for a misconfigured/stale track branch, unlike the existing `verify-plan-artifact-refs-local` task which errors on the same condition.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 606,
+              "category": null
+            },
+            {
+              "message": "This task does not validate that `track/items/<id>` exists before invoking `verify catalogue-spec-signals`. The CLI implementation treats missing signal files as a lenient skip, so on a `track/*` branch with no corresponding track directory the new CI dependency will pass without checking anything.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 623,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:7357fb281ced7fe4d231103f82369f898cb441c60e3fe8f7cdbbe771caf7e464",
+          "at": "2026-04-24T07:43:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a `track/*` branch with no matching `track/items/$TRACK_ID` directory, this new CI gate prints `[SKIP]` and exits successfully, so both `ci-local` and `ci-container` can pass without running `verify catalogue-spec-refs`. That makes a branch-bound catalogue ref integrity gate silently disappear for an invalid track branch; the nearby `verify-plan-artifact-refs-local` precedent treats the same condition as `[FAIL]` with `exit 1`. This branch should fail non-zero or let the verifier report the missing track.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 606,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:7357fb281ced7fe4d231103f82369f898cb441c60e3fe8f7cdbbe771caf7e464",
+          "at": "2026-04-24T07:44:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e7874e7903fa262724dcf3c65bee79208cd50a4ae22df968bebc8618162710d",
+          "at": "2026-04-24T07:46:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e7874e7903fa262724dcf3c65bee79208cd50a4ae22df968bebc8618162710d",
+          "at": "2026-04-24T07:48:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e7874e7903fa262724dcf3c65bee79208cd50a4ae22df968bebc8618162710d",
+          "at": "2026-04-24T07:48:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21972349be5038023ed6ff3071e51f5ebab05a047bb0d966535bcc66fab5ce1d",
+          "at": "2026-04-24T10:33:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21972349be5038023ed6ff3071e51f5ebab05a047bb0d966535bcc66fab5ce1d",
+          "at": "2026-04-24T10:34:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95428ab711a70c7e5716e99209f3b6b0985b6872afd8d0244318f7d3e57ca7a4",
+          "at": "2026-04-24T14:33:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95428ab711a70c7e5716e99209f3b6b0985b6872afd8d0244318f7d3e57ca7a4",
+          "at": "2026-04-24T14:34:49Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
+          "at": "2026-04-23T23:05:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
+          "at": "2026-04-23T23:06:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
+          "at": "2026-04-23T23:16:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
+          "at": "2026-04-23T23:17:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_id` is still a raw `String`, and `execute` never validates it with the existing `LayerId` domain type before handing it to the reader/writer ports. That lets malformed layer ids cross the usecase boundary and reach filesystem-backed adapters, which violates the repo's validated-input rule and can turn bad CLI input into adapter failures or path-safety issues.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6f19c10845140bece5962dd885d1833d95963abcd4a5313cc11dba17634f6534",
+          "at": "2026-04-23T23:29:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public `FetchError`/`WriteFailed` path forwards upstream error text verbatim into user-facing output. If the reader or writer adapter includes raw git stderr, filesystem paths, or other internal diagnostics in those messages, this use case will leak implementation details to CLI users instead of returning a sanitized failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 70,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
+          "at": "2026-04-23T23:34:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
+          "at": "2026-04-23T23:38:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
+          "at": "2026-04-23T23:39:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new test module does not exercise the public failure branches `CatalogueNotFound`, `CatalogueFetchError`, `SpecNotFound`, or `SpecFetchError`. Because `execute` now exposes these as part of its API contract, a regression in port-error mapping or the `NotFound` handling would ship without coverage.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 398,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
+          "at": "2026-04-23T23:49:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new usecase exposes several public failure branches, but this module only tests the happy path, the two branch guards, invalid catalogue hash parsing, and the three integrity findings. There are no tests for `CatalogueNotFound`/`CatalogueFetchError` from `read_catalogue_for_spec_ref_check` or `SpecNotFound`/`SpecFetchError` from `read_spec_element_hashes` and signals fetch failures, so regressions in the adapter/error mapping can ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 159,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
+          "at": "2026-04-23T23:51:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Failures from `read_spec_element_hashes` and `read_catalogue_spec_signals_document` are both collapsed into `SpecFetchError`, so callers cannot tell whether `spec.json` or the signals blob failed. That violates the distinct-failure-mode contract and makes remediation or targeted retries ambiguous.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 210,
+              "category": "error_handling"
+            },
+            {
+              "message": "`verify_skip_stale_bypasses_signals_read` does not actually prove the signals port is skipped: `FixedReader::new(..., None)` returns `NotFound`, so the test would still pass if the interactor accidentally called `read_catalogue_spec_signals_document`. Use a reader that fails on any signals access to cover the required skip-stale behavior.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 616,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:c284cf5a7ee8beb19dbceca811ef7d37cb78f5d5a620451b090983700257c00f",
+          "at": "2026-04-23T23:56:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
+          "at": "2026-04-23T23:59:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` parses `catalogue_hash_hex` unconditionally before the stale-check branch. That means `skip_stale=true` and the `signals NotFound` path can still fail with `InvalidCatalogueHash`, even though stale detection is supposed to be bypassed/no-op there and the hash is never consumed. In those cases the usecase should continue to report dangling/hash findings via `Ok(Vec<SpecRefFinding>)` instead of aborting on an unrelated stale-check input.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 198,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
+          "at": "2026-04-24T00:02:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`InvalidCatalogueHash` is only surfaced inside the `signals`-found branch, so a malformed `read_catalogue_for_spec_ref_check` hash is silently accepted whenever `skip_stale=true` or `<layer>-catalogue-spec-signals.json` is absent. That lets the usecase succeed even though the catalogue port violated its raw-hash contract.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
+              "line": 220,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:816885757158a17855495be846adaed7105dafa75c8e3f166e4322a9bf59c14e",
+          "at": "2026-04-24T00:04:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
+          "at": "2026-04-24T00:07:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
+          "at": "2026-04-24T00:11:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` no longer preserves the pre-T017 short-circuit order: after Stage 2 has already produced an error, the new Chain ② loop still runs and can add extra catalogue-spec findings. That contradicts the deferred-reorder intent in the briefing and changes diagnostics/behavior for existing Stage-2-failure scenarios once a layer starts carrying catalogue-spec artifacts. Insert an `outcome.has_errors()` return before entering Stage 3 if the old fail-fast order is meant to stay intact in this landing.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 330,
+              "category": "logic"
+            },
+            {
+              "message": "The new merge-gate behavior is effectively untested in this scope. All added `SpecElementHashReader` test stubs return an empty map, while the new `TrackBlobReader` defaults return `NotFound`, so every existing `check_strict_merge_gate` test still skips Chain ② entirely. That leaves the new public-API behaviors from the briefing unverified: integrity findings promoted to merge-gate errors, strict Yellow blocking for catalogue-spec signals, and fetch-error handling on the new ports.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 451,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:d08628683ac7a5a39b96f89565bb57172d69fe51a947ab04ebe02d226b4c47a9",
+          "at": "2026-04-24T09:32:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` no longer preserves the old short-circuit order after Stage 2. The new Stage 3 block starts immediately after the type-signal loop, so a Yellow/Red or fetch error from `read_type_catalogue` still triggers `read_spec_element_hashes` and the per-layer Chain ② reads. That can add new blocking findings or adapter errors on paths that were supposed to stop at the existing Chain ①/③ failure, which contradicts the deferred-order design in the briefing.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 306,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d08628683ac7a5a39b96f89565bb57172d69fe51a947ab04ebe02d226b4c47a9",
+          "at": "2026-04-24T09:35:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After Stage 2 records a blocking type-signal or catalogue read error, the new Stage 3 block still runs and calls `read_spec_element_hashes` plus the catalogue-spec readers. The briefing says this landing preserves the old success/early-fail short-circuit order, so Chain ② should only run once the existing Stage 1/2 gates have passed; otherwise a pre-existing Stage 2 failure can produce extra unrelated errors and adapter work. Return the Stage 2 outcome when `outcome.has_errors()` before starting Chain ②.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 319,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:d08628683ac7a5a39b96f89565bb57172d69fe51a947ab04ebe02d226b4c47a9",
+          "at": "2026-04-24T09:38:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_spec_element_hashes()` now gates the whole Chain ② block: on `NotFound` or `FetchError` you return `None` and skip the per-layer loop entirely. That does not just disable the integrity check, it also suppresses `check_catalogue_spec_signals(strict=true)`, so an already-activated layer with Yellow/Red catalogue-spec signals will pass the merge gate whenever the hash reader glitches or is unavailable. The signal gate should still run once `<layer>-catalogue-spec-signals.json` exists, even if spec-hash collection cannot support the integrity sub-check.",
+              "severity": "P0",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 328,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b5f5f99aeb5f2ec92b11334c22fbecfd19f2e29c46cdc1c7d104b00cec14007",
+          "at": "2026-04-24T09:41:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `read_spec_element_hashes()` returns `NotFound` or `FetchError`, this code only disables the integrity sub-check and still runs `check_catalogue_spec_signals(..., strict=true)` for every activated layer. The briefing for T017 explicitly makes missing spec hashes an opt-out for the whole Chain ② block, so a branch with an existing `*-catalogue-spec-signals.json` but unavailable hash support will now block merges instead of silently skipping.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 338,
+              "category": "behavioral_regression"
+            },
+            {
+              "message": "The new signal-gate path hardcodes `\"{layer_id}-types.json\"` in the finding text instead of using the resolved catalogue filename. Layers that override `tddd.catalogue_file` will get Yellow/Red catalogue-spec errors pointing at a file that does not exist, which regresses the filename-accuracy contract already preserved in Stage 2.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 374,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bb70c7abfc396c3ec625382887fdbc775eb916a4a807771acb4fb2a797dbd887",
+          "at": "2026-04-24T09:49:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5ebef625745384e31b0ad05f9c10c73e75694110c00916ec99203f5de0113b0",
+          "at": "2026-04-24T10:01:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5ebef625745384e31b0ad05f9c10c73e75694110c00916ec99203f5de0113b0",
+          "at": "2026-04-24T10:01:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stage 3 silently skips any enabled layer whose id cannot be converted into `LayerId`. `read_enabled_layers` is a string-based port fed from PR-controlled `architecture-rules.json`, and the real parser does not enforce the stricter `LayerId::try_new` rules, so a malformed enabled layer can bypass the new catalogue-spec integrity and signal checks instead of failing closed. Return an error finding when layer-id validation fails.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 338,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b5ebef625745384e31b0ad05f9c10c73e75694110c00916ec99203f5de0113b0",
+          "at": "2026-04-24T10:04:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91128700303bf072ea3bd8cfc6cdd8315881ab0be7a2b042ddf4a2b7207a2879",
+          "at": "2026-04-24T10:08:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91128700303bf072ea3bd8cfc6cdd8315881ab0be7a2b042ddf4a2b7207a2879",
+          "at": "2026-04-24T10:10:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_spec_element_hashes()` is checked before any `LayerId::try_new()` validation. If that port returns `NotFound` or `FetchError`, the early return at this point skips the whole Chain ② block, so a malformed layer id from `architecture-rules.json` is never reported. That reopens the silent-bypass case the new fail-closed layer-id check was meant to prevent whenever the spec-hash reader is unavailable. Validate `layer_ids` before this short-circuit.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 330,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:91128700303bf072ea3bd8cfc6cdd8315881ab0be7a2b042ddf4a2b7207a2879",
+          "at": "2026-04-24T10:11:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
+          "at": "2026-04-24T10:15:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
+          "at": "2026-04-24T10:16:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
+          "at": "2026-04-24T10:19:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
+          "at": "2026-04-24T10:20:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
+          "at": "2026-04-24T10:22:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96506589b3eb514629f1874092cecd421ff5a5f4c9227b4eed5191d3688fd756",
+          "at": "2026-04-24T10:34:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96506589b3eb514629f1874092cecd421ff5a5f4c9227b4eed5191d3688fd756",
+          "at": "2026-04-24T10:37:27Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 449,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:44:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:53:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 84,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T21:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T22:00:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:12:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:13:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:22:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:23:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:33:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:36:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:41:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:42:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:46:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a70d3a69a9245973361c92d4b7834e6b217bc5de0b658710b72cd14670a0f8e",
+          "at": "2026-04-24T13:49:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a70d3a69a9245973361c92d4b7834e6b217bc5de0b658710b72cd14670a0f8e",
+          "at": "2026-04-24T13:50:16Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -702,6 +1387,50 @@
           "findings": [],
           "hash": "rvw1:sha256:b91e6bdd63c668d49345dd8255e57645e3ef6e293bf3b7e9f87223a385f3e5aa",
           "at": "2026-04-24T15:16:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-merge/post-merge split here conflicts with `knowledge/conventions/pre-track-adr-authoring.md:18`, which still says existing ADRs may be rewritten directly without exception. As written, the repo now gives two different answers for whether a landed ADR is editable in place, so adr-editor can follow the wrong branch.",
+              "severity": "P1",
+              "file": "knowledge/conventions/adr.md",
+              "line": 34,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:ec41e6ce282cbbd10c2001cdf5b3001b457814fff231c5c0e4a55f9ad9b04e92",
+          "at": "2026-04-24T16:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec41e6ce282cbbd10c2001cdf5b3001b457814fff231c5c0e4a55f9ad9b04e92",
+          "at": "2026-04-24T16:12:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-merge detection rule tells adr-editor to run `git log main -- <adr-file>`, but the same agent file still has a hard rule forbidding all `git` commands. That leaves the agent unable to perform the required pre/post-merge branch, so the policy is internally contradictory. Update the existing command restrictions to permit this read-only detection command, or move detection entirely to the orchestrator contract.",
+              "severity": "P1",
+              "file": ".claude/agents/adr-editor.md",
+              "line": 58,
+              "category": "policy_conflict"
+            }
+          ],
+          "hash": "rvw1:sha256:ec41e6ce282cbbd10c2001cdf5b3001b457814fff231c5c0e4a55f9ad9b04e92",
+          "at": "2026-04-24T16:13:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b19e1d5c72c0741ed12993425169d6dfff96bb372674230a190c08df4ec548e",
+          "at": "2026-04-24T16:17:06Z"
         }
       ]
     },
@@ -989,381 +1718,6 @@
           "findings": [],
           "hash": "rvw1:sha256:bacdda4a93d38866c9942227a06f98347cd80e9ad391476a9a7f6f43fd003aa6",
           "at": "2026-04-24T13:58:55Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
-          "at": "2026-04-23T23:05:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5924db089be68d58dd46333402d08f4090b60cc97d5aa7dfad2e5f7c04eca30c",
-          "at": "2026-04-23T23:06:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
-          "at": "2026-04-23T23:16:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a22ede006f8b4b4b852f7b9db231e807b1305c7fb71bb360fb78bbac4850564e",
-          "at": "2026-04-23T23:17:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`layer_id` is still a raw `String`, and `execute` never validates it with the existing `LayerId` domain type before handing it to the reader/writer ports. That lets malformed layer ids cross the usecase boundary and reach filesystem-backed adapters, which violates the repo's validated-input rule and can turn bad CLI input into adapter failures or path-safety issues.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
-              "line": 35,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6f19c10845140bece5962dd885d1833d95963abcd4a5313cc11dba17634f6534",
-          "at": "2026-04-23T23:29:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public `FetchError`/`WriteFailed` path forwards upstream error text verbatim into user-facing output. If the reader or writer adapter includes raw git stderr, filesystem paths, or other internal diagnostics in those messages, this use case will leak implementation details to CLI users instead of returning a sanitized failure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
-              "line": 70,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
-          "at": "2026-04-23T23:34:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
-          "at": "2026-04-23T23:38:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:904603259818944f70b68ba6db9968566e8e06d79d573cb5014de21335999ffd",
-          "at": "2026-04-23T23:39:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new test module does not exercise the public failure branches `CatalogueNotFound`, `CatalogueFetchError`, `SpecNotFound`, or `SpecFetchError`. Because `execute` now exposes these as part of its API contract, a regression in port-error mapping or the `NotFound` handling would ship without coverage.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 398,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
-          "at": "2026-04-23T23:49:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new usecase exposes several public failure branches, but this module only tests the happy path, the two branch guards, invalid catalogue hash parsing, and the three integrity findings. There are no tests for `CatalogueNotFound`/`CatalogueFetchError` from `read_catalogue_for_spec_ref_check` or `SpecNotFound`/`SpecFetchError` from `read_spec_element_hashes` and signals fetch failures, so regressions in the adapter/error mapping can ship unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 159,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:fe6319292c63348abb062381d2fa12aeca2a5bc2c53b4e0e7e3fce9c6c18363e",
-          "at": "2026-04-23T23:51:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Failures from `read_spec_element_hashes` and `read_catalogue_spec_signals_document` are both collapsed into `SpecFetchError`, so callers cannot tell whether `spec.json` or the signals blob failed. That violates the distinct-failure-mode contract and makes remediation or targeted retries ambiguous.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 210,
-              "category": "error_handling"
-            },
-            {
-              "message": "`verify_skip_stale_bypasses_signals_read` does not actually prove the signals port is skipped: `FixedReader::new(..., None)` returns `NotFound`, so the test would still pass if the interactor accidentally called `read_catalogue_spec_signals_document`. Use a reader that fails on any signals access to cover the required skip-stale behavior.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 616,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:c284cf5a7ee8beb19dbceca811ef7d37cb78f5d5a620451b090983700257c00f",
-          "at": "2026-04-23T23:56:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
-          "at": "2026-04-23T23:59:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` parses `catalogue_hash_hex` unconditionally before the stale-check branch. That means `skip_stale=true` and the `signals NotFound` path can still fail with `InvalidCatalogueHash`, even though stale detection is supposed to be bypassed/no-op there and the hash is never consumed. In those cases the usecase should continue to report dangling/hash findings via `Ok(Vec<SpecRefFinding>)` instead of aborting on an unrelated stale-check input.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 198,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:251cabf3d2ff8e1cf77daf90400b077a2acdc78f1c17cf06cb60bab4e3a07904",
-          "at": "2026-04-24T00:02:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`InvalidCatalogueHash` is only surfaced inside the `signals`-found branch, so a malformed `read_catalogue_for_spec_ref_check` hash is silently accepted whenever `skip_stale=true` or `<layer>-catalogue-spec-signals.json` is absent. That lets the usecase succeed even though the catalogue port violated its raw-hash contract.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_refs.rs",
-              "line": 220,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:816885757158a17855495be846adaed7105dafa75c8e3f166e4322a9bf59c14e",
-          "at": "2026-04-24T00:04:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
-          "at": "2026-04-24T00:07:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
-          "at": "2026-04-24T00:11:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_strict_merge_gate` no longer preserves the pre-T017 short-circuit order: after Stage 2 has already produced an error, the new Chain ② loop still runs and can add extra catalogue-spec findings. That contradicts the deferred-reorder intent in the briefing and changes diagnostics/behavior for existing Stage-2-failure scenarios once a layer starts carrying catalogue-spec artifacts. Insert an `outcome.has_errors()` return before entering Stage 3 if the old fail-fast order is meant to stay intact in this landing.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 330,
-              "category": "logic"
-            },
-            {
-              "message": "The new merge-gate behavior is effectively untested in this scope. All added `SpecElementHashReader` test stubs return an empty map, while the new `TrackBlobReader` defaults return `NotFound`, so every existing `check_strict_merge_gate` test still skips Chain ② entirely. That leaves the new public-API behaviors from the briefing unverified: integrity findings promoted to merge-gate errors, strict Yellow blocking for catalogue-spec signals, and fetch-error handling on the new ports.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 451,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:d08628683ac7a5a39b96f89565bb57172d69fe51a947ab04ebe02d226b4c47a9",
-          "at": "2026-04-24T09:32:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_strict_merge_gate` no longer preserves the old short-circuit order after Stage 2. The new Stage 3 block starts immediately after the type-signal loop, so a Yellow/Red or fetch error from `read_type_catalogue` still triggers `read_spec_element_hashes` and the per-layer Chain ② reads. That can add new blocking findings or adapter errors on paths that were supposed to stop at the existing Chain ①/③ failure, which contradicts the deferred-order design in the briefing.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 306,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d08628683ac7a5a39b96f89565bb57172d69fe51a947ab04ebe02d226b4c47a9",
-          "at": "2026-04-24T09:35:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "After Stage 2 records a blocking type-signal or catalogue read error, the new Stage 3 block still runs and calls `read_spec_element_hashes` plus the catalogue-spec readers. The briefing says this landing preserves the old success/early-fail short-circuit order, so Chain ② should only run once the existing Stage 1/2 gates have passed; otherwise a pre-existing Stage 2 failure can produce extra unrelated errors and adapter work. Return the Stage 2 outcome when `outcome.has_errors()` before starting Chain ②.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 319,
-              "category": "behavioral_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:d08628683ac7a5a39b96f89565bb57172d69fe51a947ab04ebe02d226b4c47a9",
-          "at": "2026-04-24T09:38:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_spec_element_hashes()` now gates the whole Chain ② block: on `NotFound` or `FetchError` you return `None` and skip the per-layer loop entirely. That does not just disable the integrity check, it also suppresses `check_catalogue_spec_signals(strict=true)`, so an already-activated layer with Yellow/Red catalogue-spec signals will pass the merge gate whenever the hash reader glitches or is unavailable. The signal gate should still run once `<layer>-catalogue-spec-signals.json` exists, even if spec-hash collection cannot support the integrity sub-check.",
-              "severity": "P0",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 328,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9b5f5f99aeb5f2ec92b11334c22fbecfd19f2e29c46cdc1c7d104b00cec14007",
-          "at": "2026-04-24T09:41:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When `read_spec_element_hashes()` returns `NotFound` or `FetchError`, this code only disables the integrity sub-check and still runs `check_catalogue_spec_signals(..., strict=true)` for every activated layer. The briefing for T017 explicitly makes missing spec hashes an opt-out for the whole Chain ② block, so a branch with an existing `*-catalogue-spec-signals.json` but unavailable hash support will now block merges instead of silently skipping.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 338,
-              "category": "behavioral_regression"
-            },
-            {
-              "message": "The new signal-gate path hardcodes `\"{layer_id}-types.json\"` in the finding text instead of using the resolved catalogue filename. Layers that override `tddd.catalogue_file` will get Yellow/Red catalogue-spec errors pointing at a file that does not exist, which regresses the filename-accuracy contract already preserved in Stage 2.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 374,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bb70c7abfc396c3ec625382887fdbc775eb916a4a807771acb4fb2a797dbd887",
-          "at": "2026-04-24T09:49:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5ebef625745384e31b0ad05f9c10c73e75694110c00916ec99203f5de0113b0",
-          "at": "2026-04-24T10:01:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5ebef625745384e31b0ad05f9c10c73e75694110c00916ec99203f5de0113b0",
-          "at": "2026-04-24T10:01:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Stage 3 silently skips any enabled layer whose id cannot be converted into `LayerId`. `read_enabled_layers` is a string-based port fed from PR-controlled `architecture-rules.json`, and the real parser does not enforce the stricter `LayerId::try_new` rules, so a malformed enabled layer can bypass the new catalogue-spec integrity and signal checks instead of failing closed. Return an error finding when layer-id validation fails.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 338,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b5ebef625745384e31b0ad05f9c10c73e75694110c00916ec99203f5de0113b0",
-          "at": "2026-04-24T10:04:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91128700303bf072ea3bd8cfc6cdd8315881ab0be7a2b042ddf4a2b7207a2879",
-          "at": "2026-04-24T10:08:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91128700303bf072ea3bd8cfc6cdd8315881ab0be7a2b042ddf4a2b7207a2879",
-          "at": "2026-04-24T10:10:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_spec_element_hashes()` is checked before any `LayerId::try_new()` validation. If that port returns `NotFound` or `FetchError`, the early return at this point skips the whole Chain ② block, so a malformed layer id from `architecture-rules.json` is never reported. That reopens the silent-bypass case the new fail-closed layer-id check was meant to prevent whenever the spec-hash reader is unavailable. Validate `layer_ids` before this short-circuit.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 330,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:91128700303bf072ea3bd8cfc6cdd8315881ab0be7a2b042ddf4a2b7207a2879",
-          "at": "2026-04-24T10:11:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
-          "at": "2026-04-24T10:15:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
-          "at": "2026-04-24T10:16:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
-          "at": "2026-04-24T10:19:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
-          "at": "2026-04-24T10:20:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfe1883b91c8548bc7be5b4d516ccdedde437777b002a4a79a0e286fd19da88d",
-          "at": "2026-04-24T10:22:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96506589b3eb514629f1874092cecd421ff5a5f4c9227b4eed5191d3688fd756",
-          "at": "2026-04-24T10:34:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96506589b3eb514629f1874092cecd421ff5a5f4c9227b4eed5191d3688fd756",
-          "at": "2026-04-24T10:37:27Z"
         }
       ]
     },
@@ -5189,316 +5543,6 @@
           "findings": [],
           "hash": "rvw1:sha256:e4e636617009a23e28d72a6d78fab98d858a849a91392b8427f1c42f957b0451",
           "at": "2026-04-24T15:15:38Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:40:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
-              "severity": "P0",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 449,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:43:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:44:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:50:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:53:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:54:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 84,
-              "category": "contract"
-            }
-          ],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T21:57:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T22:00:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "invariant"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:12:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:13:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:14:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:16:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:22:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:23:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:33:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:36:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:41:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:42:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:45:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:46:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a70d3a69a9245973361c92d4b7834e6b217bc5de0b658710b72cd14670a0f8e",
-          "at": "2026-04-24T13:49:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a70d3a69a9245973361c92d4b7834e6b217bc5de0b658710b72cd14670a0f8e",
-          "at": "2026-04-24T13:50:16Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On a `track/*` branch whose `track/items/<id>` directory is missing, this task prints `[SKIP]` and exits successfully instead of failing closed. That bypasses the new `catalogue-spec-refs` CI gate entirely for a misconfigured/stale track branch, unlike the existing `verify-plan-artifact-refs-local` task which errors on the same condition.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 606,
-              "category": null
-            },
-            {
-              "message": "This task does not validate that `track/items/<id>` exists before invoking `verify catalogue-spec-signals`. The CLI implementation treats missing signal files as a lenient skip, so on a `track/*` branch with no corresponding track directory the new CI dependency will pass without checking anything.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 623,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:7357fb281ced7fe4d231103f82369f898cb441c60e3fe8f7cdbbe771caf7e464",
-          "at": "2026-04-24T07:43:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On a `track/*` branch with no matching `track/items/$TRACK_ID` directory, this new CI gate prints `[SKIP]` and exits successfully, so both `ci-local` and `ci-container` can pass without running `verify catalogue-spec-refs`. That makes a branch-bound catalogue ref integrity gate silently disappear for an invalid track branch; the nearby `verify-plan-artifact-refs-local` precedent treats the same condition as `[FAIL]` with `exit 1`. This branch should fail non-zero or let the verifier report the missing track.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 606,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:7357fb281ced7fe4d231103f82369f898cb441c60e3fe8f7cdbbe771caf7e464",
-          "at": "2026-04-24T07:44:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e7874e7903fa262724dcf3c65bee79208cd50a4ae22df968bebc8618162710d",
-          "at": "2026-04-24T07:46:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e7874e7903fa262724dcf3c65bee79208cd50a4ae22df968bebc8618162710d",
-          "at": "2026-04-24T07:48:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e7874e7903fa262724dcf3c65bee79208cd50a4ae22df968bebc8618162710d",
-          "at": "2026-04-24T07:48:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21972349be5038023ed6ff3071e51f5ebab05a047bb0d966535bcc66fab5ce1d",
-          "at": "2026-04-24T10:33:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21972349be5038023ed6ff3071e51f5ebab05a047bb0d966535bcc66fab5ce1d",
-          "at": "2026-04-24T10:34:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:95428ab711a70c7e5716e99209f3b6b0985b6872afd8d0244318f7d3e57ca7a4",
-          "at": "2026-04-24T14:33:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:95428ab711a70c7e5716e99209f3b6b0985b6872afd8d0244318f7d3e57ca7a4",
-          "at": "2026-04-24T14:34:49Z"
         }
       ]
     }
