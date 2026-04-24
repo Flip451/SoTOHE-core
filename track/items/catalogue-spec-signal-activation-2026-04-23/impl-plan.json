@@ -82,12 +82,13 @@
     {
       "id": "T014",
       "description": "CLI 層に sotp verify catalogue-spec-refs サブコマンドを apps/cli/src/commands/verify/catalogue_spec_refs.rs に追加する。引数 --track <id> / --layer <layer_id> (省略時は全 tddd.enabled + catalogue_spec_signal.enabled 層をループ実行; T013 の --layer と同セマンティクス) / --skip-stale。各 layer_id に対して VerifyCatalogueSpecRefsInteractor を dispatch し、SpecRefFinding を D1.5 の形式で stderr に 1 行ずつ出力する。違反ゼロ → exit 0 / 1 件以上 → non-zero。integration test で dangling / drift / stale / skip-stale ケースの exit code + stderr 出力形式を検証する (IN-10、CLI 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "e137c6b"
     },
     {
       "id": "T015",
       "description": "pre-commit フロー (dispatch_track_commit_message) に 2 step を挿入する。挿入順 (D3.4): (既存 1) Stage 2 type-signals 再計算 → (新規 2) sotp verify catalogue-spec-refs --skip-stale (binary gate、ERROR で block + 後段スキップ) → (新規 3) sotp track catalogue-spec-signals (signal 再計算) → (既存 4+) cargo make ci / review guard / commit。active track の tddd.enabled + catalogue_spec_signal.enabled 層のみ gate を発火する。integration test で binary gate ERROR 時に commit が block されることを確認する (IN-12、integration 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T016",
