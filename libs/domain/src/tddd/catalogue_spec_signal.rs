@@ -319,22 +319,31 @@ pub fn check_catalogue_spec_ref_integrity(
 ///
 /// # Rules
 ///
-/// - `signals.signals` is empty → `VerifyOutcome::pass` (a layer with no
-///   declared catalogue entries has no catalogue-spec signal to block on)
+/// - **Coverage mismatch** (signals length ≠ catalogue entries length, or
+///   positional `type_name` mismatch at any index) →
+///   [`VerifyFinding::error`]. This catches the fail-open path where a
+///   tampered `<layer>-catalogue-spec-signals.json` keeps a valid
+///   `catalogue_declaration_hash` but omits or renames entries so Yellow /
+///   Red signals are silently dropped.
 /// - any [`ConfidenceSignal::Red`] entry → `VerifyFinding::error`
 ///   (always blocks, regardless of `strict`)
 /// - any [`ConfidenceSignal::Yellow`] entry:
 ///   - `strict = true` → `VerifyFinding::error` (merge gate blocks)
 ///   - `strict = false` → `VerifyFinding::warning` (CI interim mode visualises)
-/// - all [`ConfidenceSignal::Blue`] → `VerifyOutcome::pass`
+/// - all [`ConfidenceSignal::Blue`] (or empty on both sides) → `VerifyOutcome::pass`
 ///
-/// Red takes precedence over Yellow: a document with both Red and Yellow
-/// entries reports the Red finding only. This matches the precedent set by
-/// the Phase 1 / SoT Chain ③ sibling gates where Red is the terminal state
-/// and Yellow is only inspected when Red is absent.
+/// Coverage check runs first so a mis-covered signals file fails the gate
+/// even when every listed signal is Blue. Red then takes precedence over
+/// Yellow: a document with both Red and Yellow entries reports the Red
+/// finding only. This matches the precedent set by the Phase 1 / SoT
+/// Chain ③ sibling gates where Red is the terminal state and Yellow is
+/// only inspected when Red is absent.
 ///
 /// # Parameters
 ///
+/// * `catalogue` — the authoritative type catalogue document for this
+///   layer. Used for coverage validation: `signals.signals[i]` must cover
+///   `catalogue.entries()[i]` (positional match on `type_name`).
 /// * `signals` — the persisted signals document for one layer
 ///   (`<layer>-catalogue-spec-signals.json`).
 /// * `strict` — `true` for the merge gate (Yellow blocks), `false` for CI
@@ -351,12 +360,45 @@ pub fn check_catalogue_spec_ref_integrity(
 /// - Sibling: `check_type_signals` in `libs/domain/src/tddd/consistency.rs` (SoT Chain ③ type signal gate)
 #[must_use]
 pub fn check_catalogue_spec_signals(
+    catalogue: &super::catalogue::TypeCatalogueDocument,
     signals: &CatalogueSpecSignalsDocument,
     strict: bool,
     catalogue_file: &str,
 ) -> crate::verify::VerifyOutcome {
     use crate::verify::{VerifyFinding, VerifyOutcome};
 
+    // Coverage validation (fail-closed): a tampered signals file with a
+    // matching `catalogue_declaration_hash` could still omit entries and
+    // silently drop Yellow / Red signals. Enforce length equality + positional
+    // `type_name` match so the gate cannot be bypassed by trimming the
+    // signals array.
+    let catalogue_entries = catalogue.entries();
+    if catalogue_entries.len() != signals.signals.len() {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{catalogue_file}: catalogue-spec signals coverage mismatch — catalogue has {} \
+             entry/entries, signals document has {} signal(s). Regenerate the signals file \
+             with `sotp track catalogue-spec-signals` so every catalogue entry is covered.",
+            catalogue_entries.len(),
+            signals.signals.len()
+        ))]);
+    }
+    if let Some((i, entry, sig)) = catalogue_entries
+        .iter()
+        .zip(signals.signals.iter())
+        .enumerate()
+        .find(|(_, (entry, sig))| entry.name() != sig.type_name)
+        .map(|(i, (entry, sig))| (i, entry, sig))
+    {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{catalogue_file}: catalogue-spec signals positional mismatch at index {i} \
+             (catalogue entry '{}' vs signal '{}'). Regenerate the signals file.",
+            entry.name(),
+            sig.type_name
+        ))]);
+    }
+
+    // Empty on both sides: nothing to gate on (layer with no catalogue
+    // entries). Coverage check above already rejected the asymmetric cases.
     if signals.signals.is_empty() {
         return VerifyOutcome::pass();
     }
@@ -842,11 +884,42 @@ mod tests {
         CatalogueSpecSignalsDocument::new(hash(0x00), entries)
     }
 
+    /// Builds a `TypeCatalogueDocument` whose entry names (positional) match
+    /// the `signals.signals` `type_name`s. Used by the signal-gate tests so
+    /// the coverage check passes and the Red / Yellow logic under test is
+    /// the only thing exercised.
+    fn catalogue_matching(
+        signals: &CatalogueSpecSignalsDocument,
+    ) -> super::super::catalogue::TypeCatalogueDocument {
+        use super::super::catalogue::{
+            TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+        };
+        use crate::TypeAction;
+
+        let entries = signals
+            .signals
+            .iter()
+            .map(|s| {
+                TypeCatalogueEntry::new(
+                    s.type_name.clone(),
+                    "generated fixture",
+                    TypeDefinitionKind::ValueObject,
+                    TypeAction::Add,
+                    true,
+                )
+                .expect("test fixture: signal type_name is non-empty")
+            })
+            .collect();
+        TypeCatalogueDocument::new(1, entries)
+    }
+
     #[test]
     fn check_signals_passes_when_document_is_empty() {
         let doc = signals_doc(vec![]);
+        let catalogue = catalogue_matching(&doc);
         for &strict in &[true, false] {
-            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            let outcome =
+                check_catalogue_spec_signals(&catalogue, &doc, strict, "domain-types.json");
             assert!(outcome.is_ok());
             assert!(outcome.findings().is_empty());
         }
@@ -858,8 +931,10 @@ mod tests {
             CatalogueSpecSignal::new("T1", ConfidenceSignal::Blue),
             CatalogueSpecSignal::new("T2", ConfidenceSignal::Blue),
         ]);
+        let catalogue = catalogue_matching(&doc);
         for &strict in &[true, false] {
-            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            let outcome =
+                check_catalogue_spec_signals(&catalogue, &doc, strict, "domain-types.json");
             assert!(outcome.is_ok());
             assert!(outcome.findings().is_empty());
         }
@@ -871,9 +946,11 @@ mod tests {
             CatalogueSpecSignal::new("Ok", ConfidenceSignal::Blue),
             CatalogueSpecSignal::new("Bad", ConfidenceSignal::Red),
         ]);
+        let catalogue = catalogue_matching(&doc);
 
         for &strict in &[true, false] {
-            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            let outcome =
+                check_catalogue_spec_signals(&catalogue, &doc, strict, "domain-types.json");
             assert_eq!(outcome.findings().len(), 1);
             assert!(outcome.has_errors());
             let msg = outcome.findings()[0].message();
@@ -886,7 +963,8 @@ mod tests {
     #[test]
     fn check_signals_yellow_strict_true_returns_error() {
         let doc = signals_doc(vec![CatalogueSpecSignal::new("Pending", ConfidenceSignal::Yellow)]);
-        let outcome = check_catalogue_spec_signals(&doc, true, "domain-types.json");
+        let catalogue = catalogue_matching(&doc);
+        let outcome = check_catalogue_spec_signals(&catalogue, &doc, true, "domain-types.json");
         assert_eq!(outcome.findings().len(), 1);
         assert!(outcome.has_errors());
         let msg = outcome.findings()[0].message();
@@ -899,7 +977,8 @@ mod tests {
         use crate::verify::Severity;
 
         let doc = signals_doc(vec![CatalogueSpecSignal::new("Pending", ConfidenceSignal::Yellow)]);
-        let outcome = check_catalogue_spec_signals(&doc, false, "domain-types.json");
+        let catalogue = catalogue_matching(&doc);
+        let outcome = check_catalogue_spec_signals(&catalogue, &doc, false, "domain-types.json");
         assert_eq!(outcome.findings().len(), 1);
         assert!(outcome.is_ok(), "warning should not set has_errors");
         assert_eq!(outcome.findings()[0].severity(), Severity::Warning);
@@ -914,8 +993,10 @@ mod tests {
             CatalogueSpecSignal::new("TY", ConfidenceSignal::Yellow),
             CatalogueSpecSignal::new("TR", ConfidenceSignal::Red),
         ]);
+        let catalogue = catalogue_matching(&doc);
         for &strict in &[true, false] {
-            let outcome = check_catalogue_spec_signals(&doc, strict, "domain-types.json");
+            let outcome =
+                check_catalogue_spec_signals(&catalogue, &doc, strict, "domain-types.json");
             assert_eq!(outcome.findings().len(), 1);
             let msg = outcome.findings()[0].message();
             assert!(msg.contains("Red"));
@@ -928,8 +1009,101 @@ mod tests {
     #[test]
     fn check_signals_message_includes_catalogue_file() {
         let doc = signals_doc(vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Yellow)]);
-        let outcome = check_catalogue_spec_signals(&doc, true, "usecase-types.json");
+        let catalogue = catalogue_matching(&doc);
+        let outcome = check_catalogue_spec_signals(&catalogue, &doc, true, "usecase-types.json");
         let msg = outcome.findings()[0].message();
         assert!(msg.starts_with("usecase-types.json:"));
+    }
+
+    // Coverage validation tests (PR #111 fail-open fix).
+
+    #[test]
+    fn check_signals_errors_when_signals_shorter_than_catalogue() {
+        // Tampered signals file: catalogue has 2 entries, signals doc omits 1.
+        // A valid `catalogue_declaration_hash` would otherwise let this pass —
+        // the length-equality check rejects it.
+        use super::super::catalogue::{
+            TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+        };
+        use crate::TypeAction;
+
+        let catalogue = TypeCatalogueDocument::new(
+            1,
+            vec![
+                TypeCatalogueEntry::new(
+                    "A",
+                    "desc",
+                    TypeDefinitionKind::ValueObject,
+                    TypeAction::Add,
+                    true,
+                )
+                .unwrap(),
+                TypeCatalogueEntry::new(
+                    "B",
+                    "desc",
+                    TypeDefinitionKind::ValueObject,
+                    TypeAction::Add,
+                    true,
+                )
+                .unwrap(),
+            ],
+        );
+        let doc = signals_doc(vec![CatalogueSpecSignal::new("A", ConfidenceSignal::Blue)]);
+
+        let outcome = check_catalogue_spec_signals(&catalogue, &doc, true, "domain-types.json");
+        assert!(outcome.has_errors(), "coverage mismatch must block");
+        let msg = outcome.findings()[0].message();
+        assert!(
+            msg.contains("coverage mismatch"),
+            "expected coverage mismatch message, got: {msg}"
+        );
+        assert!(msg.contains("2"));
+        assert!(msg.contains("1"));
+    }
+
+    #[test]
+    fn check_signals_errors_when_catalogue_empty_but_signals_present() {
+        use super::super::catalogue::TypeCatalogueDocument;
+
+        let catalogue = TypeCatalogueDocument::new(1, vec![]);
+        let doc = signals_doc(vec![CatalogueSpecSignal::new("Ghost", ConfidenceSignal::Blue)]);
+
+        let outcome = check_catalogue_spec_signals(&catalogue, &doc, true, "domain-types.json");
+        assert!(outcome.has_errors(), "stray signal without catalogue entry must block");
+        assert!(outcome.findings()[0].message().contains("coverage mismatch"));
+    }
+
+    #[test]
+    fn check_signals_errors_when_type_name_mismatched_positionally() {
+        // Same length but positional name mismatch: signals[0] refers to a
+        // name that is not catalogue.entries[0].name. This defeats a subtler
+        // tampering that keeps the length correct but swaps in a Blue row for
+        // an entry that should be Yellow / Red.
+        use super::super::catalogue::{
+            TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+        };
+        use crate::TypeAction;
+
+        let catalogue = TypeCatalogueDocument::new(
+            1,
+            vec![
+                TypeCatalogueEntry::new(
+                    "Real",
+                    "desc",
+                    TypeDefinitionKind::ValueObject,
+                    TypeAction::Add,
+                    true,
+                )
+                .unwrap(),
+            ],
+        );
+        let doc = signals_doc(vec![CatalogueSpecSignal::new("Fake", ConfidenceSignal::Blue)]);
+
+        let outcome = check_catalogue_spec_signals(&catalogue, &doc, true, "domain-types.json");
+        assert!(outcome.has_errors(), "positional name mismatch must block");
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("positional mismatch"));
+        assert!(msg.contains("Real"));
+        assert!(msg.contains("Fake"));
     }
 }

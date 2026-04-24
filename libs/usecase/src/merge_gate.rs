@@ -416,12 +416,26 @@ where
             Ok(id) => id,
             Err(_) => continue, // unreachable: pre-validated above
         };
-        // Step 1: read signals file — NotFound means layer not yet activated.
+        // Step 1: read signals file.
+        //
+        // For an opted-in layer the signals file MUST exist on the branch —
+        // treating `NotFound` as silent skip would let a PR bypass Chain ②
+        // by deleting `<layer>-catalogue-spec-signals.json` while leaving the
+        // opt-in flag set. Fail-closed with a remediation hint pointing at
+        // `sotp track catalogue-spec-signals`.
         let signals_doc = match reader
             .read_catalogue_spec_signals_document(branch, track_id, layer_id)
         {
             BlobFetchResult::Found(doc) => doc,
-            BlobFetchResult::NotFound => continue, // layer not yet activated
+            BlobFetchResult::NotFound => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "opted-in layer '{layer_id}' is missing \
+                     <layer>-catalogue-spec-signals.json on origin/{branch}. Run \
+                     `sotp track catalogue-spec-signals` and commit the generated file \
+                     so the merge gate can evaluate Chain ②."
+                ))]));
+                continue;
+            }
             BlobFetchResult::FetchError(msg) => {
                 outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "failed to read catalogue-spec signals for layer '{layer_id}' \
@@ -431,12 +445,24 @@ where
             }
         };
 
-        // Step 2: read catalogue + hash — NotFound = opt-out for integrity check.
+        // Step 2: read catalogue + hash.
+        //
+        // Opted-in layers are also `tddd.enabled` (see the opt-in gate above
+        // — the set is a strict subset), so a missing catalogue on an
+        // opted-in layer is an integrity violation, not a benign opt-out.
+        // Mirror the step-1 fail-closed policy.
         let (catalogue, catalogue_hash_hex) = match reader
             .read_catalogue_for_spec_ref_check(branch, track_id, layer_id)
         {
             BlobFetchResult::Found(pair) => pair,
-            BlobFetchResult::NotFound => continue,
+            BlobFetchResult::NotFound => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "opted-in layer '{layer_id}' is missing its catalogue file \
+                     on origin/{branch}. A layer cannot opt in to Chain ② without the \
+                     `<layer>-types.json` catalogue the signals are computed from."
+                ))]));
+                continue;
+            }
             BlobFetchResult::FetchError(msg) => {
                 outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "failed to read catalogue hash for layer '{layer_id}' \
@@ -480,6 +506,7 @@ where
         // Use the catalogue filename (not the signals filename) so diagnostic
         // messages point maintainers at the file they need to edit.
         let layer_signal_outcome = check_catalogue_spec_signals(
+            &catalogue,
             &signals_doc,
             /* strict */ true,
             &format!("{layer_id}-types.json"),
@@ -1424,23 +1451,44 @@ mod tests {
         format!("{:02x}", byte).repeat(32)
     }
 
-    /// An empty catalogue with a matching hash (signals hash == catalogue hash → not stale).
-    fn empty_catalogue_for_chain2() -> BlobFetchResult<(TypeCatalogueDocument, String)> {
-        // The signals document above uses ContentHash::from_bytes([0xcd; 32]),
-        // so supply a catalogue hash hex that encodes 0xcd repeated 32 bytes.
-        BlobFetchResult::Found((TypeCatalogueDocument::new(1, Vec::new()), hex64(0xcd)))
+    /// Catalogue with a single `TrackId` entry matching `all_*_signals()` doc
+    /// structure. Hash uses `0xcd` repeat so `declaration_hash` matches the
+    /// signals document used in these tests.
+    fn catalogue_with_trackid_entry() -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        use domain::TypeAction;
+        use domain::tddd::catalogue::{TypeCatalogueEntry, TypeDefinitionKind};
+
+        let entry = TypeCatalogueEntry::new(
+            "TrackId",
+            "test fixture",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        BlobFetchResult::Found((TypeCatalogueDocument::new(1, vec![entry]), hex64(0xcd)))
     }
 
     #[test]
-    fn test_u31_chain2_signals_not_found_skips_layer() {
-        // U31: Chain ② signals=NotFound → layer not yet activated → silent skip → PASS
+    fn test_u31_chain2_signals_not_found_blocks_for_opted_in_layer() {
+        // U31 (updated per PR #111 fail-open fix): Chain ② signals=NotFound
+        // for an opted-in layer → BLOCKED. Previously this was treated as
+        // silent opt-out, but that let a PR bypass Chain ② by deleting
+        // `<layer>-catalogue-spec-signals.json`.
         let reader = ChainTwoMock::new(
             BlobFetchResult::NotFound,
             BlobFetchResult::NotFound,
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(!outcome.has_errors(), "signals NotFound must pass (opt-out): {outcome:?}");
+        assert!(outcome.has_errors(), "signals NotFound on opted-in layer must block: {outcome:?}");
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("missing <layer>-catalogue-spec-signals.json")),
+            "error must explicitly name the missing signals file: {outcome:?}"
+        );
     }
 
     #[test]
@@ -1449,7 +1497,7 @@ mod tests {
         // Both signals and catalogue must be Found so the full Chain ② path runs.
         let reader = ChainTwoMock::new(
             BlobFetchResult::Found(all_yellow_signals()),
-            empty_catalogue_for_chain2(),
+            catalogue_with_trackid_entry(),
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
@@ -1467,9 +1515,11 @@ mod tests {
     #[test]
     fn test_u33_chain2_blue_signals_passes() {
         // U33: Chain ② activated layer with all-Blue signals → PASS
+        // Catalogue is provided with a matching `TrackId` entry so the
+        // coverage check in `check_catalogue_spec_signals` passes.
         let reader = ChainTwoMock::new(
             BlobFetchResult::Found(all_blue_catalogue_signals()),
-            empty_catalogue_for_chain2(),
+            catalogue_with_trackid_entry(),
             BlobFetchResult::Found(std::collections::BTreeMap::new()),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
@@ -1492,6 +1542,32 @@ mod tests {
                 .iter()
                 .any(|f| f.message().contains("failed to read catalogue-spec signals")),
             "error must mention catalogue-spec signals read failure: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u39_chain2_catalogue_not_found_blocks_for_opted_in_layer() {
+        // U39 (PR #111 regression): Step 2 catalogue=NotFound for an opted-in
+        // layer must block the merge even when Step 1 signals=Found. The
+        // `continue` after the Step 2 NotFound arm still accumulates the error
+        // into `outcome`, so this is fail-closed.
+        //
+        // Distinct from U31 (signals=NotFound): U31 never reaches Step 2 because
+        // the Step 1 `continue` fires first. U39 exercises the Step 2 path by
+        // providing valid signals but a missing catalogue.
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::Found(all_blue_catalogue_signals()),
+            BlobFetchResult::NotFound, // catalogue missing
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "catalogue NotFound on opted-in layer must block: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("missing its catalogue file")),
+            "error must mention the missing catalogue file: {outcome:?}"
         );
     }
 
@@ -1576,7 +1652,7 @@ mod tests {
         ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
             // Match the hash embedded in `all_yellow_signals()`:
             // ContentHash::from_bytes([0xcd; 32]) → hex64(0xcd)
-            empty_catalogue_for_chain2()
+            catalogue_with_trackid_entry()
         }
     }
 
@@ -1756,7 +1832,7 @@ mod tests {
                 // if Chain ② were not short-circuited. Without this override the
                 // NotFound default causes the per-layer loop to `continue` before
                 // reaching `check_catalogue_spec_signals`, making the test non-falsifiable.
-                empty_catalogue_for_chain2()
+                catalogue_with_trackid_entry()
             }
         }
         let reader = Stage2FailWithChain2Mock;

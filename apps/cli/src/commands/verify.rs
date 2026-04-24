@@ -841,7 +841,52 @@ fn execute_catalogue_spec_signals(
             }
         };
         let catalogue_file = binding.catalogue_file();
-        let layer_outcome = check_catalogue_spec_signals(&doc, strict, catalogue_file);
+
+        // Coverage validation requires the catalogue itself (not just its
+        // filename) so `check_catalogue_spec_signals` can confirm every
+        // catalogue entry has a matching signal. Without this, a tampered
+        // signals file with a valid `catalogue_declaration_hash` could omit
+        // entries and bypass Yellow / Red gating.
+        let catalogue_path = track_dir.join(catalogue_file);
+        match reject_symlinks_below(&catalogue_path, &items_dir) {
+            Ok(true) => {}
+            Ok(false) => {
+                outcome.add(domain::verify::VerifyFinding::error(format!(
+                    "catalogue file not found: {}",
+                    catalogue_path.display()
+                )));
+                continue;
+            }
+            Err(e) => {
+                outcome.add(domain::verify::VerifyFinding::error(format!(
+                    "symlink guard: {}: {e}",
+                    catalogue_path.display()
+                )));
+                continue;
+            }
+        }
+        let catalogue_text = match std::fs::read_to_string(&catalogue_path) {
+            Ok(s) => s,
+            Err(e) => {
+                outcome.add(domain::verify::VerifyFinding::error(format!(
+                    "{}: {e}",
+                    catalogue_path.display()
+                )));
+                continue;
+            }
+        };
+        let catalogue_doc = match infrastructure::tddd::catalogue_codec::decode(&catalogue_text) {
+            Ok(d) => d,
+            Err(e) => {
+                outcome.add(domain::verify::VerifyFinding::error(format!(
+                    "{}: decode error: {e}",
+                    catalogue_path.display()
+                )));
+                continue;
+            }
+        };
+        let layer_outcome =
+            check_catalogue_spec_signals(&catalogue_doc, &doc, strict, catalogue_file);
         for finding in layer_outcome.findings() {
             outcome.add(finding.clone());
         }
@@ -1639,6 +1684,35 @@ mod tests {
         );
     }
 
+    /// Helper: write a minimal `domain-types.json` whose single entry matches
+    /// the `type_name` used in the Yellow/Red signals test fixtures. Required
+    /// by the coverage-validation check in `check_catalogue_spec_signals`
+    /// (PR #111 fail-open fix): a signals file must list exactly the catalogue
+    /// entries, so each test that persists a signals document also needs a
+    /// catalogue file with matching names.
+    fn write_matching_domain_catalogue_with_single_entry(
+        track_dir: &std::path::Path,
+        entry_name: &str,
+    ) {
+        let catalogue = serde_json::json!({
+            "schema_version": 2,
+            "type_definitions": [
+                {
+                    "name": entry_name,
+                    "description": "test fixture",
+                    "kind": "value_object",
+                    "action": "add",
+                    "approved": true
+                }
+            ]
+        });
+        std::fs::write(
+            track_dir.join("domain-types.json"),
+            serde_json::to_string_pretty(&catalogue).unwrap(),
+        )
+        .unwrap();
+    }
+
     // Helper: write architecture-rules.json with one TDDD-enabled domain layer.
     fn write_arch_rules_for_signals_test(workspace_root: &std::path::Path) {
         let rules = serde_json::json!({
@@ -1698,6 +1772,7 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
         write_arch_rules_for_signals_test(&ws);
+        write_matching_domain_catalogue_with_single_entry(&track_dir, "MyType");
         // Write a signals file with one Yellow entry (informal_grounds[] non-empty,
         // spec_refs[] empty).
         let signals_json = serde_json::json!({
@@ -1737,6 +1812,7 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
         write_arch_rules_for_signals_test(&ws);
+        write_matching_domain_catalogue_with_single_entry(&track_dir, "MyType");
         let signals_json = serde_json::json!({
             "schema_version": 1,
             "catalogue_declaration_hash": "a".repeat(64),
