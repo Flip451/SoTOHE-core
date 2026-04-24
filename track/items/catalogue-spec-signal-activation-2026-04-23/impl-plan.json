@@ -52,12 +52,13 @@
     {
       "id": "T009",
       "description": "usecase 層に VerifyCatalogueSpecRefsInteractor を libs/usecase/src/catalogue_spec_refs.rs に実装する。TrackBlobReader + SpecElementHashReader の 2 port を依存注入で受け取り入力を収集: (1) read_catalogue_for_spec_ref_check → (TypeCatalogueDocument, String); String は raw bytes SHA-256 hex digest で ContentHash::try_from_hex(hash_str)? で ContentHash に変換して domain 関数の current_catalogue_hash 引数に渡す。(2) SpecElementHashReader::read_spec_element_hashes → BTreeMap<SpecElementId, ContentHash>; spec.json の各要素の canonical SHA-256 を事前計算した形で受け取る (read_spec_document の代わりに使用; canonical JSON serialization を usecase 層に持ち込まないための分離)。(3) read_catalogue_spec_signals_document → CatalogueSpecSignalsDocument (--skip-stale=true の場合は読み込み不要)。domain check_catalogue_spec_ref_integrity(layer, catalogue, &spec_element_hashes, Some(&content_hash), Some(&signals)) を呼び出し Vec<SpecRefFinding> を aggregate して返す。--skip-stale flag (bool) を受け取り、true の場合は current_catalogue_hash=None かつ signals_opt=None で domain 関数を呼ぶ (stale 検出スキップ)。active-track guard (CN-07) を適用する。unit test でモックポートを使って dangling / drift / stale / skip-stale / 非アクティブ reject を検証する (IN-06、usecase 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "c1bfde4"
     },
     {
       "id": "T010",
       "description": "infrastructure 層に CatalogueSpecSignalsDocumentDto serde DTO (schema_version: u32, catalogue_declaration_hash: String, signals: Vec<CatalogueSpecSignalDto>) と CatalogueSpecSignalsCodecError error enum (Json / UnsupportedSchemaVersion / Validation の 3 variant) を libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs に実装する。deny_unknown_fields 全 nesting で適用。encode / decode round-trip と unsupported schema version エラー / field 不正エラーを unit test で検証する。generated_at なし (CN-06) を確認する (IN-11、infrastructure 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T011",

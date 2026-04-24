@@ -4,13 +4,13 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| CatalogueSpecSignalsCodecError | error_type | — | Json, UnsupportedSchemaVersion, Validation | 🟡 |
+| CatalogueSpecSignalsCodecError | error_type | — | Json, UnsupportedSchemaVersion, Validation | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| CatalogueSpecSignalsDocumentDto | dto | — | — | 🟡 |
+| CatalogueSpecSignalsDocumentDto | dto | — | — | 🔵 |
 
 ## Secondary Adapters
 
