@@ -3,7 +3,7 @@
   "type_definitions": [
     {
       "name": "GitShowTrackBlobReader",
-      "description": "Existing infrastructure secondary adapter implementing TrackBlobReader via git show. Extended by this track to implement the two new port methods added to TrackBlobReader: read_catalogue_for_spec_ref_check (git show origin/<branch>:track/items/<id>/<layer>-types.json → BlobFetchResult<(TypeCatalogueDocument, String)>; String = SHA-256 of raw bytes for stale detection, same tuple pattern as existing read_type_catalogue) and read_catalogue_spec_signals_document (git show origin/<branch>:track/items/<id>/<layer>-catalogue-spec-signals.json decoded as CatalogueSpecSignalsDocument). All existing guard patterns are reused: symlink rejection, LANG=C fixation, BlobResult, path-not-found stderr parsing per ADR 2026-04-12-1200 §D4. action=modify because the adapter struct already exists in libs/infrastructure/src/verify/merge_gate_adapter.rs.",
+      "description": "Existing infrastructure secondary adapter implementing TrackBlobReader via git show. Extended by this track to implement: (a) the two new port methods added to TrackBlobReader (read_catalogue_for_spec_ref_check — (TypeCatalogueDocument, String) where String = raw-bytes SHA-256 for stale detection; read_catalogue_spec_signals_document — CatalogueSpecSignalsDocument); and (b) the new SpecElementHashReader port introduced in T009 (read_spec_element_hashes — BTreeMap<SpecElementId, ContentHash> for per-spec-element canonical hashes). All existing guard patterns are reused: symlink rejection, LANG=C fixation, BlobResult, path-not-found stderr parsing per ADR 2026-04-12-1200 §D4. The SpecElementHashReader impl shares the existing canonical_json_sha256 + build_element_map helpers from verify/plan_artifact_refs.rs (visibility raised to pub(crate)). action=modify because the adapter struct already exists in libs/infrastructure/src/verify/merge_gate_adapter.rs.",
       "approved": true,
       "action": "modify",
       "kind": "secondary_adapter",
@@ -116,12 +116,33 @@
               "is_async": false
             }
           ]
+        },
+        {
+          "trait_name": "SpecElementHashReader",
+          "expected_methods": [
+            {
+              "name": "read_spec_element_hashes",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>",
+              "is_async": false
+            }
+          ]
         }
       ],
       "informal_grounds": [
         {
           "kind": "user_directive",
-          "summary": "IN-08 (ADR D3.6) extends GitShowTrackBlobReader with two new git-show blob fetch methods; existing guard patterns are reused; hash will be computed at implementation time"
+          "summary": "IN-08 (ADR D3.6) extends GitShowTrackBlobReader with two new TrackBlobReader methods + SpecElementHashReader impl (T009); existing guard patterns are reused; hash will be computed at implementation time"
         }
       ]
     },

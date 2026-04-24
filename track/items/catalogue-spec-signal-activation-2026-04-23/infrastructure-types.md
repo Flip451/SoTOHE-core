@@ -16,6 +16,6 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| GitShowTrackBlobReader | secondary_adapter | modify | impl TrackBlobReader | 🟡 |
+| GitShowTrackBlobReader | secondary_adapter | modify | impl TrackBlobReader, impl SpecElementHashReader | 🔵 |
 | FsCatalogueSpecSignalsStore | secondary_adapter | — | impl CatalogueSpecSignalsWriter | 🟡 |
 

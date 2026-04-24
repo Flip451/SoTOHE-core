@@ -58,12 +58,13 @@
     {
       "id": "T010",
       "description": "infrastructure 層に CatalogueSpecSignalsDocumentDto serde DTO (schema_version: u32, catalogue_declaration_hash: String, signals: Vec<CatalogueSpecSignalDto>) と CatalogueSpecSignalsCodecError error enum (Json / UnsupportedSchemaVersion / Validation の 3 variant) を libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs に実装する。deny_unknown_fields 全 nesting で適用。encode / decode round-trip と unsupported schema version エラー / field 不正エラーを unit test で検証する。generated_at なし (CN-06) を確認する (IN-11、infrastructure 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "2ce67f3"
     },
     {
       "id": "T011",
       "description": "infrastructure 層に GitShowTrackBlobReader への method 追加と SpecElementHashReader の新規 impl を libs/infrastructure/src/verify/merge_gate_adapter.rs に実装する。TrackBlobReader 追加メソッド: (1) read_catalogue_for_spec_ref_check (git show origin/<branch>:track/items/<id>/<layer>-types.json → (TypeCatalogueDocument, String) decode; String は raw bytes の SHA-256 hash で stale 検出に必須; 既存 read_type_catalogue と同パターン)、(2) read_catalogue_spec_signals_document (git show origin/<branch>:track/items/<id>/<layer>-catalogue-spec-signals.json → CatalogueSpecSignalsDocument decode)。SpecElementHashReader impl: read_spec_element_hashes (git show origin/<branch>:track/items/<id>/spec.json → 各 spec 要素の canonical JSON subtree を sha2 で SHA-256 計算 → BTreeMap<SpecElementId, ContentHash> 返却; 既存 canonical_json_sha256 helper を流用)。既存 symlink guard / LANG=C fixation / BlobResult / path-not-found stderr 解析パターンを流用する。unit test で mock git-show 出力を使って正常 decode / path-not-found / symlink reject / SpecElementHashReader 正常返却を検証する (IN-08、infrastructure 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T012",

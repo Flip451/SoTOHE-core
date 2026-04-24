@@ -32,8 +32,8 @@ flowchart LR
     end
     L14_infrastructure_FsCatalogueSpecSignalsStore -.impl.-> L7_usecase_CatalogueSpecSignalsWriter
     L14_infrastructure_GitShowTrackBlobReader -->|"read_catalogue_spec_signals_document"| L6_domain_CatalogueSpecSignalsDocument
-    L14_infrastructure_GitShowTrackBlobReader -.impl.-> L7_usecase_TrackBlobReader
     L14_infrastructure_GitShowTrackBlobReader -.impl.-> L7_usecase_SpecElementHashReader
+    L14_infrastructure_GitShowTrackBlobReader -.impl.-> L7_usecase_TrackBlobReader
     L7_usecase_CatalogueSpecSignalsWriter -->|"write_catalogue_spec_signals(doc)"| L6_domain_CatalogueSpecSignalsDocument
     L7_usecase_RefreshCatalogueSpecSignals -->|"execute"| L7_usecase_RefreshCatalogueSpecSignalsError
     L7_usecase_RefreshCatalogueSpecSignals -->|"execute(cmd)"| L7_usecase_RefreshCatalogueSpecSignalsCommand

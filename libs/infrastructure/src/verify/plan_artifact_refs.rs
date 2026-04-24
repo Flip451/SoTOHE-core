@@ -387,7 +387,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
 // ---------------------------------------------------------------------------
 
 /// Mapping from spec element id string → canonical JSON representation of the element subtree.
-type SpecElementMap = HashMap<String, String>;
+pub(crate) type SpecElementMap = HashMap<String, String>;
 
 /// Resolve a file-based ref path, guard against symlinks, and push a finding if the
 /// file is absent or unsafe.
@@ -552,7 +552,7 @@ fn load_spec_element_map<'c>(
 ///
 /// Walks: `goal[]`, `scope.in_scope[]`, `scope.out_of_scope[]`, `constraints[]`,
 /// `acceptance_criteria[]`.
-fn build_element_map(raw: &serde_json::Value) -> SpecElementMap {
+pub(crate) fn build_element_map(raw: &serde_json::Value) -> SpecElementMap {
     let mut map = HashMap::new();
 
     let sections: &[&str] = &["goal", "constraints", "acceptance_criteria"];
@@ -616,7 +616,7 @@ fn escape_json_string(s: &str) -> String {
 }
 
 /// Compute SHA-256 of a canonical JSON string and return a 64-char lowercase hex.
-fn canonical_json_sha256(json: &str) -> String {
+pub(crate) fn canonical_json_sha256(json: &str) -> String {
     use sha2::Digest as _;
     let mut hasher = sha2::Sha256::new();
     hasher.update(json.as_bytes());
