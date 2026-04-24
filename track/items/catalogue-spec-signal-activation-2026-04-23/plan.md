@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # 型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ② の実装)
 
-## Tasks (13/25 resolved)
+## Tasks (14/25 resolved)
 
 ### S1 — S1 — Domain primitives: types + pure functions
 
@@ -41,7 +41,7 @@
 
 - [x] **T010**: infrastructure 層に CatalogueSpecSignalsDocumentDto serde DTO (schema_version: u32, catalogue_declaration_hash: String, signals: Vec<CatalogueSpecSignalDto>) と CatalogueSpecSignalsCodecError error enum (Json / UnsupportedSchemaVersion / Validation の 3 variant) を libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs に実装する。deny_unknown_fields 全 nesting で適用。encode / decode round-trip と unsupported schema version エラー / field 不正エラーを unit test で検証する。generated_at なし (CN-06) を確認する (IN-11、infrastructure 層) (`2ce67f3`)
 - [x] **T011**: infrastructure 層に GitShowTrackBlobReader への method 追加と SpecElementHashReader の新規 impl を libs/infrastructure/src/verify/merge_gate_adapter.rs に実装する。TrackBlobReader 追加メソッド: (1) read_catalogue_for_spec_ref_check (git show origin/<branch>:track/items/<id>/<layer>-types.json → (TypeCatalogueDocument, String) decode; String は raw bytes の SHA-256 hash で stale 検出に必須; 既存 read_type_catalogue と同パターン)、(2) read_catalogue_spec_signals_document (git show origin/<branch>:track/items/<id>/<layer>-catalogue-spec-signals.json → CatalogueSpecSignalsDocument decode)。SpecElementHashReader impl: read_spec_element_hashes (git show origin/<branch>:track/items/<id>/spec.json → 各 spec 要素の canonical JSON subtree を sha2 で SHA-256 計算 → BTreeMap<SpecElementId, ContentHash> 返却; 既存 canonical_json_sha256 helper を流用)。既存 symlink guard / LANG=C fixation / BlobResult / path-not-found stderr 解析パターンを流用する。unit test で mock git-show 出力を使って正常 decode / path-not-found / symlink reject / SpecElementHashReader 正常返却を検証する (IN-08、infrastructure 層) (`def0beb`)
-- [x] **T012**: infrastructure 層に FsCatalogueSpecSignalsStore を libs/infrastructure/src/tddd/ (新モジュール) に実装する。CatalogueSpecSignalsWriter port を実装し、track/items/<track_id>/<layer>-catalogue-spec-signals.json への atomic write を FsTrackStore / FsReviewStore と同パターンで提供する。workspace root path + CatalogueSpecSignalsDocumentDto を介した serde_json serialize を使用する。unit test でファイル書き込みと overwrite 冪等性を検証する (IN-08、infrastructure 層)
+- [x] **T012**: infrastructure 層に FsCatalogueSpecSignalsStore を libs/infrastructure/src/tddd/ (新モジュール) に実装する。CatalogueSpecSignalsWriter port を実装し、track/items/<track_id>/<layer>-catalogue-spec-signals.json への atomic write を FsTrackStore / FsReviewStore と同パターンで提供する。workspace root path + CatalogueSpecSignalsDocumentDto を介した serde_json serialize を使用する。unit test でファイル書き込みと overwrite 冪等性を検証する (IN-08、infrastructure 層) (`5f677bb`)
 - [ ] **T020**: <layer>-types.md レンダラー (libs/infrastructure/src/type_catalogue_render.rs) を拡張し、catalogue-spec signal (新規) を entry セクション内に type→implementation signal (既存) と並置表示する。<layer>-catalogue-spec-signals.json が存在する場合は signal 列を entry ヘッダー行に追記し、存在しない場合は従来表示を維持する。表示レイアウト (列配置、フォーマット) は実装時に proposal を確定する (IN-17、D2.5)。unit test でシグナルあり / なしの 2 ケースの markdown 出力を検証する (IN-17、infrastructure 層)
 
 ### S4 — S4 — CLI wrappers
@@ -50,7 +50,7 @@
 > sotp verify catalogue-spec-refs サブコマンド + --skip-stale (T014)
 > apps/cli/src/commands/track/ + apps/cli/src/commands/verify/ 配置
 
-- [ ] **T013**: CLI 層に sotp track catalogue-spec-signals サブコマンドを apps/cli/src/commands/track/catalogue_spec_signals.rs に追加する。引数 --layer <layer_id> (省略時は全 tddd.enabled + catalogue_spec_signal.enabled 層)。RefreshCatalogueSpecSignalsInteractor を dispatch し、exit 0 (成功) / non-zero (schema 違反・decode 失敗・active-track guard 失敗等) を返す。integration test で end-to-end (フィクスチャ types.json → signals.json 生成 + exit code) を検証する (IN-09、CLI 層)
+- [x] **T013**: CLI 層に sotp track catalogue-spec-signals サブコマンドを apps/cli/src/commands/track/catalogue_spec_signals.rs に追加する。引数 --layer <layer_id> (省略時は全 tddd.enabled + catalogue_spec_signal.enabled 層)。RefreshCatalogueSpecSignalsInteractor を dispatch し、exit 0 (成功) / non-zero (schema 違反・decode 失敗・active-track guard 失敗等) を返す。integration test で end-to-end (フィクスチャ types.json → signals.json 生成 + exit code) を検証する (IN-09、CLI 層)
 - [ ] **T014**: CLI 層に sotp verify catalogue-spec-refs サブコマンドを apps/cli/src/commands/verify/catalogue_spec_refs.rs に追加する。引数 --track <id> / --layer <layer_id> (省略時は全 tddd.enabled + catalogue_spec_signal.enabled 層をループ実行; T013 の --layer と同セマンティクス) / --skip-stale。各 layer_id に対して VerifyCatalogueSpecRefsInteractor を dispatch し、SpecRefFinding を D1.5 の形式で stderr に 1 行ずつ出力する。違反ゼロ → exit 0 / 1 件以上 → non-zero。integration test で dangling / drift / stale / skip-stale ケースの exit code + stderr 出力形式を検証する (IN-10、CLI 層)
 
 ### S5 — S5 — Integration wiring: pre-commit / CI / merge gate / config

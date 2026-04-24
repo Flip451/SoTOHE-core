@@ -114,804 +114,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:17bcee0f5b45b2d963af80b406102b41a57b5d5ad96ac5f716a2ec673607d9d8",
-          "at": "2026-04-23T13:36:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The convention establishes a rule that every new rule proposal must include an enforcement mechanism design or, if not yet implemented, a Reassess When trigger. This file is itself introducing that project rule, but it only documents the policy and provides no concrete mechanism design or Reassess trigger for enforcing this convention, leaving the rule dependent on the documentation/review path it says is drift-prone.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 25,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:17bcee0f5b45b2d963af80b406102b41a57b5d5ad96ac5f716a2ec673607d9d8",
-          "at": "2026-04-23T13:38:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new self-enforcement exception is internally inconsistent: it says the convention is enforced via Rules §3's 4th tier as \"documentation + review\", but Rules §3 defines the 4th tier as \"lint / static analysis\". That leaves the document disagreeing with itself about which mechanism is responsible for enforcing this convention.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 65,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:e623a6c8431292baed2168e3155842e5fe5620b2c73f861fbe9e549f8229a79d",
-          "at": "2026-04-23T14:21:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:473c658e6af17004d818ae0ad1db7c5a65c4d37b99f3a73fd52d552b5e936eca",
-          "at": "2026-04-23T14:23:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:473c658e6af17004d818ae0ad1db7c5a65c4d37b99f3a73fd52d552b5e936eca",
-          "at": "2026-04-23T14:25:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new facts-only briefing rule conflicts with the adr-editor invocation below it: this briefing still requires the imperative `edit the working tree only; do not commit inside the loop`. Because the same file tells harness-policy reviewers to flag briefing violations, legitimate Phase 1 back-and-forth invocations will now trip the new rule by construction.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
-              "line": 222,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:5b233c94c4ee3f0161ef66a2e234beba8482f791e40aff15a21736a8214e413c",
-          "at": "2026-04-23T16:40:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new \"facts only\" briefing rule conflicts with the existing adr-editor invocation contract later in this file: line 222 still requires the caller to include the imperative \"edit the working tree only; do not commit inside the loop\" in the briefing body. As written, the rule cannot be applied uniformly to all listed track sub-agents.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 148,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5b233c94c4ee3f0161ef66a2e234beba8482f791e40aff15a21736a8214e413c",
-          "at": "2026-04-23T16:43:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14435fd4b698365adea1f5004fd2fbf7bb960e2b8bd4e402185478f859413ab8",
-          "at": "2026-04-23T16:45:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The self-enforcement exception claims that new ADRs are semantically checked by the reviewer capability when they pass through `/track:plan` or `/adr:add`, but neither workflow actually invokes reviewer tooling. `.claude/commands/adr/add.md` only authors the ADR, and `.claude/commands/track/plan.md` only points the user to run `/track:review` later. That means the convention currently overstates its own tier-5 enforcement and leaves ADR additions unguarded unless a separate review step is run.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 69,
-              "category": "grounding_gap"
-            },
-            {
-              "message": "`Rules` require non-active tracks to be rejected by the write path itself, but the `security-critical` exception says fixes may still be retroactively applied to non-active tracks. Because the document never defines any override path or narrowed guard for that exception, the rule set is internally contradictory: an implementation cannot both hard-reject all non-active writes and also permit the documented emergency backport case.",
-              "severity": "P1",
-              "file": "knowledge/conventions/no-backward-compat.md",
-              "line": 21,
-              "category": "internal_consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:14435fd4b698365adea1f5004fd2fbf7bb960e2b8bd4e402185478f859413ab8",
-          "at": "2026-04-23T16:49:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ff85c9a060e2201601c52cd5055c8c3863ff91b2b117765a7c47e8fe7f593ef",
-          "at": "2026-04-23T16:51:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new self-enforcement exception points new ADRs at the wrong review scope. It says \"new ADR / convention changes\" are reviewed through `harness-policy`, but `track/review-scope.json` classifies `knowledge/adr/**` under `plan-artifacts`, not `harness-policy`. That means the documented safeguard for ADRs is grounded in a scope that will never see ADR diffs.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 69,
-              "category": "policy"
-            },
-            {
-              "message": "The reviewer obligation is not actually enforceable for the Codex-heavy path it is trying to cover. It requires harness-policy reviewers to flag violating briefings in `tmp/reviewer-runtime/briefing-*.md`, but harness-policy review is driven from `git diff` over tracked scope files and `track/review-scope.json` does not include `tmp/**`; those briefing files are runtime-only and untracked. In the normal review loop, the reviewer will never see the offending briefing.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 167,
-              "category": "policy"
-            }
-          ],
-          "hash": "rvw1:sha256:4ff85c9a060e2201601c52cd5055c8c3863ff91b2b117765a7c47e8fe7f593ef",
-          "at": "2026-04-23T16:53:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new 'facts-only' rule is only documented in the command text, but the real runtime input to sub-agents is `tmp/reviewer-runtime/briefing-*.md`. This section explicitly exempts those files from harness-policy review and defers prompt-body checks to plan-artifacts, so the artifact that actually drives the sub-agent still has no fail-closed enforcement. That leaves the biased-briefing failure mode this change is meant to prevent still reachable.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 167,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:183afe1c6b490a9b0a649a143a63fecfa717e08c96ac558a24d93ed92bd252b4",
-          "at": "2026-04-23T16:56:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:366c9e1a89ce13c5dd0e730585ea3ecec78371c1bd1e72c07ced1efec6e6b125",
-          "at": "2026-04-23T16:58:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new no-prescription rule still leaves the actual runtime briefings unchecked. Line 167 explicitly limits harness-policy review to the command text and excludes `tmp/reviewer-runtime/briefing-*.md`, but those gitignored files are the artifacts sub-agents actually consume. As a result, an orchestrator can still generate a biased briefing in normal use and no reviewer operating on tracked scope will ever see it, so the failure mode this section is meant to prevent remains reachable.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 167,
-              "category": "mechanism_gap"
-            },
-            {
-              "message": "The self-enforcement exception only documents review coverage for `knowledge/conventions/**` and `knowledge/adr/**`, even though this round introduces a new behavioral rule in `.claude/commands/track/plan.md`. `Rules` require every new rule proposal to carry an enforcement design, so narrowing the convention's own tier-5 safeguard to conventions/ADRs leaves policy-bearing command files outside the documented enforcement path.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 69,
-              "category": "policy"
-            }
-          ],
-          "hash": "rvw1:sha256:366c9e1a89ce13c5dd0e730585ea3ecec78371c1bd1e72c07ced1efec6e6b125",
-          "at": "2026-04-23T17:02:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fac548784cc08862a85693f7a7f28b75060cfc564bfcad6e2cd9b02b2b3ecebb",
-          "at": "2026-04-23T17:04:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`knowledge/conventions/enforce-by-mechanism.md` reserves tier-5-only enforcement for **that convention's own** self-referential rules, but this section uses the self-enforcement exception to justify the new no-prescription briefing rule. That opens a loophole where ordinary operational rules can skip designing a real mechanism just by citing the exception, which contradicts the convention's fail-closed priority order.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 167,
-              "category": null
-            },
-            {
-              "message": "This section says the no-prescription constraint applies to \"any caller invoking\" `spec-designer` / `type-designer` / `impl-planner` / `adr-editor`, but the rule is only documented here. There is no shared convention or parallel rule in the other command/agent docs, so the documented scope is broader than the review mechanism that is supposed to enforce it: a future caller can violate the rule without any local authoritative text for harness-policy review to anchor on.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 150,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:fac548784cc08862a85693f7a7f28b75060cfc564bfcad6e2cd9b02b2b3ecebb",
-          "at": "2026-04-23T17:08:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new 'facts only' rule is incompatible with the required Phase 1 adr-editor briefing: this same plan file still requires the imperative 'edit the working tree only; do not commit inside the loop' in the briefing body. That instruction is not a fact, so either every valid adr-editor escalation now violates the rule or the safety guardrail gets dropped.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 150,
-              "category": "logic"
-            },
-            {
-              "message": "The enforcement here only reviews the static command text, but the sub-agents actually consume untracked `tmp/reviewer-runtime/briefing-*.md` prompts. Because those runtime briefings are outside tracked harness-policy scope, a biased briefing can still be emitted and no reviewer will ever see the offending artifact, so the failure mode this section is meant to prevent remains reachable.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 167,
-              "category": "mechanism"
-            }
-          ],
-          "hash": "rvw1:sha256:2cf5287ff41070dc92682f2c48309f3daf298296ce3942e8a4dd59451dccb45e",
-          "at": "2026-04-23T17:10:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new \"facts-only\" briefing rule is only enforced in the tracked command text, but the actual sub-agent briefing bodies are generated at runtime as `tmp/reviewer-runtime/briefing-*.md` files, which are outside the tracked review scope. As a result, harness-policy review can inspect the policy but not the prompt bodies that may still contain prescription, so the failure mode this section is trying to prevent remains reachable.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 150,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
-          "at": "2026-04-23T17:14:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The enforcement note is grounded on `tmp/reviewer-runtime/`, but `/track:plan` actually emits its planner briefings through runtime files such as `tmp/spec-designer-briefing.md` and `tmp/impl-planner-briefing.md` via `track-local-plan`. As written, the rule reviews the policy text while leaving the generated briefing artifacts that can carry prescription outside the stated enforcement path.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:0e4589e21d878bc76b2854676bb73fc361aece3fa0b334015a1eb01c07513402",
-          "at": "2026-04-23T17:17:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The enforcement claim here is incomplete: the rule only reviews the tracked command text, while the actual sub-agent prompt bodies are emitted to transient `tmp/*-briefing.md` files or inline Agent prompts that this scope cannot inspect. That leaves biased briefing content unobservable to the harness-policy reviewer, so the new no-prescription rule does not actually prevent the failure mode it is meant to block.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism gap"
-            }
-          ],
-          "hash": "rvw1:sha256:8c654f9b2cac4e3260ad268fe511dcb4ec6fdac4e35771fb48d6b9aa371090fb",
-          "at": "2026-04-23T17:19:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This guard only covers the source command file, but `/track:plan` actually emits the prompts sent to sub-agents into runtime files like `tmp/spec-designer-briefing.md` and `tmp/impl-planner-briefing.md`. Those generated briefings are outside the harness-policy review scope, so a later change can still inject prescriptive text into the delivered prompt without any finding. The new enforcement path therefore misses the artifact it is meant to constrain.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:cd903a160e76797007e4210f28c3f87fd97d5c168278119da97c5c21bbe18a2a",
-          "at": "2026-04-23T17:22:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
-          "at": "2026-04-23T17:25:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `Sub-agent briefing rules` section defines author-side MUST/MUST NOT content, but it never states that harness-policy review must treat biased briefings as a reportable violation. That leaves the change without the reviewer-side semantic-review backstop described in the design intent, so the rule is still advisory and future prescriptive briefing edits can slip through review without any policy text saying they are failures.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 148,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
-          "at": "2026-04-23T17:28:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0cf9a08c80fb630f088057d6712d06e2aed7846ff0156d19ff58503dabcb59df",
-          "at": "2026-04-23T17:29:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new self-enforcement exception says ADR changes are checked for compliance with this convention via `plan-artifacts` review, but the review workflow only auto-loads conventions from the current `spec.md`/`plan.md`, and the `plan-artifacts` severity policy is just generic semantic review. That means an ADR that simply omits citing `enforce-by-mechanism.md` can bypass the exact mechanism this paragraph claims will catch it, so ADR-side self-enforcement is not actually closed here.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 75,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:0cf9a08c80fb630f088057d6712d06e2aed7846ff0156d19ff58503dabcb59df",
-          "at": "2026-04-23T17:31:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:883d85bec861cc3b641745ce272a4fc66d3d96697b3c21c9f0b6fcfd0c881c55",
-          "at": "2026-04-23T17:33:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Line 165 makes the tracked command file the enforcement surface for the new no-prescription rule, but the sub-agents actually consume transient briefings (`tmp/*-briefing.md` in Codex-heavy flows, inline Agent prompts elsewhere). Because those runtime prompt bodies are outside harness-policy scope and `tmp/` is gitignored, a biased briefing can still reach a sub-agent without any reviewer ever seeing the offending artifact, so the stated mechanism does not close the failure mode this section is meant to prevent.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:883d85bec861cc3b641745ce272a4fc66d3d96697b3c21c9f0b6fcfd0c881c55",
-          "at": "2026-04-23T17:36:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This rule only constrains the source command text, but the actual sub-agent prompts are generated into runtime briefing files outside harness-policy review scope. A later change can still inject prescriptive instructions into those delivered prompts without any review finding, so the new prohibition is still advisory rather than actually enforced on the artifact that matters.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:299874dd11bc2c183ac818dd002be8b585e81d9f2659e563bea8ffb483994b23",
-          "at": "2026-04-23T17:39:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b18170416a39baa0021db1aec08bad7eede2493d2e592f8a5a5941b91e195d55",
-          "at": "2026-04-23T17:41:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new tier-5 enforcement claim still does not cover the artifact that actually reaches the planner sub-agents. `/track:plan` says harness-policy review of `.claude/commands/**` is the mechanism here, but the codex-heavy path delivers the prompt through transient `tmp/*-briefing.md` files (`.claude/commands/track/plan.md` lines 198 and 215), and `apps/cli/src/commands/plan/codex_local.rs` turns `--briefing-file` into a runtime-only `Read ... and perform the task described there.` prompt. Because those briefing files are gitignored and outside harness-policy scope, a biased briefing can still be emitted without any reviewer ever seeing it, so the failure mode this section is meant to prevent remains reachable.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:b18170416a39baa0021db1aec08bad7eede2493d2e592f8a5a5941b91e195d55",
-          "at": "2026-04-23T17:44:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new \"facts-only, no prescription\" rule is internally inconsistent with the rest of this file: the `adr-editor` briefing still must include the imperative \"edit the working tree only; do not commit inside the loop\" later in the same command. As written, the rule cannot be applied uniformly to the listed sub-agents.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 148,
-              "category": "logic"
-            },
-            {
-              "message": "The enforcement claim still only covers the tracked command text, but the Codex-heavy path emits the actual sub-agent prompt through untracked `tmp/*-briefing.md` files (`tmp/spec-designer-briefing.md`, `tmp/impl-planner-briefing.md`). A later change can still inject prescriptive text into the delivered prompt without any harness-policy review finding, so the biased-briefing failure mode remains reachable.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:081b29d1bf78bea0d599cd5ad0be75f10a981d5e854346538c11536a9e0db0d0",
-          "at": "2026-04-23T17:47:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6083d9262add8025017de31844cbe40926667ce9ff76698ca635b365449b59ea",
-          "at": "2026-04-23T17:49:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new self-enforcement exception makes missing citations a reassess trigger, but the review path it defines explicitly does not check whether ADRs cite this convention. Because `plan-artifacts` review only looks for contradiction/factual errors/infeasibility, trigger (a) is not actually observable through the stated mechanism and the convention will not escalate when that failure mode occurs.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 75,
-              "category": null
-            },
-            {
-              "message": "The new security-fix exception allows an `admin-only flag` as a write-guard bypass example for non-active tracks. A generic admin override re-opens the very write path that Rules §2 says must reject non-active tracks, and the exception does not require the bypass mechanism itself to enforce the 'security-critical only' condition. As written, this creates a permanent loophole rather than a narrowly scoped emergency path.",
-              "severity": "P1",
-              "file": "knowledge/conventions/no-backward-compat.md",
-              "line": 53,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6083d9262add8025017de31844cbe40926667ce9ff76698ca635b365449b59ea",
-          "at": "2026-04-23T17:51:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This \"documentation + semantic review\" rule is only attached to the tracked command file, but the sub-agents actually consume transient briefing files (`tmp/spec-designer-briefing.md`, `tmp/impl-planner-briefing.md`, etc.) that are outside `harness-policy` scope. A biased runtime briefing can still be emitted without any reviewer seeing the offending artifact, so the new mechanism does not close the failure mode it is meant to prevent.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:5ef3ba385c6eb94c0e4025180f612c201cca975132724e0124fb7b83cd94d3ed",
-          "at": "2026-04-23T17:53:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
-          "at": "2026-04-23T17:57:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new reassess trigger `(a) 本 convention を cite しない新 ADR が複数観測` is broader than the rule it is supposed to monitor. `enforce-by-mechanism` only requires mechanism discussion when an ADR introduces a new rule, but this trigger counts every new ADR that omits the citation, including ADRs that do not define any rule at all. In practice that will generate false positives and make the escalation signal meaningless. Scope the trigger to ADRs that actually introduce rules/mechanisms, or to a missing required section, so it stays observable and actionable.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 78,
-              "category": "logic"
-            },
-            {
-              "message": "The security-fix exception now says retroactive application requires \"write guard のバイパス経路\" in a separate ADR, but the rule above defines non-active protection as a stack of `filesystem / codec / CLI / active-track guard` checks. Referring to a singular \"write guard\" leaves the override point undefined: an implementer can satisfy this literally by bypassing only one layer (so the emergency path still does not work) or by punching through the lowest layer without constraining the others. The exception needs to identify the canonical override surface or require coordinated handling across all relevant guard layers.",
-              "severity": "P1",
-              "file": "knowledge/conventions/no-backward-compat.md",
-              "line": 53,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
-          "at": "2026-04-23T18:01:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ADR-side self-enforcement path fails open for uncited ADRs. This paragraph says `knowledge/adr/**` changes are protected by `plan-artifacts` semantic review, but `/track:review` only loads convention files that the current `spec.md`/`plan.md` already names, and `track/review-prompts/plan-artifacts.md` does not treat missing convention citations as a reportable issue. A new ADR that simply omits `enforce-by-mechanism.md` can therefore pass the stated review path unchanged, so trigger (a) ('new ADRs that do not cite this convention') is not actually observable through the mechanism this section defines.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 75,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
-          "at": "2026-04-23T18:05:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new no-prescription rule is still enforced only on the tracked command text, but the prompts that sub-agents actually consume are emitted through transient `tmp/*-briefing.md` files in the Codex-heavy paths and inline Agent prompts elsewhere. Because those runtime prompt bodies are outside `harness-policy` scope, a biased briefing can still reach a sub-agent without any reviewer seeing the offending artifact, so this mechanism does not actually close the failure mode it is meant to prevent.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "mechanism_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:34363795cc3b74da034784fa7cbf78fdfaa4e2f359ad53ae8a67fd59c8c1a3b6",
-          "at": "2026-04-23T18:07:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The self-enforcement reassess trigger dropped the case where multiple new ADRs appear without citing this convention. That was the only observable signal for silent drift before a violating merge lands, so the current trigger set can let the convention decay without ever escalating to higher-tier enforcement.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 78,
-              "category": "mechanism-gap"
-            },
-            {
-              "message": "The security-fix exception is under-specified because it says to define a \"write guard\" bypass, but the base rule protects non-active tracks with layered filesystem / codec / CLI / active-track guards. As written, the override surface is ambiguous and can either fail to bypass all relevant checks or create a broader escape hatch than intended.",
-              "severity": "P1",
-              "file": "knowledge/conventions/no-backward-compat.md",
-              "line": 53,
-              "category": "security-mechanism"
-            }
-          ],
-          "hash": "rvw1:sha256:fbf6163ef89b0eff111cfa046c723629d9138af81980b9ae14976520da60f189",
-          "at": "2026-04-23T18:09:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This only constrains the tracked command text, not the prompt bodies that actually reach the sub-agents. The same file still uses transient `tmp/*-briefing.md` paths for the Codex-heavy flow later on, so a future edit can inject prescriptive briefing content into those generated files without any harness-policy review finding.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan.md",
-              "line": 165,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:54c143a5756566b16e96b889c1e2e019ac983470f866327b6cde04480a20cb21",
-          "at": "2026-04-23T18:12:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new security-critical exception adds two review-sensitive constraints (`override ADR` required before bypassing write guards, and the bypass must stay scoped to security fixes) but `## Review Checklist` was not updated to verify either one. Since this convention layer is enforced only through tier-5 semantic review, that omission leaves the new safeguard effectively unenforced: a future generic admin bypass could satisfy the written exception in practice without reviewers being prompted to check for the required ADR or scope restriction.",
-              "severity": "P1",
-              "file": "knowledge/conventions/no-backward-compat.md",
-              "line": 52,
-              "category": "mechanism gap"
-            }
-          ],
-          "hash": "rvw1:sha256:54c143a5756566b16e96b889c1e2e019ac983470f866327b6cde04480a20cb21",
-          "at": "2026-04-23T18:15:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
-          "at": "2026-04-23T18:16:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
-          "at": "2026-04-23T18:18:52Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:40:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
-              "severity": "P0",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 449,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:43:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
-          "at": "2026-04-23T16:44:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:50:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:53:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 49,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
-          "at": "2026-04-23T21:54:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 84,
-              "category": "contract"
-            }
-          ],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T21:57:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
-          "at": "2026-04-23T22:00:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "invariant"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:12:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
-              "line": 147,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
-          "at": "2026-04-23T22:13:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:14:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
-          "at": "2026-04-23T22:16:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:22:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
-          "at": "2026-04-23T22:23:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:33:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
-          "at": "2026-04-23T22:36:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:41:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
-          "at": "2026-04-23T22:42:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:45:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
-          "at": "2026-04-23T22:46:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
-          "at": "2026-04-23T23:05:43Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -2784,6 +1986,35 @@
           "findings": [],
           "hash": "rvw1:sha256:43334a4d8917526a0615b46ac5ea5b539e952f0078e318129d5645c0a6bf68f9",
           "at": "2026-04-24T01:31:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f74b84cc8e61c8f5564c71b43952c43bde088a0c7211304c0fdd1dfcea20091a",
+          "at": "2026-04-24T01:47:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T013` is now marked done, but its own definition says the no-arg `--layer` behavior is driven by `catalogue_spec_signal.enabled`, while `T018` still says that task is what adds and enables that config block. That makes the status progression internally inconsistent: the CLI feature is declared complete before the configuration contract it depends on exists in the plan.",
+              "severity": "P1",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f74b84cc8e61c8f5564c71b43952c43bde088a0c7211304c0fdd1dfcea20091a",
+          "at": "2026-04-24T01:48:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f74b84cc8e61c8f5564c71b43952c43bde088a0c7211304c0fdd1dfcea20091a",
+          "at": "2026-04-24T01:49:38Z"
         }
       ]
     },
@@ -2963,6 +2194,1023 @@
           "findings": [],
           "hash": "rvw1:sha256:15de2461661139f54d59abef806a3764213ad26f4cdb5d78d06ec00ea594195e",
           "at": "2026-04-24T00:11:06Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This active-track preflight is missing the `check_impl_plan_presence` guard that `type-signals`/`type-graph`/`contract-map` use. Because `FsTrackStore::load_impl_plan` returns `None` on an absent file and `derive_track_status(None, ...)` becomes `Planned`, a branch-bearing track with a missing `impl-plan.json` will be treated as active enough and the command will regenerate catalogue-spec signals instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 57,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e69147a7450df9d465d190fda25cb653441deedcdc834e40235608394794871f",
+          "at": "2026-04-24T01:49:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The refresh reads the layer catalogue with `std::fs::read` but never applies the symlink guard used elsewhere for local catalogue inputs. A malicious workspace can replace `track/items/<track_id>/<layer>-types.json` with a symlink to an arbitrary file outside the track tree, and this command will still read/hash it. Reject symlinked catalogue paths before decoding, or the pre-commit refresh can be pointed at attacker-controlled files.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 127,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:cbb163a1d0f095e843fd7e36a169e31e26c4bc25292810e5e45aec7ff81155c8",
+          "at": "2026-04-24T01:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new command path has no test covering the frozen-track guard (`Done`/`Archived`), so the custom rejection in `ensure_active_track_catalogue` can regress without being caught. Add a focused integration test that builds a completed/archived track and asserts `execute_catalogue_spec_signals` fails before any write occurs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 45,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b24aa9d71c0d3e9a2bfade7c7ec981e5f60ceb3f65736323bc216f359f67bf7f",
+          "at": "2026-04-24T01:57:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir` is used as a trusted filesystem root before any symlink/root validation. `read_track_metadata` and `FsTrackStore::load_impl_plan` will follow a symlinked or attacker-controlled `--items-dir`, so the command can be redirected to arbitrary metadata/impl-plan files before the active-track guard runs.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 56,
+              "category": "Security"
+            }
+          ],
+          "hash": "rvw1:sha256:aabcf41b58675165ec60a73c932a4b8eb9b9ea26fd80865fc382368aa9ae1b47",
+          "at": "2026-04-24T02:02:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` reads tracks from `items_dir` but constructs `FsCatalogueSpecSignalsStore` from `workspace_root`. If a caller passes a non-default `--items-dir`, the command will silently write `<layer>-catalogue-spec-signals.json` under `workspace_root/track/items/...` instead of the requested items tree, so a successful run can update the wrong files.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 105,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
+          "at": "2026-04-24T02:08:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_below` is anchored at `track_dir`, which means a symlink placed on `track/items/<track_id>` itself is never inspected. That lets an attacker redirect the read/hash step to an out-of-tree `<layer>-types.json` and generate signals from attacker-controlled content. Anchor this guard at `items_dir` instead, as the baseline-capture path does.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 152,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
+          "at": "2026-04-24T02:11:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The read-path guard only checks symlinks below `track_dir`; it never rejects `track_dir` itself being a symlink. A workspace can replace `track/items/<track-id>` with a symlink and make this command read/hash files outside the intended project tree.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 145,
+              "category": "security"
+            },
+            {
+              "message": "This test only asserts `is_err()`, so it would still pass if `TrackId::try_new` stopped rejecting `../evil` and the command failed later for some unrelated filesystem reason. It does not actually prove the path-traversal guard is enforced.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 371,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0012f0333567c5662d883ea246aa64a4e4e0db61dbf8fe87bad4173a2a5ce6e3",
+          "at": "2026-04-24T02:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:711db80117bd491d02fbaa19282bf205e8f68e2dca3839c97e4b52bd48385b87",
+          "at": "2026-04-24T02:29:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` only checks whether `items_dir` itself is a symlink, then immediately calls `read_track_metadata` and `load_impl_plan` through `items_dir/<track_id>`. If the track directory is a symlink, those reads escape the trusted tree before `reject_symlinks_below` ever runs, so the new path guard is bypassed for the active-track check. Reject symlinked `track_dir` before loading metadata / impl-plan.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 76,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:711db80117bd491d02fbaa19282bf205e8f68e2dca3839c97e4b52bd48385b87",
+          "at": "2026-04-24T02:32:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The explicit-layer test only uses a workspace with one enabled layer, so it would still pass if `--layer` were ignored and the command refreshed every enabled layer. Add a second enabled layer and assert only the requested layer is written.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 433,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:38:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The symlink guard only `lstat`s the final `items_dir`/`track_dir` path, so a symlink in any parent component still escapes the trusted tree. A path like `<workspace>/symlinked-parent/track/items` will be treated as safe even though the subsequent catalogue read resolves outside the intended `track/items` root.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 59,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:40:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:43:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` reads metadata and `<layer>-types.json` from the caller-supplied `items_dir`, but it creates `FsCatalogueSpecSignalsStore` from `workspace_root`, so the write path cannot follow a non-default `--items-dir`. On any invocation that points at a custom track-items root, the command will regenerate outputs in the default workspace tree instead of alongside the source track, leaving the requested track stale while writing stray files elsewhere.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 132,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T02:45:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T03:00:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_signals` reads metadata and source catalogues from `--items-dir`, but it always constructs `FsCatalogueSpecSignalsStore` from `workspace_root`. If a caller overrides `--items-dir` to point at a non-default track tree, the command will regenerate signals for that tree and then write the output into a different `track/items` directory, leaving the requested track stale and potentially overwriting another checkout's files.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 132,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T03:02:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1273442176f6cdbbcaaac9cc086814c14d4bf5c2a189ce3e9a351b2ddf4821ba",
+          "at": "2026-04-24T03:03:59Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_trait_methods` now downgrades structural signature mismatches to `Yellow` because the reverse check only compares method names. If the catalogue declares `save(&self, user: User) -> Result<(), DomainError>` but code implements `save(&self, user: User) -> ()`, the forward pass marks the declared signature as missing, the reverse pass produces no `extra` at all, and the new `missing => Yellow` branch classifies an incompatible implemented method as WIP instead of a Red drift violation. This weakens detection for non-strict flows and contradicts the six-axis method matching the evaluator otherwise uses.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 449,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9c899522ace3807bc208f38c6d4c48cb701f503197426ccf517100aa640ae89",
+          "at": "2026-04-23T16:44:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding`'s public optional locator fields and unchecked `new` constructor leave illegal combinations representable through the public API, e.g. `StaleSignals` can carry `catalogue_entry`/`spec_file` data or per-entry findings can omit them. That breaks the ADR contract that consumers may rely on when formatting or interpreting findings, and it weakens the domain-layer 'make illegal states unrepresentable' guarantee for this new value object.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:53:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` leaves the entry locator (`catalogue_entry`, `ref_index`, `spec_file`) outside the enum and exposes all of those fields publicly without any constructor validation, so callers can create impossible states such as `StaleSignals` with per-entry metadata or `DanglingAnchor`/`HashMismatch` with the locator missing. That breaks the domain invariant this type is supposed to model and will let later consumers receive malformed diagnostics they cannot distinguish from valid findings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3bcf7123e259da4d71437cc3e231de01c98207bb9e190370912b7017191bfc3a",
+          "at": "2026-04-23T21:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecRefFinding` no longer has the `{ layer, catalogue_entry, ref_index, spec_file, kind }` shape approved for T001: the locator fields were moved into `SpecRefFindingKind`, and `new()` now only accepts `(layer, kind)`. That breaks the public domain contract described in the review brief / track type definition, so downstream T004/T009 code written against the approved API will not match this crate export.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 84,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T21:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f079c43b89e739c895ee5328ee7b73284361f22eaf909f651fd4d9b425b63b1c",
+          "at": "2026-04-23T22:00:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:12:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8e354bd21ea98d9afcb2772ab56701d6ba71809c0d7216ba790b7187be806594",
+          "at": "2026-04-23T22:13:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77869696b076cd65bc035a6546a83c22caf8ecc9ab7d66766b7f54b4e3b4e1a0",
+          "at": "2026-04-23T22:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:22:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f818efb431d845565a0f72441ce60cec8e6d32c0f195d8b618f11d6f943dce1d",
+          "at": "2026-04-23T22:23:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:33:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3df7f682b51ed9bd00deb62b83d3f8d2a6b919dff1c496a485a18583b7a10d01",
+          "at": "2026-04-23T22:36:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:41:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4be5651625b3072bbeb397669bcb6fca8dd1442d6242e531645981ccf41d318",
+          "at": "2026-04-23T22:42:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa8853c582560bed0eaa4350c95ae3773fa7ba3c8e709a82ed6a1189053148e",
+          "at": "2026-04-23T22:46:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b000c8e1238900618ffe4df6d967efab8b54d5d8086e789f9f303fccda2ab107",
+          "at": "2026-04-23T23:05:43Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17bcee0f5b45b2d963af80b406102b41a57b5d5ad96ac5f716a2ec673607d9d8",
+          "at": "2026-04-23T13:36:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The convention establishes a rule that every new rule proposal must include an enforcement mechanism design or, if not yet implemented, a Reassess When trigger. This file is itself introducing that project rule, but it only documents the policy and provides no concrete mechanism design or Reassess trigger for enforcing this convention, leaving the rule dependent on the documentation/review path it says is drift-prone.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 25,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:17bcee0f5b45b2d963af80b406102b41a57b5d5ad96ac5f716a2ec673607d9d8",
+          "at": "2026-04-23T13:38:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception is internally inconsistent: it says the convention is enforced via Rules §3's 4th tier as \"documentation + review\", but Rules §3 defines the 4th tier as \"lint / static analysis\". That leaves the document disagreeing with itself about which mechanism is responsible for enforcing this convention.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 65,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:e623a6c8431292baed2168e3155842e5fe5620b2c73f861fbe9e549f8229a79d",
+          "at": "2026-04-23T14:21:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c658e6af17004d818ae0ad1db7c5a65c4d37b99f3a73fd52d552b5e936eca",
+          "at": "2026-04-23T14:23:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c658e6af17004d818ae0ad1db7c5a65c4d37b99f3a73fd52d552b5e936eca",
+          "at": "2026-04-23T14:25:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new facts-only briefing rule conflicts with the adr-editor invocation below it: this briefing still requires the imperative `edit the working tree only; do not commit inside the loop`. Because the same file tells harness-policy reviewers to flag briefing violations, legitimate Phase 1 back-and-forth invocations will now trip the new rule by construction.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "line": 222,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:5b233c94c4ee3f0161ef66a2e234beba8482f791e40aff15a21736a8214e413c",
+          "at": "2026-04-23T16:40:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new \"facts only\" briefing rule conflicts with the existing adr-editor invocation contract later in this file: line 222 still requires the caller to include the imperative \"edit the working tree only; do not commit inside the loop\" in the briefing body. As written, the rule cannot be applied uniformly to all listed track sub-agents.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 148,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5b233c94c4ee3f0161ef66a2e234beba8482f791e40aff15a21736a8214e413c",
+          "at": "2026-04-23T16:43:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14435fd4b698365adea1f5004fd2fbf7bb960e2b8bd4e402185478f859413ab8",
+          "at": "2026-04-23T16:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The self-enforcement exception claims that new ADRs are semantically checked by the reviewer capability when they pass through `/track:plan` or `/adr:add`, but neither workflow actually invokes reviewer tooling. `.claude/commands/adr/add.md` only authors the ADR, and `.claude/commands/track/plan.md` only points the user to run `/track:review` later. That means the convention currently overstates its own tier-5 enforcement and leaves ADR additions unguarded unless a separate review step is run.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 69,
+              "category": "grounding_gap"
+            },
+            {
+              "message": "`Rules` require non-active tracks to be rejected by the write path itself, but the `security-critical` exception says fixes may still be retroactively applied to non-active tracks. Because the document never defines any override path or narrowed guard for that exception, the rule set is internally contradictory: an implementation cannot both hard-reject all non-active writes and also permit the documented emergency backport case.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 21,
+              "category": "internal_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:14435fd4b698365adea1f5004fd2fbf7bb960e2b8bd4e402185478f859413ab8",
+          "at": "2026-04-23T16:49:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ff85c9a060e2201601c52cd5055c8c3863ff91b2b117765a7c47e8fe7f593ef",
+          "at": "2026-04-23T16:51:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception points new ADRs at the wrong review scope. It says \"new ADR / convention changes\" are reviewed through `harness-policy`, but `track/review-scope.json` classifies `knowledge/adr/**` under `plan-artifacts`, not `harness-policy`. That means the documented safeguard for ADRs is grounded in a scope that will never see ADR diffs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 69,
+              "category": "policy"
+            },
+            {
+              "message": "The reviewer obligation is not actually enforceable for the Codex-heavy path it is trying to cover. It requires harness-policy reviewers to flag violating briefings in `tmp/reviewer-runtime/briefing-*.md`, but harness-policy review is driven from `git diff` over tracked scope files and `track/review-scope.json` does not include `tmp/**`; those briefing files are runtime-only and untracked. In the normal review loop, the reviewer will never see the offending briefing.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:4ff85c9a060e2201601c52cd5055c8c3863ff91b2b117765a7c47e8fe7f593ef",
+          "at": "2026-04-23T16:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new 'facts-only' rule is only documented in the command text, but the real runtime input to sub-agents is `tmp/reviewer-runtime/briefing-*.md`. This section explicitly exempts those files from harness-policy review and defers prompt-body checks to plan-artifacts, so the artifact that actually drives the sub-agent still has no fail-closed enforcement. That leaves the biased-briefing failure mode this change is meant to prevent still reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:183afe1c6b490a9b0a649a143a63fecfa717e08c96ac558a24d93ed92bd252b4",
+          "at": "2026-04-23T16:56:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:366c9e1a89ce13c5dd0e730585ea3ecec78371c1bd1e72c07ced1efec6e6b125",
+          "at": "2026-04-23T16:58:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new no-prescription rule still leaves the actual runtime briefings unchecked. Line 167 explicitly limits harness-policy review to the command text and excludes `tmp/reviewer-runtime/briefing-*.md`, but those gitignored files are the artifacts sub-agents actually consume. As a result, an orchestrator can still generate a biased briefing in normal use and no reviewer operating on tracked scope will ever see it, so the failure mode this section is meant to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "mechanism_gap"
+            },
+            {
+              "message": "The self-enforcement exception only documents review coverage for `knowledge/conventions/**` and `knowledge/adr/**`, even though this round introduces a new behavioral rule in `.claude/commands/track/plan.md`. `Rules` require every new rule proposal to carry an enforcement design, so narrowing the convention's own tier-5 safeguard to conventions/ADRs leaves policy-bearing command files outside the documented enforcement path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 69,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:366c9e1a89ce13c5dd0e730585ea3ecec78371c1bd1e72c07ced1efec6e6b125",
+          "at": "2026-04-23T17:02:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fac548784cc08862a85693f7a7f28b75060cfc564bfcad6e2cd9b02b2b3ecebb",
+          "at": "2026-04-23T17:04:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/conventions/enforce-by-mechanism.md` reserves tier-5-only enforcement for **that convention's own** self-referential rules, but this section uses the self-enforcement exception to justify the new no-prescription briefing rule. That opens a loophole where ordinary operational rules can skip designing a real mechanism just by citing the exception, which contradicts the convention's fail-closed priority order.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": null
+            },
+            {
+              "message": "This section says the no-prescription constraint applies to \"any caller invoking\" `spec-designer` / `type-designer` / `impl-planner` / `adr-editor`, but the rule is only documented here. There is no shared convention or parallel rule in the other command/agent docs, so the documented scope is broader than the review mechanism that is supposed to enforce it: a future caller can violate the rule without any local authoritative text for harness-policy review to anchor on.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 150,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:fac548784cc08862a85693f7a7f28b75060cfc564bfcad6e2cd9b02b2b3ecebb",
+          "at": "2026-04-23T17:08:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new 'facts only' rule is incompatible with the required Phase 1 adr-editor briefing: this same plan file still requires the imperative 'edit the working tree only; do not commit inside the loop' in the briefing body. That instruction is not a fact, so either every valid adr-editor escalation now violates the rule or the safety guardrail gets dropped.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 150,
+              "category": "logic"
+            },
+            {
+              "message": "The enforcement here only reviews the static command text, but the sub-agents actually consume untracked `tmp/reviewer-runtime/briefing-*.md` prompts. Because those runtime briefings are outside tracked harness-policy scope, a biased briefing can still be emitted and no reviewer will ever see the offending artifact, so the failure mode this section is meant to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 167,
+              "category": "mechanism"
+            }
+          ],
+          "hash": "rvw1:sha256:2cf5287ff41070dc92682f2c48309f3daf298296ce3942e8a4dd59451dccb45e",
+          "at": "2026-04-23T17:10:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new \"facts-only\" briefing rule is only enforced in the tracked command text, but the actual sub-agent briefing bodies are generated at runtime as `tmp/reviewer-runtime/briefing-*.md` files, which are outside the tracked review scope. As a result, harness-policy review can inspect the policy but not the prompt bodies that may still contain prescription, so the failure mode this section is trying to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 150,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
+          "at": "2026-04-23T17:14:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The enforcement note is grounded on `tmp/reviewer-runtime/`, but `/track:plan` actually emits its planner briefings through runtime files such as `tmp/spec-designer-briefing.md` and `tmp/impl-planner-briefing.md` via `track-local-plan`. As written, the rule reviews the policy text while leaving the generated briefing artifacts that can carry prescription outside the stated enforcement path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0e4589e21d878bc76b2854676bb73fc361aece3fa0b334015a1eb01c07513402",
+          "at": "2026-04-23T17:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The enforcement claim here is incomplete: the rule only reviews the tracked command text, while the actual sub-agent prompt bodies are emitted to transient `tmp/*-briefing.md` files or inline Agent prompts that this scope cannot inspect. That leaves biased briefing content unobservable to the harness-policy reviewer, so the new no-prescription rule does not actually prevent the failure mode it is meant to block.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism gap"
+            }
+          ],
+          "hash": "rvw1:sha256:8c654f9b2cac4e3260ad268fe511dcb4ec6fdac4e35771fb48d6b9aa371090fb",
+          "at": "2026-04-23T17:19:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guard only covers the source command file, but `/track:plan` actually emits the prompts sent to sub-agents into runtime files like `tmp/spec-designer-briefing.md` and `tmp/impl-planner-briefing.md`. Those generated briefings are outside the harness-policy review scope, so a later change can still inject prescriptive text into the delivered prompt without any finding. The new enforcement path therefore misses the artifact it is meant to constrain.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:cd903a160e76797007e4210f28c3f87fd97d5c168278119da97c5c21bbe18a2a",
+          "at": "2026-04-23T17:22:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
+          "at": "2026-04-23T17:25:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Sub-agent briefing rules` section defines author-side MUST/MUST NOT content, but it never states that harness-policy review must treat biased briefings as a reportable violation. That leaves the change without the reviewer-side semantic-review backstop described in the design intent, so the rule is still advisory and future prescriptive briefing edits can slip through review without any policy text saying they are failures.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 148,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9177f4a71756beae9e431810cfd1277f17053e3f07a066ef866723669a967473",
+          "at": "2026-04-23T17:28:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cf9a08c80fb630f088057d6712d06e2aed7846ff0156d19ff58503dabcb59df",
+          "at": "2026-04-23T17:29:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception says ADR changes are checked for compliance with this convention via `plan-artifacts` review, but the review workflow only auto-loads conventions from the current `spec.md`/`plan.md`, and the `plan-artifacts` severity policy is just generic semantic review. That means an ADR that simply omits citing `enforce-by-mechanism.md` can bypass the exact mechanism this paragraph claims will catch it, so ADR-side self-enforcement is not actually closed here.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 75,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0cf9a08c80fb630f088057d6712d06e2aed7846ff0156d19ff58503dabcb59df",
+          "at": "2026-04-23T17:31:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:883d85bec861cc3b641745ce272a4fc66d3d96697b3c21c9f0b6fcfd0c881c55",
+          "at": "2026-04-23T17:33:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Line 165 makes the tracked command file the enforcement surface for the new no-prescription rule, but the sub-agents actually consume transient briefings (`tmp/*-briefing.md` in Codex-heavy flows, inline Agent prompts elsewhere). Because those runtime prompt bodies are outside harness-policy scope and `tmp/` is gitignored, a biased briefing can still reach a sub-agent without any reviewer ever seeing the offending artifact, so the stated mechanism does not close the failure mode this section is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:883d85bec861cc3b641745ce272a4fc66d3d96697b3c21c9f0b6fcfd0c881c55",
+          "at": "2026-04-23T17:36:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This rule only constrains the source command text, but the actual sub-agent prompts are generated into runtime briefing files outside harness-policy review scope. A later change can still inject prescriptive instructions into those delivered prompts without any review finding, so the new prohibition is still advisory rather than actually enforced on the artifact that matters.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:299874dd11bc2c183ac818dd002be8b585e81d9f2659e563bea8ffb483994b23",
+          "at": "2026-04-23T17:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b18170416a39baa0021db1aec08bad7eede2493d2e592f8a5a5941b91e195d55",
+          "at": "2026-04-23T17:41:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new tier-5 enforcement claim still does not cover the artifact that actually reaches the planner sub-agents. `/track:plan` says harness-policy review of `.claude/commands/**` is the mechanism here, but the codex-heavy path delivers the prompt through transient `tmp/*-briefing.md` files (`.claude/commands/track/plan.md` lines 198 and 215), and `apps/cli/src/commands/plan/codex_local.rs` turns `--briefing-file` into a runtime-only `Read ... and perform the task described there.` prompt. Because those briefing files are gitignored and outside harness-policy scope, a biased briefing can still be emitted without any reviewer ever seeing it, so the failure mode this section is meant to prevent remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b18170416a39baa0021db1aec08bad7eede2493d2e592f8a5a5941b91e195d55",
+          "at": "2026-04-23T17:44:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new \"facts-only, no prescription\" rule is internally inconsistent with the rest of this file: the `adr-editor` briefing still must include the imperative \"edit the working tree only; do not commit inside the loop\" later in the same command. As written, the rule cannot be applied uniformly to the listed sub-agents.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 148,
+              "category": "logic"
+            },
+            {
+              "message": "The enforcement claim still only covers the tracked command text, but the Codex-heavy path emits the actual sub-agent prompt through untracked `tmp/*-briefing.md` files (`tmp/spec-designer-briefing.md`, `tmp/impl-planner-briefing.md`). A later change can still inject prescriptive text into the delivered prompt without any harness-policy review finding, so the biased-briefing failure mode remains reachable.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:081b29d1bf78bea0d599cd5ad0be75f10a981d5e854346538c11536a9e0db0d0",
+          "at": "2026-04-23T17:47:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6083d9262add8025017de31844cbe40926667ce9ff76698ca635b365449b59ea",
+          "at": "2026-04-23T17:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new self-enforcement exception makes missing citations a reassess trigger, but the review path it defines explicitly does not check whether ADRs cite this convention. Because `plan-artifacts` review only looks for contradiction/factual errors/infeasibility, trigger (a) is not actually observable through the stated mechanism and the convention will not escalate when that failure mode occurs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 75,
+              "category": null
+            },
+            {
+              "message": "The new security-fix exception allows an `admin-only flag` as a write-guard bypass example for non-active tracks. A generic admin override re-opens the very write path that Rules §2 says must reject non-active tracks, and the exception does not require the bypass mechanism itself to enforce the 'security-critical only' condition. As written, this creates a permanent loophole rather than a narrowly scoped emergency path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 53,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6083d9262add8025017de31844cbe40926667ce9ff76698ca635b365449b59ea",
+          "at": "2026-04-23T17:51:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This \"documentation + semantic review\" rule is only attached to the tracked command file, but the sub-agents actually consume transient briefing files (`tmp/spec-designer-briefing.md`, `tmp/impl-planner-briefing.md`, etc.) that are outside `harness-policy` scope. A biased runtime briefing can still be emitted without any reviewer seeing the offending artifact, so the new mechanism does not close the failure mode it is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5ef3ba385c6eb94c0e4025180f612c201cca975132724e0124fb7b83cd94d3ed",
+          "at": "2026-04-23T17:53:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
+          "at": "2026-04-23T17:57:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reassess trigger `(a) 本 convention を cite しない新 ADR が複数観測` is broader than the rule it is supposed to monitor. `enforce-by-mechanism` only requires mechanism discussion when an ADR introduces a new rule, but this trigger counts every new ADR that omits the citation, including ADRs that do not define any rule at all. In practice that will generate false positives and make the escalation signal meaningless. Scope the trigger to ADRs that actually introduce rules/mechanisms, or to a missing required section, so it stays observable and actionable.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 78,
+              "category": "logic"
+            },
+            {
+              "message": "The security-fix exception now says retroactive application requires \"write guard のバイパス経路\" in a separate ADR, but the rule above defines non-active protection as a stack of `filesystem / codec / CLI / active-track guard` checks. Referring to a singular \"write guard\" leaves the override point undefined: an implementer can satisfy this literally by bypassing only one layer (so the emergency path still does not work) or by punching through the lowest layer without constraining the others. The exception needs to identify the canonical override surface or require coordinated handling across all relevant guard layers.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 53,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
+          "at": "2026-04-23T18:01:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR-side self-enforcement path fails open for uncited ADRs. This paragraph says `knowledge/adr/**` changes are protected by `plan-artifacts` semantic review, but `/track:review` only loads convention files that the current `spec.md`/`plan.md` already names, and `track/review-prompts/plan-artifacts.md` does not treat missing convention citations as a reportable issue. A new ADR that simply omits `enforce-by-mechanism.md` can therefore pass the stated review path unchanged, so trigger (a) ('new ADRs that do not cite this convention') is not actually observable through the mechanism this section defines.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 75,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:ab3acffbd7c6bfd56cc2ea86d7f2959a916cc5ba155aad7280e8c96e064a6a5e",
+          "at": "2026-04-23T18:05:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new no-prescription rule is still enforced only on the tracked command text, but the prompts that sub-agents actually consume are emitted through transient `tmp/*-briefing.md` files in the Codex-heavy paths and inline Agent prompts elsewhere. Because those runtime prompt bodies are outside `harness-policy` scope, a biased briefing can still reach a sub-agent without any reviewer seeing the offending artifact, so this mechanism does not actually close the failure mode it is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "mechanism_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:34363795cc3b74da034784fa7cbf78fdfaa4e2f359ad53ae8a67fd59c8c1a3b6",
+          "at": "2026-04-23T18:07:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The self-enforcement reassess trigger dropped the case where multiple new ADRs appear without citing this convention. That was the only observable signal for silent drift before a violating merge lands, so the current trigger set can let the convention decay without ever escalating to higher-tier enforcement.",
+              "severity": "P1",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 78,
+              "category": "mechanism-gap"
+            },
+            {
+              "message": "The security-fix exception is under-specified because it says to define a \"write guard\" bypass, but the base rule protects non-active tracks with layered filesystem / codec / CLI / active-track guards. As written, the override surface is ambiguous and can either fail to bypass all relevant checks or create a broader escape hatch than intended.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 53,
+              "category": "security-mechanism"
+            }
+          ],
+          "hash": "rvw1:sha256:fbf6163ef89b0eff111cfa046c723629d9138af81980b9ae14976520da60f189",
+          "at": "2026-04-23T18:09:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This only constrains the tracked command text, not the prompt bodies that actually reach the sub-agents. The same file still uses transient `tmp/*-briefing.md` paths for the Codex-heavy flow later on, so a future edit can inject prescriptive briefing content into those generated files without any harness-policy review finding.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 165,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:54c143a5756566b16e96b889c1e2e019ac983470f866327b6cde04480a20cb21",
+          "at": "2026-04-23T18:12:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new security-critical exception adds two review-sensitive constraints (`override ADR` required before bypassing write guards, and the bypass must stay scoped to security fixes) but `## Review Checklist` was not updated to verify either one. Since this convention layer is enforced only through tier-5 semantic review, that omission leaves the new safeguard effectively unenforced: a future generic admin bypass could satisfy the written exception in practice without reviewers being prompted to check for the required ADR or scope restriction.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 52,
+              "category": "mechanism gap"
+            }
+          ],
+          "hash": "rvw1:sha256:54c143a5756566b16e96b889c1e2e019ac983470f866327b6cde04480a20cb21",
+          "at": "2026-04-23T18:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
+          "at": "2026-04-23T18:16:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:294772f12872e7a600d377b9b950d4c790b0fb01e1b6d5348804cb14241a57d1",
+          "at": "2026-04-23T18:18:52Z"
         }
       ]
     }

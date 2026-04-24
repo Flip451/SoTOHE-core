@@ -70,12 +70,13 @@
     {
       "id": "T012",
       "description": "infrastructure 層に FsCatalogueSpecSignalsStore を libs/infrastructure/src/tddd/ (新モジュール) に実装する。CatalogueSpecSignalsWriter port を実装し、track/items/<track_id>/<layer>-catalogue-spec-signals.json への atomic write を FsTrackStore / FsReviewStore と同パターンで提供する。workspace root path + CatalogueSpecSignalsDocumentDto を介した serde_json serialize を使用する。unit test でファイル書き込みと overwrite 冪等性を検証する (IN-08、infrastructure 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5f677bb"
     },
     {
       "id": "T013",
       "description": "CLI 層に sotp track catalogue-spec-signals サブコマンドを apps/cli/src/commands/track/catalogue_spec_signals.rs に追加する。引数 --layer <layer_id> (省略時は全 tddd.enabled + catalogue_spec_signal.enabled 層)。RefreshCatalogueSpecSignalsInteractor を dispatch し、exit 0 (成功) / non-zero (schema 違反・decode 失敗・active-track guard 失敗等) を返す。integration test で end-to-end (フィクスチャ types.json → signals.json 生成 + exit code) を検証する (IN-09、CLI 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T014",
