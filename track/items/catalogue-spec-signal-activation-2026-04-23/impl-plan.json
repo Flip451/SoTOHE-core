@@ -146,7 +146,8 @@
     {
       "id": "T025",
       "description": "libs/domain/src/impl_plan.rs から check_impl_plan_presence 関数および ImplPlanPresenceError 型を削除する。呼び出し元 2 箇所 (libs/infrastructure/src/verify/latest_track.rs および apps/cli/src/commands/make.rs) の call site を合わせて除去し、is_activated() ↔ impl-plan.json present invariant の enforcement を完全に削除する。削除後の挙動変化: impl-plan.json が不在の activated track は check_impl_plan_presence が返していたエラーではなく、derive_track_status の「impl-plan.json 不在 → Planned」graceful fallback で Planned として扱われる。この挙動変化は意図的 — /track:init でブランチが先行 materialize される Phase 0-2 進行において false-positive な corruption エラーが発生していたための修正 (IN-21)。cargo make ci が pass することを確認する (IN-21、domain 層 + infrastructure 層 + cli 層)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "83c9eb7435fff7d472e317a2fe282c3735936a3a"
     }
   ],
   "plan": {
