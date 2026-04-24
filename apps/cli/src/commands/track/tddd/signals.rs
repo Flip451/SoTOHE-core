@@ -558,8 +558,15 @@ fn validate_and_write_catalogue(
                 domain_types_path.display()
             ))
         })?;
+    // Pass `None` for catalogue_spec_signals here: the CLI type-signals refresh
+    // does not own the SoT Chain ② signals file, and a fresh catalogue write
+    // typically invalidates any pre-existing `<layer>-catalogue-spec-signals.json`
+    // via declaration-hash drift anyway. The full 6-column view is produced
+    // on the next `track-transition` / `sync-views` pass through
+    // `infrastructure::track::render`, which re-reads and validates the
+    // catalogue-spec-signals file. ADR 2026-04-23-0344 §D2.5 / §D3.7.
     let rendered =
-        infrastructure::type_catalogue_render::render_type_catalogue(doc, catalogue_file);
+        infrastructure::type_catalogue_render::render_type_catalogue(doc, catalogue_file, None);
     atomic_write_file(&rendered_md_path, rendered.as_bytes()).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", rendered_md_path.display()))
     })?;

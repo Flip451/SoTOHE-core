@@ -99,6 +99,23 @@ impl TdddLayerBinding {
         self.catalogue_spec_signal_enabled
     }
 
+    /// Returns the per-layer catalogue-spec signals file name
+    /// (`<layer_id>-catalogue-spec-signals.json`).
+    ///
+    /// This file stores the SoT Chain ② signals (catalogue-entry ↔ spec
+    /// grounding) per ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
+    /// §D2.2. The naming convention differs from [`Self::signal_file`]
+    /// (which derives from `catalogue_file`): the catalogue-spec-signals
+    /// path is always `<layer_id>-catalogue-spec-signals.json`, mirroring
+    /// the `FsCatalogueSpecSignalsStore` write path (§D3.7).
+    ///
+    /// No I/O — pure string derivation from `layer_id`. Callers apply the
+    /// `reject_symlinks_below` guard before reading.
+    #[must_use]
+    pub fn catalogue_spec_signal_file(&self) -> String {
+        format!("{}-catalogue-spec-signals.json", self.layer_id)
+    }
+
     /// Returns the crate targets used by `schema_export`.
     #[must_use]
     pub fn targets(&self) -> &[String] {
@@ -468,6 +485,51 @@ mod tests {
         let signal = binding.signal_file();
         assert_ne!(signal, catalogue);
         assert_ne!(signal, baseline);
+    }
+
+    // --- catalogue_spec_signal_file() accessor (ADR 2026-04-23-0344 §D2.2) ---
+
+    fn binding_with_layer_id(layer_id: &str, catalogue_file: &str) -> TdddLayerBinding {
+        TdddLayerBinding {
+            layer_id: layer_id.to_owned(),
+            catalogue_file: catalogue_file.to_owned(),
+            catalogue_spec_signal_enabled: false,
+            targets: vec![layer_id.to_owned()],
+        }
+    }
+
+    #[test]
+    fn test_catalogue_spec_signal_file_derives_from_layer_id_not_catalogue_file() {
+        // The catalogue-spec-signals path is derived from `layer_id`, NOT from
+        // `catalogue_file` — this differs from `signal_file()` which derives
+        // from `catalogue_file`. The invariant mirrors `FsCatalogueSpecSignalsStore`
+        // (ADR §D3.7).
+        let binding = binding_with_layer_id("domain", "domain-types.json");
+        assert_eq!(binding.catalogue_spec_signal_file(), "domain-catalogue-spec-signals.json");
+
+        let binding = binding_with_layer_id("usecase", "usecase-types.json");
+        assert_eq!(binding.catalogue_spec_signal_file(), "usecase-catalogue-spec-signals.json");
+
+        let binding = binding_with_layer_id("infrastructure", "infrastructure-types.json");
+        assert_eq!(
+            binding.catalogue_spec_signal_file(),
+            "infrastructure-catalogue-spec-signals.json"
+        );
+    }
+
+    #[test]
+    fn test_catalogue_spec_signal_file_is_pure_string_derivation() {
+        let binding = binding_with_layer_id("domain", "domain-types.json");
+        let first = binding.catalogue_spec_signal_file();
+        let second = binding.catalogue_spec_signal_file();
+        assert_eq!(first, second);
+    }
+
+    #[test]
+    fn test_catalogue_spec_signal_file_differs_from_signal_file() {
+        // Regression guard: the two signal files must not collide.
+        let binding = binding_with_layer_id("domain", "domain-types.json");
+        assert_ne!(binding.catalogue_spec_signal_file(), binding.signal_file());
     }
 
     #[test]

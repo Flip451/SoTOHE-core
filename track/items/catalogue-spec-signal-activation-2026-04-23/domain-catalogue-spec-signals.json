@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "76991319b0ab2f6d290dc823727e0408e666318aae1befb5c481a6aee46e6909",
+  "signals": [
+    {
+      "type_name": "ImplPlanPresenceError",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "SpecRefFinding",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "SpecRefFindingKind",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "CatalogueSpecSignal",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "CatalogueSpecSignalsDocument",
+      "signal": "yellow"
+    }
+  ]
+}

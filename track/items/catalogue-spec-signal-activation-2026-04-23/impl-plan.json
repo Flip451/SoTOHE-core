@@ -112,12 +112,13 @@
     {
       "id": "T019",
       "description": "track/review-scope.json の review_operational 配列に track/items/<track-id>/*-catalogue-spec-signals.json の glob パターンを追加する。既存 *-type-signals.json と同型の一括除外パターンを踏襲する (IN-16、D2.4)。sotp verify review-scope 等の既存 review scope 検証 task が通ることを確認する (IN-16、integration 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "08b99358b3e9fb491dc9e37ca6e6e25079810b48"
     },
     {
       "id": "T020",
       "description": "<layer>-types.md レンダラー (libs/infrastructure/src/type_catalogue_render.rs) を拡張し、catalogue-spec signal (新規) を entry セクション内に type→implementation signal (既存) と並置表示する。<layer>-catalogue-spec-signals.json が存在する場合は signal 列を entry ヘッダー行に追記し、存在しない場合は従来表示を維持する。表示レイアウト (列配置、フォーマット) は実装時に proposal を確定する (IN-17、D2.5)。unit test でシグナルあり / なしの 2 ケースの markdown 出力を検証する (IN-17、infrastructure 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T021",

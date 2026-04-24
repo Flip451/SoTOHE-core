@@ -24,10 +24,19 @@
 //! `## Interactors`, `## DTOs`, `## Commands`, `## Queries`, `## Factories`.
 //!
 //! The Signal column shows `🔵` / `🔴` / `—` (no signal yet).
+//!
+//! T020 (ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D2.5 /
+//! IN-17): when a `<layer>-catalogue-spec-signals.json` document is supplied
+//! via `render_type_catalogue`'s new `catalogue_spec_signals` parameter, an
+//! additional `Cat-Spec` column is appended to the per-section table —
+//! showing the SoT Chain ② catalogue-spec grounding signal alongside the
+//! existing SoT Chain ③ type→implementation `Signal`. When the parameter is
+//! `None` (layer not yet opted in, or signals file absent/stale), the
+//! existing 5-column layout is preserved unchanged.
 
 use domain::{
-    ConfidenceSignal, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
-    TypestateTransitions,
+    CatalogueSpecSignalsDocument, ConfidenceSignal, TypeAction, TypeCatalogueDocument,
+    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
 };
 
 /// Section descriptor: a heading label paired with the predicate that selects entries.
@@ -59,8 +68,24 @@ const SECTIONS: &[Section] = &[
 /// Entries are grouped by kind into per-section tables in the canonical order
 /// defined by D7 of ADR `2026-04-13-1813-tddd-taxonomy-expansion.md`.
 /// Sections with no entries are omitted.
+///
+/// # Parameters
+///
+/// * `doc` — the type catalogue declaration.
+/// * `source_file_name` — filename used in the `<!-- Generated from ... -->`
+///   header comment (e.g. `"domain-types.json"`). Sanitised against HTML
+///   comment injection (newline strip + `-->` → `-- >` replacement).
+/// * `catalogue_spec_signals` — when `Some`, appends a `Cat-Spec` column
+///   populated from the per-entry signals. When `None`, the existing
+///   5-column layout (`Name | Kind | Action | Details | Signal`) is preserved
+///   unchanged. See ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
+///   §D2.5 / IN-17.
 #[must_use]
-pub fn render_type_catalogue(doc: &TypeCatalogueDocument, source_file_name: &str) -> String {
+pub fn render_type_catalogue(
+    doc: &TypeCatalogueDocument,
+    source_file_name: &str,
+    catalogue_spec_signals: Option<&CatalogueSpecSignalsDocument>,
+) -> String {
     let mut out = String::new();
 
     // Sanitize source_file_name for safe HTML comment interpolation:
@@ -74,6 +99,8 @@ pub fn render_type_catalogue(doc: &TypeCatalogueDocument, source_file_name: &str
     // any second entry with the same key skips past it to the next match.
     let mut consumed: std::collections::HashSet<usize> = std::collections::HashSet::new();
 
+    let has_spec_signals = catalogue_spec_signals.is_some();
+
     for section in SECTIONS {
         let section_entries: Vec<&TypeCatalogueEntry> =
             doc.entries().iter().filter(|e| e.kind().kind_tag() == section.kind_tag).collect();
@@ -85,27 +112,79 @@ pub fn render_type_catalogue(doc: &TypeCatalogueDocument, source_file_name: &str
         out.push('\n');
         out.push_str(section.heading);
         out.push_str("\n\n");
-        out.push_str("| Name | Kind | Action | Details | Signal |\n");
-        out.push_str("|------|------|--------|---------|--------|\n");
+        if has_spec_signals {
+            out.push_str("| Name | Kind | Action | Details | Signal | Cat-Spec |\n");
+            out.push_str("|------|------|--------|---------|--------|----------|\n");
+        } else {
+            out.push_str("| Name | Kind | Action | Details | Signal |\n");
+            out.push_str("|------|------|--------|---------|--------|\n");
+        }
 
         for entry in section_entries {
             let signal_col =
                 signal_for_entry(doc, entry.name(), entry.kind().kind_tag(), &mut consumed);
             let details_col = render_details(entry);
             let action_col = render_action(entry.action());
-            out.push_str(&format!(
-                "| {} | {} | {} | {} | {} |\n",
-                entry.name(),
-                entry.kind().kind_tag(),
-                action_col,
-                details_col,
-                signal_col,
-            ));
+            if let Some(spec_signals) = catalogue_spec_signals {
+                // Use the entry's catalogue-declared index to look up the
+                // corresponding catalogue-spec signal. `signals[i]` was
+                // generated for `doc.entries()[i]`, so a positional lookup
+                // is correct even when a delete+add pair shares a `type_name`
+                // and the SECTIONS canonical order differs from catalogue-declared
+                // order — name-only first-match would assign signals to the wrong
+                // entry in that case.
+                //
+                // The `type_name` guard is a defensive cross-check: a fresh,
+                // hash-verified `CatalogueSpecSignalsDocument` always satisfies
+                // `signals[i].type_name == entries[i].name`. A mismatch here means
+                // the signals doc is stale in a way the declaration-hash check
+                // missed; fall back to `—` rather than showing the wrong signal.
+                let cat_spec_col = doc
+                    .entries()
+                    .iter()
+                    .position(|e| std::ptr::eq(e, entry))
+                    .and_then(|i| spec_signals.signals.get(i))
+                    .filter(|sig| sig.type_name == entry.name())
+                    .map(|sig| catalogue_spec_signal_emoji(sig.signal))
+                    .unwrap_or_else(|| "\u{2014}".to_owned()); // —
+                out.push_str(&format!(
+                    "| {} | {} | {} | {} | {} | {} |\n",
+                    entry.name(),
+                    entry.kind().kind_tag(),
+                    action_col,
+                    details_col,
+                    signal_col,
+                    cat_spec_col,
+                ));
+            } else {
+                out.push_str(&format!(
+                    "| {} | {} | {} | {} | {} |\n",
+                    entry.name(),
+                    entry.kind().kind_tag(),
+                    action_col,
+                    details_col,
+                    signal_col,
+                ));
+            }
         }
     }
 
     out.push('\n');
     out
+}
+
+/// Maps a [`ConfidenceSignal`] to its display emoji for the `Cat-Spec` column.
+///
+/// Returns `🔵` / `🟡` / `🔴` for the three standard values; any future
+/// extended variant renders as `?` so the output remains legible rather than
+/// panicking.
+fn catalogue_spec_signal_emoji(signal: ConfidenceSignal) -> String {
+    match signal {
+        ConfidenceSignal::Blue => "\u{1f535}".to_owned(),
+        ConfidenceSignal::Yellow => "\u{1f7e1}".to_owned(),
+        ConfidenceSignal::Red => "\u{1f534}".to_owned(),
+        _ => "?".to_owned(),
+    }
 }
 
 /// Returns the signal emoji string for a named entry, or `"—"` if not evaluated.
@@ -200,7 +279,7 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
     use domain::{
         ConfidenceSignal, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
@@ -223,7 +302,7 @@ mod tests {
     #[test]
     fn test_render_type_catalogue_includes_generated_header() {
         let doc = make_doc(vec![]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(
             output.contains("<!-- Generated from domain-types.json"),
             "missing generated header"
@@ -238,7 +317,7 @@ mod tests {
         // `usecase-types.md`) correctly attribute their source.
         let doc = make_doc(vec![]);
 
-        let infra_output = render_type_catalogue(&doc, "infrastructure-types.json");
+        let infra_output = render_type_catalogue(&doc, "infrastructure-types.json", None);
         assert!(
             infra_output.contains("<!-- Generated from infrastructure-types.json"),
             "header must contain 'infrastructure-types.json', got: {infra_output}"
@@ -248,7 +327,7 @@ mod tests {
             "header must NOT hardcode 'domain-types.json' for infrastructure layer"
         );
 
-        let usecase_output = render_type_catalogue(&doc, "usecase-types.json");
+        let usecase_output = render_type_catalogue(&doc, "usecase-types.json", None);
         assert!(
             usecase_output.contains("<!-- Generated from usecase-types.json"),
             "header must contain 'usecase-types.json', got: {usecase_output}"
@@ -266,7 +345,7 @@ mod tests {
         // comment cannot close the comment prematurely. The test checks that the
         // rendered header contains the sanitized form `evil-- >suffix.json` rather
         // than the raw `evil-->suffix.json` sequence.
-        let injection_output = render_type_catalogue(&doc, "evil-->suffix.json");
+        let injection_output = render_type_catalogue(&doc, "evil-->suffix.json", None);
         assert!(
             injection_output.contains("evil-- >suffix.json"),
             "sanitized name must appear as `-- >` replacement, got: {injection_output}"
@@ -278,7 +357,7 @@ mod tests {
 
         // A newline in the name must be stripped so the comment stays on one line.
         // After stripping the `\n`, the name becomes `badname.json` with no embedded newline.
-        let newline_output = render_type_catalogue(&doc, "bad\nname.json");
+        let newline_output = render_type_catalogue(&doc, "bad\nname.json", None);
         let first_line = newline_output.lines().next().unwrap_or("");
         assert!(
             first_line.contains("badname.json"),
@@ -291,7 +370,7 @@ mod tests {
         // D7: the old flat "## Type Declarations" heading is replaced by per-kind
         // section headings.  An empty catalogue produces no section headings at all.
         let doc = make_doc(vec![]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(
             !output.contains("## Type Declarations"),
             "old flat heading must not appear after D7 rewrite"
@@ -301,7 +380,7 @@ mod tests {
     #[test]
     fn test_render_type_catalogue_table_header_present_when_entries_exist() {
         let doc = make_doc(vec![make_entry("Foo", TypeDefinitionKind::ValueObject)]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(
             output.contains("| Name | Kind | Action | Details | Signal |"),
             "missing table header"
@@ -319,7 +398,7 @@ mod tests {
             make_entry("Foo", TypeDefinitionKind::ValueObject),
             make_entry("Bar", TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }),
         ]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("## Value Objects"), "missing ## Value Objects");
         assert!(output.contains("## Secondary Ports"), "missing ## Secondary Ports");
         // Other section headers must NOT appear when no entries exist for them
@@ -334,7 +413,7 @@ mod tests {
             "MyPort",
             TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
         )]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(!output.contains("## Trait Ports"), "old ## Trait Ports heading must not appear");
         assert!(output.contains("## Secondary Ports"), "## Secondary Ports must appear");
     }
@@ -352,7 +431,7 @@ mod tests {
             },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| Draft | typestate |"), "missing typestate row");
         assert!(output.contains("\u{2192} Published"), "missing transition arrow");
     }
@@ -364,7 +443,7 @@ mod tests {
             TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("\u{2205} (terminal)"), "missing terminal marker");
     }
 
@@ -375,7 +454,7 @@ mod tests {
             TypeDefinitionKind::Enum { expected_variants: vec!["Planned".into(), "Done".into()] },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| TrackStatus | enum |"), "missing enum row");
         assert!(output.contains("Planned, Done"), "missing enum variants");
     }
@@ -384,7 +463,7 @@ mod tests {
     fn test_render_value_object_entry_row() {
         let entry = make_entry("TrackId", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| TrackId | value_object |"), "missing value_object row");
     }
 
@@ -395,7 +474,7 @@ mod tests {
             TypeDefinitionKind::ErrorType { expected_variants: vec!["NightlyNotFound".into()] },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| SchemaExportError | error_type |"), "missing error_type row");
         assert!(output.contains("NightlyNotFound"), "missing error variant");
     }
@@ -415,7 +494,7 @@ mod tests {
             },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(
             output.contains("| SchemaExporter | secondary_port |"),
             "missing secondary_port row"
@@ -438,7 +517,7 @@ mod tests {
             },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(
             output.contains("| HookHandler | application_service |"),
             "missing application_service row"
@@ -450,7 +529,7 @@ mod tests {
     fn test_render_use_case_entry_row() {
         let entry = make_entry("SaveTrackUseCase", TypeDefinitionKind::UseCase);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| SaveTrackUseCase | use_case |"), "missing use_case row");
     }
 
@@ -458,7 +537,7 @@ mod tests {
     fn test_render_interactor_entry_row() {
         let entry = make_entry("SaveTrackInteractor", TypeDefinitionKind::Interactor);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| SaveTrackInteractor | interactor |"), "missing interactor row");
     }
 
@@ -466,7 +545,7 @@ mod tests {
     fn test_render_dto_entry_row() {
         let entry = make_entry("CreateUserDto", TypeDefinitionKind::Dto);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| CreateUserDto | dto |"), "missing dto row");
     }
 
@@ -474,7 +553,7 @@ mod tests {
     fn test_render_command_entry_row() {
         let entry = make_entry("CreateUserCommand", TypeDefinitionKind::Command);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| CreateUserCommand | command |"), "missing command row");
     }
 
@@ -482,7 +561,7 @@ mod tests {
     fn test_render_query_entry_row() {
         let entry = make_entry("GetUserQuery", TypeDefinitionKind::Query);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| GetUserQuery | query |"), "missing query row");
     }
 
@@ -490,7 +569,7 @@ mod tests {
     fn test_render_factory_entry_row() {
         let entry = make_entry("UserFactory", TypeDefinitionKind::Factory);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| UserFactory | factory |"), "missing factory row");
     }
 
@@ -547,7 +626,7 @@ mod tests {
             make_entry("AggFactory", TypeDefinitionKind::Factory),
         ];
         let doc = make_doc(entries);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
 
         // All 12 kind tags must appear in the output
         assert!(output.contains("typestate"), "missing typestate");
@@ -606,7 +685,7 @@ mod tests {
     fn test_render_signal_column_shows_dash_when_no_signals() {
         let entry = make_entry("Draft", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("\u{2014}"), "missing em-dash for unevaluated signal");
     }
 
@@ -623,7 +702,7 @@ mod tests {
             vec![],
             vec![],
         )]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("\u{1f535}"), "missing blue circle for Blue signal");
     }
 
@@ -640,7 +719,7 @@ mod tests {
             vec![],
             vec![],
         )]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("\u{1f534}"), "missing red circle for Red signal");
     }
 
@@ -660,7 +739,7 @@ mod tests {
             make_entry("TrackId", TypeDefinitionKind::ValueObject),
         ];
         let doc = make_doc(entries);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("Draft"), "missing Draft");
         assert!(output.contains("TrackStatus"), "missing TrackStatus");
         assert!(output.contains("TrackId"), "missing TrackId");
@@ -674,7 +753,7 @@ mod tests {
     fn test_render_add_action_shows_dash() {
         let entry = make_entry("Foo", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         // Add action renders as em-dash
         assert!(output.contains("| \u{2014} |"), "Add action should show em-dash");
     }
@@ -690,20 +769,217 @@ mod tests {
         )
         .unwrap();
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| delete |"), "Delete action should show 'delete'");
     }
 
     #[test]
     fn test_render_output_ends_with_newline() {
         let doc = make_doc(vec![]);
-        let output = render_type_catalogue(&doc, "domain-types.json");
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.ends_with('\n'), "output must end with trailing newline");
     }
 
     // ---------------------------------------------------------------------------
     // SECTIONS coverage (TDDD-Q01)
     // ---------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------
+    // render_type_catalogue: Cat-Spec column (T020, ADR 2026-04-23-0344 §D2.5)
+    // ---------------------------------------------------------------------------
+
+    use domain::{CatalogueSpecSignal, CatalogueSpecSignalsDocument, ContentHash};
+
+    fn make_spec_signals(per_entry: Vec<(&str, ConfidenceSignal)>) -> CatalogueSpecSignalsDocument {
+        let hash = ContentHash::from_bytes([0u8; 32]);
+        let signals = per_entry.into_iter().map(|(n, s)| CatalogueSpecSignal::new(n, s)).collect();
+        CatalogueSpecSignalsDocument::new(hash, signals)
+    }
+
+    #[test]
+    fn test_render_cat_spec_column_absent_when_signals_none() {
+        // Backward-compat: when catalogue_spec_signals is None, the rendered
+        // output matches the legacy 5-column layout — no `Cat-Spec` header
+        // and no extra column. A pre-existing caller that passes `None`
+        // must see byte-identical output to the pre-T020 version.
+        let entry = make_entry("Foo", TypeDefinitionKind::ValueObject);
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
+        assert!(
+            !output.contains("Cat-Spec"),
+            "Cat-Spec header must not appear when signals is None: {output}"
+        );
+        assert!(
+            output.contains("| Name | Kind | Action | Details | Signal |"),
+            "legacy 5-column header must be preserved when signals is None: {output}"
+        );
+    }
+
+    #[test]
+    fn test_render_cat_spec_column_present_when_signals_some() {
+        // When catalogue_spec_signals is Some, a sixth `Cat-Spec` column is
+        // appended to the header and each entry row. Signal values map to
+        // the same emoji set as the existing Signal column.
+        let entries = vec![
+            make_entry("FooBlue", TypeDefinitionKind::ValueObject),
+            make_entry("BarYellow", TypeDefinitionKind::ValueObject),
+            make_entry("BazRed", TypeDefinitionKind::ValueObject),
+            make_entry("QuxMissing", TypeDefinitionKind::ValueObject),
+        ];
+        let doc = make_doc(entries);
+        let spec_signals = make_spec_signals(vec![
+            ("FooBlue", ConfidenceSignal::Blue),
+            ("BarYellow", ConfidenceSignal::Yellow),
+            ("BazRed", ConfidenceSignal::Red),
+            // QuxMissing is deliberately absent so the Cat-Spec column
+            // shows the `—` fallback for that entry.
+        ]);
+        let output = render_type_catalogue(&doc, "domain-types.json", Some(&spec_signals));
+
+        // Header has six columns including Cat-Spec.
+        assert!(
+            output.contains("| Name | Kind | Action | Details | Signal | Cat-Spec |"),
+            "six-column header missing: {output}"
+        );
+        assert!(
+            output.contains("|------|------|--------|---------|--------|----------|"),
+            "six-column separator missing: {output}"
+        );
+
+        // Per-entry emoji rendering (Blue/Yellow/Red/— em-dash for missing).
+        assert!(output.contains("\u{1f535}"), "Blue emoji (🔵) missing");
+        assert!(output.contains("\u{1f7e1}"), "Yellow emoji (🟡) missing");
+        assert!(output.contains("\u{1f534}"), "Red emoji (🔴) missing");
+        // The em-dash fallback exists (also used by the Signal column for
+        // unevaluated entries) so its presence is always expected.
+        assert!(output.contains("\u{2014}"), "em-dash missing for absent signal");
+
+        // Ensure the Cat-Spec column is the LAST column of each data row,
+        // not a replacement for the existing Signal column. Check one row
+        // ends with ` | <Cat-Spec> |` and contains two emoji-or-dash cells
+        // after `value_object |`.
+        let blue_row = output
+            .lines()
+            .find(|l| l.starts_with("| FooBlue | value_object |"))
+            .expect("FooBlue row must be present");
+        // Row format: `| Name | Kind | Action | Details | Signal | Cat-Spec |`
+        // — i.e. 7 `|` characters total (including leading and trailing).
+        let pipe_count = blue_row.chars().filter(|c| *c == '|').count();
+        assert_eq!(pipe_count, 7, "expected 7 pipes in six-column row, got: {blue_row}");
+    }
+
+    #[test]
+    fn test_render_cat_spec_column_entry_without_matching_signal_shows_dash() {
+        // An entry whose name is not present in `signals.signals` renders
+        // the em-dash fallback, not a panic or misaligned row.
+        let entry = make_entry("Unmapped", TypeDefinitionKind::ValueObject);
+        let doc = make_doc(vec![entry]);
+        // Spec signals document with a DIFFERENT entry name so the lookup misses.
+        let spec_signals = make_spec_signals(vec![("Other", ConfidenceSignal::Blue)]);
+        let output = render_type_catalogue(&doc, "domain-types.json", Some(&spec_signals));
+
+        let row = output
+            .lines()
+            .find(|l| l.starts_with("| Unmapped |"))
+            .expect("Unmapped row must be present");
+        // The Cat-Spec cell (last non-empty cell) must be the em-dash.
+        assert!(
+            row.ends_with("| \u{2014} |"),
+            "Unmapped entry without signal must show em-dash Cat-Spec cell: {row}"
+        );
+    }
+
+    #[test]
+    fn test_render_cat_spec_column_uses_catalogue_position_not_name_order() {
+        // Regression guard for the delete+add pair ordering bug (gpt-5.5 P1
+        // finding): when a delete+add pair shares a `type_name` and the two
+        // entries' kinds fall in different SECTIONS positions (different canonical
+        // section order vs catalogue-declared order), a name-only first-match
+        // approach would assign the wrong signal to each entry.
+        //
+        // The signals document is generated in catalogue-declared order, so
+        // `signals[i]` is always for `doc.entries()[i]`. The renderer must use
+        // a positional lookup (by catalogue index) rather than a name-only
+        // first-match.
+        //
+        // Catalogue-declared order: [enum(0), value_object(1)]
+        // SECTIONS canonical order: enum(1) comes before value_object(2) — same
+        // here since both are adjacent, but the signals are generated in catalogue
+        // order: signals[0] = Red (for enum entry), signals[1] = Blue (for value_object).
+        //
+        // With the position-based lookup:
+        //   enum row → catalogue index 0 → signals[0] = Red ✓
+        //   value_object row → catalogue index 1 → signals[1] = Blue ✓
+        //
+        // With the old name-only first-match (bug):
+        //   enum walks SECTIONS first → picks signals[0] = Red (correct by coincidence)
+        //   value_object picks signals[1] = Blue (also correct by coincidence here)
+        //
+        // The critical case: catalogue order is [value_object(0), enum(1)] but
+        // SECTIONS renders enum section BEFORE value_object section. Then:
+        //   Signals: [0]=Blue (for value_object), [1]=Red (for enum)
+        //   Name-only: enum section renders first → finds "SameName" at index 0
+        //     → picks Blue (WRONG: should be Red, index 1)
+        //   Positional: enum entry is at catalogue index 1 → signals[1] = Red ✓
+        //
+        // This test covers that case explicitly.
+        use domain::TypeAction;
+
+        // Build catalogue with value_object FIRST (catalogue index 0), enum SECOND
+        // (catalogue index 1). SECTIONS renders enum (index 1 in SECTIONS) before
+        // value_object (index 2 in SECTIONS), so the render order differs from
+        // catalogue order.
+        let vo_entry = TypeCatalogueEntry::new(
+            "SameName",
+            "value object entry",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        let enum_entry = TypeCatalogueEntry::new(
+            "SameName",
+            "enum entry",
+            TypeDefinitionKind::Enum { expected_variants: vec!["A".into(), "B".into()] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Catalogue-declared order: [value_object(0), enum(1)]
+        let doc = make_doc(vec![vo_entry, enum_entry]);
+
+        // Signals in catalogue-declared order:
+        //   signals[0] = Blue  (for value_object entry at catalogue index 0)
+        //   signals[1] = Red   (for enum entry at catalogue index 1)
+        let spec_signals = make_spec_signals(vec![
+            ("SameName", ConfidenceSignal::Blue),
+            ("SameName", ConfidenceSignal::Red),
+        ]);
+
+        let output = render_type_catalogue(&doc, "domain-types.json", Some(&spec_signals));
+
+        // SECTIONS renders enum before value_object. The positional lookup must
+        // assign:
+        //   - enum row (catalogue index 1) → signals[1] = Red
+        //   - value_object row (catalogue index 0) → signals[0] = Blue
+        let enum_row = output
+            .lines()
+            .find(|l| l.contains("| SameName | enum |"))
+            .expect("enum SameName row must be present");
+        assert!(
+            enum_row.ends_with("| \u{1f534} |"),
+            "enum SameName must show Red (signals[1]), got: {enum_row}"
+        );
+
+        let vo_row = output
+            .lines()
+            .find(|l| l.contains("| SameName | value_object |"))
+            .expect("value_object SameName row must be present");
+        assert!(
+            vo_row.ends_with("| \u{1f535} |"),
+            "value_object SameName must show Blue (signals[0]), got: {vo_row}"
+        );
+    }
 
     #[test]
     fn test_sections_covers_all_kind_tags() {
