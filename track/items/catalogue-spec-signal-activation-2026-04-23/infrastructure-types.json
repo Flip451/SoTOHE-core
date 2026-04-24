@@ -209,6 +209,26 @@
           "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
         }
       ]
+    },
+    {
+      "name": "LoadCatalogueSpecSignalsForViewError",
+      "description": "Error enum returned by infrastructure::type_catalogue_render::load_catalogue_spec_signals_for_view. Reports fail-closed load failures for <layer>-catalogue-spec-signals.json at view-render time: NotFound (signals file absent), NotRegularFile (symlink or non-file), Io (read failure), Decode (JSON / schema / hash format invalid), StaleHash (catalogue_declaration_hash mismatch vs on-disk catalogue bytes). Variants carry path + diagnostic context so the error message directs the user to `sotp track catalogue-spec-signals <track_id>` for regeneration. Placed in libs/infrastructure/src/type_catalogue_render.rs. Enforces the opt-in fail-closed view-render invariant defined by T020 (IN-17): opt-in layers must render the 6-column view from a fresh signals file; silent fallback would flap hashes between pre-commit steps.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "NotFound",
+        "NotRegularFile",
+        "Io",
+        "Decode",
+        "StaleHash"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-17",
+          "hash": "8dea9e8182ee5d3a2da05a58f3cae81d5c37b93e6eba550a3970340484718d64"
+        }
+      ]
     }
   ]
 }

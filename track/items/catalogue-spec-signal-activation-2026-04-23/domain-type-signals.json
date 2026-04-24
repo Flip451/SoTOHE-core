@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-24T13:23:01Z",
-  "declaration_hash": "0f2ee0e1f14adc751ef588c484159397600409c4b78a0baf559ab1363faaa694",
+  "generated_at": "2026-04-24T14:20:03Z",
+  "declaration_hash": "8cb4298e911072fc7826a468aaa1fbb18ec2f376a52b33a44600795c8abd313a",
   "signals": [
     {
       "type_name": "ImplPlanPresenceError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "SpecRefFinding",

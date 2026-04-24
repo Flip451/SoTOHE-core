@@ -869,15 +869,14 @@ fn run_pre_commit_type_signals(
                          '{track_id}': {e}"
                     ))
                 })?;
-                // Fail-closed: a track with no impl-plan.json but with a
-                // materialized branch is potentially corrupt — block the
-                // commit. Route through the domain API so the activation
-                // invariant has a single source of truth.
+                // Derive the effective track status from impl-plan.json (if
+                // present) + status_override. When impl-plan.json is absent
+                // (Phase 0-2 pre-impl-plan state), `derive_track_status`
+                // returns Planned gracefully — no invariant check blocks the
+                // commit at this layer. The CLI-level `ensure_active_track`
+                // guard below handles frozen tracks (Done / Archived).
                 let effective_status =
                     domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-                domain::check_impl_plan_presence(&metadata, impl_plan.as_ref()).map_err(|e| {
-                    CliError::Message(format!("[track-commit-message] BLOCKED: {e}"))
-                })?;
                 if ensure_active_track(effective_status, track_id).is_err() {
                     // Track is Done or Archived — skip pre-commit type-signal recomputation.
                     // The frozen track's signal files are already correct from when it was active.

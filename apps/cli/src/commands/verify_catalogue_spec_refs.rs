@@ -149,9 +149,6 @@ pub fn execute_verify_catalogue_spec_refs(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref()).map_err(|e| {
-        CliError::Message(format!("cannot run catalogue-spec-refs on '{track_id}': {e}"))
-    })?;
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     // Use ensure_active_track for the exhaustive TrackStatus match (compile-time

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-24T13:23:03Z",
-  "declaration_hash": "f77871cf00ea36bd5c727799724ff21ef3629e31fa97636e781bb6922a441ee5",
+  "generated_at": "2026-04-24T14:20:04Z",
+  "declaration_hash": "b6e3ac75ca84103acbd831edae1b4645c5fdfbb6222bf77bced71374fab302a0",
   "signals": [
     {
       "type_name": "GitShowTrackBlobReader",
@@ -48,6 +48,19 @@
         "Json",
         "UnsupportedSchemaVersion",
         "Validation"
+      ]
+    },
+    {
+      "type_name": "LoadCatalogueSpecSignalsForViewError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "NotFound",
+        "NotRegularFile",
+        "Io",
+        "Decode",
+        "StaleHash"
       ]
     }
   ]

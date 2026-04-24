@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0f2ee0e1f14adc751ef588c484159397600409c4b78a0baf559ab1363faaa694",
+  "catalogue_declaration_hash": "8cb4298e911072fc7826a468aaa1fbb18ec2f376a52b33a44600795c8abd313a",
   "signals": [
     {
       "type_name": "ImplPlanPresenceError",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "SpecRefFinding",

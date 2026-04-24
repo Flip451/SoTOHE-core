@@ -786,11 +786,6 @@ fn execute_catalogue_spec_signals(
             )]);
         }
     };
-    if let Err(e) = domain::check_impl_plan_presence(&metadata, impl_plan.as_ref()) {
-        return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(format!(
-            "cannot run catalogue-spec-signals on '{track_id}': {e}"
-        ))]);
-    }
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     use crate::commands::track::tddd::signals::ensure_active_track;

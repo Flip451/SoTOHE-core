@@ -34,10 +34,115 @@
 //! `None` (layer not yet opted in, or signals file absent/stale), the
 //! existing 5-column layout is preserved unchanged.
 
+use std::path::{Path, PathBuf};
+
 use domain::{
     CatalogueSpecSignalsDocument, ConfidenceSignal, TypeAction, TypeCatalogueDocument,
     TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
 };
+use thiserror::Error;
+
+use crate::tddd::{catalogue_spec_signals_codec, type_signals_codec};
+
+/// Failure modes when loading a `<layer>-catalogue-spec-signals.json`
+/// document for view rendering.
+///
+/// A layer that has opted in (`catalogue_spec_signal.enabled = true`) is
+/// expected to carry a fresh signals file whenever a view is rendered. Any
+/// missing / symlinked / malformed / stale state is a system-level error
+/// the caller should surface fail-closed, typically with the remediation
+/// `sotp track catalogue-spec-signals <track_id>` to regenerate the file.
+#[derive(Debug, Error)]
+pub enum LoadCatalogueSpecSignalsForViewError {
+    /// The signals file is absent at the expected path.
+    #[error("catalogue-spec-signals file not found at '{}'. Run `sotp track catalogue-spec-signals <track_id>` to generate it.", path.display())]
+    NotFound { path: PathBuf },
+
+    /// The signals path exists but is not a regular file (symlink /
+    /// directory / submodule). Same fail-closed policy as the existing
+    /// `reject_symlinks_below` guards elsewhere in the repo.
+    #[error("catalogue-spec-signals path '{}' is not a regular file (symlink or other non-file entry rejected)", path.display())]
+    NotRegularFile { path: PathBuf },
+
+    /// The signals file could not be read.
+    #[error("failed to read catalogue-spec-signals at '{}': {source}", path.display())]
+    Io {
+        path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
+    /// The signals file is not valid JSON / schema / hash format.
+    #[error("failed to decode catalogue-spec-signals at '{}': {source}", path.display())]
+    Decode {
+        path: PathBuf,
+        #[source]
+        source: catalogue_spec_signals_codec::CatalogueSpecSignalsCodecError,
+    },
+
+    /// The signals file is stale relative to the on-disk catalogue bytes.
+    #[error("catalogue-spec-signals at '{}' is stale (declared={declared}, actual={actual}). Run `sotp track catalogue-spec-signals <track_id>` to regenerate.", path.display())]
+    StaleHash { path: PathBuf, declared: String, actual: String },
+}
+
+/// Load a `<layer>-catalogue-spec-signals.json` document for view rendering.
+///
+/// **Fail-closed**: any missing / symlinked / malformed / stale state is
+/// reported as an error — the caller surfaces it and blocks view rendering.
+/// The remediation is to re-run `sotp track catalogue-spec-signals
+/// <track_id>` before the next view regeneration. Opt-out layers never
+/// reach this function (callers gate on `catalogue_spec_signal_enabled()`).
+///
+/// Shared by `sync_rendered_views` (track-transition / sync-views path) and
+/// the CLI type-signals refresh so both call sites error identically on
+/// inconsistent state — without this helper the two paths diverged and
+/// caused plan-artifacts review hashes to flap between 5-column and
+/// 6-column renders across pre-commit steps.
+///
+/// # Errors
+///
+/// Returns [`LoadCatalogueSpecSignalsForViewError`] when the signals file
+/// is absent, not a regular file, unreadable, malformed, or stale.
+pub fn load_catalogue_spec_signals_for_view(
+    signals_path: &Path,
+    catalogue_bytes: &[u8],
+) -> Result<CatalogueSpecSignalsDocument, LoadCatalogueSpecSignalsForViewError> {
+    let meta = match signals_path.symlink_metadata() {
+        Ok(m) => m,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return Err(LoadCatalogueSpecSignalsForViewError::NotFound {
+                path: signals_path.to_path_buf(),
+            });
+        }
+        Err(source) => {
+            return Err(LoadCatalogueSpecSignalsForViewError::Io {
+                path: signals_path.to_path_buf(),
+                source,
+            });
+        }
+    };
+    if !meta.file_type().is_file() {
+        return Err(LoadCatalogueSpecSignalsForViewError::NotRegularFile {
+            path: signals_path.to_path_buf(),
+        });
+    }
+    let json = std::fs::read_to_string(signals_path).map_err(|source| {
+        LoadCatalogueSpecSignalsForViewError::Io { path: signals_path.to_path_buf(), source }
+    })?;
+    let doc = catalogue_spec_signals_codec::decode(&json).map_err(|source| {
+        LoadCatalogueSpecSignalsForViewError::Decode { path: signals_path.to_path_buf(), source }
+    })?;
+    let actual = type_signals_codec::declaration_hash(catalogue_bytes);
+    let declared = doc.catalogue_declaration_hash.to_hex();
+    if declared != actual {
+        return Err(LoadCatalogueSpecSignalsForViewError::StaleHash {
+            path: signals_path.to_path_buf(),
+            declared,
+            actual,
+        });
+    }
+    Ok(doc)
+}
 
 /// Section descriptor: a heading label paired with the predicate that selects entries.
 struct Section {

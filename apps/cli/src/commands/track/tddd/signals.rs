@@ -122,12 +122,6 @@ pub fn execute_type_signals(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    // Fail-closed: route through the domain API so the activation invariant
-    // has a single source of truth. Activation is identified by branch
-    // materialization only; an override on a branchless planning track does
-    // not imply activation.
-    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
-        .map_err(|e| CliError::Message(format!("cannot run type-signals on '{track_id}': {e}")))?;
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;
@@ -216,12 +210,6 @@ pub fn execute_type_signals_lenient_with_bindings(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    // Fail-closed: route through the domain API so the activation invariant
-    // has a single source of truth. Activation is identified by branch
-    // materialization only; an override on a branchless planning track does
-    // not imply activation.
-    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
-        .map_err(|e| CliError::Message(format!("cannot run type-signals on '{track_id}': {e}")))?;
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;
@@ -386,6 +374,14 @@ fn execute_type_signals_for_layer(
     // Delegate to the core evaluator (nightly-free, directly testable).
     let rendered_stem = binding.rendered_file();
     let signal_file_name = binding.signal_file();
+    // Pass the catalogue-spec-signals file name only when the layer has
+    // opted in via `tddd.catalogue_spec_signal.enabled = true`. This is what
+    // lets the renderer emit the 6-column view consistently between CLI
+    // refreshes and `track-transition` / `sync-views` re-renders — without
+    // it, a pre-commit type-signals refresh would silently regress the view
+    // from 6 columns to 5, invalidating the reviewed plan-artifacts hash.
+    let cat_spec_signal_file =
+        binding.catalogue_spec_signal_enabled().then(|| binding.catalogue_spec_signal_file());
     evaluate_and_write_signals(
         &mut doc,
         &profile,
@@ -394,6 +390,7 @@ fn execute_type_signals_for_layer(
         &track_dir,
         &rendered_stem,
         &signal_file_name,
+        cat_spec_signal_file.as_deref(),
     )
 }
 
@@ -408,6 +405,7 @@ fn execute_type_signals_for_layer(
 /// Returns `CliError` if action diagnostics fail (delete errors), encoding fails,
 /// either declaration-path / signal-path is a symlink (fail-closed per ADR §D7),
 /// or any atomic write fails.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn evaluate_and_write_signals(
     doc: &mut domain::TypeCatalogueDocument,
     profile: &domain::TypeGraph,
@@ -416,6 +414,7 @@ pub(crate) fn evaluate_and_write_signals(
     track_dir: &std::path::Path,
     rendered_file_stem: &str,
     signal_file_name: &str,
+    catalogue_spec_signal_file: Option<&str>,
 ) -> Result<ExitCode, CliError> {
     // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
     let report = domain::check_consistency(doc.entries(), profile, baseline);
@@ -474,6 +473,7 @@ pub(crate) fn evaluate_and_write_signals(
         domain_types_path,
         track_dir,
         rendered_file_stem,
+        catalogue_spec_signal_file,
     )?;
 
     // Write the signal file alongside the declaration file. Signals are stored
@@ -516,6 +516,7 @@ fn validate_and_write_catalogue(
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
     rendered_file_stem: &str,
+    catalogue_spec_signal_file: Option<&str>,
 ) -> Result<Vec<u8>, CliError> {
     // Validate first: abort before any writes if delete errors are present.
     print_action_diagnostics(report)?;
@@ -558,15 +559,25 @@ fn validate_and_write_catalogue(
                 domain_types_path.display()
             ))
         })?;
-    // Pass `None` for catalogue_spec_signals here: the CLI type-signals refresh
-    // does not own the SoT Chain ② signals file, and a fresh catalogue write
-    // typically invalidates any pre-existing `<layer>-catalogue-spec-signals.json`
-    // via declaration-hash drift anyway. The full 6-column view is produced
-    // on the next `track-transition` / `sync-views` pass through
-    // `infrastructure::track::render`, which re-reads and validates the
-    // catalogue-spec-signals file. ADR 2026-04-23-0344 §D2.5 / §D3.7.
-    let rendered =
-        infrastructure::type_catalogue_render::render_type_catalogue(doc, catalogue_file, None);
+    // Load the catalogue-spec-signals document (opt-in layers only). The
+    // helper is fail-closed on missing / symlinked / malformed / stale —
+    // remediation is `sotp track catalogue-spec-signals <track_id>`. Opt-out
+    // layers render the legacy 5-column view unchanged (None).
+    let spec_signals_doc = match catalogue_spec_signal_file {
+        Some(name) => Some(
+            infrastructure::type_catalogue_render::load_catalogue_spec_signals_for_view(
+                &track_dir.join(name),
+                &declaration_bytes,
+            )
+            .map_err(|e| CliError::Message(e.to_string()))?,
+        ),
+        None => None,
+    };
+    let rendered = infrastructure::type_catalogue_render::render_type_catalogue(
+        doc,
+        catalogue_file,
+        spec_signals_doc.as_ref(),
+    );
     atomic_write_file(&rendered_md_path, rendered.as_bytes()).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", rendered_md_path.display()))
     })?;
@@ -1010,6 +1021,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-types.md",
+            None,
         );
 
         assert!(result.is_err(), "delete errors must cause validate_and_write_catalogue to fail");
@@ -1043,6 +1055,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-types.md",
+            None,
         );
 
         assert!(result.is_ok(), "no-error report must succeed: {result:?}");
@@ -1076,6 +1089,7 @@ mod tests {
             &catalogue_path,
             &track_dir,
             "infrastructure-types.md",
+            None,
         );
 
         assert!(result.is_ok(), "clean report must succeed: {result:?}");
@@ -1114,6 +1128,7 @@ mod tests {
             &track_dir,
             "domain-types.md",
             "domain-type-signals.json",
+            None,
         );
 
         assert!(result.is_err(), "delete error must cause evaluate_and_write_signals to fail");
@@ -1151,6 +1166,7 @@ mod tests {
             &track_dir,
             "domain-types.md",
             "domain-type-signals.json",
+            None,
         );
 
         assert!(result.is_ok(), "clean report must succeed: {result:?}");
@@ -1215,6 +1231,7 @@ mod tests {
             &track_dir,
             "domain-types.md",
             "domain-type-signals.json",
+            None,
         );
 
         assert!(result.is_ok(), "clean report must succeed: {result:?}");
@@ -1253,6 +1270,7 @@ mod tests {
             &track_dir,
             "domain-types.md",
             "domain-type-signals.json",
+            None,
         );
 
         let err = result.unwrap_err();
@@ -1284,6 +1302,7 @@ mod tests {
             &track_dir,
             "domain-types.md",
             "domain-type-signals.json",
+            None,
         );
 
         let err = result.unwrap_err();

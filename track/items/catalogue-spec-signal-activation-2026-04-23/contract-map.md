@@ -30,6 +30,7 @@ flowchart LR
         L14_infrastructure_CatalogueSpecSignalsDocumentDto[CatalogueSpecSignalsDocumentDto]
         L14_infrastructure_TdddLayerBinding(TdddLayerBinding)
         L14_infrastructure_CatalogueSpecSignalsCodecError>CatalogueSpecSignalsCodecError]
+        L14_infrastructure_LoadCatalogueSpecSignalsForViewError>LoadCatalogueSpecSignalsForViewError]
     end
     L14_infrastructure_FsCatalogueSpecSignalsStore -.impl.-> L7_usecase_CatalogueSpecSignalsWriter
     L14_infrastructure_GitShowTrackBlobReader -->|"read_catalogue_spec_signals_document"| L6_domain_CatalogueSpecSignalsDocument

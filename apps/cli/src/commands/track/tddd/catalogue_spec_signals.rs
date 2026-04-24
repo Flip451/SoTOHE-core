@@ -107,12 +107,6 @@ pub fn execute_catalogue_spec_signals(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    // Fail-closed: an activated track without impl-plan.json is a broken state.
-    // Without this check, `derive_track_status(None, ...)` returns `Planned`,
-    // which would let the command silently succeed on a misconfigured track.
-    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref()).map_err(|e| {
-        CliError::Message(format!("cannot run catalogue-spec-signals on '{track_id}': {e}"))
-    })?;
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track_catalogue(effective_status, &track_id)?;

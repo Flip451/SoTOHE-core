@@ -31,9 +31,7 @@ pub use error::{
 };
 pub use git_ref::{RefValidationError, validate_branch_ref};
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
-pub use impl_plan::{
-    IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument, ImplPlanPresenceError, check_impl_plan_presence,
-};
+pub use impl_plan::{IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument};
 pub use plan::{PlanSection, PlanView};
 pub use plan_ref::{
     AdrAnchor, AdrRef, ContentHash, ConventionAnchor, ConventionRef, InformalGroundKind,

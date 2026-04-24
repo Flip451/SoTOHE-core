@@ -74,12 +74,6 @@ pub fn execute_type_graph(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    // Fail-closed: route through the domain API so the activation invariant
-    // has a single source of truth. Activation is identified by branch
-    // materialization only; an override on a branchless planning track does
-    // not imply activation.
-    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
-        .map_err(|e| CliError::Message(format!("cannot run type-graph on '{track_id}': {e}")))?;
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;

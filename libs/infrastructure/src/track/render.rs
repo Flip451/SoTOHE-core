@@ -1031,60 +1031,26 @@ pub fn sync_rendered_views(
                                 }
                             }
                         }
-                        // Optionally load `<layer>-catalogue-spec-signals.json`
-                        // for the T020 Cat-Spec column (ADR 2026-04-23-0344 §D2.5).
-                        // Mirrors the type-signals load above: symlink guard
-                        // via `symlink_metadata`, decode failure = non-fatal
-                        // fallback to `None`, hash drift (catalogue changed but
-                        // signals not regenerated) = non-fatal fallback to `None`
-                        // with a warning. The authoritative fail-closed response
-                        // to stale catalogue-spec-signals lives in the
-                        // `catalogue-spec-refs` verify CLI and merge gate.
-                        let spec_signals_doc: Option<domain::CatalogueSpecSignalsDocument> =
-                            if binding.catalogue_spec_signal_enabled() {
-                                let spec_signal_path =
-                                    track_dir.join(binding.catalogue_spec_signal_file());
-                                let is_plain_spec_file = spec_signal_path
-                                    .symlink_metadata()
-                                    .map(|m| m.file_type().is_file())
-                                    .unwrap_or(false);
-                                if is_plain_spec_file {
-                                    match std::fs::read_to_string(&spec_signal_path) {
-                                        Ok(spec_signal_json) => {
-                                            match crate::tddd::catalogue_spec_signals_codec::decode(
-                                                &spec_signal_json,
-                                            ) {
-                                                Ok(sd) => {
-                                                    let current_hex =
-                                                        type_signals_codec::declaration_hash(
-                                                            catalogue_content.as_bytes(),
-                                                        );
-                                                    if sd.catalogue_declaration_hash.to_hex()
-                                                        == current_hex
-                                                    {
-                                                        Some(sd)
-                                                    } else {
-                                                        eprintln!(
-                                                            "warning: ignoring stale {} for {} \
-                                                         (catalogue_declaration_hash mismatch) — \
-                                                         rendered Cat-Spec column will fall back to `—`",
-                                                            binding.catalogue_spec_signal_file(),
-                                                            track_dir.display()
-                                                        );
-                                                        None
-                                                    }
-                                                }
-                                                Err(_) => None,
-                                            }
-                                        }
-                                        Err(_) => None,
-                                    }
-                                } else {
-                                    None
-                                }
-                            } else {
-                                None
-                            };
+                        // Load `<layer>-catalogue-spec-signals.json` for the
+                        // T020 Cat-Spec column (ADR 2026-04-23-0344 §D2.5).
+                        // Opt-in gated; fail-closed on missing / symlinked /
+                        // malformed / stale — remediation is documented in
+                        // the error message (`sotp track catalogue-spec-signals
+                        // <track_id>`). Opt-out layers render the legacy
+                        // 5-column view (None).
+                        let spec_signals_doc = if binding.catalogue_spec_signal_enabled() {
+                            Some(
+                                type_catalogue_render::load_catalogue_spec_signals_for_view(
+                                    &track_dir.join(binding.catalogue_spec_signal_file()),
+                                    catalogue_content.as_bytes(),
+                                )
+                                .map_err(|e| {
+                                    RenderError::Io(std::io::Error::other(e.to_string()))
+                                })?,
+                            )
+                        } else {
+                            None
+                        };
                         let rendered = type_catalogue_render::render_type_catalogue(
                             &doc,
                             catalogue_file,
@@ -3432,12 +3398,11 @@ mod tests {
     }
 
     #[test]
-    fn sync_rendered_views_ignores_stale_cat_spec_signals() {
-        // Stale fallback: when `catalogue_declaration_hash` in the signals file
-        // does not match the on-disk `domain-types.json` bytes, the renderer
-        // falls back to `None` (no Cat-Spec column). Authoritative fail-closed
-        // policy for stale catalogue-spec signals lives in the verify CLI and
-        // merge gate; the renderer just avoids painting stale state.
+    fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
+        // Fail-closed: a stale `catalogue_declaration_hash` in the signals
+        // file indicates the catalogue changed without regenerating signals.
+        // View rendering aborts and the caller is expected to run
+        // `sotp track catalogue-spec-signals <track_id>` before retrying.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -3473,21 +3438,19 @@ mod tests {
         )
         .unwrap();
 
-        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
-
-        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
+        let msg = err.to_string();
         assert!(
-            !md.contains("Cat-Spec"),
-            "Cat-Spec column must NOT appear when signals file is stale, got:\n{md}"
+            msg.contains("stale") && msg.contains("catalogue-spec-signals"),
+            "stale-hash error expected, got: {msg}"
         );
     }
 
     #[test]
-    fn sync_rendered_views_ignores_malformed_cat_spec_signals() {
-        // Malformed-JSON fallback: an unparseable signals file must produce
-        // the legacy 5-column layout (no Cat-Spec column). The renderer is
-        // fail-soft here; the authoritative fail-closed response to malformed
-        // signals lives in the verify CLI and merge gate.
+    fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
+        // Fail-closed: an unparseable signals file is a system-state error,
+        // not a silent fallback. The view renderer propagates the decode
+        // failure and the caller re-runs `sotp track catalogue-spec-signals`.
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -3517,12 +3480,43 @@ mod tests {
         )
         .unwrap();
 
-        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
-
-        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
+        let msg = err.to_string();
         assert!(
-            !md.contains("Cat-Spec"),
-            "Cat-Spec column must NOT appear when signals JSON is malformed, got:\n{md}"
+            msg.contains("decode") || msg.contains("JSON"),
+            "decode error expected, got: {msg}"
         );
+    }
+
+    #[test]
+    fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
+        // Fail-closed: when opt-in is enabled but the signals file has never
+        // been generated, view rendering must error and direct the user to
+        // `sotp track catalogue-spec-signals <track_id>`.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("not found"), "not-found error expected, got: {msg}");
+        assert!(msg.contains("sotp track catalogue-spec-signals"), "remediation missing: {msg}");
     }
 }

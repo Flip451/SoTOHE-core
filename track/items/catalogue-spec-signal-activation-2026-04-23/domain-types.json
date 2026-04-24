@@ -3,17 +3,18 @@
   "type_definitions": [
     {
       "name": "ImplPlanPresenceError",
-      "description": "Error enum that enforced the is_activated() ↔ impl-plan.json present invariant. Removed because the invariant was deemed obstructive: /track:init creates the branch before impl-plan.json exists (ADR 2026-04-19-1242 §D1.4), and derive_track_status already handles impl-plan.json absence gracefully via Planned fallback. The invariant was recorded in parent ADR 2026-04-19-1242 §Follow-up (2026-04-22) then reverted via the 2026-04-23 Correction in the same ADR after the conflict with /track:init was identified in practice. Call sites in libs/infrastructure/src/verify/latest_track.rs and apps/cli/src/commands/make.rs are removed together with this type (IN-21).",
+      "description": "Error enum that previously enforced the is_activated() ↔ impl-plan.json present invariant. Removed in T025 because the invariant conflicted with /track:init branch creation (the branch is materialised before impl-plan.json is authored, which turned Phase 0-2 progression into a corruption false-positive). `derive_track_status` now returns Planned via its graceful fallback when impl-plan.json is absent. Catalogue entry kept with `action: delete` so the baseline reverse check acknowledges the intentional deletion until the next baseline recapture.",
       "approved": true,
       "action": "delete",
       "kind": "error_type",
       "expected_variants": [
         "MissingForActivatedTrack"
       ],
-      "informal_grounds": [
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "IN-21 (ADR 2026-04-19-1242 §Follow-up 末尾 2026-04-23 Correction) removes check_impl_plan_presence and ImplPlanPresenceError because the is_activated() ↔ impl-plan.json invariant conflicts with /track:init branch creation and Phase 0-2 progression; derive_track_status Planned fallback is sufficient; call sites in latest_track.rs and make.rs removed together"
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-21",
+          "hash": "37f2fbfc1382ce3fe4bf689f0477546257ed064ecad48883c82a9278fc1a47c2"
         }
       ]
     },
