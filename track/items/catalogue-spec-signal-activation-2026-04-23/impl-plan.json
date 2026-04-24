@@ -118,7 +118,8 @@
     {
       "id": "T020",
       "description": "<layer>-types.md レンダラー (libs/infrastructure/src/type_catalogue_render.rs) を拡張し、catalogue-spec signal (新規) を entry セクション内に type→implementation signal (既存) と並置表示する。<layer>-catalogue-spec-signals.json が存在する場合は signal 列を entry ヘッダー行に追記し、存在しない場合は従来表示を維持する。表示レイアウト (列配置、フォーマット) は実装時に proposal を確定する (IN-17、D2.5)。unit test でシグナルあり / なしの 2 ケースの markdown 出力を検証する (IN-17、infrastructure 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "05a7f0f1950d2fa2c3b447b17a9796ed6e66af41"
     },
     {
       "id": "T021",
@@ -128,7 +129,7 @@
     {
       "id": "T022",
       "description": "親 ADR 2026-04-12-1200 §D5 amendment を adr-editor back-and-forth で実施する。check_strict_merge_gate の既存順序 (Chain ① → Chain ③) 記述を本 ADR D3.6 の bottom-up reorder (Chain ③ → ② → ①) に整合させる (IN-19)",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "id": "T023",
