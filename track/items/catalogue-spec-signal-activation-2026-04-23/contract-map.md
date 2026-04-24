@@ -28,6 +28,7 @@ flowchart LR
         L14_infrastructure_GitShowTrackBlobReader[GitShowTrackBlobReader]:::secondary_adapter
         L14_infrastructure_FsCatalogueSpecSignalsStore[FsCatalogueSpecSignalsStore]:::secondary_adapter
         L14_infrastructure_CatalogueSpecSignalsDocumentDto[CatalogueSpecSignalsDocumentDto]
+        L14_infrastructure_TdddLayerBinding(TdddLayerBinding)
         L14_infrastructure_CatalogueSpecSignalsCodecError>CatalogueSpecSignalsCodecError]
     end
     L14_infrastructure_FsCatalogueSpecSignalsStore -.impl.-> L7_usecase_CatalogueSpecSignalsWriter

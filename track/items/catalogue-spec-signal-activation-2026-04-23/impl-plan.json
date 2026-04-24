@@ -106,12 +106,13 @@
     {
       "id": "T018",
       "description": "architecture-rules.json の layers[].tddd に catalogue_spec_signal サブ block (enabled: bool、省略時 false) を追加する。schema version v2 維持 (optional field 追加、破壊的変更なし)。SoTOHE-core 本リポジトリの本 track 対象 layer (domain / usecase / infrastructure の 3 層; 全 tddd.enabled 層が本 track の実装対象であるため、D5.4 の段階適用原則に従い flag 先行 true 設定: まず catalogue_spec_signal.enabled: true に設定し、その後 T023 で spec_refs[] を記入する順序) を catalogue_spec_signal.enabled: true に設定する。T018 と T023 の間でも pre-commit / CI は interim モード (D4.1: Yellow → Finding::warning、PASS) で動作するため commit はブロックされない; Yellow がブロックするのは strict=true の merge gate のみであり、T023 完了 (spec_refs[] 記入 → Blue) まで merge gate 通過は保留する。他の tddd.enabled 層が将来追加された場合は後続 track で layer 別に記入 + flag flip 可能 (D5.3 段階適用)。integration test で enabled: false の層が全 gate でスキップされることを確認する (IN-15、integration 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "c4f317a628da0bb55ebff85bf123374852dba300"
     },
     {
       "id": "T019",
       "description": "track/review-scope.json の review_operational 配列に track/items/<track-id>/*-catalogue-spec-signals.json の glob パターンを追加する。既存 *-type-signals.json と同型の一括除外パターンを踏襲する (IN-16、D2.4)。sotp verify review-scope 等の既存 review scope 検証 task が通ることを確認する (IN-16、integration 層)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T020",
