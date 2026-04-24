@@ -1,0 +1,341 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RefreshCatalogueSpecSignalsInteractor",
+      "description": "Usecase-layer struct implementing the sotp track catalogue-spec-signals command logic. Orchestrates: (1) read <layer>-types.json via read_catalogue_for_spec_ref_check (returns (TypeCatalogueDocument, String) where String = raw-bytes SHA-256 used as catalogue_declaration_hash; read_type_catalogue cannot be used here since its String is the resolved filename, not the hash), (2) call domain evaluate_catalogue_entry_signal for each entry, (3) use the SHA-256 String from step 1 as catalogue_declaration_hash, (4) write <layer>-catalogue-spec-signals.json via CatalogueSpecSignalsWriter (atomic write). Applies active-track guard (non-active → reject, exit non-zero) per CN-07 / ADR D3.1. Placed in libs/usecase/src/catalogue_spec_signals.rs per D3.7.",
+      "approved": true,
+      "kind": "interactor",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignals",
+      "description": "Primary (driving) port trait implemented by RefreshCatalogueSpecSignalsInteractor. Exposes a single `execute(&RefreshCatalogueSpecSignalsCommand) -> Result<(), RefreshCatalogueSpecSignalsError>` method so CLI / integration code can depend on the trait rather than the concrete interactor struct. Follows the same trait+interactor pattern used by RenderContractMap / RenderContractMapInteractor (libs/usecase/src/contract_map_workflow.rs). Send + Sync bounds. Authored alongside the interactor in T008.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RefreshCatalogueSpecSignalsCommand"
+            }
+          ],
+          "returns": "Result<(), RefreshCatalogueSpecSignalsError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignalsCommand",
+      "description": "Command input value-object for RefreshCatalogueSpecSignals::execute. Fields: branch (String — current git branch for CN-07 guard), track_id (TrackId — target track), layer_id (String — layer whose catalogue is being refreshed). #[derive(Debug, Clone, PartialEq, Eq)] for ergonomic CLI dispatch + tests.",
+      "approved": true,
+      "kind": "command",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignalsError",
+      "description": "Failure-mode enum for RefreshCatalogueSpecSignals::execute. Six variants cover: NonActiveTrack (CN-07 branch guard), BranchTrackMismatch (branch/track_id disagreement), CatalogueNotFound (layer file absent), FetchError (blob-fetch I/O / decode), InvalidCatalogueHash (raw-bytes hash not canonical SHA-256 hex), WriteFailed (writer port failure). thiserror::Error + #[source] for chained diagnostics.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "FetchError",
+        "InvalidCatalogueHash",
+        "WriteFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefsInteractor",
+      "description": "Usecase-layer struct implementing the sotp verify catalogue-spec-refs command logic. Orchestrates: (1) read <layer>-types.json, spec.json element hashes, and optionally <layer>-catalogue-spec-signals.json via TrackBlobReader + SpecElementHashReader, (2) call domain check_catalogue_spec_ref_integrity, (3) return Vec<SpecRefFinding>. Supports --skip-stale flag (when true, StaleSignals detection is skipped — used in pre-commit path where signals file is re-generated in the next step). Applies active-track guard per CN-07 / ADR D3.2. Placed in libs/usecase/src/catalogue_spec_refs.rs per D3.7.",
+      "approved": true,
+      "kind": "interactor",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefs",
+      "description": "Primary (driving) port trait implemented by VerifyCatalogueSpecRefsInteractor. Single `execute(&VerifyCatalogueSpecRefsCommand) -> Result<Vec<SpecRefFinding>, VerifyCatalogueSpecRefsError>` method. Send + Sync. Authored alongside the interactor in T009.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&VerifyCatalogueSpecRefsCommand"
+            }
+          ],
+          "returns": "Result<Vec<SpecRefFinding>, VerifyCatalogueSpecRefsError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefsCommand",
+      "description": "Command input for VerifyCatalogueSpecRefs::execute. Fields: branch (String — current git branch for CN-07 guard), track_id (TrackId), layer_id (LayerId — validated newtype), skip_stale (bool — pre-commit path skips StaleSignals detection since the signals file is re-generated immediately after). #[derive(Debug, Clone, PartialEq, Eq)].",
+      "approved": true,
+      "kind": "command",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefsError",
+      "description": "Failure-mode enum for VerifyCatalogueSpecRefs::execute. Eight variants cover: NonActiveTrack (CN-07 branch guard), BranchTrackMismatch (branch/track_id disagreement), CatalogueNotFound (layer file absent), CatalogueFetchError (catalogue I/O), InvalidCatalogueHash (raw-bytes hex parse failure), SpecNotFound (spec.json absent), SpecFetchError (spec-element-hash reader I/O), SignalsFetchError (signals file I/O failure, only fired when skip_stale=false). thiserror::Error + #[source] for chained diagnostics. Integrity violations themselves are reported in the Ok(Vec<SpecRefFinding>) channel, not as errors.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "CatalogueFetchError",
+        "InvalidCatalogueHash",
+        "SpecNotFound",
+        "SpecFetchError",
+        "SignalsFetchError"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
+        }
+      ]
+    },
+    {
+      "name": "SpecElementHashReader",
+      "description": "Secondary (driven) port returning the canonical SHA-256 digest of every spec element (goal, constraints, acceptance_criteria, scope.in_scope, scope.out_of_scope) in a track's spec.json, keyed by SpecElementId. Splits the canonical-JSON serialization concern out of TrackBlobReader so the T009 interactor receives pre-computed hashes via a BTreeMap (keeps usecase pure, domain free of sha2/serde_json). Implemented atop the existing canonical_json_sha256 helper in infrastructure (T011 adapter). Send + Sync.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_spec_element_hashes",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-06",
+          "hash": "177b654b5a776670d0edf968e8f0300e2c56c30b254051267ec1af2b9bc6ed81"
+        }
+      ]
+    },
+    {
+      "name": "TrackBlobReader",
+      "description": "Usecase secondary port extended by this track to add two new methods required by the merge gate SoT Chain bottom-up reorder (ADR D3.6): read_catalogue_for_spec_ref_check (reads <layer>-types.json for binary gate anchor/hash verification; returns BlobFetchResult<(TypeCatalogueDocument, String)> where the String is the SHA-256 hex digest of the raw file bytes, used by the usecase layer to construct ContentHash for stale detection; this is a DISTINCT method from read_type_catalogue — read_type_catalogue's String is the resolved catalogue filename for diagnostics, read_catalogue_for_spec_ref_check's String is the raw-bytes SHA-256; the same Rust type (String) carries different domain semantics in each method) and read_catalogue_spec_signals_document (reads <layer>-catalogue-spec-signals.json for stale detection and signal check). action=modify because the trait already exists in libs/usecase/src/merge_gate.rs.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<SpecDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_impl_plan",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<ImplPlanDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false
+        },
+        {
+          "name": "read_catalogue_for_spec_ref_check",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_catalogue_spec_signals_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<CatalogueSpecSignalsDocument>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-07",
+          "hash": "3b81088ea757f6c856f92cb8c52e4e7db665ae3501304865409899add66d25b6"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsWriter",
+      "description": "New usecase secondary port for atomic write of <layer>-catalogue-spec-signals.json. Single method: write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>. Follows the same pattern as TrackWriter / ImplPlanWriter / ReviewWriter ports. Implemented by FsCatalogueSpecSignalsStore in the infrastructure layer. Placed in libs/usecase/src/catalogue_spec_signals.rs alongside RefreshCatalogueSpecSignalsInteractor.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "write_catalogue_spec_signals",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            },
+            {
+              "name": "doc",
+              "ty": "&CatalogueSpecSignalsDocument"
+            }
+          ],
+          "returns": "Result<(), RepositoryError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-05",
+          "hash": "e666b5e0d38364a2d84c05cc23fe5afca758554fbdbd0d54995ced332863837b"
+        }
+      ]
+    }
+  ]
+}

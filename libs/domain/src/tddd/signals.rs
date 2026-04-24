@@ -385,8 +385,12 @@ fn evaluate_secondary_adapter(
         }
     }
 
+    // Per ADR 2026-04-11-0003 §"L1 expected_methods を宣言した場合の WIP セマンティクス":
+    // secondary_adapter has no reverse check (per ADR 2026-04-15-1636 §Consequences §Bad),
+    // so missing_items is always forward-check WIP → Yellow. Red is not produced by
+    // this evaluator path; undeclared implementations are caught elsewhere if at all.
     let signal =
-        if missing_items.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Red };
+        if missing_items.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Yellow };
     TypeSignal::new(name, kind_tag, signal, true, found_items, missing_items, vec![])
 }
 
@@ -451,10 +455,16 @@ fn evaluate_trait_methods(
         .collect();
     extra.sort();
 
-    let signal = if missing.is_empty() && extra.is_empty() {
-        ConfidenceSignal::Blue
-    } else {
+    // Per ADR 2026-04-11-0003 §"L1 expected_methods を宣言した場合の WIP セマンティクス":
+    // - forward check missing (declared not in code) → Yellow (WIP)
+    // - reverse check extra (code not declared) → Red (undeclared implementation)
+    // - both empty → Blue
+    let signal = if !extra.is_empty() {
         ConfidenceSignal::Red
+    } else if !missing.is_empty() {
+        ConfidenceSignal::Yellow
+    } else {
+        ConfidenceSignal::Blue
     };
     TypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
 }
@@ -849,9 +859,11 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_secondary_port_red_when_returns_mismatch() {
+    fn test_evaluate_secondary_port_yellow_when_returns_mismatch() {
         // Declared `fn save(&self, user: User) -> Result<(), DomainError>` but
-        // the code trait has `fn save(&self, user: User) -> ()` — step 5 miss.
+        // the code trait has `fn save(&self, user: User) -> ()` — forward-check miss.
+        // Per ADR 2026-04-11-0003 WIP-Yellow rule: forward-check missing yields Yellow
+        // (the code has a method with the same name, so no reverse-check extra).
         let entry = TypeCatalogueEntry::new(
             "Repo",
             "desc",
@@ -881,8 +893,9 @@ mod tests {
         let profile = TypeGraph::new(HashMap::new(), traits);
         let results = evaluate_type_signals(&[entry], &profile);
         let sig = results.first().unwrap();
-        assert_eq!(sig.signal(), ConfidenceSignal::Red);
+        assert_eq!(sig.signal(), ConfidenceSignal::Yellow);
         assert_eq!(sig.missing_items().len(), 1);
+        assert!(sig.extra_items().is_empty(), "reverse check should be clean");
     }
 
     #[test]
@@ -1293,7 +1306,10 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_secondary_adapter_red_one_impl_missing() {
+    fn test_evaluate_secondary_adapter_yellow_one_impl_missing() {
+        // Per ADR 2026-04-11-0003 WIP-Yellow rule: adapter missing a declared trait impl
+        // is forward-check WIP → Yellow (not Red). Secondary adapters have no reverse
+        // check (per ADR 2026-04-15-1636), so missing_items always yields Yellow.
         let entry = TypeCatalogueEntry::new(
             "FsReviewStore",
             "desc",
@@ -1313,12 +1329,14 @@ mod tests {
             vec![TraitImplEntry::new("ReviewReader", vec![])],
         );
         let results = evaluate_type_signals(&[entry], &profile);
-        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
         assert!(results[0].missing_items().iter().any(|m| m.contains("ReviewWriter")));
     }
 
     #[test]
-    fn test_evaluate_secondary_adapter_red_method_signature_mismatch() {
+    fn test_evaluate_secondary_adapter_yellow_method_signature_mismatch() {
+        // Per ADR 2026-04-11-0003 WIP-Yellow rule: method signature mismatch is a
+        // forward-check miss → Yellow (not Red).
         let declared_method =
             MethodDeclaration::new("find", Some("&self".into()), vec![], "Option<Review>", false);
         let entry = TypeCatalogueEntry::new(
@@ -1344,7 +1362,7 @@ mod tests {
             vec![TraitImplEntry::new("ReviewReader", vec![code_method])],
         );
         let results = evaluate_type_signals(&[entry], &profile);
-        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
         assert!(!results[0].missing_items().is_empty());
     }
 
@@ -1364,7 +1382,7 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_secondary_adapter_with_two_traits_one_missing_is_red() {
+    fn test_evaluate_secondary_adapter_with_two_traits_one_missing_is_yellow() {
         let entry = TypeCatalogueEntry::new(
             "SystemGitRepo",
             "desc",
@@ -1384,7 +1402,7 @@ mod tests {
             vec![TraitImplEntry::new("WorktreeReader", vec![])],
         );
         let results = evaluate_type_signals(&[entry], &profile);
-        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
         assert!(results[0].found_items().iter().any(|f| f == "WorktreeReader"));
         assert!(results[0].missing_items().iter().any(|m| m.contains("TrackWriter")));
     }

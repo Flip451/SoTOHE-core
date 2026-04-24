@@ -26,10 +26,12 @@ If `$ARGUMENTS` is empty:
 
 ## Step 1: Pre-commit review
 
+**Staging order (canonical flow)**: `implement → /track:review → stage → /track:commit`. Review rounds append to `review.json`; staging **before** review silently omits that delta from the commit, producing an unstaged `review.json` left in the worktree after commit. Always run `cargo make add-all` (or selective `track-add-paths`) **after** the final review round, not before.
+
 Before committing:
 
 1. Run `git diff --cached --stat` and verify the staged scope matches the intended commit.
-2. If the staged diff is empty or includes unrelated changes, stop and fix staging before continuing.
+2. If the staged diff is empty or includes unrelated changes, stop and fix staging before continuing. If `review.json` shows as modified-but-unstaged in `git status`, the caller staged before the final review round — re-stage now before proceeding.
 3. Resolve the current track in this order:
    - current `track/<id>` branch
    - explicit planning-only `<track-id>` selector on a non-track branch

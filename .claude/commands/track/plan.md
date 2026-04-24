@@ -145,6 +145,25 @@ After Phase 3 OK (or `max_retry` overflow anywhere in the loop):
 
 Each writer owns its SSoT files and associated rendered views end-to-end. Rewriting another writer's files during the same phase is forbidden so file hashes stay stable; only back-and-forth escalation may re-invoke an upstream writer.
 
+## Sub-agent briefing rules (no design prescription)
+
+When the `/track:plan` orchestrator composes a briefing for one of the track sub-agents (spec-designer, type-designer, impl-planner, adr-editor), the briefing body MUST contain only:
+
+- Problem statement / trigger (what was observed, what symptom)
+- Context references (track state, file paths, relevant ADRs / conventions, prior edits already in the working tree)
+- Interaction contract: what the sub-agent should report back **and** any operational constraints on what it may or may not do (e.g., "edit the working tree only; do not commit inside the loop")
+
+The briefing body MUST NOT contain **design prescription** — anything that pre-solves the sub-agent's own domain expert judgment:
+
+- Prescriptive design solutions (e.g., "apply approach X to solve this problem")
+- Pre-classified approaches (e.g., "categorize into these 3 buckets")
+- Pre-decided outcomes presented as design requirements (e.g., "this must result in Z")
+- Priority orderings for design alternatives the sub-agent is supposed to evaluate
+
+Each sub-agent is the domain expert for its owned artifact (ADR / spec / type catalogue / impl-plan). The orchestrator supplies context and problem framing; the sub-agent judges, decides, and reports back the decision path with rationale. Pre-solving in the briefing bypasses the sub-agent's judgment, violates SoT Chain writer ownership, and has produced real design errors in past runs (e.g., type-designer was briefed with "list only new methods for `action: modify`" — a TDDD-framework-semantic decision the orchestrator was not qualified to make, producing Red signals that should have been Yellow).
+
+**Mechanism**: tier 5 (documentation + semantic review) per `knowledge/conventions/enforce-by-mechanism.md` §Exceptions. Harness-policy scope covers `.claude/commands/**`; reviewers must flag changes that weaken or remove this constraint. **Reassess trigger**: recurring Red signals traceable to biased briefings, or a committed briefing-file schema that enables static analysis.
+
 ## Gate policy
 
 Each gate uses one of two evaluation styles:

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "da090f5a638582bc793820268cf6bbaf97ebef87ae8f1759d4c5aa885292bb73",
+  "signals": [
+    {
+      "type_name": "RefreshCatalogueSpecSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefs",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SpecElementHashReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueSpecSignalsWriter",
+      "signal": "blue"
+    }
+  ]
+}

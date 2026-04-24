@@ -1031,8 +1031,31 @@ pub fn sync_rendered_views(
                                 }
                             }
                         }
-                        let rendered =
-                            type_catalogue_render::render_type_catalogue(&doc, catalogue_file);
+                        // Load `<layer>-catalogue-spec-signals.json` for the
+                        // T020 Cat-Spec column (ADR 2026-04-23-0344 §D2.5).
+                        // Opt-in gated; fail-closed on missing / symlinked /
+                        // malformed / stale — remediation is documented in
+                        // the error message (`sotp track catalogue-spec-signals
+                        // <track_id>`). Opt-out layers render the legacy
+                        // 5-column view (None).
+                        let spec_signals_doc = if binding.catalogue_spec_signal_enabled() {
+                            Some(
+                                type_catalogue_render::load_catalogue_spec_signals_for_view(
+                                    &track_dir.join(binding.catalogue_spec_signal_file()),
+                                    catalogue_content.as_bytes(),
+                                )
+                                .map_err(|e| {
+                                    RenderError::Io(std::io::Error::other(e.to_string()))
+                                })?,
+                            )
+                        } else {
+                            None
+                        };
+                        let rendered = type_catalogue_render::render_type_catalogue(
+                            &doc,
+                            catalogue_file,
+                            spec_signals_doc.as_ref(),
+                        );
                         let rendered_md_path = track_dir.join(binding.rendered_file());
                         let old_md = match std::fs::read_to_string(&rendered_md_path) {
                             Ok(content) => Some(content),
@@ -3215,5 +3238,285 @@ mod tests {
             !changed.iter().any(|p| p.ends_with("usecase-types.md")),
             "usecase-types.md must NOT be rendered when usecase-types.json is malformed"
         );
+    }
+
+    // ---------------------------------------------------------------------------
+    // T020 sync_rendered_views <layer>-catalogue-spec-signals.json integration
+    // ---------------------------------------------------------------------------
+    //
+    // End-to-end tests covering the catalogue-spec signals file-loading path
+    // added in T020 (ADR 2026-04-23-0344 §D2.5 / IN-17). Complements the
+    // renderer-level Some/None unit tests in `type_catalogue_render.rs` by
+    // exercising the actual `sync_rendered_views` pipeline:
+    //   - opt-in guard via `catalogue_spec_signal.enabled`
+    //   - filename derivation (`<layer_id>-catalogue-spec-signals.json`)
+    //   - fresh-hash validation (hex comparison)
+    //   - stale / malformed fallback to `None` (em-dash fallback, non-fatal)
+
+    const MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN: &str = r#"{
+      "layers": [
+        {
+          "crate": "domain",
+          "tddd": {
+            "enabled": true,
+            "catalogue_file": "domain-types.json",
+            "catalogue_spec_signal": { "enabled": true }
+          }
+        }
+      ]
+    }"#;
+
+    const MULTI_LAYER_ARCH_RULES_CAT_SPEC_OPT_OUT: &str = r#"{
+      "layers": [
+        {
+          "crate": "domain",
+          "tddd": {
+            "enabled": true,
+            "catalogue_file": "domain-types.json"
+          }
+        }
+      ]
+    }"#;
+
+    #[test]
+    fn sync_rendered_views_renders_cat_spec_column_when_signals_fresh_and_opt_in_enabled() {
+        // Happy path: opt-in flag is true, signals file exists with a matching
+        // catalogue_declaration_hash, and a per-entry `blue` signal is declared
+        // for `TrackId`. The rendered markdown must carry the 6-column header
+        // and paint the 🔵 emoji in the Cat-Spec column.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
+        )
+        .unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Catalogue-spec-signals file with a fresh (matching) hash.
+        let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
+        let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let spec_signals_json = serde_json::json!({
+            "schema_version": 1,
+            "catalogue_declaration_hash": hash_hex,
+            "signals": [
+                { "type_name": "TrackId", "signal": "blue" }
+            ],
+        });
+        // Filename derivation: `<layer_id>-catalogue-spec-signals.json`
+        // = `domain-catalogue-spec-signals.json`.
+        std::fs::write(
+            track_dir.join("domain-catalogue-spec-signals.json"),
+            serde_json::to_string_pretty(&spec_signals_json).unwrap(),
+        )
+        .unwrap();
+
+        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(
+            md.contains("| Name | Kind | Action | Details | Signal | Cat-Spec |"),
+            "6-column header must appear when opt-in + fresh signals present, got:\n{md}"
+        );
+        // TrackId entry row must include the 🔵 emoji in Cat-Spec column.
+        let track_id_row = md
+            .lines()
+            .find(|l| l.starts_with("| TrackId |"))
+            .expect("TrackId row must be rendered");
+        assert!(
+            track_id_row.contains('\u{1f535}'),
+            "TrackId row must show Blue emoji in Cat-Spec column, got: {track_id_row}"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_skips_cat_spec_column_when_opt_in_disabled() {
+        // Opt-in guard: even when a valid catalogue-spec-signals.json is
+        // present on disk, the renderer must produce the legacy 5-column
+        // layout if the layer has NOT opted in via `catalogue_spec_signal.enabled`.
+        // This is the phased-activation knob per ADR §D5.4.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            MULTI_LAYER_ARCH_RULES_CAT_SPEC_OPT_OUT,
+        )
+        .unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Signals file present with matching hash — but layer hasn't opted in.
+        let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
+        let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let spec_signals_json = serde_json::json!({
+            "schema_version": 1,
+            "catalogue_declaration_hash": hash_hex,
+            "signals": [ { "type_name": "TrackId", "signal": "blue" } ],
+        });
+        std::fs::write(
+            track_dir.join("domain-catalogue-spec-signals.json"),
+            serde_json::to_string_pretty(&spec_signals_json).unwrap(),
+        )
+        .unwrap();
+
+        let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(
+            !md.contains("Cat-Spec"),
+            "Cat-Spec column must NOT appear when opt-in is disabled, got:\n{md}"
+        );
+        assert!(
+            md.contains("| Name | Kind | Action | Details | Signal |"),
+            "legacy 5-column header must be preserved when opt-in is disabled, got:\n{md}"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
+        // Fail-closed: a stale `catalogue_declaration_hash` in the signals
+        // file indicates the catalogue changed without regenerating signals.
+        // View rendering aborts and the caller is expected to run
+        // `sotp track catalogue-spec-signals <track_id>` before retrying.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
+        )
+        .unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Stale: hash does NOT match on-disk catalogue.
+        let stale_hash = "0".repeat(64);
+        let stale_json = serde_json::json!({
+            "schema_version": 1,
+            "catalogue_declaration_hash": stale_hash,
+            "signals": [ { "type_name": "TrackId", "signal": "blue" } ],
+        });
+        std::fs::write(
+            track_dir.join("domain-catalogue-spec-signals.json"),
+            serde_json::to_string_pretty(&stale_json).unwrap(),
+        )
+        .unwrap();
+
+        let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
+        let msg = err.to_string();
+        assert!(
+            msg.contains("stale") && msg.contains("catalogue-spec-signals"),
+            "stale-hash error expected, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
+        // Fail-closed: an unparseable signals file is a system-state error,
+        // not a silent fallback. The view renderer propagates the decode
+        // failure and the caller re-runs `sotp track catalogue-spec-signals`.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
+        )
+        .unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // Malformed JSON.
+        std::fs::write(
+            track_dir.join("domain-catalogue-spec-signals.json"),
+            "{ this is not valid json ",
+        )
+        .unwrap();
+
+        let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
+        let msg = err.to_string();
+        assert!(
+            msg.contains("decode") || msg.contains("JSON"),
+            "decode error expected, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
+        // Fail-closed: when opt-in is enabled but the signals file has never
+        // been generated, view rendering must error and direct the user to
+        // `sotp track catalogue-spec-signals <track_id>`.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("not found"), "not-found error expected, got: {msg}");
+        assert!(msg.contains("sotp track catalogue-spec-signals"), "remediation missing: {msg}");
     }
 }

@@ -53,6 +53,11 @@ Opus is chosen because ADR decisions have long-lasting cross-track implications;
 - **No Status field**: do not add a `## Status` section or any artificial state field. The convention (`knowledge/conventions/pre-track-adr-authoring.md`) treats file existence as operational approval.
 - **No illustrative content without markers**: any Rust code or schema examples added to the ADR must carry `<!-- illustrative, non-canonical -->` markers.
 - **No reverse references**: the ADR must not reference track-internal artifacts (`spec.json`, type catalogues, `impl-plan.json`, `task-coverage.json`). Only forward references (ADR ← spec ← type catalogue ← implementation) are valid per the SoT Chain.
+- **No track-specific information**: ADRs are cross-track persistent architectural decisions. The body must not reference specific commit hashes (e.g. `e60d8cc`), task IDs (e.g. `T017`, `T022`), or track IDs (e.g. `catalogue-spec-signal-activation-2026-04-23`). Implementation history (when / in which task / by which commit) belongs in track artifacts (`impl-plan.json`, `metadata.json`, commit messages, `TRACK_TRACEABILITY.md`) — not in the ADR. Cross-references to *other* ADR files under `knowledge/adr/` are allowed and encouraged.
+- **Pre-merge draft vs post-merge record** (see `knowledge/conventions/adr.md` § Lifecycle). An ADR is **immutable only after it has landed on `main`**. Before that — while the ADR file still lives exclusively on a working branch / open PR — it is a draft and the agent should amend it in-place when the briefing identifies a design flaw, missing constraint, or semantic contradiction. Do NOT create a new superseding ADR merely to fix a pre-merge draft; that is ceremony overhead.
+  - **Pre-merge detection**: run `git log main -- <adr-file>` — empty output means the ADR is not on `main`, so it is pre-merge and freely editable. Non-empty means the ADR body has landed on `main`, so it is post-merge and the immutability rule below applies.
+  - **Post-merge immutability**: once on `main`, the ADR body is a historical record. A new decision that supersedes or refines an earlier one must be recorded in a *new* ADR that references the older one from its `## Context` / `## Related` sections. Acceptable edits to a post-merge ADR are limited to (1) typo / broken cross-reference fixes, (2) wording tightening without semantic change, (3) back-reference to a newer ADR in `## Related` (a single-line pointer is acceptable; do NOT add a `Status: Superseded` field — the convention has no Status section).
+  - If the briefing asks for a semantic amendment to a post-merge ADR, stop and advise the orchestrator that the correct fix is a new ADR whose own body captures the amendment.
 - **Minimal change**: fix only the sections that caused the 🔴 signal. Do not restructure unrelated sections.
 - **Language**: ADR body is in Japanese. Section headers (`## Context`, `## Decision`, etc.) and code identifiers remain in English.
 
@@ -70,6 +75,6 @@ Do NOT write to any file other than the target ADR. Do NOT spawn further agents.
 
 - Use `Read`, `Grep`, `Glob` for exploring the ADR and related conventions
 - Do not use `Bash(cat/grep/head)` — dedicated tools only
-- Do not run `git` commands
+- Do not run write-side `git` commands (`git add`, `git commit`, `git push`, `git checkout`, etc.). The single permitted read-only exception is `git log main -- <adr-file>` used exclusively for pre-merge detection (see the Lifecycle rule above). Other read-only inspections should go through the dedicated tools (`Read` / `Grep` / `Glob`).
 - Do not modify spec.json, metadata.json, impl-plan.json, task-coverage.json, or any catalogue file (`*-types.json`)
 - Do not modify any file outside `knowledge/adr/`

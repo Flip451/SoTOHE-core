@@ -122,12 +122,6 @@ pub fn execute_type_signals(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    // Fail-closed: route through the domain API so the activation invariant
-    // has a single source of truth. Activation is identified by branch
-    // materialization only; an override on a branchless planning track does
-    // not imply activation.
-    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
-        .map_err(|e| CliError::Message(format!("cannot run type-signals on '{track_id}': {e}")))?;
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;
@@ -216,12 +210,6 @@ pub fn execute_type_signals_lenient_with_bindings(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    // Fail-closed: route through the domain API so the activation invariant
-    // has a single source of truth. Activation is identified by branch
-    // materialization only; an override on a branchless planning track does
-    // not imply activation.
-    domain::check_impl_plan_presence(&metadata, impl_plan.as_ref())
-        .map_err(|e| CliError::Message(format!("cannot run type-signals on '{track_id}': {e}")))?;
     let effective_status =
         domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
     ensure_active_track(effective_status, &track_id)?;
@@ -384,7 +372,6 @@ fn execute_type_signals_for_layer(
     };
 
     // Delegate to the core evaluator (nightly-free, directly testable).
-    let rendered_stem = binding.rendered_file();
     let signal_file_name = binding.signal_file();
     evaluate_and_write_signals(
         &mut doc,
@@ -392,7 +379,6 @@ fn execute_type_signals_for_layer(
         &baseline,
         &catalogue_path,
         &track_dir,
-        &rendered_stem,
         &signal_file_name,
     )
 }
@@ -414,7 +400,6 @@ pub(crate) fn evaluate_and_write_signals(
     baseline: &domain::TypeBaseline,
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
-    rendered_file_stem: &str,
     signal_file_name: &str,
 ) -> Result<ExitCode, CliError> {
     // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
@@ -468,13 +453,8 @@ pub(crate) fn evaluate_and_write_signals(
     // wrote to disk, so `declaration_hash` in the signal file matches the
     // on-disk declaration bytes verbatim (ADR §D5: hash is pinned to post-encode
     // disk bytes, not pre-encode in-memory state).
-    let declaration_bytes = validate_and_write_catalogue(
-        &report,
-        doc,
-        domain_types_path,
-        track_dir,
-        rendered_file_stem,
-    )?;
+    let declaration_bytes =
+        validate_and_write_catalogue(&report, doc, domain_types_path, track_dir)?;
 
     // Write the signal file alongside the declaration file. Signals are stored
     // separately in `<layer>-type-signals.json` per ADR Migration §2.
@@ -515,7 +495,6 @@ fn validate_and_write_catalogue(
     doc: &domain::TypeCatalogueDocument,
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
-    rendered_file_stem: &str,
 ) -> Result<Vec<u8>, CliError> {
     // Validate first: abort before any writes if delete errors are present.
     print_action_diagnostics(report)?;
@@ -542,28 +521,16 @@ fn validate_and_write_catalogue(
         CliError::Message(format!("cannot write {}: {e}", domain_types_path.display()))
     })?;
 
-    // Re-render the markdown view so it stays in sync with the catalogue.
-    // The markdown filename is `<catalogue_stem>.md` where `<catalogue_stem>`
-    // is derived from the binding's `catalogue_file`.
-    let rendered_md_path = track_dir.join(rendered_file_stem);
-    // Derive the catalogue JSON filename from the write path so the rendered view's
-    // `Generated from ...` header reflects the actual source file (e.g.
-    // `infrastructure-types.json`) — not the rendered `.md` path. `binding` is not
-    // in this scope; `domain_types_path` already holds the exact catalogue file path
-    // that was just written, so deriving from its file_name is authoritative.
-    let catalogue_file =
-        domain_types_path.file_name().and_then(|n| n.to_str()).ok_or_else(|| {
-            CliError::Message(format!(
-                "cannot derive catalogue file name from {}",
-                domain_types_path.display()
-            ))
-        })?;
-    let rendered =
-        infrastructure::type_catalogue_render::render_type_catalogue(doc, catalogue_file);
-    atomic_write_file(&rendered_md_path, rendered.as_bytes()).map_err(|e| {
-        CliError::Message(format!("cannot write {}: {e}", rendered_md_path.display()))
-    })?;
-
+    // NOTE: Markdown view rendering is intentionally NOT performed here. The
+    // `<layer>-types.md` view depends on both type-signals (this step) AND
+    // catalogue-spec-signals (pre-commit step 3). Rendering from this step
+    // would require a stale/fresh check against the catalogue-spec-signals
+    // JSON that has not yet been refreshed, creating a deadlock in the
+    // pre-commit chain. Instead, rendering is centralised in
+    // `sync_rendered_views` (pre-commit step 3.5 and track-transition /
+    // track-sync-views entrypoints), which runs once both signals are
+    // persisted. See ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
+    // §D2.5 (view content) / §D3.4 (pre-commit ordering).
     Ok(declaration_bytes)
 }
 
@@ -997,13 +964,7 @@ mod tests {
             "precondition: delete_errors must be non-empty"
         );
 
-        let result = validate_and_write_catalogue(
-            &report,
-            &doc,
-            &domain_types_path,
-            &track_dir,
-            "domain-types.md",
-        );
+        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
 
         assert!(result.is_err(), "delete errors must cause validate_and_write_catalogue to fail");
         assert!(
@@ -1012,14 +973,19 @@ mod tests {
         );
         assert!(
             !dir.path().join("domain-types.md").exists(),
-            "domain-types.md must NOT be written on delete-error abort"
+            "domain-types.md must NOT be written on delete-error abort (md render is centralised \
+             in sync_rendered_views and is never invoked by this function)"
         );
     }
 
     #[test]
-    fn test_validate_and_write_catalogue_writes_files_when_no_errors() {
-        // Verifies that validate_and_write_catalogue writes both files when there
-        // are no delete errors (contradiction warnings are advisory and do not block writes).
+    fn test_validate_and_write_catalogue_writes_json_only_when_no_errors() {
+        // Verifies that validate_and_write_catalogue writes only the JSON catalogue
+        // when the report is clean. Markdown view rendering is centralised in
+        // `sync_rendered_views` (pre-commit step 3.5 / track-transition / track-sync-views)
+        // so the md file must NOT be produced by this function — a regression that
+        // reintroduces render here would recreate the pre-commit deadlock against a
+        // stale `<layer>-catalogue-spec-signals.json` (PR #111 P1 finding).
         let dir = tempfile::tempdir().unwrap();
         let domain_types_path = dir.path().join("domain-types.json");
         let track_dir = dir.path().to_path_buf();
@@ -1030,58 +996,14 @@ mod tests {
 
         assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
 
-        let result = validate_and_write_catalogue(
-            &report,
-            &doc,
-            &domain_types_path,
-            &track_dir,
-            "domain-types.md",
-        );
+        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
 
         assert!(result.is_ok(), "no-error report must succeed: {result:?}");
         assert!(domain_types_path.exists(), "domain-types.json must be written on success");
         assert!(
-            dir.path().join("domain-types.md").exists(),
-            "domain-types.md must be written on success"
-        );
-    }
-
-    #[test]
-    fn test_validate_and_write_catalogue_rendered_header_uses_json_catalogue_filename() {
-        // Regression guard for the T004 caller-side header fix: the rendered `.md` file's
-        // `Generated from ...` header must reference the catalogue JSON filename, not the
-        // markdown output filename.  Using a non-domain path (`infrastructure-types.json`)
-        // makes the distinction explicit — if the derivation regresses back to passing
-        // `rendered_file_stem` the header would incorrectly say
-        // `Generated from infrastructure-types.md`.
-        let dir = tempfile::tempdir().unwrap();
-        let catalogue_path = dir.path().join("infrastructure-types.json");
-        let track_dir = dir.path().to_path_buf();
-
-        let doc = domain::TypeCatalogueDocument::new(1, vec![]);
-        let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
-
-        assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
-
-        let result = validate_and_write_catalogue(
-            &report,
-            &doc,
-            &catalogue_path,
-            &track_dir,
-            "infrastructure-types.md",
-        );
-
-        assert!(result.is_ok(), "clean report must succeed: {result:?}");
-
-        let rendered = std::fs::read_to_string(dir.path().join("infrastructure-types.md"))
-            .expect("rendered md must exist");
-        assert!(
-            rendered.contains("Generated from infrastructure-types.json"),
-            "rendered header must reference the JSON catalogue file, got:\n{rendered}"
-        );
-        assert!(
-            !rendered.contains("Generated from infrastructure-types.md"),
-            "rendered header must NOT reference the md output file, got:\n{rendered}"
+            !dir.path().join("domain-types.md").exists(),
+            "domain-types.md must NOT be written by this function (render is owned by \
+             sync_rendered_views)"
         );
     }
 
@@ -1105,7 +1027,6 @@ mod tests {
             &empty_baseline_d(),
             &domain_types_path,
             &track_dir,
-            "domain-types.md",
             "domain-type-signals.json",
         );
 
@@ -1142,7 +1063,6 @@ mod tests {
             &empty_baseline_d(),
             &domain_types_path,
             &track_dir,
-            "domain-types.md",
             "domain-type-signals.json",
         );
 
@@ -1150,8 +1070,9 @@ mod tests {
         assert_eq!(result.unwrap(), ExitCode::SUCCESS, "must return EXIT_SUCCESS");
         assert!(domain_types_path.exists(), "domain-types.json must be written on success");
         assert!(
-            dir.path().join("domain-types.md").exists(),
-            "domain-types.md must be written on success"
+            !dir.path().join("domain-types.md").exists(),
+            "domain-types.md must NOT be written by evaluate_and_write_signals — \
+             view rendering is centralised in sync_rendered_views"
         );
         // T004: dual-write — signal file must be written alongside the declaration file.
         let signal_path = dir.path().join("domain-type-signals.json");
@@ -1206,7 +1127,6 @@ mod tests {
             &empty_baseline_d(),
             &domain_types_path,
             &track_dir,
-            "domain-types.md",
             "domain-type-signals.json",
         );
 
@@ -1244,7 +1164,6 @@ mod tests {
             &empty_baseline_d(),
             &domain_types_path,
             &track_dir,
-            "domain-types.md",
             "domain-type-signals.json",
         );
 
@@ -1275,7 +1194,6 @@ mod tests {
             &empty_baseline_d(),
             &domain_types_path,
             &track_dir,
-            "domain-types.md",
             "domain-type-signals.json",
         );
 

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-24T15:17:50Z",
+  "declaration_hash": "8cb4298e911072fc7826a468aaa1fbb18ec2f376a52b33a44600795c8abd313a",
+  "signals": [
+    {
+      "type_name": "ImplPlanPresenceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecRefFinding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecRefFindingKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DanglingAnchor",
+        "HashMismatch",
+        "StaleSignals"
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecSignal",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueSpecSignalsDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

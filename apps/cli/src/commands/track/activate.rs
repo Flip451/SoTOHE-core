@@ -153,12 +153,6 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
             impl_plan_for_status.as_ref(),
             track_meta.status_override(),
         );
-        // Fail-closed: route through the domain API so the activation invariant
-        // has a single source of truth. Activation is identified by branch
-        // materialization only; an override on a branchless planning track
-        // does not imply activation.
-        domain::check_impl_plan_presence(&track_meta, impl_plan_for_status.as_ref())
-            .map_err(|e| CliError::Message(format!("activation preflight failed: {e}")))?;
         let status_str = derived_status.to_string();
         activation_resume_allowed(
             &repo,

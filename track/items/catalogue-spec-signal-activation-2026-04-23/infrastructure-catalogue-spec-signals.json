@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "b6e3ac75ca84103acbd831edae1b4645c5fdfbb6222bf77bced71374fab302a0",
+  "signals": [
+    {
+      "type_name": "GitShowTrackBlobReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueSpecSignalsDocumentDto",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TdddLayerBinding",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueSpecSignalsCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LoadCatalogueSpecSignalsForViewError",
+      "signal": "blue"
+    }
+  ]
+}

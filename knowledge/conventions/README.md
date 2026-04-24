@@ -57,11 +57,13 @@
 <!-- convention-docs:start -->
 - `adr.md`: Convention: Architecture Decision Records (ADR)
 - `bash-write-guard.md`: Bash File-Write Guard (CON-07)
+- `enforce-by-mechanism.md`: Enforce by Mechanism Convention
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
 - `hexagonal-architecture.md`: Hexagonal Architecture Convention
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `language-policy.md`: Language Policy Convention
 - `nightly-dev-tool.md`: Nightly Toolchain Dev-Tool Convention
+- `no-backward-compat.md`: No Backward Compatibility Convention
 - `pre-track-adr-authoring.md`: Pre-Track ADR Authoring Convention
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
 - `review-protocol.md`: Review Protocol Convention

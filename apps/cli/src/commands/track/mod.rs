@@ -257,6 +257,33 @@ pub enum TrackCommand {
         layers: Option<String>,
     },
 
+    /// Regenerate `<layer>-catalogue-spec-signals.json` for each
+    /// catalogue-spec-enabled layer (SoT Chain ② pre-commit step).
+    ///
+    /// Reads the LOCAL `<layer>-types.json` (not the origin blob) so
+    /// uncommitted changes are reflected. Emits per-entry signals computed
+    /// via the informal-priority rule (ADR D1.1) plus the raw-bytes SHA-256
+    /// `catalogue_declaration_hash` used by the stale-detection gate.
+    CatalogueSpecSignals {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Workspace root directory (must contain `architecture-rules.json`).
+        /// Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+
+        /// Optional layer id filter. When omitted all `tddd.enabled` layers
+        /// are processed. When supplied, the specified layer id must be
+        /// `tddd.enabled=true`.
+        #[arg(long)]
+        layer: Option<String>,
+    },
+
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     ///
     /// Idempotent: if the baseline file already exists it is kept as-is. Re-capturing
@@ -438,6 +465,14 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         }
         TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, layer } => {
             tddd::baseline::execute_baseline_capture(items_dir, track_id, workspace_root, layer)
+        }
+        TrackCommand::CatalogueSpecSignals { items_dir, track_id, workspace_root, layer } => {
+            tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
+                items_dir,
+                track_id,
+                workspace_root,
+                layer,
+            )
         }
     };
     match result {

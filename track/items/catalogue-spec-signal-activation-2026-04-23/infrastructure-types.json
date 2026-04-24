@@ -1,0 +1,234 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "GitShowTrackBlobReader",
+      "description": "Existing infrastructure secondary adapter implementing TrackBlobReader via git show. Extended by this track to implement: (a) the two new port methods added to TrackBlobReader (read_catalogue_for_spec_ref_check — (TypeCatalogueDocument, String) where String = raw-bytes SHA-256 for stale detection; read_catalogue_spec_signals_document — CatalogueSpecSignalsDocument); and (b) the new SpecElementHashReader port introduced in T009 (read_spec_element_hashes — BTreeMap<SpecElementId, ContentHash> for per-spec-element canonical hashes). All existing guard patterns are reused: symlink rejection, LANG=C fixation, BlobResult, path-not-found stderr parsing per ADR 2026-04-12-1200 §D4. The SpecElementHashReader impl shares the existing canonical_json_sha256 + build_element_map helpers from verify/plan_artifact_refs.rs (visibility raised to pub(crate)). action=modify because the adapter struct already exists in libs/infrastructure/src/verify/merge_gate_adapter.rs.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "TrackBlobReader",
+          "expected_methods": [
+            {
+              "name": "read_spec_document",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<SpecDocument>",
+              "is_async": false
+            },
+            {
+              "name": "read_type_catalogue",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+              "is_async": false
+            },
+            {
+              "name": "read_impl_plan",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<ImplPlanDocument>",
+              "is_async": false
+            },
+            {
+              "name": "read_enabled_layers",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<Vec<String>>",
+              "is_async": false
+            },
+            {
+              "name": "read_catalogue_for_spec_ref_check",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<(TypeCatalogueDocument, String)>",
+              "is_async": false
+            },
+            {
+              "name": "read_catalogue_spec_signals_document",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<CatalogueSpecSignalsDocument>",
+              "is_async": false
+            }
+          ]
+        },
+        {
+          "trait_name": "SpecElementHashReader",
+          "expected_methods": [
+            {
+              "name": "read_spec_element_hashes",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "branch",
+                  "ty": "&str"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-08",
+          "hash": "6807711ae8659db5a0bc31fbc86f5d13b92d714174717bae24271ec497fd919c"
+        }
+      ]
+    },
+    {
+      "name": "FsCatalogueSpecSignalsStore",
+      "description": "New infrastructure secondary adapter implementing CatalogueSpecSignalsWriter via filesystem atomic write. Writes <layer>-catalogue-spec-signals.json to track/items/<track_id>/<layer>-catalogue-spec-signals.json using the same atomic write pattern as FsTrackStore / FsReviewStore. Placed in libs/infrastructure/src/tddd/ (new module). Takes a workspace root path and delegates serialization to CatalogueSpecSignalsDocumentDto via serde_json.",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "CatalogueSpecSignalsWriter"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-08",
+          "hash": "6807711ae8659db5a0bc31fbc86f5d13b92d714174717bae24271ec497fd919c"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsDocumentDto",
+      "description": "Infrastructure serde DTO for <layer>-catalogue-spec-signals.json (schema v1). Fields: schema_version (u32, = 1), catalogue_declaration_hash (String, 64-char hex), signals (Vec<CatalogueSpecSignalDto>). deny_unknown_fields enforced at all nesting levels. No generated_at field (deterministic output per CN-06 / ADR D2.2). Used by the CatalogueSpecSignals codec (encode and decode) in libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs. Mirrors domain CatalogueSpecSignalsDocument.",
+      "approved": true,
+      "kind": "dto",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
+        }
+      ]
+    },
+    {
+      "name": "TdddLayerBinding",
+      "description": "Existing infrastructure struct describing one TDDD-enabled layer's configuration (layer_id, catalogue_file, catalogue_spec_signal_enabled, targets). T018 adds the `catalogue_spec_signal_enabled: bool` field alongside a new `pub fn catalogue_spec_signal_enabled()` accessor, both derived from the `tddd.catalogue_spec_signal.enabled` flag in `architecture-rules.json` (ADR §D5.4 phased activation). action=modify — the struct already exists in `libs/infrastructure/src/verify/tddd_layers.rs`; only a field + accessor were added, no behavioural semantics changed for existing fields.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-15",
+          "hash": "27a296b0dbe983ff1347aee7330db9c7a48516170c746bf168c881df4d90ecf3"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsCodecError",
+      "description": "Error enum for the <layer>-catalogue-spec-signals.json codec. Variants follow existing codec conventions: Json (serde_json failures), UnsupportedSchemaVersion (version != 1), Validation (domain construction errors from CatalogueSpecSignal or ContentHash). Placed in libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs alongside CatalogueSpecSignalsDocumentDto.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
+        }
+      ]
+    },
+    {
+      "name": "LoadCatalogueSpecSignalsForViewError",
+      "description": "Error enum returned by infrastructure::type_catalogue_render::load_catalogue_spec_signals_for_view. Reports fail-closed load failures for <layer>-catalogue-spec-signals.json at view-render time: NotFound (signals file absent), NotRegularFile (symlink or non-file), Io (read failure), Decode (JSON / schema / hash format invalid), StaleHash (catalogue_declaration_hash mismatch vs on-disk catalogue bytes). Variants carry path + diagnostic context so the error message directs the user to `sotp track catalogue-spec-signals <track_id>` for regeneration. Placed in libs/infrastructure/src/type_catalogue_render.rs. Enforces the opt-in fail-closed view-render invariant defined by T020 (IN-17): opt-in layers must render the 6-column view from a fresh signals file; silent fallback would flap hashes between pre-commit steps.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "NotFound",
+        "NotRegularFile",
+        "Io",
+        "Decode",
+        "StaleHash"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-17",
+          "hash": "8dea9e8182ee5d3a2da05a58f3cae81d5c37b93e6eba550a3970340484718d64"
+        }
+      ]
+    }
+  ]
+}

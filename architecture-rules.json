@@ -50,6 +50,9 @@
       "tddd": {
         "enabled": true,
         "catalogue_file": "domain-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
         "schema_export": {
           "method": "rustdoc",
           "targets": ["domain"]
@@ -66,6 +69,9 @@
       "tddd": {
         "enabled": true,
         "catalogue_file": "usecase-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
         "schema_export": {
           "method": "rustdoc",
           "targets": ["usecase"]
@@ -83,6 +89,9 @@
       "tddd": {
         "enabled": true,
         "catalogue_file": "infrastructure-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
         "schema_export": {
           "method": "rustdoc",
           "targets": ["infrastructure"]

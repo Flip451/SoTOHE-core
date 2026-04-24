@@ -17,8 +17,13 @@
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::validate_branch_ref;
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{ImplPlanDocument, TrackId};
+use domain::{
+    CatalogueSpecSignalsDocument, ContentHash, ImplPlanDocument, TrackId,
+    check_catalogue_spec_ref_integrity, check_catalogue_spec_signals,
+};
 use domain::{TypeCatalogueDocument, check_type_signals};
+
+use crate::catalogue_spec_refs::SpecElementHashReader;
 
 /// Result of a port-level blob fetch.
 ///
@@ -96,6 +101,83 @@ pub trait TrackBlobReader {
     fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
         BlobFetchResult::Found(vec!["domain".to_string()])
     }
+
+    /// Reads and decodes the `<layer>-types.json` catalogue for the purpose
+    /// of catalogue-spec ref integrity checking (ADR
+    /// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D2.2).
+    ///
+    /// The `Found` variant returns `(doc, raw_bytes_sha256_hex)` where the
+    /// 64-character lowercase hex SHA-256 is computed over the canonical
+    /// on-disk bytes of the catalogue. Callers convert this into a
+    /// [`ContentHash`] via [`ContentHash::try_from_hex`] and pass it to
+    /// [`check_catalogue_spec_ref_integrity`] as `current_catalogue_hash`
+    /// for stale detection.
+    ///
+    /// Note: the `String` return here is the **raw-bytes SHA-256 hash**, not
+    /// a resolved filename (the `read_type_catalogue` port returns a filename
+    /// in the same tuple slot). The stale-detection use case requires the
+    /// hash, so the two ports are kept distinct even though both read the
+    /// same catalogue file.
+    ///
+    /// A default implementation returns `FetchError` so adapters that opt into
+    /// the new port surface the gap explicitly. Implementations in
+    /// `libs/infrastructure/` override this method in T011.
+    fn read_catalogue_for_spec_ref_check(
+        &self,
+        _branch: &str,
+        _track_id: &str,
+        _layer_id: &str,
+    ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        // Default: NotFound so opt-out test mocks skip silently without failing
+        // the merge gate. Real infrastructure implementations override.
+        BlobFetchResult::NotFound
+    }
+
+    /// Reads and decodes the `<layer>-catalogue-spec-signals.json` file for
+    /// the given layer on the target branch.
+    ///
+    /// Returns `NotFound` when the signals file has not been generated yet
+    /// (expected for tracks before `sotp track catalogue-spec-signals` runs
+    /// or for layers whose `catalogue_spec_signal.enabled` flag is false).
+    /// Callers (verify / merge-gate) decide whether `NotFound` short-circuits
+    /// to a finding or to `pass`.
+    ///
+    /// A default implementation returns `FetchError` so adapters that opt into
+    /// the new port surface the gap explicitly. Implementations in
+    /// `libs/infrastructure/` override this method in T011.
+    fn read_catalogue_spec_signals_document(
+        &self,
+        _branch: &str,
+        _track_id: &str,
+        _layer_id: &str,
+    ) -> BlobFetchResult<CatalogueSpecSignalsDocument> {
+        // Default: NotFound so opt-out test mocks skip silently without failing
+        // the merge gate. Real infrastructure implementations override.
+        BlobFetchResult::NotFound
+    }
+
+    /// Returns the subset of TDDD-enabled layer ids that have also opted in
+    /// to Chain ② evaluation via `tddd.catalogue_spec_signal.enabled = true`
+    /// on the given branch.
+    ///
+    /// This is a strict subset of `read_enabled_layers`: every id returned
+    /// here is also `tddd.enabled`, but not every `tddd.enabled` layer is in
+    /// this set. The merge gate uses this list to avoid evaluating stale or
+    /// mismatched signals files for layers that have intentionally opted out
+    /// of Chain ② (for example a layer that previously generated a signals
+    /// file and later flipped the flag to `false`). Keying Chain ② behavior
+    /// on file presence alone would let such stale files block merges for a
+    /// disabled feature.
+    ///
+    /// The default implementation returns an empty set so mocks that have
+    /// not been updated simply skip Chain ②. Real infrastructure adapters
+    /// override this to parse `architecture-rules.json` on the branch blob.
+    fn read_catalogue_spec_signal_opted_in_layers(
+        &self,
+        _branch: &str,
+    ) -> BlobFetchResult<Vec<String>> {
+        BlobFetchResult::Found(Vec::new())
+    }
 }
 
 /// Evaluates the strict merge gate for the given branch using the provided
@@ -125,7 +207,10 @@ pub trait TrackBlobReader {
 ///
 /// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D5.2.
 #[must_use]
-pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> VerifyOutcome {
+pub fn check_strict_merge_gate<R>(branch: &str, reader: &R) -> VerifyOutcome
+where
+    R: TrackBlobReader + SpecElementHashReader,
+{
     // 1. plan/ branches skip the gate entirely (D6)
     if branch.starts_with("plan/") {
         return VerifyOutcome::pass();
@@ -238,6 +323,197 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
             }
         }
     }
+
+    // Stage 3 (Chain ② — ADR §D3.6 / IN-14): catalogue-spec integrity binary
+    // gate + signal gate. Runs AFTER Stage 1 (spec signals) + Stage 2 (type
+    // signals) so that lower-layer failures short-circuit before paying for
+    // per-layer spec-ref integrity checks. A full bottom-up reorder (Chain ③ →
+    // ② → ①) per D3.6 is deferred — T017 ships the new gate logic at the end
+    // of the existing order to avoid rewriting 30+ existing tests in the same
+    // commit. The behavioural effect is identical when Stage 1 / 2 pass
+    // cleanly (which is the success path the reorder optimises for).
+    //
+    // Short-circuit: if Stage 1 or Stage 2 already produced errors, Chain ②
+    // would only add unrelated failures on top of a known-broken state. Return
+    // early so the caller sees only the primary failure first.
+    if outcome.has_errors() {
+        return outcome;
+    }
+
+    // Per-layer Chain ② loop (ADR §D3.6 / briefing §Design Intent).
+    //
+    // Layer-id validation runs first (before the spec-hash opt-out gate) so
+    // that a malformed layer id in `architecture-rules.json` is always reported,
+    // even when the spec-hash reader is unavailable. This prevents a PR from
+    // adding an invalid layer id that would silently bypass fail-closed checking
+    // regardless of the spec-hash opt-out state.
+    for layer_id in &layer_ids {
+        if let Err(e) = domain::tddd::LayerId::try_new(layer_id) {
+            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "invalid layer id '{layer_id}' in architecture-rules.json on origin/{branch}: {e}"
+            ))]));
+        }
+    }
+    if outcome.has_errors() {
+        return outcome;
+    }
+
+    // Opt-out gate: `read_spec_element_hashes` NotFound/FetchError means the
+    // spec hash codec is unavailable → SKIP the whole Chain ② block.
+    // Per the briefing: "if NotFound / FetchError, SKIP the whole Chain ② block
+    // (catalogue-spec activation is per-layer opt-in and depends on having a
+    // valid spec.json)." A real spec.json parse failure already surfaces in
+    // Stage 1 via check_spec_doc_signals.
+    let spec_element_hashes = match reader.read_spec_element_hashes(branch, track_id) {
+        BlobFetchResult::Found(map) => map,
+        BlobFetchResult::NotFound | BlobFetchResult::FetchError(_) => {
+            return outcome; // hash codec unavailable → skip whole Chain ②
+        }
+    };
+
+    // Per-layer opt-in gate (ADR §D5.4 phased activation): only layers whose
+    // `tddd.catalogue_spec_signal.enabled = true` participate in Chain ②.
+    // Presence of a committed `<layer>-catalogue-spec-signals.json` on the
+    // branch is NOT sufficient on its own — a layer that was previously opted
+    // in and later flipped the flag back to `false` may still carry a stale
+    // signals file; blocking merges on it for a now-disabled feature would be
+    // wrong.
+    //
+    // `FetchError` is fail-closed: `architecture-rules.json` was already
+    // parsed successfully once in `read_enabled_layers` (the `layer_ids` set
+    // above was produced from it), so a second-call failure is a transient /
+    // systemic adapter issue. Returning an error here prevents the merge gate
+    // from silently skipping Chain ② validation for opted-in layers when the
+    // opt-in lookup fails (which would be fail-open).
+    //
+    // `NotFound` means "no rules file on the branch" — opt-in defaults to
+    // empty, which skips Chain ② entirely. That is consistent with the default
+    // trait impl's empty-Vec semantic for mocks, and with the fact that a PR
+    // without `architecture-rules.json` would already have been rejected by
+    // the Stage 2 `read_enabled_layers` fail-closed check above (this code is
+    // unreachable on such a PR in practice; the empty-set fallback is just
+    // defensive).
+    let opted_in_layers: std::collections::HashSet<String> =
+        match reader.read_catalogue_spec_signal_opted_in_layers(branch) {
+            BlobFetchResult::Found(ids) => ids.into_iter().collect(),
+            BlobFetchResult::NotFound => std::collections::HashSet::new(),
+            BlobFetchResult::FetchError(msg) => {
+                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "failed to read catalogue-spec opt-in layers on origin/{branch}: {msg}"
+                ))]);
+            }
+        };
+
+    for layer_id in &layer_ids {
+        // Skip layers that have NOT opted in to Chain ② — mere presence of a
+        // signals file is insufficient (see the opted_in_layers comment above).
+        if !opted_in_layers.contains(layer_id) {
+            continue;
+        }
+        // `LayerId::try_new` was validated in the pre-validation pass above and
+        // any failures caused an early return, so this conversion cannot fail.
+        let layer_id_newtype = match domain::tddd::LayerId::try_new(layer_id) {
+            Ok(id) => id,
+            Err(_) => continue, // unreachable: pre-validated above
+        };
+        // Step 1: read signals file.
+        //
+        // For an opted-in layer the signals file MUST exist on the branch —
+        // treating `NotFound` as silent skip would let a PR bypass Chain ②
+        // by deleting `<layer>-catalogue-spec-signals.json` while leaving the
+        // opt-in flag set. Fail-closed with a remediation hint pointing at
+        // `sotp track catalogue-spec-signals`.
+        let signals_doc = match reader
+            .read_catalogue_spec_signals_document(branch, track_id, layer_id)
+        {
+            BlobFetchResult::Found(doc) => doc,
+            BlobFetchResult::NotFound => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "opted-in layer '{layer_id}' is missing \
+                     <layer>-catalogue-spec-signals.json on origin/{branch}. Run \
+                     `sotp track catalogue-spec-signals` and commit the generated file \
+                     so the merge gate can evaluate Chain ②."
+                ))]));
+                continue;
+            }
+            BlobFetchResult::FetchError(msg) => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "failed to read catalogue-spec signals for layer '{layer_id}' \
+                             on origin/{branch}: {msg}"
+                ))]));
+                continue;
+            }
+        };
+
+        // Step 2: read catalogue + hash.
+        //
+        // Opted-in layers are also `tddd.enabled` (see the opt-in gate above
+        // — the set is a strict subset), so a missing catalogue on an
+        // opted-in layer is an integrity violation, not a benign opt-out.
+        // Mirror the step-1 fail-closed policy.
+        let (catalogue, catalogue_hash_hex) = match reader
+            .read_catalogue_for_spec_ref_check(branch, track_id, layer_id)
+        {
+            BlobFetchResult::Found(pair) => pair,
+            BlobFetchResult::NotFound => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "opted-in layer '{layer_id}' is missing its catalogue file \
+                     on origin/{branch}. A layer cannot opt in to Chain ② without the \
+                     `<layer>-types.json` catalogue the signals are computed from."
+                ))]));
+                continue;
+            }
+            BlobFetchResult::FetchError(msg) => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "failed to read catalogue hash for layer '{layer_id}' \
+                             on origin/{branch}: {msg}"
+                ))]));
+                continue;
+            }
+        };
+        let catalogue_hash = match ContentHash::try_from_hex(&catalogue_hash_hex) {
+            Ok(h) => h,
+            Err(e) => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "catalogue hash for layer '{layer_id}' is not canonical hex: {e}"
+                ))]));
+                continue;
+            }
+        };
+
+        // Step 3: integrity binary gate (dangling / mismatch / stale).
+        let integrity_findings = check_catalogue_spec_ref_integrity(
+            &layer_id_newtype,
+            &catalogue,
+            &spec_element_hashes,
+            Some(&catalogue_hash),
+            Some(&signals_doc),
+        );
+        if !integrity_findings.is_empty() {
+            let error_findings: Vec<VerifyFinding> = integrity_findings
+                .into_iter()
+                .map(|f| {
+                    VerifyFinding::error(format!(
+                        "catalogue-spec integrity violation on layer '{layer_id}': {:?}",
+                        f.kind
+                    ))
+                })
+                .collect();
+            outcome.merge(VerifyOutcome::from_findings(error_findings));
+        }
+
+        // Step 4: signal gate — strict=true (merge gate blocks Yellow).
+        // Use the catalogue filename (not the signals filename) so diagnostic
+        // messages point maintainers at the file they need to edit.
+        let layer_signal_outcome = check_catalogue_spec_signals(
+            &catalogue,
+            &signals_doc,
+            /* strict */ true,
+            &format!("{layer_id}-types.json"),
+        );
+        outcome.merge(layer_signal_outcome);
+    }
+
     outcome
 }
 
@@ -280,6 +556,17 @@ mod tests {
         /// making regressions in the short-circuit logic observable.
         fn with_unreachable_dt(spec: BlobFetchResult<SpecDocument>) -> Self {
             Self { spec: RefCell::new(Some(spec)), dt: RefCell::new(None), dt_unreachable: true }
+        }
+    }
+
+    impl SpecElementHashReader for MockTrackBlobReader {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            BlobFetchResult::Found(std::collections::BTreeMap::new())
         }
     }
 
@@ -340,6 +627,17 @@ mod tests {
                 recorded_dt_branch: RefCell::new(None),
                 recorded_dt_track_id: RefCell::new(None),
             }
+        }
+    }
+
+    impl SpecElementHashReader for RecordingTrackBlobReader {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            BlobFetchResult::Found(std::collections::BTreeMap::new())
         }
     }
 
@@ -775,6 +1073,17 @@ mod tests {
         }
     }
 
+    impl SpecElementHashReader for MultiLayerMock {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            BlobFetchResult::Found(std::collections::BTreeMap::new())
+        }
+    }
+
     impl TrackBlobReader for MultiLayerMock {
         fn read_spec_document(
             &self,
@@ -1019,6 +1328,521 @@ mod tests {
         assert!(
             outcome.findings().iter().any(|f| f.message().contains("architecture-rules.json")),
             "fail-closed error must mention architecture-rules.json: {outcome:?}"
+        );
+    }
+
+    // ===============================================================
+    // U31–U35 — Chain ② (catalogue-spec integrity + signal gate) tests.
+    //
+    // A dedicated `ChainTwoMock` controls the signals / catalogue / hash
+    // readers for Chain ②. Stage 1 always returns an all-Blue spec and
+    // Stage 2 always returns NotFound (TDDD opt-out) so the test isolates
+    // Chain ② behaviour exclusively.
+    // ===============================================================
+
+    struct ChainTwoMock {
+        signals: BlobFetchResult<domain::CatalogueSpecSignalsDocument>,
+        catalogue: BlobFetchResult<(domain::tddd::catalogue::TypeCatalogueDocument, String)>,
+        spec_hashes:
+            BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>,
+    }
+
+    impl ChainTwoMock {
+        /// Build a mock where Stage 1/2 succeed (Blue spec, TDDD opt-out for
+        /// Stage 2) and Chain ② reads are controlled via arguments.
+        fn new(
+            signals: BlobFetchResult<domain::CatalogueSpecSignalsDocument>,
+            catalogue: BlobFetchResult<(domain::tddd::catalogue::TypeCatalogueDocument, String)>,
+            spec_hashes: BlobFetchResult<
+                std::collections::BTreeMap<domain::SpecElementId, ContentHash>,
+            >,
+        ) -> Self {
+            Self { signals, catalogue, spec_hashes }
+        }
+    }
+
+    impl SpecElementHashReader for ChainTwoMock {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            self.spec_hashes.clone()
+        }
+    }
+
+    impl TrackBlobReader for ChainTwoMock {
+        fn read_spec_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<SpecDocument> {
+            BlobFetchResult::Found(all_blue_spec())
+        }
+
+        fn read_type_catalogue(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
+        }
+
+        fn read_impl_plan(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<domain::ImplPlanDocument> {
+            panic!("read_impl_plan must not be called by Chain ② tests")
+        }
+
+        fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+            BlobFetchResult::Found(vec!["domain".to_string()])
+        }
+
+        fn read_catalogue_spec_signal_opted_in_layers(
+            &self,
+            _branch: &str,
+        ) -> BlobFetchResult<Vec<String>> {
+            // These tests exercise Chain ② actively, so the mocked layer must be
+            // opted in. The real infrastructure adapter derives this subset from
+            // `architecture-rules.json` via
+            // `TdddLayerBinding::catalogue_spec_signal_enabled()`.
+            BlobFetchResult::Found(vec!["domain".to_string()])
+        }
+
+        fn read_catalogue_spec_signals_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<domain::CatalogueSpecSignalsDocument> {
+            self.signals.clone()
+        }
+
+        fn read_catalogue_for_spec_ref_check(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            self.catalogue.clone()
+        }
+    }
+
+    fn all_yellow_signals() -> domain::CatalogueSpecSignalsDocument {
+        domain::CatalogueSpecSignalsDocument::new(
+            ContentHash::from_bytes([0xcd_u8; 32]),
+            vec![domain::CatalogueSpecSignal::new("TrackId", domain::ConfidenceSignal::Yellow)],
+        )
+    }
+
+    fn all_blue_catalogue_signals() -> domain::CatalogueSpecSignalsDocument {
+        domain::CatalogueSpecSignalsDocument::new(
+            ContentHash::from_bytes([0xcd_u8; 32]),
+            vec![domain::CatalogueSpecSignal::new("TrackId", domain::ConfidenceSignal::Blue)],
+        )
+    }
+
+    /// A 64-char lowercase hex string of repeating `byte` (for catalogue_hash_hex).
+    fn hex64(byte: u8) -> String {
+        format!("{:02x}", byte).repeat(32)
+    }
+
+    /// Catalogue with a single `TrackId` entry matching `all_*_signals()` doc
+    /// structure. Hash uses `0xcd` repeat so `declaration_hash` matches the
+    /// signals document used in these tests.
+    fn catalogue_with_trackid_entry() -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        use domain::TypeAction;
+        use domain::tddd::catalogue::{TypeCatalogueEntry, TypeDefinitionKind};
+
+        let entry = TypeCatalogueEntry::new(
+            "TrackId",
+            "test fixture",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        BlobFetchResult::Found((TypeCatalogueDocument::new(1, vec![entry]), hex64(0xcd)))
+    }
+
+    #[test]
+    fn test_u31_chain2_signals_not_found_blocks_for_opted_in_layer() {
+        // U31 (updated per PR #111 fail-open fix): Chain ② signals=NotFound
+        // for an opted-in layer → BLOCKED. Previously this was treated as
+        // silent opt-out, but that let a PR bypass Chain ② by deleting
+        // `<layer>-catalogue-spec-signals.json`.
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::NotFound,
+            BlobFetchResult::NotFound,
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "signals NotFound on opted-in layer must block: {outcome:?}");
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("missing <layer>-catalogue-spec-signals.json")),
+            "error must explicitly name the missing signals file: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u32_chain2_yellow_signal_blocks_strict() {
+        // U32: Chain ② activated layer with Yellow signal → BLOCKED (strict=true)
+        // Both signals and catalogue must be Found so the full Chain ② path runs.
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::Found(all_yellow_signals()),
+            catalogue_with_trackid_entry(),
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "Yellow catalogue-spec signal must block in strict mode: {outcome:?}"
+        );
+        // Error message must reference the catalogue file (not the signals file)
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("domain-types.json")),
+            "error must mention the catalogue file 'domain-types.json', not the signals file: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u33_chain2_blue_signals_passes() {
+        // U33: Chain ② activated layer with all-Blue signals → PASS
+        // Catalogue is provided with a matching `TrackId` entry so the
+        // coverage check in `check_catalogue_spec_signals` passes.
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::Found(all_blue_catalogue_signals()),
+            catalogue_with_trackid_entry(),
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(!outcome.has_errors(), "all-Blue catalogue-spec signals must pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u34_chain2_signals_fetch_error_blocks() {
+        // U34: Chain ② signals=FetchError → BLOCKED (fail-closed)
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::FetchError("signals file corrupted".to_owned()),
+            BlobFetchResult::NotFound,
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "signals FetchError must block: {outcome:?}");
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("failed to read catalogue-spec signals")),
+            "error must mention catalogue-spec signals read failure: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u39_chain2_catalogue_not_found_blocks_for_opted_in_layer() {
+        // U39 (PR #111 regression): Step 2 catalogue=NotFound for an opted-in
+        // layer must block the merge even when Step 1 signals=Found. The
+        // `continue` after the Step 2 NotFound arm still accumulates the error
+        // into `outcome`, so this is fail-closed.
+        //
+        // Distinct from U31 (signals=NotFound): U31 never reaches Step 2 because
+        // the Step 1 `continue` fires first. U39 exercises the Step 2 path by
+        // providing valid signals but a missing catalogue.
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::Found(all_blue_catalogue_signals()),
+            BlobFetchResult::NotFound, // catalogue missing
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "catalogue NotFound on opted-in layer must block: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("missing its catalogue file")),
+            "error must mention the missing catalogue file: {outcome:?}"
+        );
+    }
+
+    /// Mock variant of `ChainTwoMock` where the layer is `tddd.enabled` (Stage 2)
+    /// but NOT in `read_catalogue_spec_signal_opted_in_layers` (Chain ② opt-out).
+    /// Used by the regression test covering the PR #111 finding: a stale signals
+    /// file for an opted-out layer must not be re-evaluated by the merge gate.
+    struct ChainTwoOptOutMock {
+        signals: BlobFetchResult<domain::CatalogueSpecSignalsDocument>,
+    }
+
+    impl SpecElementHashReader for ChainTwoOptOutMock {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            BlobFetchResult::Found(std::collections::BTreeMap::new())
+        }
+    }
+
+    impl TrackBlobReader for ChainTwoOptOutMock {
+        fn read_spec_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<SpecDocument> {
+            BlobFetchResult::Found(all_blue_spec())
+        }
+
+        fn read_type_catalogue(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
+        }
+
+        fn read_impl_plan(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<domain::ImplPlanDocument> {
+            panic!("read_impl_plan must not be called")
+        }
+
+        fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+            // Layer IS `tddd.enabled` → included in Stage 2 iteration.
+            BlobFetchResult::Found(vec!["domain".to_string()])
+        }
+
+        fn read_catalogue_spec_signal_opted_in_layers(
+            &self,
+            _branch: &str,
+        ) -> BlobFetchResult<Vec<String>> {
+            // But NOT opted in for Chain ② → should be skipped in Stage 3.
+            BlobFetchResult::Found(Vec::new())
+        }
+
+        fn read_catalogue_spec_signals_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<domain::CatalogueSpecSignalsDocument> {
+            self.signals.clone()
+        }
+
+        /// Override to provide a valid catalogue+hash so the test is falsifiable:
+        /// if the opt-in guard were removed, Stage 3 would proceed past signals to
+        /// the catalogue read, parse the hash, run the signal gate, and then block
+        /// on the Yellow signal. Without this override the default `NotFound` causes
+        /// a `continue` before `check_catalogue_spec_signals` is ever called,
+        /// making `test_u36` pass vacuously even when the guard is absent.
+        fn read_catalogue_for_spec_ref_check(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            // Match the hash embedded in `all_yellow_signals()`:
+            // ContentHash::from_bytes([0xcd; 32]) → hex64(0xcd)
+            catalogue_with_trackid_entry()
+        }
+    }
+
+    #[test]
+    fn test_u36_chain2_opt_out_skips_even_when_signals_yellow() {
+        // Regression: PR #111 found that a layer which previously emitted a
+        // signals file and later flipped `catalogue_spec_signal.enabled = false`
+        // would still be evaluated on file presence, blocking merges on stale
+        // Yellow/Red findings for a disabled feature. The fix consults
+        // `read_catalogue_spec_signal_opted_in_layers` and skips layers that
+        // are not in the opt-in set — even when the signals file is Found and
+        // Yellow (which would otherwise block in strict mode per U32).
+        let reader = ChainTwoOptOutMock { signals: BlobFetchResult::Found(all_yellow_signals()) };
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "opted-out layer with stale Yellow signals must NOT block merge: {outcome:?}"
+        );
+    }
+
+    /// Mock that returns `FetchError` specifically from
+    /// `read_catalogue_spec_signal_opted_in_layers` while all earlier reads
+    /// succeed. Exercises the fail-closed branch that blocks merges when the
+    /// opt-in lookup itself cannot be resolved.
+    struct ChainTwoOptInLookupErrorMock;
+
+    impl SpecElementHashReader for ChainTwoOptInLookupErrorMock {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            BlobFetchResult::Found(std::collections::BTreeMap::new())
+        }
+    }
+
+    impl TrackBlobReader for ChainTwoOptInLookupErrorMock {
+        fn read_spec_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<SpecDocument> {
+            BlobFetchResult::Found(all_blue_spec())
+        }
+
+        fn read_type_catalogue(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
+        }
+
+        fn read_impl_plan(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<domain::ImplPlanDocument> {
+            panic!("read_impl_plan must not be called")
+        }
+
+        fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+            BlobFetchResult::Found(vec!["domain".to_string()])
+        }
+
+        fn read_catalogue_spec_signal_opted_in_layers(
+            &self,
+            _branch: &str,
+        ) -> BlobFetchResult<Vec<String>> {
+            BlobFetchResult::FetchError(
+                "architecture-rules.json transient read error (simulated)".to_owned(),
+            )
+        }
+    }
+
+    #[test]
+    fn test_u38_chain2_opt_in_lookup_fetch_error_blocks_fail_closed() {
+        // Regression: the opt-in lookup itself failing must block the merge
+        // (fail-closed), not silently skip Chain ②. Treating `FetchError` as
+        // an empty set here would be fail-open — an adapter-side transient
+        // error on `architecture-rules.json` would silently disable Chain ②
+        // for opted-in layers, which PR #111 explicitly flagged.
+        let reader = ChainTwoOptInLookupErrorMock;
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "opt-in lookup FetchError must block merge (fail-closed): {outcome:?}"
+        );
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("failed to read catalogue-spec opt-in layers")),
+            "error must mention the opt-in lookup failure: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u37_chain2_opt_out_skips_even_when_signals_fetch_error() {
+        // Same opt-out gate: even a FetchError on a layer that is NOT opted in
+        // must not surface — the signals file is irrelevant to a disabled
+        // feature, so the adapter's fetch outcome should never be consulted.
+        let reader = ChainTwoOptOutMock {
+            signals: BlobFetchResult::FetchError("signals file corrupted".to_owned()),
+        };
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "opted-out layer signals FetchError must NOT surface: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u35_chain2_does_not_run_when_stage2_fails() {
+        // U35: Stage 2 (type catalogue) failure → short-circuits before Chain ②
+        // even when Chain ② signals would block. This test is falsifiable:
+        // removing the `if outcome.has_errors() { return outcome; }` guard would
+        // allow Chain ② to run. With Yellow signals AND a valid catalogue/hash
+        // available, `check_catalogue_spec_signals(strict=true)` would then emit
+        // a "catalogue-spec" finding, causing the final assertion to fail.
+        struct Stage2FailWithChain2Mock;
+        impl SpecElementHashReader for Stage2FailWithChain2Mock {
+            fn read_spec_element_hashes(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+            {
+                BlobFetchResult::Found(std::collections::BTreeMap::new())
+            }
+        }
+        impl TrackBlobReader for Stage2FailWithChain2Mock {
+            fn read_spec_document(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<SpecDocument> {
+                BlobFetchResult::Found(all_blue_spec())
+            }
+            fn read_type_catalogue(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+                // Stage 2: Red → blocks immediately and triggers early return.
+                BlobFetchResult::Found((dt_with_red(), "domain-types.json".to_owned()))
+            }
+            fn read_impl_plan(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<domain::ImplPlanDocument> {
+                panic!("read_impl_plan must not be called by U35")
+            }
+            fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+                BlobFetchResult::Found(vec!["domain".to_string()])
+            }
+            fn read_catalogue_spec_signals_document(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<domain::CatalogueSpecSignalsDocument> {
+                // Chain ②: Yellow signals — would block if Chain ② ran.
+                BlobFetchResult::Found(all_yellow_signals())
+            }
+            fn read_catalogue_for_spec_ref_check(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+                // Return a valid catalogue so that the signal gate would be reached
+                // if Chain ② were not short-circuited. Without this override the
+                // NotFound default causes the per-layer loop to `continue` before
+                // reaching `check_catalogue_spec_signals`, making the test non-falsifiable.
+                catalogue_with_trackid_entry()
+            }
+        }
+        let reader = Stage2FailWithChain2Mock;
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "Stage 2 Red must block: {outcome:?}");
+        // If the guard were removed, Chain ② would run and `check_catalogue_spec_signals`
+        // would emit a finding containing "catalogue-spec" for the Yellow signal.
+        assert!(
+            outcome.findings().iter().all(|f| !f.message().contains("catalogue-spec")),
+            "no Chain ② finding expected after Stage 2 short-circuit: {outcome:?}"
         );
     }
 }

@@ -141,7 +141,7 @@ pub(super) fn execute_next_task(
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     // Validate the track exists before proceeding; propagate read/not-found errors.
-    let (track, _meta) = read_track_metadata(&items_dir, &valid_id)
+    let (_track, _meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|err| CliError::Message(format!("next-task failed: {err}")))?;
 
     // Load impl-plan.json. Missing on an activated track is a corruption
@@ -157,12 +157,6 @@ pub(super) fn execute_next_task(
     let impl_plan = store
         .load_impl_plan(&valid_id)
         .map_err(|err| CliError::Message(format!("next-task failed reading impl-plan: {err}")))?;
-
-    domain::check_impl_plan_presence(&track, impl_plan.as_ref()).map_err(|e| {
-        CliError::Message(format!(
-            "next-task: {e}; refusing to report no-open-task for a potentially corrupt track state"
-        ))
-    })?;
 
     match impl_plan.as_ref().and_then(|doc| doc.next_open_task()) {
         Some(task) => {
@@ -194,7 +188,7 @@ pub(super) fn execute_task_counts(
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     // Validate the track exists before proceeding; propagate read/not-found errors.
-    let (track, _meta) = read_track_metadata(&items_dir, &valid_id)
+    let (_track, _meta) = read_track_metadata(&items_dir, &valid_id)
         .map_err(|err| CliError::Message(format!("task-counts failed: {err}")))?;
 
     // Load impl-plan.json.
@@ -220,13 +214,9 @@ pub(super) fn execute_task_counts(
             (total, todo, in_progress, done, skipped)
         }
         None => {
-            // Route through the domain API: activation is identified by branch
-            // materialization only. An override on a branchless planning track
-            // does not imply activation; impl-plan.json is legitimately absent
-            // in that case. The domain API is the single source of truth.
-            domain::check_impl_plan_presence(&track, None).map_err(|e| {
-                CliError::Message(format!("task-counts: {e}; refusing to report zero counts for a potentially corrupt track state"))
-            })?;
+            // impl-plan.json absent — report zeros (Phase 0-2 state or
+            // branchless planning track). `derive_track_status` returns
+            // Planned via its fallback when impl-plan.json is None.
             (0, 0, 0, 0, 0)
         }
     };
@@ -322,17 +312,21 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_next_task_with_no_impl_plan_on_activated_track_errors() {
-        // An activated track (branch set, status != planned) missing impl-plan.json is a
-        // corruption state. The command fails closed rather than reporting no-open-task.
+    fn test_execute_next_task_with_no_impl_plan_on_activated_track_succeeds() {
+        // An activated track without impl-plan.json is a legitimate Phase 0-2
+        // state (branch materialised before impl-plan.json is authored).
+        // `derive_track_status` returns Planned via its fallback; next-task
+        // reports no open task rather than erroring. The old invariant
+        // `is_activated() ↔ impl-plan.json present` was removed in T025 because
+        // it conflicted with /track:init branch creation and Phase 0-2 progression.
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         let result = execute_next_task(items_dir, "test-track".to_string());
-        assert!(result.is_err(), "expected Err on activated track without impl-plan.json");
-        if let Err(CliError::Message(msg)) = result {
-            assert!(msg.contains("missing impl-plan.json"), "message: {msg}");
-        }
+        assert!(
+            result.is_ok(),
+            "expected Ok on activated track without impl-plan.json: {result:?}"
+        );
     }
 
     #[test]
@@ -346,17 +340,18 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_task_counts_with_no_impl_plan_on_activated_track_errors() {
-        // Same fail-closed behavior as next-task: activated track missing impl-plan.json
-        // → error rather than silently reporting zero counts.
+    fn test_execute_task_counts_with_no_impl_plan_on_activated_track_succeeds() {
+        // Matches `execute_next_task` semantics after T025: an activated
+        // track without impl-plan.json is a legitimate Phase 0-2 state and
+        // reports zero counts without erroring.
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
         let result = execute_task_counts(items_dir, "test-track".to_string());
-        assert!(result.is_err(), "expected Err on activated track without impl-plan.json");
-        if let Err(CliError::Message(msg)) = result {
-            assert!(msg.contains("missing impl-plan.json"), "message: {msg}");
-        }
+        assert!(
+            result.is_ok(),
+            "expected Ok on activated track without impl-plan.json: {result:?}"
+        );
     }
 
     #[test]

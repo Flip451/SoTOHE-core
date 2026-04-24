@@ -590,6 +590,52 @@ case "$BRANCH" in
 esac
 ''']
 
+[tasks.verify-catalogue-spec-refs-local]
+private = true
+description = "[internal] Verify catalogue-spec ref integrity (SoT Chain ② binary gate: dangling / drift / stale) per ADR 2026-04-23-0344 §D1.5"
+script_runner = "@shell"
+script = ['''
+BRANCH=$(git branch --show-current 2>/dev/null || true)
+case "$BRANCH" in
+  track/*)
+    TRACK_ID="${BRANCH#track/}"
+    TRACK_DIR="track/items/$TRACK_ID"
+    if [ -d "$TRACK_DIR" ]; then
+      cargo run --quiet -p cli -- verify catalogue-spec-refs --track "$TRACK_ID"
+    else
+      echo "[FAIL] Track dir not found: $TRACK_DIR (branch maps to missing track)"
+      exit 1
+    fi
+    ;;
+  *)
+    echo "[SKIP] not on a track branch (branch: ${BRANCH:-detached})"
+    ;;
+esac
+''']
+
+[tasks.check-catalogue-spec-signals-local]
+private = true
+description = "[internal] Check catalogue-spec signal gate (strict=false interim mode): Red blocks, Yellow warns"
+script_runner = "@shell"
+script = ['''
+BRANCH=$(git branch --show-current 2>/dev/null || true)
+case "$BRANCH" in
+  track/*)
+    TRACK_ID="${BRANCH#track/}"
+    TRACK_DIR="track/items/$TRACK_ID"
+    if [ -d "$TRACK_DIR" ]; then
+      cargo run --quiet -p cli -- verify catalogue-spec-signals
+    else
+      echo "[FAIL] Track dir not found: $TRACK_DIR (branch maps to missing track)"
+      exit 1
+    fi
+    ;;
+  *)
+    echo "[SKIP] not on a track branch (branch: ${BRANCH:-detached})"
+    ;;
+esac
+''']
+
 [tasks.ci-rust-local]
 private = true
 description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers + canonical-modules)"
@@ -598,7 +644,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -606,7 +652,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -866,9 +912,9 @@ script_runner = "@shell"
 script = ['bin/sotp make track-local-plan "$@"']
 
 [tasks.track-local-review]
-description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper"
+description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper. Runs `bin/sotp make track-sync-views` first so review scope hashes are computed against the up-to-date rendered views (plan.md / contract-map.md / <layer>-types.md). Without this, a reviewer approving at hash H followed by a later `track-sync-views` flap would desync the approval from the on-disk state and force a re-review at commit time."
 script_runner = "@shell"
-script = ['bin/sotp make track-local-review "$@"']
+script = ['bin/sotp make track-sync-views && bin/sotp make track-local-review "$@"']
 
 [tasks.track-set-commit-hash]
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"

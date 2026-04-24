@@ -31,9 +31,7 @@ pub use error::{
 };
 pub use git_ref::{RefValidationError, validate_branch_ref};
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
-pub use impl_plan::{
-    IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument, ImplPlanPresenceError, check_impl_plan_presence,
-};
+pub use impl_plan::{IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument};
 pub use plan::{PlanSection, PlanView};
 pub use plan_ref::{
     AdrAnchor, AdrRef, ContentHash, ConventionAnchor, ConventionRef, InformalGroundKind,
@@ -55,6 +53,11 @@ pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
     MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
     TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
+};
+pub use tddd::catalogue_spec_signal::{
+    CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION, CatalogueSpecSignal, CatalogueSpecSignalsDocument,
+    SpecRefFinding, SpecRefFindingKind, check_catalogue_spec_ref_integrity,
+    check_catalogue_spec_signals, evaluate_catalogue_entry_signal,
 };
 pub use tddd::consistency::{
     ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,

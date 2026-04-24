@@ -256,26 +256,22 @@ fn load_track_metadata(
     // inconsistency (missing required fields, malformed branch, invalid
     // status_override syntax, etc.) is surfaced as an error here rather than
     // being discovered later or silently ignored.
-    let (track, doc_meta) = codec::decode(&content).map_err(|e| {
+    let (_track, doc_meta) = codec::decode(&content).map_err(|e| {
         vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because metadata.json fails v5 schema validation: {} ({e})",
             display_path(&metadata_file, root)
         ))]
     })?;
 
-    // Load impl-plan.json (if present) and enforce the activation invariant
-    // `is_activated() -> impl-plan.json present` at the domain layer. A
-    // branch-materialized track with a missing impl-plan.json is corrupt and
-    // must not be treated as a healthy "planned" track.
+    // Load impl-plan.json (if present). A track that is branch-materialized
+    // but lacks impl-plan.json is handled gracefully by `derive_track_status`
+    // (Planned fallback), so no invariant check is required here — the
+    // invariant `is_activated() ↔ impl-plan.json present` was deemed too
+    // strict because `/track:init` materialises the branch before any
+    // Phase 1-3 artifact is authored.
     let impl_plan = load_impl_plan_from_dir(track_dir).map_err(|e| {
         vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because impl-plan.json is invalid: {} ({e})",
-            display_path(&metadata_file, root)
-        ))]
-    })?;
-    domain::check_impl_plan_presence(&track, impl_plan.as_ref()).map_err(|e| {
-        vec![VerifyFinding::error(format!(
-            "[ERROR] Cannot determine latest track because activation invariant is violated: {} ({e})",
             display_path(&metadata_file, root)
         ))]
     })?;
@@ -901,19 +897,18 @@ mod tests {
     fn setup_track_with_branch(root: &Path, id: &str) {
         let branch = format!("track/{id}");
         setup_track(root, id, Some(&branch));
-        // Activated tracks (branch materialized) must carry impl-plan.json per the
-        // activation invariant `is_activated() → impl-plan.json present`. Write a
-        // minimal valid document so that `check_impl_plan_presence` in
-        // `load_track_metadata` succeeds and tests can focus on artifact validation.
+        // Write a minimal impl-plan.json so tests that assert on the derived
+        // track status (`derive_track_status`) exercise the normal activated
+        // path rather than the Planned fallback used for pre-impl-plan state.
         let dir = root.join(TRACK_ITEMS_DIR).join(id);
         fs::write(dir.join("impl-plan.json"), MINIMAL_IMPL_PLAN_JSON).unwrap();
     }
 
     fn setup_complete_track(root: &Path, id: &str, branch: Option<&str>) {
         setup_track(root, id, branch);
-        // Activated (branched) tracks must carry impl-plan.json. Write a minimal valid
-        // document so `check_impl_plan_presence` succeeds and the verifier can proceed
-        // to check the actual markdown artifacts that this helper is testing.
+        // Write a minimal impl-plan.json so the derived track status drives
+        // the artifact-validation test path rather than the pre-impl-plan
+        // Planned fallback.
         if branch.is_some() {
             let dir = root.join(TRACK_ITEMS_DIR).join(id);
             fs::write(dir.join("impl-plan.json"), MINIMAL_IMPL_PLAN_JSON).unwrap();
@@ -1167,29 +1162,42 @@ mod tests {
     }
 
     #[test]
-    fn test_activated_track_missing_impl_plan_surfaces_error() {
-        // An activated (branch-materialized) v5 track without impl-plan.json violates
-        // the activation invariant `is_activated() → impl-plan.json present` and must
-        // surface an error. A broken activated track must not be silently selected and
-        // treated as a healthy "planned" track.
+    fn test_activated_track_missing_impl_plan_derives_planned_fallback() {
+        // After T025 removed `check_impl_plan_presence`, an activated
+        // (branch-materialized) v5 track without impl-plan.json is a
+        // legitimate Phase 0-2 state — `derive_track_status` returns Planned
+        // via its fallback and `verify` proceeds to check the track's
+        // markdown artifacts. The old "activation invariant" error was
+        // dropped because /track:init materialises the branch before any
+        // Phase 1-3 artifact is authored.
         let tmp = TempDir::new().unwrap();
         let dir = tmp.path().join(TRACK_ITEMS_DIR).join("activated-no-plan");
         fs::create_dir_all(&dir).unwrap();
-        // Branch is set → activated; no impl-plan.json written → invariant violation.
         let meta = make_metadata_v5("activated-no-plan", r#""track/activated-no-plan""#, "");
         fs::write(dir.join("metadata.json"), meta).unwrap();
-        // Intentionally omit impl-plan.json.
+        // Intentionally omit impl-plan.json (legitimate Phase 0 state).
 
         let outcome = verify(tmp.path());
+        // The track is processed without the activation-invariant error; any
+        // remaining findings are about the missing markdown artifacts
+        // (spec.md / plan.md), not the invariant itself.
+        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+        // Guard 1: activation-invariant error must not appear after T025.
+        assert!(
+            !msgs.iter().any(|m| m.contains("activation invariant")),
+            "activation-invariant error must not fire after T025, got: {msgs:?}"
+        );
+        // Guard 2: the verifier still reports the expected follow-on findings
+        // about missing markdown artifacts (spec.md and plan.md are absent).
+        // This ensures `verify` actually processed the track via the Planned
+        // fallback rather than silently skipping or returning zero findings.
         assert!(
             outcome.has_errors(),
-            "activated track missing impl-plan.json must surface an error: {:#?}",
-            outcome.findings()
+            "verifier must report missing-artifact errors for the Planned fallback path: {msgs:?}"
         );
-        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
         assert!(
-            msgs.iter().any(|m| m.contains("activation invariant")),
-            "error should mention activation invariant, got: {msgs:?}"
+            msgs.iter().any(|m| m.contains("spec")),
+            "missing spec.md finding expected in fallback path, got: {msgs:?}"
         );
     }
 

@@ -79,7 +79,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD: 逆方向チェック信号機統合 + designer capability](2026-04-08-1800-reverse-signal-integration.md) | Accepted | 2026-04-08 |
 | [TDDD-02: Baseline-Aware Reverse Signal Detection](2026-04-11-0001-baseline-reverse-signals.md) | Proposed | 2026-04-11 |
 | [TDDD-01: Multilayer Extension — 型カタログ多層化 + シグネチャ検証](2026-04-11-0002-tddd-multilayer-extension.md) | Proposed | 2026-04-11 |
-| [TDDD-03: 型アクション宣言 — add / modify / delete](2026-04-11-0003-type-action-declarations.md) | Proposed | 2026-04-11 |
+| [TDDD-03: 型アクション宣言 — add / modify / delete](2026-04-11-0003-type-action-declarations.md) | Accepted | 2026-04-11 |
 | [TDDD 型カタログ Taxonomy 拡張 — アプリケーション層パターンの幅を広げる](2026-04-13-1813-tddd-taxonomy-expansion.md) | Accepted | 2026-04-13 |
 | [Finding 型 Taxonomy クリーンアップ — 同名衝突の解消と hexagonal 分離の維持](2026-04-14-0625-finding-taxonomy-cleanup.md) | Accepted | 2026-04-14 |
 | [Domain serde 依存除去 — hexagonal 純粋性回復 + infrastructure 層 TDDD partial dogfood](2026-04-14-1531-domain-serde-ripout.md) | Accepted | 2026-04-14 |
@@ -87,6 +87,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD-05: Secondary Adapter variant の追加 — infrastructure 層における hexagonal port 実装の検証](2026-04-15-1636-tddd-05-secondary-adapter.md) | Accepted | 2026-04-15 |
 | [TDDD Type Graph View — TypeGraph から mermaid 図をレンダーして型間関係を可視化する](2026-04-16-2200-tddd-type-graph-view.md) | Accepted | 2026-04-16 |
 | [TDDD Contract Map — 全層カタログを入力とする統合 mermaid view](2026-04-17-1528-tddd-contract-map.md) | Accepted | 2026-04-17 |
+| [型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ②)](2026-04-23-0344-catalogue-spec-signal-activation.md) | — | 2026-04-23 |
 
 ### トラック・ワークフロー
 

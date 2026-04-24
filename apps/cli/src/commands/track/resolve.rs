@@ -42,13 +42,6 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
         .load_impl_plan(&track_id)
         .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
 
-    // Fail-closed: route through the domain API so the activation invariant
-    // (`is_activated() ↔ impl-plan.json present`) has a single source of truth.
-    // Activation is identified by branch materialization only; an override on
-    // a branchless planning track does not imply activation.
-    domain::check_impl_plan_presence(&track, impl_plan.as_ref())
-        .map_err(|e| CliError::Message(format!("resolve failed: {e}")))?;
-
     // Note: TrackStatus::Archived is not reachable from derive_track_status();
     // archived tracks live under track/archive/ and are not resolved by this command.
     let info = domain::track_phase::resolve_phase(&track, meta.schema_version, impl_plan.as_ref());

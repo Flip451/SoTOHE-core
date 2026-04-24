@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-24T15:17:51Z",
+  "declaration_hash": "b6e3ac75ca84103acbd831edae1b4645c5fdfbb6222bf77bced71374fab302a0",
+  "signals": [
+    {
+      "type_name": "GitShowTrackBlobReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>",
+        "fn read_type_catalogue(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument>",
+        "fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>>",
+        "fn read_catalogue_for_spec_ref_check(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(TypeCatalogueDocument, String)>",
+        "fn read_catalogue_spec_signals_document(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<CatalogueSpecSignalsDocument>",
+        "fn read_spec_element_hashes(&self, branch: &str, track_id: &str) -> BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>"
+      ]
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueSpecSignalsWriter"
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecSignalsDocumentDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TdddLayerBinding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueSpecSignalsCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "Validation"
+      ]
+    },
+    {
+      "type_name": "LoadCatalogueSpecSignalsForViewError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "NotFound",
+        "NotRegularFile",
+        "Io",
+        "Decode",
+        "StaleHash"
+      ]
+    }
+  ]
+}

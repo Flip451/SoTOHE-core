@@ -336,8 +336,10 @@ impl TrackMetadata {
     /// planning track carrying `status_override = blocked / cancelled` is
     /// NOT activated.
     ///
-    /// Use together with [`crate::check_impl_plan_presence`] to enforce the
-    /// invariant "activated track ↔ impl-plan.json present".
+    /// Activation does NOT require `impl-plan.json` to be present: Phase 0-2
+    /// progression legitimately runs on an activated branch before
+    /// impl-plan.json is authored. `derive_track_status` handles this
+    /// gracefully by returning Planned when impl-plan.json is absent.
     #[must_use]
     pub fn is_activated(&self) -> bool {
         self.branch.is_some()

@@ -15,11 +15,14 @@
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D5.3.
 
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use domain::ImplPlanDocument;
 use domain::TypeCatalogueDocument;
 use domain::spec::SpecDocument;
+use domain::{CatalogueSpecSignalsDocument, ContentHash, SpecElementId};
+use usecase::catalogue_spec_refs::SpecElementHashReader;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
 use crate::git_cli::show::{BlobResult, fetch_blob_safe};
@@ -241,6 +244,36 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         BlobFetchResult::Found(bindings.iter().map(|b| b.layer_id().to_owned()).collect())
     }
 
+    fn read_catalogue_spec_signal_opted_in_layers(
+        &self,
+        branch: &str,
+    ) -> BlobFetchResult<Vec<String>> {
+        // Mirrors `read_enabled_layers` but filters the binding set to layers
+        // whose `tddd.catalogue_spec_signal.enabled = true` (ADR §D5.4 phased
+        // activation). The merge gate's Stage 3 loop uses this subset so that
+        // a layer which flipped the flag to false after generating a signals
+        // file is not accidentally re-evaluated on presence alone.
+        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
+            Ok(s) => s,
+            Err(result) => return result,
+        };
+        let bindings = match super::tddd_layers::parse_tddd_layers(&text) {
+            Ok(b) => b,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "architecture-rules.json parse error: {e}"
+                ));
+            }
+        };
+        BlobFetchResult::Found(
+            bindings
+                .iter()
+                .filter(|b| b.catalogue_spec_signal_enabled())
+                .map(|b| b.layer_id().to_owned())
+                .collect(),
+        )
+    }
+
     fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument> {
         let path = Self::blob_path(track_id, "impl-plan.json");
         let text = match self.fetch_string::<ImplPlanDocument>(branch, &path) {
@@ -253,6 +286,121 @@ impl TrackBlobReader for GitShowTrackBlobReader {
                 BlobFetchResult::FetchError(format!("{path}: impl-plan.json decode error: {e}"))
             }
         }
+    }
+
+    /// Reads `<layer>-types.json` and returns `(doc, raw_bytes_sha256_hex)`.
+    ///
+    /// Shares the same filename-resolution + UTF-8 + decode pipeline as
+    /// `read_type_catalogue`, but the `String` slot carries the SHA-256 hex
+    /// digest of the raw catalogue bytes (used for catalogue-spec stale
+    /// detection) instead of the resolved filename. No Stage-2 signal-file
+    /// hydration runs here — this port feeds the SoT Chain ② binary gate
+    /// which does its own freshness check via `catalogue_declaration_hash`.
+    fn read_catalogue_for_spec_ref_check(
+        &self,
+        branch: &str,
+        track_id: &str,
+        layer_id: &str,
+    ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        let filename = match self.resolve_catalogue_filename(branch, layer_id) {
+            Ok(name) => name,
+            Err(msg) => return BlobFetchResult::FetchError(msg),
+        };
+        let path = Self::blob_path(track_id, &filename);
+        let text = match self.fetch_string::<(TypeCatalogueDocument, String)>(branch, &path) {
+            Ok(s) => s,
+            Err(result) => return result,
+        };
+        let doc = match crate::tddd::catalogue_codec::decode(&text) {
+            Ok(doc) => doc,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "{path}: {filename} decode error: {e}"
+                ));
+            }
+        };
+        let hash_hex = crate::tddd::type_signals_codec::declaration_hash(text.as_bytes());
+        BlobFetchResult::Found((doc, hash_hex))
+    }
+
+    /// Reads `<layer>-catalogue-spec-signals.json` and decodes it via the
+    /// T010 codec. Returns `NotFound` when the signals file has not been
+    /// generated yet (no `sotp track catalogue-spec-signals` run on this
+    /// branch), `FetchError` on I/O / decode failure.
+    fn read_catalogue_spec_signals_document(
+        &self,
+        branch: &str,
+        track_id: &str,
+        layer_id: &str,
+    ) -> BlobFetchResult<CatalogueSpecSignalsDocument> {
+        let filename = format!("{layer_id}-catalogue-spec-signals.json");
+        let path = Self::blob_path(track_id, &filename);
+        let text = match self.fetch_string::<CatalogueSpecSignalsDocument>(branch, &path) {
+            Ok(s) => s,
+            Err(result) => return result,
+        };
+        match crate::tddd::catalogue_spec_signals_codec::decode(&text) {
+            Ok(doc) => BlobFetchResult::Found(doc),
+            Err(e) => BlobFetchResult::FetchError(format!("{path}: {filename} decode error: {e}")),
+        }
+    }
+}
+
+/// `SpecElementHashReader` is implemented on the same adapter so consumers
+/// share a single `GitShowTrackBlobReader` instance for all three read ports
+/// (TrackBlobReader read_* methods, SpecElementHashReader).
+impl SpecElementHashReader for GitShowTrackBlobReader {
+    fn read_spec_element_hashes(
+        &self,
+        branch: &str,
+        track_id: &str,
+    ) -> BlobFetchResult<BTreeMap<SpecElementId, ContentHash>> {
+        let path = Self::blob_path(track_id, "spec.json");
+        let text = match self.fetch_string::<BTreeMap<SpecElementId, ContentHash>>(branch, &path) {
+            Ok(s) => s,
+            Err(result) => return result,
+        };
+        // Pre-validate spec.json via the codec so that schema violations
+        // (unknown element IDs, structural errors) cause a fail-closed
+        // FetchError rather than a silent partial map. The codec already
+        // runs in `read_spec_document`; mirroring it here means both
+        // callers of spec.json see the same validation gate.
+        if let Err(e) = crate::spec::codec::decode(&text) {
+            return BlobFetchResult::FetchError(format!("{path}: spec.json validation error: {e}"));
+        }
+        let raw: serde_json::Value = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "{path}: spec.json JSON parse error: {e}"
+                ));
+            }
+        };
+        let element_map = super::plan_artifact_refs::build_element_map(&raw);
+        let mut out: BTreeMap<SpecElementId, ContentHash> = BTreeMap::new();
+        for (id_str, canonical_json) in element_map {
+            let anchor = match SpecElementId::try_new(id_str.clone()) {
+                Ok(a) => a,
+                Err(_) => {
+                    // spec.json already passed upstream validation; skip ids
+                    // that do not match the SpecElementId newtype pattern
+                    // rather than fail the whole read.
+                    continue;
+                }
+            };
+            let hash_hex = super::plan_artifact_refs::canonical_json_sha256(&canonical_json);
+            let hash = match ContentHash::try_from_hex(hash_hex) {
+                Ok(h) => h,
+                Err(e) => {
+                    return BlobFetchResult::FetchError(format!(
+                        "{path}: internal canonical-hash parse error for '{}': {e}",
+                        anchor.as_ref()
+                    ));
+                }
+            };
+            out.insert(anchor, hash);
+        }
+        BlobFetchResult::Found(out)
     }
 }
 
@@ -704,6 +852,205 @@ mod tests {
                 assert!(msg.contains("symlink"), "{msg}");
             }
             other => panic!("expected FetchError(symlink), got {other:?}"),
+        }
+    }
+
+    // --- Fixtures for catalogue-spec-signals ---
+
+    /// A minimal `<layer>-catalogue-spec-signals.json` payload (schema_version 1).
+    /// Uses an all-zeroes hash which is valid per the codec (64-char lowercase hex).
+    const CATALOGUE_SPEC_SIGNALS_MINIMAL: &str = r#"{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "signals": []
+}"#;
+
+    /// A spec.json with one in_scope element (id = "IN-01") so that
+    /// `read_spec_element_hashes` can return a non-empty map.
+    const SPEC_JSON_WITH_ELEMENT: &str = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [
+      { "id": "IN-01", "text": "Some requirement" }
+    ],
+    "out_of_scope": []
+  },
+  "signals": { "blue": 1, "yellow": 0, "red": 0 }
+}"#;
+
+    // --- read_catalogue_for_spec_ref_check ---
+
+    #[test]
+    fn test_read_catalogue_for_spec_ref_check_returns_raw_sha256_not_filename() {
+        // Verify that the `String` slot is the SHA-256 of the raw catalogue bytes
+        // (for stale detection), NOT the resolved filename.
+        let dir =
+            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_catalogue_for_spec_ref_check("main", "foo", "domain") {
+            BlobFetchResult::Found((_doc, hash_hex)) => {
+                // Must be a 64-char lowercase hex string (SHA-256), not a filename.
+                assert_eq!(hash_hex.len(), 64, "hash_hex must be 64-char hex, got '{hash_hex}'");
+                assert!(
+                    hash_hex.chars().all(|c| c.is_ascii_hexdigit() && !c.is_uppercase()),
+                    "hash_hex must be lowercase hex, got '{hash_hex}'"
+                );
+                // Must NOT be the filename.
+                assert_ne!(hash_hex, "domain-types.json", "String slot must be hash, not filename");
+                // Must match the SHA-256 of the raw catalogue bytes.
+                let expected = crate::tddd::type_signals_codec::declaration_hash(
+                    DOMAIN_TYPES_MINIMAL.as_bytes(),
+                );
+                assert_eq!(hash_hex, expected, "hash_hex must be SHA-256 of raw catalogue bytes");
+            }
+            other => panic!("expected Found, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_catalogue_for_spec_ref_check_no_stage2_hydration() {
+        // Verify that read_catalogue_for_spec_ref_check does NOT look up or require
+        // the Stage-2 signal file (unlike read_type_catalogue). This test has only
+        // the declaration file and no companion signal file — it must succeed.
+        let dir =
+            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        // If Stage-2 hydration ran, it would return FetchError (signal file absent).
+        // A clean Found confirms no signal file hydration occurred.
+        assert!(
+            matches!(
+                reader.read_catalogue_for_spec_ref_check("main", "foo", "domain"),
+                BlobFetchResult::Found(_)
+            ),
+            "read_catalogue_for_spec_ref_check must not require signal file"
+        );
+    }
+
+    #[test]
+    fn test_read_catalogue_for_spec_ref_check_not_found() {
+        let dir = setup_repo_with_track("foo", &[]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(matches!(
+            reader.read_catalogue_for_spec_ref_check("main", "foo", "domain"),
+            BlobFetchResult::NotFound
+        ));
+    }
+
+    #[test]
+    fn test_read_catalogue_for_spec_ref_check_decode_error() {
+        let dir = setup_repo_with_track("foo", &[("domain-types.json", b"{}")]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_catalogue_for_spec_ref_check("main", "foo", "domain") {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("decode error"), "{msg}");
+            }
+            other => panic!("expected FetchError, got {other:?}"),
+        }
+    }
+
+    // --- read_catalogue_spec_signals_document ---
+
+    #[test]
+    fn test_read_catalogue_spec_signals_document_found() {
+        let dir = setup_repo_with_track(
+            "foo",
+            &[("domain-catalogue-spec-signals.json", CATALOGUE_SPEC_SIGNALS_MINIMAL.as_bytes())],
+        );
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(
+            matches!(
+                reader.read_catalogue_spec_signals_document("main", "foo", "domain"),
+                BlobFetchResult::Found(_)
+            ),
+            "expected Found for existing signals file"
+        );
+    }
+
+    #[test]
+    fn test_read_catalogue_spec_signals_document_not_found_propagates() {
+        // NotFound is expected (and acceptable) when the signals file has not been
+        // generated yet. The adapter must propagate NotFound, not convert it to FetchError.
+        let dir = setup_repo_with_track("foo", &[]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(
+            matches!(
+                reader.read_catalogue_spec_signals_document("main", "foo", "domain"),
+                BlobFetchResult::NotFound
+            ),
+            "NotFound must propagate for absent signals file"
+        );
+    }
+
+    #[test]
+    fn test_read_catalogue_spec_signals_document_decode_error() {
+        let dir = setup_repo_with_track(
+            "foo",
+            &[("domain-catalogue-spec-signals.json", b"not valid json")],
+        );
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_catalogue_spec_signals_document("main", "foo", "domain") {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("decode error"), "{msg}");
+            }
+            other => panic!("expected FetchError, got {other:?}"),
+        }
+    }
+
+    // --- read_spec_element_hashes ---
+
+    #[test]
+    fn test_read_spec_element_hashes_found_with_element() {
+        let dir = setup_repo_with_track("foo", &[("spec.json", SPEC_JSON_WITH_ELEMENT.as_bytes())]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_spec_element_hashes("main", "foo") {
+            BlobFetchResult::Found(map) => {
+                // IN-01 element must be in the returned map.
+                assert_eq!(map.len(), 1, "expected exactly one element");
+                let id = domain::SpecElementId::try_new("IN-01").unwrap();
+                assert!(map.contains_key(&id), "IN-01 must be present in the hash map");
+            }
+            other => panic!("expected Found, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_spec_element_hashes_not_found() {
+        let dir = setup_repo_with_track("foo", &[]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(matches!(
+            reader.read_spec_element_hashes("main", "foo"),
+            BlobFetchResult::NotFound
+        ));
+    }
+
+    #[test]
+    fn test_read_spec_element_hashes_fails_closed_on_invalid_spec_json() {
+        // A spec.json that is valid JSON but fails spec_codec validation
+        // (e.g. wrong schema_version) must produce FetchError, not a partial map.
+        let invalid_spec = br#"{"schema_version": 1, "version": "1.0", "title": "F",
+            "scope": {"in_scope": [], "out_of_scope": []}, "signals": {"blue":1,"yellow":0,"red":0}}"#;
+        let dir = setup_repo_with_track("foo", &[("spec.json", invalid_spec)]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_spec_element_hashes("main", "foo") {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(
+                    msg.contains("validation error") || msg.contains("unsupported"),
+                    "expected validation error for wrong schema_version, got: {msg}"
+                );
+            }
+            other => panic!("expected FetchError for invalid spec.json, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_spec_element_hashes_fails_on_non_json() {
+        let dir = setup_repo_with_track("foo", &[("spec.json", b"not json at all")]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_spec_element_hashes("main", "foo") {
+            BlobFetchResult::FetchError(_) => {}
+            other => panic!("expected FetchError for non-JSON spec.json, got {other:?}"),
         }
     }
 }

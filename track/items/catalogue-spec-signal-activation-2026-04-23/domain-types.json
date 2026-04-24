@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ImplPlanPresenceError",
+      "description": "Error enum that previously enforced the is_activated() ↔ impl-plan.json present invariant. Removed in T025 because the invariant conflicted with /track:init branch creation (the branch is materialised before impl-plan.json is authored, which turned Phase 0-2 progression into a corruption false-positive). `derive_track_status` now returns Planned via its graceful fallback when impl-plan.json is absent. Catalogue entry kept with `action: delete` so the baseline reverse check acknowledges the intentional deletion until the next baseline recapture.",
+      "approved": true,
+      "action": "delete",
+      "kind": "error_type",
+      "expected_variants": [
+        "MissingForActivatedTrack"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-21",
+          "hash": "37f2fbfc1382ce3fe4bf689f0477546257ed064ecad48883c82a9278fc1a47c2"
+        }
+      ]
+    },
+    {
+      "name": "SpecRefFinding",
+      "description": "Structured finding produced by the domain pure function check_catalogue_spec_ref_integrity. Holds the layer id, optional catalogue entry name, optional spec_refs index, optional spec file path, and a SpecRefFindingKind discriminant. Emitted as Vec<SpecRefFinding> and consumed by the CLI layer for human-readable stderr formatting (D1.5). I/O-free — the struct is a plain data carrier in libs/domain/src/tddd/catalogue_spec_signal.rs.",
+      "approved": true,
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-04",
+          "hash": "c0dd469adae762d592a1d692f307fbc96b0cce81b5e8b8e801d35fc7f4e2bc10"
+        }
+      ]
+    },
+    {
+      "name": "SpecRefFindingKind",
+      "description": "Enum discriminating the three categories of catalogue spec-ref integrity violations. Each variant carries associated diagnostic data per ADR D1.5: DanglingAnchor { anchor: SpecElementId } (SpecRef.anchor absent from spec.json; carries the failing anchor for CLI error output), HashMismatch { anchor: SpecElementId, declared: ContentHash, actual: ContentHash } (SpecRef.hash differs from canonical SHA-256 of spec element subtree; carries anchor + declared vs actual hashes for diff output), StaleSignals { declared_catalogue_hash: ContentHash, actual_catalogue_hash: ContentHash } (catalogue_declaration_hash in signals file differs from current layer-types.json SHA-256; layer-level finding, carries both hashes). Enum-first per 04-coding-principles.md — three fixed variants with no transitions. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs alongside SpecRefFinding.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "DanglingAnchor",
+        "HashMismatch",
+        "StaleSignals"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-04",
+          "hash": "c0dd469adae762d592a1d692f307fbc96b0cce81b5e8b8e801d35fc7f4e2bc10"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignal",
+      "description": "Per-entry signal record in the <layer>-catalogue-spec-signals.json output. Fields: type_name (String) and signal (ConfidenceSignal — blue / yellow / red). Produced by applying the informal-priority rule (D1.1) to a single TypeCatalogueEntry. 1 entry → 1 CatalogueSpecSignal; multiple spec_refs[] per entry are collapsed into 1 signal. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs.",
+      "approved": true,
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsDocument",
+      "description": "Aggregate root for <layer>-catalogue-spec-signals.json. Schema v1 fields: schema_version (1), catalogue_declaration_hash (SHA-256 hex of the input <layer>-types.json for stale detection), signals (Vec<CatalogueSpecSignal>). No generated_at field — deterministic output, byte-identical across multiple runs with the same input. Decoded by the infrastructure CatalogueSpecSignals codec; consumed by VerifyCatalogueSpecRefsInteractor and check_catalogue_spec_signals. Defined in libs/domain/src/tddd/catalogue_spec_signal.rs.",
+      "approved": true,
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-spec-signal-activation-2026-04-23/spec.json",
+          "anchor": "IN-11",
+          "hash": "6b2e1065f2b7b41c74d47fb3ac731aa9c61d867f3a890064ba425deffae75a13"
+        }
+      ]
+    }
+  ]
+}
