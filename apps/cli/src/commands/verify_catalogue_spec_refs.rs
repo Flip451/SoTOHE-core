@@ -14,19 +14,16 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use domain::ImplPlanReader as _;
 use domain::tddd::LayerId;
 use domain::{
     ContentHash, SpecElementId, SpecRefFinding, SpecRefFindingKind,
     check_catalogue_spec_ref_integrity,
 };
 use infrastructure::tddd::{catalogue_codec, catalogue_spec_signals_codec, type_signals_codec};
-use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
 use infrastructure::track::symlink_guard::reject_symlinks_below;
 use infrastructure::verify::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::ensure_active_track;
 
 /// Entry point for `sotp verify catalogue-spec-refs`.
 ///
@@ -92,73 +89,31 @@ pub fn execute_verify_catalogue_spec_refs(
         }
     }
 
-    // Security: guard the track directory itself against symlinks before reading
-    // metadata.json / impl-plan.json from it. The `items_dir` guard above only
-    // covers `items_dir`; a symlinked `items_dir/<track_id>` directory would escape
-    // the trusted tree before `reject_symlinks_below` (anchored at `items_dir`) can
-    // catch it. Mirrors `execute_catalogue_spec_signals` (catalogue_spec_signals.rs).
-    let track_dir_preflight = items_dir.join(&track_id);
-    match track_dir_preflight.symlink_metadata() {
+    // Security: guard the track directory itself against symlinks. The `items_dir`
+    // guard above only covers `items_dir`; a symlinked `items_dir/<track_id>`
+    // directory would escape the trusted tree before `reject_symlinks_below`
+    // (anchored at `items_dir`) can catch it. Mirrors `execute_catalogue_spec_signals`
+    // (verify.rs).
+    let track_dir = items_dir.join(&track_id);
+    match track_dir.symlink_metadata() {
         Ok(meta) if meta.file_type().is_symlink() => {
             return Err(CliError::Message(format!(
                 "symlink guard: refusing to follow symlink at track directory: {}",
-                track_dir_preflight.display()
+                track_dir.display()
             )));
         }
         Ok(_) => {}
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Track directory absent — the metadata read below will produce a
-            // clear error message. Don't short-circuit here.
+            // Track directory absent — downstream reads (spec.json, catalogues,
+            // signals) will produce a clear error message. Don't short-circuit here.
         }
         Err(e) => {
             return Err(CliError::Message(format!(
                 "symlink guard: cannot stat track directory {}: {e}",
-                track_dir_preflight.display()
+                track_dir.display()
             )));
         }
     }
-
-    // Active-track guard (ADR §D3.2): reject Done/Archived tracks fail-closed.
-    // The verify command is a local CI gate — running it against a frozen track
-    // would produce misleading results (frozen tracks may not have current
-    // catalogues) and is inconsistent with the companion `catalogue-spec-signals`
-    // command which enforces the same guard.
-    //
-    // Guard `metadata.json` and `impl-plan.json` leaf files with
-    // `reject_symlinks_below` before reading them.  `items_dir` and `track_dir`
-    // are already checked for symlinks; leaf-file symlinks within the directory
-    // could still redirect reads to off-workspace files.
-    let metadata_path = track_dir_preflight.join("metadata.json");
-    reject_symlinks_below(&metadata_path, &items_dir).map_err(|e| {
-        CliError::Message(format!(
-            "symlink guard: metadata.json at '{}': {e}",
-            metadata_path.display()
-        ))
-    })?;
-    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let impl_plan_path = track_dir_preflight.join("impl-plan.json");
-    // `impl-plan.json` is optional; Ok(false) means absent (skip guard — no file to guard).
-    reject_symlinks_below(&impl_plan_path, &items_dir).map_err(|e| {
-        CliError::Message(format!(
-            "symlink guard: impl-plan.json at '{}': {e}",
-            impl_plan_path.display()
-        ))
-    })?;
-    let store = FsTrackStore::new(items_dir.clone());
-    let impl_plan = store
-        .load_impl_plan(&valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    let effective_status =
-        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-    // Use ensure_active_track for the exhaustive TrackStatus match (compile-time
-    // exhaustiveness guard); wrap the error to produce the right command name.
-    ensure_active_track(effective_status, &track_id).map_err(|_| {
-        CliError::Message(format!(
-            "cannot run catalogue-spec-refs on '{track_id}' (status={effective_status}). \
-             Completed tracks are frozen — run on an active track instead.",
-        ))
-    })?;
 
     // Binary-gate fail-closed: `resolve_layers` (shared with `sotp track type-signals`)
     // falls back to a synthetic `domain` binding when `architecture-rules.json` is absent.
@@ -207,7 +162,6 @@ pub fn execute_verify_catalogue_spec_refs(
         ));
     }
 
-    let track_dir = items_dir.join(&track_id);
     let spec_element_hashes = read_spec_element_hashes(&track_dir, &items_dir)?;
 
     let mut all_findings: Vec<SpecRefFinding> = Vec::new();
@@ -459,23 +413,6 @@ mod tests {
 
     use super::*;
 
-    /// Write a minimal metadata.json (schema_version=5, InProgress) for the given track.
-    ///
-    /// The active-track guard now reads `metadata.json` before verifying, so every
-    /// integration test that calls `execute_verify_catalogue_spec_refs` must have
-    /// this file present.
-    fn write_metadata_json(track_dir: &Path, track_id: &str) {
-        let meta = serde_json::json!({
-            "schema_version": 5,
-            "id": track_id,
-            "title": "Test Track",
-            "created_at": "2026-01-01T00:00:00Z",
-            "updated_at": "2026-01-01T00:00:00Z"
-        });
-        fs::write(track_dir.join("metadata.json"), serde_json::to_string_pretty(&meta).unwrap())
-            .unwrap();
-    }
-
     fn write_architecture_rules(root: &Path) {
         let rules = serde_json::json!({
             "schema_version": 2,
@@ -551,7 +488,6 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        write_metadata_json(&track_dir, track_id);
         write_spec_json(&track_dir);
         // Catalogue has no entries → no findings.
         let cat = serde_json::json!({"schema_version": 2, "type_definitions": []});
@@ -575,7 +511,6 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        write_metadata_json(&track_dir, track_id);
         write_spec_json(&track_dir);
         write_catalogue_with_dangling(&track_dir);
 
@@ -610,7 +545,6 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        write_metadata_json(&track_dir, track_id);
         // No spec.json
 
         let result = execute_verify_catalogue_spec_refs(items_dir, track_id.to_owned(), ws, true);
@@ -628,7 +562,6 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        write_metadata_json(&track_dir, track_id);
         write_spec_json(&track_dir);
         // Deliberately do NOT write `test_layer-types.json`.
 
@@ -654,7 +587,6 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        write_metadata_json(&track_dir, track_id);
         write_spec_json(&track_dir);
 
         // Empty catalogue (no spec_refs) → no dangling findings regardless of signals.
@@ -699,7 +631,6 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        write_metadata_json(&track_dir, track_id);
         write_spec_json(&track_dir);
 
         // Catalogue references valid anchor IN-01 but with a deliberately wrong hash.
@@ -752,7 +683,6 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        write_metadata_json(&track_dir, track_id);
         write_spec_json(&track_dir);
 
         // Empty catalogue — no spec_refs → no dangling or hash-mismatch findings.

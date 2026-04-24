@@ -37,7 +37,7 @@ Steps:
 
 1. **Implement**: execute `/track:implement` scoped to this single task.
 2. **Review**: execute `/track:review`. Must reach full model `zero_findings`.
-3. **Commit**: execute `/track:commit` with a commit message generated from the task description.
+3. **Commit**: stage **after** the final review round (`cargo make add-all` or selective `track-add-paths`), then execute `/track:commit` with a commit message generated from the task description. Staging before review omits the `review.json` delta from the commit — see `/track:commit` Step 1.
    After commit, record the hash: `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>`.
 
 If any step fails, stop the loop and report the failure.

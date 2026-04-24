@@ -637,13 +637,13 @@ fn execute_catalogue_spec_signals_check(args: CatalogueSpecSignalsArgs) -> Verif
 /// Core catalogue-spec-signals check logic with explicit, resolved parameters.
 ///
 /// Separated from `execute_catalogue_spec_signals_check` so the guard logic
-/// (symlink guards, active-track guard, per-layer signals loop) can be exercised
-/// from tests without requiring a real git environment.
+/// (symlink guards, per-layer signals loop) can be exercised from tests without
+/// requiring a real git environment.
 ///
 /// # Errors
 ///
 /// Returns a `VerifyOutcome` with error findings on symlink violations, missing
-/// `architecture-rules.json`, active-track guard failures, or signals decode errors.
+/// `architecture-rules.json`, or signals decode errors.
 #[allow(clippy::too_many_lines)]
 fn execute_catalogue_spec_signals(
     items_dir: std::path::PathBuf,
@@ -651,10 +651,8 @@ fn execute_catalogue_spec_signals(
     workspace_root: std::path::PathBuf,
     strict: bool,
 ) -> VerifyOutcome {
-    use domain::ImplPlanReader as _;
     use domain::check_catalogue_spec_signals;
     use infrastructure::tddd::catalogue_spec_signals_codec;
-    use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
     use infrastructure::track::symlink_guard::reject_symlinks_below;
 
     // Security: `reject_symlinks_below` treats its second argument as the trusted
@@ -733,67 +731,6 @@ fn execute_catalogue_spec_signals(
                 format!("symlink guard: cannot stat track directory {}: {e}", track_dir.display()),
             )]);
         }
-    }
-
-    // Active-track guard (ADR §D3.2 / §D4.1): reject Done/Archived tracks fail-closed.
-    // Running the catalogue-spec-signals gate against a frozen track would produce
-    // misleading CI results — frozen tracks may not have current catalogues. Mirrors
-    // the guard in `execute_verify_catalogue_spec_refs`.
-    //
-    // Guard `metadata.json` leaf with `reject_symlinks_below` before reading; the
-    // `items_dir` and `track_dir` symlink checks above only cover the directory,
-    // not individual files within it.
-    let valid_id = match domain::TrackId::try_new(&track_id) {
-        Ok(id) => id,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("[ERROR] invalid track id '{track_id}': {e}"),
-            )]);
-        }
-    };
-    let metadata_path = track_dir.join("metadata.json");
-    match reject_symlinks_below(&metadata_path, &items_dir) {
-        Ok(true) | Ok(false) => {}
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("symlink guard: metadata.json at '{}': {e}", metadata_path.display()),
-            )]);
-        }
-    }
-    let (metadata, _doc_meta) = match read_track_metadata(&items_dir, &valid_id) {
-        Ok(m) => m,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("cannot load metadata for '{track_id}': {e}"),
-            )]);
-        }
-    };
-    let impl_plan_path = track_dir.join("impl-plan.json");
-    match reject_symlinks_below(&impl_plan_path, &items_dir) {
-        Ok(true) | Ok(false) => {}
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("symlink guard: impl-plan.json at '{}': {e}", impl_plan_path.display()),
-            )]);
-        }
-    }
-    let store = FsTrackStore::new(items_dir.clone());
-    let impl_plan: Option<domain::ImplPlanDocument> = match store.load_impl_plan(&valid_id) {
-        Ok(p) => p,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("cannot load impl-plan for '{track_id}': {e}"),
-            )]);
-        }
-    };
-    let effective_status =
-        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-    use crate::commands::track::tddd::signals::ensure_active_track;
-    if let Err(e) = ensure_active_track(effective_status, &track_id) {
-        return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(format!(
-            "cannot run catalogue-spec-signals on '{track_id}' \
-                 (status={effective_status}): {e}"
-        ))]);
     }
 
     // Enumerate tddd-enabled layers. Fail-closed: a missing `architecture-rules.json`
@@ -1702,22 +1639,6 @@ mod tests {
         );
     }
 
-    // Helper: write a minimal non-activated metadata.json that the active-track guard accepts.
-    fn write_metadata_json_for_signals_test(track_dir: &std::path::Path, track_id: &str) {
-        let meta = serde_json::json!({
-            "schema_version": 5,
-            "id": track_id,
-            "title": "Test Track",
-            "created_at": "2026-01-01T00:00:00Z",
-            "updated_at": "2026-01-01T00:00:00Z"
-        });
-        std::fs::write(
-            track_dir.join("metadata.json"),
-            serde_json::to_string_pretty(&meta).unwrap(),
-        )
-        .unwrap();
-    }
-
     // Helper: write architecture-rules.json with one TDDD-enabled domain layer.
     fn write_arch_rules_for_signals_test(workspace_root: &std::path::Path) {
         let rules = serde_json::json!({
@@ -1750,7 +1671,6 @@ mod tests {
         let items_dir = ws.join("track/items");
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
-        write_metadata_json_for_signals_test(&track_dir, track_id);
         write_arch_rules_for_signals_test(&ws);
         // NO domain-catalogue-spec-signals.json → lenient skip per layer.
 
@@ -1777,7 +1697,6 @@ mod tests {
         let items_dir = ws.join("track/items");
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
-        write_metadata_json_for_signals_test(&track_dir, track_id);
         write_arch_rules_for_signals_test(&ws);
         // Write a signals file with one Yellow entry (informal_grounds[] non-empty,
         // spec_refs[] empty).
@@ -1817,7 +1736,6 @@ mod tests {
         let items_dir = ws.join("track/items");
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
-        write_metadata_json_for_signals_test(&track_dir, track_id);
         write_arch_rules_for_signals_test(&ws);
         let signals_json = serde_json::json!({
             "schema_version": 1,
@@ -1850,7 +1768,6 @@ mod tests {
         let items_dir = ws.join("track/items");
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
-        write_metadata_json_for_signals_test(&track_dir, track_id);
         // No architecture-rules.json → fail-closed error.
 
         let outcome = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws, false);
