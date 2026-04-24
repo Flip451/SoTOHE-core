@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-23T23:40:41Z",
-  "declaration_hash": "36db2538379879b756d5ab8b5d9f7cc6010c4fb4ef5fc8edd19a02c696c8e59d",
+  "generated_at": "2026-04-24T00:43:29Z",
+  "declaration_hash": "96d769d7c77aef8ef6820b1bf82af337f4086503d0d4ea662b18bda63dafd7cf",
   "signals": [
     {
       "type_name": "RefreshCatalogueSpecSignalsInteractor",
@@ -41,8 +41,48 @@
     {
       "type_name": "VerifyCatalogueSpecRefsInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefs",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: &VerifyCatalogueSpecRefsCommand) -> Result<Vec<SpecRefFinding>, VerifyCatalogueSpecRefsError>"
+      ]
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "CatalogueFetchError",
+        "InvalidCatalogueHash",
+        "SpecNotFound",
+        "SpecFetchError",
+        "SignalsFetchError"
+      ]
+    },
+    {
+      "type_name": "SpecElementHashReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn read_spec_element_hashes(&self, branch: &str, track_id: &str) -> BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>"
+      ]
     },
     {
       "type_name": "TrackBlobReader",

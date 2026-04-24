@@ -73,13 +73,103 @@
     },
     {
       "name": "VerifyCatalogueSpecRefsInteractor",
-      "description": "Usecase-layer struct implementing the sotp verify catalogue-spec-refs command logic. Orchestrates: (1) read <layer>-types.json, spec.json, and optionally <layer>-catalogue-spec-signals.json via TrackBlobReader, (2) call domain check_catalogue_spec_ref_integrity for each layer, (3) aggregate Vec<SpecRefFinding> and return. Supports --skip-stale flag (when true, StaleSignals detection is skipped — used in pre-commit path where signals file is re-generated in the next step). Applies active-track guard per CN-07 / ADR D3.2. Placed in libs/usecase/src/catalogue_spec_refs.rs per D3.7.",
+      "description": "Usecase-layer struct implementing the sotp verify catalogue-spec-refs command logic. Orchestrates: (1) read <layer>-types.json, spec.json element hashes, and optionally <layer>-catalogue-spec-signals.json via TrackBlobReader + SpecElementHashReader, (2) call domain check_catalogue_spec_ref_integrity, (3) return Vec<SpecRefFinding>. Supports --skip-stale flag (when true, StaleSignals detection is skipped — used in pre-commit path where signals file is re-generated in the next step). Applies active-track guard per CN-07 / ADR D3.2. Placed in libs/usecase/src/catalogue_spec_refs.rs per D3.7.",
       "approved": true,
       "kind": "interactor",
       "informal_grounds": [
         {
           "kind": "user_directive",
           "summary": "IN-06 (ADR D3.2 / D3.7) defines VerifyCatalogueSpecRefs interactor responsibilities including --skip-stale support; hash will be computed at implementation time"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefs",
+      "description": "Primary (driving) port trait implemented by VerifyCatalogueSpecRefsInteractor. Single `execute(&VerifyCatalogueSpecRefsCommand) -> Result<Vec<SpecRefFinding>, VerifyCatalogueSpecRefsError>` method. Send + Sync. Authored alongside the interactor in T009.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&VerifyCatalogueSpecRefsCommand"
+            }
+          ],
+          "returns": "Result<Vec<SpecRefFinding>, VerifyCatalogueSpecRefsError>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T009 implementation-time: adjacent application_service trait co-located with the interactor; pattern follows RefreshCatalogueSpecSignals"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefsCommand",
+      "description": "Command input for VerifyCatalogueSpecRefs::execute. Fields: branch (String — current git branch for CN-07 guard), track_id (TrackId), layer_id (LayerId — validated newtype), skip_stale (bool — pre-commit path skips StaleSignals detection since the signals file is re-generated immediately after). #[derive(Debug, Clone, PartialEq, Eq)].",
+      "approved": true,
+      "kind": "command",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T009 implementation-time: command input co-located with interactor"
+        }
+      ]
+    },
+    {
+      "name": "VerifyCatalogueSpecRefsError",
+      "description": "Failure-mode enum for VerifyCatalogueSpecRefs::execute. Eight variants cover: NonActiveTrack (CN-07 branch guard), BranchTrackMismatch (branch/track_id disagreement), CatalogueNotFound (layer file absent), CatalogueFetchError (catalogue I/O), InvalidCatalogueHash (raw-bytes hex parse failure), SpecNotFound (spec.json absent), SpecFetchError (spec-element-hash reader I/O), SignalsFetchError (signals file I/O failure, only fired when skip_stale=false). thiserror::Error + #[source] for chained diagnostics. Integrity violations themselves are reported in the Ok(Vec<SpecRefFinding>) channel, not as errors.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "CatalogueFetchError",
+        "InvalidCatalogueHash",
+        "SpecNotFound",
+        "SpecFetchError",
+        "SignalsFetchError"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T009 implementation-time: error taxonomy captures guard + catalogue + spec I/O failures; integrity violations stay in the Ok(Vec<SpecRefFinding>) channel per ADR D1.5"
+        }
+      ]
+    },
+    {
+      "name": "SpecElementHashReader",
+      "description": "Secondary (driven) port returning the canonical SHA-256 digest of every spec element (goal, constraints, acceptance_criteria, scope.in_scope, scope.out_of_scope) in a track's spec.json, keyed by SpecElementId. Splits the canonical-JSON serialization concern out of TrackBlobReader so the T009 interactor receives pre-computed hashes via a BTreeMap (keeps usecase pure, domain free of sha2/serde_json). Implemented atop the existing canonical_json_sha256 helper in infrastructure (T011 adapter). Send + Sync.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_spec_element_hashes",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T009 implementation-time: split spec-element-hash reading from TrackBlobReader to keep T006 port surface stable; infrastructure adapter shares canonical_json_sha256 with sotp verify plan-artifact-refs"
         }
       ]
     },
