@@ -377,18 +377,30 @@ where
     // branch is NOT sufficient on its own — a layer that was previously opted
     // in and later flipped the flag back to `false` may still carry a stale
     // signals file; blocking merges on it for a now-disabled feature would be
-    // wrong. FetchError here is fail-closed (architecture-rules.json already
-    // parsed once in `read_enabled_layers`, so a second-call failure is a
-    // systemic adapter issue — do NOT silently skip Chain ②).
+    // wrong.
+    //
+    // `FetchError` is fail-closed: `architecture-rules.json` was already
+    // parsed successfully once in `read_enabled_layers` (the `layer_ids` set
+    // above was produced from it), so a second-call failure is a transient /
+    // systemic adapter issue. Returning an error here prevents the merge gate
+    // from silently skipping Chain ② validation for opted-in layers when the
+    // opt-in lookup fails (which would be fail-open).
+    //
+    // `NotFound` means "no rules file on the branch" — opt-in defaults to
+    // empty, which skips Chain ② entirely. That is consistent with the default
+    // trait impl's empty-Vec semantic for mocks, and with the fact that a PR
+    // without `architecture-rules.json` would already have been rejected by
+    // the Stage 2 `read_enabled_layers` fail-closed check above (this code is
+    // unreachable on such a PR in practice; the empty-set fallback is just
+    // defensive).
     let opted_in_layers: std::collections::HashSet<String> =
         match reader.read_catalogue_spec_signal_opted_in_layers(branch) {
             BlobFetchResult::Found(ids) => ids.into_iter().collect(),
-            BlobFetchResult::NotFound | BlobFetchResult::FetchError(_) => {
-                // An empty set triggers "no layer opted in → skip Chain ②"
-                // rather than a hard error, mirroring the default trait
-                // implementation's behavior for mocks. Real adapters that
-                // can read the file always return Found (possibly empty).
-                std::collections::HashSet::new()
+            BlobFetchResult::NotFound => std::collections::HashSet::new(),
+            BlobFetchResult::FetchError(msg) => {
+                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "failed to read catalogue-spec opt-in layers on origin/{branch}: {msg}"
+                ))]);
             }
         };
 
@@ -1582,6 +1594,85 @@ mod tests {
         assert!(
             !outcome.has_errors(),
             "opted-out layer with stale Yellow signals must NOT block merge: {outcome:?}"
+        );
+    }
+
+    /// Mock that returns `FetchError` specifically from
+    /// `read_catalogue_spec_signal_opted_in_layers` while all earlier reads
+    /// succeed. Exercises the fail-closed branch that blocks merges when the
+    /// opt-in lookup itself cannot be resolved.
+    struct ChainTwoOptInLookupErrorMock;
+
+    impl SpecElementHashReader for ChainTwoOptInLookupErrorMock {
+        fn read_spec_element_hashes(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+        {
+            BlobFetchResult::Found(std::collections::BTreeMap::new())
+        }
+    }
+
+    impl TrackBlobReader for ChainTwoOptInLookupErrorMock {
+        fn read_spec_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<SpecDocument> {
+            BlobFetchResult::Found(all_blue_spec())
+        }
+
+        fn read_type_catalogue(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
+        }
+
+        fn read_impl_plan(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<domain::ImplPlanDocument> {
+            panic!("read_impl_plan must not be called")
+        }
+
+        fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+            BlobFetchResult::Found(vec!["domain".to_string()])
+        }
+
+        fn read_catalogue_spec_signal_opted_in_layers(
+            &self,
+            _branch: &str,
+        ) -> BlobFetchResult<Vec<String>> {
+            BlobFetchResult::FetchError(
+                "architecture-rules.json transient read error (simulated)".to_owned(),
+            )
+        }
+    }
+
+    #[test]
+    fn test_u38_chain2_opt_in_lookup_fetch_error_blocks_fail_closed() {
+        // Regression: the opt-in lookup itself failing must block the merge
+        // (fail-closed), not silently skip Chain ②. Treating `FetchError` as
+        // an empty set here would be fail-open — an adapter-side transient
+        // error on `architecture-rules.json` would silently disable Chain ②
+        // for opted-in layers, which PR #111 explicitly flagged.
+        let reader = ChainTwoOptInLookupErrorMock;
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "opt-in lookup FetchError must block merge (fail-closed): {outcome:?}"
+        );
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("failed to read catalogue-spec opt-in layers")),
+            "error must mention the opt-in lookup failure: {outcome:?}"
         );
     }
 
