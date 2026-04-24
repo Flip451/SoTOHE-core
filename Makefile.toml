@@ -912,9 +912,9 @@ script_runner = "@shell"
 script = ['bin/sotp make track-local-plan "$@"']
 
 [tasks.track-local-review]
-description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper"
+description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper. Runs `bin/sotp make track-sync-views` first so review scope hashes are computed against the up-to-date rendered views (plan.md / contract-map.md / <layer>-types.md). Without this, a reviewer approving at hash H followed by a later `track-sync-views` flap would desync the approval from the on-disk state and force a re-review at commit time."
 script_runner = "@shell"
-script = ['bin/sotp make track-local-review "$@"']
+script = ['bin/sotp make track-sync-views && bin/sotp make track-local-review "$@"']
 
 [tasks.track-set-commit-hash]
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"

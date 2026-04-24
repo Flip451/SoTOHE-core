@@ -55,6 +55,17 @@ severity filter for this round.
 
 ## Workflow
 
+**Always invoke review via `cargo make track-local-review` (never `bin/sotp
+review codex-local` directly).** The cargo-make wrapper chains
+`track-sync-views` before the review so the scope hash is computed against
+the up-to-date rendered views (`plan.md`, `contract-map.md`,
+`<layer>-types.md`). Calling the inner `bin/sotp` form directly skips
+sync-views, which surfaces later as "review approved at hash H → later
+`track-sync-views` changes a view → hash H' ≠ H → commit blocked, re-review
+needed" — the recurring pre-commit flap that the ordering rule exists to
+prevent. If a briefing lists the raw `bin/sotp review codex-local` form,
+translate it to `cargo make track-local-review -- ...` before running.
+
 1. **Review**: Run `cargo make track-local-review` with the provided briefing and fast model.
 2. **Parse verdict**: Read the verdict from command output.
    - `zero_findings` → return `completed`

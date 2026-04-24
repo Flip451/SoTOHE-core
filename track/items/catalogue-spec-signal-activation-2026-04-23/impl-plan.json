@@ -140,7 +140,8 @@
     {
       "id": "T024",
       "description": "cargo make ci の全項目 (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* + verify-catalogue-spec-refs + check-catalogue-spec-signals) が pass することを確認する。新規追加した domain 純粋関数 / usecase interactor / infrastructure adapter / CLI wrapper の全 unit test および integration test が pass する。verification.md に最終確認結果を記録する (AC-10、IN-20 の全テスト pass 確認)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "83c9eb7435fff7d472e317a2fe282c3735936a3a"
     },
     {
       "id": "T025",
