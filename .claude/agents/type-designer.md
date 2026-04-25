@@ -28,6 +28,8 @@ Translate the track's ADR (design decisions) and spec.json (behavioral contract)
 
 The type-designer **owns each `<layer>-types.json` and its derived views for this track**: it writes the catalogue files directly, captures baselines, regenerates the per-layer rendered views (type-graph via `bin/sotp track type-graph` → `<layer>-graph/` directory by default; contract-map md; `<layer>-types.md` via `bin/sotp track type-signals`), and evaluates the type → spec signal via the CLI. The orchestrator receives the per-layer signal counts and decides whether Phase 2 passes.
 
+**Reconnaissance first**: every layer pass begins with `baseline-capture` + `type-graph` so the catalogue draft is grounded in what already exists in the workspace. This is internal preparation only — the existing inventory is not echoed back to the orchestrator.
+
 ## Boundary with other capabilities
 
 | aspect | spec-designer | impl-planner | type-designer (this agent) | adr-editor |
@@ -64,15 +66,25 @@ Opus is chosen because kind selection and cross-partition migration decisions (e
 
 ### Internal pipeline (all executed by this agent, per layer in scope)
 
-1. Draft catalogue entries for the layer (kinds, kind-specific fields, `action`, `spec_refs[]`, `informal_grounds[]`).
-2. Write `track/items/<id>/<layer>-types.json` directly with the drafted content (merging with the existing catalogue when incremental).
-3. Capture the baseline:
+1. **Reconnaissance** — capture the current code state and read it back so the catalogue draft is grounded in the existing inventory. Internal exploration only; do NOT surface this in the final report:
    ```
    bin/sotp track baseline-capture <id> [--layer <layer_id>]
-   ```
-4. Render the type-graph and contract-map views:
-   ```
    bin/sotp track type-graph <id> [--layer <layer_id>]
+   ```
+   Then `Read` the `type-graph` output to absorb the existing inventory. The path depends on the `--cluster-depth` value used:
+   - `--cluster-depth 0` (single flat file): `track/items/<id>/<layer>-graph.md`
+   - `--cluster-depth ≥ 1` (cluster directory): `track/items/<id>/<layer>-graph/index.md` plus the per-cluster files it links to
+
+   In either case, absorb:
+   - which types already exist (vs. what the ADR / spec requires to be added)
+   - current kind / partition (informs `action: modify` vs cross-partition `delete` + `add`)
+   - naming conventions in use (so new entries stay consistent)
+
+   `baseline-capture` is idempotent — it keeps any pre-existing baseline, so re-running this step on incremental sessions is safe. `type-graph` is rustdoc-driven and runs without a catalogue, so it works on the very first pass too. Skip neither step.
+2. Draft catalogue entries for the layer (kinds, kind-specific fields, `action`, `spec_refs[]`, `informal_grounds[]`), informed by the reconnaissance + ADR + spec.
+3. Write `track/items/<id>/<layer>-types.json` directly with the drafted content (merging with the existing catalogue when incremental).
+4. Render the contract-map view (catalogue-driven, so runs after the catalogue is written):
+   ```
    bin/sotp track contract-map <id> [--layers <layer_id>]
    ```
 5. Evaluate the type → spec signal (also writes `<layer>-types.md`):

@@ -1,0 +1,8 @@
+{
+  "branch": "track/type-designer-tuning-2026-04-25",
+  "created_at": "2026-04-25T02:55:59Z",
+  "id": "type-designer-tuning-2026-04-25",
+  "schema_version": 5,
+  "title": "type-designer の reconnaissance フェーズ追加 — baseline+type-graph 先行実行で既存型インベントリを設計判断に取り込む",
+  "updated_at": "2026-04-25T02:55:59Z"
+}

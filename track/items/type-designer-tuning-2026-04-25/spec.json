@@ -1,0 +1,232 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "type-designer の reconnaissance フェーズ追加 + orchestrator 向け出力整理",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "type-designer の internal pipeline 先頭に reconnaissance step (baseline-capture + type-graph 実行 + Read) を挿入し、catalogue draft 段階で既存型インベントリ (種別 / partition / 命名規則) を把握した状態で kind・action 判定ができるようにすることで、低レベル review 指摘 (「既存にあった」「kind 違い」) の発生を構造的に抑制する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "type-designer の orchestrator 向け final message を Signal evaluation + Open Questions の 2 セクションに絞り込み、Entries written / Action rationale / Cross-partition migrations の 3 セクションを削除することで、type-designer 1 回の invocation あたりの戻り値を小さくし、親 ADR が定める「orchestrator 向け責務は信号機評価のみ完結」の実装と定義を一致させる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": ".claude/agents/type-designer.md の Internal pipeline セクションを改訂し、新 7-step 順序 (baseline-capture → type-graph → Read → catalogue draft → Write → contract-map → type-signals) を反映する。step 3 の Read 対象は --cluster-depth 値に応じた 2 ケース (<layer>-graph.md / <layer>-graph/index.md + per-cluster ファイル群) を両方明記する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": ".claude/agents/type-designer.md の Output セクション (lines 96 onward) を改訂し、Entries written / Action rationale / Cross-partition migrations の 3 セクションを削除する。残すセクションは per-layer の Signal evaluation と末尾の Open Questions のみとする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "Mission セクションの「Reconnaissance first」段落を、Internal pipeline の新 7-step 設計と矛盾なく整合させる (既に部分的に追加済みの段落を確認し、pipeline セクションとの一貫性を保つ)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "type-graph の --cluster-depth レンダリングオプション最適値の確定: 別途調査用トラックで評価し、得られた判断基準を後続 ADR / convention として固定する。本 track では「depth 値ごとに Read 対象が異なる」という事実を記述するのみ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "Rust ソースコードへの変更: 本 track の成果物は .claude/agents/type-designer.md の agent 定義ファイル編集のみ。CLI 追加 / domain 純粋関数 / usecase interactor / infrastructure adapter への変更は含まない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "/track:type-design command 本体 (.claude/commands/ 配下) の挙動変更: command 本体は subagent invocation + signal 受け取りのみであり、reconnaissance step の追加は subagent 内部 pipeline に閉じる。command 定義ファイルは変更対象外",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "reconnaissance step で取得した既存型インベントリ情報を orchestrator に echo する設計: インベントリは <layer>-graph/ / baseline / catalogue 自体に残っているため、orchestrator が必要なら直接 Read できる。subagent の final message に含める必要はない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "他 subagent 定義ファイル (spec-designer.md / impl-planner.md / adr-editor.md) への同様の整理適用: 「ADR 範囲を超えた余計な output sections」問題が他 subagent で表面化した場合は別 ADR / 別 track で対応する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": ".claude/agents/type-designer.md 以外のファイルは変更しない。特に knowledge/adr/ 配下、knowledge/conventions/ 配下、Rust ソース、および他 subagent 定義ファイルへの変更は禁止",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "reconnaissance step (baseline-capture / type-graph / Read) で得た既存型インベントリは subagent 内部の探索情報として扱い、orchestrator への final message には含めない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "reconnaissance を orchestrator (command 本体) 側で実行して briefing に埋め込む設計は採用しない。subagent 内部 pipeline として完結させ、command 本体は subagent invocation + 結果受け取りのみに留める (親 ADR D1 / Rejected Alternative B の確認)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "catalogue draft 後に baseline / type-graph 出力との整合性を後付け検証する post-hoc validation 方式は採用しない。reconnaissance を pipeline 先頭に置き draft 前に既存インベントリを把握する設計を維持する (Rejected Alternative A の確認)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": ".claude/agents/type-designer.md の Internal pipeline セクションが 7-step 構造 (baseline-capture → type-graph → Read → catalogue draft → Write → contract-map → type-signals) を明示しており、step 3 の Read 対象として --cluster-depth 0 (単一ファイル) と --cluster-depth >= 1 (cluster directory) の 2 ケースが両方記述されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": ".claude/agents/type-designer.md の Output セクションが Signal evaluation (per-layer) と Open Questions の 2 セクションのみを定義しており、Entries written / Action rationale / Cross-partition migrations の 3 セクションが存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": ".claude/agents/type-designer.md の Mission セクションに「reconnaissance は内部探索のみ — orchestrator への final message には含めない」という趣旨の記述があり、Internal pipeline の新 7-step 設計と矛盾しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "reconnaissance step の記述が「catalogue draft の前に既存コードベースの型インベントリを把握する」という目的を明示しており、skip してはならない旨が pipeline 仕様として記述されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    }
+  ],
+  "signals": {
+    "blue": 18,
+    "yellow": 0,
+    "red": 0
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reconnaissance step only reads `track/items/<id>/<layer>-graph/index.md` plus linked cluster files, but `sotp track type-graph` can also produce the flat `<layer>-graph.md` artifact when `--cluster-depth 0`. In that mode the agent would skip the actual graph output and make its draft from incomplete reconnaissance; the pipeline needs to branch on cluster depth, as the ADR describes.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b75436dc20add9b801a622ec54d8d27c166b6e0ab85aa96a4e5ec5110ebecf15",
+          "at": "2026-04-25T04:03:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
+          "at": "2026-04-25T04:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
+          "at": "2026-04-25T04:11:48Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 が `Read` 対象として `track/items/<id>/<layer>-graph...` を ADR 内に直書きしており、SoT Chain の向きが逆になります。計画 ADR では生成済み track 成果物を固定の参照先として書かず、出力種別だけを抽象的に述べるべきです。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+              "line": 41,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:9a46e4b1beb112f7f03db1082dae38a3dba25b89ece6b17345eaa0332b04568c",
+          "at": "2026-04-25T04:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a46e4b1beb112f7f03db1082dae38a3dba25b89ece6b17345eaa0332b04568c",
+          "at": "2026-04-25T04:05:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a46e4b1beb112f7f03db1082dae38a3dba25b89ece6b17345eaa0332b04568c",
+          "at": "2026-04-25T04:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd54a1cd7348c63f37c51cc1910157890463ab1b27d43dfbdb1e64908e543479",
+          "at": "2026-04-25T04:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rejected Alternative C says the combined ADR avoids a situation where a new decision says “reconnaissance は加えない”, but D1 and the rest of the ADR explicitly decide to add reconnaissance before catalogue drafting. This contradiction makes the rejection rationale ambiguous; it appears to mean “do not echo reconnaissance results to the orchestrator,” not “do not add reconnaissance.”",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+              "line": 100,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cd54a1cd7348c63f37c51cc1910157890463ab1b27d43dfbdb1e64908e543479",
+          "at": "2026-04-25T04:33:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f53df996c0609825731eb8af65d303dafd884e2615074d23306cafda72c597b8",
+          "at": "2026-04-25T04:39:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f53df996c0609825731eb8af65d303dafd884e2615074d23306cafda72c597b8",
+          "at": "2026-04-25T04:44:04Z"
+        }
+      ]
+    }
+  }
+}

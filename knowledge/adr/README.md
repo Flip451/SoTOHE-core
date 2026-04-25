@@ -88,6 +88,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD Type Graph View — TypeGraph から mermaid 図をレンダーして型間関係を可視化する](2026-04-16-2200-tddd-type-graph-view.md) | Accepted | 2026-04-16 |
 | [TDDD Contract Map — 全層カタログを入力とする統合 mermaid view](2026-04-17-1528-tddd-contract-map.md) | Accepted | 2026-04-17 |
 | [型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ②)](2026-04-23-0344-catalogue-spec-signal-activation.md) | — | 2026-04-23 |
+| [type-designer Phase 2 reconnaissance step — 設計開始前に baseline + type-graph で既存型インベントリを把握する](2026-04-25-0353-type-designer-reconnaissance-step.md) | — | 2026-04-25 |
 
 ### トラック・ワークフロー
 
