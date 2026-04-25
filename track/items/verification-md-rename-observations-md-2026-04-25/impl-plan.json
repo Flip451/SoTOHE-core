@@ -4,22 +4,24 @@
     {
       "id": "T001",
       "description": "libs/infrastructure/src/verify/latest_track.rs から VERIFICATION_SCAFFOLD_LINES static set、scaffold_placeholder_lines 関数、validate_verification_file 関数を削除し、verify() 内の other_files 配列から \"verification.md\" タプルを除去して plan.md のみに縮退させる。削除後の CI gate は spec.md / spec.json / plan.md のみを検証する。CN-01 (最新 track 選択ロジックは維持) を確認する (IN-01、infrastructure 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "dc53f02747f176b271933c91c42bfedaf98eac03"
     },
     {
       "id": "T002",
       "description": "libs/infrastructure/src/verify/latest_track.rs の unit/integration test を VERIFICATION_SCAFFOLD_LINES 削除後の縮退仕様に合わせて更新・削除する: verification.md を必要とする setup_complete_track / setup_complete_track_with_spec_json 等のヘルパーから verification.md 書き込みを除去し、test_scaffold_placeholder_detected / test_complete_v5_track_passes などの verification.md 依存テストを縮退仕様 (plan.md のみ) を正とするよう修正または削除する。cargo make ci が pass することを確認する (IN-06、infrastructure 層)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "dc53f02747f176b271933c91c42bfedaf98eac03"
     },
     {
       "id": "T003",
       "description": ".claude/commands/track/implement.md のステップ「After CI passes, update verification.md…」を削除し、「D4 (a)/(b) の条件に該当する場合のみ observations.md を作成/追記する」手順に置き換える。.claude/commands/track/full-cycle.md の「## Post-loop」セクションにある「update verification.md with overall results and verified_at」を同様に observations.md の条件付き手順に書き換える (IN-02、command docs)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T004",
       "description": ".claude/commands/track/commit.md の Step 0 および Step 3 から verification.md への参照を削除し、observations.md を optional source (存在する場合のみ参照) として扱う記述に更新する。Step 3a の「Read spec.md, plan.md, and verification.md」を「Read spec.md and plan.md; if observations.md exists, also read it」相当に書き換える (IN-03、command docs)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",
@@ -34,7 +36,8 @@
     {
       "id": "T007",
       "description": "オフトピック bookkeeping 3 件をまとめてコミットする: (1) .claude/commands/track/merge.md の IMPORTANT-note ホットフィックス (auto-selection of merge method 禁止)、(2) libs/infrastructure/src/track/render.rs:362 の `/track:implement` → `/track:impl-plan` テキスト修正、(3) libs/domain/src/tddd/catalogue_spec_signal.rs:324 の rustdoc intra-doc link 完全修飾パス修正。これらは spec.json の IN-* に属さないため task-coverage の対象外 (bookkeeping のみ)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "dc53f02747f176b271933c91c42bfedaf98eac03"
     }
   ],
   "plan": {

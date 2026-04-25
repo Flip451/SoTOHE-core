@@ -20,7 +20,7 @@ If `$ARGUMENTS` is empty:
    - On a non-track branch, do not auto-detect a branchless planning-only track.
    - For actual commit execution from a non-track branch, require an explicit track-id selector and use it only for the planning-only lane.
 2. Inspect the current track under `track/items/` when present.
-3. Read available context from `spec.md`, `plan.md`, `verification.md`, and current changed files.
+3. Read available context from `spec.md` and `plan.md`, current changed files, and `observations.md` if it exists (optional source — absent is normal).
 4. Propose 2-3 commit message candidates that follow the repository's current style and reflect the actual change scope.
 5. Stop after presenting the candidates. Do not run `cargo make track-commit-message` yet.
 
@@ -70,7 +70,7 @@ Generate the note from current track context unless the user explicitly provided
 traceability source:
 
 1. Find the current track under `track/items/` (if any exist).
-2. Read `spec.md`, `plan.md`, and `verification.md` from that track.
+2. Read `spec.md` and `plan.md` from that track; also read `observations.md` if it exists (optional source).
 3. Run `git show HEAD --stat` to get the list of changed files.
 4. Generate the note text using the format below and write it to `tmp/track-commit/note.md`.
 5. Run: `cargo make track-note`
