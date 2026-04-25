@@ -1,0 +1,237 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2526259d568e6633843195d95b9d6dd2564b492c31121a1dc8d4478688d8349c",
+          "at": "2026-04-25T00:54:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2526259d568e6633843195d95b9d6dd2564b492c31121a1dc8d4478688d8349c",
+          "at": "2026-04-25T00:55:45Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00e316e23790fb6dc01b0c1e5ea3986825e0b6915500ea5d9df536f319fa3ade",
+          "at": "2026-04-25T00:12:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00e316e23790fb6dc01b0c1e5ea3986825e0b6915500ea5d9df536f319fa3ade",
+          "at": "2026-04-25T00:14:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53150f8229d13084b943906e023e64a2cccf5c8d085f2544feca11d2dfae3713",
+          "at": "2026-04-25T00:22:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53150f8229d13084b943906e023e64a2cccf5c8d085f2544feca11d2dfae3713",
+          "at": "2026-04-25T00:23:34Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd77d91ef3666b6273e0e46019e5c307921f681f7706eaf99a2b19f556579233",
+          "at": "2026-04-25T00:21:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd77d91ef3666b6273e0e46019e5c307921f681f7706eaf99a2b19f556579233",
+          "at": "2026-04-25T00:22:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cac04cf12b999bf858a22f08a717f60796961551d657f9b314680e8f6df891ec",
+          "at": "2026-04-25T01:14:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cac04cf12b999bf858a22f08a717f60796961551d657f9b314680e8f6df891ec",
+          "at": "2026-04-25T01:16:27Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The placeholder note points users to `/track:implement` to generate `impl-plan.json`, but the workflow defines `/track:impl-plan` as the phase that produces `impl-plan.json`; `/track:implement` is the later code-implementation phase.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/verification-md-rename-observations-md-2026-04-25/plan.md",
+              "line": 4,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8f0fd71dd72d212b69e0d1e20d446fc9299ad1e3c822d44cedfc0c6e10e88ad7",
+          "at": "2026-04-25T00:13:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdd4d2c3e44fd15a5a9ae12e9dad4c03172a79bd4a03c19f16c412703c4a6796",
+          "at": "2026-04-25T00:21:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says AC fulfillment is proven by `metadata.json` task `done` plus `commit_hash`, but the current Phase 0-3 workflow makes `metadata.json` schema v5 identity-only and stores tasks/commit hashes in `impl-plan.json`. This points the migration at the wrong source of truth for task completion.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+              "line": 24,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The ADR cites a specific prior track artifact (`track-plan-decomposition-2026-04-22/verification.md`) as part of its rationale, but `pre-track-adr-authoring` prohibits ADRs from referencing track-internal artifacts. This violates the cited lifecycle convention for track-cross ADRs.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+              "line": 14,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bdd4d2c3e44fd15a5a9ae12e9dad4c03172a79bd4a03c19f16c412703c4a6796",
+          "at": "2026-04-25T00:24:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdd4d2c3e44fd15a5a9ae12e9dad4c03172a79bd4a03c19f16c412703c4a6796",
+          "at": "2026-04-25T00:25:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 says `verify-latest-track-local` should shrink to validating only `spec.md` / `spec.json` / `plan.md`, but the current v5 workflow still relies on `verify-latest-track` to read and validate `metadata.json` for latest-track selection and decode `impl-plan.json` when deriving status. As written, this plan could be implemented by removing those semantic checks along with the `verification.md` gate, which is broader than the ADR's stated migration intent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+              "line": 41,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:e505f0bdb87a7899d5a57ea64ea419ff4a4f9d7f29220068ce67c076edc73154",
+          "at": "2026-04-25T00:29:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d02a453a764b933495744133cf9480a2d64ae49974ca3177cefb110604e24f49",
+          "at": "2026-04-25T00:31:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:056fd3a1f916d476c5a713c8aea8314688c5e5e8121d518edca88d6ffe98de4a",
+          "at": "2026-04-25T00:56:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-04 says verification.md references outside CLAUDE.md / START_HERE_HUMAN.md / .claude/rules must not be rewritten, but IN-02, IN-03, and IN-04 require rewriting .claude/commands/track/* and track/workflow.md. As written, the spec simultaneously requires and forbids the command/workflow doc edits; narrow OS-04 to historical artifacts or add those in-scope docs to the exception list.",
+              "severity": "P1",
+              "file": "track/items/verification-md-rename-observations-md-2026-04-25/spec.json",
+              "line": 147,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:056fd3a1f916d476c5a713c8aea8314688c5e5e8121d518edca88d6ffe98de4a",
+          "at": "2026-04-25T00:59:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-04 says verification.md references outside CLAUDE.md / START_HERE_HUMAN.md / .claude/rules/ must not be rewritten, but the same spec puts .claude/commands/track/* and track/workflow.md updates in scope via IN-02, IN-03, and IN-04. This leaves the implementation plan with contradictory scope instructions for command docs and workflow docs.",
+              "severity": "P1",
+              "file": "track/items/verification-md-rename-observations-md-2026-04-25/spec.json",
+              "line": 147,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:056fd3a1f916d476c5a713c8aea8314688c5e5e8121d518edca88d6ffe98de4a",
+          "at": "2026-04-25T01:01:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af8f0b7a6380f61cd89b342370d1e4127668d7169f466788684a2d5615d5eeac",
+          "at": "2026-04-25T01:05:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 says `verify.md` instead of `verification.md` when describing the helper cleanup. That misnames the artifact and makes the task read as if it targets a different file than the rest of the plan.",
+              "severity": "P1",
+              "file": "track/items/verification-md-rename-observations-md-2026-04-25/impl-plan.json",
+              "line": 11,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:cf91b0214f531852eb04a3e2e0651a86d7c3c7e9756085d98dabf4b4db21e125",
+          "at": "2026-04-25T01:15:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:754dcb58f515c88d2cfb9f90cb150cb8f46a93c6ae9dcf781c2d3fc5f36f5d4c",
+          "at": "2026-04-25T01:17:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:754dcb58f515c88d2cfb9f90cb150cb8f46a93c6ae9dcf781c2d3fc5f36f5d4c",
+          "at": "2026-04-25T01:20:02Z"
+        }
+      ]
+    }
+  }
+}

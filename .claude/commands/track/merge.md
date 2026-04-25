@@ -10,6 +10,14 @@ If any check fails, stops and reports the failure.
 Arguments:
 - Use `$ARGUMENTS` as PR number (required). Optionally append merge method: `3 squash`, `3 rebase`. Default is merge commit.
 
+**IMPORTANT — do NOT auto-select the merge method**: when `$ARGUMENTS` does
+not include a method, that means the user has explicitly chosen the default
+(merge commit). Pass `--method merge` (or omit `--method`, whichever the
+wrapper interprets as the default) and stop. Do NOT substitute `squash` or
+`rebase` based on prior knowledge of how other projects merge.
+Override the default only when the user typed `squash` or `rebase`
+verbatim in `$ARGUMENTS`.
+
 ## Step 0: Resolve PR
 
 - If `$ARGUMENTS` is empty, detect the PR for the current branch via `gh pr view --json number -q .number`.

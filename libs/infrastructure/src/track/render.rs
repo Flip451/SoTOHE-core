@@ -359,7 +359,7 @@ pub fn render_plan(track: &TrackMetadata, impl_plan: Option<&ImplPlanDocument>) 
     let Some(doc) = impl_plan else {
         lines.push(
             "> **Note**: `impl-plan.json` not yet generated. \
-             Run `/track:implement` to generate the implementation plan."
+             Run `/track:impl-plan` to generate the implementation plan."
                 .to_owned(),
         );
         lines.push(String::new());

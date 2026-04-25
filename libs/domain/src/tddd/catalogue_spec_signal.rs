@@ -321,7 +321,7 @@ pub fn check_catalogue_spec_ref_integrity(
 ///
 /// - **Coverage mismatch** (signals length ≠ catalogue entries length, or
 ///   positional `type_name` mismatch at any index) →
-///   [`VerifyFinding::error`]. This catches the fail-open path where a
+///   [`crate::verify::VerifyFinding::error`]. This catches the fail-open path where a
 ///   tampered `<layer>-catalogue-spec-signals.json` keeps a valid
 ///   `catalogue_declaration_hash` but omits or renames entries so Yellow /
 ///   Red signals are silently dropped.
