@@ -29,8 +29,8 @@
 > track/workflow.md の「## verification.md」セクションを「## observations.md」に置換、役割・作成条件・制約を記述 (T005)
 > CLAUDE.md / START_HERE_HUMAN.md / .claude/rules/08-orchestration.md / .claude/rules/10-guardrails.md の verification.md 言及を削除または observations.md 文脈に書き換え (T006)
 
-- [x] **T005**: track/workflow.md の「## verification.md」セクションを廃止し、「## observations.md」セクションに置き換える。新セクションには observations.md の役割 (機械検証不能な手動観測ログ、自由形式、scaffold なし)、作成条件 (D4 (a) implementer 裁量 / D4 (b) spec AC 明示)、および CN-02 (ファイル不在 = 観測なし、CI は不在を error にしない)・CN-03 (フォーマット自由)・CN-04 (新規 track で verification.md を作成しない) の制約を記述する (IN-04、workflow docs)
-- [x] **T006**: CLAUDE.md / START_HERE_HUMAN.md / .claude/rules/08-orchestration.md / .claude/rules/10-guardrails.md から verification.md への言及を削除または observations.md の文脈に書き換える。CLAUDE.md の Priority references にある verification.md エントリを削除する。08-orchestration.md の Source Of Truth セクションにある verification.md 参照を削除する。10-guardrails.md にある verification.md 言及を確認し該当箇所を更新する (IN-05、docs)
+- [x] **T005**: track/workflow.md の「## verification.md」セクションを廃止し、「## observations.md」セクションに置き換える。新セクションには observations.md の役割 (機械検証不能な手動観測ログ、自由形式、scaffold なし)、作成条件 (D4 (a) implementer 裁量 / D4 (b) spec AC 明示)、および CN-02 (ファイル不在 = 観測なし、CI は不在を error にしない)・CN-03 (フォーマット自由)・CN-04 (新規 track で verification.md を作成しない) の制約を記述する (IN-04、workflow docs) (`8012fce7a27cf181351a59ef539fa370efa5d6a8`)
+- [x] **T006**: CLAUDE.md / START_HERE_HUMAN.md / .claude/rules/08-orchestration.md / .claude/rules/10-guardrails.md から verification.md への言及を削除または observations.md の文脈に書き換える。CLAUDE.md の Priority references にある verification.md エントリを削除する。08-orchestration.md の Source Of Truth セクションにある verification.md 参照を削除する。10-guardrails.md にある verification.md 言及を確認し該当箇所を更新する (IN-05、docs) (`8012fce7a27cf181351a59ef539fa370efa5d6a8`)
 
 ### S4 — S4 — Off-topic bookkeeping
 
