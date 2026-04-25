@@ -1,0 +1,446 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 921,
+              "category": "factual"
+            },
+            {
+              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 925,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:15:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:16:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 919,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:18:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T17:26:40Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "FreeFunction validation semantics are inconsistent across the plan: IN-01 says forward checks must compare `expected_params`/`expected_returns` names, while AC-01 and T001 describe existence-check-only behavior, and T002 also contradicts itself by treating FreeFunction as both part of and outside the existence-only guard. The implementation rule needs to be made single-valued.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "T004 points the Interactor codec update at `domain-types.json`, but `RenderContractMapInteractor` is declared in `usecase-types.json` (the surrounding S04 note already names the correct file). As written, this task sends the change to the wrong artifact.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 24,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:471b9c38af977f1fdcb88417440535f136a939b76c398520953b607e57ca38c1",
+          "at": "2026-04-25T16:15:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 points the Interactor codec update at `domain-types.json`, but `RenderContractMapInteractor` lives in `usecase-types.json` and `plan.md` already describes the same step against the usecase catalogue. As written, the task directs the change to the wrong layer/file.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 24,
+              "category": "factual error"
+            },
+            {
+              "message": "AC-04 says the L2 exemplar is `ValidationError (action=modify)`, but the catalogued `ValidationError` entry is still `action=reference` in `domain-types.json:156-160`, and no task in this plan changes that action. The declaration_only example therefore cannot be produced as specified.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 53,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002 tells the implementer to include `free_function` in `EXISTENCE_ONLY_KINDS`, then immediately says `free_function is NOT existence-only`. Those two requirements conflict, so the stale-field guard behavior is ambiguous.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:471b9c38af977f1fdcb88417440535f136a939b76c398520953b607e57ca38c1",
+          "at": "2026-04-25T16:18:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-01` requires FreeFunction signal evaluation to validate both parameter and return-name matches, but `AC-01` and `T001` reduce the same check to existence-only behavior. The plan needs one rule here; as written, the FreeFunction forward-check semantics are inconsistent.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+              "line": 73,
+              "category": "contradiction"
+            },
+            {
+              "message": "`T005` only applies `declaration_only` when a `modify` node with empty `expected_methods` is also absent from the edge set, but `IN-04`/`AC-04` define `declaration_only` solely by `action=modify` + empty methods, with `ValidationError` as the exemplar. This extra no-edge شرط will suppress the intended dashed border on referenced declaration-only nodes.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a61fed5dafa889955ff2713c4f4dfcd17d80ad698f3d5c014152236f35cbc511",
+          "at": "2026-04-25T16:24:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-09 is not achievable as written: T005/GO-05 define the L2 `declaration_only` category as edge-less by design, but this criterion requires the phase-2 dogfood to reduce isolated nodes from 9 to 0. The plan can style those nodes differently, but it does not eliminate their isolation, so the close-out target conflicts with the stated implementation.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 58,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:34114a7ea1248951c30860f54837e724328765c75c76dd32dbb2e5512ba5e1c9",
+          "at": "2026-04-25T16:28:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fae3b02f44b9521cfeedf898bddd59a020dd4397fc925ad98f1b9fd9aff8c25",
+          "at": "2026-04-25T16:32:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 still says all 9 isolated nodes will be converted into nodes with edges, but IN-11/AC-09/T010 define the L1 nodes and ValidationError as resolved by dashed-border visual markers while remaining edge-less. The close-out target is therefore contradictory: implementers cannot both leave those nodes edge-less by design and satisfy GO-01's edge-for-all statement.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+              "line": 8,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-09 says the dogfood result must be recorded in confirmation.md, while IN-11, T010, and the plan section all require verification.md. This gives the close-out task two different artifact names for the same evidence, so one of the acceptance checks will be missed or written to the wrong file.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+              "line": 478,
+              "category": "contradiction"
+            },
+            {
+              "message": "The S05 section description defines declaration_only as action=modify + empty expected_methods + no edges, but T005 and AC-04 define it as action=modify + empty expected_methods regardless of edge presence. That extra edge-less condition changes behavior and can suppress the intended declaration_only styling for nodes that later gain field/return edges.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 109,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5fae3b02f44b9521cfeedf898bddd59a020dd4397fc925ad98f1b9fd9aff8c25",
+          "at": "2026-04-25T16:35:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 requires converting all 9 isolated contract-map nodes into nodes with edges, but the same spec later defines the L1 nodes and ValidationError as resolved by dashed-border visual markers while remaining edge-less. That makes the close-out target contradictory: implementers cannot both leave those nodes edge-less by design and satisfy the 'edge for every isolated node' goal.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 11,
+              "category": "contradiction"
+            },
+            {
+              "message": "T001 says FreeFunction expected params/returns are declared for future renderer use, while the plan's L4 close-out relies on Phase 2 using those fields to produce FreeFunction edges. If T001 is followed literally, L4 cannot gain an edge in this track, so AC-08/T010 are not achievable as written.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 6,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The S05 section defines declaration_only as action=modify + empty expected_methods + no edges, but T005 in the same section says action=modify + empty expected_methods gets declaration_only regardless of edge presence. This gives two different rendering rules for the same classDef and can change behavior for declaration-only nodes that later gain field/return edges.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/plan.md",
+              "line": 38,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-09 requires recording dogfood evidence in confirmation.md, while IN-11, S10, and T010 all require verification.md for the same close-out result. This leaves the acceptance artifact ambiguous and can cause one acceptance path to be missed.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5fae3b02f44b9521cfeedf898bddd59a020dd4397fc925ad98f1b9fd9aff8c25",
+          "at": "2026-04-25T16:38:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01/GO-02/AC-09 require the L4 free-function case to be resolved by edge coverage, and domain-types.json says expected_params/expected_returns should generate method-call edges, but T001 explicitly leaves those fields for \"future renderer use\" and no later task implements FreeFunction param/return edge emission. Completing these tasks can therefore mark L4 resolved while only rendering a FreeFunction node, contradicting the stated Phase 2 edge-coverage goal.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-05/IN-08/AC-05 define field edges from catalogue entry expected_members / MemberDeclaration::Field, but T006 only adds domain storage/rendering and no task extends the catalogue codec/schema path to decode or encode expected_members from the JSON catalogues. Since the plan's integration tests and dogfood operate on fixture/catalogue entries, the field-edge acceptance criteria are not executable as written.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 36,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:3777597bf7ffc1d2a5319ee08529834856fb6c7c08b07367426ffde99b1f50af",
+          "at": "2026-04-25T16:45:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-08 requires layer-agnostic tests for a \"free_function edge\", but the same spec says L4 is only made renderable as a FreeFunction node in Phase 2 and that free-function edges are deferred to Phase 3; T009 likewise only asks for a FreeFunction kind node. As written, the acceptance criterion asks implementers to test behavior that this plan explicitly leaves out of scope, so it should say FreeFunction node/kind support rather than free_function edge.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+              "line": 468,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6679e11edc7034fc57095e1f026744c918a90076e77d50465985caa863245de8",
+          "at": "2026-04-25T16:51:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 requires the dogfood run to show `render_contract_map` as a FreeFunction node and `ContractMapRenderOptions` with field edges, but the preceding tasks only add schema/renderer/codec support and fixture coverage. No task updates this track's own catalogue data from the temporary `value_object` placeholder to `free_function`, or populates `expected_members` for the entries that must produce field edges. Following the plan as written can therefore reach T010 without the data needed to satisfy AC-09.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 60,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ba0b388898b0ee0bf9d0dea2289759b23350137b1e9cd652661cc793ea855000",
+          "at": "2026-04-25T16:56:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-07 is mapped only to T004, but T004 is the Interactor codec extension and only covers `declares_application_service` encode/decode plus catalogue entry updates. It does not exercise or preserve the symlink/atomic-write constraint described by CN-07, so the task coverage claims this security constraint is handled by unrelated work.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/task-coverage.json",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:de111ef070de4361ad06a1121c36a03f5f5f2fc3407103f4d75dc4005fbd5012",
+          "at": "2026-04-25T17:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan says Phase 2 dogfood will verify that all nine Phase 1 isolated nodes are resolved, including L4, but the same spec defines L4 as only rendering the FreeFunction node while deferring return/parameter edges to Phase 3. Rendering a FreeFunction node by itself does not create an edge to the isolated error type, so T010 cannot satisfy AC-09's L4 resolution claim unless this phase also implements FreeFunction param/return edge generation or narrows the acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2e9af29ad32004b10d9749f748b17369b21fa9336ded48686036968c81055376",
+          "at": "2026-04-25T17:08:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `render_contract_map` catalogue entry omits `action`, which decodes as the default `add`, but AC-09/T010 rely on it being `action=reference` so the L4 free-function node receives `unused_reference` dashed-border treatment. T010 only says to change the kind to `free_function`, so the planned dogfood can complete without satisfying the stated L4 resolution.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/domain-types.json",
+              "line": 5,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002's stale-field guard instruction is not executable as written: it says not to add `free_function` to `EXISTENCE_ONLY_KINDS`, but then says to add `FreeFunction` to `FORBIDDEN_FIELDS_EXISTENCE_ONLY` so params/returns are permitted. That list is for forbidden field names, not kind exceptions, so following the plan will not create a coherent codec rule for `expected_params` / `expected_returns`.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:acc9e74f4a4deacfbcd17a81d489f962f471e0c7da0b8e0fee0646f4368300e0",
+          "at": "2026-04-25T17:14:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 says not to add `free_function` to the stale-field guard because serde's internally tagged enum will reject unexpected fields, but this codec path is explicitly guarded because `flatten` + internally tagged variants otherwise drop cross-kind fields. As written, the plan leaves `free_function` stale-field validation uncovered, so illegal catalogue fields can be silently accepted instead of rejected. Add an explicit guard/test for allowed `free_function` fields rather than relying on serde here.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 12,
+              "category": "factual error"
+            },
+            {
+              "message": "IN-03 defines `unused_reference` as a reference node absent only from method / trait-impl edges, while AC-03 later requires absence from all edge types including Interactor-impl and field edges. If the implementation follows IN-03, a reference node that gains a field or Interactor impl edge can still be styled as unused, contradicting the acceptance criterion. Align IN-03 with AC-03's all-edge definition.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:43bb3f4d774e4873a66414c8f9ffbe77ff67ba1f23146e32ff67e6cc9f0d1eb8",
+          "at": "2026-04-25T17:19:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c88dc898ce05abf6d7989a2b308d8db55b059e9bf6a1983059cd358df9fb830",
+          "at": "2026-04-25T17:23:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-09/T010 say the L4 close-out is satisfied by turning `render_contract_map` into a FreeFunction node, but the catalogue itself identifies `LoadAllCataloguesError` as the L4 isolated error type that lacked an edge source from the `load_all_catalogues` free function. No task adds a `load_all_catalogues` FreeFunction entry or otherwise connects that error type, so following the plan can still leave the documented L4 isolated node unresolved while the close-out claims all 9 Phase 1 isolated nodes are handled.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:45a2edc90bc322f61c01e203f9e1d2d570600ddffbb6b3701f924d4585c452bc",
+          "at": "2026-04-25T23:17:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 requires `action_overlay=false` to produce Phase 1-identical output, but other Phase 2 requirements in the same spec (AC-03/AC-04 via T005) add always-on `unused_reference` and `declaration_only` classDefs/annotations to the rendered map. Once those fixes land, disabling only the action overlay cannot make the output Phase 1-identical, so the acceptance test/regression guard is infeasible unless it is scoped to action-overlay-specific output only.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:60fd7a37077b297cf4f46095b8034cca8ddc05ba26cc34ee1b3f9a19e5117f58",
+          "at": "2026-04-25T23:25:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 requires the `signals() == None` fallback to produce the same output as `signal_overlay=false`, but T008 instructs the implementation to add signal-specific classDef lines whenever `signal_overlay=true` and only says `signal_overlay=false` omits those lines. Implemented literally, a no-signal document would still differ from the disabled output, so the acceptance criterion and task plan disagree on the fallback behavior.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.md",
+              "line": 56,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:11cf904ccb59985080aa1f4ac6bf96de552cace00b96cbde856082823f7de509",
+          "at": "2026-04-25T23:30:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 claims the L4 fix is to add `load_all_catalogues` / `render_contract_map` as `free_function` entries with `expected_returns`, but then explicitly defers FreeFunction return-type edge rendering to Phase 3 and says both nodes have no outgoing edges. That contradicts GO-02/ADR L4, where the problem is the missing edge from a free function to its returned error type; under this plan `LoadAllCataloguesError` remains edge-isolated, so AC-09's claim that all 9 Phase 1 isolated nodes are resolved is not actually executable.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            },
+            {
+              "message": "The infrastructure catalogue view reports `—` for the Signal column on every infrastructure entry, even though the track artifacts for this scope describe the infrastructure type signals as 4 Blue entries. This makes the generated plan view semantically inconsistent: readers see signal data as absent for the infrastructure layer while the signal overlay inputs are supposed to be present and Blue.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/infrastructure-types.md",
+              "line": 7,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:2e40ea85ace41a1f3a5da7928f0e229faef851a8dca6cc2edb1e5f5f3c194065",
+          "at": "2026-04-25T23:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 now says Phase 2 only adds FreeFunction catalogue entries as preparation for Phase 3 return-type edge rendering, but GO-02 still says this track structurally resolves the L4 problem where return error types receive no edge. Since T001/T010 also defer expected_returns rendering to future use, the plan contradicts itself about whether Phase 2 actually fixes return-type edges or only prepares their sources.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:383f6b80454e7cc44d818d62d4748d85e5093486bcefc388774f702eabc92ae3",
+          "at": "2026-04-25T23:37:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ffd7b10a31b13145b9c49b1442c2d6a649cd77c6f09591911a5cd43e126d35d",
+          "at": "2026-04-25T23:40:53Z"
+        }
+      ]
+    }
+  }
+}

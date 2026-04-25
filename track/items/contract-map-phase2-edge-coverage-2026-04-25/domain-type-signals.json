@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-25T23:41:27Z",
+  "declaration_hash": "2d3735bf53a851a65931a11e7002968a040afa28a88fad14ed9a2fd178fcb343",
+  "signals": [
+    {
+      "type_name": "render_contract_map",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "LayerId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapContent",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapRenderOptions",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLoader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn load_all(&self, track_id: &TrackId) -> Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>"
+      ]
+    },
+    {
+      "type_name": "ContractMapWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError>"
+      ]
+    },
+    {
+      "type_name": "CatalogueLoaderError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueNotFound",
+        "LayerDiscoveryFailed",
+        "DecodeFailed",
+        "SymlinkRejected",
+        "IoError",
+        "TopologicalSortFailed"
+      ]
+    },
+    {
+      "type_name": "ContractMapWriterError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "IoError",
+        "SymlinkRejected",
+        "TrackNotFound"
+      ]
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ValidationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyString",
+        "InvalidTrackId",
+        "InvalidTaskId",
+        "InvalidCommitHash",
+        "InvalidTimestamp",
+        "InvalidTrackBranch",
+        "EmptyTrackTitle",
+        "EmptyTaskDescription",
+        "EmptyPlanSectionId",
+        "EmptyPlanSectionTitle",
+        "DuplicateTaskId",
+        "DuplicatePlanSectionId",
+        "UnknownTaskReference",
+        "DuplicateTaskReference",
+        "UnreferencedTask",
+        "OverrideIncompatibleWithResolvedTasks",
+        "TrackActivationRequiresPlanningOnly",
+        "TrackActivationRequiresSchemaV3",
+        "TrackAlreadyMaterialized",
+        "UnsupportedTargetStatus",
+        "SectionNotFound",
+        "NoSectionsAvailable",
+        "TaskDescriptionMutated",
+        "TaskRemoved",
+        "InvalidLayerId"
+      ]
+    },
+    {
+      "type_name": "TrackId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitHash",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackBranch",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "NonEmptyString",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewGroupName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
+    }
+  ]
+}

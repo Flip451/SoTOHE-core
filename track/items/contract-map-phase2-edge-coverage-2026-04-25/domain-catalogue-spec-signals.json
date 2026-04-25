@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "2d3735bf53a851a65931a11e7002968a040afa28a88fad14ed9a2fd178fcb343",
+  "signals": [
+    {
+      "type_name": "render_contract_map",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LayerId",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapContent",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapRenderOptions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapWriter",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "CatalogueLoaderError",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "ContractMapWriterError",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ValidationError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackId",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "TaskId",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CommitHash",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackBranch",
+      "signal": "blue"
+    },
+    {
+      "type_name": "NonEmptyString",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewGroupName",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "signal": "blue"
+    }
+  ]
+}

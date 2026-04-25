@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RenderContractMap",
+      "description": "Primary port (application_service trait) driving the contract-map render workflow. CLI and future adapters depend on this trait, not on the concrete interactor. Pre-exists from previous track. Declared with action=reference (structure unchanged).",
+      "approved": true,
+      "action": "reference",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RenderContractMapCommand"
+            }
+          ],
+          "returns": "Result<RenderContractMapOutput, RenderContractMapError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-02",
+          "hash": "60e32c4898f4db90da6807fa071036ccd2efecc17148c7999ff756e63b638c66"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapInteractor",
+      "description": "Interactor implementing RenderContractMap by composing CatalogueLoader, domain render_contract_map free function, and ContractMapWriter. Phase 2 extends this type with a declares_application_service field (value: RenderContractMap) so the Contract Map renderer emits a -.impl.-> edge from this interactor to RenderContractMap (IN-02, L3 isolation fix, AC-02). The field is a Phase 2 catalogue schema extension — not yet in catalogue_codec.rs Interactor variant. Declared with action=modify to record the intended structural change against baseline.",
+      "approved": true,
+      "action": "modify",
+      "kind": "interactor",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-02",
+          "hash": "60e32c4898f4db90da6807fa071036ccd2efecc17148c7999ff756e63b638c66"
+        },
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "AC-02",
+          "hash": "21eb2640e7e8571b9e39106c8a5c6a2e7f7fc348a8fd4fb54966ca8cd11d9fac"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "declares_application_service=RenderContractMap field not yet in catalogue_codec.rs Interactor variant; Yellow expected until IN-02 codec support is merged"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapCommand",
+      "description": "Command input for RenderContractMap::execute carrying TrackId, optional kind_filter, and optional layer_filter. Pre-exists from previous track. Declared with action=reference (structure unchanged).",
+      "approved": true,
+      "action": "reference",
+      "kind": "command",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-02",
+          "hash": "60e32c4898f4db90da6807fa071036ccd2efecc17148c7999ff756e63b638c66"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapOutput",
+      "description": "DTO reporting rendered_layer_count and total_entry_count after a successful render. Pre-exists from previous track. Declared with action=reference (structure unchanged).",
+      "approved": true,
+      "action": "reference",
+      "kind": "dto",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Output DTO for RenderContractMap::execute; carries rendered_layer_count and total_entry_count. Declared prior to Phase 2 spec element authoring with a dedicated anchor; reachable via IN-02 (execute method signature context)."
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapError",
+      "description": "Error variants surfaced by RenderContractMap primary port. Pre-exists from previous track. No new variants in this track. Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Error type for RenderContractMap primary port; variants map loader and writer failures. Declared prior to Phase 2 spec element authoring with a dedicated anchor; reachable via IN-02 (execute method returns this error)."
+        }
+      ]
+    }
+  ]
+}

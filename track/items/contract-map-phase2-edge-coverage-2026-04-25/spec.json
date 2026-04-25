@@ -1,0 +1,524 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "TDDD Contract Map Phase 2 — Edge coverage で孤立ノード 9 件 (L1-L4) を解消",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "ADR 2026-04-17-1528 §Known Limitations で特定された 4 カテゴリの孤立ノード (L1: forward-reference placeholder / L2: field 参照・mutation-only / L3: Interactor→ApplicationService 実装関係 / L4: free function と関連エラー型) を解消し、contract-map.md 上の孤立ノード 9 件を各カテゴリに応じた方法で対処済みにする: L3 は impl edge 付与、L2 の一部 (ContractMapRenderOptions 等) は field edge 付与、L4 は (i) LoadAllCataloguesError が action=reference + no edges のため unused_reference dashed border で意図的宣言として視覚識別 (T005 常時適用)、かつ (ii) FreeFunction kind 追加により load_all_catalogues / render_contract_map catalogue entry を追加して両 free function をノードとして描画可能化 (Phase 3 で return-type edge 実装の基盤)、L1 と L2 の宣言のみ型は dashed border で意図的宣言として視覚識別",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "catalogue schema に free_function kind を追加して TypeDefinitionKind の 14 variant 体系を確立し、L4 カテゴリ (load_all_catalogues 等の free function が返すエラー型に edge が届かない問題) の解消基盤を整える。Phase 2 では FreeFunction kind の追加とカタログ entry 宣言まで行い、return-type edge の実際の描画は Phase 3 以降で実装する。Phase 2 で LoadAllCataloguesError は unused_reference dashed border によって視覚識別されることで孤立状態を脱する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        },
+        {
+          "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "ADR §D4 (2) の trait-impl edge を SecondaryAdapter + Interactor kind に拡張して L3 (RenderContractMapInteractor -.impl.-> RenderContractMap が未描画) を解消し、Interactor→ApplicationService の実装関係を Contract Map 上に可視化する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "ADR §D5 で定義された action overlay (add/modify/delete/reference の視覚化) と signal overlay (Blue/Yellow/Red のノード塗り) を実装し、Contract Map を信号機評価の 1 枚俯瞰 artifact に進化させる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Implementation Phases"
+        }
+      ]
+    },
+    {
+      "id": "GO-05",
+      "text": "L1 (unused reference) と L2 (declaration-only) の型について dashed border + 視覚マーク付きの描画を実装し、edge がない孤立ノードを意図的な宣言として識別できるようにする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "catalogue schema に free_function kind を新規追加する (TypeDefinitionKind::FreeFunction { expected_params: Vec<ParamDeclaration>, expected_returns: Vec<String> })。kind_tag は free_function。forward check は存在チェックのみ (ValueObject と同等)。mermaid shape は記法の都合で rect ([Name]) + classDef free_function とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          },
+          {
+            "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "ADR §D4 (2) の trait-impl edge を Interactor kind に拡張する。Interactor 種の catalogue entry が declares_application_service フィールド (Option<String>) を持てるようにし、そこに ApplicationService name を記述すると contract_map_render.rs が -.impl.-> edge を描画する。edge 方向は SecondaryAdapter パターンと統一 (Interactor -.impl.-> ApplicationService)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          },
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "action=reference かつ edge を持たないノード (type_index に登録済みだが method-call / trait-impl / Interactor-impl / field のいずれの edge 元にも target にもならないノード) を unused_reference として classDef で dashed border 描画する。L1 (TaskId / CommitHash / TrackBranch 等の forward-reference placeholder) がこのカテゴリに該当する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "action=modify かつ expected_methods が空 (メソッド宣言なし) のノードを declaration_only として classDef で dashed border + shape 変更なしで描画する。L2 の ValidationError (action=modify で declare のみ、try_new 系の戻り値として使われるが expected_methods に登場しない) がこのカテゴリに該当する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "field edge を dto / command / query / value_object kind に限定して実装する。struct F { x: T } 形式の field 参照 → F -->|.field_name| T 形式の edge。ノイズ制御のため method-bearing kind (secondary_port / application_service) および typestate / enum / error_type には field edge を生成しない。field 情報は catalogue entry の MemberDeclaration::Field から取得する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          },
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "action overlay を実装する (ADR §D5 前半)。ContractMapRenderOptions.action_overlay=true の場合: add → デフォルト塗り (変更なし)、modify → 破線枠 classDef、delete → 取り消し線 + 薄色 classDef、reference → 点線枠 classDef。各 action の classDef を render 出力に追加し、entry の action に応じた :::class_name を node shape に付与する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "signal overlay を実装する (ADR §D5 後半)。ContractMapRenderOptions.signal_overlay=true の場合に type-signals の評価結果を読み取りノード fill color を適用する。signal 値の読取は CatalogueLoader が返す TypeCatalogueDocument の signals() フィールドから inline 参照する方式 (ADR §Q2 前者推奨、render 時に再評価しない)。Blue → 既定色、Yellow → #fff3e0 (警戒色)、Red → #ffebee (エラー色)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Open Questions"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "catalogue schema の MemberDeclaration::Field を contract_map_render.rs から参照可能にする。field edge 生成のため TypeCatalogueEntry に expected_members: Vec<MemberDeclaration> を参照する経路を contract_map_render.rs の field_members_of() ヘルパーとして追加する。domain → infrastructure 依存禁止を維持 (domain 内完結)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/hexagonal-architecture.md",
+            "anchor": "Layer Dependencies"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "free_function kind の catalogue codec (decode / encode) を実装する。JSON schema: kind=free_function + expected_params (ParamDeclaration 配列、optional) + expected_returns (String 配列、optional)。forward check は FreeFunction の名前存在確認のみ (存在チェック、value_object と同等)。catalogue_codec.rs の kind_tag ディスパッチに free_function を追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          },
+          {
+            "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "layer-agnostic テストを更新する。3 fixture (fixture_2layers.json / fixture_3layers_default.json / fixture_custom_names.json) で IN-01 (free_function) / IN-02 (Interactor impl edge) / IN-03/04 (dashed border) / IN-05 (field edge) / IN-06/07 (overlay) が layer-agnostic に動作することを検証する単体テストを追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Implementation Phases"
+          },
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "Phase 2 完了後に dogfood を実行する。contract-map-phase2-edge-coverage-2026-04-25 track 自身の catalogue に対して sotp track contract-map を実行し、Phase 1 の孤立 9 件がすべて対処済みであること (edge 付与または dashed border 視覚識別) を verification.md に記録する。ADR §Known Limitations の各 L# に Resolved 注記を追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "spec_source edge (ノード → spec セクションへの外向きリンク) は Phase 3 に送る。spec_source フィールドが catalogue schema に未実装のため対象外",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Implementation Phases"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "baseline diff view (4 グループ差分の色分け) は Phase 3 に送る。現 track では「現在のカタログ」のみを対象とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Open Questions"
+          },
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Implementation Phases"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "Contract Map の living document 化 (sotp track type-signals 成功時の auto-render 統合) は Phase 3 に送る。手動 sotp track contract-map 実行で十分",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Implementation Phases"
+          }
+        ]
+      },
+      {
+        "id": "OUT-04",
+        "text": "/track:review / /track:plan briefing への Contract Map 自動添付は Phase 3 に送る",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Implementation Phases"
+          }
+        ]
+      },
+      {
+        "id": "OUT-05",
+        "text": "既存 type-graph CLI (ADR 2026-04-16-2200 Phase 2 実装) の usecase 層介在へのリファクタは本 track では扱わない。Contract Map だけが usecase 経由で、type-graph は現状の CLI 直結パターンのまま",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Notes for track planning"
+          }
+        ]
+      },
+      {
+        "id": "OUT-06",
+        "text": "Interactor kind 以外の application_service impl 関係 (例: UseCase が ApplicationService を impl するケース) の trace は本 track のスコープ外。ADR L3 は Interactor のみを対象としている",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "layer-agnostic 不変条件: 層名 (domain/usecase/infrastructure 等) を一切ハードコードしない。IN-01 (free_function kind) / IN-02 (Interactor impl edge) / IN-05 (field edge) / IN-06/07 (overlay) はすべて architecture-rules.json の layers[] 駆動で動作する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "hexagonal 原則: render (純粋関数) は domain 配置 (I/O なし純粋変換)。port trait は domain。orchestration は usecase。adapter / I/O は infrastructure。domain は serde 非依存 (ADR 2026-04-14-1531 準拠)。IN-01 の free_function kind は domain の catalogue.rs に追加し、I/O を伴わない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/hexagonal-architecture.md",
+          "anchor": "Layer Dependencies"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "後方互換なし: free_function kind の追加は catalogue_codec の既存 kind_tag 一覧に加法的に追加する。既存 13 variants の kind_tag は変更しない。ADR 2026-04-11-0002 の「後方互換なし」先例に従う",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "mermaid 出力は GitHub の mermaid renderer で正常に描画可能な記法のみ使用する。IN-01 の free_function shape、IN-03/04 の dashed border classDef、IN-06 の action overlay classDef、IN-07 の signal overlay classDef は mermaid 公式サポート内に限定する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "IN-05 の field edge は dto / command / query / value_object の 4 kind に限定する。method-bearing kind (secondary_port / application_service / secondary_adapter) と typestate / enum / error_type / free_function は field edge 対象外とする。ノイズ制御の YAGNI 判断",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "IN-07 の signal overlay は CatalogueLoader が返す TypeCatalogueDocument.signals() から inline 参照する (render 時に inline 再評価しない)。type-signals 出力の読み取り方式は ADR §Q2 の前者推奨 (per-layer type-signals が出力する signal を集約する方式) に従う",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Open Questions"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "Symlink safety: 全ての write / read パスで reject_symlinks_below を通す。書き出しは atomic_write_file 経由。Phase 2 で I/O 経路を追加しない (renderer は domain 内純粋関数のまま)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/security.md",
+          "anchor": "Symlink Rejection in Infrastructure Adapters"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "TypeDefinitionKind::FreeFunction が catalogue.rs に追加され、kind_tag は free_function。catalogue_codec.rs が free_function kind を encode / decode できる。evaluate_type_signals が FreeFunction に対して存在チェックのみの forward check を実行する (ValueObject と同等のパス)。13 → 14 variants として test_all_fourteen_kind_tags_are_unique が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        },
+        {
+          "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "Interactor kind の catalogue entry が declares_application_service フィールドを持てる。そのフィールドに ApplicationService name を記述すると render_contract_map が -.impl.-> edge を描画する。edge 描画条件: (1) src の kind が Interactor かつ declares_application_service が Some(name)、(2) name が application_service_index (ApplicationService kind 限定インデックス) に存在する。unit test で Interactor -.impl.-> ApplicationService edge が描画されることを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "action=reference かつ全 edge (method-call / trait-impl / Interactor-impl / field) に出現しないノードが unused_reference classDef で dashed border 描画される。Phase 1 dogfood で孤立していた TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName (L1 カテゴリ) が contract-map.md でこのスタイルで描画されることを verification.md で確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "action=modify かつ expected_methods が空のノード (メソッド宣言なし) が declaration_only classDef で dashed border 描画される。Phase 1 dogfood で孤立していた ValidationError (action=modify、L2 カテゴリ) が contract-map.md でこのスタイルで描画されることを verification.md で確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "dto / command / query / value_object kind の catalogue entry が expected_members に MemberDeclaration::Field を持つ場合、render_contract_map が F -->|\".field_name\"| T 形式の field edge を描画する。target T は type_index 内の declared 型のみ。external 型 (String / bool / u32 等、catalogue 未宣言) は edge 対象外。unit test で同層 / 層跨ぎ / external 型 (edge なし) の 3 ケースを検証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "ContractMapRenderOptions.action_overlay=true の場合に action ごとの classDef が mermaid 出力に付与される。modify → 破線枠 (stroke-dasharray)、delete → 取り消し線 + 薄色 fill、reference → 点線枠 (stroke-dasharray 疎め)。action_overlay=false の場合は action-overlay-specific classDef (modify_action / delete_action / reference_action) と :::action_classDef アノテーションが出力されない (他の Phase 2 追加 — unused_reference / declaration_only classDef 等 — は常時適用されるため Phase 1 出力とは異なる)。unit test で on/off 両方を検証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "ContractMapRenderOptions.signal_overlay=true の場合に TypeCatalogueDocument.signals() から signal 値を取得してノード fill color を適用する。Blue → 既定色 (変更なし)、Yellow → fill:#fff3e0、Red → fill:#ffebee の classDef が付与される。signals() が None の場合は signal_overlay=false と同一の出力となる (fallback として silence)。unit test で Blue / Yellow / Red / None の 4 ケースを検証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Open Questions"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "layer-agnostic テストが 3 fixture (2層 / 3層デフォルト / 独自層名) に対して Phase 2 拡張 (FreeFunction kind ノード描画 / Interactor impl edge / field edge / overlay) が layer-agnostic に動作することを assert する。他 fixture の層名が混入しないことを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Implementation Phases"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "Phase 2 完了後の dogfood で contract-map-phase2-edge-coverage-2026-04-25 track 自身の catalogue に sotp track contract-map を実行した結果、Phase 1 の孤立 9 件がすべて対処済みであることを verification.md に記録する: L3 (RenderContractMapInteractor) は impl edge 付与、一部 L2 (ContractMapRenderOptions 等) は field edge 付与、L4 は (a) LoadAllCataloguesError が action=reference + edges なしのため unused_reference dashed border で意図的宣言として視覚識別 (T005)、(b) load_all_catalogues / render_contract_map を FreeFunction kind entry として catalogue に追加することで Phase 3 の return-type edge 描画を可能にする準備が整う — これにより L4 カテゴリの両ノードが視覚識別または描画可能化される、L1 (TaskId 等 5 件) と ValidationError は unused_reference/declaration_only dashed border によって意図的な宣言として視覚識別される。ADR §Known Limitations の各 L# (L1-L4) に Resolved in contract-map-phase2-edge-coverage-2026-04-25 注記を追加する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "cargo make ci が全通過する (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-* 一式)。free_function kind の追加による catalogue_codec / signals / consistency の変更箇所で regression がないことを CI が確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Implementation Phases"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Source Tag Types"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/security.md",
+      "anchor": "Symlink Rejection in Infrastructure Adapters"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Core Principles"
+    }
+  ],
+  "signals": {
+    "blue": 39,
+    "yellow": 0,
+    "red": 0
+  }
+}

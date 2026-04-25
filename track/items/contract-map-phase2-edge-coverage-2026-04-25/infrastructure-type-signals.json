@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-25T23:41:28Z",
+  "declaration_hash": "4b283cba20f6e8adce486db610c26e8d23c97b2988c8d79882550b432ac5f328",
+  "signals": [
+    {
+      "type_name": "FsCatalogueLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoader"
+      ]
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ContractMapWriter"
+      ]
+    },
+    {
+      "type_name": "LoadAllCataloguesError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "LayerBindings",
+        "ArchRulesParse",
+        "Io",
+        "CatalogueNotFound",
+        "Decode",
+        "TopologicalSortFailed",
+        "InvalidLayerId"
+      ]
+    },
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "Validation",
+        "UnsupportedSchemaVersion",
+        "InvalidEntry"
+      ]
+    }
+  ]
+}

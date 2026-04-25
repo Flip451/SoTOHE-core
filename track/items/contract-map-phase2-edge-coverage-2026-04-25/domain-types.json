@@ -1,0 +1,338 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "render_contract_map",
+      "description": "Pure domain free function (not a struct or trait) converting per-layer type catalogues into a single-file mermaid Contract Map markdown. This entry declares the existence requirement for the 14th TypeDefinitionKind variant (free_function). Phase 2 tasks IN-01 and IN-09 add FreeFunction to catalogue.rs and catalogue_codec.rs respectively, enabling this free function to appear as a rendered node in the contract-map (L4 fix: free function nodes were previously not renderable). The expected_params and expected_returns fields are declared in the domain variant for future renderer use (return-type and param-type edges are out-of-scope for Phase 2). Declared as value_object temporarily until codec support is merged (AC-01). action=reference so that after kind is updated to free_function in T010, the node receives unused_reference dashed border (no edges yet, param/return edge rendering is Phase 3).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Declared as value_object placeholder because free_function kind is not yet in catalogue_codec.rs (IN-09 task); Yellow signal expected until codec adds FreeFunction variant (AC-01)"
+        }
+      ]
+    },
+    {
+      "name": "TypeCatalogueEntry",
+      "description": "Existing domain struct extended in Phase 2 to carry expected_members: Vec<MemberDeclaration> so that field edge generation (IN-05/IN-08) can retrieve struct field declarations from dto/command/query/value_object entries. The new field is optional for backwards compatibility. Declared with action=modify to reflect the structural extension against baseline.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-05",
+          "hash": "4789fc4142d10ed7b450d9a8dfbc8e07e9d83d875bcc2a555aed79dbe6047663"
+        },
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-08",
+          "hash": "64be9f47b2b9b6ba50d767cbb7696f0e2ffbebf7307611dcc5d229ca095c7904"
+        }
+      ]
+    },
+    {
+      "name": "LayerId",
+      "description": "Existing domain value object (newtype around architecture-rules.json layer crate name). Pre-exists from previous track. Declared with action=reference for Contract Map edge visualisation.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-06",
+          "hash": "862a1fb49b075f89f917d98768b23776fce00c0cb8d0adc2eb15e50f2184a13b"
+        }
+      ]
+    },
+    {
+      "name": "ContractMapContent",
+      "description": "Existing domain value object (newtype around rendered contract-map markdown string). Pre-exists from previous track. Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-01",
+          "hash": "d15e9aad5cba130137e315d6ffd470d926195c2e07183a0c59b00ccc1ee4d85b"
+        }
+      ]
+    },
+    {
+      "name": "ContractMapRenderOptions",
+      "description": "Existing domain value object carrying render configuration. Phase 2 activates the signal_overlay and action_overlay fields (previously stubs in Phase 1). The type shape is unchanged — only the renderer behaviour changes. Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-06",
+          "hash": "862a1fb49b075f89f917d98768b23776fce00c0cb8d0adc2eb15e50f2184a13b"
+        },
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-07",
+          "hash": "0d2bed60646cee7ae83b99211ecb0e48490950e09de86f3b8bab8907d1b47d62"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLoader",
+      "description": "Existing secondary port bulk-loading per-layer type catalogues. Pre-exists from previous track. Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "load_all",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-07",
+          "hash": "0d2bed60646cee7ae83b99211ecb0e48490950e09de86f3b8bab8907d1b47d62"
+        }
+      ]
+    },
+    {
+      "name": "ContractMapWriter",
+      "description": "Existing secondary port atomically writing rendered contract-map content. Pre-exists from previous track. Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "content",
+              "ty": "&ContractMapContent"
+            }
+          ],
+          "returns": "Result<(), ContractMapWriterError>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Driven port pattern: ContractMapWriter abstracts filesystem write for contract-map.md; referenced by RenderContractMapInteractor. Declared prior to Phase 2 spec element authoring; promote to spec_refs once a GO/IN element directly naming this port is added."
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLoaderError",
+      "description": "Existing error type for CatalogueLoader implementations. Pre-exists from previous track. Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueNotFound",
+        "LayerDiscoveryFailed",
+        "DecodeFailed",
+        "SymlinkRejected",
+        "IoError",
+        "TopologicalSortFailed"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Error type for the CatalogueLoader secondary port; referenced as the error variant in load_all return type. Declared prior to Phase 2 spec element authoring; promote to spec_refs once a spec element directly names this error type."
+        }
+      ]
+    },
+    {
+      "name": "ContractMapWriterError",
+      "description": "Existing error type for ContractMapWriter implementations. Pre-exists from previous track. Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "IoError",
+        "SymlinkRejected",
+        "TrackNotFound"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Error type for the ContractMapWriter secondary port; referenced as the error variant in write return type. Declared prior to Phase 2 spec element authoring; promote to spec_refs once a spec element directly names this error type."
+        }
+      ]
+    },
+    {
+      "name": "TypeCatalogueDocument",
+      "description": "Existing domain aggregate root used by the render_contract_map function. The signals() method provides signal data for signal_overlay (IN-07, ADR §Q2 front-end recommendation). Declared with action=reference.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-07",
+          "hash": "0d2bed60646cee7ae83b99211ecb0e48490950e09de86f3b8bab8907d1b47d62"
+        }
+      ]
+    },
+    {
+      "name": "ValidationError",
+      "description": "Existing domain validation error enum. No new variants added in this track. Declared with action=modify (declaration-only, no expected_methods) to serve as the L2 exemplar for the declaration_only classDef (IN-04/AC-04): action=modify + empty expected_methods + no edge → dashed border.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "EmptyString",
+        "InvalidTrackId",
+        "InvalidTaskId",
+        "InvalidCommitHash",
+        "InvalidTimestamp",
+        "InvalidTrackBranch",
+        "EmptyTrackTitle",
+        "EmptyTaskDescription",
+        "EmptyPlanSectionId",
+        "EmptyPlanSectionTitle",
+        "DuplicateTaskId",
+        "DuplicatePlanSectionId",
+        "UnknownTaskReference",
+        "DuplicateTaskReference",
+        "UnreferencedTask",
+        "OverrideIncompatibleWithResolvedTasks",
+        "TrackActivationRequiresPlanningOnly",
+        "TrackActivationRequiresSchemaV3",
+        "TrackAlreadyMaterialized",
+        "UnsupportedTargetStatus",
+        "SectionNotFound",
+        "NoSectionsAvailable",
+        "TaskDescriptionMutated",
+        "TaskRemoved",
+        "InvalidLayerId"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-04",
+          "hash": "7e6252a812b7a29bbe0fac728c7c223dabb84c6ac331509c823ddd53ac823662"
+        }
+      ]
+    },
+    {
+      "name": "TrackId",
+      "description": "Existing domain identifier for track slugs. Declared with action=reference for Contract Map parameter-edge visualisation.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "TrackId is a parameter in CatalogueLoader.load_all and ContractMapWriter.write; referenced as method parameter for contract-map render workflow. Declared prior to Phase 2 spec element authoring with a dedicated anchor; reachable via IN-07 (signal_overlay reads TypeCatalogueDocument which is loaded per TrackId)."
+        }
+      ]
+    },
+    {
+      "name": "TaskId",
+      "description": "Existing domain identifier. Declared with action=reference for Contract Map forward-reference placeholder visualisation (L1 category — will render with unused_reference classDef after IN-03 is implemented).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-03",
+          "hash": "e53524c16a83c305bf5625ff374a38e00ce15e83eefad8685017fb9982aa46c5"
+        }
+      ]
+    },
+    {
+      "name": "CommitHash",
+      "description": "Existing domain identifier. Declared with action=reference for Contract Map forward-reference placeholder visualisation (L1 category — unused_reference classDef after IN-03).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-03",
+          "hash": "e53524c16a83c305bf5625ff374a38e00ce15e83eefad8685017fb9982aa46c5"
+        }
+      ]
+    },
+    {
+      "name": "TrackBranch",
+      "description": "Existing domain identifier. Declared with action=reference for Contract Map forward-reference placeholder visualisation (L1 category — unused_reference classDef after IN-03).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-03",
+          "hash": "e53524c16a83c305bf5625ff374a38e00ce15e83eefad8685017fb9982aa46c5"
+        }
+      ]
+    },
+    {
+      "name": "NonEmptyString",
+      "description": "Existing domain identifier. Declared with action=reference for Contract Map forward-reference placeholder visualisation (L1 category — unused_reference classDef after IN-03).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-03",
+          "hash": "e53524c16a83c305bf5625ff374a38e00ce15e83eefad8685017fb9982aa46c5"
+        }
+      ]
+    },
+    {
+      "name": "ReviewGroupName",
+      "description": "Existing domain identifier. Declared with action=reference for Contract Map forward-reference placeholder visualisation (L1 category — unused_reference classDef after IN-03).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-03",
+          "hash": "e53524c16a83c305bf5625ff374a38e00ce15e83eefad8685017fb9982aa46c5"
+        }
+      ]
+    },
+    {
+      "name": "MemberDeclaration",
+      "description": "Existing domain enum (Variant | Field) used by TypeCatalogueEntry.expected_members for field edge generation (IN-05/IN-08). The Field variant carries name + ty for struct field references. Declared with action=reference since the type pre-exists and is not modified by this track.",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "Variant",
+        "Field"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-05",
+          "hash": "4789fc4142d10ed7b450d9a8dfbc8e07e9d83d875bcc2a555aed79dbe6047663"
+        }
+      ]
+    }
+  ]
+}

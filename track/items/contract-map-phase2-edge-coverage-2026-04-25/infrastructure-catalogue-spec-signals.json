@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "4b283cba20f6e8adce486db610c26e8d23c97b2988c8d79882550b432ac5f328",
+  "signals": [
+    {
+      "type_name": "FsCatalogueLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "LoadAllCataloguesError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "signal": "blue"
+    }
+  ]
+}
