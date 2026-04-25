@@ -1,39 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new reconnaissance step only reads `track/items/<id>/<layer>-graph/index.md` plus linked cluster files, but `sotp track type-graph` can also produce the flat `<layer>-graph.md` artifact when `--cluster-depth 0`. In that mode the agent would skip the actual graph output and make its draft from incomplete reconnaissance; the pipeline needs to branch on cluster depth, as the ADR describes.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 74,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b75436dc20add9b801a622ec54d8d27c166b6e0ab85aa96a4e5ec5110ebecf15",
-          "at": "2026-04-25T04:03:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
-          "at": "2026-04-25T04:08:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
-          "at": "2026-04-25T04:11:48Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -100,6 +67,745 @@
           "findings": [],
           "hash": "rvw1:sha256:f53df996c0609825731eb8af65d303dafd884e2615074d23306cafda72c597b8",
           "at": "2026-04-25T04:44:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-01`/`IN-05` attribute the `--out-suffix d1/d2` reconnaissance sequence to `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md#D1`, but that ADR introduces the suffix flag only in D2. The spec is collapsing the D1/D2 split and pointing readers at the wrong decision source; D1 should cover the default `depth=1+2 / edges=all` choice, while D2 should own the suffix-based output separation.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.json",
+              "line": 55,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:c32d7e2a9bc018708b2200f2a6a66163ed5c200d5df7ed74264445435ec1c083",
+          "at": "2026-04-25T06:42:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-05 treats the suffixed two-pass reconnaissance flow as if it were supported by `0530#D1`, but that ADR section only fixes the default depth/edges choices and still uses the shared `<layer>-graph/` path. The `--out-suffix` coexistence comes from `0530#D2`, so this cross-reference set is wrong/incomplete.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.json",
+              "line": 99,
+              "category": "broken reference"
+            },
+            {
+              "message": "S1 says the Rust changes are confined to `apps/cli/src/commands/track/tddd/graph.rs` and `libs/infrastructure/src/tddd/type_graph_render.rs`, but T001 explicitly requires updating `apps/cli/src/commands/track/tddd/mod.rs` as well. As written, the scope statement understates the file set needed for the plan.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/impl-plan.json",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c32d7e2a9bc018708b2200f2a6a66163ed5c200d5df7ed74264445435ec1c083",
+          "at": "2026-04-25T06:46:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1051428ae416065a4252a2edfbf2a5b8a76deb68118642a0c1a28d60a961ae82",
+          "at": "2026-04-25T06:49:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1051428ae416065a4252a2edfbf2a5b8a76deb68118642a0c1a28d60a961ae82",
+          "at": "2026-04-25T06:51:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1051428ae416065a4252a2edfbf2a5b8a76deb68118642a0c1a28d60a961ae82",
+          "at": "2026-04-25T06:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 requires the type-designer pipeline to run the suffixed `--out-suffix d1/d2` reconnaissance flow but only cites the child ADR's D1 decision. In `2026-04-25-0530...`, D1 still defines the unsuffixed sequential `<layer>-graph/` procedure, while D2 owns the `--out-suffix` output separation. This leaves the spec pointing readers at the wrong decision source for the required behavior; the same mismatch is reflected in generated AC-01/AC-06 and T005.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.json",
+              "line": 55,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:1051428ae416065a4252a2edfbf2a5b8a76deb68118642a0c1a28d60a961ae82",
+          "at": "2026-04-25T06:59:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec maps the suffix-based reconnaissance sequence to the child ADR's D1, but that ADR's D1 still defines suffixless `type-graph` calls, uses the shared `<layer>-graph/` path, and requires reading depth=1 before running depth=2. D2 only introduces `--out-suffix` as a CLI fix, and the ADR even says updating the D1 examples to suffix form is a later reassessment. As written, T005 would update the agent to a procedure that the cited D1 does not actually specify, so the plan and ADR conflict on the canonical reconnaissance flow.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.md",
+              "line": 19,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-05 explicitly includes the `.gitignore` pattern addition in the bounded `type-graph` change scope, but its task mapping only lists T001-T003 while T004 is the task that performs the `.gitignore` update. This leaves the constraint coverage internally inconsistent: the task-coverage gate claims CN-05 is covered without the task that implements one of CN-05's stated requirements.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/task-coverage.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1051428ae416065a4252a2edfbf2a5b8a76deb68118642a0c1a28d60a961ae82",
+          "at": "2026-04-25T07:05:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-04 cites `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md#D2` as the design basis for changing `.claude/agents/adr-editor.md`, but that D2 decision is about `bin/sotp track type-graph` auto-cleanup and the `--out-suffix` flag. The ADR contains no decision authorizing the adr-editor rule change, so GO-04/IN-06/AC-07/T007 are presented as ADR-backed by an unrelated decision.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.md",
+              "line": 14,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:32db37ed2f8ff2c5e70e363e07b805df1ea185dc1de062390662e9c843409c1d",
+          "at": "2026-04-25T07:10:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 requires the `--out-suffix d1/d2` reconnaissance sequence, but its ADR trace points only to the child ADR D1 for the child ADR. In `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md`, D1 defines the depth=1+2 / edges=all two-pass procedure without suffixes; D2 is the decision that introduces `--out-suffix` and free Read ordering. This is a broken decision reference and should include D2, matching IN-01/AC-06.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.json",
+              "line": 257,
+              "category": "broken_reference"
+            },
+            {
+              "message": "T005 describes the suffix-bearing sequence as the \"child ADR D1 canonical procedure\", but child ADR D1's procedure is suffix-less and the suffix/read-order behavior is introduced by D2. This mislabels the source decision for the implementation task; rewrite it as D1+D2 or D2-backed suffix update.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/impl-plan.json",
+              "line": 30,
+              "category": "factual_error_semantic"
+            }
+          ],
+          "hash": "rvw1:sha256:299d19325f59949acb6abf8c4e9fb51f368c8b32df5a8d26341f1e954f4b22fb",
+          "at": "2026-04-25T07:17:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR still describes the reconnaissance flow in `Decision` as writing depth=1 and depth=2 outputs to the same `<layer>-graph/` path and overwriting the first run, but the later D2 section and Consequences now require suffix-separated directories (`<layer>-graph-d1/`, `<layer>-graph-d2/`) that coexist. That leaves two incompatible prescriptions in the same ADR for the same flow, so a reader cannot tell which path behavior is the intended one.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 23,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:25:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CN-05` is mapped to `T001`-`T003` only, but the scope text for `CN-05` explicitly includes the `.gitignore` pattern addition implemented by `T004`. As written, the coverage artifact says the constraint is fully covered while one required task is omitted.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/task-coverage.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:27:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:30:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:34:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:36:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR still defines the D1 reconnaissance procedure as suffixless: depth=1 writes to `<layer>-graph/`, must be read before depth=2, and depth=2 overwrites the same path. Later plan artifacts treat the canonical T005/IN-05 procedure as `--out-suffix d1` / `--out-suffix d2` with free read ordering. That leaves the ADR and implementation plan contradicting each other on the canonical reconnaissance flow.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 23,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:41:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 expands `--out-suffix` to flat mode by writing `<layer>-graph-<name>.md`, but the ADR/spec/T004 only plan the `.gitignore` addition for suffix-named directories (`track/items/**/*-graph-*/`). If the flag works with depth=0 as T002/T003 require, the generated flat markdown artefacts are left unignored and AC-08 will not catch them. Either constrain suffix support to clustered output or add the matching flat-file ignore/verification requirement.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:45:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan/spec artifacts cite this ADR as `#D1`, but the ADR never defines a named D1 decision. It has an unlabeled `## Decision` section and then a named `## Decision (D2)` / `### D2`, so references such as `...recon-options-defaults.md#D1` have no corresponding design decision anchor. This breaks the SoT chain for the D1-backed requirements; add a `### D1: ...` heading or otherwise name the first decision consistently.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 17,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ee91ffac1e080826548758ca959bd83ef1eb0bfa4dd037b75028c7e1ccb406ae",
+          "at": "2026-04-25T07:48:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74911863437d637a29088d364db4ef51ef0d0b99715a846de75498d708aa9497",
+          "at": "2026-04-25T08:00:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan treats `--out-suffix <name>` as a raw `Option<String>` and the catalogue explicitly states `TypeGraphRenderOptions` has no validation invariants, even though that suffix is used to build output paths like `<layer>-graph-<name>/`. Without a task/AC requiring rejection of path separators or `..`, an implementation following this plan can write generated files outside the intended track artifact path. Add validation for the suffix before path construction and cover invalid suffixes in the tests.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/infrastructure-types.json",
+              "line": 25,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:74911863437d637a29088d364db4ef51ef0d0b99715a846de75498d708aa9497",
+          "at": "2026-04-25T08:07:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan treats `--out-suffix <name>` as a raw `Option<String>` path fragment and the catalogue explicitly says `TypeGraphRenderOptions` has no validation invariants. Because that value is interpolated into output paths like `<layer>-graph-<name>/`, an implementation following this plan can accept separators or `..` and write generated artifacts outside the intended track directory. Add a validated suffix type or explicit CLI validation plus invalid-suffix tests before path construction.",
+              "severity": "P0",
+              "file": "track/items/type-designer-tuning-2026-04-25/infrastructure-types.json",
+              "line": 25,
+              "category": "security"
+            },
+            {
+              "message": "The ADR still defines D1 as a suffixless flow where depth=2 overwrites the same `<layer>-graph/` path, while the later D2/Consequences and implementation plan treat `--out-suffix d1/d2` with coexisting `<layer>-graph-d1/` and `<layer>-graph-d2/` directories as the canonical reconnaissance procedure. These are conflicting prescriptions for the same agent pipeline, so the plan leaves implementers unsure whether to preserve the D1 read-before-overwrite sequence or replace it with the D2 suffix-based sequence.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 27,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002 requires suffixed flat-mode output (`<layer>-graph-<name>.md`), but T004/IN-07/AC-08 only add and verify the directory ignore pattern `track/items/**/*-graph-*/`. If `--out-suffix` is supported with depth=0 as T002/T003 require, the generated flat markdown artifacts remain tracked unless a matching `*-graph-*.md` ignore/verification requirement is added, or flat-mode suffix support is explicitly removed from scope.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:74911863437d637a29088d364db4ef51ef0d0b99715a846de75498d708aa9497",
+          "at": "2026-04-25T08:11:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002/T003 require `--out-suffix` to work in flat mode by writing `<layer>-graph-<name>.md`, but T004/IN-07/AC-08 only add and verify the directory ignore pattern `track/items/**/*-graph-*/`. If depth=0 suffix output is implemented as planned, those generated markdown artifacts remain unignored despite the stated intent to keep suffix-named graph outputs out of version control.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan treats `--out-suffix <name>` as a raw `Option<String>` path fragment, and the catalogue explicitly says `TypeGraphRenderOptions` has no validation invariants. Because that value is interpolated into output paths such as `<layer>-graph-<name>/`, an implementation following this plan can accept separators or `..` and write outside the intended track artifact location. The plan needs a validated suffix or explicit CLI validation with invalid-suffix tests.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/infrastructure-types.json",
+              "line": 25,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:74911863437d637a29088d364db4ef51ef0d0b99715a846de75498d708aa9497",
+          "at": "2026-04-25T08:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4e3aba6ffe84d9045769a31be069cd7a8d149bcea933fdd6bf5cc91379e09f5",
+          "at": "2026-04-25T08:28:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` / `plan.md` now extend `--out-suffix` to flat `<layer>-graph-<name>.md` outputs and add a second `.gitignore` glob, but the governing ADR `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md#D2` still only describes directory outputs and a single `track/items/**/*-graph-*/` pattern. The decision record and the derived plan no longer describe the same contract, so implementers following the ADR will miss the flat-file behavior and ignore rule.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.json",
+              "line": 129,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c4e3aba6ffe84d9045769a31be069cd7a8d149bcea933fdd6bf5cc91379e09f5",
+          "at": "2026-04-25T08:30:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure type catalogue introduces the field as `output_suffix`, but the rest of the plan/spec consistently refer to `out_suffix` for the `TypeGraphRenderOptions` field. That leaves the target API surface ambiguous and risks implementing the wrong property name.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/infrastructure-types.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7bc7da20421dc2605080e395d9f1930f884cd81e2215d2215021c0e0217216cf",
+          "at": "2026-04-25T08:36:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bc7da20421dc2605080e395d9f1930f884cd81e2215d2215021c0e0217216cf",
+          "at": "2026-04-25T08:38:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ADR still hard-codes a sequential reconnaissance order: step 3 must finish before step 4, and the depth=1 output is read before the depth=2 render. That conflicts with the updated plan/spec artifacts, which make the two reads order-free and place them after both `type-graph` invocations. The result is inconsistent implementation guidance for the same feature.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9ef58a0493b5e6dcee196756818347f19299f56aecbb9dba23cbe62631d141ae",
+          "at": "2026-04-25T09:18:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ef58a0493b5e6dcee196756818347f19299f56aecbb9dba23cbe62631d141ae",
+          "at": "2026-04-25T09:20:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The canonical reconnaissance procedure is internally inconsistent: this decision still requires reading the depth=1 output before running depth=2 (`track/items/<id>/<layer>-graph/` at the step-3/step-4 boundary), but `impl-plan.json` T005 and `spec.json` AC-01/AC-06 now require independent `<layer>-graph-d1/` and `<layer>-graph-d2/` reads in any order. As written, it is unclear whether the sequential constraint is still authoritative or has been superseded by the `--out-suffix` design.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9ef58a0493b5e6dcee196756818347f19299f56aecbb9dba23cbe62631d141ae",
+          "at": "2026-04-25T09:23:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba9aac6a6ddf52244802ccf63223b99d70c175540ab8b48882660415ecd429bf",
+          "at": "2026-04-25T09:27:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 already prescribes the suffixed calls (`--out-suffix d1` / `--out-suffix d2`) and says the depth outputs can be read in either order, but this Reassess When item still says updating D1's step 2/4 examples to suffix form is a future optional decision. That contradicts the current Decision section and leaves the canonical reconnaissance flow ambiguous.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 108,
+              "category": "contradiction"
+            },
+            {
+              "message": "The type catalogue names the new `TypeGraphRenderOptions` field `output_suffix`, while the implementation plan tells T001/T002 to pass and add `out_suffix: Option<String>`. These plan artifacts disagree on the target API field name, so an implementer could satisfy one artifact while violating the other.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/infrastructure-types.json",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba9aac6a6ddf52244802ccf63223b99d70c175540ab8b48882660415ecd429bf",
+          "at": "2026-04-25T09:33:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-04 is still informal-only, and the same pattern is repeated for IN-06/AC-07, leaving the spec at 26 blue / 3 yellow instead of an all-blue implementation plan. Because these elements are mapped to T007 and kept in the acceptance surface, the plan is still carrying unpromoted design work; either promote the adr-editor rule change to a formal ADR/reference or keep it outside this plan.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.json",
+              "line": 41,
+              "category": "contradiction"
+            },
+            {
+              "message": "The Reassess When item says to decide after D2 implementation whether D1 step 2/4 should be updated to suffix calls, but D1 already uses `--out-suffix d1/d2` and the spec/tasks rely on that as the canonical procedure. This stale future action contradicts the current ADR state and can send implementers looking for a decision that has already been made.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 108,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba9aac6a6ddf52244802ccf63223b99d70c175540ab8b48882660415ecd429bf",
+          "at": "2026-04-25T09:36:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR now makes `--out-suffix d1/d2` part of D1's canonical procedure and explicitly says the depth=1/depth=2 reads are order-free, but the Reassess When entry still says to consider updating D1 step 2/4 to suffix-style calls after D2 is implemented. That is a stale contradiction inside the decision record and leaves readers unsure whether suffix calls are already the accepted procedure or only a future optional update.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 108,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6a4df0510cd14f5f054bd614a9c2f0c83d65c8e5d5c3f7a83372fe09acfe6ea0",
+          "at": "2026-04-25T09:43:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bd9809d0d09d1a9610f5826661bf118f059967940488c734ba91b1b404bf852",
+          "at": "2026-04-25T09:50:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 still presents the canonical reconnaissance procedure as an ordered list where depth=1 output is read before the depth=2 `type-graph` run, but the immediately following paragraph and the derived spec/plan say the D2 suffix paths make the reads order-free and T005 should remove the old “Read depth=1 BEFORE running depth=2” constraint. This leaves two conflicting prescriptions for the agent pipeline: preserve the ordered read-before-depth2 sequence, or run both suffixed graphs first and read either output later.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 23,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2bd9809d0d09d1a9610f5826661bf118f059967940488c734ba91b1b404bf852",
+          "at": "2026-04-25T09:54:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2's rationale still says D1 adopted the sequence `depth=1 -> Read -> depth=2` and that Read timing can cause depth=1 output to be missed, but the same ADR now states that d1/d2 outputs coexist and step 3/5 Read order is free. This also conflicts with T005, which explicitly removes the old read-before-depth2 constraint, leaving contradictory design intent for the agent rewrite.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 47,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2bd9809d0d09d1a9610f5826661bf118f059967940488c734ba91b1b404bf852",
+          "at": "2026-04-25T09:57:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The canonical reconnaissance order is contradictory. The ADR's D1 numbered procedure says to read the depth=1 output before running the depth=2 graph, but spec/plan require running both graph commands first and then reading both outputs in free order, with T005 explicitly removing the old depth=1-before-depth=2 read constraint. The implementation task can therefore update the agent definition in a way that no longer matches the cited ADR D1. Reconcile the ADR D1 procedure with the spec/plan ordering before using it as the source of truth.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4dd0562ebac5643601934dfd6b1cdd8065ff801060f7aae95378a379f0956971",
+          "at": "2026-04-25T10:03:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この仕様は Internal pipeline を「8-step」と呼んでいますが、列挙されている要素は 9 個あります (baseline-capture, type-graph depth=1, type-graph depth=2, depth=1 Read, depth=2 Read, catalogue draft, Write, contract-map, type-signals)。同じ不整合が plan.md と impl-plan.json にも繰り返されており、意図したパイプライン形状が曖昧です。",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.json",
+              "line": 49,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a183de10ba6cffacce283cc5a71bc32b80f6d6a2685f3a3b822c31c906d4de61",
+          "at": "2026-04-25T11:36:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 stops at `catalogue draft`, but the corresponding scope/task entries say the Internal pipeline rewrite must cover the full 9-step sequence through `Write`, `contract-map`, and `type-signals`. As written, the acceptance gate can pass without verifying the second half of the intended edit.",
+              "severity": "P1",
+              "file": "track/items/type-designer-tuning-2026-04-25/spec.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1ddb96ea6d46652cf109828dec07a6d5055063466097c24b6dd056e74ddf08d2",
+          "at": "2026-04-25T11:39:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bab93c50d89de1b17e092f366f6e7c0f7f95d9883930bf5f1f293c1aabd5ff9a",
+          "at": "2026-04-25T11:41:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ADR still hard-codes `track/items/<id>/...` paths in the decision body (`D1` step 4/5), which conflicts with the track-independent authoring rule for ADRs in this review scope. The decision should refer to the abstract `<layer>-graph-d1/` / `<layer>-graph-d2/` outputs without embedding the track artifact path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+              "line": 26,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bab93c50d89de1b17e092f366f6e7c0f7f95d9883930bf5f1f293c1aabd5ff9a",
+          "at": "2026-04-25T11:45:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c0f4114e0da667af3f95771e839993f4d31e06d918b0b2ad6af3b9561813ab1",
+          "at": "2026-04-25T11:49:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c0f4114e0da667af3f95771e839993f4d31e06d918b0b2ad6af3b9561813ab1",
+          "at": "2026-04-25T11:56:13Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reconnaissance step only reads `track/items/<id>/<layer>-graph/index.md` plus linked cluster files, but `sotp track type-graph` can also produce the flat `<layer>-graph.md` artifact when `--cluster-depth 0`. In that mode the agent would skip the actual graph output and make its draft from incomplete reconnaissance; the pipeline needs to branch on cluster depth, as the ADR describes.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b75436dc20add9b801a622ec54d8d27c166b6e0ab85aa96a4e5ec5110ebecf15",
+          "at": "2026-04-25T04:03:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
+          "at": "2026-04-25T04:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
+          "at": "2026-04-25T04:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9749ec5481aabba0055c5554dd0e8f38760c557075ea872d79038326aa22b07f",
+          "at": "2026-04-25T06:40:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9749ec5481aabba0055c5554dd0e8f38760c557075ea872d79038326aa22b07f",
+          "at": "2026-04-25T06:44:18Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TDDD-Q04` mislabels the example as a struct field / rustdoc field accessor. `StatusOverride::kind` is a normal getter method over a private field, so `--edges fields` would not separate it out and the stated remediation is aimed at the wrong abstraction.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 985,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0dd84b710ae7fb7ad5dc6e3d42dd2e08776e130c174cb96a1d876f05dba1f5cb",
+          "at": "2026-04-25T06:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`StatusOverride -->|kind| StatusOverrideKind` is produced by the public accessor method `StatusOverride::kind()` in `libs/domain/src/track.rs`, not by a rustdoc field accessor. As written, this item describes a field/method mismatch that does not exist, so the proposed `--edges fields` split is based on a false premise.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 985,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0dd84b710ae7fb7ad5dc6e3d42dd2e08776e130c174cb96a1d876f05dba1f5cb",
+          "at": "2026-04-25T06:42:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6967bd4efc0817e12f944e461d87332e28babdd66f561ae15276d2eeaedfa33",
+          "at": "2026-04-25T06:44:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6967bd4efc0817e12f944e461d87332e28babdd66f561ae15276d2eeaedfa33",
+          "at": "2026-04-25T06:45:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6967bd4efc0817e12f944e461d87332e28babdd66f561ae15276d2eeaedfa33",
+          "at": "2026-04-25T06:47:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6967bd4efc0817e12f944e461d87332e28babdd66f561ae15276d2eeaedfa33",
+          "at": "2026-04-25T06:52:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3902718d72ad61fa5486a558e0416495b2449675221bde816641363bc14cc9d4",
+          "at": "2026-04-25T09:17:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3902718d72ad61fa5486a558e0416495b2449675221bde816641363bc14cc9d4",
+          "at": "2026-04-25T09:21:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WF-68’s migration plan is internally inconsistent: step (2) makes new ADRs carry a user/review ref, but step (3) blocks red signals without any exemption for the legacy ADRs that step (4) says may be grandfathered. As written, grandfathered ADRs would still fail `verify adr-signals` instead of being allowed through.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 484,
+              "category": "behavioral-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:063f3c82139d73542dd16c0a1f955dd5d7ab755c00e27512c036c807c1038077",
+          "at": "2026-04-25T09:29:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d41afb195eec3f6df1c95604ee49e80371fae8c26066105d1ab169079c1293e9",
+          "at": "2026-04-25T09:31:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d41afb195eec3f6df1c95604ee49e80371fae8c26066105d1ab169079c1293e9",
+          "at": "2026-04-25T09:33:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d41afb195eec3f6df1c95604ee49e80371fae8c26066105d1ab169079c1293e9",
+          "at": "2026-04-25T09:35:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f3ce255d7dd47fb1fe9181120246cfffb914b6f27e15d3dfb833cb690ec3873",
+          "at": "2026-04-25T09:51:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f3ce255d7dd47fb1fe9181120246cfffb914b6f27e15d3dfb833cb690ec3873",
+          "at": "2026-04-25T09:55:49Z"
         }
       ]
     }
