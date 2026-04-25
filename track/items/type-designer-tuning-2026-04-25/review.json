@@ -1,6 +1,57 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7a737cf6f70ce88ef9490bc0bc7e398a937492dfd81c2a57b82bb8b961e3eb6",
+          "at": "2026-04-25T12:23:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7a737cf6f70ce88ef9490bc0bc7e398a937492dfd81c2a57b82bb8b961e3eb6",
+          "at": "2026-04-25T12:25:57Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3de80028c37a32cb4d0ad00da0a4e62b3159c3167cae7ae597f153545a53d4e4",
+          "at": "2026-04-25T12:23:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated module docs still say that omitting `--cluster-depth` uses default 0 and writes the flat file, but the CLI option defaults to 2 and this same paragraph says cluster mode is the default. This leaves the new output-path documentation internally contradictory and factually wrong for omitted `--cluster-depth`, which now writes `<layer>-graph-d2/`, not `<layer>-graph.md`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 6,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:d3f4828bd97ceadf614134ba23080906852ba13196c70de26bd2bb1910a2e5f3",
+          "at": "2026-04-25T12:26:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3f4828bd97ceadf614134ba23080906852ba13196c70de26bd2bb1910a2e5f3",
+          "at": "2026-04-25T12:28:31Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -806,6 +857,20 @@
           "findings": [],
           "hash": "rvw1:sha256:9f3ce255d7dd47fb1fe9181120246cfffb914b6f27e15d3dfb833cb690ec3873",
           "at": "2026-04-25T09:55:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2843a8d29e19018885441260e3c55fc3a9f981974299c8e56071a0b6ca31910a",
+          "at": "2026-04-25T12:22:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2843a8d29e19018885441260e3c55fc3a9f981974299c8e56071a0b6ca31910a",
+          "at": "2026-04-25T12:23:55Z"
         }
       ]
     }
