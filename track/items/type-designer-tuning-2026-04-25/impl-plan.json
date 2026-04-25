@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "Update `.claude/agents/type-designer.md` Internal pipeline section: introduce 9-step reconnaissance procedure (baseline-capture → type-graph depth=1 edges=all → type-graph depth=2 edges=all → Read depth=1 output from `<layer>-graph-d1/` → Read depth=2 output from `<layer>-graph-d2/` → catalogue draft → Write → contract-map → type-signals), and align the Mission `Reconnaissance first` paragraph to state that reconnaissance is internal only and must not be skipped",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "a2764f312bbf4a555041279e55b6a3457a888a64"
     },
     {
       "id": "T003",
       "description": "Update `.claude/agents/type-designer.md` Output section: remove `Entries written`, `Action rationale`, and `Cross-partition migrations` sections; keep only `Signal evaluation` (per-layer) and `Open Questions`",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {

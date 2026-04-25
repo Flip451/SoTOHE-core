@@ -114,14 +114,13 @@ The pipeline is fixed at **9 steps**. Steps 1–5 form the reconnaissance phase 
 
 Per layer processed:
 
-1. **## {layer} — Entries written** — list of catalogue entries written (name, kind, action, one-line description). Mark any `delete` + `add` pair for cross-partition migration.
-2. **## {layer} — Action rationale** — for any `modify` / `reference` / `delete`, cite the baseline entry being referenced and why the action applies.
-3. **## {layer} — Signal evaluation** — blue / yellow / red counts plus a short note on notable yellow / red entries.
+1. **## {layer} — Signal evaluation** — blue / yellow / red counts plus a short note on notable yellow / red entries.
 
 Plus once at the end:
 
-4. **## Cross-partition migrations** — summary of any `delete` + `add` pairs across layers (empty if none).
-5. **## Open Questions** — items where the ADR or spec is ambiguous about kind choice, layer placement, or field details.
+2. **## Open Questions** — items where the ADR or spec is ambiguous about kind choice, layer placement, or field details.
+
+The orchestrator's responsibility is signal-based phase gate evaluation only (per parent ADR `knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md` D1). Catalogue entries written, per-action rationale, and cross-partition migration summaries remain in the catalogue files (`<layer>-types.json`) and rendered views (`<layer>-types.md` via `sync_rendered_views`, `contract-map.md`); the orchestrator can read those directly when needed and they are not echoed in this final message.
 
 Do NOT emit Rust code, module trees, or inline trait signatures outside the catalogue fields.
 

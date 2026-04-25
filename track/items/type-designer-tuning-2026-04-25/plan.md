@@ -5,7 +5,7 @@
 
 Three focused tasks covering the two affected files: (1) the Rust CLI output-path fix, (2) the type-designer Internal pipeline rewrite, and (3) the type-designer Output section trim. Tasks are ordered so the CLI is stable before the agent definition references the new paths.
 
-## Tasks (1/3 resolved)
+## Tasks (2/3 resolved)
 
 ### S001 — CLI: depth-suffix output path fix
 
@@ -17,10 +17,10 @@ Three focused tasks covering the two affected files: (1) the Rust CLI output-pat
 
 > Rewrite the Internal pipeline section of `.claude/agents/type-designer.md` to reflect the 9-step reconnaissance-first order decided in ADR D1+D2. Read targets change from `<layer>-graph/index.md` to `<layer>-graph-d1/` and `<layer>-graph-d2/`. Update the Mission `Reconnaissance first` paragraph to make explicit that reconnaissance output stays internal and that neither step may be skipped.
 
-- [~] **T002**: Update `.claude/agents/type-designer.md` Internal pipeline section: introduce 9-step reconnaissance procedure (baseline-capture → type-graph depth=1 edges=all → type-graph depth=2 edges=all → Read depth=1 output from `<layer>-graph-d1/` → Read depth=2 output from `<layer>-graph-d2/` → catalogue draft → Write → contract-map → type-signals), and align the Mission `Reconnaissance first` paragraph to state that reconnaissance is internal only and must not be skipped
+- [x] **T002**: Update `.claude/agents/type-designer.md` Internal pipeline section: introduce 9-step reconnaissance procedure (baseline-capture → type-graph depth=1 edges=all → type-graph depth=2 edges=all → Read depth=1 output from `<layer>-graph-d1/` → Read depth=2 output from `<layer>-graph-d2/` → catalogue draft → Write → contract-map → type-signals), and align the Mission `Reconnaissance first` paragraph to state that reconnaissance is internal only and must not be skipped (`a2764f312bbf4a555041279e55b6a3457a888a64`)
 
 ### S003 — Agent definition: output section trim
 
 > Remove `Entries written`, `Action rationale`, and `Cross-partition migrations` from the Output section of `.claude/agents/type-designer.md` per ADR D2. The remaining output is `Signal evaluation` (per-layer) and `Open Questions`. This aligns the agent contract with the parent ADR's mandate that orchestrator-facing output is signal evaluation only.
 
-- [ ] **T003**: Update `.claude/agents/type-designer.md` Output section: remove `Entries written`, `Action rationale`, and `Cross-partition migrations` sections; keep only `Signal evaluation` (per-layer) and `Open Questions`
+- [~] **T003**: Update `.claude/agents/type-designer.md` Output section: remove `Entries written`, `Action rationale`, and `Cross-partition migrations` sections; keep only `Signal evaluation` (per-layer) and `Open Questions`
