@@ -485,7 +485,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
         "> This file lists all tracks and their current status.".to_owned(),
         "> Auto-updated by `/track:plan`, `/track:plan-only`, `/track:activate`, and `/track:commit`.".to_owned(),
         "> `/track:status` uses this file as an entry point to summarize progress.".to_owned(),
-        "> Each track is expected to have `spec.md` / `plan.md` / `metadata.json` / `verification.md`.".to_owned(),
+        "> Each track is expected to have `spec.md` (or `spec.json`) / `plan.md` / `metadata.json`; `observations.md` is optional.".to_owned(),
         String::new(),
         "## Current Focus".to_owned(),
         String::new(),

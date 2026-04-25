@@ -2,7 +2,7 @@
 
 Detailed development workflow for this project.
 
-- `track`: context management layer — `spec.md` / `plan.md` / `verification.md` / progress tracking
+- `track`: context management layer — `spec.md` / `plan.md` / progress tracking (plus optional `observations.md` for manual observation logs)
 - `Claude Code + Agent Teams + Rust CLI`: execution layer for implementation, review, and guarded git/PR workflow
 
 ## Spec-Driven Development Cycle
@@ -18,7 +18,7 @@ Detailed development workflow for this project.
    │   ├── Phase 2: resolve track/tech-stack.md `TODO:` via user dialogue
    │   ├── Phase 2.5: Agent Teams (Researcher ↔ Architect)
    │   ├── Phase 3: plan creation → user approval
-   │   └── Phase 4: create track artifacts (metadata.json, plan.md, spec.md, verification.md, registry.md)
+   │   └── Phase 4: create track artifacts (metadata.json, plan.md, spec.md, registry.md)
    │
    └── Alternative (plan-only, separate review branch):
        └── /track:plan-only <feature>       # Create plan/<id> branch + planning artifacts (branch=null in metadata)
@@ -70,11 +70,11 @@ It keeps the public `/track:*` interface stable while running the full loop insi
 
 1. Resolve the current track and map `<task>` to approved scope in `metadata.json`
 2. Mark the target task `in_progress`
-3. Read `spec.md`, rendered `plan.md`, `verification.md`, and required conventions
+3. Read `spec.md`, rendered `plan.md`, and required conventions (plus `observations.md` if present)
 4. Implement with Agent Teams and focused validation
 5. Run the local review loop until findings are zero
 6. Run `cargo make ci`
-7. Update `verification.md` and mark the task `done`
+7. Append to `observations.md` only when machine-non-verifiable observations arose or when `spec.json` acceptance_criteria explicitly requires it, then mark the task `done`
 
 There is no second autonomous queue/orchestrator to keep in sync.
 
@@ -131,7 +131,7 @@ cargo make verify-track-metadata # track metadata.json required fields
 cargo make verify-track-registry # track registry.md sync check
 cargo make verify-tech-stack     # tech-stack.md TODO resolution check
 cargo make verify-orchestra      # settings.json hooks/permissions/agent definitions
-cargo make verify-latest-track   # Latest track spec.md + plan.md + verification.md completeness
+cargo make verify-latest-track   # Latest track spec.md (or spec.json) + plan.md completeness
 ```
 
 Optional (not included in `cargo make ci`):

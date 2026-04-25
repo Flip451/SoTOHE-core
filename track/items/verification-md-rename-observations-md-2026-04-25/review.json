@@ -1,42 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4a3a3b2d0888568b4009c5e4216e396e87cb17b3c72ee3b67b7638bf4230337",
-          "at": "2026-04-25T02:02:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4a3a3b2d0888568b4009c5e4216e396e87cb17b3c72ee3b67b7638bf4230337",
-          "at": "2026-04-25T02:03:51Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2526259d568e6633843195d95b9d6dd2564b492c31121a1dc8d4478688d8349c",
-          "at": "2026-04-25T00:54:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2526259d568e6633843195d95b9d6dd2564b492c31121a1dc8d4478688d8349c",
-          "at": "2026-04-25T00:55:45Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -229,6 +193,92 @@
         }
       ]
     },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a3a3b2d0888568b4009c5e4216e396e87cb17b3c72ee3b67b7638bf4230337",
+          "at": "2026-04-25T02:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a3a3b2d0888568b4009c5e4216e396e87cb17b3c72ee3b67b7638bf4230337",
+          "at": "2026-04-25T02:03:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This wording makes `observations.md` sound purely optional, but ADR D4 also requires creating or appending it when `spec.json` explicitly asks for observations. As written, the `/track:full-cycle` flow can finish a spec-mandated observation task without producing the required file.",
+              "severity": "P1",
+              "file": "knowledge/WORKFLOW.md",
+              "line": 77,
+              "category": "workflow"
+            },
+            {
+              "message": "The same omission appears in the `/track:auto` full-cycle sequence: it only mentions machine-non-verifiable observations, not the spec-driven case where `spec.json` requires `observations.md`. That means the auto-mode path can also skip a required artifact.",
+              "severity": "P1",
+              "file": "knowledge/designs/auto-mode-integration.md",
+              "line": 15,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f37edbf7fd6d801371925aa1ee1b05521f8c1df62ce2bd2a148232e41d10f5bb",
+          "at": "2026-04-25T02:17:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5028baed54a78a8316e96acf212bf66c837ce394df167e9321a33784b6efd33e",
+          "at": "2026-04-25T02:20:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5028baed54a78a8316e96acf212bf66c837ce394df167e9321a33784b6efd33e",
+          "at": "2026-04-25T02:21:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdc67d5e4f0a27a8375e83f8b820fe0fad874a4ab7c2c1aa68589f60fb9eb2d9",
+          "at": "2026-04-25T02:26:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdc67d5e4f0a27a8375e83f8b820fe0fad874a4ab7c2c1aa68589f60fb9eb2d9",
+          "at": "2026-04-25T02:28:14Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2526259d568e6633843195d95b9d6dd2564b492c31121a1dc8d4478688d8349c",
+          "at": "2026-04-25T00:54:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2526259d568e6633843195d95b9d6dd2564b492c31121a1dc8d4478688d8349c",
+          "at": "2026-04-25T00:55:45Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -301,6 +351,20 @@
           "findings": [],
           "hash": "rvw1:sha256:4a89434f16883f4983e747d8ea821d69bb0d07e745bb0939f1f8f5b57cdd02f5",
           "at": "2026-04-25T02:01:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96de7c234bcba8085d690ca6a2c0836ac1e9ae2e01307555c329aca89a32797b",
+          "at": "2026-04-25T02:16:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96de7c234bcba8085d690ca6a2c0836ac1e9ae2e01307555c329aca89a32797b",
+          "at": "2026-04-25T02:17:43Z"
         }
       ]
     },
@@ -333,6 +397,20 @@
           "findings": [],
           "hash": "rvw1:sha256:cac04cf12b999bf858a22f08a717f60796961551d657f9b314680e8f6df891ec",
           "at": "2026-04-25T01:16:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a03eebb95aa9894a52bcfdf0fea0964f9027f306ac1e064de72859e37d511b3",
+          "at": "2026-04-25T02:27:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a03eebb95aa9894a52bcfdf0fea0964f9027f306ac1e064de72859e37d511b3",
+          "at": "2026-04-25T02:28:37Z"
         }
       ]
     }

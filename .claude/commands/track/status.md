@@ -14,7 +14,7 @@ Execution rules:
 - If any track exists, identify the current track directory under `track/items/`.
 - Read the current track's `metadata.json` when present.
 - Read the current track's `spec.md` and `plan.md` (if present).
-- Read `verification.md` when present.
+- Read `observations.md` when present (optional manual observation log — absent is normal).
 - Derive the current phase:
   - `Ready to Activate` for branchless planning-only tracks
   - `Planning` for materialized `planned` tracks
@@ -28,7 +28,7 @@ Execution rules:
   - phase (`Ready to Activate`, `Planning`, `In Progress`, `Done`)
   - metadata status / updated_at (if present)
   - task state counts from `metadata.json` (todo / in_progress / done)
-  - manual verification status from `verification.md` (if present)
+  - manual observations from `observations.md` (if present — otherwise report as "no observations recorded")
   - next recommended action
 
 Next-command rules:

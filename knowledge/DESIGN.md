@@ -2,7 +2,7 @@
 
 > This document tracks architecture decisions made during development.
 > Updated by `/track:plan` workflow and specialist capability consultations.
-> Track-facing docs (`spec.md`, `plan.md`, `verification.md`) stay in Japanese, but this design document stays in English for cross-provider compatibility.
+> Track-facing docs (`spec.md`, `plan.md`, `observations.md`) stay in Japanese, but this design document stays in English for cross-provider compatibility.
 > Diagrams in this document and in `plan.md` use Mermaid `flowchart TD`; do not use ASCII box art.
 
 ## Overview

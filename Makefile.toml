@@ -528,7 +528,7 @@ script = ['cargo run --quiet -p cli -- verify view-freshness']
 
 [tasks.verify-latest-track-local]
 private = true
-description = "[internal] Verify latest track has spec.md, plan.md, and verification.md"
+description = "[internal] Verify latest track has spec.md (or spec.json) and plan.md"
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify latest-track']
 

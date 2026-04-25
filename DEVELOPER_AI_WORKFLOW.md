@@ -118,7 +118,7 @@ flowchart TD
 ## 1. 目的
 
 - `/track:*` を入口にして、仕様から計画、実装、レビュー、コミットまでを一貫して進める
-- `track/items/` の `spec.md` / `plan.md` / `verification.md` を常に最新の正式な状態に保つ
+- `track/items/` の `spec.md` / `plan.md` を常に最新の正式な状態に保つ (`observations.md` は機械検証不能な手動観測がある場合のみ作成)
 - `knowledge/conventions/` にプロジェクト固有の実装規約を集約し、テンプレート共通ルールと分離する
 - Claude Code を主操作面にしつつ、必要なときだけ内部で specialist capability と Agent Teams を使う
 - ローカル実行は `docker compose` 前提で統一する
@@ -225,18 +225,19 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 12. `[Claude Code]` `/track:status`
     - 現在地と次アクションを確認する。どの段階でも呼べる
 
-手動検証:
+手動観測 (任意):
 
-- 実装やレビューの区切りごとに、Claude Code は手動検証手順を提示する
-- 実施結果は `track/items/<id>/verification.md` に残す
+- 実装やレビューで機械検証不能な観測値 (実測値 / UX 確認 / dogfood 結果など) が出た場合のみ、結果を `track/items/<id>/observations.md` に残す
+- spec.json の `acceptance_criteria` が明示的に `observations.md` への記録を要求する task でも同様に追記する
+- 観測がない通常の task ではファイルを作成しない (file 存在 = phase 状態)
 
 ### 3.2 日常運用ループ
 
-この節は、すでに `track/items/<id>/spec.md` / `plan.md` / `verification.md` が存在する状態から、
+この節は、すでに `track/items/<id>/spec.md` / `plan.md` が存在する状態から、
 次に何をするかを日常的に判断するためのループを示す。
 
 1. `[Claude Code]` `/track:status`
-2. Claude Code が `track/registry.md`, `track/items/<id>/spec.md`, `track/items/<id>/plan.md`, `track/items/<id>/verification.md` を読んで状況を整理し、次に使うべきコマンドを提案する
+2. Claude Code が `track/registry.md`, `track/items/<id>/spec.md`, `track/items/<id>/plan.md` を読み、`observations.md` が存在する場合はそれも合わせて状況を整理し、次に使うべきコマンドを提案する
    - 例: `/track:plan`, `/track:implement`, `/track:review`, `/track:ci`
 
    > **TDDD 参考**: 型を新規追加・変更する場合は、実装前に標準フローの任意ステップ 4b（`/track:type-design`）で各レイヤーの型カタログ（`domain-types.json`・`usecase-types.json` 等）に型を宣言することを推奨する（Yellow = WIP 宣言 → `/track:implement` で実装 → Blue 確定。未宣言の型がコードに存在すると Red = TDDD 違反）。`/track:status` はトラック状態に基づいてコマンドを提案するため、設計フェーズが必要かどうかは開発者自身が判断して明示的に実行する。
@@ -325,7 +326,7 @@ cargo make verify-plan-progress  # plan.md 進捗記法を検査
 cargo make verify-track-metadata  # track metadata.json の必須項目を検査
 cargo make verify-track-registry # track registry.md と metadata.json の同期を検査
 cargo make verify-tech-stack  # tech-stack.md の TODO 解消を検査
-cargo make verify-latest-track  # 最新トラックの spec.md / plan.md / verification.md 完成度確認（metadata.updated_at + placeholder 検知）
+cargo make verify-latest-track  # 最新トラックの spec.md / spec.json / plan.md 完成度確認（metadata.updated_at + placeholder 検知）
 cargo make verify-orchestra  # フック・権限・エージェント設定を検査
 cargo make scripts-selftest  # verify script の回帰テストを実行
 ```
