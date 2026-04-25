@@ -2,7 +2,7 @@
 
 > **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
 > **作成日**: 2026-03-11
-> **最終更新**: 2026-04-13
+> **最終更新**: 2026-04-25
 > **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
 > **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
 > **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
@@ -476,6 +476,17 @@
   - **対応**: タスク完了ガードを push/review_cycle から wait_and_merge_with (merge 前) に移動。中間 push と PR review が未完了タスクでもブロックされなくなった
 
 - [ ] **WF-60** (HIGH): 設計⇆実装の自動遷移 — reviewer finding が spec スコープ外を指摘した場合に、自動で planner に設計相談を escalation し、ADR/spec 更新後に実装に戻るフロー。autorecord-stabilization トラックでは spec 外の修正が大量に蓄積し事後的に spec を更新する事態になった。`/track:review` スキル内に scope guard + auto-escalation to planner を組み込み、(1) finding が spec の in_scope/out_of_scope に該当するか自動判定、(2) scope 外 → planner に設計相談を自動起動、(3) planner が spec 更新 or 別トラック化を判断、(4) spec 更新後に実装に復帰。手動介入なしに設計と実装のスコープ整合性を維持する仕組み
+
+- [ ] **WF-67** (MEDIUM): agent briefing が orchestrator の decision/judgement 密輸ルートになるアンチパターンの構造的解決 — adr-editor / spec-designer / impl-planner / review-fix-lead に渡す briefing を orchestrator が free-form text で書く現行設計が、user 未承認の semantic decision (Decision body の独自仕様、Known Accepted Deviations の勝手追加、Constraints の reviewer 抑制等) を ADR / spec / impl-plan / review verdict に密輸する構造的リスクを抱えている。解決方向: (a) briefing 完全廃止 (agent が SSoT を直接読む)、(b) briefing 機械生成 (`bin/sotp` が spec/ADR から render)、(c) static template + slot 注入のみ、(d) SSoT pointer 化。最有力は (b)。詳細は memory `feedback_briefing_anti_pattern.md`
+  - **追加日**: 2026-04-25
+  - **由来**: `type-designer-tuning-2026-04-25` で auto-cleanup 仕様の orchestrator 独断密輸が user 指摘で発覚
+
+- [ ] **WF-68** (MEDIUM): ADR decision に `user_decision_ref` / `review_finding_ref` / `status` を attach し信号機評価 + decision-level lifecycle 管理する設計 — 各 ADR decision (D1, D2, ...) の根拠 trace を mechanically encode し、🔵 青 (user 明示承認) / 🟡 黄 (review process 由来) / 🔴 赤 (根拠なし = orchestrator 独断) で評価する。さらに decision 個別 status (proposed / accepted / implemented / superseded / deprecated) を持たせ、partial supersession (ADR file 内の D1 だけ superseded、D2 は active 等) や implementation tracking (`implemented_in: <commit>`) を encode できる。WF-67 (briefing アンチパターン解決) と補完する ADR 側の構造的 safety net (briefing 経由で密輸が混入しても CI / 信号で検出可能)。
+  - **ADR フォーマット**: MD body + YAML front-matter (front-matter で各 decision の `user_decision_ref` / `review_finding_ref` / `status` / `superseded_by` / `implemented_in` / `grandfathered: true` 等を encode、md body は narrative 維持)。検討候補 (JSON / XML / HTML / sidecar JSON 等) との比較で、人間可読性 + 機械パース容易性 + 既存 ADR migration コスト + diff レビュー容易性のバランスが最良。pre-track-adr-authoring.md の `## Status` 見出し禁止 (ADR file 全体 status 廃止) とは別 axis で、decision 個別 status を追加するため整合
+  - **実装段階**: (1) MD + YAML front-matter schema 設計 (`decisions[]` / `user_decision_ref` / `review_finding_ref` / `status` / `superseded_by` / `implemented_in` / `grandfathered` 等の field 構成)、(2) adr-editor 改修で新規 ADR に `user_decision_ref` または `review_finding_ref` を必須化 + 新規 decision に `status: proposed` を default 設定 (`grandfathered: true` 指定時はスキップ)、(3) `bin/sotp verify adr-signals` を実装し red を block (`grandfathered: true` はスキップ)、(4) 既存 ADR への front-matter back-fill (or `grandfathered: true` 一括登録) で gradual rollout、(5) 実装完了時に `status: implemented` + `implemented_in: <commit>` を更新する mechanism (commit hook or 別 CLI subcommand)
+  - **追加日**: 2026-04-25
+  - **由来**: `type-designer-tuning-2026-04-25` で auto-cleanup 仕様の orchestrator 独断密輸が user 指摘で発覚 (WF-67 と同根、user による補完案として浮上)。フォーマット選定 (MD + YAML front-matter) + decision-level status 拡張も同セッション中に user 採用
+  - 詳細は memory `feedback_adr_signal_traceability.md`
 
 ---
 
@@ -977,3 +988,12 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 - [ ] **TDDD-Q02** (XS): `catalogue_codec.rs` Phase 1.5: 既存 structured kinds (`secondary_port`, `application_service`) に `implements` の stale field guard が未設定 — TDDD-05 で `secondary_adapter` 側のみ修正、pre-existing code は対象外で見送り
   - **追加日**: 2026-04-16
+
+- [ ] **TDDD-Q03** (LOW): `bin/sotp track type-graph` 単一層 view では cross-layer impl wiring が描画されない — 例: `FsCatalogueLoader implements domain::CatalogueLoader` のような最重要 hexagonal 関係は trait 定義が domain / impl が infrastructure にあるため、`--layer infrastructure --edges impls/all` のいずれでも見えない。infrastructure secondary_adapter の reconnaissance には catalogue の `implements` field を主軸にする必要がある。修正案: `--cross-layer` flag を追加し、cross-layer impl edges を ghost node として描画する
+  - **追加日**: 2026-04-25
+  - **由来**: `type-designer-tuning-2026-04-25` 投資調査の OS-03
+
+- [ ] **TDDD-Q04** (LOW): `--edges methods` モードが単純な field accessor メソッドとビジネスロジックメソッドを区別せず同一の method edge として描画している (semantic 混在) — 例: `StatusOverride::kind(&self) -> StatusOverrideKind` は private field `kind` を返すだけの accessor メソッドだが、`StatusOverride -->\|kind\| StatusOverrideKind` として複雑なビジネスメソッドと同一形式で描画される。`--edges fields` は struct field 直接参照のみを対象とするため、このような accessor メソッドは分離できない。修正案: 引数なし・戻り値が単一型の self-receiver メソッドを accessor として区別するか、CLI help でこの semantic を明示する
+  - **追加日**: 2026-04-25
+  - **由来**: `type-designer-tuning-2026-04-25` 投資調査の OS-04
+

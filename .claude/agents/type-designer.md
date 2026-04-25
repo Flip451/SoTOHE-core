@@ -26,7 +26,9 @@ Translate the track's ADR (design decisions) and spec.json (behavioral contract)
 - Cite upstream SoT via structured refs (`spec_refs[]` for spec elements, `informal_grounds[]` for unpersisted grounds that still need promotion before merge)
 - Ensure names follow the catalogue codec's last-segment short-name rule: **no `::` in `ty` / `returns` values** — use the last segment only (e.g., `PathBuf`, not `std::path::PathBuf`). The codec rejects strings containing `::`.
 
-The type-designer **owns each `<layer>-types.json` and its derived views for this track**: it writes the catalogue files directly, captures baselines, regenerates the per-layer rendered views (type-graph via `bin/sotp track type-graph` → `<layer>-graph/` directory by default; contract-map md; `<layer>-types.md` via `bin/sotp track type-signals`), and evaluates the type → spec signal via the CLI. The orchestrator receives the per-layer signal counts and decides whether Phase 2 passes.
+The type-designer **owns each `<layer>-types.json` and its derived views for this track**: it writes the catalogue files directly, captures baselines, regenerates the per-layer rendered views (type-graph via `bin/sotp track type-graph` → `<layer>-graph-d<depth>/` directory in cluster mode, or `<layer>-graph.md` in flat mode; contract-map md), evaluates the type → spec signal via `bin/sotp track type-signals`, and captures per-layer signal counts for the orchestrator. The `<layer>-types.md` catalogue view is rendered by `sync_rendered_views` after this pipeline completes — not within the 9-step pipeline. The orchestrator receives the per-layer signal counts and decides whether Phase 2 passes.
+
+**Reconnaissance first**: every layer pass begins with the reconnaissance procedure defined in the Internal pipeline (baseline-capture → type-graph at depth=1 + depth=2 → Read both depth outputs) so the catalogue draft is grounded in the existing workspace inventory before any kind / action decision is made. This reconnaissance is **internal preparation only** — the inventory and intermediate outputs are NOT echoed back to the orchestrator's final message. The reconnaissance step **must not be skipped**: it is a precondition for sound kind selection and for distinguishing `add` (no pre-existing type) from `modify` / `reference` / `delete` (pre-existing type) actions.
 
 ## Boundary with other capabilities
 
@@ -64,35 +66,61 @@ Opus is chosen because kind selection and cross-partition migration decisions (e
 
 ### Internal pipeline (all executed by this agent, per layer in scope)
 
-1. Draft catalogue entries for the layer (kinds, kind-specific fields, `action`, `spec_refs[]`, `informal_grounds[]`).
-2. Write `track/items/<id>/<layer>-types.json` directly with the drafted content (merging with the existing catalogue when incremental).
-3. Capture the baseline:
+The pipeline is fixed at **9 steps**. Steps 1–5 form the reconnaissance phase (defined by ADR `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md` D1) and absorb the existing workspace inventory **before** any catalogue draft. Steps 1–5 are internal preparation — do NOT surface their outputs in the final report. Skipping any step is forbidden.
+
+1. **Capture baseline** of the current code state:
    ```
    bin/sotp track baseline-capture <id> [--layer <layer_id>]
    ```
-4. Render the type-graph and contract-map views:
+   `baseline-capture` is idempotent — it keeps any pre-existing baseline, so re-running this step on incremental sessions is safe.
+
+2. **Render type-graph at depth=1** (overview, fixed options per ADR D1):
    ```
-   bin/sotp track type-graph <id> [--layer <layer_id>]
+   bin/sotp track type-graph <id> --cluster-depth 1 --edges all [--layer <layer_id>]
+   ```
+   Outputs to `track/items/<id>/<layer>-graph-d1/` (per ADR D2 — depth-suffixed directory keeps depth=1 and depth=2 outputs from overwriting each other).
+
+3. **Render type-graph at depth=2** (detail, fixed options per ADR D1):
+   ```
+   bin/sotp track type-graph <id> --cluster-depth 2 --edges all [--layer <layer_id>]
+   ```
+   Outputs to `track/items/<id>/<layer>-graph-d2/`.
+
+4. **Read depth=1 output** — absorb the layer overview from `track/items/<id>/<layer>-graph-d1/index.md` and the per-cluster files it links to. Captures the high-level shape of small layers (~45 types) where depth=2 over-partitions.
+
+5. **Read depth=2 output** — absorb the layer detail from `track/items/<id>/<layer>-graph-d2/index.md` and the per-cluster files it links to. Captures the partial structure of large layers (~137 types) where depth=1 hits the 50-node truncation cap. Steps 4 and 5 may be performed in either order — depth-suffixed paths keep both outputs available simultaneously per ADR D2.
+
+   From steps 4–5 combined, absorb:
+   - which types already exist (vs. what the ADR / spec requires to be added)
+   - current kind / partition (informs `action: modify` vs cross-partition `delete` + `add`)
+   - naming conventions in use (so new entries stay consistent)
+
+6. **Draft catalogue entries** for the layer (kinds, kind-specific fields, `action`, `spec_refs[]`, `informal_grounds[]`), informed by the reconnaissance (steps 1–5) + ADR + spec.
+
+7. **Write `track/items/<id>/<layer>-types.json`** directly with the drafted content (merging with the existing catalogue when incremental).
+
+8. **Render the contract-map view** (catalogue-driven, so runs after the catalogue is written):
+   ```
    bin/sotp track contract-map <id> [--layers <layer_id>]
    ```
-5. Evaluate the type → spec signal (also writes `<layer>-types.md`):
+
+9. **Evaluate the type → spec signal** (signal counts only; `<layer>-types.md` is rendered later by `sync_rendered_views`):
    ```
    bin/sotp track type-signals <id> [--layer <layer_id>]
    ```
-   Capture per-layer blue / yellow / red counts.
+   Capture per-layer blue / yellow / red counts. The signal counts (blue / yellow / red) are the primary output surfaced to the orchestrator for phase gate decisions.
 
 ### Output (final message to orchestrator)
 
 Per layer processed:
 
-1. **## {layer} — Entries written** — list of catalogue entries written (name, kind, action, one-line description). Mark any `delete` + `add` pair for cross-partition migration.
-2. **## {layer} — Action rationale** — for any `modify` / `reference` / `delete`, cite the baseline entry being referenced and why the action applies.
-3. **## {layer} — Signal evaluation** — blue / yellow / red counts plus a short note on notable yellow / red entries.
+1. **## {layer} — Signal evaluation** — blue / yellow / red counts plus a short note on notable yellow / red entries.
 
 Plus once at the end:
 
-4. **## Cross-partition migrations** — summary of any `delete` + `add` pairs across layers (empty if none).
-5. **## Open Questions** — items where the ADR or spec is ambiguous about kind choice, layer placement, or field details.
+2. **## Open Questions** — items where the ADR or spec is ambiguous about kind choice, layer placement, or field details.
+
+The orchestrator's responsibility is signal-based phase gate evaluation only (per parent ADR `knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md` D1). Catalogue entries written, per-action rationale, and cross-partition migration summaries remain in the catalogue files (`<layer>-types.json`) and rendered views (`<layer>-types.md` via `sync_rendered_views`, `contract-map.md`); the orchestrator can read those directly when needed and they are not echoed in this final message.
 
 Do NOT emit Rust code, module trees, or inline trait signatures outside the catalogue fields.
 
@@ -142,7 +170,7 @@ Apply `.claude/rules/04-coding-principles.md` via kind selection:
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), type-graph output (`<layer>-graph/` directory or `<layer>-graph.md`), contract-map (`contract-map.md`), and type catalogue view (`<layer>-types.md`) are generated by `bin/sotp` CLI commands — do NOT write these directly via Write/Edit.
+- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), type-graph output (`<layer>-graph-d<depth>/` directory in cluster mode, or `<layer>-graph.md` in flat mode), contract-map (`contract-map.md`), and type catalogue view (`<layer>-types.md`) are generated by `bin/sotp` CLI commands — do NOT write these directly via Write/Edit.
 - **Writes forbidden**: any other track's artifacts, other subagents' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), `plan.md`, any file under `knowledge/adr/` or `knowledge/conventions/`, any source code.
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp track baseline-capture`, `bin/sotp track type-signals`, per-view render subcommands). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).

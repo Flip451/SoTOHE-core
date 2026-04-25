@@ -5,7 +5,10 @@
 //!
 //! When `--cluster-depth N` is 0 (or omitted and the default is 0), writes a
 //! single flat file `<layer>-graph.md`. When N ≥ 1 (default 2), writes a
-//! cluster directory `<layer>-graph/` with `index.md` + per-cluster files.
+//! cluster directory `<layer>-graph-d<depth>/` with `index.md` + per-cluster
+//! files. The depth-suffix on the directory name lets depth=1 and depth=2
+//! outputs coexist in independent paths (per ADR
+//! `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md` D2).
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -46,7 +49,7 @@ fn parse_edge_set(value: &str) -> Result<EdgeSet, CliError> {
 /// Render a mermaid type graph for each TDDD-enabled layer.
 ///
 /// When `cluster_depth` is 0 writes `<layer>-graph.md` (flat mode).
-/// When `cluster_depth` ≥ 1 writes `<layer>-graph/` directory layout.
+/// When `cluster_depth` ≥ 1 writes `<layer>-graph-d<depth>/` directory layout.
 ///
 /// # Errors
 ///
@@ -178,7 +181,7 @@ enum WriteMode {
 /// Selects the write mode for a given `cluster_depth`.
 ///
 /// - `cluster_depth == 0` → [`WriteMode::Flat`] (single `<layer>-graph.md` file)
-/// - `cluster_depth >= 1` → [`WriteMode::Cluster`] (`<layer>-graph/` directory)
+/// - `cluster_depth >= 1` → [`WriteMode::Cluster`] (`<layer>-graph-d<depth>/` directory)
 #[must_use]
 fn select_write_mode(cluster_depth: usize) -> WriteMode {
     if cluster_depth == 0 { WriteMode::Flat } else { WriteMode::Cluster }
@@ -280,10 +283,12 @@ mod tests {
     /// `cargo test --package cli -- --ignored`
     ///
     /// Exercises both dispatch branches of `execute_type_graph_for_layer`:
-    /// 1. `cluster_depth = 2` (default) writes `<layer>-graph/` directory with `index.md` + cluster files
-    /// 2. `cluster_depth = 0` writes flat `<layer>-graph.md` and removes the stale cluster directory
+    /// 1. `cluster_depth = 2` (default) writes `<layer>-graph-d2/` directory with `index.md` + cluster files
+    /// 2. `cluster_depth = 0` writes flat `<layer>-graph.md` (the `<layer>-graph-d2/` from
+    ///    branch 1 is left intact — depth outputs coexist independently per ADR
+    ///    `knowledge/adr/2026-04-25-0530-...` D2)
     ///
-    /// Guards against regressions in the dispatch branch AND the stale-file cleanup.
+    /// Guards against regressions in the dispatch branch and the depth-suffix path.
     #[test]
     #[ignore]
     fn test_execute_type_graph_cluster_depth_dispatch() {
@@ -311,7 +316,7 @@ mod tests {
             .expect("workspace root")
             .to_path_buf();
 
-        // Branch 1: cluster_depth = 2 → directory layout written
+        // Branch 1: cluster_depth = 2 → directory layout written under depth-suffixed path
         let result = execute_type_graph(
             items_dir.clone(),
             track_id.to_owned(),
@@ -321,11 +326,15 @@ mod tests {
             TEST_EDGES.to_owned(),
         );
         assert!(result.is_ok(), "cluster_depth=2 must succeed: {result:?}");
-        let cluster_dir = track_dir.join("domain-graph");
-        assert!(cluster_dir.is_dir(), "cluster_depth=2 must create <layer>-graph/ directory");
+        let cluster_dir = track_dir.join("domain-graph-d2");
+        assert!(cluster_dir.is_dir(), "cluster_depth=2 must create <layer>-graph-d2/ directory");
         assert!(cluster_dir.join("index.md").is_file(), "cluster mode must write index.md");
+        assert!(
+            !track_dir.join("domain-graph").exists(),
+            "legacy suffix-less directory must not be created in cluster mode"
+        );
 
-        // Branch 2: cluster_depth = 0 → flat file + stale cluster dir cleanup
+        // Branch 2: cluster_depth = 0 → flat file written; depth=2 dir from branch 1 remains
         let result = execute_type_graph(
             items_dir.clone(),
             track_id.to_owned(),
@@ -336,7 +345,10 @@ mod tests {
         );
         assert!(result.is_ok(), "cluster_depth=0 must succeed: {result:?}");
         assert!(track_dir.join("domain-graph.md").is_file(), "flat mode must write .md file");
-        assert!(!cluster_dir.exists(), "flat mode must remove the stale <layer>-graph/ directory");
+        assert!(
+            cluster_dir.exists(),
+            "depth=2 cluster dir must remain after flat-mode run (depth outputs coexist)"
+        );
     }
 
     #[test]

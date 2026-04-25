@@ -1,0 +1,332 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "type-designer の reconnaissance フェーズ追加 + orchestrator 向け出力整理",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "type-designer の internal pipeline 先頭に reconnaissance step (baseline-capture → type-graph depth=1 → type-graph depth=2 → Read) を挿入し、catalogue draft 段階で既存型インベントリ (種別 / partition / 命名規則) を把握した状態で kind・action 判定ができるようにすることで、低レベル review 指摘 (「既存にあった」「kind 違い」) の発生を構造的に抑制する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "type-designer の orchestrator 向け final message を Signal evaluation + Open Questions の 2 セクションに絞り込み、Entries written / Action rationale / Cross-partition migrations の 3 セクションを削除することで、type-designer 1 回の invocation あたりの戻り値を小さくし、親 ADR が定める「orchestrator 向け責務は信号機評価のみ完結」の実装と定義を一致させる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "reconnaissance step が depth=1 と depth=2 を独立したパスに並存させて Read できるよう、bin/sotp track type-graph の出力先をクラスタモードで depth 値から自動 suffix (<layer>-graph-d<depth>/) に変更し、Read 順序制約なしに 2 段階の調査が安定して実行できるようにする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": ".claude/agents/type-designer.md の Internal pipeline セクションを改訂し、新 9-step 順序 (baseline-capture → type-graph depth=1 → type-graph depth=2 → depth=1 出力 Read → depth=2 出力 Read → catalogue draft → Write → contract-map → type-signals) を反映する。depth=1 出力は <layer>-graph-d1/ 配下、depth=2 出力は <layer>-graph-d2/ 配下を Read 対象とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": ".claude/agents/type-designer.md の Output セクションを改訂し、Entries written / Action rationale / Cross-partition migrations の 3 セクションを削除する。残すセクションは per-layer の Signal evaluation と末尾の Open Questions のみとする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "Mission セクションの「Reconnaissance first」段落を、Internal pipeline の新設計と矛盾なく整合させる (reconnaissance は内部探索のみで orchestrator への final message には含めない旨を記述する)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "bin/sotp track type-graph の Rust CLI 実装を変更し、クラスタモード (--cluster-depth >= 1) の出力ディレクトリ名を <layer>-graph-d<depth>/ とする。フラットモード (--cluster-depth 0) の出力ファイル名は従来通り <layer>-graph.md のまま変更しない。CLI フラグの追加はなく、出力パス計算の内部実装のみ変更する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": ".gitignore に track/items/**/*-graph-d*/ パターンを追加し、クラスタモードの depth 別出力ディレクトリを git 追跡対象外にする。既存の depth=0 フラット出力を対象とするパターンはそのまま維持する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "type-graph の --cluster-depth 最適値 / --edges オプションのプロジェクト別チューニング: 本 track では edges=all かつ depth=1+2 の 2 段構成を固定採用するが、別プロジェクトやワークスペース規模変化への再調整は別 ADR / 別 track で対応する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "reconnaissance step で取得した既存型インベントリ情報を orchestrator に echo する設計: インベントリは <layer>-graph-d1/ / <layer>-graph-d2/ / baseline / catalogue 自体に残っているため、orchestrator が必要なら直接 Read できる。subagent の final message に含める必要はない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "/track:type-design command 本体 (.claude/commands/ 配下) の挙動変更: command 本体は subagent invocation + signal 受け取りのみであり、reconnaissance step の追加は subagent 内部 pipeline に閉じる。command 定義ファイルは変更対象外",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "他 subagent 定義ファイル (spec-designer.md / impl-planner.md / adr-editor.md) への同様の整理適用: 「ADR 範囲を超えた余計な output sections」問題が他 subagent で表面化した場合は別 ADR / 別 track で対応する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "DRIFT-01 / orphan type 検出 / auto-render 統合 / type-path CLI などの type-graph view 拡張機能: これらは type-graph view ADR の Phase 2/3 以降に位置付けられており、本 track の出力パス変更は既存 CLI 動作の修正のみに留まる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+            "anchor": "D7"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "変更対象ファイルは .claude/agents/type-designer.md (エージェント定義)、bin/sotp track type-graph の Rust CLI 実装 (出力パス計算ロジックのみ)、.gitignore の 3 つに限定する。knowledge/adr/ 配下、knowledge/conventions/ 配下、および他 subagent 定義ファイルへの変更は禁止",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "bin/sotp track type-graph の引数インターフェースは変えない。--out-suffix フラグや --cluster-depth の引数形式に変更を加えず、出力パス計算の内部実装のみを変更する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "reconnaissance を orchestrator (command 本体) 側で実行して briefing に埋め込む設計は採用しない。subagent 内部 pipeline として完結させ、command 本体は subagent invocation + 結果受け取りのみに留める",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "catalogue draft 後に baseline / type-graph 出力との整合性を後付け検証する post-hoc validation 方式は採用しない。reconnaissance を pipeline 先頭に置き draft 前に既存インベントリを把握する設計を維持する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "--out-suffix <name> フラグを追加する候補 A は採用しない。depth 値と suffix 名が reconnaissance 手順では常に 1:1 対応するため、フラグを明示する意味がなく、必須フラグ化による既存呼び出し箇所への修正コストも不要",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": ".claude/agents/type-designer.md の Internal pipeline セクションが reconnaissance 手順を含む全 9-step 順序 (bin/sotp track baseline-capture → bin/sotp track type-graph --cluster-depth 1 --edges all → bin/sotp track type-graph --cluster-depth 2 --edges all → depth=1 出力 Read → depth=2 出力 Read → catalogue draft → Write → contract-map → type-signals) を明示しており、depth=1 出力は <layer>-graph-d1/ 配下、depth=2 出力は <layer>-graph-d2/ 配下を Read 対象とすることが記述されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": ".claude/agents/type-designer.md の Output セクションが Signal evaluation (per-layer) と Open Questions の 2 セクションのみを定義しており、Entries written / Action rationale / Cross-partition migrations の 3 セクションが存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": ".claude/agents/type-designer.md の Mission セクションに「reconnaissance は内部探索のみ — orchestrator への final message には含めない」という趣旨の記述があり、Internal pipeline の新設計と矛盾しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "reconnaissance step の記述が「catalogue draft の前に既存コードベースの型インベントリを把握する」という目的を明示しており、skip してはならない旨が pipeline 仕様として記述されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0353-type-designer-reconnaissance-step.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "bin/sotp track type-graph を --cluster-depth 1 で実行すると出力先が <layer>-graph-d1/ になり、--cluster-depth 2 で実行すると <layer>-graph-d2/ になる。同一トラックで両 depth を順番に実行しても互いの出力が上書きされない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "bin/sotp track type-graph を --cluster-depth 0 で実行した場合の出力先は従来通り <layer>-graph.md であり、変更されていない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "bin/sotp track type-graph の CLI フラグセットが変わっていない (--out-suffix フラグが追加されておらず、既存フラグの引数形式も変わっていない)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": ".gitignore に track/items/**/*-graph-d*/ エントリが追加されており、depth=1 / depth=2 出力ディレクトリが git 追跡対象外になっている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    }
+  ],
+  "signals": {
+    "blue": 26,
+    "yellow": 0,
+    "red": 0
+  }
+}
