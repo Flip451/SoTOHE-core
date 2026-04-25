@@ -6,7 +6,7 @@ Core guardrails:
 - Do not use direct `git add` / `git commit`
 - Do not tell users to run `*-local` tasks directly
 - Keep `track/tech-stack.md` free of blocking `TODO:` before implementation
-- Keep `track/registry.md`, `spec.md`, `plan.md`, and `verification.md` synchronized
+- Keep `track/registry.md`, `spec.md`, and `plan.md` synchronized
 - Keep `cargo make ci`, `cargo make deny`, and `cargo make verify-*` as reproducible final gates (`run --rm`)
 - Before committing code changes, run the `reviewer` capability review cycle
   (review -> fix -> review -> ... -> no findings). Do not commit until the reviewer

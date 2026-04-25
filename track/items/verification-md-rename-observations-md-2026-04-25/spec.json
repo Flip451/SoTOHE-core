@@ -1,0 +1,306 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "verification.md を observations.md に改名 — 役割を手動観測ログに限定",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "verification.md から acceptance criteria 充足宣言の役割 (役割 A) を完全に廃止し、AC 充足の正を spec.json signals + review.json zero_findings + impl-plan.json task done/commit_hash の 3 機構に移譲することで、workflow-ceremony-minimization の「成果物レビューは事後方式」原則に準拠した workflow を確立する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "機械検証不能な手動観測ログ (役割 B) を新ファイル track/items/<id>/observations.md に移行し、verification.md という名前を新規 track で使わないことで、grep-based な全参照洗い出しを可能にして移行作業の機械的検証を担保する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "verify-latest-track (libs/infrastructure/src/verify/latest_track.rs) から verification.md の必須化と VERIFICATION_SCAFFOLD_LINES scaffold 検出を完全に削除し、CI gate を spec.md / spec.json / plan.md のみに縮退させることで、「file 存在 = phase 状態」原則を observations.md にも適用する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "observations.md の作成タイミングを implementer 裁量 + spec AC 明示の観測要求のいずれかに限定し、/track:implement / /track:full-cycle の手順記述を「上記条件に該当する場合のみ observations.md を作成/追記」に書き換えることで、ceremony 削減後の運用を workflow docs に反映する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "libs/infrastructure/src/verify/latest_track.rs から VERIFICATION_SCAFFOLD_LINES static set、scaffold_placeholder_lines 関数、validate_verification_file 関数を削除し、verify-latest-track の検証対象を spec.md / spec.json / plan.md のみに縮退させる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "/track:implement および /track:full-cycle のコマンド記述から「無条件で verification.md を update」する手順を削除し、「D4 (a)/(b) のいずれかに該当する場合のみ observations.md を作成/追記する」手順に置き換える",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "/track:commit コマンド記述から verification.md への参照を削除し、observations.md の optional source として扱う記述 (D4 の条件に沿って存在する場合のみ参照) に更新する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "track/workflow.md の「## verification.md」セクションを廃止または改訂し、observations.md の役割 (D2: 機械検証不能な手動観測ログ、自由形式、scaffold なし) および作成条件 (D4 (a)/(b)) を新セクションで記述する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "CLAUDE.md、START_HERE_HUMAN.md、.claude/rules/08-orchestration.md、.claude/rules/10-guardrails.md から verification.md への言及を削除または observations.md の文脈に書き換える",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "verify-latest-track に関連する unit / integration test を VERIFICATION_SCAFFOLD_LINES の削除に合わせて更新・削除し、縮退後の CI gate (spec.md / spec.json / plan.md のみ検証) を正とするテストを整備する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "過去 track の track/items/*/verification.md および track/archive/*/verification.md の batch rename または内容刈り込み。これらは歴史資料として原型保存する (D5)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "observations.md の scaffold 自動生成機能の追加。CI gate への必須化や scaffold check の新設も行わない (D3 の「将来 observations.md に対しても scaffold check / 必須化を新設しない」方針)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "git history / 過去 ADR / 過去 commit message / 過去 review.json などからの verification.md 文字列参照の修正。これらは歴史資料として保存する (D5)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "歴史資料にある verification.md 参照の書き換えは行わない: knowledge/adr/ 内の過去 ADR 本文、過去 commit message、過去 review.json などは原型保存する (D5)。IN-02 / IN-03 / IN-04 / IN-05 の対象 (active workflow docs: .claude/commands/track/*.md、track/workflow.md、CLAUDE.md、START_HERE_HUMAN.md、.claude/rules/) は書き換え対象であり本 OS-04 の対象外である",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+            "anchor": "D5"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "verify-latest-track の縮退後も、最新 track 選択のための metadata.json / impl-plan.json の読み込みは維持する。検証対象ファイルを spec.md / spec.json / plan.md に縮退させることは、track 選択ロジックの変更ではない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "observations.md は「ファイルが存在しない = 観測なし」として扱い、CI gate / verify-latest-track は observations.md の不在を error にしない。file 存在ベースの単純分岐 (存在すれば参照、なければ skip) に限定する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "observations.md の内容フォーマットは自由とし、scaffold / required field / required section などの構造制約を設けない。作成者の裁量で観測対象 / 手順 / 値 / 日時を含む",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "新規 track で verification.md を作成しない。track/items/<id>/ 配下への verification.md 新規作成は本 ADR 移行後は禁止とし、手動観測ログが必要な場合は observations.md に記録する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "observations.md の作成は D4 (a) 実装中に implementer が機械検証不能な観測値があると判断した場合、または D4 (b) spec.json の acceptance_criteria に「observations.md に記録する」と明示された場合に限定する。両条件は排他ではない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "libs/infrastructure/src/verify/latest_track.rs に VERIFICATION_SCAFFOLD_LINES、scaffold_placeholder_lines、validate_verification_file が存在しない。cargo make ci (verify-latest-track を含む全 CI task) が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "/track:implement および /track:full-cycle のコマンドドキュメントに「無条件で verification.md を update する」指示が存在しない。代わりに D4 (a)/(b) の条件付きで observations.md を作成/追記する手順が記述されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "/track:commit のコマンドドキュメントが verification.md を必須 source として参照しておらず、observations.md を optional source として扱う記述になっている (存在する場合のみ参照)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "track/workflow.md に旧 verification.md セクションが存在しないか、存在する場合は observations.md の役割 (機械検証不能な手動観測ログ、自由形式、scaffold なし) と作成条件 (D4 (a)/(b)) を正確に記述したセクションに置き換えられている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "CLAUDE.md、START_HERE_HUMAN.md、.claude/rules/08-orchestration.md、.claude/rules/10-guardrails.md に verification.md への言及が残っていない (または observations.md の文脈に書き換えられている)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "cargo make ci の全 task (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-*) が pass する。verify-latest-track に関連するテストが VERIFICATION_SCAFFOLD_LINES 削除後の縮退仕様を正として pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-24-2356-verification-md-rename-observations-md.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "Lifecycle: pre-merge draft vs post-merge record"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 25,
+    "yellow": 0,
+    "red": 0
+  }
+}

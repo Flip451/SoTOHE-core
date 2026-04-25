@@ -44,11 +44,17 @@ If any step fails, stop the loop and report the failure.
 
 ## Post-loop
 
-After all tasks are committed, update `verification.md` with overall results and `verified_at`.
+After all tasks are committed, create or append to `track/items/<id>/observations.md` **only** when one of the following holds:
+
+- (a) any task produced machine-non-verifiable observations (wall-time measurements, UX confirmation, dogfooding results) worth recording, or
+- (b) `spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`.
+
+The file is free-form markdown (no scaffold). Otherwise, skip this step (file absence = no observations).
 
 ## Behavior
 
 After execution, summarize:
+
 1. Tasks completed (count and IDs)
 2. Tasks remaining (if stopped early)
 3. Failure details (if any)

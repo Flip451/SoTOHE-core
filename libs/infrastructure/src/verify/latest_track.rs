@@ -26,34 +26,13 @@ static PLACEHOLDER_LINE_RE: LazyLock<Option<Regex>> =
 static TASK_LINE_RE: LazyLock<Option<Regex>> =
     LazyLock::new(|| Regex::new(r"^\s*(?:[-*]|\d+\.)\s+\[[^\]]\]\s+.+").ok());
 
-static LIST_MARKER_RE: LazyLock<Option<Regex>> =
-    LazyLock::new(|| Regex::new(r"^\s*(?:[-*]|\d+\.)\s+").ok());
-
 static HORIZONTAL_RULE_RE: LazyLock<Option<Regex>> =
     LazyLock::new(|| Regex::new(r"^[-*_]{3,}$").ok());
 
-/// Scaffold keyword set for verification.md placeholders.
-/// Values are lowercase normalized strings matched after stripping list markers and trailing `:`.
-static VERIFICATION_SCAFFOLD_LINES: LazyLock<std::collections::HashSet<&'static str>> =
-    LazyLock::new(|| {
-        [
-            "scope verified",
-            "manual verification steps",
-            "result / open issues",
-            "verified_at",
-            "検証範囲",
-            "手動検証手順",
-            "結果 / 未解決事項",
-            "検証日",
-        ]
-        .into_iter()
-        .collect()
-    });
-
 /// Run the latest-track file verification.
 ///
-/// Finds the "latest" non-archived track and validates its `spec.md`,
-/// `plan.md`, and `verification.md` files for completeness.
+/// Finds the "latest" non-archived track and validates its `spec.md` (or
+/// `spec.json`) and `plan.md` files for completeness.
 ///
 /// # Errors
 ///
@@ -88,8 +67,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                 )));
             }
 
-            let other_files: [(&str, FileValidator); 2] =
-                [("plan.md", validate_plan_file), ("verification.md", validate_verification_file)];
+            let other_files: [(&str, FileValidator); 1] = [("plan.md", validate_plan_file)];
             for (filename, validator) in &other_files {
                 let path = track_dir.join(filename);
                 if !path.is_file() {
@@ -539,38 +517,6 @@ fn has_task_items(text: &str) -> bool {
     text.lines().any(|line| TASK_LINE_RE.as_ref().is_some_and(|re| re.is_match(line)))
 }
 
-/// Normalize a line for scaffold keyword matching.
-///
-/// Strips leading/trailing whitespace, removes list markers, strips trailing `:`,
-/// and lowercases the result.
-fn normalize_scaffold_line(line: &str) -> String {
-    let stripped = line.trim();
-    let without_marker = LIST_MARKER_RE
-        .as_ref()
-        .map(|re| re.replace(stripped, "").into_owned())
-        .unwrap_or_else(|| stripped.to_owned());
-    without_marker.trim_end_matches(':').trim().to_lowercase()
-}
-
-/// Return `(line_number, line)` pairs for scaffold placeholder lines.
-fn scaffold_placeholder_lines(text: &str) -> Vec<(usize, String)> {
-    let mut found = Vec::new();
-    for (line_number, line) in text.lines().enumerate().map(|(i, l)| (i + 1, l)) {
-        let stripped = line.trim();
-        if stripped.is_empty() {
-            continue;
-        }
-        if stripped.starts_with('#') {
-            continue;
-        }
-        let normalized = normalize_scaffold_line(line);
-        if VERIFICATION_SCAFFOLD_LINES.contains(normalized.as_str()) {
-            found.push((line_number, line.to_owned()));
-        }
-    }
-    found
-}
-
 // ---------------------------------------------------------------------------
 // File validators
 // ---------------------------------------------------------------------------
@@ -784,52 +730,6 @@ fn validate_plan_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
     findings
 }
 
-fn validate_verification_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
-    let text = match std::fs::read_to_string(path) {
-        Ok(t) => t,
-        Err(e) => {
-            return vec![VerifyFinding::error(format!(
-                "[ERROR] Cannot read verification.md: {} ({e})",
-                display_path(path, root)
-            ))];
-        }
-    };
-    let mut findings = Vec::new();
-    if text.trim().is_empty() {
-        return vec![VerifyFinding::error(format!(
-            "[ERROR] Latest track verification.md is empty: {}",
-            display_path(path, root)
-        ))];
-    }
-    let placeholders = placeholder_lines(&text);
-    if !placeholders.is_empty() {
-        findings.push(VerifyFinding::error(format!(
-            "[ERROR] Latest track verification.md still contains placeholders: {}",
-            display_path(path, root)
-        )));
-        for (line_number, line) in &placeholders {
-            findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
-        }
-    }
-    if meaningful_non_heading_lines(&text).is_empty() {
-        findings.push(VerifyFinding::error(format!(
-            "[ERROR] Latest track verification.md lacks substantive content beyond headings: {}",
-            display_path(path, root)
-        )));
-    }
-    let scaffold_lines = scaffold_placeholder_lines(&text);
-    if !scaffold_lines.is_empty() {
-        findings.push(VerifyFinding::error(format!(
-            "[ERROR] Latest track verification.md still contains scaffold placeholders: {}",
-            display_path(path, root)
-        )));
-        for (line_number, line) in &scaffold_lines {
-            findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
-        }
-    }
-    findings
-}
-
 // ---------------------------------------------------------------------------
 // Path helper
 // ---------------------------------------------------------------------------
@@ -923,11 +823,6 @@ mod tests {
             &format!("{TRACK_ITEMS_DIR}/{id}/plan.md"),
             "# Plan\n\n- [ ] Task one\n- [x] Task two done\n",
         );
-        write_file(
-            root,
-            &format!("{TRACK_ITEMS_DIR}/{id}/verification.md"),
-            "# Verification\n\nAll checks passed. The implementation has been verified.\n",
-        );
     }
 
     // ---- test cases ----
@@ -970,16 +865,11 @@ mod tests {
     fn test_missing_spec_fails() {
         let tmp = TempDir::new().unwrap();
         setup_track_with_branch(tmp.path(), "feat-a");
-        // plan.md and verification.md present, spec.md absent
+        // plan.md present, spec.md absent
         write_file(
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/feat-a/plan.md"),
             "# Plan\n\n- [ ] Task one\n",
-        );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-a/verification.md"),
-            "# Verification\n\nCompleted all items.\n",
         );
 
         let outcome = verify(tmp.path());
@@ -1005,11 +895,6 @@ mod tests {
             &format!("{TRACK_ITEMS_DIR}/feat-b/plan.md"),
             "# Plan\n\n- [ ] Task one\n",
         );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-b/verification.md"),
-            "# Verification\n\nAll verified.\n",
-        );
 
         let outcome = verify(tmp.path());
         assert!(outcome.has_errors(), "placeholder in spec should fail");
@@ -1033,11 +918,6 @@ mod tests {
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/feat-c/plan.md"),
             "# Plan\n\n- [ ] Task one\n",
-        );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-c/verification.md"),
-            "# Verification\n\nAll verified.\n",
         );
 
         let outcome = verify(tmp.path());
@@ -1064,36 +944,6 @@ mod tests {
     }
 
     #[test]
-    fn test_scaffold_placeholder_detected() {
-        let tmp = TempDir::new().unwrap();
-        setup_track_with_branch(tmp.path(), "feat-d");
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-d/spec.md"),
-            "# Spec\n\nReal content.\n",
-        );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-d/plan.md"),
-            "# Plan\n\n- [ ] Task one\n",
-        );
-        // verification.md with scaffold placeholder lines
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-d/verification.md"),
-            "# Verification\n\nScope Verified:\nManual Verification Steps:\nResult / Open Issues:\nverified_at:\n",
-        );
-
-        let outcome = verify(tmp.path());
-        assert!(outcome.has_errors(), "scaffold placeholders should fail");
-        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
-        assert!(
-            msgs.iter().any(|m| m.contains("scaffold")),
-            "error should mention scaffold, got: {msgs:?}"
-        );
-    }
-
-    #[test]
     fn test_v5_branchless_planned_valid() {
         let tmp = TempDir::new().unwrap();
         // v5 planning-only: no branch, no impl-plan.json → status derives to "planned".
@@ -1107,11 +957,6 @@ mod tests {
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/planning-track/plan.md"),
             "# Plan\n\n- [ ] Task one\n",
-        );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/planning-track/verification.md"),
-            "# Verification\n\nNot yet started.\n",
         );
 
         let outcome = verify(tmp.path());
@@ -1220,11 +1065,6 @@ mod tests {
             &format!("{TRACK_ITEMS_DIR}/no-version-track/plan.md"),
             "# Plan\n\n- [ ] Task one\n",
         );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/no-version-track/verification.md"),
-            "# Verification\n\nAll done.\n",
-        );
         // No spec.md — should produce a "missing spec" error (not pass silently).
         let outcome = verify(tmp.path());
         assert!(
@@ -1281,11 +1121,6 @@ mod tests {
         setup_track_with_branch(root, id);
         write_file(root, &format!("{TRACK_ITEMS_DIR}/{id}/spec.json"), VALID_SPEC_JSON);
         write_file(root, &format!("{TRACK_ITEMS_DIR}/{id}/plan.md"), "# Plan\n\n- [ ] Task one\n");
-        write_file(
-            root,
-            &format!("{TRACK_ITEMS_DIR}/{id}/verification.md"),
-            "# Verification\n\nAll checks passed. The implementation has been verified.\n",
-        );
     }
 
     #[test]
@@ -1333,11 +1168,6 @@ mod tests {
             &format!("{TRACK_ITEMS_DIR}/feat-bad-json/plan.md"),
             "# Plan\n\n- [ ] Task one\n",
         );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-bad-json/verification.md"),
-            "# Verification\n\nAll checks passed.\n",
-        );
         let outcome = verify(tmp.path());
         assert!(outcome.has_errors(), "invalid spec.json should fail");
         let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
@@ -1356,11 +1186,6 @@ mod tests {
             tmp.path(),
             &format!("{TRACK_ITEMS_DIR}/feat-no-spec/plan.md"),
             "# Plan\n\n- [ ] Task one\n",
-        );
-        write_file(
-            tmp.path(),
-            &format!("{TRACK_ITEMS_DIR}/feat-no-spec/verification.md"),
-            "# Verification\n\nAll checks passed.\n",
         );
         let outcome = verify(tmp.path());
         assert!(outcome.has_errors(), "missing both spec.md and spec.json should fail");

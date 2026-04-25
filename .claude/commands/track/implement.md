@@ -26,10 +26,10 @@ Execution:
 - Do not modify dependencies or rewrite `Cargo.lock` from multiple workers at once. Serialize `cargo add`, `cargo update`, and any `Cargo.lock`-changing step through a single worker, then resume parallel work.
 - Parallel workers should prefer `cargo make test-one-exec {test_name}` for single-test validation. Reserve full-suite commands (`test-exec`, `check-exec`) for integration phases or a single worker to avoid `target/` build lock contention.
 - Before reporting completion, require `cargo make ci` equivalent validation.
-- After CI passes, update `verification.md` in the current track directory:
-  - Record which manual verification steps were performed and their results.
-  - Note any open issues or areas requiring further review.
-  - Set `verified_at` to the current date.
+- After CI passes, create or append to `track/items/<id>/observations.md` **only** when one of the following holds:
+  - (a) the task produced machine-non-verifiable observations (e.g., wall-time measurements, UX confirmation, dogfooding results) that the implementer judges worth recording, or
+  - (b) `spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`.
+  The file is free-form markdown with no scaffold / required fields / required sections — record the observation target, procedure, value, and date at the author's discretion. Otherwise, skip this step (file absence = no observations).
 - Use `cargo make track-transition <track_dir> <task_id> done` to mark completed tasks as `done` (auto-renders `plan.md` + `registry.md`). After `/track:commit` creates the actual commit, run `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>` to record the commit hash. If work remains blocked, keep tasks in `in_progress` and report why.
 
 Behavior:

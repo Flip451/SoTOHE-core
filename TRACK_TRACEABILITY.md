@@ -26,7 +26,7 @@ This document defines the mapping rules between track workflow state transitions
 6. Before commit, `verify-plan-progress` validates that `plan.md` and `metadata.json` are in sync
 7. Track status is auto-derived from task states (`effective_track_status()`). Both `done` and `skipped` are treated as "resolved"; when all tasks are resolved, the track becomes `done`
 8. Use `set_track_override()` for blocking/cancelling
-9. Before commit, verify that the latest track's `spec.md` / `plan.md` / `verification.md` (selected by `metadata.json.updated_at`) are filled without placeholders
+9. Before commit, verify that the latest track's `spec.md` (or `spec.json`) / `plan.md` (selected by `metadata.json.updated_at`) are filled without placeholders
 10. User-facing commits use `/track:commit <message>` (direct `git commit` is forbidden). `cargo make commit` is the low-level terminal alternative only
 
 This document covers state transitions and verification rules only.
@@ -50,7 +50,7 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
   - `verify-track-registry-local` — registry.md and metadata.json sync verification
   - `verify-orchestra-local` — hooks, permissions, agent definition verification
   - `verify-canonical-modules-local` — canonical module ownership verification
-  - `verify-latest-track-local` — latest track spec.md / plan.md / verification.md completeness
+  - `verify-latest-track-local` — latest track spec.md (or spec.json) / plan.md completeness
   - `verify-module-size-local` — Rust source file size verification
   - `verify-domain-strings-local` — domain pub String field detection
   - `verify-domain-purity-local` — domain hexagonal purity verification

@@ -8,11 +8,11 @@
 
 1. Resolve the current track and map task to approved scope
 2. Mark target task `in_progress`
-3. Read spec.md, plan.md, verification.md, conventions
+3. Read spec.md, plan.md, conventions (plus observations.md if present)
 4. Implement with Agent Teams and focused validation
 5. Run local review loop until zero findings
 6. Run `cargo make ci`
-7. Update verification.md and mark task `done`
+7. Append to observations.md only when machine-non-verifiable observations arose or when `spec.json` acceptance_criteria explicitly requires it, then mark task `done`
 
 **Limitations**:
 - Single-task scope per invocation

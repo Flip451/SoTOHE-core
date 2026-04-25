@@ -124,7 +124,7 @@ class ExternalGuidesTest(unittest.TestCase):
             (track_dir / "plan.md").write_text(
                 "Review migration ordering.\n", encoding="utf-8"
             )
-            (track_dir / "verification.md").write_text("pending\n", encoding="utf-8")
+            # observations.md is optional (post-2026-04-25 ADR); the test does not create it.
 
             matches = external_guides.find_relevant_guides_for_track_workflow(
                 "/track:implement current task",

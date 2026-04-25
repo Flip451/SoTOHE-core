@@ -1,0 +1,8 @@
+{
+  "branch": "track/verification-md-rename-observations-md-2026-04-25",
+  "created_at": "2026-04-25T00:02:58Z",
+  "id": "verification-md-rename-observations-md-2026-04-25",
+  "schema_version": 5,
+  "title": "verification.md を observations.md に改名 — 役割を手動観測ログに限定",
+  "updated_at": "2026-04-25T00:02:58Z"
+}
