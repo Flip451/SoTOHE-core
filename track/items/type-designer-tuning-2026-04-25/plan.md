@@ -5,7 +5,7 @@
 
 Three focused tasks covering the two affected files: (1) the Rust CLI output-path fix, (2) the type-designer Internal pipeline rewrite, and (3) the type-designer Output section trim. Tasks are ordered so the CLI is stable before the agent definition references the new paths.
 
-## Tasks (2/3 resolved)
+## Tasks (3/3 resolved)
 
 ### S001 — CLI: depth-suffix output path fix
 
@@ -23,4 +23,4 @@ Three focused tasks covering the two affected files: (1) the Rust CLI output-pat
 
 > Remove `Entries written`, `Action rationale`, and `Cross-partition migrations` from the Output section of `.claude/agents/type-designer.md` per ADR D2. The remaining output is `Signal evaluation` (per-layer) and `Open Questions`. This aligns the agent contract with the parent ADR's mandate that orchestrator-facing output is signal evaluation only.
 
-- [~] **T003**: Update `.claude/agents/type-designer.md` Output section: remove `Entries written`, `Action rationale`, and `Cross-partition migrations` sections; keep only `Signal evaluation` (per-layer) and `Open Questions`
+- [x] **T003**: Update `.claude/agents/type-designer.md` Output section: remove `Entries written`, `Action rationale`, and `Cross-partition migrations` sections; keep only `Signal evaluation` (per-layer) and `Open Questions` (`aed93aee8afaa5f21271effd7f1b21728e2c3435`)

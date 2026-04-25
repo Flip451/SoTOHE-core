@@ -1,6 +1,163 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reconnaissance step only reads `track/items/<id>/<layer>-graph/index.md` plus linked cluster files, but `sotp track type-graph` can also produce the flat `<layer>-graph.md` artifact when `--cluster-depth 0`. In that mode the agent would skip the actual graph output and make its draft from incomplete reconnaissance; the pipeline needs to branch on cluster depth, as the ADR describes.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b75436dc20add9b801a622ec54d8d27c166b6e0ab85aa96a4e5ec5110ebecf15",
+          "at": "2026-04-25T04:03:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
+          "at": "2026-04-25T04:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
+          "at": "2026-04-25T04:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9749ec5481aabba0055c5554dd0e8f38760c557075ea872d79038326aa22b07f",
+          "at": "2026-04-25T06:40:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9749ec5481aabba0055c5554dd0e8f38760c557075ea872d79038326aa22b07f",
+          "at": "2026-04-25T06:44:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The 9-step pipeline now requires `bin/sotp track contract-map <id> [--layers <layer_id>]`, but the Bash allowlist here only names `baseline-capture`, `type-signals`, and generic “per-view render subcommands”. That omission can make step 8 unauthorized under this file’s own rules, so the pipeline is not fully executable as written.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 176,
+              "category": "behavioral coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8f7e532d0a73260c0ccf149b843d78cfda198de0f1ea2aa27eb6cc1aca1244eb",
+          "at": "2026-04-25T12:43:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new sentence here says the per-layer blue/yellow/red counts are \"the only outputs surfaced to the orchestrator,\" but the unchanged Output section below still requires catalogue entries, action rationale, cross-partition migrations, and open questions in the final message. That creates an internal contradiction about what the agent must emit.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 111,
+              "category": "behavior"
+            }
+          ],
+          "hash": "rvw1:sha256:8f7e532d0a73260c0ccf149b843d78cfda198de0f1ea2aa27eb6cc1aca1244eb",
+          "at": "2026-04-25T12:47:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This step description still says `bin/sotp track type-signals` writes `<layer>-types.md` (and the mission paragraph repeats the same association), but the implementation explicitly keeps markdown rendering out of `type-signals` and centralizes it in `sync_rendered_views` after both signal files are persisted. As written, the agent will assume the Markdown view exists immediately after `type-signals`, which is false.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 107,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e953d0c40fdb9a743b1397fdcb19648ab867f387b3c2352b07ae7ec697859f3f",
+          "at": "2026-04-25T12:50:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e90c21a65dd51a83485129a1f47686bc80c5973318571b8d9d83bf6729ec0091",
+          "at": "2026-04-25T12:52:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 9 now says `<layer>-types.md` is rendered later by `sync_rendered_views`, but the fixed 9-step pipeline never runs any sync-rendered-views command while this same agent still owns the rendered views. As written, a type-design pass can finish after `type-signals` with refreshed JSON/signals but a stale or missing `<layer>-types.md`, contradicting the agent's rendered-view ownership and leaving a Phase 2 artifact unsynchronized. Add the sync step to the pipeline or make clear which outer command renders it before `/track:type-design` completes.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 107,
+              "category": "behavioral_coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e90c21a65dd51a83485129a1f47686bc80c5973318571b8d9d83bf6729ec0091",
+          "at": "2026-04-25T12:59:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rewritten internal pipeline no longer includes any step that refreshes `<layer>-types.md`. `type-signals` only writes the declaration/signals JSON, and `sync_rendered_views` is not invoked anywhere in the 9-step sequence, so the agent no longer fulfills its own ownership claim for all derived views.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 107,
+              "category": "behavioral coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e90c21a65dd51a83485129a1f47686bc80c5973318571b8d9d83bf6729ec0091",
+          "at": "2026-04-25T14:47:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72246840915f775f6423ddaebd2ce872df3287f7160fe15b1df3d9defb478c6a",
+          "at": "2026-04-25T14:50:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72246840915f775f6423ddaebd2ce872df3287f7160fe15b1df3d9defb478c6a",
+          "at": "2026-04-25T14:53:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35556dea2beb822f91e7add03a071d50160347cef24f669b742e9b005b51edbc",
+          "at": "2026-04-25T14:59:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35556dea2beb822f91e7add03a071d50160347cef24f669b742e9b005b51edbc",
+          "at": "2026-04-25T15:00:39Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -138,6 +295,39 @@
           "findings": [],
           "hash": "rvw1:sha256:2843a8d29e19018885441260e3c55fc3a9f981974299c8e56071a0b6ca31910a",
           "at": "2026-04-25T12:23:55Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3de80028c37a32cb4d0ad00da0a4e62b3159c3167cae7ae597f153545a53d4e4",
+          "at": "2026-04-25T12:23:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated module docs still say that omitting `--cluster-depth` uses default 0 and writes the flat file, but the CLI option defaults to 2 and this same paragraph says cluster mode is the default. This leaves the new output-path documentation internally contradictory and factually wrong for omitted `--cluster-depth`, which now writes `<layer>-graph-d2/`, not `<layer>-graph.md`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 6,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:d3f4828bd97ceadf614134ba23080906852ba13196c70de26bd2bb1910a2e5f3",
+          "at": "2026-04-25T12:26:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3f4828bd97ceadf614134ba23080906852ba13196c70de26bd2bb1910a2e5f3",
+          "at": "2026-04-25T12:28:31Z"
         }
       ]
     },
@@ -801,6 +991,20 @@
           "findings": [],
           "hash": "rvw1:sha256:4761be894037f2489fad8d58094d48a155db77766d1f1cb5e175fd0870aa95cd",
           "at": "2026-04-25T14:59:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e0ea8ab41d46e4778421b2d9064a3945d4c192caa7b1aace2cee5649b7fb458",
+          "at": "2026-04-25T15:04:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e0ea8ab41d46e4778421b2d9064a3945d4c192caa7b1aace2cee5649b7fb458",
+          "at": "2026-04-25T15:05:19Z"
         }
       ]
     },
@@ -819,196 +1023,6 @@
           "findings": [],
           "hash": "rvw1:sha256:b7a737cf6f70ce88ef9490bc0bc7e398a937492dfd81c2a57b82bb8b961e3eb6",
           "at": "2026-04-25T12:25:57Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new reconnaissance step only reads `track/items/<id>/<layer>-graph/index.md` plus linked cluster files, but `sotp track type-graph` can also produce the flat `<layer>-graph.md` artifact when `--cluster-depth 0`. In that mode the agent would skip the actual graph output and make its draft from incomplete reconnaissance; the pipeline needs to branch on cluster depth, as the ADR describes.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 74,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b75436dc20add9b801a622ec54d8d27c166b6e0ab85aa96a4e5ec5110ebecf15",
-          "at": "2026-04-25T04:03:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
-          "at": "2026-04-25T04:08:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e77351d39e19f26a3b0cec9068832b8b7c9c937cb4c938a7b7ca99a3af4d893",
-          "at": "2026-04-25T04:11:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9749ec5481aabba0055c5554dd0e8f38760c557075ea872d79038326aa22b07f",
-          "at": "2026-04-25T06:40:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9749ec5481aabba0055c5554dd0e8f38760c557075ea872d79038326aa22b07f",
-          "at": "2026-04-25T06:44:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The 9-step pipeline now requires `bin/sotp track contract-map <id> [--layers <layer_id>]`, but the Bash allowlist here only names `baseline-capture`, `type-signals`, and generic “per-view render subcommands”. That omission can make step 8 unauthorized under this file’s own rules, so the pipeline is not fully executable as written.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 176,
-              "category": "behavioral coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:8f7e532d0a73260c0ccf149b843d78cfda198de0f1ea2aa27eb6cc1aca1244eb",
-          "at": "2026-04-25T12:43:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new sentence here says the per-layer blue/yellow/red counts are \"the only outputs surfaced to the orchestrator,\" but the unchanged Output section below still requires catalogue entries, action rationale, cross-partition migrations, and open questions in the final message. That creates an internal contradiction about what the agent must emit.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 111,
-              "category": "behavior"
-            }
-          ],
-          "hash": "rvw1:sha256:8f7e532d0a73260c0ccf149b843d78cfda198de0f1ea2aa27eb6cc1aca1244eb",
-          "at": "2026-04-25T12:47:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This step description still says `bin/sotp track type-signals` writes `<layer>-types.md` (and the mission paragraph repeats the same association), but the implementation explicitly keeps markdown rendering out of `type-signals` and centralizes it in `sync_rendered_views` after both signal files are persisted. As written, the agent will assume the Markdown view exists immediately after `type-signals`, which is false.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 107,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e953d0c40fdb9a743b1397fdcb19648ab867f387b3c2352b07ae7ec697859f3f",
-          "at": "2026-04-25T12:50:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e90c21a65dd51a83485129a1f47686bc80c5973318571b8d9d83bf6729ec0091",
-          "at": "2026-04-25T12:52:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 9 now says `<layer>-types.md` is rendered later by `sync_rendered_views`, but the fixed 9-step pipeline never runs any sync-rendered-views command while this same agent still owns the rendered views. As written, a type-design pass can finish after `type-signals` with refreshed JSON/signals but a stale or missing `<layer>-types.md`, contradicting the agent's rendered-view ownership and leaving a Phase 2 artifact unsynchronized. Add the sync step to the pipeline or make clear which outer command renders it before `/track:type-design` completes.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 107,
-              "category": "behavioral_coverage_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:e90c21a65dd51a83485129a1f47686bc80c5973318571b8d9d83bf6729ec0091",
-          "at": "2026-04-25T12:59:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The rewritten internal pipeline no longer includes any step that refreshes `<layer>-types.md`. `type-signals` only writes the declaration/signals JSON, and `sync_rendered_views` is not invoked anywhere in the 9-step sequence, so the agent no longer fulfills its own ownership claim for all derived views.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 107,
-              "category": "behavioral coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:e90c21a65dd51a83485129a1f47686bc80c5973318571b8d9d83bf6729ec0091",
-          "at": "2026-04-25T14:47:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72246840915f775f6423ddaebd2ce872df3287f7160fe15b1df3d9defb478c6a",
-          "at": "2026-04-25T14:50:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72246840915f775f6423ddaebd2ce872df3287f7160fe15b1df3d9defb478c6a",
-          "at": "2026-04-25T14:53:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35556dea2beb822f91e7add03a071d50160347cef24f669b742e9b005b51edbc",
-          "at": "2026-04-25T14:59:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35556dea2beb822f91e7add03a071d50160347cef24f669b742e9b005b51edbc",
-          "at": "2026-04-25T15:00:39Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3de80028c37a32cb4d0ad00da0a4e62b3159c3167cae7ae597f153545a53d4e4",
-          "at": "2026-04-25T12:23:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated module docs still say that omitting `--cluster-depth` uses default 0 and writes the flat file, but the CLI option defaults to 2 and this same paragraph says cluster mode is the default. This leaves the new output-path documentation internally contradictory and factually wrong for omitted `--cluster-depth`, which now writes `<layer>-graph-d2/`, not `<layer>-graph.md`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/graph.rs",
-              "line": 6,
-              "category": "documentation"
-            }
-          ],
-          "hash": "rvw1:sha256:d3f4828bd97ceadf614134ba23080906852ba13196c70de26bd2bb1910a2e5f3",
-          "at": "2026-04-25T12:26:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3f4828bd97ceadf614134ba23080906852ba13196c70de26bd2bb1910a2e5f3",
-          "at": "2026-04-25T12:28:31Z"
         }
       ]
     }

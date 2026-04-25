@@ -16,7 +16,8 @@
     {
       "id": "T003",
       "description": "Update `.claude/agents/type-designer.md` Output section: remove `Entries written`, `Action rationale`, and `Cross-partition migrations` sections; keep only `Signal evaluation` (per-layer) and `Open Questions`",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "aed93aee8afaa5f21271effd7f1b21728e2c3435"
     }
   ],
   "plan": {
