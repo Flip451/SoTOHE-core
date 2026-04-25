@@ -10,7 +10,7 @@ Priority references:
 - `track/items/<id>/metadata.json`
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
-- `track/items/<id>/verification.md`
+- `track/items/<id>/observations.md` (optional — manual observation log)
 - `knowledge/DESIGN.md`
 - `knowledge/WORKFLOW.md`
 - `knowledge/adr/README.md`

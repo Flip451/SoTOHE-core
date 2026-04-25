@@ -15,7 +15,7 @@ Host orchestration stays in Claude Code. Specialist capabilities may switch as m
 
 Terms:
 
-- `track`: `metadata.json` (identity SSoT) / `spec.json` (Phase 1 behavioral contract SSoT) / `<layer>-types.json` (Phase 2 type-contract SSoT) / `impl-plan.json` + `task-coverage.json` (Phase 3 implementation plan SSoT) / `spec.md` / `plan.md` / `verification.md` (read-only rendered views) / progress management layer
+- `track`: `metadata.json` (identity SSoT) / `spec.json` (Phase 1 behavioral contract SSoT) / `<layer>-types.json` (Phase 2 type-contract SSoT) / `impl-plan.json` + `task-coverage.json` (Phase 3 implementation plan SSoT) / `spec.md` / `plan.md` (read-only rendered views) / `observations.md` (optional manual observation log) / progress management layer
 
 ## Source Of Truth
 
@@ -31,7 +31,7 @@ Read these first before planning or implementation:
 - `track/items/<id>/impl-plan.json` + `task-coverage.json` (Phase 3 SSoT, if exists)
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
-- `track/items/<id>/verification.md`
+- `track/items/<id>/observations.md` (optional — manual observation log)
 - `TRACK_TRACEABILITY.md`
 - `knowledge/DESIGN.md`
 - `.claude/rules/`

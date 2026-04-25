@@ -16,22 +16,24 @@
     {
       "id": "T003",
       "description": ".claude/commands/track/implement.md のステップ「After CI passes, update verification.md…」を削除し、「D4 (a)/(b) の条件に該当する場合のみ observations.md を作成/追記する」手順に置き換える。.claude/commands/track/full-cycle.md の「## Post-loop」セクションにある「update verification.md with overall results and verified_at」を同様に observations.md の条件付き手順に書き換える (IN-02、command docs)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "e322e0b45b1789463ae7f202693e364a714992dd"
     },
     {
       "id": "T004",
       "description": ".claude/commands/track/commit.md の Step 0 および Step 3 から verification.md への参照を削除し、observations.md を optional source (存在する場合のみ参照) として扱う記述に更新する。Step 3a の「Read spec.md, plan.md, and verification.md」を「Read spec.md and plan.md; if observations.md exists, also read it」相当に書き換える (IN-03、command docs)",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "e322e0b45b1789463ae7f202693e364a714992dd"
     },
     {
       "id": "T005",
       "description": "track/workflow.md の「## verification.md」セクションを廃止し、「## observations.md」セクションに置き換える。新セクションには observations.md の役割 (機械検証不能な手動観測ログ、自由形式、scaffold なし)、作成条件 (D4 (a) implementer 裁量 / D4 (b) spec AC 明示)、および CN-02 (ファイル不在 = 観測なし、CI は不在を error にしない)・CN-03 (フォーマット自由)・CN-04 (新規 track で verification.md を作成しない) の制約を記述する (IN-04、workflow docs)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "CLAUDE.md / START_HERE_HUMAN.md / .claude/rules/08-orchestration.md / .claude/rules/10-guardrails.md から verification.md への言及を削除または observations.md の文脈に書き換える。CLAUDE.md の Priority references にある verification.md エントリを削除する。08-orchestration.md の Source Of Truth セクションにある verification.md 参照を削除する。10-guardrails.md にある verification.md 言及を確認し該当箇所を更新する (IN-05、docs)",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T007",
