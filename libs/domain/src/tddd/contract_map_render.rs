@@ -81,10 +81,16 @@ pub fn render_contract_map(
     // 3. Build lookup: type name → (layer, node_id) so edges can resolve
     //    targets by last-segment type name.
     //
-    //    `type_index`  — all surviving entries (used for method-call edges).
-    //    `port_index`  — only `SecondaryPort` entries (used for trait-impl
-    //                    edges so that `-.impl.->` never accidentally targets a
-    //                    same-named DTO/value-object).
+    //    `type_index`              — all surviving entries (used for method-call
+    //                                edges and FreeFunction param/return edges).
+    //    `port_index`              — only `SecondaryPort` entries (used for
+    //                                trait-impl edges so that `-.impl.->` never
+    //                                accidentally targets a same-named
+    //                                DTO/value-object).
+    //    `application_service_index` — only `ApplicationService` entries (used
+    //                                for Interactor `-.impl.->` edges so that the
+    //                                dashed arrow never accidentally targets a
+    //                                same-named non-service entry).
     //
     //    Per-layer catalogues may legitimately declare the same short name in
     //    different layers (e.g. `Error` or `Command` as layer-local types).
@@ -95,11 +101,15 @@ pub fn render_contract_map(
     //    declarations.
     let mut type_index: BTreeMap<String, Vec<(LayerId, String)>> = BTreeMap::new();
     let mut port_index: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut application_service_index: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for (layer, entry) in &entries {
         let id = node_id(layer, entry.name());
         type_index.entry(entry.name().to_owned()).or_default().push(((*layer).clone(), id.clone()));
         if matches!(entry.kind(), TypeDefinitionKind::SecondaryPort { .. }) {
-            port_index.entry(entry.name().to_owned()).or_default().push(id);
+            port_index.entry(entry.name().to_owned()).or_default().push(id.clone());
+        }
+        if matches!(entry.kind(), TypeDefinitionKind::ApplicationService { .. }) {
+            application_service_index.entry(entry.name().to_owned()).or_default().push(id);
         }
     }
 
@@ -111,6 +121,7 @@ pub fn render_contract_map(
     out.push_str("    classDef command fill:#e3f2fd,stroke:#1976d2\n");
     out.push_str("    classDef query fill:#f3e5f5,stroke:#8e24aa\n");
     out.push_str("    classDef factory fill:#fff8e1,stroke:#f9a825\n");
+    out.push_str("    classDef free_function fill:#f1f8e9,stroke:#558b2f\n");
 
     // 4a. Subgraphs.
     for layer in &active_layers {
@@ -185,6 +196,63 @@ pub fn render_contract_map(
                 if let Some(port_ids) = port_index.get(impl_decl.trait_name()) {
                     for port_id in port_ids {
                         edges.insert(format!("    {src_id} -.impl.-> {port_id}"));
+                    }
+                }
+            }
+        }
+
+        // Interactor → ApplicationService trait-impl edges (ADR 2026-04-17-1528 §L3).
+        //
+        // Use `application_service_index` (ApplicationService entries only) so
+        // that `-.impl.->` is never accidentally drawn to a same-named
+        // non-service entry. Missing names (ApplicationService not in catalogue)
+        // are silently skipped — no broken edge is emitted (CN-08 compliant:
+        // no layer names hardcoded).
+        if let TypeDefinitionKind::Interactor { declares_application_service, .. } = entry.kind() {
+            for svc_name in declares_application_service {
+                if let Some(svc_ids) = application_service_index.get(svc_name.as_str()) {
+                    for svc_id in svc_ids {
+                        edges.insert(format!("    {src_id} -.impl.-> {svc_id}"));
+                    }
+                }
+            }
+        }
+
+        // FreeFunction param/return edges (ADR 2026-04-17-1528 §L2 / §L4).
+        //
+        // For each `expected_params[].ty` token that resolves in `type_index`,
+        // draw an edge labelled with the parameter name.  For each token in
+        // `expected_returns` that resolves in `type_index`, draw an edge
+        // labelled `"returns"`.  Only declared types (present in `type_index`)
+        // become edge targets — external types (e.g. `String`, `Result`) are
+        // silently ignored.  Self-loops are suppressed.
+        if let TypeDefinitionKind::FreeFunction { expected_params, expected_returns, .. } =
+            entry.kind()
+        {
+            for param in expected_params {
+                for token in extract_type_names(param.ty()) {
+                    if let Some(dsts) = type_index.get(token) {
+                        for (_dst_layer, dst_id) in dsts {
+                            if dst_id == &src_id {
+                                continue;
+                            }
+                            edges.insert(format!(
+                                "    {src_id} -->|{label}| {dst_id}",
+                                label = escape_edge_label(param.name()),
+                            ));
+                        }
+                    }
+                }
+            }
+            for ret_ty in expected_returns {
+                for token in extract_type_names(ret_ty.as_str()) {
+                    if let Some(dsts) = type_index.get(token) {
+                        for (_dst_layer, dst_id) in dsts {
+                            if dst_id == &src_id {
+                                continue;
+                            }
+                            edges.insert(format!("    {src_id} -->|\"returns\"| {dst_id}"));
+                        }
                     }
                 }
             }
@@ -966,6 +1034,301 @@ mod tests {
         assert!(
             text.contains("-->|\"save\"|"),
             "quoted `|\"save\"|` must appear for returns edges; output was:\n{text}"
+        );
+    }
+
+    // --- T009: Interactor → ApplicationService -.impl.-> edge (AC-10) ---
+
+    #[test]
+    fn test_render_contract_map_draws_interactor_to_application_service_impl_edge() {
+        // AC-10: Interactor with `declares_application_service: ["UserManagement"]`
+        // and an ApplicationService entry "UserManagement" → output contains the
+        // dashed impl edge (ADR 2026-04-17-1528 §L3 resolved).
+        let usecase = layer("usecase");
+
+        let interactor_entry = entry(
+            "RegisterUserInteractor",
+            TypeDefinitionKind::Interactor {
+                expected_members: Vec::new(),
+                declares_application_service: vec!["UserManagement".to_owned()],
+            },
+        );
+        let svc_entry = entry(
+            "UserManagement",
+            TypeDefinitionKind::ApplicationService { expected_methods: vec![] },
+        );
+
+        let usecase_doc = doc(vec![interactor_entry, svc_entry]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(usecase.clone(), usecase_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&usecase),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            text.contains("L7_usecase_RegisterUserInteractor -.impl.-> L7_usecase_UserManagement"),
+            "Interactor → ApplicationService impl edge must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_interactor_to_application_service_edge_cross_layer() {
+        // AC-10 cross-layer variant: Interactor in usecase layer declares
+        // ApplicationService that lives in a different layer — edge must
+        // still be drawn using the index, not hardcoded layer names (CN-08).
+        let app = layer("app");
+        let core = layer("core");
+
+        let interactor_entry = entry(
+            "DoThingInteractor",
+            TypeDefinitionKind::Interactor {
+                expected_members: Vec::new(),
+                declares_application_service: vec!["DoThing".to_owned()],
+            },
+        );
+        let svc_entry =
+            entry("DoThing", TypeDefinitionKind::ApplicationService { expected_methods: vec![] });
+
+        let app_doc = doc(vec![interactor_entry]);
+        let core_doc = doc(vec![svc_entry]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(app.clone(), app_doc);
+        catalogues.insert(core.clone(), core_doc);
+        let order = vec![core, app];
+
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        assert!(
+            text.contains("L3_app_DoThingInteractor -.impl.-> L4_core_DoThing"),
+            "cross-layer interactor → application_service edge must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_interactor_missing_application_service_emits_no_broken_edge() {
+        // Edge case: Interactor declares_application_service references a name
+        // that has no matching ApplicationService entry in the catalogue.
+        // The renderer must skip gracefully — no broken edge, no panic.
+        let usecase = layer("usecase");
+
+        let interactor_entry = entry(
+            "OrphanInteractor",
+            TypeDefinitionKind::Interactor {
+                expected_members: Vec::new(),
+                declares_application_service: vec!["MissingService".to_owned()],
+            },
+        );
+
+        let usecase_doc = doc(vec![interactor_entry]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(usecase.clone(), usecase_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&usecase),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        // No edge of any kind should reference the missing service.
+        assert!(
+            !text.contains("MissingService"),
+            "missing ApplicationService must not produce a broken edge; output was:\n{text}"
+        );
+        // Node itself must be present (the interactor should still render).
+        assert!(
+            text.contains("L7_usecase_OrphanInteractor"),
+            "OrphanInteractor node must still be rendered; output was:\n{text}"
+        );
+    }
+
+    // --- T009: FreeFunction param / return edges (AC-09) ---
+
+    #[test]
+    fn test_render_contract_map_free_function_param_edge_to_declared_type() {
+        // AC-09a: FreeFunction with expected_params containing a type
+        // that is declared as a ValueObject → edge from FreeFunction node to
+        // that ValueObject node must appear.
+        let domain = layer("domain");
+
+        let fn_entry = entry(
+            "find_user",
+            TypeDefinitionKind::FreeFunction {
+                module_path: None,
+                expected_params: vec![ParamDeclaration::new("id", "UserId")],
+                expected_returns: Vec::new(),
+                expected_is_async: false,
+            },
+        );
+        let vo_entry =
+            entry("UserId", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+
+        let domain_doc = doc(vec![fn_entry, vo_entry]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        // `find_user` → sanitize_id encodes `_` as `__`, so the node id is
+        // `find__user`.
+        assert!(
+            text.contains("L6_domain_find__user -->|\"id\"| L6_domain_UserId"),
+            "FreeFunction param edge to UserId must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_free_function_return_edge_to_declared_type() {
+        // AC-09b: FreeFunction with expected_returns containing a type that
+        // is declared in the catalogue → edge from FreeFunction node to that
+        // type node must appear, labelled "returns".
+        let domain = layer("domain");
+
+        let fn_entry = entry(
+            "make_result",
+            TypeDefinitionKind::FreeFunction {
+                module_path: None,
+                expected_params: Vec::new(),
+                expected_returns: vec!["MyResult".to_owned()],
+                expected_is_async: false,
+            },
+        );
+        let result_entry =
+            entry("MyResult", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+
+        let domain_doc = doc(vec![fn_entry, result_entry]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        // `make_result` → sanitize_id encodes `_` as `__`, so the node id is
+        // `make__result`.
+        assert!(
+            text.contains("L6_domain_make__result -->|\"returns\"| L6_domain_MyResult"),
+            "FreeFunction returns edge to MyResult must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_free_function_both_param_and_return_edges() {
+        // AC-09 combined: FreeFunction with both params and returns referencing
+        // declared types → both edges appear.
+        let domain = layer("domain");
+
+        let fn_entry = entry(
+            "transform",
+            TypeDefinitionKind::FreeFunction {
+                module_path: None,
+                expected_params: vec![ParamDeclaration::new("input", "InputDto")],
+                expected_returns: vec!["OutputDto".to_owned()],
+                expected_is_async: false,
+            },
+        );
+        let in_entry = entry("InputDto", TypeDefinitionKind::Dto { expected_members: Vec::new() });
+        let out_entry =
+            entry("OutputDto", TypeDefinitionKind::Dto { expected_members: Vec::new() });
+
+        let domain_doc = doc(vec![fn_entry, in_entry, out_entry]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            text.contains("L6_domain_transform -->|\"input\"| L6_domain_InputDto"),
+            "FreeFunction param edge to InputDto must appear; output was:\n{text}"
+        );
+        assert!(
+            text.contains("L6_domain_transform -->|\"returns\"| L6_domain_OutputDto"),
+            "FreeFunction returns edge to OutputDto must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_free_function_undeclared_param_type_emits_no_edge() {
+        // AC-09 edge case: FreeFunction param type that is not in the catalogue
+        // must NOT produce an edge (external/undeclared types are ignored).
+        let domain = layer("domain");
+
+        let fn_entry = entry(
+            "read_file",
+            TypeDefinitionKind::FreeFunction {
+                module_path: None,
+                expected_params: vec![ParamDeclaration::new("path", "std::path::PathBuf")],
+                expected_returns: Vec::new(),
+                expected_is_async: false,
+            },
+        );
+
+        let domain_doc = doc(vec![fn_entry]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            !text.contains("-->"),
+            "no edge should be emitted for undeclared param type; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_free_function_node_is_rendered_in_subgraph() {
+        // AC-09: FreeFunction node appears in the subgraph with the
+        // free_function classDef shape (verified by node_shape test above
+        // but also confirmed here in the full render flow).
+        let domain = layer("domain");
+
+        let fn_entry = entry(
+            "helper_fn",
+            TypeDefinitionKind::FreeFunction {
+                module_path: None,
+                expected_params: Vec::new(),
+                expected_returns: Vec::new(),
+                expected_is_async: false,
+            },
+        );
+
+        let domain_doc = doc(vec![fn_entry]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        // `helper_fn` → sanitize_id encodes `_` as `__`, so the node id is
+        // `helper__fn`.
+        assert!(
+            text.contains("L6_domain_helper__fn[helper_fn]:::free_function"),
+            "FreeFunction node must appear with free_function classDef; output was:\n{text}"
+        );
+        // classDef must be emitted.
+        assert!(
+            text.contains("classDef free_function"),
+            "free_function classDef must be declared in diagram header; output was:\n{text}"
         );
     }
 }

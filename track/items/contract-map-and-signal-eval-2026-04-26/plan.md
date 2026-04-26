@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Contract Map 表示拡張 + signal 評価拡張 (両輪)
 
-## Tasks (9/10 resolved)
+## Tasks (10/10 resolved)
 
 ### S1 — Signal Evaluator Action-Awareness (bootstrap fix)
 
@@ -51,7 +51,7 @@
 > T009 は contract_map_render.rs に interactor → ApplicationService -.impl.-> edge および FreeFunction ノード + edges を追加する。
 > T002 の FreeFunction variant と S3 の型拡張が前提となる。layer-agnostic 不変条件 (CN-08) を遵守する。
 
-- [ ] **T009**: Contract Map edge 描画ロジック (domain 層 contract_map_render.rs) を拡張する。(a) Interactor の declares_application_service に列挙された ApplicationService trait 名への -.impl.-> edge を描画する (ADR 2026-04-17-1528 §L3 解消)。application_service_index (ApplicationService kind のエントリインデックス) を構築し、Interactor エントリの declares_application_service を走査して edge を追加する (AC-10)。(b) FreeFunction ノードを Contract Map に追加し、node_shape を定義する。FreeFunction の expected_params 型への edge および expected_returns 型への edge を type_index 経由で描画する (ADR 2026-04-17-1528 §L2 / §L4 解消) (AC-09)。(c) layer-agnostic 不変条件 (CN-08) を遵守し、層名をハードコードしない。unit tests を追加する。
+- [x] **T009**: Contract Map edge 描画ロジック (domain 層 contract_map_render.rs) を拡張する。(a) Interactor の declares_application_service に列挙された ApplicationService trait 名への -.impl.-> edge を描画する (ADR 2026-04-17-1528 §L3 解消)。application_service_index (ApplicationService kind のエントリインデックス) を構築し、Interactor エントリの declares_application_service を走査して edge を追加する (AC-10)。(b) FreeFunction ノードを Contract Map に追加し、node_shape を定義する。FreeFunction の expected_params 型への edge および expected_returns 型への edge を type_index 経由で描画する (ADR 2026-04-17-1528 §L2 / §L4 解消) (AC-09)。(c) layer-agnostic 不変条件 (CN-08) を遵守し、層名をハードコードしない。unit tests を追加する。
 
 ### S7 — Catalogue Data Migration + CI Integration
 
