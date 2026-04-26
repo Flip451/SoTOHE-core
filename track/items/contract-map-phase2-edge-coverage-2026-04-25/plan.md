@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD Contract Map Phase 2 — Edge coverage で孤立ノード 9 件 (L1-L4) を解消
 
-## Tasks (4/10 resolved)
+## Tasks (5/10 resolved)
 
 ### S01 — Domain: FreeFunction Kind Addition
 
@@ -38,7 +38,7 @@
 > unused_reference classDef (action=reference かつ edge なし) と declaration_only classDef (action=modify かつ expected_methods 空、edge の有無は問わない) を renderer に実装する (GO-05、IN-03、IN-04、AC-03、AC-04)。
 > Phase 1 の 9 件孤立ノードのうち L1 (TaskId 等の forward-reference) と L2 (ValidationError) が視覚的に識別可能になる。
 
-- [~] **T005**: Implement unused_reference and declaration_only dashed-border classDef rendering in contract_map_render.rs (domain). After building type_index and edges, compute the set of node_ids that appear as an edge source or target. Entries where action=reference AND node_id is absent from the edge set get classDef unused_reference (stroke-dasharray). Entries where action=modify AND expected_methods is empty get classDef declaration_only (stroke-dasharray) regardless of edge presence. Add both classDef definitions to the mermaid header. Add unit tests: reference entry with no edges renders with unused_reference; reference entry that IS an edge target does not; modify+empty-methods entry renders with declaration_only.
+- [x] **T005**: Implement unused_reference and declaration_only dashed-border classDef rendering in contract_map_render.rs (domain). After building type_index and edges, compute the set of node_ids that appear as an edge source or target. Entries where action=reference AND node_id is absent from the edge set get classDef unused_reference (stroke-dasharray). Entries where action=modify AND expected_methods is empty get classDef declaration_only (stroke-dasharray) regardless of edge presence. Add both classDef definitions to the mermaid header. Add unit tests: reference entry with no edges renders with unused_reference; reference entry that IS an edge target does not; modify+empty-methods entry renders with declaration_only. (`1eba32039a6774748180c8779989e7b122ec9c15`)
 
 ### S06 — Domain: Field Edge Generation (L2 Fix)
 
@@ -46,7 +46,7 @@
 > MemberDeclaration は既存 domain 型。domain → infrastructure 逆依存禁止を維持 (CN-02)。
 > 対象 4 kind 限定でノイズ制御 (CN-05)。
 
-- [ ] **T006**: Implement field edge generation in contract_map_render.rs (domain) and extend the catalogue codec (infrastructure) to decode/encode expected_members. (1) Domain: add expected_members: Vec<MemberDeclaration> to TypeCatalogueEntry struct and new_with_members constructor (or extend existing with_refs). Add field_members_of() helper that returns MemberDeclaration::Field items for the four eligible kinds (dto, command, query, value_object). In the edge-building loop, iterate field_members_of(), extract type name tokens via extract_type_names, resolve against type_index (declared types only), and emit F -->|".field_name"| T edges. External types (String, bool, u32, etc.) absent from type_index are silently skipped. (2) Infrastructure: extend TypeCatalogueEntryDto in catalogue_codec.rs to include optional expected_members: Vec<MemberDto> (serde default/skip). Extend encode/decode conversion paths to round-trip MemberDeclaration::Field items. The existing stale-field guard must permit expected_members for the four eligible entry kinds. (3) Unit tests: same-layer field edge, cross-layer field edge, external type produces no edge, method-bearing kind (secondary_port) produces no field edge; codec round-trip for a dto entry with expected_members.
+- [~] **T006**: Implement field edge generation in contract_map_render.rs (domain) and extend the catalogue codec (infrastructure) to decode/encode expected_members. (1) Domain: add expected_members: Vec<MemberDeclaration> to TypeCatalogueEntry struct and new_with_members constructor (or extend existing with_refs). Add field_members_of() helper that returns MemberDeclaration::Field items for the four eligible kinds (dto, command, query, value_object). In the edge-building loop, iterate field_members_of(), extract type name tokens via extract_type_names, resolve against type_index (declared types only), and emit F -->|".field_name"| T edges. External types (String, bool, u32, etc.) absent from type_index are silently skipped. (2) Infrastructure: extend TypeCatalogueEntryDto in catalogue_codec.rs to include optional expected_members: Vec<MemberDto> (serde default/skip). Extend encode/decode conversion paths to round-trip MemberDeclaration::Field items. The existing stale-field guard must permit expected_members for the four eligible entry kinds. (3) Unit tests: same-layer field edge, cross-layer field edge, external type produces no edge, method-bearing kind (secondary_port) produces no field edge; codec round-trip for a dto entry with expected_members.
 
 ### S07 — Domain: Action Overlay
 

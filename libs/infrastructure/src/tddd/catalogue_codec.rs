@@ -20,7 +20,9 @@
 
 use std::path::PathBuf;
 
-use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration, TraitImplDecl};
+use domain::tddd::catalogue::{
+    MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl,
+};
 use domain::{
     ConfidenceSignal, ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
     SpecElementId, SpecRef, SpecValidationError, TypeAction, TypeCatalogueDocument,
@@ -105,6 +107,11 @@ struct TypeCatalogueEntryDto {
     /// Defaults to empty when absent in JSON.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub informal_grounds: Vec<InformalGroundRefDto>,
+    /// T006 / IN-05 / CN-05: declared composite-type members. Only valid
+    /// for `Dto`, `Command`, `Query`, `ValueObject` kinds; per-kind guards
+    /// reject this field on other kinds.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub expected_members: Vec<MemberDto>,
 }
 
 /// DTO for a single `SpecRef` (SoT Chain ② — catalogue→spec).
@@ -230,6 +237,15 @@ struct ParamDto {
     ty: String,
 }
 
+/// T006 / IN-05: DTO for `MemberDeclaration` — mirrors the domain enum
+/// (`Variant(String)` / `Field { name, ty }`) using a tagged JSON shape.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+enum MemberDto {
+    Variant { name: String },
+    Field { name: String, ty: String },
+}
+
 /// DTO for a single trait implementation declaration within a `SecondaryAdapter`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -290,8 +306,10 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 .and_then(|v| v.as_str())
                 .unwrap_or("<unnamed>");
             // Existence-only kinds must not carry any structural fields.
-            const EXISTENCE_ONLY_KINDS: &[&str] =
-                &["use_case", "dto", "command", "query", "factory", "value_object"];
+            // T006 / CN-05: dto/command/query/value_object are field-bearing
+            // and have their own dedicated guard below; existence-only here
+            // covers only use_case and factory.
+            const EXISTENCE_ONLY_KINDS: &[&str] = &["use_case", "factory"];
             const FORBIDDEN_FIELDS_EXISTENCE_ONLY: &[&str] = &[
                 "expected_methods",
                 "expected_variants",
@@ -300,6 +318,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 "expected_params",
                 "expected_returns",
                 "declares_application_service",
+                "expected_members",
             ];
             if EXISTENCE_ONLY_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
@@ -310,6 +329,37 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                                 reason: format!(
                                     "kind '{}' does not support field '{}' — \
                                      existence-only kinds carry no structural fields",
+                                    kind, forbidden
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+            // T006 / CN-05: `dto` / `command` / `query` / `value_object` are
+            // field-bearing kinds. They may carry `expected_members` (used by
+            // the contract map renderer's field-edge pass) but must not carry
+            // any other structural field belonging to a different kind. Same
+            // serde-flatten silent-drop concern as the other guards.
+            const FIELD_BEARING_KINDS: &[&str] = &["dto", "command", "query", "value_object"];
+            const FORBIDDEN_FIELDS_FIELD_BEARING: &[&str] = &[
+                "expected_methods",
+                "expected_variants",
+                "transitions_to",
+                "implements",
+                "expected_params",
+                "expected_returns",
+                "declares_application_service",
+            ];
+            if FIELD_BEARING_KINDS.contains(&kind) {
+                if let Some(obj) = entry_obj {
+                    for forbidden in FORBIDDEN_FIELDS_FIELD_BEARING {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind '{}' does not support field '{}' — \
+                                     field-bearing kinds carry only 'expected_members'",
                                     kind, forbidden
                                 ),
                             });
@@ -332,6 +382,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     "implements",
                     "expected_params",
                     "expected_returns",
+                    "expected_members",
                 ];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_INTERACTOR {
@@ -360,6 +411,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     "transitions_to",
                     "implements",
                     "declares_application_service",
+                    "expected_members",
                 ];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_FREE_FUNCTION {
@@ -388,6 +440,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     "expected_params",
                     "expected_returns",
                     "declares_application_service",
+                    "expected_members",
                 ];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_SECONDARY_ADAPTER {
@@ -417,6 +470,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 "expected_params",
                 "expected_returns",
                 "declares_application_service",
+                "expected_members",
             ];
             if STRUCTURED_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
@@ -585,7 +639,8 @@ fn type_catalogue_entry_from_dto(
     let action = type_action_from_dto(dto.action);
     let spec_refs = spec_refs_from_dtos(&dto.name, &dto.spec_refs)?;
     let informal_grounds = informal_grounds_from_dtos(&dto.name, &dto.informal_grounds)?;
-    TypeCatalogueEntry::with_refs(
+    let members = decode_member_list(&dto.name, &dto.expected_members)?;
+    let entry = TypeCatalogueEntry::with_refs(
         &dto.name,
         &dto.description,
         kind,
@@ -594,7 +649,39 @@ fn type_catalogue_entry_from_dto(
         spec_refs,
         informal_grounds,
     )
-    .map_err(TypeCatalogueCodecError::Validation)
+    .map_err(TypeCatalogueCodecError::Validation)?;
+    entry.with_members(members).map_err(TypeCatalogueCodecError::Validation)
+}
+
+/// T006 / IN-05: decode `Vec<MemberDto>` → `Vec<MemberDeclaration>`. L1
+/// enforcement: `Field.ty` must not contain `::` (last-segment short names
+/// only, mirrors the existing method/return validation).
+fn decode_member_list(
+    entry_name: &str,
+    dtos: &[MemberDto],
+) -> Result<Vec<MemberDeclaration>, TypeCatalogueCodecError> {
+    let mut decls = Vec::with_capacity(dtos.len());
+    for m in dtos {
+        match m {
+            MemberDto::Variant { name } => {
+                decls.push(MemberDeclaration::variant(name.clone()));
+            }
+            MemberDto::Field { name, ty } => {
+                if ty.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members field '{}' ty contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{}'",
+                            name, ty
+                        ),
+                    });
+                }
+                decls.push(MemberDeclaration::field(name.clone(), ty.clone()));
+            }
+        }
+    }
+    Ok(decls)
 }
 
 /// Decode `Vec<SpecRefDto>` → `Vec<SpecRef>`.
@@ -963,6 +1050,7 @@ fn type_catalogue_entry_to_dto(
     };
     let spec_refs = spec_refs_to_dtos(entry.spec_refs());
     let informal_grounds = informal_grounds_to_dtos(entry.informal_grounds());
+    let expected_members = encode_member_list(entry.name(), entry.expected_members())?;
     Ok(TypeCatalogueEntryDto {
         name: entry.name().to_owned(),
         description: entry.description().to_owned(),
@@ -971,7 +1059,43 @@ fn type_catalogue_entry_to_dto(
         kind,
         spec_refs,
         informal_grounds,
+        expected_members,
     })
+}
+
+/// T006 / IN-05: encode `&[MemberDeclaration]` → `Vec<MemberDto>`.
+///
+/// Mirrors the decode-side L1 enforcement so encode never produces JSON
+/// that decode would reject. `MemberDeclaration::field` accepts raw
+/// strings, so a `Field { ty: "domain::UserId" }` could be constructed by
+/// callers; surfacing the same `InvalidEntry` error here keeps the
+/// round-trip invariant intact.
+fn encode_member_list(
+    entry_name: &str,
+    members: &[MemberDeclaration],
+) -> Result<Vec<MemberDto>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(members.len());
+    for m in members {
+        match m {
+            MemberDeclaration::Variant(name) => {
+                out.push(MemberDto::Variant { name: name.clone() });
+            }
+            MemberDeclaration::Field { name, ty } => {
+                if ty.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members field '{}' ty contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{}'",
+                            name, ty
+                        ),
+                    });
+                }
+                out.push(MemberDto::Field { name: name.clone(), ty: ty.clone() });
+            }
+        }
+    }
+    Ok(out)
 }
 
 /// Encode `&[SpecRef]` → `Vec<SpecRefDto>`.
@@ -2009,6 +2133,118 @@ mod tests {
         }
         // skip_serializing_if = "Option::is_none" → field absent from emitted JSON.
         assert!(!encoded.contains("\"declares_application_service\""));
+    }
+
+    // --- T006 / IN-05: expected_members round-trip + reject ---
+
+    #[test]
+    fn test_round_trip_dto_with_expected_members() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "UserDto",
+      "kind": "dto",
+      "description": "user dto with field members",
+      "expected_members": [
+        { "kind": "field", "name": "id", "ty": "UserId" },
+        { "kind": "field", "name": "name", "ty": "String" }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let entry = &doc.entries()[0];
+        assert_eq!(entry.expected_members().len(), 2);
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].expected_members(), entry.expected_members());
+        assert!(encoded.contains("\"expected_members\""));
+        assert!(encoded.contains("\"UserId\""));
+    }
+
+    #[test]
+    fn test_round_trip_dto_with_empty_expected_members() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "EmptyDto", "kind": "dto", "description": "no members" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(doc.entries()[0].expected_members().is_empty());
+        let encoded = encode(&doc).unwrap();
+        // skip_serializing_if = "Vec::is_empty" → field absent in JSON.
+        assert!(!encoded.contains("\"expected_members\""));
+    }
+
+    #[test]
+    fn test_decode_dto_rejects_module_path_in_member_field_ty() {
+        // L1 enforcement on Field.ty.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "BrokenDto",
+      "kind": "dto",
+      "description": "field ty contains qualified path",
+      "expected_members": [
+        { "kind": "field", "name": "id", "ty": "domain::UserId" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for `::` in member field ty, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_use_case_rejects_expected_members() {
+        // use_case is existence-only post T006; expected_members forbidden.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "WrongKind",
+      "kind": "use_case",
+      "description": "use_case carrying expected_members",
+      "expected_members": [{ "kind": "field", "name": "x", "ty": "Foo" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for expected_members on use_case, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_secondary_port_rejects_expected_members() {
+        // secondary_port is method-bearing structured kind; expected_members forbidden.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "WrongKindPort",
+      "kind": "secondary_port",
+      "description": "secondary_port carrying expected_members",
+      "expected_methods": [],
+      "expected_members": [{ "kind": "field", "name": "x", "ty": "Foo" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for expected_members on secondary_port, got: {:?}",
+            err
+        );
     }
 
     #[test]

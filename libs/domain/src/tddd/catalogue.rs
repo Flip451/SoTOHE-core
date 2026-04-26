@@ -471,6 +471,11 @@ pub struct TypeCatalogueEntry {
     /// Unpersisted ground citations.
     /// Non-empty → 🟡 advisory signal (ADR 2026-04-19-1242 §D3.2).
     informal_grounds: Vec<InformalGroundRef>,
+    /// T006 / IN-05: declared composite-type members. Only valid for the
+    /// four field-bearing kinds (`Dto`, `Command`, `Query`, `ValueObject`);
+    /// other kinds must keep this empty. Renderer uses the `Field` variants
+    /// to draw `F -->|".field"| T` edges (CN-05). Empty by default.
+    expected_members: Vec<MemberDeclaration>,
 }
 
 impl TypeCatalogueEntry {
@@ -500,6 +505,7 @@ impl TypeCatalogueEntry {
             approved,
             spec_refs: Vec::new(),
             informal_grounds: Vec::new(),
+            expected_members: Vec::new(),
         })
     }
 
@@ -540,7 +546,30 @@ impl TypeCatalogueEntry {
             approved,
             spec_refs,
             informal_grounds,
+            expected_members: Vec::new(),
         })
+    }
+
+    /// T006 / IN-05: attach declared composite-type members to a freshly
+    /// constructed entry. Only `Dto`, `Command`, `Query`, and `ValueObject`
+    /// kinds are field-bearing per CN-05; other kinds are rejected to keep
+    /// catalogue-side noise out of the contract map renderer's field-edge
+    /// generation pass.
+    ///
+    /// # Errors
+    ///
+    /// Returns `SpecValidationError::EmptyDomainStateName` reused as a
+    /// generic invalid-construction signal when `members` is non-empty and
+    /// the entry's kind is not one of the four field-bearing kinds.
+    pub fn with_members(
+        mut self,
+        members: Vec<MemberDeclaration>,
+    ) -> Result<Self, SpecValidationError> {
+        if !members.is_empty() && !is_field_bearing_kind(&self.kind) {
+            return Err(SpecValidationError::EmptyDomainStateName);
+        }
+        self.expected_members = members;
+        Ok(self)
     }
 
     /// Returns the type name.
@@ -591,6 +620,39 @@ impl TypeCatalogueEntry {
     pub fn has_informal_grounds(&self) -> bool {
         !self.informal_grounds.is_empty()
     }
+
+    /// Returns the declared composite-type members (T006 / IN-05).
+    /// Empty for non-field-bearing kinds.
+    #[must_use]
+    pub fn expected_members(&self) -> &[MemberDeclaration] {
+        &self.expected_members
+    }
+
+    /// T006 / IN-05 / IN-08: returns only `MemberDeclaration::Field` items
+    /// from `expected_members`. Used by the Contract Map renderer's field
+    /// edge generation pass; `Variant` items (enum members) are filtered
+    /// out as they do not carry a target type.
+    pub fn field_members(&self) -> impl Iterator<Item = (&str, &str)> + '_ {
+        self.expected_members.iter().filter_map(|m| match m {
+            MemberDeclaration::Field { name, ty } => Some((name.as_str(), ty.as_str())),
+            MemberDeclaration::Variant(_) => None,
+        })
+    }
+}
+
+/// CN-05: the four kinds eligible for declared `expected_members` and
+/// downstream field-edge rendering. Centralised so the catalogue
+/// constructor (`with_members`), the contract-map renderer's
+/// `field_members_of` pass, and the codec stale-field guards stay in sync.
+#[must_use]
+pub fn is_field_bearing_kind(kind: &TypeDefinitionKind) -> bool {
+    matches!(
+        kind,
+        TypeDefinitionKind::Dto
+            | TypeDefinitionKind::Command
+            | TypeDefinitionKind::Query
+            | TypeDefinitionKind::ValueObject
+    )
 }
 
 // ---------------------------------------------------------------------------

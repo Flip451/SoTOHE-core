@@ -232,6 +232,39 @@ pub fn render_contract_map(
                 }
             }
         }
+
+        // T006 / IN-05 / IN-08 / CN-05: field edges from `expected_members`.
+        // Only emit for the four field-bearing kinds (Dto / Command / Query /
+        // ValueObject) per CN-05. The constructor-side gate
+        // (`TypeCatalogueEntry::with_members`) already keeps `expected_members`
+        // empty for other kinds, so `field_members()` is structurally empty on
+        // them; the explicit kind match here is a defence-in-depth read-side
+        // filter against externally-constructed entries.
+        if matches!(
+            entry.kind(),
+            TypeDefinitionKind::Dto
+                | TypeDefinitionKind::Command
+                | TypeDefinitionKind::Query
+                | TypeDefinitionKind::ValueObject
+        ) {
+            for (field_name, field_ty) in entry.field_members() {
+                for token in extract_type_names(field_ty) {
+                    if let Some(dsts) = type_index.get(token) {
+                        for (_dst_layer, dst_id) in dsts {
+                            if dst_id == &src_id {
+                                continue;
+                            }
+                            edges.insert(format!(
+                                "    {src_id} -->|{label}| {dst_id}",
+                                label = escape_edge_label(&format!(".{field_name}")),
+                            ));
+                            used_ids.insert(src_id.clone());
+                            used_ids.insert(dst_id.clone());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     for edge in &edges {
@@ -431,8 +464,8 @@ fn extract_type_names(ty: &str) -> Vec<&str> {
 mod tests {
     use super::*;
     use crate::tddd::catalogue::{
-        MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction, TypeCatalogueDocument,
-        TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
+        MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction,
+        TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
     };
 
     fn layer(name: &str) -> LayerId {
@@ -1068,6 +1101,95 @@ mod tests {
             !text.contains(" -.impl.-> "),
             "no impl edge expected when target is not an ApplicationService; output was:\n{text}"
         );
+    }
+
+    // --- T006 / IN-05 / CN-05: field edges from expected_members ---
+
+    #[test]
+    fn test_render_contract_map_field_edge_same_layer() {
+        // Dto with a Field referencing a same-layer ValueObject → field edge emitted.
+        let domain = layer("domain");
+        let user_id_entry = entry("UserId", TypeDefinitionKind::ValueObject);
+        let user_dto = entry("UserDto", TypeDefinitionKind::Dto)
+            .with_members(vec![MemberDeclaration::field("id", "UserId")])
+            .unwrap();
+        let domain_doc = doc(vec![user_id_entry, user_dto]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            text.contains("L6_domain_UserDto -->|\".id\"| L6_domain_UserId"),
+            "same-layer field edge to UserId must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_field_edge_cross_layer() {
+        // usecase Command with a Field referencing a domain ValueObject.
+        let domain = layer("domain");
+        let usecase = layer("usecase");
+        let user_id = entry("UserId", TypeDefinitionKind::ValueObject);
+        let cmd = entry("CreateUserCommand", TypeDefinitionKind::Command)
+            .with_members(vec![MemberDeclaration::field("user_id", "UserId")])
+            .unwrap();
+        let domain_doc = doc(vec![user_id]);
+        let usecase_doc = doc(vec![cmd]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        catalogues.insert(usecase.clone(), usecase_doc);
+        let content = render_contract_map(
+            &catalogues,
+            &[domain, usecase],
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            text.contains("L7_usecase_CreateUserCommand -->|\".user_id\"| L6_domain_UserId"),
+            "cross-layer field edge to UserId must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_no_field_edge_for_external_type() {
+        // Field referencing an external type (String) absent from type_index → no edge.
+        let domain = layer("domain");
+        let dto = entry("Vo", TypeDefinitionKind::Dto)
+            .with_members(vec![MemberDeclaration::field("name", "String")])
+            .unwrap();
+        let domain_doc = doc(vec![dto]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            !text.contains("-->|\".name\"|"),
+            "no edge for external type 'String'; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_with_members_rejects_method_bearing_kind() {
+        // CN-05: SecondaryPort is method-bearing, not field-bearing → with_members rejects.
+        let secondary_port_entry = TypeCatalogueEntry::new(
+            "SomePort",
+            "secondary port",
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let result =
+            secondary_port_entry.with_members(vec![MemberDeclaration::field("x", "SomeType")]);
+        assert!(result.is_err(), "with_members must reject field on a method-bearing kind");
     }
 
     // --- T005 / IN-03 / IN-04: dashed-border classDefs ---
