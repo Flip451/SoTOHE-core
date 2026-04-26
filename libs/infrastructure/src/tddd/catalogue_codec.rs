@@ -177,8 +177,13 @@ enum TypeDefinitionKindDto {
     },
     /// Struct-only use case; existence check only.
     UseCase {},
-    /// ApplicationService implementation struct; existence check only.
-    Interactor {},
+    /// `ApplicationService` implementation struct. `declares_application_service`
+    /// records the L1 short name of the `ApplicationService` (primary port)
+    /// the interactor implements; renderer uses it for the impl-edge target.
+    Interactor {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        declares_application_service: Option<String>,
+    },
     /// Pure data-transfer object struct; existence check only.
     Dto {},
     /// CQRS command object struct; existence check only.
@@ -286,7 +291,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 .unwrap_or("<unnamed>");
             // Existence-only kinds must not carry any structural fields.
             const EXISTENCE_ONLY_KINDS: &[&str] =
-                &["use_case", "interactor", "dto", "command", "query", "factory", "value_object"];
+                &["use_case", "dto", "command", "query", "factory", "value_object"];
             const FORBIDDEN_FIELDS_EXISTENCE_ONLY: &[&str] = &[
                 "expected_methods",
                 "expected_variants",
@@ -294,6 +299,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 "implements",
                 "expected_params",
                 "expected_returns",
+                "declares_application_service",
             ];
             if EXISTENCE_ONLY_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
@@ -311,14 +317,50 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     }
                 }
             }
+            // `interactor` carries optional `declares_application_service`
+            // but must not carry fields belonging to other structured variants.
+            // T003 / IN-02: interactor was removed from EXISTENCE_ONLY_KINDS to
+            // allow `declares_application_service`; this dedicated guard keeps
+            // every other field rejected (same drop-silently risk that
+            // motivated the existence-only / secondary_adapter / free_function
+            // guards).
+            if kind == "interactor" {
+                const FORBIDDEN_FIELDS_INTERACTOR: &[&str] = &[
+                    "expected_methods",
+                    "expected_variants",
+                    "transitions_to",
+                    "implements",
+                    "expected_params",
+                    "expected_returns",
+                ];
+                if let Some(obj) = entry_obj {
+                    for forbidden in FORBIDDEN_FIELDS_INTERACTOR {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind 'interactor' does not support field '{}' — \
+                                     use 'declares_application_service' for ApplicationService impl-edge target",
+                                    forbidden
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
             // `free_function` carries `expected_params` / `expected_returns`
             // but must not carry fields belonging to other structured variants.
             // Without this guard `#[serde(flatten)]` + internally-tagged enum
             // would silently drop those fields (same reason the existence-only
             // and secondary_adapter guards exist).
             if kind == "free_function" {
-                const FORBIDDEN_FIELDS_FREE_FUNCTION: &[&str] =
-                    &["expected_methods", "expected_variants", "transitions_to", "implements"];
+                const FORBIDDEN_FIELDS_FREE_FUNCTION: &[&str] = &[
+                    "expected_methods",
+                    "expected_variants",
+                    "transitions_to",
+                    "implements",
+                    "declares_application_service",
+                ];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_FREE_FUNCTION {
                         if obj.contains_key(*forbidden) {
@@ -345,6 +387,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     "transitions_to",
                     "expected_params",
                     "expected_returns",
+                    "declares_application_service",
                 ];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_SECONDARY_ADAPTER {
@@ -369,8 +412,12 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
             // with the cross-kind field dropped by serde.
             const STRUCTURED_KINDS: &[&str] =
                 &["typestate", "enum", "error_type", "secondary_port", "application_service"];
-            const FORBIDDEN_FIELDS_STRUCTURED: &[&str] =
-                &["implements", "expected_params", "expected_returns"];
+            const FORBIDDEN_FIELDS_STRUCTURED: &[&str] = &[
+                "implements",
+                "expected_params",
+                "expected_returns",
+                "declares_application_service",
+            ];
             if STRUCTURED_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_STRUCTURED {
@@ -672,7 +719,27 @@ fn type_definition_kind_from_dto(
             Ok(TypeDefinitionKind::ApplicationService { expected_methods: decls })
         }
         TypeDefinitionKindDto::UseCase {} => Ok(TypeDefinitionKind::UseCase),
-        TypeDefinitionKindDto::Interactor {} => Ok(TypeDefinitionKind::Interactor),
+        TypeDefinitionKindDto::Interactor { declares_application_service } => {
+            // L1 enforcement: declares_application_service must be a last-segment
+            // short name (no `::`). Without this, a qualified name like
+            // "domain::RegisterUser" decodes successfully but cannot match the
+            // ApplicationService short-name index, silently dropping the impl edge.
+            if let Some(name) = declares_application_service.as_deref() {
+                if name.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "interactor declares_application_service contains '::' — \
+                             L1 catalogue entries must use last-segment short names: '{}'",
+                            name
+                        ),
+                    });
+                }
+            }
+            Ok(TypeDefinitionKind::Interactor {
+                declares_application_service: declares_application_service.clone(),
+            })
+        }
         TypeDefinitionKindDto::Dto {} => Ok(TypeDefinitionKind::Dto),
         TypeDefinitionKindDto::Command {} => Ok(TypeDefinitionKind::Command),
         TypeDefinitionKindDto::Query {} => Ok(TypeDefinitionKind::Query),
@@ -854,7 +921,27 @@ fn type_catalogue_entry_to_dto(
             TypeDefinitionKindDto::ApplicationService { expected_methods: dtos }
         }
         TypeDefinitionKind::UseCase => TypeDefinitionKindDto::UseCase {},
-        TypeDefinitionKind::Interactor => TypeDefinitionKindDto::Interactor {},
+        TypeDefinitionKind::Interactor { declares_application_service } => {
+            // Mirror the decode-side L1 enforcement so that encode never produces
+            // JSON that decode would reject. Domain `Option<String>` is raw,
+            // so callers could pass a qualified name; we surface the same
+            // InvalidEntry error here to keep the round-trip invariant intact.
+            if let Some(name) = declares_application_service.as_deref() {
+                if name.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry.name().to_owned(),
+                        reason: format!(
+                            "interactor declares_application_service contains '::' — \
+                             L1 catalogue entries must use last-segment short names: '{}'",
+                            name
+                        ),
+                    });
+                }
+            }
+            TypeDefinitionKindDto::Interactor {
+                declares_application_service: declares_application_service.clone(),
+            }
+        }
         TypeDefinitionKind::Dto => TypeDefinitionKindDto::Dto {},
         TypeDefinitionKind::Command => TypeDefinitionKindDto::Command {},
         TypeDefinitionKind::Query => TypeDefinitionKindDto::Query {},
@@ -1567,7 +1654,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Interactor));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Interactor { .. }));
     }
 
     #[test]
@@ -1867,6 +1954,150 @@ mod tests {
         assert!(
             matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
             "expected InvalidEntry for stale expected_methods on free_function, got: {:?}",
+            err
+        );
+    }
+
+    // --- T003 / IN-02: Interactor.declares_application_service round-trip + reject ---
+
+    #[test]
+    fn test_round_trip_interactor_with_declares_application_service() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RegisterUserInteractor",
+      "kind": "interactor",
+      "description": "interactor implementing RegisterUser",
+      "declares_application_service": "RegisterUser"
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        if let TypeDefinitionKind::Interactor { declares_application_service } =
+            doc2.entries()[0].kind()
+        {
+            assert_eq!(declares_application_service.as_deref(), Some("RegisterUser"));
+        } else {
+            panic!("expected Interactor kind");
+        }
+        assert!(encoded.contains("\"declares_application_service\""));
+        assert!(encoded.contains("\"RegisterUser\""));
+    }
+
+    #[test]
+    fn test_round_trip_interactor_without_declares_application_service() {
+        // Legacy / existence-only Interactor: no declares_application_service field
+        // round-trips to None.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "LegacyInteractor", "kind": "interactor", "description": "no impl declared" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        if let TypeDefinitionKind::Interactor { declares_application_service } =
+            doc2.entries()[0].kind()
+        {
+            assert!(declares_application_service.is_none());
+        } else {
+            panic!("expected Interactor kind");
+        }
+        // skip_serializing_if = "Option::is_none" → field absent from emitted JSON.
+        assert!(!encoded.contains("\"declares_application_service\""));
+    }
+
+    #[test]
+    fn test_decode_interactor_rejects_module_path_in_declares_application_service() {
+        // L1 enforcement: declares_application_service must not contain `::`.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "QualifiedInteractor",
+      "kind": "interactor",
+      "description": "interactor with full path declares_application_service",
+      "declares_application_service": "domain::RegisterUser"
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for `::` in declares_application_service, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_dto_rejects_declares_application_service() {
+        // declares_application_service は interactor-only field。
+        // 他 kind に付与した場合は serde silent-drop を防ぐため reject される。
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "WrongKindDto",
+      "kind": "dto",
+      "description": "dto carrying interactor-only field",
+      "declares_application_service": "SomeService"
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for declares_application_service on dto, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_enum_rejects_declares_application_service() {
+        // STRUCTURED_KINDS guard も declares_application_service を reject する。
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "WrongKindEnum",
+      "kind": "enum",
+      "description": "enum carrying interactor-only field",
+      "expected_variants": ["A"],
+      "declares_application_service": "SomeService"
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for declares_application_service on enum, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_interactor_rejects_expected_methods() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "broken",
+      "kind": "interactor",
+      "description": "interactor with forbidden expected_methods",
+      "expected_methods": [
+        { "name": "execute", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale expected_methods on interactor, got: {:?}",
             err
         );
     }

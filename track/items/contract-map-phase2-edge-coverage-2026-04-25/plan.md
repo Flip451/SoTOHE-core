@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD Contract Map Phase 2 — Edge coverage で孤立ノード 9 件 (L1-L4) を解消
 
-## Tasks (0/10 resolved)
+## Tasks (2/10 resolved)
 
 ### S01 — Domain: FreeFunction Kind Addition
 
@@ -9,7 +9,7 @@
 > domain 層内完結 — serde 依存なし、I/O なし (CN-02 準拠)。
 > 14 variant 体系を確立する (GO-02、AC-01 の domain 側)。
 
-- [~] **T001**: Add TypeDefinitionKind::FreeFunction variant to catalogue.rs (domain). Extend kind_tag() match arm, update node_shape() and methods_of() in contract_map_render.rs to handle FreeFunction. Extend evaluate_type_signals to treat FreeFunction with existence-check-only forward check (same path as ValueObject). Update test_render_contract_map_emits_13_shape_variants to 14 variants and add a test_all_fourteen_kind_tags_are_unique test. Expected params/returns fields are declared in the domain variant for future renderer use. Domain layer only — no serde, no I/O.
+- [x] **T001**: Add TypeDefinitionKind::FreeFunction variant to catalogue.rs (domain). Extend kind_tag() match arm, update node_shape() and methods_of() in contract_map_render.rs to handle FreeFunction. Extend evaluate_type_signals to treat FreeFunction with existence-check-only forward check (same path as ValueObject). Update test_render_contract_map_emits_13_shape_variants to 14 variants and add a test_all_fourteen_kind_tags_are_unique test. Expected params/returns fields are declared in the domain variant for future renderer use. Domain layer only — no serde, no I/O. (`86880a3aae398036c86e2a087804f56f575b6070`)
 
 ### S02 — Infrastructure: FreeFunction Codec
 
@@ -17,21 +17,21 @@
 > Phase 2 Yellow 状態だった domain-types.json の render_contract_map エントリが Blue 化するための codec 基盤。
 > AC-01 の CI ゲート (test_all_fourteen_kind_tags_are_unique) が通る (CN-03: 既存 13 variants の kind_tag は変更しない)。
 
-- [~] **T002**: Add free_function kind support to catalogue_codec.rs (infrastructure). Add FreeFunction variant to TypeDefinitionKindDto with optional expected_params (Vec<ParamDto>) and expected_returns (Vec<String>). Extend decode/encode conversion paths (type_definition_kind_from_dto / type_catalogue_entry_to_dto). free_function is NOT existence-only — it carries expected_params and expected_returns as its own designated fields; do NOT add it to EXISTENCE_ONLY_KINDS. Important: the Phase 1.5 stale-field guard uses #[serde(flatten)] + internally-tagged enum, which means serde silently drops cross-kind fields rather than rejecting them (known serde limitation documented in the codec). Add an explicit guard block for 'free_function' kind in Phase 1.5 that rejects forbidden fields (expected_methods, expected_variants, transitions_to, implements) — the same pattern as the existing existence-only guard — so illegal fields on free_function entries are caught at the codec boundary. Add codec round-trip tests covering free_function with and without params/returns, and a rejection test for a free_function entry carrying expected_methods. AC-01 CI gate (13 → 14 kind tags) passes.
+- [x] **T002**: Add free_function kind support to catalogue_codec.rs (infrastructure). Add FreeFunction variant to TypeDefinitionKindDto with optional expected_params (Vec<ParamDto>) and expected_returns (Vec<String>). Extend decode/encode conversion paths (type_definition_kind_from_dto / type_catalogue_entry_to_dto). free_function is NOT existence-only — it carries expected_params and expected_returns as its own designated fields; do NOT add it to EXISTENCE_ONLY_KINDS. Important: the Phase 1.5 stale-field guard uses #[serde(flatten)] + internally-tagged enum, which means serde silently drops cross-kind fields rather than rejecting them (known serde limitation documented in the codec). Add an explicit guard block for 'free_function' kind in Phase 1.5 that rejects forbidden fields (expected_methods, expected_variants, transitions_to, implements) — the same pattern as the existing existence-only guard — so illegal fields on free_function entries are caught at the codec boundary. Add codec round-trip tests covering free_function with and without params/returns, and a rejection test for a free_function entry carrying expected_methods. AC-01 CI gate (13 → 14 kind tags) passes. (`86880a3aae398036c86e2a087804f56f575b6070`)
 
 ### S03 — Domain: Interactor impl-edge (L3 Fix)
 
 > TypeDefinitionKind::Interactor に declares_application_service: Option<String> を追加し、renderer で application_service_index を用いた -.impl.-> edge を描画する (GO-03、IN-02、AC-02)。
 > Domain 層内完結。
 
-- [ ] **T003**: Extend TypeDefinitionKind::Interactor in catalogue.rs (domain) to carry an optional declares_application_service: Option<String> field for the impl-edge target. Update contract_map_render.rs: build an application_service_index (ApplicationService kind only, parallel to port_index) and emit -.impl.-> edges from Interactor entries whose declares_application_service is Some(name) and name resolves in application_service_index. Add unit tests: Interactor with declares_application_service produces the impl edge; Interactor without it produces no edge; name not in application_service_index produces no edge. Domain layer only.
+- [~] **T003**: Extend TypeDefinitionKind::Interactor in catalogue.rs (domain) to carry an optional declares_application_service: Option<String> field for the impl-edge target. Update contract_map_render.rs: build an application_service_index (ApplicationService kind only, parallel to port_index) and emit -.impl.-> edges from Interactor entries whose declares_application_service is Some(name) and name resolves in application_service_index. Add unit tests: Interactor with declares_application_service produces the impl edge; Interactor without it produces no edge; name not in application_service_index produces no edge. Domain layer only.
 
 ### S04 — Infrastructure: Interactor Codec Extension
 
 > catalogue_codec.rs の Interactor DTO に declares_application_service を追加し、T003 で追加したフィールドの encode/decode を実装する (IN-02 の codec 側)。
 > usecase-types.json の RenderContractMapInteractor エントリを更新して declares_application_service: RenderContractMap を設定する。
 
-- [ ] **T004**: Extend catalogue_codec.rs (infrastructure) to decode/encode the new declares_application_service field on Interactor entries. Add declares_application_service: Option<String> to the Interactor variant of TypeDefinitionKindDto (serde default/skip). Extend stale-field guard: interactor now allows declares_application_service alongside the existing empty-fields rule. Add codec round-trip tests: Interactor with declares_application_service round-trips correctly; Interactor without the field decodes to None. Update usecase-types.json catalogue entry for RenderContractMapInteractor to set declares_application_service: RenderContractMap once codec is in place.
+- [~] **T004**: Extend catalogue_codec.rs (infrastructure) to decode/encode the new declares_application_service field on Interactor entries. Add declares_application_service: Option<String> to the Interactor variant of TypeDefinitionKindDto (serde default/skip). Extend stale-field guard: interactor now allows declares_application_service alongside the existing empty-fields rule. Add codec round-trip tests: Interactor with declares_application_service round-trips correctly; Interactor without the field decodes to None. Update usecase-types.json catalogue entry for RenderContractMapInteractor to set declares_application_service: RenderContractMap once codec is in place.
 
 ### S05 — Domain: Dashed-Border Nodes (L1/L2 Fix)
 

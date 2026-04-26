@@ -31,10 +31,11 @@
     },
     {
       "name": "RenderContractMapInteractor",
-      "description": "Interactor implementing RenderContractMap by composing CatalogueLoader, domain render_contract_map free function, and ContractMapWriter. Phase 2 extends this type with a declares_application_service field (value: RenderContractMap) so the Contract Map renderer emits a -.impl.-> edge from this interactor to RenderContractMap (IN-02, L3 isolation fix, AC-02). The field is a Phase 2 catalogue schema extension — not yet in catalogue_codec.rs Interactor variant. Declared with action=modify to record the intended structural change against baseline.",
+      "description": "Interactor implementing RenderContractMap by composing CatalogueLoader, domain render_contract_map free function, and ContractMapWriter. T003 extends the Interactor variant with declares_application_service: Option<String>, and T004 propagates that field through the catalogue codec; this entry sets declares_application_service=RenderContractMap so the Contract Map renderer emits a -.impl.-> edge from this interactor to the RenderContractMap ApplicationService (IN-02 / AC-02 / ADR §D4 (2)).",
       "approved": true,
       "action": "modify",
       "kind": "interactor",
+      "declares_application_service": "RenderContractMap",
       "spec_refs": [
         {
           "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
@@ -45,12 +46,6 @@
           "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
           "anchor": "AC-02",
           "hash": "21eb2640e7e8571b9e39106c8a5c6a2e7f7fc348a8fd4fb54966ca8cd11d9fac"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "declares_application_service=RenderContractMap field not yet in catalogue_codec.rs Interactor variant; Yellow expected until IN-02 codec support is merged"
         }
       ]
     },

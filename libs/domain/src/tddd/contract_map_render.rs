@@ -95,11 +95,19 @@ pub fn render_contract_map(
     //    declarations.
     let mut type_index: BTreeMap<String, Vec<(LayerId, String)>> = BTreeMap::new();
     let mut port_index: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    // `application_service_index` — only `ApplicationService` entries
+    // (used for Interactor `-.impl.->` edges introduced in T003 / IN-02 /
+    // ADR §D4 (2)). Same shadowing semantics as `port_index`: multiple
+    // declarations of the same short name fan out to all matching targets.
+    let mut application_service_index: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for (layer, entry) in &entries {
         let id = node_id(layer, entry.name());
         type_index.entry(entry.name().to_owned()).or_default().push(((*layer).clone(), id.clone()));
         if matches!(entry.kind(), TypeDefinitionKind::SecondaryPort { .. }) {
-            port_index.entry(entry.name().to_owned()).or_default().push(id);
+            port_index.entry(entry.name().to_owned()).or_default().push(id.clone());
+        }
+        if matches!(entry.kind(), TypeDefinitionKind::ApplicationService { .. }) {
+            application_service_index.entry(entry.name().to_owned()).or_default().push(id);
         }
     }
 
@@ -187,6 +195,21 @@ pub fn render_contract_map(
                     for port_id in port_ids {
                         edges.insert(format!("    {src_id} -.impl.-> {port_id}"));
                     }
+                }
+            }
+        }
+
+        // T003 / IN-02 / ADR §D4 (2): Interactor → ApplicationService
+        // impl edge. Only emitted when (1) the entry kind is `Interactor`,
+        // (2) `declares_application_service` is `Some(name)`, and (3) `name`
+        // resolves in `application_service_index` (same fan-out semantics
+        // as `port_index` so shadowed declarations across layers don't drop).
+        if let TypeDefinitionKind::Interactor { declares_application_service: Some(name) } =
+            entry.kind()
+        {
+            if let Some(svc_ids) = application_service_index.get(name) {
+                for svc_id in svc_ids {
+                    edges.insert(format!("    {src_id} -.impl.-> {svc_id}"));
                 }
             }
         }
@@ -311,7 +334,7 @@ fn node_shape(layer: &LayerId, entry: &TypeCatalogueEntry) -> String {
         }
         TypeDefinitionKind::ApplicationService { .. } => format!("{id}[/{name}\\]"),
         TypeDefinitionKind::UseCase => format!("{id}[/{name}/]"),
-        TypeDefinitionKind::Interactor => format!("{id}[\\{name}/]"),
+        TypeDefinitionKind::Interactor { .. } => format!("{id}[\\{name}/]"),
         TypeDefinitionKind::Dto => format!("{id}[{name}]"),
         TypeDefinitionKind::Command => format!("{id}[{name}]:::command"),
         TypeDefinitionKind::Query => format!("{id}[{name}]:::query"),
@@ -336,7 +359,7 @@ fn methods_of(kind: &TypeDefinitionKind) -> Vec<&MethodDeclaration> {
         | TypeDefinitionKind::ValueObject
         | TypeDefinitionKind::ErrorType { .. }
         | TypeDefinitionKind::UseCase
-        | TypeDefinitionKind::Interactor
+        | TypeDefinitionKind::Interactor { .. }
         | TypeDefinitionKind::Dto
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
@@ -471,7 +494,7 @@ mod tests {
             entry("SAdap", TypeDefinitionKind::SecondaryAdapter { implements: vec![] }),
             entry("AppSvc", TypeDefinitionKind::ApplicationService { expected_methods: vec![] }),
             entry("UCase", TypeDefinitionKind::UseCase),
-            entry("Intc", TypeDefinitionKind::Interactor),
+            entry("Intc", TypeDefinitionKind::Interactor { declares_application_service: None }),
             entry("DtoK", TypeDefinitionKind::Dto),
             entry("CmdK", TypeDefinitionKind::Command),
             entry("QryK", TypeDefinitionKind::Query),
@@ -928,6 +951,107 @@ mod tests {
         assert!(
             text.contains("-->|\"save\"|"),
             "quoted `|\"save\"|` must appear for returns edges; output was:\n{text}"
+        );
+    }
+
+    // --- T003 / IN-02 / ADR §D4 (2): Interactor → ApplicationService impl edge ---
+
+    #[test]
+    fn test_render_contract_map_emits_interactor_application_service_impl_edge() {
+        // Cross-layer: usecase Interactor declares ApplicationService it implements;
+        // renderer emits `-.impl.->` edge fanning to all matching ApplicationService entries.
+        let usecase = layer("usecase");
+
+        let usecase_doc = doc(vec![
+            entry(
+                "RegisterUser",
+                TypeDefinitionKind::ApplicationService { expected_methods: vec![] },
+            ),
+            entry(
+                "RegisterUserInteractor",
+                TypeDefinitionKind::Interactor {
+                    declares_application_service: Some("RegisterUser".to_owned()),
+                },
+            ),
+        ]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(usecase.clone(), usecase_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&usecase),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+
+        assert!(
+            text.contains("L7_usecase_RegisterUserInteractor -.impl.-> L7_usecase_RegisterUser"),
+            "Interactor → ApplicationService impl edge must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_no_impl_edge_when_application_service_unknown() {
+        // declares_application_service points at a name not in any
+        // ApplicationService entry → no edge emitted (not even to a same-named
+        // non-ApplicationService entry).
+        let usecase = layer("usecase");
+
+        let usecase_doc = doc(vec![
+            // `RegisterUser` is declared as a `Dto`, NOT as an ApplicationService.
+            entry("RegisterUser", TypeDefinitionKind::Dto),
+            entry(
+                "RegisterUserInteractor",
+                TypeDefinitionKind::Interactor {
+                    declares_application_service: Some("RegisterUser".to_owned()),
+                },
+            ),
+        ]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(usecase.clone(), usecase_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&usecase),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+
+        assert!(
+            !text.contains(" -.impl.-> "),
+            "no impl edge expected when target is not an ApplicationService; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_no_impl_edge_when_interactor_lacks_field() {
+        // Interactor with `declares_application_service: None` produces
+        // no impl edge (preserves legacy / existence-only behaviour).
+        let usecase = layer("usecase");
+
+        let usecase_doc = doc(vec![
+            entry(
+                "RegisterUser",
+                TypeDefinitionKind::ApplicationService { expected_methods: vec![] },
+            ),
+            entry(
+                "RegisterUserInteractor",
+                TypeDefinitionKind::Interactor { declares_application_service: None },
+            ),
+        ]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(usecase.clone(), usecase_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&usecase),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+
+        assert!(
+            !text.contains(" -.impl.-> "),
+            "no impl edge expected when Interactor has no declares_application_service; output was:\n{text}"
         );
     }
 }

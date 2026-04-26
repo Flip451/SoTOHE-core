@@ -106,7 +106,7 @@ fn parse_kind_filter(raw: &str) -> Result<Vec<TypeDefinitionKind>, CliError> {
                 TypeDefinitionKind::ApplicationService { expected_methods: Vec::new() }
             }
             "use_case" => TypeDefinitionKind::UseCase,
-            "interactor" => TypeDefinitionKind::Interactor,
+            "interactor" => TypeDefinitionKind::Interactor { declares_application_service: None },
             "dto" => TypeDefinitionKind::Dto,
             "command" => TypeDefinitionKind::Command,
             "query" => TypeDefinitionKind::Query,

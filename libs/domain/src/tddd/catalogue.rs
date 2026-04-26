@@ -379,7 +379,15 @@ pub enum TypeDefinitionKind {
     /// A struct-only use case type; evaluated by existence check only.
     UseCase,
     /// An `ApplicationService` implementation struct; evaluated by existence check only.
-    Interactor,
+    ///
+    /// `declares_application_service` records the L1 short name of the
+    /// `ApplicationService` (primary port) the interactor implements. When
+    /// `Some(name)` and `name` resolves in the per-track catalogue's
+    /// `ApplicationService` index, the Contract Map renderer emits a
+    /// `Interactor -.impl.-> ApplicationService` edge (ADR
+    /// `2026-04-17-1528-tddd-contract-map.md` §D4 (2) extension).
+    /// `None` keeps the historical existence-only behaviour.
+    Interactor { declares_application_service: Option<String> },
     /// A pure data-transfer object struct; evaluated by existence check only.
     Dto,
     /// A CQRS command object struct; evaluated by existence check only.
@@ -424,7 +432,7 @@ impl TypeDefinitionKind {
             Self::SecondaryPort { .. } => "secondary_port",
             Self::ApplicationService { .. } => "application_service",
             Self::UseCase => "use_case",
-            Self::Interactor => "interactor",
+            Self::Interactor { .. } => "interactor",
             Self::Dto => "dto",
             Self::Command => "command",
             Self::Query => "query",
@@ -995,12 +1003,15 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "SaveTrackInteractor",
             "Interactor implementing SaveTrackUseCase",
-            TypeDefinitionKind::Interactor,
+            TypeDefinitionKind::Interactor { declares_application_service: None },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &TypeDefinitionKind::Interactor);
+        assert_eq!(
+            entry.kind(),
+            &TypeDefinitionKind::Interactor { declares_application_service: None }
+        );
         assert_eq!(entry.kind().kind_tag(), "interactor");
     }
 
@@ -1071,7 +1082,7 @@ mod tests {
             TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }.kind_tag(),
             TypeDefinitionKind::ApplicationService { expected_methods: vec![] }.kind_tag(),
             TypeDefinitionKind::UseCase.kind_tag(),
-            TypeDefinitionKind::Interactor.kind_tag(),
+            TypeDefinitionKind::Interactor { declares_application_service: None }.kind_tag(),
             TypeDefinitionKind::Dto.kind_tag(),
             TypeDefinitionKind::Command.kind_tag(),
             TypeDefinitionKind::Query.kind_tag(),

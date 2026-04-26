@@ -76,7 +76,7 @@ fn evaluate_single(
             evaluate_application_service(name, &kind_tag, expected_methods, profile)
         }
         TypeDefinitionKind::UseCase
-        | TypeDefinitionKind::Interactor
+        | TypeDefinitionKind::Interactor { .. }
         | TypeDefinitionKind::Dto
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
@@ -1110,7 +1110,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "SaveTrackInteractor",
             "desc",
-            TypeDefinitionKind::Interactor,
+            TypeDefinitionKind::Interactor { declares_application_service: None },
             TypeAction::Add,
             true,
         )
@@ -1125,7 +1125,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "SaveTrackInteractor",
             "desc",
-            TypeDefinitionKind::Interactor,
+            TypeDefinitionKind::Interactor { declares_application_service: None },
             TypeAction::Add,
             true,
         )

@@ -361,7 +361,7 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
         // Existence-check-only variants render as em-dash (no structural detail).
         TypeDefinitionKind::ValueObject
         | TypeDefinitionKind::UseCase
-        | TypeDefinitionKind::Interactor
+        | TypeDefinitionKind::Interactor { .. }
         | TypeDefinitionKind::Dto
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
@@ -658,7 +658,10 @@ mod tests {
 
     #[test]
     fn test_render_interactor_entry_row() {
-        let entry = make_entry("SaveTrackInteractor", TypeDefinitionKind::Interactor);
+        let entry = make_entry(
+            "SaveTrackInteractor",
+            TypeDefinitionKind::Interactor { declares_application_service: None },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| SaveTrackInteractor | interactor |"), "missing interactor row");
@@ -788,7 +791,10 @@ mod tests {
                 },
             ),
             make_entry("SaveUseCase", TypeDefinitionKind::UseCase),
-            make_entry("SaveInteractor", TypeDefinitionKind::Interactor),
+            make_entry(
+                "SaveInteractor",
+                TypeDefinitionKind::Interactor { declares_application_service: None },
+            ),
             make_entry("SaveDto", TypeDefinitionKind::Dto),
             make_entry("SaveCommand", TypeDefinitionKind::Command),
             make_entry("GetQuery", TypeDefinitionKind::Query),
@@ -1177,7 +1183,7 @@ mod tests {
             TypeDefinitionKind::SecondaryPort { expected_methods: Vec::new() },
             TypeDefinitionKind::ApplicationService { expected_methods: Vec::new() },
             TypeDefinitionKind::UseCase,
-            TypeDefinitionKind::Interactor,
+            TypeDefinitionKind::Interactor { declares_application_service: None },
             TypeDefinitionKind::Dto,
             TypeDefinitionKind::Command,
             TypeDefinitionKind::Query,

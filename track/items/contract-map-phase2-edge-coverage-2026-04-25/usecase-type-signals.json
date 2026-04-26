@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-26T01:27:12Z",
-  "declaration_hash": "8dc5fd7b9b7db26510a1c93597b71fbd5f12c90c76f13af1bda39c3cefec89bd",
+  "generated_at": "2026-04-26T02:56:34Z",
+  "declaration_hash": "b2d358a4a77a69fa1c25cfc71a8777ba09f24987b8f7f697613f8fababb0ca71",
   "signals": [
     {
       "type_name": "RenderContractMap",

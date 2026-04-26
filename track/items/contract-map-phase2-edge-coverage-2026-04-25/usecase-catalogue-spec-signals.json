@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8dc5fd7b9b7db26510a1c93597b71fbd5f12c90c76f13af1bda39c3cefec89bd",
+  "catalogue_declaration_hash": "b2d358a4a77a69fa1c25cfc71a8777ba09f24987b8f7f697613f8fababb0ca71",
   "signals": [
     {
       "type_name": "RenderContractMap",
@@ -8,7 +8,7 @@
     },
     {
       "type_name": "RenderContractMapInteractor",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "RenderContractMapCommand",

@@ -4,6 +4,7 @@ flowchart LR
     classDef command fill:#e3f2fd,stroke:#1976d2
     classDef query fill:#f3e5f5,stroke:#8e24aa
     classDef factory fill:#fff8e1,stroke:#f9a825
+    classDef free_function fill:#e8eaf6,stroke:#3949ab
     subgraph domain [domain]
         L6_domain_render__contract__map(render_contract_map)
         L6_domain_TypeCatalogueEntry(TypeCatalogueEntry)
@@ -50,4 +51,5 @@ flowchart LR
     L7_usecase_RenderContractMap -->|"execute"| L7_usecase_RenderContractMapError
     L7_usecase_RenderContractMap -->|"execute"| L7_usecase_RenderContractMapOutput
     L7_usecase_RenderContractMap -->|"execute(cmd)"| L7_usecase_RenderContractMapCommand
+    L7_usecase_RenderContractMapInteractor -.impl.-> L7_usecase_RenderContractMap
 ```

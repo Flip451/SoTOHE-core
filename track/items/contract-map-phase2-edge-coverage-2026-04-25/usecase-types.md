@@ -16,7 +16,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RenderContractMapInteractor | interactor | modify | — | 🔵 | 🟡 |
+| RenderContractMapInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## DTOs
 
