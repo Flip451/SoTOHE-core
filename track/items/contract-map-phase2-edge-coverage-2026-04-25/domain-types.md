@@ -11,11 +11,10 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| render_contract_map | value_object | reference | — | 🟡 | 🟡 |
 | TypeCatalogueEntry | value_object | modify | — | 🔵 | 🔵 |
 | LayerId | value_object | reference | — | 🔵 | 🔵 |
 | ContractMapContent | value_object | reference | — | 🔵 | 🔵 |
-| ContractMapRenderOptions | value_object | reference | — | 🔵 | 🔵 |
+| ContractMapRenderOptions | value_object | modify | — | 🔵 | 🔵 |
 | TypeCatalogueDocument | value_object | reference | — | 🔵 | 🔵 |
 | TrackId | value_object | reference | — | 🔵 | 🟡 |
 | TaskId | value_object | reference | — | 🔵 | 🔵 |
@@ -38,4 +37,10 @@
 |------|------|--------|---------|--------|----------|
 | CatalogueLoader | secondary_port | reference | fn load_all(&self, track_id: &TrackId) -> Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError> | 🔵 | 🔵 |
 | ContractMapWriter | secondary_port | reference | fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError> | 🔵 | 🟡 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| render_contract_map | free_function | reference | fn (catalogues: &BTreeMap<LayerId, TypeCatalogueDocument>, layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> ContractMapContent | 🟡 | 🟡 |
 

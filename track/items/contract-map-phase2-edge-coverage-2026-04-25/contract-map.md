@@ -8,7 +8,7 @@ flowchart LR
     classDef unused_reference stroke-dasharray: 4 4
     classDef declaration_only stroke-dasharray: 4 4
     subgraph domain [domain]
-        L6_domain_render__contract__map(render_contract_map)
+        L6_domain_render__contract__map[render_contract_map]:::free_function
         L6_domain_TypeCatalogueEntry(TypeCatalogueEntry)
         L6_domain_LayerId(LayerId)
         L6_domain_ContractMapContent(ContractMapContent)
@@ -39,6 +39,7 @@ flowchart LR
         L14_infrastructure_FsCatalogueLoader[FsCatalogueLoader]:::secondary_adapter
         L14_infrastructure_FsContractMapWriter[FsContractMapWriter]:::secondary_adapter
         L14_infrastructure_LoadAllCataloguesError>LoadAllCataloguesError]
+        L14_infrastructure_load__all__catalogues[load_all_catalogues]:::free_function
         L14_infrastructure_TypeCatalogueCodecError>TypeCatalogueCodecError]
     end
     L14_infrastructure_FsCatalogueLoader -.impl.-> L6_domain_CatalogueLoader
@@ -47,6 +48,8 @@ flowchart LR
     L6_domain_CatalogueLoader -->|"load_all"| L6_domain_LayerId
     L6_domain_CatalogueLoader -->|"load_all"| L6_domain_TypeCatalogueDocument
     L6_domain_CatalogueLoader -->|"load_all(track_id)"| L6_domain_TrackId
+    L6_domain_ContractMapRenderOptions -->|".kind_filter"| L6_domain_TypeDefinitionKind
+    L6_domain_ContractMapRenderOptions -->|".layers"| L6_domain_LayerId
     L6_domain_ContractMapWriter -->|"write"| L6_domain_ContractMapWriterError
     L6_domain_ContractMapWriter -->|"write(content)"| L6_domain_ContractMapContent
     L6_domain_ContractMapWriter -->|"write(track_id)"| L6_domain_TrackId
@@ -56,8 +59,9 @@ flowchart LR
     L7_usecase_RenderContractMapInteractor -.impl.-> L7_usecase_RenderContractMap
     class L14_infrastructure_LoadAllCataloguesError unused_reference
     class L14_infrastructure_TypeCatalogueCodecError declaration_only
+    class L14_infrastructure_load__all__catalogues unused_reference
     class L6_domain_CommitHash unused_reference
-    class L6_domain_ContractMapRenderOptions unused_reference
+    class L6_domain_ContractMapRenderOptions declaration_only
     class L6_domain_MemberDeclaration unused_reference
     class L6_domain_NonEmptyString unused_reference
     class L6_domain_ReviewGroupName unused_reference

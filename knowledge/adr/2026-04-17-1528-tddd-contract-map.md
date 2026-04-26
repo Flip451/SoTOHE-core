@@ -272,13 +272,23 @@ Phase 1 / Phase 1.5 時点の dogfooding で、宣言された型のうち **edg
 | # | カテゴリ | 例 (現 SoTOHE-core での dogfooding より) | 原因 | Phase 2+ での対応 |
 |---|---|---|---|---|
 | L1 | **Forward-reference プレースホルダ** | `TaskId`, `CommitHash`, `TrackBranch`, `NonEmptyString`, `ReviewGroupName` | `action=reference` で declare されているが、現 catalogue の `expected_methods` シグネチャに登場しない (将来の port/service 拡張に備えた「待機」状態) | 実装側で参照された時点で自動的に edge が発生するため、本質的には catalogue 設計の正常動作。ただし **「未使用 reference の可視マーク」** (例: kind shape を dashed border + `(unused)` ラベル付与) を追加検討 |
-| L2 | **Field 参照 / free-function 引数 / mutation-only declaration** | `ContractMapRenderOptions` (domain `render_contract_map` 関数の引数), `ValidationError` (domain、`action=modify` で declare、try_new 系の戻り値として使われるが catalogue の `expected_methods` に登場しない) | ADR §D4 初期スコープで **field edge / free-function / 宣言のみの型 は除外** | (a) `ContractMapRenderOptions` (free-fn 引数): L4 と同じ `free_function` kind schema 拡張で対応。`render_contract_map` を catalogue に `free_function` kind として declare し `expected_params` に `ContractMapRenderOptions` を記述することで edge が発生する。(b) `ValidationError` (mutation-only): `action=modify` で declare のみの型は dashed border で「declaration-only」として視覚区別する。(c) 汎用 field 参照: §D4 (4) として `field edge` を追加 (`struct F { x: T }` → `F -->|.x| T`、kind-based で `dto` / `command` / `query` に限定してノイズ制御) |
+| L2 | **Field 参照 / free-function 引数 / mutation-only declaration** | `ContractMapRenderOptions` (domain `render_contract_map` 関数の引数), `ValidationError` (domain、`action=modify` で declare、try_new 系の戻り値として使われるが catalogue の `expected_methods` に登場しない) | ADR §D4 初期スコープで **field edge / free-function / 宣言のみの型 は除外** | (a) `ContractMapRenderOptions` (value_object として field edge で対応): `expected_members` に MemberDeclaration::Field を追加することで、value_object 自身から参照型への field edge が描画される (ContractMapRenderOptions は value_object kind なので §D4 拡張の対象に含まれる)。(b) `ValidationError` (mutation-only): `action=modify` で declare のみの型は dashed border で「declaration-only」として視覚区別する。(c) 汎用 field 参照: §D4 (4) として `field edge` を追加 (`struct F { x: T }` → `F -->|.x| T`、kind-based で `dto` / `command` / `query` / `value_object` の 4 kind に限定してノイズ制御) |
 | L3 | **interactor → application_service 実装関係** | `RenderContractMapInteractor -.impl.-> RenderContractMap` が描画されない | ADR §D4 (2) trait-impl edge は `SecondaryAdapter` kind 限定。`Interactor` kind が `ApplicationService` を impl する関係は現仕様では描画対象外 | §D4 (2) を `SecondaryAdapter` + `Interactor` kind に拡張。edge 方向は既存 secondary pattern と統一 |
 | L4 | **Free function の返すエラー型** | `LoadAllCataloguesError` (`load_all_catalogues` 関数が返す) | `load_all_catalogues` は catalogue entry ではないため、該当 error type に到達する edge を作る起点が無い | catalogue schema に `free_function` kind (あるいは `helper` kind) を追加し、`expected_returns` / `expected_params` を declare 可能にする。または既存の `FsCatalogueLoader.load_all` (adapter wrapper) が返すと declare し直して infra-internal edge を生む |
 
 Phase 1.5 時点の現 SoTOHE-core 自身の dogfood (contract-map.md、23 nodes / 10 method edges / 2 trait-impl edges) において、上記 4 カテゴリで 9 nodes が edge 無し。いずれも **設計ミスや実装バグではなく、カタログ仕様の初期スコープ制約に由来する**。
 
 **忘却防止**: 本 Known Limitations ブロックは本 ADR 上に残置し、Phase 2 作業時の入口として `knowledge/strategy/TODO.md` の `contract-map-phase2-edge-coverage` エントリと相互リンクする。Phase 2 完了時に各 L# を "Resolved in <ADR / 実装 track の識別子>" 注記で埋めて記録を残す。
+
+### Resolved 記録 (contract-map-phase2-edge-coverage-2026-04-25)
+
+L1-L4 全 4 カテゴリは track `contract-map-phase2-edge-coverage-2026-04-25` の T010 dogfood で対処済みとなった (Phase 1.5 時点の 9 isolated nodes → 0)。詳細は `track/items/contract-map-phase2-edge-coverage-2026-04-25/verification.md` を参照。
+
+- **L1** (forward-reference placeholders — 5 件: TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName): `unused_reference` classDef による dashed border 視覚識別で対処済み。意図的な待機宣言として視覚的に区別される。
+- **L2a** (declaration-only — ValidationError): `declaration_only` classDef による dashed border 視覚識別で対処済み。
+- **L2b** (field 参照 — ContractMapRenderOptions): field edge 実装 (§D4 拡張) により `expected_members` から参照型への edge が描画される。dogfood で `LayerId` / `TypeDefinitionKind` への field edge 2 本を確認済み。
+- **L3** (Interactor → ApplicationService 実装関係 — RenderContractMapInteractor): `Interactor.declares_application_service` field 拡張により `-.impl.->` edge が描画される。dogfood で `RenderContractMapInteractor -.impl.-> RenderContractMap` を確認済み。
+- **L4** (free function 戻り値型 — LoadAllCataloguesError): 二段階で対処済み。(i) `LoadAllCataloguesError` は `unused_reference` dashed border で視覚識別済み。(ii) `load_all_catalogues` / `render_contract_map` を `TypeDefinitionKind::FreeFunction` kind として catalogue に declare し、return-type / param edge 描画の基盤を確立した。return-type edge rendering 自体は Phase 3 のスコープに残る。
 
 ## Rejected Alternatives
 

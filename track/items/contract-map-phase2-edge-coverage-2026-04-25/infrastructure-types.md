@@ -14,3 +14,9 @@
 | FsCatalogueLoader | secondary_adapter | reference | impl CatalogueLoader | 🔵 | 🔵 |
 | FsContractMapWriter | secondary_adapter | reference | impl ContractMapWriter | 🔵 | 🟡 |
 
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| load_all_catalogues | free_function | reference | fn () -> LoadAllCataloguesError | 🟡 | 🟡 |
+

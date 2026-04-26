@@ -3,14 +3,31 @@
   "type_definitions": [
     {
       "name": "render_contract_map",
-      "description": "Pure domain free function (not a struct or trait) converting per-layer type catalogues into a single-file mermaid Contract Map markdown. This entry declares the existence requirement for the 14th TypeDefinitionKind variant (free_function). Phase 2 tasks IN-01 and IN-09 add FreeFunction to catalogue.rs and catalogue_codec.rs respectively, enabling this free function to appear as a rendered node in the contract-map (L4 fix: free function nodes were previously not renderable). The expected_params and expected_returns fields are declared in the domain variant for future renderer use (return-type and param-type edges are out-of-scope for Phase 2). Declared as value_object temporarily until codec support is merged (AC-01). action=reference so that after kind is updated to free_function in T010, the node receives unused_reference dashed border (no edges yet, param/return edge rendering is Phase 3).",
+      "description": "Pure domain free function (not a struct or trait) converting per-layer type catalogues into a single-file mermaid Contract Map markdown. T010 dogfood: now declared with kind=free_function (was value_object placeholder until T002 shipped the FreeFunction codec). expected_params records the actual Rust parameter types at L1 resolution (last-segment short names with reference syntax preserved, matching the ADR D1 signature); expected_returns declares ContractMapContent so future Phase 3 edge rendering can wire return-type edges from this free function to the declared return type.",
       "approved": true,
       "action": "reference",
-      "kind": "value_object",
+      "kind": "free_function",
+      "expected_params": [
+        {
+          "name": "catalogues",
+          "ty": "&BTreeMap<LayerId, TypeCatalogueDocument>"
+        },
+        {
+          "name": "layer_order",
+          "ty": "&[LayerId]"
+        },
+        {
+          "name": "opts",
+          "ty": "&ContractMapRenderOptions"
+        }
+      ],
+      "expected_returns": [
+        "ContractMapContent"
+      ],
       "informal_grounds": [
         {
           "kind": "user_directive",
-          "summary": "Declared as value_object placeholder because free_function kind is not yet in catalogue_codec.rs (IN-09 task); Yellow signal expected until codec adds FreeFunction variant (AC-01)"
+          "summary": "T010 dogfood: kind transitioned from value_object placeholder to free_function after T001/T002 shipped the FreeFunction variant + codec; this entry now exemplifies the new kind on the renderer's own free function"
         }
       ]
     },
@@ -63,9 +80,9 @@
     },
     {
       "name": "ContractMapRenderOptions",
-      "description": "Existing domain value object carrying render configuration. Phase 2 activates the signal_overlay and action_overlay fields (previously stubs in Phase 1). The type shape is unchanged — only the renderer behaviour changes. Declared with action=reference.",
+      "description": "Existing domain value object carrying render configuration. Phase 2 activates the signal_overlay and action_overlay fields (previously stubs in Phase 1) and T010 dogfood adds expected_members so the renderer's field-edge pass (IN-05) emits edges from this struct to its referenced types (LayerId / TypeDefinitionKind). bool / Option / Vec types are external (absent from type_index) and silently skipped per CN-05.",
       "approved": true,
-      "action": "reference",
+      "action": "modify",
       "kind": "value_object",
       "spec_refs": [
         {
@@ -77,6 +94,33 @@
           "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
           "anchor": "IN-07",
           "hash": "0d2bed60646cee7ae83b99211ecb0e48490950e09de86f3b8bab8907d1b47d62"
+        }
+      ],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "layers",
+          "ty": "Vec<LayerId>"
+        },
+        {
+          "kind": "field",
+          "name": "kind_filter",
+          "ty": "Option<Vec<TypeDefinitionKind>>"
+        },
+        {
+          "kind": "field",
+          "name": "signal_overlay",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "action_overlay",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "include_spec_source_edges",
+          "ty": "bool"
         }
       ]
     },

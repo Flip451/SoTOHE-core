@@ -62,6 +62,23 @@
       ]
     },
     {
+      "name": "load_all_catalogues",
+      "description": "T010 dogfood: free function in catalogue_bulk_loader.rs that bulk-loads per-layer catalogue documents. Declared as kind=free_function with expected_returns=[LoadAllCataloguesError] so the Contract Map renderer establishes a return-type edge source from this free function to the L4 isolated error type (Phase 3 will turn this declaration into an actual mermaid edge once return-type edge rendering ships).",
+      "approved": true,
+      "action": "reference",
+      "kind": "free_function",
+      "expected_params": [],
+      "expected_returns": [
+        "LoadAllCataloguesError"
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "T010 dogfood entry establishing the L4 edge source: declares the bulk loader as FreeFunction with LoadAllCataloguesError as its return type; only addable after T002 shipped the FreeFunction codec. Phase 3 will add return-type edge rendering."
+        }
+      ]
+    },
+    {
       "name": "TypeCatalogueCodecError",
       "description": "Error type for the catalogue codec (decode / encode operations). Phase 2 extends the codec to support free_function kind_tag (IN-09 / AC-01) by adding a new variant to TypeDefinitionKindDto. The existing variants are: Json (serde_json), Validation (SpecValidationError), UnsupportedSchemaVersion, InvalidEntry. Declared with action=modify to indicate Phase 2 codec extension for free_function kind dispatch.",
       "approved": true,

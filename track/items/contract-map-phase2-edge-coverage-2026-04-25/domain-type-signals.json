@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-26T04:20:48Z",
-  "declaration_hash": "3513661f481674c2d7573f6a731cd93e5ad287b4d1e32d6c396bb2dcdbd98e76",
+  "generated_at": "2026-04-26T04:42:35Z",
+  "declaration_hash": "d26a5d4b051abd01fc21bc5f2e19a67f40a8d66892537135c13515edbd60b5b4",
   "signals": [
     {
       "type_name": "render_contract_map",
-      "kind_tag": "value_object",
+      "kind_tag": "free_function",
       "signal": "yellow",
       "found_type": false
     },

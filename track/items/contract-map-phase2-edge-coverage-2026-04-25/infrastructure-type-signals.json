@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-26T04:20:49Z",
-  "declaration_hash": "4b283cba20f6e8adce486db610c26e8d23c97b2988c8d79882550b432ac5f328",
+  "generated_at": "2026-04-26T04:42:37Z",
+  "declaration_hash": "b3f2f0f1f96cad19e6a23b232fd96ce89e5f3012ae3103412d86d35a3371a6d8",
   "signals": [
     {
       "type_name": "FsCatalogueLoader",
@@ -35,6 +35,12 @@
         "TopologicalSortFailed",
         "InvalidLayerId"
       ]
+    },
+    {
+      "type_name": "load_all_catalogues",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
     },
     {
       "type_name": "TypeCatalogueCodecError",
