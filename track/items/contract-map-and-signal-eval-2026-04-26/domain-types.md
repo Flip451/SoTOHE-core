@@ -26,7 +26,7 @@
 | TraitImplEntry | dto | modify | — | 🔵 | 🔵 |
 | TypeBaselineEntry | dto | modify | — | 🔵 | 🔵 |
 | TypeBaseline | dto | modify | — | 🔵 | 🔵 |
-| FunctionNode | dto | — | — | 🟡 | 🔵 |
-| FunctionBaselineEntry | dto | — | — | 🟡 | 🔵 |
-| TraitImplBaselineEntry | dto | — | — | 🟡 | 🔵 |
+| FunctionNode | dto | — | — | 🔵 | 🔵 |
+| FunctionBaselineEntry | dto | — | — | 🔵 | 🔵 |
+| TraitImplBaselineEntry | dto | — | — | 🔵 | 🔵 |
 

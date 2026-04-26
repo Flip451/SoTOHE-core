@@ -39,7 +39,7 @@ pub use plan_ref::{
 };
 pub use repository::{ImplPlanReader, ImplPlanWriter, TrackReader, TrackWriter, WorktreeReader};
 pub use review_v2::RoundType;
-pub use schema::{TraitImplEntry, TraitNode, TypeGraph, TypeNode};
+pub use schema::{FunctionNode, TraitImplEntry, TraitNode, TypeGraph, TypeNode};
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };
@@ -49,7 +49,10 @@ pub use spec::{
     evaluate_requirement_signal,
 };
 pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
-pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
+pub use tddd::baseline::{
+    FunctionBaselineEntry, TraitBaselineEntry, TraitImplBaselineEntry, TypeBaseline,
+    TypeBaselineEntry,
+};
 pub use tddd::catalogue::{
     MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
     TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,

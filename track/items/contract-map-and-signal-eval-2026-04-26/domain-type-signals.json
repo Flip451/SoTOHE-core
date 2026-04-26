@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-26T19:29:57Z",
+  "generated_at": "2026-04-26T19:45:25Z",
   "declaration_hash": "d8774ee22c8778b083ddd54ef756839c2c544b60d029e256176c12ee0eed8d1c",
   "signals": [
     {
@@ -52,20 +52,20 @@
     {
       "type_name": "FunctionNode",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FunctionBaselineEntry",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TraitImplBaselineEntry",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeCatalogueDocument",

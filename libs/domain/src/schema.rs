@@ -349,17 +349,34 @@ pub trait SchemaExporter {
 ///
 /// Constructed from `SchemaExport` by infrastructure. The domain evaluation
 /// layer uses only this type — no raw string parsing needed.
+///
+/// T004 (S3): adds `functions: HashMap<(String, Option<String>), FunctionNode>`
+/// for in-memory free-function lookup keyed by `(short_name, module_path)`.
+/// JSON serialization (T007 `baseline_codec`) converts the tuple key to a
+/// fully-qualified string at codec boundaries.
 #[derive(Debug, Clone)]
 pub struct TypeGraph {
     types: HashMap<String, TypeNode>,
     traits: HashMap<String, TraitNode>,
+    /// Free functions indexed by `(short_name, module_path)`.
+    functions: HashMap<(String, Option<String>), FunctionNode>,
 }
 
 impl TypeGraph {
-    /// Creates a new `TypeGraph`.
+    /// Creates a new `TypeGraph` (backward-compatible: `functions` defaults to empty).
     #[must_use]
     pub fn new(types: HashMap<String, TypeNode>, traits: HashMap<String, TraitNode>) -> Self {
-        Self { types, traits }
+        Self { types, traits, functions: HashMap::new() }
+    }
+
+    /// Creates a new `TypeGraph` with an explicit `functions` map.
+    #[must_use]
+    pub fn with_functions(
+        types: HashMap<String, TypeNode>,
+        traits: HashMap<String, TraitNode>,
+        functions: HashMap<(String, Option<String>), FunctionNode>,
+    ) -> Self {
+        Self { types, traits, functions }
     }
 
     /// Returns `true` if a type with the given name exists in the profile.
@@ -384,6 +401,28 @@ impl TypeGraph {
     #[must_use]
     pub fn get_impl(&self, type_name: &str, trait_name: &str) -> Option<&TraitImplEntry> {
         self.types.get(type_name)?.trait_impls().iter().find(|i| i.trait_name() == trait_name)
+    }
+
+    /// Returns `true` if a function with the given `(short_name, module_path)` key exists.
+    #[must_use]
+    pub fn has_function(&self, short_name: &str, module_path: Option<&str>) -> bool {
+        self.functions.contains_key(&(short_name.to_string(), module_path.map(str::to_string)))
+    }
+
+    /// Returns the `FunctionNode` for the given `(short_name, module_path)` key, if present.
+    #[must_use]
+    pub fn get_function(
+        &self,
+        short_name: &str,
+        module_path: Option<&str>,
+    ) -> Option<&FunctionNode> {
+        self.functions.get(&(short_name.to_string(), module_path.map(str::to_string)))
+    }
+
+    /// Returns the functions map.
+    #[must_use]
+    pub fn functions(&self) -> &HashMap<(String, Option<String>), FunctionNode> {
+        &self.functions
     }
 
     /// Returns an iterator over all type names in this graph.
@@ -486,17 +525,34 @@ impl TypeNode {
 /// Represents one `impl TraitName for TypeName { ... }` block. The evaluator
 /// uses this to verify that a `SecondaryAdapter` entry's declared trait
 /// implementations actually exist in the crate profile.
+///
+/// T004 (S3): adds `origin_crate` to distinguish workspace-owned traits from
+/// external/std traits. Signal evaluators (T008 IN-10) filter on this field
+/// to avoid false-positive reverse extras for external crate traits.
 #[derive(Debug, Clone)]
 pub struct TraitImplEntry {
     trait_name: String,
     methods: Vec<MethodDeclaration>,
+    /// The crate that defines this trait (e.g., `"domain"`, `"std"`).
+    /// `""` (empty string) when the origin could not be determined.
+    origin_crate: String,
 }
 
 impl TraitImplEntry {
     /// Creates a new `TraitImplEntry`.
     #[must_use]
     pub fn new(trait_name: impl Into<String>, methods: Vec<MethodDeclaration>) -> Self {
-        Self { trait_name: trait_name.into(), methods }
+        Self { trait_name: trait_name.into(), methods, origin_crate: String::new() }
+    }
+
+    /// Creates a new `TraitImplEntry` with an explicit `origin_crate`.
+    #[must_use]
+    pub fn with_origin_crate(
+        trait_name: impl Into<String>,
+        methods: Vec<MethodDeclaration>,
+        origin_crate: impl Into<String>,
+    ) -> Self {
+        Self { trait_name: trait_name.into(), methods, origin_crate: origin_crate.into() }
     }
 
     /// Returns the trait name (last-segment short name).
@@ -509,6 +565,75 @@ impl TraitImplEntry {
     #[must_use]
     pub fn methods(&self) -> &[MethodDeclaration] {
         &self.methods
+    }
+
+    /// Returns the crate that defines this trait.
+    ///
+    /// Returns an empty string when the origin is unknown (default for entries
+    /// created via `TraitImplEntry::new` before T006 populates the field).
+    #[must_use]
+    pub fn origin_crate(&self) -> &str {
+        &self.origin_crate
+    }
+}
+
+// ---------------------------------------------------------------------------
+// FunctionNode — a public free function in the crate, indexed for evaluation
+// ---------------------------------------------------------------------------
+
+/// A public free function in the crate, as indexed for TDDD evaluation.
+///
+/// T004 (S3): new type. Represents a top-level `pub fn` (not a method).
+/// Stored in `TypeGraph::functions` under the key `(short_name, module_path)`.
+/// Serialization/deserialization (T007 `baseline_codec`) uses a fully-qualified
+/// string key (`"crate::module::fn_name"`) — the in-memory tuple key is
+/// converted at codec boundaries.
+#[derive(Debug, Clone)]
+pub struct FunctionNode {
+    /// Structured parameter list at L1 resolution (excluding any self receiver).
+    params: Vec<ParamDeclaration>,
+    /// Return type names extracted from the return type (last-segment short names).
+    returns: Vec<String>,
+    /// Whether the function is declared `async fn`.
+    is_async: bool,
+    /// Module path for scoped lookup (e.g., `"domain::review"`). `None` if unknown.
+    module_path: Option<String>,
+}
+
+impl FunctionNode {
+    /// Creates a new `FunctionNode`.
+    #[must_use]
+    pub fn new(
+        params: Vec<ParamDeclaration>,
+        returns: Vec<String>,
+        is_async: bool,
+        module_path: Option<String>,
+    ) -> Self {
+        Self { params, returns, is_async, module_path }
+    }
+
+    /// Returns the structured parameter list (L1 resolution, no self receiver).
+    #[must_use]
+    pub fn params(&self) -> &[ParamDeclaration] {
+        &self.params
+    }
+
+    /// Returns the return type names (last-segment short names).
+    #[must_use]
+    pub fn returns(&self) -> &[String] {
+        &self.returns
+    }
+
+    /// Returns `true` if the function is declared `async fn`.
+    #[must_use]
+    pub fn is_async(&self) -> bool {
+        self.is_async
+    }
+
+    /// Returns the module path, if known.
+    #[must_use]
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
     }
 }
 
@@ -702,5 +827,114 @@ mod tests {
         let names: Vec<&str> = node.methods().iter().map(MethodDeclaration::name).collect();
         assert_eq!(names, vec!["save", "find"]);
         assert_eq!(node.methods().len(), 2);
+    }
+
+    // --- T004 (S3): TraitImplEntry::origin_crate ---
+
+    #[test]
+    fn test_trait_impl_entry_new_has_empty_origin_crate() {
+        let entry = TraitImplEntry::new("Display", vec![]);
+        assert_eq!(entry.origin_crate(), "");
+    }
+
+    #[test]
+    fn test_trait_impl_entry_with_origin_crate_stores_value() {
+        let entry = TraitImplEntry::with_origin_crate("TrackReader", vec![], "domain");
+        assert_eq!(entry.trait_name(), "TrackReader");
+        assert_eq!(entry.origin_crate(), "domain");
+        assert!(entry.methods().is_empty());
+    }
+
+    #[test]
+    fn test_trait_impl_entry_with_origin_crate_external() {
+        let entry = TraitImplEntry::with_origin_crate("Display", vec![], "std");
+        assert_eq!(entry.origin_crate(), "std");
+    }
+
+    // --- T004 (S3): FunctionNode ---
+
+    #[test]
+    fn test_function_node_accessors() {
+        let params = vec![ParamDeclaration::new("id", "TrackId")];
+        let returns = vec!["Option<Track>".to_string()];
+        let node = FunctionNode::new(
+            params.clone(),
+            returns.clone(),
+            false,
+            Some("domain::track".to_string()),
+        );
+        assert_eq!(node.params().len(), 1);
+        assert_eq!(node.params()[0].name(), "id");
+        assert_eq!(node.returns(), &["Option<Track>"]);
+        assert!(!node.is_async());
+        assert_eq!(node.module_path(), Some("domain::track"));
+    }
+
+    #[test]
+    fn test_function_node_async_flag() {
+        let node = FunctionNode::new(vec![], vec!["()".to_string()], true, None);
+        assert!(node.is_async());
+        assert!(node.module_path().is_none());
+    }
+
+    // --- T004 (S3): TypeGraph::functions ---
+
+    #[test]
+    fn test_type_graph_new_has_empty_functions() {
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        assert!(graph.functions().is_empty());
+    }
+
+    #[test]
+    fn test_type_graph_with_functions_stores_entries() {
+        let mut functions = HashMap::new();
+        let key = ("build_baseline".to_string(), Some("infra::tddd".to_string()));
+        let node = FunctionNode::new(
+            vec![],
+            vec!["TypeBaseline".to_string()],
+            false,
+            Some("infra::tddd".to_string()),
+        );
+        functions.insert(key.clone(), node);
+
+        let graph = TypeGraph::with_functions(HashMap::new(), HashMap::new(), functions);
+        assert!(graph.has_function("build_baseline", Some("infra::tddd")));
+        assert!(!graph.has_function("build_baseline", None));
+        assert!(!graph.has_function("other_fn", Some("infra::tddd")));
+    }
+
+    #[test]
+    fn test_type_graph_get_function_returns_correct_node() {
+        let mut functions = HashMap::new();
+        let node = FunctionNode::new(
+            vec![ParamDeclaration::new("x", "u32")],
+            vec!["String".to_string()],
+            false,
+            None,
+        );
+        functions.insert(("render".to_string(), None), node);
+
+        let graph = TypeGraph::with_functions(HashMap::new(), HashMap::new(), functions);
+        let result = graph.get_function("render", None);
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().params().len(), 1);
+    }
+
+    #[test]
+    fn test_type_graph_get_function_returns_none_for_missing() {
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        assert!(graph.get_function("nonexistent", None).is_none());
+    }
+
+    #[test]
+    fn test_type_graph_has_function_with_no_module_path() {
+        let mut functions = HashMap::new();
+        functions.insert(
+            ("top_level_fn".to_string(), None),
+            FunctionNode::new(vec![], vec![], false, None),
+        );
+        let graph = TypeGraph::with_functions(HashMap::new(), HashMap::new(), functions);
+        assert!(graph.has_function("top_level_fn", None));
+        assert!(!graph.has_function("top_level_fn", Some("some::module")));
     }
 }

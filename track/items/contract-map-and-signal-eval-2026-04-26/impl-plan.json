@@ -19,12 +19,12 @@
     {
       "id": "T004",
       "description": "TypeGraph domain schema を拡張する。TraitImplEntry に origin_crate: String フィールドを追加し、コンストラクタを更新する。FunctionNode 型 (params / returns / is_async / module_path) を新規追加する。TypeGraph に functions: HashMap<(String, Option<String>), FunctionNode> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。既存の TypeGraph::new / TypeNode::set_trait_impls のシグネチャ変更に対応して呼び出し側 (code_profile_builder / tests) を更新する。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "baseline domain schema (libs/domain/src/tddd/baseline.rs) を拡張する。TraitImplBaselineEntry 型 (trait_name / origin_crate) を新規追加する。TypeBaselineEntry に trait_impls: Vec<TraitImplBaselineEntry> フィールドを追加し、コンストラクタ / getter を更新する。FunctionBaselineEntry 型 (params / returns / is_async / module_path) を新規追加する。TypeBaseline に functions: HashMap<String, FunctionBaselineEntry> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",

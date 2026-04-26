@@ -542,6 +542,165 @@
           "findings": [],
           "hash": "rvw1:sha256:14a8c1305ca877c9651d9408a2c1c818ca3c518e48e275699250639e4944d4a4",
           "at": "2026-04-26T19:10:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c61f638f110f39714425e7e4c6e6ced0e91168a822fab386b35cb8edc880819",
+          "at": "2026-04-26T19:39:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c61f638f110f39714425e7e4c6e6ced0e91168a822fab386b35cb8edc880819",
+          "at": "2026-04-26T19:39:49Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
+          "at": "2026-04-26T18:31:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
+          "at": "2026-04-26T18:32:24Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This command reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the sibling spec-verification paths. A symlinked track directory or spec file can therefore escape the trusted tree and make the CLI hash an arbitrary file.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 37,
+              "category": "security"
+            },
+            {
+              "message": "The new public subcommand has no tests in this change for the happy path and the failure branches (`--anchor` hit/miss, invalid track id, malformed/missing spec.json). Given the file I/O and branching here, regressions will go unguarded.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 25,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
+          "at": "2026-04-26T17:42:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This helper reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the neighboring TDDD commands. A symlinked `items_dir`, track directory, or `spec.json` can make the CLI hash files outside the trusted tree and leak their contents via stdout.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 34,
+              "category": "security"
+            },
+            {
+              "message": "No tests were added for the new public `execute_spec_element_hash` path, so the success case and the failure paths introduced here (`missing spec.json`, schema failure, missing anchor) are not covered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 25,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
+          "at": "2026-04-26T17:44:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new tests only assert that `execute_spec_element_hash` succeeds or fails; they never verify stdout. That leaves the core behavior of this command unprotected, so a regression that prints the wrong format (for example JSON in `--anchor` mode or a single hash in map mode) would still pass the suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 164,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b53989cab77f8c2f92e9a4242f486f40664a8cb51b8e39b6c31369faebc39603",
+          "at": "2026-04-26T17:48:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
+          "at": "2026-04-26T17:52:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
+          "at": "2026-04-26T17:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
+          "at": "2026-04-26T18:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
+          "at": "2026-04-26T18:33:15Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
+          "at": "2026-04-26T17:04:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
+          "at": "2026-04-26T17:05:21Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:41:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:42:44Z"
         }
       ]
     },
@@ -687,24 +846,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
-          "at": "2026-04-26T18:31:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
-          "at": "2026-04-26T18:32:24Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -838,133 +979,20 @@
           "findings": [],
           "hash": "rvw1:sha256:6f15fbc5f9f220f79c3e8a21cd458e9876dcdd00e7c7ef8259b370fbbf50c9b9",
           "at": "2026-04-26T18:39:48Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This command reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the sibling spec-verification paths. A symlinked track directory or spec file can therefore escape the trusted tree and make the CLI hash an arbitrary file.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 37,
-              "category": "security"
-            },
-            {
-              "message": "The new public subcommand has no tests in this change for the happy path and the failure branches (`--anchor` hit/miss, invalid track id, malformed/missing spec.json). Given the file I/O and branching here, regressions will go unguarded.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 25,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
-          "at": "2026-04-26T17:42:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This helper reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the neighboring TDDD commands. A symlinked `items_dir`, track directory, or `spec.json` can make the CLI hash files outside the trusted tree and leak their contents via stdout.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 34,
-              "category": "security"
-            },
-            {
-              "message": "No tests were added for the new public `execute_spec_element_hash` path, so the success case and the failure paths introduced here (`missing spec.json`, schema failure, missing anchor) are not covered.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 25,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
-          "at": "2026-04-26T17:44:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new tests only assert that `execute_spec_element_hash` succeeds or fails; they never verify stdout. That leaves the core behavior of this command unprotected, so a regression that prints the wrong format (for example JSON in `--anchor` mode or a single hash in map mode) would still pass the suite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 164,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b53989cab77f8c2f92e9a4242f486f40664a8cb51b8e39b6c31369faebc39603",
-          "at": "2026-04-26T17:48:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
-          "at": "2026-04-26T17:52:06Z"
+          "hash": "rvw1:sha256:0dacb40fd98cb4abbc5545ca9fbc2d61b4038bc9c211db5a5432ad075c485b6c",
+          "at": "2026-04-26T19:38:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
-          "at": "2026-04-26T17:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
-          "at": "2026-04-26T18:31:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
-          "at": "2026-04-26T18:33:15Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
-          "at": "2026-04-26T08:41:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
-          "at": "2026-04-26T08:42:44Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
-          "at": "2026-04-26T17:04:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
-          "at": "2026-04-26T17:05:21Z"
+          "hash": "rvw1:sha256:0dacb40fd98cb4abbc5545ca9fbc2d61b4038bc9c211db5a5432ad075c485b6c",
+          "at": "2026-04-26T19:40:51Z"
         }
       ]
     }

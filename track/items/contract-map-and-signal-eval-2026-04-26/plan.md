@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Contract Map 表示拡張 + signal 評価拡張 (両輪)
 
-## Tasks (4/10 resolved)
+## Tasks (6/10 resolved)
 
 ### S1 — Signal Evaluator Action-Awareness (bootstrap fix)
 
@@ -26,8 +26,8 @@
 > T005 は baseline に TraitImplBaselineEntry + TypeBaselineEntry::trait_impls + FunctionBaselineEntry + TypeBaseline::functions を追加する。
 > これで Core invariant の 3 輪 (catalogue / TypeGraph / baseline) の domain 型レベルの整合が完成する。
 
-- [ ] **T004**: TypeGraph domain schema を拡張する。TraitImplEntry に origin_crate: String フィールドを追加し、コンストラクタを更新する。FunctionNode 型 (params / returns / is_async / module_path) を新規追加する。TypeGraph に functions: HashMap<(String, Option<String>), FunctionNode> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。既存の TypeGraph::new / TypeNode::set_trait_impls のシグネチャ変更に対応して呼び出し側 (code_profile_builder / tests) を更新する。
-- [ ] **T005**: baseline domain schema (libs/domain/src/tddd/baseline.rs) を拡張する。TraitImplBaselineEntry 型 (trait_name / origin_crate) を新規追加する。TypeBaselineEntry に trait_impls: Vec<TraitImplBaselineEntry> フィールドを追加し、コンストラクタ / getter を更新する。FunctionBaselineEntry 型 (params / returns / is_async / module_path) を新規追加する。TypeBaseline に functions: HashMap<String, FunctionBaselineEntry> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。
+- [x] **T004**: TypeGraph domain schema を拡張する。TraitImplEntry に origin_crate: String フィールドを追加し、コンストラクタを更新する。FunctionNode 型 (params / returns / is_async / module_path) を新規追加する。TypeGraph に functions: HashMap<(String, Option<String>), FunctionNode> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。既存の TypeGraph::new / TypeNode::set_trait_impls のシグネチャ変更に対応して呼び出し側 (code_profile_builder / tests) を更新する。
+- [x] **T005**: baseline domain schema (libs/domain/src/tddd/baseline.rs) を拡張する。TraitImplBaselineEntry 型 (trait_name / origin_crate) を新規追加する。TypeBaselineEntry に trait_impls: Vec<TraitImplBaselineEntry> フィールドを追加し、コンストラクタ / getter を更新する。FunctionBaselineEntry 型 (params / returns / is_async / module_path) を新規追加する。TypeBaseline に functions: HashMap<String, FunctionBaselineEntry> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。
 
 ### S4 — Infrastructure Build Extensions (type graph + baseline builder/codec)
 
