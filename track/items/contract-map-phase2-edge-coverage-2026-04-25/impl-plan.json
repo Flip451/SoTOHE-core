@@ -16,17 +16,19 @@
     {
       "id": "T003",
       "description": "Extend TypeDefinitionKind::Interactor in catalogue.rs (domain) to carry an optional declares_application_service: Option<String> field for the impl-edge target. Update contract_map_render.rs: build an application_service_index (ApplicationService kind only, parallel to port_index) and emit -.impl.-> edges from Interactor entries whose declares_application_service is Some(name) and name resolves in application_service_index. Add unit tests: Interactor with declares_application_service produces the impl edge; Interactor without it produces no edge; name not in application_service_index produces no edge. Domain layer only.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "85e494923e3c1441d6d447136c1ab64e3a0f215b"
     },
     {
       "id": "T004",
       "description": "Extend catalogue_codec.rs (infrastructure) to decode/encode the new declares_application_service field on Interactor entries. Add declares_application_service: Option<String> to the Interactor variant of TypeDefinitionKindDto (serde default/skip). Extend stale-field guard: interactor now allows declares_application_service alongside the existing empty-fields rule. Add codec round-trip tests: Interactor with declares_application_service round-trips correctly; Interactor without the field decodes to None. Update usecase-types.json catalogue entry for RenderContractMapInteractor to set declares_application_service: RenderContractMap once codec is in place.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "85e494923e3c1441d6d447136c1ab64e3a0f215b"
     },
     {
       "id": "T005",
       "description": "Implement unused_reference and declaration_only dashed-border classDef rendering in contract_map_render.rs (domain). After building type_index and edges, compute the set of node_ids that appear as an edge source or target. Entries where action=reference AND node_id is absent from the edge set get classDef unused_reference (stroke-dasharray). Entries where action=modify AND expected_methods is empty get classDef declaration_only (stroke-dasharray) regardless of edge presence. Add both classDef definitions to the mermaid header. Add unit tests: reference entry with no edges renders with unused_reference; reference entry that IS an edge target does not; modify+empty-methods entry renders with declaration_only.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",

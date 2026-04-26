@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD Contract Map Phase 2 — Edge coverage で孤立ノード 9 件 (L1-L4) を解消
 
-## Tasks (2/10 resolved)
+## Tasks (4/10 resolved)
 
 ### S01 — Domain: FreeFunction Kind Addition
 
@@ -24,21 +24,21 @@
 > TypeDefinitionKind::Interactor に declares_application_service: Option<String> を追加し、renderer で application_service_index を用いた -.impl.-> edge を描画する (GO-03、IN-02、AC-02)。
 > Domain 層内完結。
 
-- [~] **T003**: Extend TypeDefinitionKind::Interactor in catalogue.rs (domain) to carry an optional declares_application_service: Option<String> field for the impl-edge target. Update contract_map_render.rs: build an application_service_index (ApplicationService kind only, parallel to port_index) and emit -.impl.-> edges from Interactor entries whose declares_application_service is Some(name) and name resolves in application_service_index. Add unit tests: Interactor with declares_application_service produces the impl edge; Interactor without it produces no edge; name not in application_service_index produces no edge. Domain layer only.
+- [x] **T003**: Extend TypeDefinitionKind::Interactor in catalogue.rs (domain) to carry an optional declares_application_service: Option<String> field for the impl-edge target. Update contract_map_render.rs: build an application_service_index (ApplicationService kind only, parallel to port_index) and emit -.impl.-> edges from Interactor entries whose declares_application_service is Some(name) and name resolves in application_service_index. Add unit tests: Interactor with declares_application_service produces the impl edge; Interactor without it produces no edge; name not in application_service_index produces no edge. Domain layer only. (`85e494923e3c1441d6d447136c1ab64e3a0f215b`)
 
 ### S04 — Infrastructure: Interactor Codec Extension
 
 > catalogue_codec.rs の Interactor DTO に declares_application_service を追加し、T003 で追加したフィールドの encode/decode を実装する (IN-02 の codec 側)。
 > usecase-types.json の RenderContractMapInteractor エントリを更新して declares_application_service: RenderContractMap を設定する。
 
-- [~] **T004**: Extend catalogue_codec.rs (infrastructure) to decode/encode the new declares_application_service field on Interactor entries. Add declares_application_service: Option<String> to the Interactor variant of TypeDefinitionKindDto (serde default/skip). Extend stale-field guard: interactor now allows declares_application_service alongside the existing empty-fields rule. Add codec round-trip tests: Interactor with declares_application_service round-trips correctly; Interactor without the field decodes to None. Update usecase-types.json catalogue entry for RenderContractMapInteractor to set declares_application_service: RenderContractMap once codec is in place.
+- [x] **T004**: Extend catalogue_codec.rs (infrastructure) to decode/encode the new declares_application_service field on Interactor entries. Add declares_application_service: Option<String> to the Interactor variant of TypeDefinitionKindDto (serde default/skip). Extend stale-field guard: interactor now allows declares_application_service alongside the existing empty-fields rule. Add codec round-trip tests: Interactor with declares_application_service round-trips correctly; Interactor without the field decodes to None. Update usecase-types.json catalogue entry for RenderContractMapInteractor to set declares_application_service: RenderContractMap once codec is in place. (`85e494923e3c1441d6d447136c1ab64e3a0f215b`)
 
 ### S05 — Domain: Dashed-Border Nodes (L1/L2 Fix)
 
 > unused_reference classDef (action=reference かつ edge なし) と declaration_only classDef (action=modify かつ expected_methods 空、edge の有無は問わない) を renderer に実装する (GO-05、IN-03、IN-04、AC-03、AC-04)。
 > Phase 1 の 9 件孤立ノードのうち L1 (TaskId 等の forward-reference) と L2 (ValidationError) が視覚的に識別可能になる。
 
-- [ ] **T005**: Implement unused_reference and declaration_only dashed-border classDef rendering in contract_map_render.rs (domain). After building type_index and edges, compute the set of node_ids that appear as an edge source or target. Entries where action=reference AND node_id is absent from the edge set get classDef unused_reference (stroke-dasharray). Entries where action=modify AND expected_methods is empty get classDef declaration_only (stroke-dasharray) regardless of edge presence. Add both classDef definitions to the mermaid header. Add unit tests: reference entry with no edges renders with unused_reference; reference entry that IS an edge target does not; modify+empty-methods entry renders with declaration_only.
+- [~] **T005**: Implement unused_reference and declaration_only dashed-border classDef rendering in contract_map_render.rs (domain). After building type_index and edges, compute the set of node_ids that appear as an edge source or target. Entries where action=reference AND node_id is absent from the edge set get classDef unused_reference (stroke-dasharray). Entries where action=modify AND expected_methods is empty get classDef declaration_only (stroke-dasharray) regardless of edge presence. Add both classDef definitions to the mermaid header. Add unit tests: reference entry with no edges renders with unused_reference; reference entry that IS an edge target does not; modify+empty-methods entry renders with declaration_only.
 
 ### S06 — Domain: Field Edge Generation (L2 Fix)
 

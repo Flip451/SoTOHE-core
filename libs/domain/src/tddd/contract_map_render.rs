@@ -120,6 +120,13 @@ pub fn render_contract_map(
     out.push_str("    classDef query fill:#f3e5f5,stroke:#8e24aa\n");
     out.push_str("    classDef factory fill:#fff8e1,stroke:#f9a825\n");
     out.push_str("    classDef free_function fill:#e8eaf6,stroke:#3949ab\n");
+    // T005 / IN-03 / IN-04: dashed-border classDefs for the L1 / L2
+    // categories. `unused_reference` flags `action=reference` entries that
+    // never appear as an edge source or target (forward-reference
+    // placeholders); `declaration_only` flags `action=modify` entries whose
+    // expected_methods list is empty (declarative-only modifications).
+    out.push_str("    classDef unused_reference stroke-dasharray: 4 4\n");
+    out.push_str("    classDef declaration_only stroke-dasharray: 4 4\n");
 
     // 4a. Subgraphs.
     for layer in &active_layers {
@@ -145,6 +152,10 @@ pub fn render_contract_map(
     //     (present in `type_index`) become edge targets — references to
     //     external types (e.g. `String`, `Result`) are ignored.
     let mut edges: BTreeSet<String> = BTreeSet::new();
+    // T005 / IN-03: track every node id that appears as an edge source or
+    // target so the post-loop classDef pass can flag `action=reference`
+    // entries that never participate in any edge as `unused_reference`.
+    let mut used_ids: BTreeSet<String> = BTreeSet::new();
     for (src_layer, entry) in &entries {
         let src_id = node_id(src_layer, entry.name());
 
@@ -160,6 +171,8 @@ pub fn render_contract_map(
                             "    {src_id} -->|{label}| {dst_id}",
                             label = escape_edge_label(method.name()),
                         ));
+                        used_ids.insert(src_id.clone());
+                        used_ids.insert(dst_id.clone());
                     }
                 }
             }
@@ -180,6 +193,8 @@ pub fn render_contract_map(
                                     param.name()
                                 )),
                             ));
+                            used_ids.insert(src_id.clone());
+                            used_ids.insert(dst_id.clone());
                         }
                     }
                 }
@@ -194,6 +209,8 @@ pub fn render_contract_map(
                 if let Some(port_ids) = port_index.get(impl_decl.trait_name()) {
                     for port_id in port_ids {
                         edges.insert(format!("    {src_id} -.impl.-> {port_id}"));
+                        used_ids.insert(src_id.clone());
+                        used_ids.insert(port_id.clone());
                     }
                 }
             }
@@ -210,6 +227,8 @@ pub fn render_contract_map(
             if let Some(svc_ids) = application_service_index.get(name) {
                 for svc_id in svc_ids {
                     edges.insert(format!("    {src_id} -.impl.-> {svc_id}"));
+                    used_ids.insert(src_id.clone());
+                    used_ids.insert(svc_id.clone());
                 }
             }
         }
@@ -217,6 +236,34 @@ pub fn render_contract_map(
 
     for edge in &edges {
         out.push_str(edge);
+        out.push('\n');
+    }
+
+    // T005 / IN-03 / IN-04: classDef applications for L1 / L2 categories.
+    //
+    // - `unused_reference` (IN-03 / L1): `action=reference` AND the node id
+    //   never appears in any edge → render with dashed border to mark the
+    //   entry as an intentional forward-reference placeholder.
+    // - `declaration_only` (IN-04 / L2): `action=modify` AND `methods_of(kind)`
+    //   is empty → render with dashed border to mark the entry as a
+    //   declarative-only modification (no method-level changes), regardless
+    //   of whether other edges reach the node.
+    let mut class_lines: BTreeSet<String> = BTreeSet::new();
+    for (layer, entry) in &entries {
+        let id = node_id(layer, entry.name());
+        if entry.action() == crate::tddd::catalogue::TypeAction::Reference
+            && !used_ids.contains(&id)
+        {
+            class_lines.insert(format!("    class {id} unused_reference"));
+        }
+        if entry.action() == crate::tddd::catalogue::TypeAction::Modify
+            && methods_of(entry.kind()).is_empty()
+        {
+            class_lines.insert(format!("    class {id} declaration_only"));
+        }
+    }
+    for line in &class_lines {
+        out.push_str(line);
         out.push('\n');
     }
 
@@ -1020,6 +1067,104 @@ mod tests {
         assert!(
             !text.contains(" -.impl.-> "),
             "no impl edge expected when target is not an ApplicationService; output was:\n{text}"
+        );
+    }
+
+    // --- T005 / IN-03 / IN-04: dashed-border classDefs ---
+
+    #[test]
+    fn test_render_contract_map_unused_reference_classdef_for_orphan_reference_entry() {
+        let domain = layer("domain");
+        let domain_doc = doc(vec![
+            // Orphan reference entry — no edges in or out.
+            TypeCatalogueEntry::new(
+                "TaskId",
+                "Forward-reference placeholder",
+                TypeDefinitionKind::ValueObject,
+                TypeAction::Reference,
+                true,
+            )
+            .unwrap(),
+        ]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            text.contains("classDef unused_reference"),
+            "unused_reference classDef definition must appear; output was:\n{text}"
+        );
+        assert!(
+            text.contains("class L6_domain_TaskId unused_reference"),
+            "unused_reference class application must target TaskId; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_no_unused_reference_when_reference_entry_is_edge_target() {
+        // Reference entry that IS an edge target → no unused_reference classDef.
+        let domain = layer("domain");
+        let exec_method =
+            vec![MethodDeclaration::new("find", Some("&self".to_owned()), vec![], "TaskId", false)];
+        let domain_doc = doc(vec![
+            entry("Repo", TypeDefinitionKind::ApplicationService { expected_methods: exec_method }),
+            TypeCatalogueEntry::new(
+                "TaskId",
+                "Reference but used as method return type",
+                TypeDefinitionKind::ValueObject,
+                TypeAction::Reference,
+                true,
+            )
+            .unwrap(),
+        ]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            !text.contains("class L6_domain_TaskId unused_reference"),
+            "TaskId is an edge target — must NOT carry unused_reference classDef; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_declaration_only_classdef_for_modify_empty_methods() {
+        // action=modify + expected_methods empty → declaration_only classDef
+        // regardless of whether the node is an edge target.
+        let domain = layer("domain");
+        let domain_doc = doc(vec![
+            TypeCatalogueEntry::new(
+                "ValidationError",
+                "Modified but no method-level changes",
+                TypeDefinitionKind::ErrorType { expected_variants: vec![] },
+                TypeAction::Modify,
+                true,
+            )
+            .unwrap(),
+        ]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            text.contains("classDef declaration_only"),
+            "declaration_only classDef definition must appear; output was:\n{text}"
+        );
+        assert!(
+            text.contains("class L6_domain_ValidationError declaration_only"),
+            "declaration_only class application must target ValidationError; output was:\n{text}"
         );
     }
 
