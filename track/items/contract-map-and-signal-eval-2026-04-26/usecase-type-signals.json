@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-26T18:07:19Z",
+  "declaration_hash": "eef6bf3c1a4af28c3ccc146b0bac29ab03a2782dfb4a9eabae5434ef7bfe166d",
+  "signals": [
+    {
+      "type_name": "RenderContractMap",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignals",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: &RefreshCatalogueSpecSignalsCommand) -> Result<(), RefreshCatalogueSpecSignalsError>"
+      ]
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "FetchError",
+        "InvalidCatalogueHash",
+        "WriteFailed"
+      ]
+    }
+  ]
+}

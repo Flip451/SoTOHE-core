@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "377e4c7be8ee6d138c8247a095071458088803bfffa76266fe6b02bffed2e4c9",
+  "signals": [
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsCatalogueLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LoadAllCataloguesError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeGraphRenderOptions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MemberDeclarationDto",
+      "signal": "blue"
+    }
+  ]
+}

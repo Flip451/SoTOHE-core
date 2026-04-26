@@ -8,6 +8,19 @@
 //!
 //! Historical note (T001): this logic used to live in `catalogue.rs`. It was
 //! extracted here during the TDDD-01 rename + DM-06 split.
+//!
+//! ## Action-aware signal mapping (ADR 2026-04-26-0855 §S)
+//!
+//! Signal decisions are determined by two structural facts — *forward miss*
+//! (declared element absent in code) and *reverse extra* (code element absent
+//! in catalogue) — combined with the entry's `TypeAction`:
+//!
+//! | action    | perfect match | forward miss | reverse extra |
+//! |-----------|---------------|--------------|---------------|
+//! | add       | Blue          | Yellow       | Red           |
+//! | modify    | Blue          | Yellow       | Yellow        |
+//! | delete    | Blue (none)   | — (no axis)  | Yellow        |
+//! | reference | Blue          | Red          | Red           |
 
 use std::collections::HashSet;
 
@@ -50,38 +63,39 @@ fn evaluate_single(
 ) -> TypeSignal {
     let name = entry.name();
     let kind_tag = entry.kind().kind_tag().to_string();
+    let action = entry.action();
 
     // Delete action inverts the forward check: absent → Blue, present → Yellow.
     // This is orthogonal to kind, so we branch before the kind dispatch.
-    if entry.action() == TypeAction::Delete {
+    if action == TypeAction::Delete {
         return evaluate_delete(name, &kind_tag, entry.kind(), profile);
     }
 
     match entry.kind() {
         TypeDefinitionKind::Typestate { transitions } => {
-            evaluate_typestate(name, &kind_tag, transitions, profile, typestate_names)
+            evaluate_typestate(name, &kind_tag, transitions, profile, typestate_names, action)
         }
         TypeDefinitionKind::Enum { expected_variants } => {
-            evaluate_enum(name, &kind_tag, expected_variants, profile)
+            evaluate_enum(name, &kind_tag, expected_variants, profile, action)
         }
-        TypeDefinitionKind::ValueObject => evaluate_value_object(name, &kind_tag, profile),
+        TypeDefinitionKind::ValueObject => evaluate_value_object(name, &kind_tag, profile, action),
         TypeDefinitionKind::ErrorType { expected_variants } => {
-            evaluate_error_type(name, &kind_tag, expected_variants, profile)
+            evaluate_error_type(name, &kind_tag, expected_variants, profile, action)
         }
         TypeDefinitionKind::SecondaryPort { expected_methods } => {
-            evaluate_secondary_port(name, &kind_tag, expected_methods, profile)
+            evaluate_secondary_port(name, &kind_tag, expected_methods, profile, action)
         }
         TypeDefinitionKind::ApplicationService { expected_methods } => {
-            evaluate_application_service(name, &kind_tag, expected_methods, profile)
+            evaluate_application_service(name, &kind_tag, expected_methods, profile, action)
         }
         TypeDefinitionKind::UseCase
         | TypeDefinitionKind::Interactor
         | TypeDefinitionKind::Dto
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
-        | TypeDefinitionKind::Factory => evaluate_struct_only(name, &kind_tag, profile),
+        | TypeDefinitionKind::Factory => evaluate_struct_only(name, &kind_tag, profile, action),
         TypeDefinitionKind::SecondaryAdapter { implements } => {
-            evaluate_secondary_adapter(name, &kind_tag, implements, profile)
+            evaluate_secondary_adapter(name, &kind_tag, implements, profile, action)
         }
     }
 }
@@ -120,12 +134,79 @@ pub(crate) fn red(name: &str, kind_tag: &str, found_type: bool) -> TypeSignal {
     TypeSignal::new(name, kind_tag, ConfidenceSignal::Red, found_type, vec![], vec![], vec![])
 }
 
-fn yellow(name: &str, kind_tag: &str) -> TypeSignal {
-    TypeSignal::new(name, kind_tag, ConfidenceSignal::Yellow, false, vec![], vec![], vec![])
-}
-
 fn blue(name: &str, kind_tag: &str) -> TypeSignal {
     TypeSignal::new(name, kind_tag, ConfidenceSignal::Blue, true, vec![], vec![], vec![])
+}
+
+// ---------------------------------------------------------------------------
+// Action-aware signal decision helpers (ADR 2026-04-26-0855 §S)
+// ---------------------------------------------------------------------------
+
+/// Returns the `ConfidenceSignal` for a **forward miss** (declared element absent in code)
+/// given the entry's `TypeAction`.
+///
+/// | action    | forward miss |
+/// |-----------|--------------|
+/// | add       | Yellow       |
+/// | modify    | Yellow       |
+/// | reference | Red          |
+/// | delete    | — (no forward axis; callers must not call this for Delete) |
+#[must_use]
+fn signal_for_forward_miss(action: TypeAction) -> ConfidenceSignal {
+    match action {
+        TypeAction::Add | TypeAction::Modify => ConfidenceSignal::Yellow,
+        TypeAction::Reference => ConfidenceSignal::Red,
+        TypeAction::Delete => ConfidenceSignal::Yellow, // delete has no forward axis; callers guard
+    }
+}
+
+/// Returns the `ConfidenceSignal` for a **reverse extra** (code element absent in catalogue)
+/// given the entry's `TypeAction`.
+///
+/// | action    | reverse extra |
+/// |-----------|---------------|
+/// | add       | Red           |
+/// | modify    | Yellow        |
+/// | reference | Red           |
+/// | delete    | Yellow (still present — not yet deleted) |
+#[must_use]
+fn signal_for_reverse_extra(action: TypeAction) -> ConfidenceSignal {
+    match action {
+        TypeAction::Add | TypeAction::Reference => ConfidenceSignal::Red,
+        TypeAction::Modify | TypeAction::Delete => ConfidenceSignal::Yellow,
+    }
+}
+
+/// Returns the most severe (lowest-confidence) signal between two candidates.
+///
+/// Severity order (most to least severe): Red > Yellow > Blue.
+/// Note: `ConfidenceSignal` implements `Ord` with Blue > Yellow > Red,
+/// so the most severe is the *minimum* under that ordering.
+#[must_use]
+fn most_severe(a: ConfidenceSignal, b: ConfidenceSignal) -> ConfidenceSignal {
+    // Ord: Blue > Yellow > Red, so min() gives the most severe.
+    a.min(b)
+}
+
+/// Combines forward-miss signal and reverse-extra signal into the dominant one.
+///
+/// Priority: Red > Yellow > Blue.  Both empty ⇒ Blue is returned by the caller,
+/// not here; this function is called only when at least one list is non-empty.
+#[must_use]
+fn dominant_signal(
+    forward_signal: ConfidenceSignal,
+    has_missing: bool,
+    reverse_signal: ConfidenceSignal,
+    has_extra: bool,
+) -> ConfidenceSignal {
+    let mut result = ConfidenceSignal::Blue;
+    if has_missing {
+        result = most_severe(result, forward_signal);
+    }
+    if has_extra {
+        result = most_severe(result, reverse_signal);
+    }
+    result
 }
 
 // ---------------------------------------------------------------------------
@@ -138,9 +219,11 @@ fn evaluate_typestate(
     transitions: &TypestateTransitions,
     profile: &TypeGraph,
     _typestate_names: &HashSet<&str>,
+    action: TypeAction,
 ) -> TypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
+        let miss_signal = signal_for_forward_miss(action);
+        return TypeSignal::new(name, kind_tag, miss_signal, false, vec![], vec![], vec![]);
     };
 
     // Use pre-filtered outgoing transitions from TypeGraph (set by build_type_graph).
@@ -156,7 +239,8 @@ fn evaluate_typestate(
                 let mut extra: Vec<String> =
                     code_transitions.into_iter().map(|s| s.to_string()).collect();
                 extra.sort();
-                TypeSignal::new(name, kind_tag, ConfidenceSignal::Red, true, vec![], vec![], extra)
+                let extra_signal = signal_for_reverse_extra(action);
+                TypeSignal::new(name, kind_tag, extra_signal, true, vec![], vec![], extra)
             }
         }
         TypestateTransitions::To(targets) => {
@@ -183,7 +267,12 @@ fn evaluate_typestate(
             let signal = if missing.is_empty() && extra.is_empty() {
                 ConfidenceSignal::Blue
             } else {
-                ConfidenceSignal::Red
+                dominant_signal(
+                    signal_for_forward_miss(action),
+                    !missing.is_empty(),
+                    signal_for_reverse_extra(action),
+                    !extra.is_empty(),
+                )
             };
             TypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
         }
@@ -195,11 +284,14 @@ fn evaluate_enum(
     kind_tag: &str,
     expected_variants: &[String],
     profile: &TypeGraph,
+    action: TypeAction,
 ) -> TypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
+        let miss_signal = signal_for_forward_miss(action);
+        return TypeSignal::new(name, kind_tag, miss_signal, false, vec![], vec![], vec![]);
     };
     if *code_type.kind() != TypeKind::Enum {
+        // Type exists but wrong kind — always Red (structural contract violation).
         return TypeSignal::new(
             name,
             kind_tag,
@@ -227,15 +319,26 @@ fn evaluate_enum(
     let signal = if missing.is_empty() && extra.is_empty() {
         ConfidenceSignal::Blue
     } else {
-        ConfidenceSignal::Red
+        dominant_signal(
+            signal_for_forward_miss(action),
+            !missing.is_empty(),
+            signal_for_reverse_extra(action),
+            !extra.is_empty(),
+        )
     };
 
     TypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
 }
 
-fn evaluate_value_object(name: &str, kind_tag: &str, profile: &TypeGraph) -> TypeSignal {
+fn evaluate_value_object(
+    name: &str,
+    kind_tag: &str,
+    profile: &TypeGraph,
+    action: TypeAction,
+) -> TypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
+        let miss_signal = signal_for_forward_miss(action);
+        return TypeSignal::new(name, kind_tag, miss_signal, false, vec![], vec![], vec![]);
     };
     // ValueObject must be a Struct (not Enum or TypeAlias).
     if *code_type.kind() == TypeKind::Struct {
@@ -250,11 +353,14 @@ fn evaluate_error_type(
     kind_tag: &str,
     expected_variants: &[String],
     profile: &TypeGraph,
+    action: TypeAction,
 ) -> TypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
+        let miss_signal = signal_for_forward_miss(action);
+        return TypeSignal::new(name, kind_tag, miss_signal, false, vec![], vec![], vec![]);
     };
     if *code_type.kind() != TypeKind::Enum {
+        // Type exists but wrong kind — always Red (structural contract violation).
         return TypeSignal::new(
             name,
             kind_tag,
@@ -266,12 +372,8 @@ fn evaluate_error_type(
         );
     }
 
-    // Empty expected_variants with enum confirmation = Blue (existence-only).
-    if expected_variants.is_empty() {
-        return blue(name, kind_tag);
-    }
-
     let code_variants: HashSet<&str> = code_type.members().iter().map(|m| m.name()).collect();
+    let spec_variants: HashSet<&str> = expected_variants.iter().map(|s| s.as_str()).collect();
 
     let mut found = Vec::new();
     let mut missing = Vec::new();
@@ -283,8 +385,23 @@ fn evaluate_error_type(
         }
     }
 
-    let signal = if missing.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Red };
-    TypeSignal::new(name, kind_tag, signal, true, found, missing, vec![])
+    // Reverse check — any code variant not declared in spec is extra.
+    // Note: when expected_variants is empty, all code variants are extra.
+    let mut extra: Vec<String> =
+        code_variants.difference(&spec_variants).map(|s| s.to_string()).collect();
+    extra.sort();
+
+    let signal = if missing.is_empty() && extra.is_empty() {
+        ConfidenceSignal::Blue
+    } else {
+        dominant_signal(
+            signal_for_forward_miss(action),
+            !missing.is_empty(),
+            signal_for_reverse_extra(action),
+            !extra.is_empty(),
+        )
+    };
+    TypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
 }
 
 /// L1 forward+reverse check for a `SecondaryPort` entry (secondary/driven port boundary).
@@ -298,8 +415,9 @@ fn evaluate_error_type(
 /// Reverse check (step 7): any code method on the trait that is not
 /// declared in `expected_methods` (keyed by name) is added to `extra`.
 ///
-/// The signal is `Yellow` when the trait does not exist in code, else
-/// `Blue` when `missing` and `extra` are both empty, else `Red`.
+/// The signal level for forward miss and reverse extra is determined by the
+/// `action` via the §S mapping (ADR 2026-04-26-0855). When the trait does not
+/// exist in code, a forward-miss signal is returned.
 ///
 /// Delegates to `evaluate_trait_methods` which is shared with `ApplicationService`.
 fn evaluate_secondary_port(
@@ -307,48 +425,66 @@ fn evaluate_secondary_port(
     kind_tag: &str,
     expected_methods: &[crate::tddd::catalogue::MethodDeclaration],
     profile: &TypeGraph,
+    action: TypeAction,
 ) -> TypeSignal {
-    evaluate_trait_methods(name, kind_tag, expected_methods, profile)
+    evaluate_trait_methods(name, kind_tag, expected_methods, profile, action)
 }
 
 /// L1 forward+reverse check for an `ApplicationService` entry (primary/driving port boundary).
 ///
 /// Identical evaluation logic to `SecondaryPort` — the difference is semantic (primary vs
 /// secondary port role), not structural. Both use the six L1 axes for forward check and
-/// the name-keyed reverse check.
+/// the name-keyed reverse check. Signal levels follow the §S action mapping.
 fn evaluate_application_service(
     name: &str,
     kind_tag: &str,
     expected_methods: &[crate::tddd::catalogue::MethodDeclaration],
     profile: &TypeGraph,
+    action: TypeAction,
 ) -> TypeSignal {
-    evaluate_trait_methods(name, kind_tag, expected_methods, profile)
+    evaluate_trait_methods(name, kind_tag, expected_methods, profile, action)
 }
 
 /// Existence-only check for struct-only variants (`UseCase`, `Interactor`, `Dto`, `Command`,
-/// `Query`, `Factory`). Checks `graph.get_type()` — Yellow if absent, Blue if present as
-/// a `Struct`, Red if present as a different kind.
-fn evaluate_struct_only(name: &str, kind_tag: &str, profile: &TypeGraph) -> TypeSignal {
-    evaluate_value_object(name, kind_tag, profile)
+/// `Query`, `Factory`). Checks `graph.get_type()` — forward-miss signal if absent, Blue if
+/// present as a `Struct`, Red if present as a different kind. Signal level follows §S mapping.
+fn evaluate_struct_only(
+    name: &str,
+    kind_tag: &str,
+    profile: &TypeGraph,
+    action: TypeAction,
+) -> TypeSignal {
+    evaluate_value_object(name, kind_tag, profile, action)
 }
 
 /// Evaluates a `SecondaryAdapter` entry: struct existence + trait impl presence + method matching.
 ///
-/// - Step 1: `profile.get_type(name)` — Yellow if struct absent, Red if not a Struct kind.
+/// - Step 1: `profile.get_type(name)` — forward-miss signal if struct absent, Red if not a Struct kind.
 /// - Step 2: For each `TraitImplDecl` in `implements`, check `profile.get_impl(name, trait_name)`.
 ///   - If the impl is absent, add trait_name to `missing_items`.
 ///   - If present and `expected_methods` is non-empty, check method signatures via
 ///     `method_structurally_matches`.
-/// - Step 3: Aggregate — all found → Blue, any missing → Red.
+/// - Step 3: Aggregate — all found → Blue, any missing → forward-miss signal per §S action mapping.
 ///   Empty `implements` with struct present → Blue (existence-only).
+///
+/// Note: secondary_adapter intentionally has no reverse check in T001. The ADR
+/// 2026-04-15-1636 §Consequences §Bad explicitly scoped out reverse-check for
+/// impl-only deletions; ADR 2026-04-26-0855 §D3 adds workspace-origin reverse
+/// check for SecondaryAdapter once `TraitImplEntry::origin_crate` is introduced
+/// (T004). Until then, only the declared `implements` traits are forward-checked,
+/// and missing_items yield the forward-miss signal per §S action mapping
+/// (Yellow for add/modify, Red for reference). This replaces the previous
+/// unconditional Yellow for forward misses.
 fn evaluate_secondary_adapter(
     name: &str,
     kind_tag: &str,
     implements: &[TraitImplDecl],
     profile: &TypeGraph,
+    action: TypeAction,
 ) -> TypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
+        let miss_signal = signal_for_forward_miss(action);
+        return TypeSignal::new(name, kind_tag, miss_signal, false, vec![], vec![], vec![]);
     };
 
     // SecondaryAdapter must be a Struct (not Enum or TypeAlias).
@@ -385,12 +521,16 @@ fn evaluate_secondary_adapter(
         }
     }
 
-    // Per ADR 2026-04-11-0003 §"L1 expected_methods を宣言した場合の WIP セマンティクス":
-    // secondary_adapter has no reverse check (per ADR 2026-04-15-1636 §Consequences §Bad),
-    // so missing_items is always forward-check WIP → Yellow. Red is not produced by
-    // this evaluator path; undeclared implementations are caught elsewhere if at all.
-    let signal =
-        if missing_items.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Yellow };
+    // Per ADR 2026-04-11-0003 and 2026-04-26-0855 §S:
+    // No reverse check in T001 — the full workspace-origin reverse check for
+    // SecondaryAdapter is deferred to T004 (requires TraitImplEntry::origin_crate,
+    // ADR 2026-04-26-0855 §D3). Missing declared impls → forward-miss signal per
+    // §S action mapping: add/modify → Yellow, reference → Red.
+    let signal = if missing_items.is_empty() {
+        ConfidenceSignal::Blue
+    } else {
+        signal_for_forward_miss(action)
+    };
     TypeSignal::new(name, kind_tag, signal, true, found_items, missing_items, vec![])
 }
 
@@ -419,15 +559,19 @@ fn evaluate_impl_methods(
 
 /// Shared L1 forward+reverse method check for both `SecondaryPort` and `ApplicationService`.
 ///
-/// Yellow when the trait does not exist, Blue when all methods match, Red otherwise.
+/// Signal levels for forward miss and reverse extra are determined by the `action` via the
+/// §S mapping (ADR 2026-04-26-0855). When the trait does not exist in code, a forward-miss
+/// signal is returned with `found_type = false`.
 fn evaluate_trait_methods(
     name: &str,
     kind_tag: &str,
     expected_methods: &[crate::tddd::catalogue::MethodDeclaration],
     profile: &TypeGraph,
+    action: TypeAction,
 ) -> TypeSignal {
     let Some(code_trait) = profile.get_trait(name) else {
-        return yellow(name, kind_tag);
+        let miss_signal = signal_for_forward_miss(action);
+        return TypeSignal::new(name, kind_tag, miss_signal, false, vec![], vec![], vec![]);
     };
 
     // Forward check — every expected method must appear and match.
@@ -455,16 +599,19 @@ fn evaluate_trait_methods(
         .collect();
     extra.sort();
 
-    // Per ADR 2026-04-11-0003 §"L1 expected_methods を宣言した場合の WIP セマンティクス":
-    // - forward check missing (declared not in code) → Yellow (WIP)
-    // - reverse check extra (code not declared) → Red (undeclared implementation)
+    // Signal levels per ADR 2026-04-26-0855 §S action mapping:
+    // - forward miss → signal_for_forward_miss(action)
+    // - reverse extra → signal_for_reverse_extra(action)
     // - both empty → Blue
-    let signal = if !extra.is_empty() {
-        ConfidenceSignal::Red
-    } else if !missing.is_empty() {
-        ConfidenceSignal::Yellow
-    } else {
+    let signal = if missing.is_empty() && extra.is_empty() {
         ConfidenceSignal::Blue
+    } else {
+        dominant_signal(
+            signal_for_forward_miss(action),
+            !missing.is_empty(),
+            signal_for_reverse_extra(action),
+            !extra.is_empty(),
+        )
     };
     TypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
 }
@@ -657,7 +804,9 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_typestate_red_when_transition_missing() {
+    fn test_evaluate_typestate_yellow_when_transition_missing_with_add_action() {
+        // action=add + forward miss (transition to Published not found) → Yellow (WIP).
+        // Per ADR 2026-04-26-0855 §S: add × forward miss → Yellow.
         let entry = TypeCatalogueEntry::new(
             "Draft",
             "desc",
@@ -665,6 +814,27 @@ mod tests {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
             },
             TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Type exists but no method returning Published.
+        let profile = make_profile(&["Draft"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert_eq!(results.first().unwrap().missing_items(), &["Published"]);
+    }
+
+    #[test]
+    fn test_evaluate_typestate_red_when_transition_missing_with_reference_action() {
+        // action=reference + forward miss (transition to Published not found) → Red.
+        // Per ADR 2026-04-26-0855 §S: reference × forward miss → Red.
+        let entry = TypeCatalogueEntry::new(
+            "Draft",
+            "desc",
+            TypeDefinitionKind::Typestate {
+                transitions: TypestateTransitions::To(vec!["Published".into()]),
+            },
+            TypeAction::Reference,
             true,
         )
         .unwrap();
@@ -808,6 +978,60 @@ mod tests {
         let results = evaluate_type_signals(&[entry], &profile);
         assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
         assert!(!results.first().unwrap().found_type());
+    }
+
+    #[test]
+    fn test_evaluate_error_type_red_when_extra_variant_with_add_action() {
+        // Code has extra variant not declared in ErrorType with action=add → reverse extra → Red.
+        let entry = TypeCatalogueEntry::new(
+            "DomainError",
+            "desc",
+            TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Code enum has "NotFound" (declared) plus "Unexpected" (extra, undeclared).
+        let profile = make_profile_with_enum("DomainError", &["NotFound", "Unexpected"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Red);
+        assert!(results.first().unwrap().extra_items().iter().any(|e| e == "Unexpected"));
+    }
+
+    #[test]
+    fn test_evaluate_error_type_yellow_when_extra_variant_with_modify_action() {
+        // Code has extra variant not declared in ErrorType with action=modify → reverse extra → Yellow (WIP).
+        let entry = TypeCatalogueEntry::new(
+            "DomainError",
+            "desc",
+            TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeAction::Modify,
+            true,
+        )
+        .unwrap();
+        // Code enum has "NotFound" (declared) plus "Unexpected" (extra, undeclared).
+        let profile = make_profile_with_enum("DomainError", &["NotFound", "Unexpected"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(results.first().unwrap().extra_items().iter().any(|e| e == "Unexpected"));
+    }
+
+    #[test]
+    fn test_evaluate_error_type_red_when_extra_variant_with_reference_action() {
+        // Code has extra variant not declared in ErrorType with action=reference → contract violation → Red.
+        let entry = TypeCatalogueEntry::new(
+            "DomainError",
+            "desc",
+            TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeAction::Reference,
+            true,
+        )
+        .unwrap();
+        // Code enum has "NotFound" (declared) plus "Unexpected" (extra, undeclared).
+        let profile = make_profile_with_enum("DomainError", &["NotFound", "Unexpected"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Red);
+        assert!(results.first().unwrap().extra_items().iter().any(|e| e == "Unexpected"));
     }
 
     #[test]
@@ -1422,5 +1646,335 @@ mod tests {
         assert_eq!(signals.len(), 2);
         assert_eq!(signals[0].kind_tag(), "undeclared_type");
         assert_eq!(signals[1].kind_tag(), "undeclared_trait");
+    }
+
+    // ---------------------------------------------------------------------------
+    // AC-11: §S action × structural-fact mapping — full coverage
+    // (ADR 2026-04-26-0855 §S, impl-plan.json T001)
+    //
+    // We use SecondaryPort (trait-based) and ValueObject (struct-based) as
+    // representative kinds.  The helpers below build minimal graphs so each
+    // combination of {action, structural-fact} produces exactly one signal.
+    //
+    // Coverage matrix (11 cells):
+    //  add    × perfect match  → Blue
+    //  add    × forward miss   → Yellow
+    //  add    × reverse extra  → Red
+    //  modify × perfect match  → Blue
+    //  modify × forward miss   → Yellow
+    //  modify × reverse extra  → Yellow
+    //  delete × absent (= "perfect" for delete) → Blue
+    //  delete × present (reverse extra) → Yellow
+    //  reference × perfect match → Blue
+    //  reference × forward miss  → Red
+    //  reference × reverse extra → Red
+    // ---------------------------------------------------------------------------
+
+    // --- Helpers ----------------------------------------------------------------
+
+    /// Build a ValueObject entry for `name` with the given action.
+    fn value_object_entry(name: &str, action: TypeAction) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(name, "desc", TypeDefinitionKind::ValueObject, action, true)
+            .unwrap()
+    }
+
+    /// Build a SecondaryPort entry that declares a single method `"save"` for `name`.
+    fn secondary_port_with_method(
+        name: &str,
+        method: &str,
+        action: TypeAction,
+    ) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(
+            name,
+            "desc",
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![unit_method(method)] },
+            action,
+            true,
+        )
+        .unwrap()
+    }
+
+    /// Build a TypeGraph that has a trait `trait_name` with exactly the methods in `methods`.
+    fn make_trait_profile(trait_name: &str, methods: &[&str]) -> TypeGraph {
+        make_profile_with_trait(trait_name, methods)
+    }
+
+    // --- add × perfect match → Blue -------------------------------------------
+
+    #[test]
+    fn test_action_add_perfect_match_returns_blue_for_value_object() {
+        let entry = value_object_entry("Foo", TypeAction::Add);
+        let profile = make_profile(&["Foo"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_action_add_perfect_match_returns_blue_for_secondary_port() {
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Add);
+        let profile = make_trait_profile("Repo", &["save"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    // --- add × forward miss → Yellow ------------------------------------------
+
+    #[test]
+    fn test_action_add_forward_miss_returns_yellow_for_value_object() {
+        // Struct absent from code while action=add → forward miss → Yellow.
+        let entry = value_object_entry("Bar", TypeAction::Add);
+        let profile = make_profile(&[]); // absent
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+        assert!(!results[0].found_type());
+    }
+
+    #[test]
+    fn test_action_add_forward_miss_returns_yellow_for_secondary_port() {
+        // Trait absent from code while action=add → forward miss → Yellow.
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Add);
+        let profile = make_profile(&[]); // no traits either
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+        assert!(!results[0].found_type());
+    }
+
+    #[test]
+    fn test_action_add_method_forward_miss_returns_yellow() {
+        // Trait exists but declared method absent → forward miss → Yellow.
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Add);
+        let profile = make_trait_profile("Repo", &[]); // trait exists, no methods
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+        assert_eq!(results[0].missing_items().len(), 1);
+    }
+
+    // --- add × reverse extra → Red --------------------------------------------
+
+    #[test]
+    fn test_action_add_reverse_extra_returns_red_for_secondary_port() {
+        // Declared "save" matches; code also has undeclared "delete" → reverse extra → Red.
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Add);
+        let profile = make_trait_profile("Repo", &["save", "delete"]); // extra "delete"
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert!(results[0].extra_items().iter().any(|e| e.contains("delete")));
+    }
+
+    // --- modify × perfect match → Blue ----------------------------------------
+
+    #[test]
+    fn test_action_modify_perfect_match_returns_blue_for_value_object() {
+        let entry = value_object_entry("Baz", TypeAction::Modify);
+        let profile = make_profile(&["Baz"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_action_modify_perfect_match_returns_blue_for_secondary_port() {
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Modify);
+        let profile = make_trait_profile("Repo", &["save"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    // --- modify × forward miss → Yellow ----------------------------------------
+
+    #[test]
+    fn test_action_modify_forward_miss_returns_yellow_for_value_object() {
+        // Struct absent while action=modify → forward miss → Yellow (WIP).
+        let entry = value_object_entry("Baz", TypeAction::Modify);
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+        assert!(!results[0].found_type());
+    }
+
+    #[test]
+    fn test_action_modify_method_forward_miss_returns_yellow() {
+        // Declared method absent from code while action=modify → Yellow (WIP).
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Modify);
+        let profile = make_trait_profile("Repo", &[]); // trait exists, no methods
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+    }
+
+    // --- modify × reverse extra → Yellow (absorbed as WIP) --------------------
+
+    #[test]
+    fn test_action_modify_reverse_extra_returns_yellow_not_red() {
+        // Code has an extra undeclared method while action=modify → reverse extra → Yellow.
+        // (Contrast with add: reverse extra → Red.)
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Modify);
+        let profile = make_trait_profile("Repo", &["save", "delete"]); // extra "delete"
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(
+            results[0].signal(),
+            ConfidenceSignal::Yellow,
+            "modify reverse extra must be Yellow (WIP absorbed), not Red"
+        );
+        assert!(results[0].extra_items().iter().any(|e| e.contains("delete")));
+    }
+
+    // --- delete × absent (deleted) → Blue -------------------------------------
+
+    #[test]
+    fn test_action_delete_absent_returns_blue() {
+        // action=delete, type absent → deletion complete → Blue.
+        let entry = value_object_entry("Old", TypeAction::Delete);
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+        assert!(!results[0].found_type());
+    }
+
+    // --- delete × present (not yet deleted) → Yellow --------------------------
+
+    #[test]
+    fn test_action_delete_present_returns_yellow() {
+        // action=delete, type still present → not yet deleted → Yellow.
+        let entry = value_object_entry("Old", TypeAction::Delete);
+        let profile = make_profile(&["Old"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+        assert!(results[0].found_type());
+    }
+
+    // --- reference × perfect match → Blue -------------------------------------
+
+    #[test]
+    fn test_action_reference_perfect_match_returns_blue_for_value_object() {
+        let entry = value_object_entry("Qux", TypeAction::Reference);
+        let profile = make_profile(&["Qux"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_action_reference_perfect_match_returns_blue_for_secondary_port() {
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Reference);
+        let profile = make_trait_profile("Repo", &["save"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    // --- reference × forward miss → Red ---------------------------------------
+
+    #[test]
+    fn test_action_reference_forward_miss_returns_red_for_value_object() {
+        // Struct absent while action=reference → contract violation → Red.
+        let entry = value_object_entry("Qux", TypeAction::Reference);
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert!(!results[0].found_type());
+    }
+
+    #[test]
+    fn test_action_reference_method_forward_miss_returns_red() {
+        // Declared method absent while action=reference → contract violation → Red.
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Reference);
+        let profile = make_trait_profile("Repo", &[]); // trait exists, method absent
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+    }
+
+    // --- reference × reverse extra → Red --------------------------------------
+
+    #[test]
+    fn test_action_reference_reverse_extra_returns_red() {
+        // Code has undeclared extra method while action=reference → contract violation → Red.
+        let entry = secondary_port_with_method("Repo", "save", TypeAction::Reference);
+        let profile = make_trait_profile("Repo", &["save", "delete"]); // extra "delete"
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert!(results[0].extra_items().iter().any(|e| e.contains("delete")));
+    }
+
+    // --- Cross-kind: Enum action mapping ---
+
+    #[test]
+    fn test_action_add_enum_forward_miss_returns_yellow() {
+        // Enum absent while action=add → forward miss → Yellow.
+        let entry = TypeCatalogueEntry::new(
+            "Status",
+            "desc",
+            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_action_add_enum_reverse_extra_returns_red() {
+        // Enum has extra variant not declared while action=add → reverse extra → Red.
+        let entry = TypeCatalogueEntry::new(
+            "Status",
+            "desc",
+            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_enum("Status", &["Active", "Deleted"]); // extra "Deleted"
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn test_action_modify_enum_reverse_extra_returns_yellow() {
+        // Enum has extra variant not declared while action=modify → reverse extra → Yellow (WIP).
+        let entry = TypeCatalogueEntry::new(
+            "Status",
+            "desc",
+            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeAction::Modify,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_enum("Status", &["Active", "Deleted"]); // extra "Deleted"
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(
+            results[0].signal(),
+            ConfidenceSignal::Yellow,
+            "modify reverse extra must be Yellow, not Red"
+        );
+    }
+
+    #[test]
+    fn test_action_reference_enum_forward_miss_returns_red() {
+        // Enum variant missing while action=reference → contract violation → Red.
+        let entry = TypeCatalogueEntry::new(
+            "Status",
+            "desc",
+            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into(), "Done".into()] },
+            TypeAction::Reference,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_enum("Status", &["Active"]); // "Done" missing
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn test_action_reference_enum_reverse_extra_returns_red() {
+        // Enum has extra variant while action=reference → contract violation → Red.
+        let entry = TypeCatalogueEntry::new(
+            "Status",
+            "desc",
+            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeAction::Reference,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_enum("Status", &["Active", "Deleted"]); // extra
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
     }
 }

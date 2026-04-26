@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "signal evaluator を §S action 別 mapping に従って action-aware 化する。forward miss / reverse extra × action (add / modify / delete / reference) の 4 × 2 組み合わせで Blue / Yellow / Red を決定するヘルパーを導入し、既存の evaluate_single / evaluate_enum / evaluate_value_object / evaluate_error_type / evaluate_secondary_port / evaluate_application_service / evaluate_struct_only / evaluate_secondary_adapter を action パラメータ受け取りに変更する。action 別 signal unit test (AC-11 の全 mapping) を追加する。",
+      "status": "done"
+    },
+    {
+      "id": "T002",
+      "description": "TypeDefinitionKind domain 型を拡張する。struct ベース 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) に expected_members: Vec<MemberDeclaration> フィールドを追加する。Interactor に declares_application_service: Vec<String> フィールドを追加する。FreeFunction variant (module_path / expected_params / expected_returns / expected_is_async) を新規追加する。kind_tag() も FreeFunction に対応させる。",
+      "status": "todo"
+    },
+    {
+      "id": "T003",
+      "description": "catalogue_codec (infrastructure 層) を T002 の schema 拡張に追わせる。TypeDefinitionKindDto に expected_members (struct 系 9 kind 必須) / declares_application_service (Interactor 必須、空 Vec 禁止) / FreeFunction variant を追加する。cross-kind フィールドバリデーション (Phase 1.5 guard) を拡張し、Enum / ErrorType の expected_variants 空 Vec を schema validation で拒否する。Interactor の declares_application_service 省略・空 Vec を拒否する。FreeFunction の codec decode/encode を実装する。unit tests: AC-01 / AC-02 / AC-03 の schema validation ケースを追加する。",
+      "status": "todo"
+    },
+    {
+      "id": "T004",
+      "description": "TypeGraph domain schema を拡張する。TraitImplEntry に origin_crate: String フィールドを追加し、コンストラクタを更新する。FunctionNode 型 (params / returns / is_async / module_path) を新規追加する。TypeGraph に functions: HashMap<(String, Option<String>), FunctionNode> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。既存の TypeGraph::new / TypeNode::set_trait_impls のシグネチャ変更に対応して呼び出し側 (code_profile_builder / tests) を更新する。",
+      "status": "todo"
+    },
+    {
+      "id": "T005",
+      "description": "baseline domain schema (libs/domain/src/tddd/baseline.rs) を拡張する。TraitImplBaselineEntry 型 (trait_name / origin_crate) を新規追加する。TypeBaselineEntry に trait_impls: Vec<TraitImplBaselineEntry> フィールドを追加し、コンストラクタ / getter を更新する。FunctionBaselineEntry 型 (params / returns / is_async / module_path) を新規追加する。TypeBaseline に functions: HashMap<String, FunctionBaselineEntry> フィールドを追加し、コンストラクタ / getter / has_function / get_function メソッドを追加する。",
+      "status": "todo"
+    },
+    {
+      "id": "T006",
+      "description": "build_type_graph (infrastructure 層) を拡張する。(a) rustdoc JSON の pub free function 情報を FunctionNode に変換して TypeGraph::functions に格納する。SchemaExport / schema_export.rs の free function 収集経路 (build_schema_export 内) を追加し、SchemaExport に fns フィールドを追加する。(b) rustdoc JSON の external_crates / paths から trait の定義 crate を特定し、TraitImplEntry::origin_crate に格納する。workspace crate 集合は architecture-rules.json の crates 一覧から取得する。両拡張の unit tests を追加する。",
+      "status": "todo"
+    },
+    {
+      "id": "T007",
+      "description": "baseline builder + codec (infrastructure 層) を拡張する。(a) baseline_builder.rs: TypeNode::trait_impls を TraitImplBaselineEntry の Vec に変換して TypeBaselineEntry::trait_impls に格納する。TypeGraph::functions を (short_name, module_path) → 完全修飾名文字列 key に変換して TypeBaseline::functions に格納する (D4 bundle: tuple key → string key 変換)。(b) baseline_codec.rs: TypeBaselineEntry::trait_impls の serde DTO (TraitImplBaselineEntryDto) を追加し encode / decode を実装する。TypeBaseline::functions の serde DTO (FunctionBaselineEntryDto) を追加し encode / decode を実装する。unit tests: AC-07 / AC-08 のベースライン capture ケースを追加する。",
+      "status": "todo"
+    },
+    {
+      "id": "T008",
+      "description": "signal 評価器を expected_members / declares_application_service / SecondaryAdapter::implements / FreeFunction に対応させる。(a) expected_members: struct ベース 9 kind の evaluator を新規実装し、forward miss (宣言したフィールドが TypeNode::members にない) / reverse extra (宣言にないフィールドが TypeNode::members にある) を §S action 別 mapping で評価する (AC-05)。(b) declares_application_service (Interactor): Interactor evaluator を新規実装し、forward miss (宣言した trait が TypeNode::trait_impls にない) / reverse extra (workspace 由来 trait が declares_application_service に含まれていない) を §S action 別 mapping + origin_crate フィルタ (IN-10) で評価する (AC-04)。(c) implements (SecondaryAdapter): SecondaryAdapter の implements reverse check に origin_crate フィルタ (IN-10) を適用し、TypeNode::trait_impls のうち workspace 由来 (TraitImplEntry::origin_crate が workspace crate 一覧と一致) の trait のみを対象として、implements Vec に含まれていない workspace 由来 trait を reverse extra として §S action 別 mapping で評価する。Interactor (b) と SecondaryAdapter (c) は同一の workspace-origin フィルタヘルパーを共有する (DRY)。(d) FreeFunction: evaluator を新規実装し、TypeGraph::functions との forward / reverse check を module_path スコープ付きで実装する (CN-07 のスコープ制約を遵守) (AC-06)。unit tests を追加する。",
+      "status": "todo"
+    },
+    {
+      "id": "T009",
+      "description": "Contract Map edge 描画ロジック (domain 層 contract_map_render.rs) を拡張する。(a) Interactor の declares_application_service に列挙された ApplicationService trait 名への -.impl.-> edge を描画する (ADR 2026-04-17-1528 §L3 解消)。application_service_index (ApplicationService kind のエントリインデックス) を構築し、Interactor エントリの declares_application_service を走査して edge を追加する (AC-10)。(b) FreeFunction ノードを Contract Map に追加し、node_shape を定義する。FreeFunction の expected_params 型への edge および expected_returns 型への edge を type_index 経由で描画する (ADR 2026-04-17-1528 §L2 / §L4 解消) (AC-09)。(c) layer-agnostic 不変条件 (CN-08) を遵守し、層名をハードコードしない。unit tests を追加する。",
+      "status": "todo"
+    },
+    {
+      "id": "T010",
+      "description": "既存カタログエントリの補完と CI 統合確認を行う。(a) 現在の track のすべての layer catalogue JSON (domain-types.json / usecase-types.json / infrastructure-types.json) に expected_members フィールドを補完する (T003 の schema validation を通過させるため)。Interactor エントリに declares_application_service を補完する。Enum / ErrorType エントリの expected_variants 空 Vec を適正な値に修正する。(b) cargo make ci を実行し fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* がすべて pass することを確認する (AC-12)。",
+      "status": "todo"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Signal Evaluator Action-Awareness (bootstrap fix)",
+        "description": [
+          "現 signal 評価器は action-aware でなく、TypeDefinitionKind の forward miss / reverse extra をすべて同一ルールで扱っている。これにより IN-09 未実装の種 (modify action でも Red が出る) が後続タスクの自己評価を汚染する。",
+          "S1 は §S の action 別 mapping を domain 評価器に先行実装することで、T002 以降のタスクコミット後の自己評価が改善されるよう bootstrap する。"
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Catalogue Schema Extension (domain + codec)",
+        "description": [
+          "カタログ schema を 3 方向 (TypeDefinitionKind / catalogue_codec / 既存エントリ補完) で拡張する。",
+          "T002 は domain 型 (TypeDefinitionKind) の拡張、T003 は infrastructure 層 codec の拡張を担う。",
+          "Core invariant (CN-01): TypeGraph / baseline schema の拡張は S3 (domain 型) → S4 (infrastructure build) の順に完了させる。S3 完了が S4 着手の前提となる。"
+        ],
+        "task_ids": [
+          "T002",
+          "T003"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "TypeGraph + Baseline Schema Extension (domain types)",
+        "description": [
+          "TypeGraph (schema.rs) と baseline (baseline.rs) の domain 型を同時拡張する。",
+          "T004 は TypeGraph に TraitImplEntry::origin_crate + FunctionNode + functions マップを追加する。",
+          "T005 は baseline に TraitImplBaselineEntry + TypeBaselineEntry::trait_impls + FunctionBaselineEntry + TypeBaseline::functions を追加する。",
+          "これで Core invariant の 3 輪 (catalogue / TypeGraph / baseline) の domain 型レベルの整合が完成する。"
+        ],
+        "task_ids": [
+          "T004",
+          "T005"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Infrastructure Build Extensions (type graph + baseline builder/codec)",
+        "description": [
+          "T006 は build_type_graph / schema_export を拡張し、rustdoc JSON から FunctionNode を収集して TypeGraph::functions に格納し、trait の origin_crate を TraitImplEntry に格納する。",
+          "T007 は baseline_builder / baseline_codec を拡張し、TypeGraph の新フィールドを baseline に正しく capture + serialize / deserialize する。",
+          "S3 の domain 型拡張が前提となるため S3 の完了後に着手する。"
+        ],
+        "task_ids": [
+          "T006",
+          "T007"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Signal Evaluator Extension (expected_members / declares_application_service / FreeFunction)",
+        "description": [
+          "S2-S4 が完了した後、signal 評価器に expected_members / declares_application_service / FreeFunction の forward / reverse check ロジックを追加する。",
+          "T008 は T001 (action-aware ヘルパー) を基盤として、3 種類の照合軸をすべて追加する。",
+          "IN-10 の workspace-only 絞り込みは origin_crate フィールドを参照する (T004 完了が前提)。"
+        ],
+        "task_ids": [
+          "T008"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Contract Map Edge Extension",
+        "description": [
+          "T009 は contract_map_render.rs に interactor → ApplicationService -.impl.-> edge および FreeFunction ノード + edges を追加する。",
+          "T002 の FreeFunction variant と S3 の型拡張が前提となる。layer-agnostic 不変条件 (CN-08) を遵守する。"
+        ],
+        "task_ids": [
+          "T009"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "Catalogue Data Migration + CI Integration",
+        "description": [
+          "T010 は既存カタログエントリへの expected_members 補完と declares_application_service 補完を行い、cargo make ci で全ゲートが pass することを確認する。",
+          "S2 (schema validation 実装) の完了後に着手し、validation を通過するデータ移行を行う。"
+        ],
+        "task_ids": [
+          "T010"
+        ]
+      }
+    ]
+  }
+}
