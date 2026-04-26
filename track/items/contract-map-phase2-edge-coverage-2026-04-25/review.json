@@ -1,6 +1,173 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 921,
+              "category": "factual"
+            },
+            {
+              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 925,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:15:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:16:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 919,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:18:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T17:26:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:27:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:28:40Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Routing `FreeFunction` through `evaluate_value_object()` makes the new kind depend on `profile.get_type(name)`, so it is not truly existence-only: a same-named type can turn the signal Blue/Red instead of the intended Yellow until function support exists in `TypeGraph`. This also leaves `Delete` entries for free functions validated against the wrong namespace.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2f24ff8cff2ffce82c809fc5c1205f71846890b323522e97e3d24fb4982f02da",
+          "at": "2026-04-25T23:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T00:54:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeAction::Delete` for `FreeFunction` is reported as Blue unconditionally even though `TypeGraph` cannot observe free functions. That means a catalogue entry can claim a free function was deleted and pass the signal check while the function still exists in source. Since this state is unverifiable until function extraction exists, it should not be treated as a successful deletion; return Yellow/unverifiable or disallow Delete for this kind.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 104,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T00:56:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T01:14:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
+          "at": "2026-04-26T02:35:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
+          "at": "2026-04-26T02:37:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo fmt --check -- libs/domain/src/tddd/contract_map_render.rs` fails on this change, so the stated `cargo make ci-rust`/fmt-check gate cannot pass until this file is rustfmt-formatted. The first unformatted block is the new `unused_reference` condition here; rustfmt also rewrites the new edge-target test setup.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 254,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:98e271ff3824fb5fe813e6b28dcebae0811660bbe676394abd367313bbbdf571",
+          "at": "2026-04-26T03:02:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6868415705e3e79bbcc9d72a07d185ebdd7209d207968ecca09252819d8fc0f0",
+          "at": "2026-04-26T03:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b36feb7229020cb175203aca644f001b7841a515ce4d5dfbf835e07121d8e14f",
+          "at": "2026-04-26T03:13:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c15779ebb1312ee1d17cc7173b051b5f2d7659c3efc75ba70d74b590dbd0a0f7",
+          "at": "2026-04-26T03:22:56Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -262,159 +429,6 @@
           "findings": [],
           "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
           "at": "2026-04-26T02:35:29Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Routing `FreeFunction` through `evaluate_value_object()` makes the new kind depend on `profile.get_type(name)`, so it is not truly existence-only: a same-named type can turn the signal Blue/Red instead of the intended Yellow until function support exists in `TypeGraph`. This also leaves `Delete` entries for free functions validated against the wrong namespace.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 67,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2f24ff8cff2ffce82c809fc5c1205f71846890b323522e97e3d24fb4982f02da",
-          "at": "2026-04-25T23:52:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
-          "at": "2026-04-26T00:54:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeAction::Delete` for `FreeFunction` is reported as Blue unconditionally even though `TypeGraph` cannot observe free functions. That means a catalogue entry can claim a free function was deleted and pass the signal check while the function still exists in source. Since this state is unverifiable until function extraction exists, it should not be treated as a successful deletion; return Yellow/unverifiable or disallow Delete for this kind.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 104,
-              "category": "behavioral_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
-          "at": "2026-04-26T00:56:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
-          "at": "2026-04-26T01:14:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
-          "at": "2026-04-26T02:35:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
-          "at": "2026-04-26T02:37:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cargo fmt --check -- libs/domain/src/tddd/contract_map_render.rs` fails on this change, so the stated `cargo make ci-rust`/fmt-check gate cannot pass until this file is rustfmt-formatted. The first unformatted block is the new `unused_reference` condition here; rustfmt also rewrites the new edge-target test setup.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 254,
-              "category": "ci"
-            }
-          ],
-          "hash": "rvw1:sha256:98e271ff3824fb5fe813e6b28dcebae0811660bbe676394abd367313bbbdf571",
-          "at": "2026-04-26T03:02:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6868415705e3e79bbcc9d72a07d185ebdd7209d207968ecca09252819d8fc0f0",
-          "at": "2026-04-26T03:03:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b36feb7229020cb175203aca644f001b7841a515ce4d5dfbf835e07121d8e14f",
-          "at": "2026-04-26T03:13:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c15779ebb1312ee1d17cc7173b051b5f2d7659c3efc75ba70d74b590dbd0a0f7",
-          "at": "2026-04-26T03:22:56Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 921,
-              "category": "factual"
-            },
-            {
-              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 925,
-              "category": "factual"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:15:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:16:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 919,
-              "category": "docs"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:18:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T17:26:40Z"
         }
       ]
     },
@@ -931,6 +945,20 @@
           "findings": [],
           "hash": "rvw1:sha256:fc94f46e042d33258fb2f814294dabd4746f28edb3f3cd9c0ce653009af2f650",
           "at": "2026-04-26T03:12:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b94aa2b1273245a22f9b3b8b9a3cdce010c16f7312447928cd4d126636b319bb",
+          "at": "2026-04-26T03:33:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b94aa2b1273245a22f9b3b8b9a3cdce010c16f7312447928cd4d126636b319bb",
+          "at": "2026-04-26T03:34:22Z"
         }
       ]
     }
