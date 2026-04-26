@@ -35,6 +35,10 @@
       "approved": true,
       "action": "reference",
       "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RenderContractMap"
+      ],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -49,6 +53,7 @@
       "approved": true,
       "action": "reference",
       "kind": "command",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -83,6 +88,7 @@
       "approved": true,
       "action": "reference",
       "kind": "dto",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -125,6 +131,10 @@
       "approved": true,
       "action": "reference",
       "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RefreshCatalogueSpecSignals"
+      ],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -139,6 +149,7 @@
       "approved": true,
       "action": "reference",
       "kind": "command",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",

@@ -37,6 +37,7 @@
       "approved": true,
       "action": "modify",
       "kind": "value_object",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -51,6 +52,7 @@
       "approved": true,
       "action": "modify",
       "kind": "dto",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -65,6 +67,7 @@
       "approved": true,
       "action": "modify",
       "kind": "dto",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -79,6 +82,7 @@
       "approved": true,
       "action": "modify",
       "kind": "dto",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -92,6 +96,7 @@
       "description": "A public free function in the crate, as indexed for TDDD evaluation. New type added to TypeGraph::functions map (D4). Holds params / returns / is_async / module_path.",
       "approved": true,
       "kind": "dto",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -105,6 +110,7 @@
       "description": "A single free function entry in the baseline snapshot. New type added to TypeBaseline::functions map (D4 bundle). Mirrors FunctionNode with string key for JSON serialization.",
       "approved": true,
       "kind": "dto",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -118,6 +124,7 @@
       "description": "A single trait impl entry in the baseline snapshot. New type added to TypeBaselineEntry::trait_impls (D3 bundle). Holds trait_name and origin_crate for workspace-origin filtering in baseline diff.",
       "approved": true,
       "kind": "dto",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -132,6 +139,7 @@
       "approved": true,
       "action": "reference",
       "kind": "value_object",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -146,6 +154,7 @@
       "approved": true,
       "action": "reference",
       "kind": "value_object",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -178,6 +187,7 @@
       "approved": true,
       "action": "reference",
       "kind": "value_object",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -192,6 +202,7 @@
       "approved": true,
       "action": "reference",
       "kind": "value_object",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",

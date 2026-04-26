@@ -56,6 +56,7 @@
           "trait_name": "CatalogueLoader"
         }
       ],
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -75,6 +76,7 @@
           "trait_name": "ContractMapWriter"
         }
       ],
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -94,6 +96,7 @@
           "trait_name": "CatalogueSpecSignalsWriter"
         }
       ],
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
@@ -131,6 +134,7 @@
       "approved": true,
       "action": "reference",
       "kind": "value_object",
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",

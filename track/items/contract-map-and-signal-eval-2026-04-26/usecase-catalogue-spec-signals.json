@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "eef6bf3c1a4af28c3ccc146b0bac29ab03a2782dfb4a9eabae5434ef7bfe166d",
+  "catalogue_declaration_hash": "fd7afcbf75f065c750f972841e59e641820784bc4de0f7b0c71fc9d17957cb17",
   "signals": [
     {
       "type_name": "RenderContractMap",

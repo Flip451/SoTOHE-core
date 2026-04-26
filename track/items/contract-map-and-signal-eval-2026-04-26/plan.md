@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Contract Map 表示拡張 + signal 評価拡張 (両輪)
 
-## Tasks (2/10 resolved)
+## Tasks (4/10 resolved)
 
 ### S1 — Signal Evaluator Action-Awareness (bootstrap fix)
 
@@ -17,7 +17,7 @@
 > Core invariant (CN-01): TypeGraph / baseline schema の拡張は S3 (domain 型) → S4 (infrastructure build) の順に完了させる。S3 完了が S4 着手の前提となる。
 
 - [x] **T002**: TypeDefinitionKind domain 型を拡張する。struct ベース 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) に expected_members: Vec<MemberDeclaration> フィールドを追加する。Interactor に declares_application_service: Vec<String> フィールドを追加する。FreeFunction variant (module_path / expected_params / expected_returns / expected_is_async) を新規追加する。kind_tag() も FreeFunction に対応させる。
-- [ ] **T003**: catalogue_codec (infrastructure 層) を T002 の schema 拡張に追わせる。TypeDefinitionKindDto に expected_members (struct 系 9 kind 必須) / declares_application_service (Interactor 必須、空 Vec 禁止) / FreeFunction variant を追加する。cross-kind フィールドバリデーション (Phase 1.5 guard) を拡張し、Enum / ErrorType の expected_variants 空 Vec を schema validation で拒否する。Interactor の declares_application_service 省略・空 Vec を拒否する。FreeFunction の codec decode/encode を実装する。unit tests: AC-01 / AC-02 / AC-03 の schema validation ケースを追加する。
+- [x] **T003**: catalogue_codec (infrastructure 層) を T002 の schema 拡張に追わせる。TypeDefinitionKindDto に expected_members (struct 系 9 kind 必須) / declares_application_service (Interactor 必須、空 Vec 禁止) / FreeFunction variant を追加する。cross-kind フィールドバリデーション (Phase 1.5 guard) を拡張し、Enum / ErrorType の expected_variants 空 Vec を schema validation で拒否する。Interactor の declares_application_service 省略・空 Vec を拒否する。FreeFunction の codec decode/encode を実装する。unit tests: AC-01 / AC-02 / AC-03 の schema validation ケースを追加する。
 
 ### S3 — TypeGraph + Baseline Schema Extension (domain types)
 
@@ -58,4 +58,4 @@
 > T010 は既存カタログエントリへの expected_members 補完と declares_application_service 補完を行い、cargo make ci で全ゲートが pass することを確認する。
 > S2 (schema validation 実装) の完了後に着手し、validation を通過するデータ移行を行う。
 
-- [ ] **T010**: 既存カタログエントリの補完と CI 統合確認を行う。(a) 現在の track のすべての layer catalogue JSON (domain-types.json / usecase-types.json / infrastructure-types.json) に expected_members フィールドを補完する (T003 の schema validation を通過させるため)。Interactor エントリに declares_application_service を補完する。Enum / ErrorType エントリの expected_variants 空 Vec を適正な値に修正する。(b) cargo make ci を実行し fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* がすべて pass することを確認する (AC-12)。
+- [x] **T010**: 既存カタログエントリの補完と CI 統合確認を行う。(a) 現在の track のすべての layer catalogue JSON (domain-types.json / usecase-types.json / infrastructure-types.json) に expected_members フィールドを補完する (T003 の schema validation を通過させるため)。Interactor エントリに declares_application_service を補完する。Enum / ErrorType エントリの expected_variants 空 Vec を適正な値に修正する。(b) cargo make ci を実行し fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* がすべて pass することを確認する (AC-12)。
