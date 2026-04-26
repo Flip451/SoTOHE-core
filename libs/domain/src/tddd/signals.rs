@@ -90,22 +90,26 @@ fn evaluate_single(
 /// Evaluates a `Delete`-action entry: absent from code → Blue, still present → Yellow.
 ///
 /// `SecondaryPort` and `ApplicationService` entries check `graph.get_trait()`; all other
-/// kinds check `graph.get_type()`. `FreeFunction` is always Blue because `TypeGraph` has no
-/// function namespace in Phase 2 — consulting `get_type` would silently match a coincidental
-/// same-named type.
+/// kinds check `graph.get_type()`. `FreeFunction` cannot be verified (TypeGraph has no
+/// function namespace in Phase 2) and we conservatively return Yellow — marking a delete
+/// as unconditional Blue would silently hide stale APIs that still exist in code (PR #115
+/// r4 finding 2). The Yellow status surfaces "verification unavailable" so the operator
+/// can re-confirm manually before relying on the deletion.
 fn evaluate_delete(
     name: &str,
     kind_tag: &str,
     kind: &TypeDefinitionKind,
     profile: &TypeGraph,
 ) -> TypeSignal {
-    // FreeFunction: TypeGraph has no function namespace in Phase 2.
-    // A Delete entry for a free function is always Blue (nothing to remove from TypeGraph).
+    // FreeFunction: TypeGraph has no function namespace in Phase 2 →
+    // verification unavailable. Conservatively mark Yellow (not Blue) so
+    // delete entries do not silently pass when the function may still
+    // exist in code.
     if matches!(kind, TypeDefinitionKind::FreeFunction { .. }) {
         return TypeSignal::new(
             name,
             kind_tag,
-            ConfidenceSignal::Blue,
+            ConfidenceSignal::Yellow,
             false,
             vec![],
             vec![],
@@ -262,19 +266,19 @@ fn evaluate_value_object(name: &str, kind_tag: &str, profile: &TypeGraph) -> Typ
     }
 }
 
-/// Phase 2 existence-only evaluator for `FreeFunction` entries.
+/// Evaluates a non-Delete `FreeFunction` entry.
 ///
-/// `TypeGraph` extraction does not include free functions in Phase 2 (function
-/// support is deferred to a later phase). Consulting `get_type(name)` would
-/// silently match a coincidentally same-named type (struct/enum) and produce a
-/// spurious Blue or Red signal. Instead, this evaluator always returns Yellow —
-/// the canonical "declared but not yet verifiable" signal for Phase 2 free
-/// functions.
+/// `TypeGraph` has no function namespace in Phase 2, so we cannot verify the
+/// function's existence at all. Returning Yellow here would make every declared
+/// `free_function` permanently unmergeable under `check_type_signals(strict=true)`
+/// regardless of implementation state (PR #115 r4 finding 1).
 ///
-/// The signal is intentional: the merge gate runs in interim mode during Phase 2
-/// and treats Yellow as a warning rather than a blocker.
+/// Until function-level verification is available, surface Blue with
+/// `found_type=false` to communicate "no negative evidence". The Delete arm
+/// (see `evaluate_delete`) handles the safety direction separately by
+/// returning Yellow conservatively.
 fn evaluate_free_function(name: &str, kind_tag: &str) -> TypeSignal {
-    yellow(name, kind_tag)
+    TypeSignal::new(name, kind_tag, ConfidenceSignal::Blue, false, vec![], vec![], vec![])
 }
 
 fn evaluate_error_type(
@@ -811,9 +815,11 @@ mod tests {
     // --- FreeFunction evaluator tests ---
 
     #[test]
-    fn test_evaluate_free_function_is_always_yellow_when_absent() {
-        // FreeFunction is always Yellow regardless of profile state — TypeGraph has no
-        // function namespace in Phase 2, so no function lookup is performed.
+    fn test_evaluate_free_function_add_is_always_blue() {
+        // Non-Delete FreeFunction is always Blue regardless of profile state (PR #115 r4
+        // finding 1). TypeGraph has no function namespace in Phase 2, so no function
+        // lookup is performed — no negative evidence means we surface Blue to allow
+        // merge through strict gate.
         let entry = TypeCatalogueEntry::new(
             "my_free_fn",
             "desc",
@@ -824,15 +830,16 @@ mod tests {
         .unwrap();
         let profile = make_profile(&[]); // nothing in profile
         let results = evaluate_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
         assert!(!results.first().unwrap().found_type());
     }
 
     #[test]
-    fn test_evaluate_free_function_is_yellow_even_when_same_named_type_exists() {
-        // Regression: routing FreeFunction through evaluate_value_object would
-        // silently match a coincidentally same-named struct type and return Blue/Red.
-        // The dedicated evaluator must always return Yellow regardless of profile content.
+    fn test_evaluate_free_function_add_is_blue_even_when_same_named_type_exists() {
+        // Regression guard: routing FreeFunction through evaluate_value_object would
+        // silently match a coincidentally same-named struct type and produce a spurious
+        // Red signal. The dedicated evaluator must always return Blue for non-Delete
+        // regardless of profile content, communicating "no negative evidence".
         let entry = TypeCatalogueEntry::new(
             "my_free_fn",
             "desc",
@@ -846,16 +853,19 @@ mod tests {
         let results = evaluate_type_signals(&[entry], &profile);
         assert_eq!(
             results.first().unwrap().signal(),
-            ConfidenceSignal::Yellow,
-            "FreeFunction must be Yellow even when a same-named type exists in the TypeGraph"
+            ConfidenceSignal::Blue,
+            "FreeFunction non-Delete must be Blue even when a same-named type exists in TypeGraph"
         );
         assert!(!results.first().unwrap().found_type());
     }
 
     #[test]
-    fn test_evaluate_free_function_delete_is_always_blue() {
-        // Delete action for FreeFunction must be Blue unconditionally — TypeGraph has
-        // no function namespace, so `get_type` must not be consulted.
+    fn test_evaluate_free_function_delete_is_always_yellow() {
+        // Delete action for FreeFunction must be Yellow unconditionally (PR #115 r4
+        // finding 2). TypeGraph has no function namespace in Phase 2, so we cannot
+        // confirm deletion; returning Blue would silently hide stale APIs that still
+        // exist in code. Yellow surfaces "verification unavailable" to prompt manual
+        // confirm before relying on the deletion.
         let entry = TypeCatalogueEntry::new(
             "old_fn",
             "desc",
@@ -864,13 +874,13 @@ mod tests {
             true,
         )
         .unwrap();
-        // Even when a same-named type exists in the profile, the signal must be Blue.
+        // Even when a same-named type exists in the profile, the signal must be Yellow.
         let profile = make_profile(&["old_fn"]);
         let results = evaluate_type_signals(&[entry], &profile);
         assert_eq!(
             results.first().unwrap().signal(),
-            ConfidenceSignal::Blue,
-            "FreeFunction Delete must be Blue — TypeGraph has no function namespace"
+            ConfidenceSignal::Yellow,
+            "FreeFunction Delete must be Yellow — TypeGraph has no function namespace"
         );
         assert!(!results.first().unwrap().found_type());
     }
