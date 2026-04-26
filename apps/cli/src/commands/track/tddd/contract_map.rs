@@ -111,12 +111,16 @@ fn parse_kind_filter(raw: &str) -> Result<Vec<TypeDefinitionKind>, CliError> {
             "command" => TypeDefinitionKind::Command,
             "query" => TypeDefinitionKind::Query,
             "factory" => TypeDefinitionKind::Factory,
+            "free_function" => TypeDefinitionKind::FreeFunction {
+                expected_params: Vec::new(),
+                expected_returns: Vec::new(),
+            },
             other => {
                 return Err(CliError::Message(format!(
                     "unknown --kind-filter value '{other}'; expected one of: \
                      typestate, enum, value_object, error_type, secondary_port, \
                      secondary_adapter, application_service, use_case, interactor, \
-                     dto, command, query, factory"
+                     dto, command, query, factory, free_function"
                 )));
             }
         };
