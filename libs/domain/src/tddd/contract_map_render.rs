@@ -127,6 +127,16 @@ pub fn render_contract_map(
     // expected_methods list is empty (declarative-only modifications).
     out.push_str("    classDef unused_reference stroke-dasharray: 4 4\n");
     out.push_str("    classDef declaration_only stroke-dasharray: 4 4\n");
+    // T007 / IN-06 / ADR §D5: action overlay classDefs. Only emitted when
+    // `opts.action_overlay = true`. `add_action` is the default and carries
+    // no classDef (preserves existing visual baseline for unmarked entries).
+    if opts.action_overlay {
+        out.push_str("    classDef modify_action stroke-dasharray: 4 4\n");
+        out.push_str(
+            "    classDef delete_action fill:#f5f5f5,stroke:#9e9e9e,color:#9e9e9e,stroke-dasharray: 6 2\n",
+        );
+        out.push_str("    classDef reference_action stroke-dasharray: 2 4\n");
+    }
 
     // 4a. Subgraphs.
     for layer in &active_layers {
@@ -134,7 +144,7 @@ pub fn render_contract_map(
         let _ = writeln!(out, "    subgraph {label} [{raw}]", raw = layer.as_ref());
         for (entry_layer, entry) in &entries {
             if entry_layer == layer {
-                let _ = writeln!(out, "        {}", node_shape(layer, entry));
+                let _ = writeln!(out, "        {}", node_shape(layer, entry, opts.action_overlay));
             }
         }
         out.push_str("    end\n");
@@ -398,12 +408,14 @@ fn sanitize_node_label(raw: &str) -> String {
 }
 
 /// Render the mermaid shape for an entry. Each variant of
-/// [`TypeDefinitionKind`] maps to one of 13 shapes defined in ADR
-/// 2026-04-17-1528 §D3.
-fn node_shape(layer: &LayerId, entry: &TypeCatalogueEntry) -> String {
+/// [`TypeDefinitionKind`] maps to one of 14 shapes defined in ADR
+/// 2026-04-17-1528 §D3. When `action_overlay=true`, an action-specific
+/// classDef (`:::modify_action` / `:::delete_action` / `:::reference_action`)
+/// is appended for non-`Add` actions per ADR §D5 / IN-06.
+fn node_shape(layer: &LayerId, entry: &TypeCatalogueEntry, action_overlay: bool) -> String {
     let id = node_id(layer, entry.name());
     let name = sanitize_node_label(entry.name());
-    match entry.kind() {
+    let base = match entry.kind() {
         TypeDefinitionKind::Typestate { .. } => format!("{id}([{name}])"),
         TypeDefinitionKind::Enum { .. } => format!("{id}{{{{{name}}}}}"),
         TypeDefinitionKind::ValueObject => format!("{id}({name})"),
@@ -420,6 +432,16 @@ fn node_shape(layer: &LayerId, entry: &TypeCatalogueEntry) -> String {
         TypeDefinitionKind::Query => format!("{id}[{name}]:::query"),
         TypeDefinitionKind::Factory => format!("{id}[{name}]:::factory"),
         TypeDefinitionKind::FreeFunction { .. } => format!("{id}[{name}]:::free_function"),
+    };
+    if action_overlay {
+        match entry.action() {
+            crate::tddd::catalogue::TypeAction::Add => base,
+            crate::tddd::catalogue::TypeAction::Modify => format!("{base}:::modify_action"),
+            crate::tddd::catalogue::TypeAction::Delete => format!("{base}:::delete_action"),
+            crate::tddd::catalogue::TypeAction::Reference => format!("{base}:::reference_action"),
+        }
+    } else {
+        base
     }
 }
 
@@ -712,21 +734,34 @@ mod tests {
     }
 
     #[test]
-    fn test_render_contract_map_phase_2_3_stub_fields_do_not_alter_output() {
+    fn test_render_contract_map_action_overlay_all_add_entries_only_adds_classdefs() {
+        // `simple_3layer_catalogues` entries are all `TypeAction::Add`.
+        // When action_overlay=true the 3 action classDef header lines
+        // (modify_action / delete_action / reference_action) are added, but
+        // no node annotations change because Add is the default and carries no
+        // extra suffix. The two outputs are therefore NOT equal — they differ
+        // by exactly those 3 classDef lines.
         let (catalogues, order) = simple_3layer_catalogues();
         let baseline = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
-        let overlays_on = ContractMapRenderOptions {
-            signal_overlay: true,
+        let overlay_on = ContractMapRenderOptions {
             action_overlay: true,
-            include_spec_source_edges: true,
             ..ContractMapRenderOptions::default()
         };
-        let with_overlays = render_contract_map(&catalogues, &order, &overlays_on);
-        assert_eq!(
+        let with_overlay = render_contract_map(&catalogues, &order, &overlay_on);
+        // The header section differs.
+        assert_ne!(
             baseline.as_ref(),
-            with_overlays.as_ref(),
-            "Phase 1 must treat the 3 overlay flags as inert stubs"
+            with_overlay.as_ref(),
+            "action_overlay=true must add 3 classDef lines to the header"
         );
+        // The 3 action classDefs are present in the overlay output.
+        assert!(with_overlay.as_ref().contains("classDef modify_action"));
+        assert!(with_overlay.as_ref().contains("classDef delete_action"));
+        assert!(with_overlay.as_ref().contains("classDef reference_action"));
+        // No node carries an action annotation (all entries are Add).
+        assert!(!with_overlay.as_ref().contains(":::modify_action"));
+        assert!(!with_overlay.as_ref().contains(":::delete_action"));
+        assert!(!with_overlay.as_ref().contains(":::reference_action"));
     }
 
     #[test]
@@ -1100,6 +1135,120 @@ mod tests {
         assert!(
             !text.contains(" -.impl.-> "),
             "no impl edge expected when target is not an ApplicationService; output was:\n{text}"
+        );
+    }
+
+    // --- T007 / IN-06 / ADR §D5: action overlay ---
+
+    #[test]
+    fn test_render_contract_map_action_overlay_classdefs_and_node_classes() {
+        // 4 entries with each TypeAction → action_overlay=true emits 3
+        // classDefs (modify/delete/reference; Add is default = no extra)
+        // and the matching `:::action_class` annotations on each node.
+        let domain = layer("domain");
+        let entries = vec![
+            TypeCatalogueEntry::new(
+                "AddedThing",
+                "added",
+                TypeDefinitionKind::ValueObject,
+                TypeAction::Add,
+                true,
+            )
+            .unwrap(),
+            TypeCatalogueEntry::new(
+                "ModifiedThing",
+                "modified",
+                TypeDefinitionKind::ValueObject,
+                TypeAction::Modify,
+                true,
+            )
+            .unwrap(),
+            TypeCatalogueEntry::new(
+                "DeletedThing",
+                "deleted",
+                TypeDefinitionKind::ValueObject,
+                TypeAction::Delete,
+                true,
+            )
+            .unwrap(),
+            TypeCatalogueEntry::new(
+                "ReferencedThing",
+                "reference",
+                TypeDefinitionKind::ValueObject,
+                TypeAction::Reference,
+                true,
+            )
+            .unwrap(),
+        ];
+        let domain_doc = doc(entries);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let opts = ContractMapRenderOptions { action_overlay: true, ..Default::default() };
+        let content = render_contract_map(&catalogues, std::slice::from_ref(&domain), &opts);
+        let text = content.as_ref();
+
+        assert!(text.contains("classDef modify_action"), "modify_action classDef must appear");
+        assert!(text.contains("classDef delete_action"), "delete_action classDef must appear");
+        assert!(
+            text.contains("classDef reference_action"),
+            "reference_action classDef must appear"
+        );
+        // Add → no `:::action_class` annotation
+        assert!(
+            text.contains("L6_domain_AddedThing(AddedThing)\n"),
+            "Add entry must NOT carry an :::action_class annotation; output was:\n{text}"
+        );
+        // Other 3 → matching annotations
+        assert!(
+            text.contains("L6_domain_ModifiedThing(ModifiedThing):::modify_action"),
+            "Modify entry must carry :::modify_action; output was:\n{text}"
+        );
+        assert!(
+            text.contains("L6_domain_DeletedThing(DeletedThing):::delete_action"),
+            "Delete entry must carry :::delete_action; output was:\n{text}"
+        );
+        assert!(
+            text.contains("L6_domain_ReferencedThing(ReferencedThing):::reference_action"),
+            "Reference entry must carry :::reference_action; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_action_overlay_disabled_omits_classdefs_and_annotations() {
+        // action_overlay=false → no action-overlay classDef header lines and
+        // no `:::*_action` annotations. The unrelated dashed-border classDefs
+        // (unused_reference / declaration_only from T005) remain present.
+        let domain = layer("domain");
+        let domain_doc = doc(vec![
+            TypeCatalogueEntry::new(
+                "ModifiedThing",
+                "m",
+                TypeDefinitionKind::ValueObject,
+                TypeAction::Modify,
+                true,
+            )
+            .unwrap(),
+        ]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            !text.contains("classDef modify_action"),
+            "action overlay classDef must be absent; output was:\n{text}"
+        );
+        assert!(
+            !text.contains(":::modify_action"),
+            "action overlay annotation must be absent; output was:\n{text}"
+        );
+        // Unrelated T005 classDefs remain present unconditionally.
+        assert!(
+            text.contains("classDef unused_reference"),
+            "unused_reference classDef must remain present (T005 is independent of action_overlay flag)"
         );
     }
 

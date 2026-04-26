@@ -1,437 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 921,
-              "category": "factual"
-            },
-            {
-              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 925,
-              "category": "factual"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:15:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:16:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 919,
-              "category": "docs"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:18:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T17:26:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:27:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:28:40Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Routing `FreeFunction` through `evaluate_value_object()` makes the new kind depend on `profile.get_type(name)`, so it is not truly existence-only: a same-named type can turn the signal Blue/Red instead of the intended Yellow until function support exists in `TypeGraph`. This also leaves `Delete` entries for free functions validated against the wrong namespace.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 67,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2f24ff8cff2ffce82c809fc5c1205f71846890b323522e97e3d24fb4982f02da",
-          "at": "2026-04-25T23:52:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
-          "at": "2026-04-26T00:54:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeAction::Delete` for `FreeFunction` is reported as Blue unconditionally even though `TypeGraph` cannot observe free functions. That means a catalogue entry can claim a free function was deleted and pass the signal check while the function still exists in source. Since this state is unverifiable until function extraction exists, it should not be treated as a successful deletion; return Yellow/unverifiable or disallow Delete for this kind.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 104,
-              "category": "behavioral_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
-          "at": "2026-04-26T00:56:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
-          "at": "2026-04-26T01:14:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
-          "at": "2026-04-26T02:35:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
-          "at": "2026-04-26T02:37:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cargo fmt --check -- libs/domain/src/tddd/contract_map_render.rs` fails on this change, so the stated `cargo make ci-rust`/fmt-check gate cannot pass until this file is rustfmt-formatted. The first unformatted block is the new `unused_reference` condition here; rustfmt also rewrites the new edge-target test setup.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 254,
-              "category": "ci"
-            }
-          ],
-          "hash": "rvw1:sha256:98e271ff3824fb5fe813e6b28dcebae0811660bbe676394abd367313bbbdf571",
-          "at": "2026-04-26T03:02:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6868415705e3e79bbcc9d72a07d185ebdd7209d207968ecca09252819d8fc0f0",
-          "at": "2026-04-26T03:03:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b36feb7229020cb175203aca644f001b7841a515ce4d5dfbf835e07121d8e14f",
-          "at": "2026-04-26T03:13:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c15779ebb1312ee1d17cc7173b051b5f2d7659c3efc75ba70d74b590dbd0a0f7",
-          "at": "2026-04-26T03:22:56Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `FreeFunction` decode arm moves `expected_returns` in the validation loop and then uses it again in `expected_returns.clone()`, which triggers E0382 and prevents the crate from compiling.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 681,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b25d292f3bda92f92bcc37a0fa3bcd44575bf02f4726d76a0ae43fd8a9dfa787",
-          "at": "2026-04-26T00:55:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This arm consumes `expected_returns` in `for ret in expected_returns` and then uses it again in `expected_returns: expected_returns.clone()`, which is a borrow-checker compile error (`use of moved value: expected_returns`). Iterate over `&expected_returns` or return the moved vector directly.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 681,
-              "category": "correctness"
-            },
-            {
-              "message": "The new `FreeFunction` rendering branch is never reached because `render_type_catalogue()` still filters entries through the static `SECTIONS` list, and that list has no `free_function` section. Free-function entries will therefore be omitted from the generated `*-types.md` output even though this formatter exists.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 368,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b25d292f3bda92f92bcc37a0fa3bcd44575bf02f4726d76a0ae43fd8a9dfa787",
-          "at": "2026-04-26T00:57:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `for ret in expected_returns` loop moves the vector, so `expected_returns.clone()` below is a use-after-move compile error; this blocks the new `free_function` decode arm from building.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 695,
-              "category": "build"
-            },
-            {
-              "message": "This match arm is missing a trailing comma, so `render_details` does not parse. Add `,` after the `FreeFunction` arm before `SecondaryAdapter`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 385,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:4fe5c8b7158aa5d951f6c4e4eb627836ad42b064ddb7b61ea347426fc0f3a8ce",
-          "at": "2026-04-26T00:59:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`free_function`'s stale-field guard still only rejects `expected_methods` / `expected_variants` / `transitions_to` / `implements`. Because `expected_params` and `expected_returns` are now schema fields, malformed non-`free_function` payloads that include them will deserialize and silently drop them instead of being rejected at the codec boundary.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 314,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:4fe5c8b7158aa5d951f6c4e4eb627836ad42b064ddb7b61ea347426fc0f3a8ce",
-          "at": "2026-04-26T01:01:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "No test exercises the new `FreeFunction` markdown rendering path, so regressions in the `fn (...) -> ...` details format or the new section emission would still pass the current suite.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 369,
-              "category": "testing"
-            },
-            {
-              "message": "The new `expected_returns` L1 validation branch has no dedicated reject test; the added coverage only hits the `expected_params` path, so a broken `::` check on return types would go unnoticed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 699,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:85116a40a6a833d4c2987604357c478500313e5d77d8b108bfcefcf3b12c01d7",
-          "at": "2026-04-26T01:05:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9955d78b37f12dca49921241119b6f25912a519700df204ad0e12ce73cfc5b3e",
-          "at": "2026-04-26T01:09:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9955d78b37f12dca49921241119b6f25912a519700df204ad0e12ce73cfc5b3e",
-          "at": "2026-04-26T01:12:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:777cbfa3b9ee060270e875dce31b0acdba62e07772907ae79c5c4040ac91da9d",
-          "at": "2026-04-26T02:35:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`declares_application_service` is documented as an L1 short name, but the codec now accepts and re-emits it without the `::` validation applied to analogous catalogue references such as `implements.trait_name`. A JSON entry like `\"declares_application_service\":\"crate::RegisterUser\"` will decode successfully, then fail to resolve in the ApplicationService index and silently omit the intended impl edge instead of rejecting invalid catalogue input.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 711,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:777cbfa3b9ee060270e875dce31b0acdba62e07772907ae79c5c4040ac91da9d",
-          "at": "2026-04-26T02:37:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new interactor-only field is not rejected on any other kind. Because this codec uses a flattened internally tagged enum, a payload such as a `use_case` or `dto` entry with `declares_application_service` will pass the Phase 1.5 guards and serde will silently drop that field, accepting an invalid catalogue and losing the authored impl-edge target. Add `declares_application_service` to the forbidden-field checks for non-interactor kinds, or use a single generic cross-kind guard so the field is only accepted when `kind == \"interactor\"`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 295,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:777cbfa3b9ee060270e875dce31b0acdba62e07772907ae79c5c4040ac91da9d",
-          "at": "2026-04-26T02:41:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f0ebdf1ea46bcad1a733643d20597d40f8e9aaa7f5047d2a1078a04cbe0a1f1d",
-          "at": "2026-04-26T02:44:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`declares_application_service` is documented as an L1 short name, but this decode path copies it directly without the `::` rejection used for other catalogue type references. A payload like `\"declares_application_service\":\"domain::RegisterUser\"` decodes successfully and then cannot match the ApplicationService short-name index, silently dropping the intended impl edge. Add decode/encode L1 validation and a reject test for qualified names.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 722,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:50611d0f220105ad8e28916b172fb3ac926fb06d43563efe248e35d9b7e5c3e7",
-          "at": "2026-04-26T02:47:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This uses a 2024-edition let-chain, but the workspace declares `rust-version = \"1.85\"`; Rust stabilized let-chains in 1.88, so building with the declared MSRV will fail before tests run. Rewrite this as a nested `if let`/`if` check or raise the MSRV. Source: https://doc.rust-lang.org/stable/releases.html#version-1880-2025-06-26",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 727,
-              "category": "compile"
-            },
-            {
-              "message": "The decode path now rejects `declares_application_service` values containing `::`, but encode clones the domain string directly into the DTO. Because `TypeDefinitionKind::Interactor` stores a raw `Option<String>`, callers can encode a document with `Some(\"domain::RegisterUser\")` and produce JSON that this same codec then rejects on decode, breaking the intended encode/decode round-trip invariant. Mirror the decode validation in the Interactor encode arm.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 926,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:57cb428fcc083f83491c8a76d1ffc7774ca221bda8ff0543d039167943dfcd34",
-          "at": "2026-04-26T02:53:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21a22c9fb7b3c65cbe37c92c76b3808e4f22c8ebe67fd1d17708f8ad3d10908a",
-          "at": "2026-04-26T02:56:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`encode_member_list` copies `MemberDeclaration::Field.ty` into JSON without the `::` check that `decode_member_list` enforces. `MemberDeclaration::field` accepts raw strings, so a field-bearing entry can be constructed with a qualified type like `domain::UserId`; `encode` will emit it successfully, but the resulting JSON is rejected by `decode`, breaking the codec round-trip/L1 invariant for the new `expected_members` field. Mirror the decode-side validation on encode and propagate `InvalidEntry` from `type_catalogue_entry_to_dto`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 1073,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f89b9fb677c456c91ab391b0a802a9d59b7e575c15765696dead8843424b4e04",
-          "at": "2026-04-26T03:13:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new `expected_members` decode/encode and guard behavior is untested in this file. Existing tests still only round-trip `dto` without members, and there are no assertions for member field round-trip, empty member serialization, `Field.ty` `::` rejection, or rejection on non-field-bearing kinds such as `use_case`/`secondary_port`; this leaves the new public codec behavior and silent-drop guards uncovered.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 114,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:20b3aba7e1902ca90b815af628aebcf362535658c700d5ca91aa1e4179d9edff",
-          "at": "2026-04-26T03:16:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eca8c88bf4b5d979f69c1ab029fc3b96b2bd7b0f25a3d37424595b20bfd29154",
-          "at": "2026-04-26T03:18:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd08157e93ee1ed2061fc47d0b6b9efaff05da6a07f32d106c294ef91442fa45",
-          "at": "2026-04-26T03:23:01Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:33:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:35:29Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -959,6 +528,505 @@
           "findings": [],
           "hash": "rvw1:sha256:b94aa2b1273245a22f9b3b8b9a3cdce010c16f7312447928cd4d126636b319bb",
           "at": "2026-04-26T03:34:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adead08cd01d700cd0e7f2aa278ab9e57193262101ef4247f1ef359007aaf063",
+          "at": "2026-04-26T03:50:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adead08cd01d700cd0e7f2aa278ab9e57193262101ef4247f1ef359007aaf063",
+          "at": "2026-04-26T03:51:39Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Routing `FreeFunction` through `evaluate_value_object()` makes the new kind depend on `profile.get_type(name)`, so it is not truly existence-only: a same-named type can turn the signal Blue/Red instead of the intended Yellow until function support exists in `TypeGraph`. This also leaves `Delete` entries for free functions validated against the wrong namespace.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2f24ff8cff2ffce82c809fc5c1205f71846890b323522e97e3d24fb4982f02da",
+          "at": "2026-04-25T23:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T00:54:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeAction::Delete` for `FreeFunction` is reported as Blue unconditionally even though `TypeGraph` cannot observe free functions. That means a catalogue entry can claim a free function was deleted and pass the signal check while the function still exists in source. Since this state is unverifiable until function extraction exists, it should not be treated as a successful deletion; return Yellow/unverifiable or disallow Delete for this kind.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 104,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T00:56:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T01:14:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
+          "at": "2026-04-26T02:35:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4f7092b0abce5bb1abdfb40b26c69b2c54b3fc2a74e27313bba07b3c636234",
+          "at": "2026-04-26T02:37:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo fmt --check -- libs/domain/src/tddd/contract_map_render.rs` fails on this change, so the stated `cargo make ci-rust`/fmt-check gate cannot pass until this file is rustfmt-formatted. The first unformatted block is the new `unused_reference` condition here; rustfmt also rewrites the new edge-target test setup.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 254,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:98e271ff3824fb5fe813e6b28dcebae0811660bbe676394abd367313bbbdf571",
+          "at": "2026-04-26T03:02:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6868415705e3e79bbcc9d72a07d185ebdd7209d207968ecca09252819d8fc0f0",
+          "at": "2026-04-26T03:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b36feb7229020cb175203aca644f001b7841a515ce4d5dfbf835e07121d8e14f",
+          "at": "2026-04-26T03:13:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c15779ebb1312ee1d17cc7173b051b5f2d7659c3efc75ba70d74b590dbd0a0f7",
+          "at": "2026-04-26T03:22:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e56155910ff883899a241b9465b1961f574314e31a201399d0fc373583831d3d",
+          "at": "2026-04-26T03:41:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e56155910ff883899a241b9465b1961f574314e31a201399d0fc373583831d3d",
+          "at": "2026-04-26T03:42:38Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:33:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:35:29Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:43:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 73,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:45:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:48:07Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `FreeFunction` decode arm moves `expected_returns` in the validation loop and then uses it again in `expected_returns.clone()`, which triggers E0382 and prevents the crate from compiling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 681,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b25d292f3bda92f92bcc37a0fa3bcd44575bf02f4726d76a0ae43fd8a9dfa787",
+          "at": "2026-04-26T00:55:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This arm consumes `expected_returns` in `for ret in expected_returns` and then uses it again in `expected_returns: expected_returns.clone()`, which is a borrow-checker compile error (`use of moved value: expected_returns`). Iterate over `&expected_returns` or return the moved vector directly.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 681,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `FreeFunction` rendering branch is never reached because `render_type_catalogue()` still filters entries through the static `SECTIONS` list, and that list has no `free_function` section. Free-function entries will therefore be omitted from the generated `*-types.md` output even though this formatter exists.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 368,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b25d292f3bda92f92bcc37a0fa3bcd44575bf02f4726d76a0ae43fd8a9dfa787",
+          "at": "2026-04-26T00:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `for ret in expected_returns` loop moves the vector, so `expected_returns.clone()` below is a use-after-move compile error; this blocks the new `free_function` decode arm from building.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 695,
+              "category": "build"
+            },
+            {
+              "message": "This match arm is missing a trailing comma, so `render_details` does not parse. Add `,` after the `FreeFunction` arm before `SecondaryAdapter`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 385,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:4fe5c8b7158aa5d951f6c4e4eb627836ad42b064ddb7b61ea347426fc0f3a8ce",
+          "at": "2026-04-26T00:59:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`free_function`'s stale-field guard still only rejects `expected_methods` / `expected_variants` / `transitions_to` / `implements`. Because `expected_params` and `expected_returns` are now schema fields, malformed non-`free_function` payloads that include them will deserialize and silently drop them instead of being rejected at the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 314,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:4fe5c8b7158aa5d951f6c4e4eb627836ad42b064ddb7b61ea347426fc0f3a8ce",
+          "at": "2026-04-26T01:01:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "No test exercises the new `FreeFunction` markdown rendering path, so regressions in the `fn (...) -> ...` details format or the new section emission would still pass the current suite.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 369,
+              "category": "testing"
+            },
+            {
+              "message": "The new `expected_returns` L1 validation branch has no dedicated reject test; the added coverage only hits the `expected_params` path, so a broken `::` check on return types would go unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 699,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:85116a40a6a833d4c2987604357c478500313e5d77d8b108bfcefcf3b12c01d7",
+          "at": "2026-04-26T01:05:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9955d78b37f12dca49921241119b6f25912a519700df204ad0e12ce73cfc5b3e",
+          "at": "2026-04-26T01:09:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9955d78b37f12dca49921241119b6f25912a519700df204ad0e12ce73cfc5b3e",
+          "at": "2026-04-26T01:12:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:777cbfa3b9ee060270e875dce31b0acdba62e07772907ae79c5c4040ac91da9d",
+          "at": "2026-04-26T02:35:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`declares_application_service` is documented as an L1 short name, but the codec now accepts and re-emits it without the `::` validation applied to analogous catalogue references such as `implements.trait_name`. A JSON entry like `\"declares_application_service\":\"crate::RegisterUser\"` will decode successfully, then fail to resolve in the ApplicationService index and silently omit the intended impl edge instead of rejecting invalid catalogue input.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 711,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:777cbfa3b9ee060270e875dce31b0acdba62e07772907ae79c5c4040ac91da9d",
+          "at": "2026-04-26T02:37:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new interactor-only field is not rejected on any other kind. Because this codec uses a flattened internally tagged enum, a payload such as a `use_case` or `dto` entry with `declares_application_service` will pass the Phase 1.5 guards and serde will silently drop that field, accepting an invalid catalogue and losing the authored impl-edge target. Add `declares_application_service` to the forbidden-field checks for non-interactor kinds, or use a single generic cross-kind guard so the field is only accepted when `kind == \"interactor\"`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 295,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:777cbfa3b9ee060270e875dce31b0acdba62e07772907ae79c5c4040ac91da9d",
+          "at": "2026-04-26T02:41:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0ebdf1ea46bcad1a733643d20597d40f8e9aaa7f5047d2a1078a04cbe0a1f1d",
+          "at": "2026-04-26T02:44:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`declares_application_service` is documented as an L1 short name, but this decode path copies it directly without the `::` rejection used for other catalogue type references. A payload like `\"declares_application_service\":\"domain::RegisterUser\"` decodes successfully and then cannot match the ApplicationService short-name index, silently dropping the intended impl edge. Add decode/encode L1 validation and a reject test for qualified names.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 722,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:50611d0f220105ad8e28916b172fb3ac926fb06d43563efe248e35d9b7e5c3e7",
+          "at": "2026-04-26T02:47:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This uses a 2024-edition let-chain, but the workspace declares `rust-version = \"1.85\"`; Rust stabilized let-chains in 1.88, so building with the declared MSRV will fail before tests run. Rewrite this as a nested `if let`/`if` check or raise the MSRV. Source: https://doc.rust-lang.org/stable/releases.html#version-1880-2025-06-26",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 727,
+              "category": "compile"
+            },
+            {
+              "message": "The decode path now rejects `declares_application_service` values containing `::`, but encode clones the domain string directly into the DTO. Because `TypeDefinitionKind::Interactor` stores a raw `Option<String>`, callers can encode a document with `Some(\"domain::RegisterUser\")` and produce JSON that this same codec then rejects on decode, breaking the intended encode/decode round-trip invariant. Mirror the decode validation in the Interactor encode arm.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 926,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:57cb428fcc083f83491c8a76d1ffc7774ca221bda8ff0543d039167943dfcd34",
+          "at": "2026-04-26T02:53:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21a22c9fb7b3c65cbe37c92c76b3808e4f22c8ebe67fd1d17708f8ad3d10908a",
+          "at": "2026-04-26T02:56:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode_member_list` copies `MemberDeclaration::Field.ty` into JSON without the `::` check that `decode_member_list` enforces. `MemberDeclaration::field` accepts raw strings, so a field-bearing entry can be constructed with a qualified type like `domain::UserId`; `encode` will emit it successfully, but the resulting JSON is rejected by `decode`, breaking the codec round-trip/L1 invariant for the new `expected_members` field. Mirror the decode-side validation on encode and propagate `InvalidEntry` from `type_catalogue_entry_to_dto`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 1073,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f89b9fb677c456c91ab391b0a802a9d59b7e575c15765696dead8843424b4e04",
+          "at": "2026-04-26T03:13:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new `expected_members` decode/encode and guard behavior is untested in this file. Existing tests still only round-trip `dto` without members, and there are no assertions for member field round-trip, empty member serialization, `Field.ty` `::` rejection, or rejection on non-field-bearing kinds such as `use_case`/`secondary_port`; this leaves the new public codec behavior and silent-drop guards uncovered.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 114,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:20b3aba7e1902ca90b815af628aebcf362535658c700d5ca91aa1e4179d9edff",
+          "at": "2026-04-26T03:16:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eca8c88bf4b5d979f69c1ab029fc3b96b2bd7b0f25a3d37424595b20bfd29154",
+          "at": "2026-04-26T03:18:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd08157e93ee1ed2061fc47d0b6b9efaff05da6a07f32d106c294ef91442fa45",
+          "at": "2026-04-26T03:23:01Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 921,
+              "category": "factual"
+            },
+            {
+              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 925,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:15:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:16:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 919,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:18:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T17:26:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:27:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:28:40Z"
         }
       ]
     }

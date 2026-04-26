@@ -68,9 +68,14 @@ translate it to `cargo make track-local-review -- ...` before running.
 
 1. **Review**: Run `cargo make track-local-review` with the provided briefing and fast model.
 2. **Parse verdict**: Read the verdict from command output.
-   - `zero_findings` → return `completed`
    - `findings_remain` → proceed to fix phase
    - Error → return `failed`
+   - `zero_findings` → run `bin/sotp review status --track-id <track-id>`
+     and confirm this scope shows `[+] {scope}: approved` before returning
+     `completed`. If status shows anything else, residual findings remain;
+     go back to **step 1** (re-run `cargo make track-local-review`) to
+     re-fetch the verdict and continue the existing fix → review loop.
+     Loop until `approved`.
 3. **Fix phase**:
    - Verify each finding's factual claims via `Grep` / `Read` before acting.
    - P3 findings from pre-existing unchanged code: note but do not fix.

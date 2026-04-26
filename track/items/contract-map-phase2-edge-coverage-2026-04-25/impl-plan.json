@@ -40,7 +40,7 @@
     {
       "id": "T007",
       "description": "Implement action overlay in contract_map_render.rs (domain). When opts.action_overlay=true, add action-specific classDef lines to the mermaid header (modify_action: stroke-dasharray for dashed border; delete_action: line-through text + light fill; reference_action: sparse stroke-dasharray for dotted border; add_action is the default — no extra classDef). Attach :::action_classDef to each node shape string based on entry.action(). When action_overlay=false, action-overlay-specific classDef lines (modify_action/delete_action/reference_action) and :::action_classDef annotations are absent from output — other Phase 2 additions (unused_reference, declaration_only classDefs from T005) are always present regardless of this flag. Unit tests: action_overlay=true produces each action classDef and node annotation; action_overlay=false produces output without action-overlay classDefs (regression guard for the action overlay feature only).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",
