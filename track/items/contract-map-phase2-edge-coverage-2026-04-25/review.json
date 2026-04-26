@@ -224,6 +224,27 @@
           "findings": [],
           "hash": "rvw1:sha256:97775dbfb93e8882ead4fef7ac967e46c3a08f142f213e7aa7b7a6d0dd11f7c4",
           "at": "2026-04-26T06:38:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83e276d053e76a8c62f4abe8612268d250b4a14631f86ee7b0a148cfc01439de",
+          "at": "2026-04-26T07:31:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83e276d053e76a8c62f4abe8612268d250b4a14631f86ee7b0a148cfc01439de",
+          "at": "2026-04-26T07:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83e276d053e76a8c62f4abe8612268d250b4a14631f86ee7b0a148cfc01439de",
+          "at": "2026-04-26T07:35:35Z"
         }
       ]
     },
@@ -264,6 +285,107 @@
           "findings": [],
           "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
           "at": "2026-04-26T03:48:07Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:33:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:35:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
+          "at": "2026-04-26T05:26:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
+          "at": "2026-04-26T05:27:19Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 921,
+              "category": "factual"
+            },
+            {
+              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 925,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:15:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:16:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 919,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:18:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T17:26:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:27:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:28:40Z"
         }
       ]
     },
@@ -640,38 +762,181 @@
           "findings": [],
           "hash": "rvw1:sha256:a87c1c8f4407932a72fcfd25a3422402dedc73612088723ad2fd21afd1f49804",
           "at": "2026-04-26T06:39:18Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `trim().is_empty()` check still accepts non-empty names that contain whitespace, such as `\"RegisterUser \"`, `\" RegisterUser\"`, or `\"Register User\"`. Those values will pass codec validation but fail the exact `application_service_index` lookup, so the interactor->application-service impl edge is still silently omitted. Reject any value containing whitespace, or at least any string whose trimmed form differs from the original, and add a regression test for a padded name.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 862,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:452ebaceb5f121496ba949a3b93058b553db7c437f8730b5910a7e524df3afbe",
+          "at": "2026-04-26T06:53:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test no longer exercises the codec's `encode()` path. It now checks that `TypeCatalogueEntry::with_members()` rejects `Variant` members, so the public `encode_member_list()` guard can regress without this test failing. Keep a direct `encode(&doc)` assertion here or add another test that still hits the codec encode path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 2531,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d9c56202e1764165a6dbcc03eee4123dcb8dc4ec9ec70ddc987395ceb7f83540",
+          "at": "2026-04-26T06:57:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `name.chars().any(|c| c.is_whitespace())` check is broader than the stated blank/padded-input fix: it rejects any `declares_application_service` value containing spaces anywhere, even though catalogue names are still raw strings and the renderer resolves this field by exact string match. That means a valid `ApplicationService` whose short name contains spaces will now fail both decode and encode here (`line 864` and the mirrored guard at `line 1083`). If the intent is only to block empty or whitespace-only/padded values, use a narrower blank check or enforce the no-space invariant on the name itself.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 864,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7ef31cb4757d7807663dba264d85b082733c987e08bcb4eaf479fcaa61ea18fa",
+          "at": "2026-04-26T06:59:45Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:33:59Z"
+          "hash": "rvw1:sha256:7d30c51f91f9cc0dd0e108911e890d9aeffa751d9588482ce906b638303c465d",
+          "at": "2026-04-26T07:02:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d30c51f91f9cc0dd0e108911e890d9aeffa751d9588482ce906b638303c465d",
+          "at": "2026-04-26T07:03:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d30c51f91f9cc0dd0e108911e890d9aeffa751d9588482ce906b638303c465d",
+          "at": "2026-04-26T07:06:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d30c51f91f9cc0dd0e108911e890d9aeffa751d9588482ce906b638303c465d",
+          "at": "2026-04-26T07:06:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:35:29Z"
+          "hash": "rvw1:sha256:7d30c51f91f9cc0dd0e108911e890d9aeffa751d9588482ce906b638303c465d",
+          "at": "2026-04-26T07:09:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test no longer exercises the public `encode()` path for the variant-member rejection case. By calling the private `encode_member_list` helper directly, it stops covering the `TypeCatalogueDocument -> DTO -> JSON` wiring, so a regression in `type_catalogue_entry_to_dto` or `encode()` could let an invalid document serialize without any failing test. Keep an end-to-end `encode(&doc)` assertion alongside the helper-level check, or add a second test that covers the full encode path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 2545,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:01cb41a305d9064ba26525ba254e80ba2ca09c04323514c63d9153bb38042765",
+          "at": "2026-04-26T07:32:28Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
-          "at": "2026-04-26T05:26:26Z"
+          "hash": "rvw1:sha256:01cb41a305d9064ba26525ba254e80ba2ca09c04323514c63d9153bb38042765",
+          "at": "2026-04-26T07:35:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new whitespace guard on `declares_application_service` is too broad. The domain model still allows catalogue entry names with internal spaces, and the renderer resolves interactor targets by exact string match, so a valid pair like `ApplicationService { name: \"My Service\" }` and `Interactor { declares_application_service: Some(\"My Service\") }` will now be rejected by both decode and encode. If the goal is only to block blank/trimmed values, this should be narrowed to that case instead of rejecting any whitespace.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 868,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:01cb41a305d9064ba26525ba254e80ba2ca09c04323514c63d9153bb38042765",
+          "at": "2026-04-26T07:37:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rejecting `declares_application_service` values with leading/trailing whitespace is overly strict here. The catalogue model only rejects blank names, and `application_service_index` is keyed by the raw `entry.name()` string, so an interactor cannot target a legitimately named application service whose identifier includes surrounding whitespace. This turns a valid round-trip into an `InvalidEntry` error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 869,
+              "category": "correctness"
+            },
+            {
+              "message": "Replacing the old end-to-end variant-member test with a direct `encode_member_list` call drops coverage of the public `encode()` path. A regression in `type_catalogue_entry_to_dto` or the plumbing that invokes this helper would now escape this test, so the encode-side error case is no longer covered at the API boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 2571,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:64ffee2a41fc3a7644be7a166e1a87b3d663527149e8ada8944206a8f6957a73",
+          "at": "2026-04-26T07:51:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64ffee2a41fc3a7644be7a166e1a87b3d663527149e8ada8944206a8f6957a73",
+          "at": "2026-04-26T07:52:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new leading/trailing-whitespace rejection is too broad: `application_service_index` is built from raw `entry.name()` values, and `TypeCatalogueEntry::new` only rejects empty/whitespace-only names. A legal `ApplicationService` named with surrounding spaces still exists in the catalogue and should round-trip, but this guard now rejects the interactor reference as `InvalidEntry` (and the encode mirror at line 1090 does the same).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 869,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:64ffee2a41fc3a7644be7a166e1a87b3d663527149e8ada8944206a8f6957a73",
+          "at": "2026-04-26T07:58:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cce63ed0ffe3836586f42a626df57e424f6ec84f086e24eeca6763444defcee",
+          "at": "2026-04-26T08:02:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
-          "at": "2026-04-26T05:27:19Z"
+          "hash": "rvw1:sha256:9cce63ed0ffe3836586f42a626df57e424f6ec84f086e24eeca6763444defcee",
+          "at": "2026-04-26T08:04:04Z"
         }
       ]
     },
@@ -1391,75 +1656,233 @@
           "findings": [],
           "hash": "rvw1:sha256:aa1a8eebe65f0b5218609a36c3db34046d0eeaaf16f76a2b497559e426e1f84e",
           "at": "2026-04-26T06:10:19Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fcc1866d1a2272b7ed12d4dbdf4cc0704929bd7fc94dca0282f3e081d1c722f",
+          "at": "2026-04-26T06:55:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fcc1866d1a2272b7ed12d4dbdf4cc0704929bd7fc94dca0282f3e081d1c722f",
+          "at": "2026-04-26T06:57:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 first narrows `declaration_only` to `is_method_bearing_kind()` and says non-method-bearing kinds must not receive it, but then concludes that `ValidationError` is rendered as `declaration_only`. `ValidationError` is the L2 error-type exemplar, not a method-bearing kind, so the narrowed rule and the stated Phase 2 outcome conflict. The ADR currently records an impossible resolution for L2a.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 67,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1fcc1866d1a2272b7ed12d4dbdf4cc0704929bd7fc94dca0282f3e081d1c722f",
+          "at": "2026-04-26T07:02:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says `ValidationError` becomes `declaration_only`, but the same section narrows `declaration_only` to `is_method_bearing_kind()` kinds. `ValidationError` is an `error_type`, and the current `is_method_bearing_kind()` gate only covers method-bearing port traits, so this ADR records a resolution that cannot happen under the stated rule.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 67,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1fcc1866d1a2272b7ed12d4dbdf4cc0704929bd7fc94dca0282f3e081d1c722f",
+          "at": "2026-04-26T07:05:04Z"
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
+              "message": "D1 says an edge-less isolated node means the catalog is missing a use-site declaration, but D4 and the consequences explicitly say `FreeFunction` nodes will still be shown without edges until a later phase. The scoped `contract-map.md` also keeps `load_all_catalogues` and `render_contract_map` as free-function nodes with no edges, so D1 needs an explicit exception for this category or the rule is false as written.",
               "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 921,
-              "category": "factual"
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 61,
+              "category": "contradiction"
             },
             {
-              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
+              "message": "The L2b row describes a field-derived dependency, but the explanatory sentence uses a free-function argument example. That conflates the D2 field-edge work with the D4 free-function work, so the reader cannot tell why `expected_members` is the correct resolution path for L2b.",
               "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 925,
-              "category": "factual"
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 33,
+              "category": "factual error"
             }
           ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:15:40Z"
+          "hash": "rvw1:sha256:4ff906ddf61f16fa692e5afcd20ef31064abae0e954dff13e63143be5fc2c522",
+          "at": "2026-04-26T07:31:01Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:16:57Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
+              "message": "D1 says the type that emits/consumes the target should itself be a `reference` entry, but the same ADR later uses `modify` (D2), `Interactor` (D3), and `FreeFunction` (D4) as valid source-side kinds for dependencies. As written, the core rule contradicts the rest of the design and would force valid catalogue entries into the wrong action kind.",
               "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 919,
-              "category": "docs"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 65,
+              "category": "contradiction"
+            },
+            {
+              "message": "The opening definition limits Contract Map to 'declared types', but the ADR later promotes `FreeFunction` to a first-class catalogue kind and the scoped artifact already renders free-function nodes. That makes the scope definition semantically too narrow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 15,
+              "category": "factual error"
             }
           ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:18:51Z"
+          "hash": "rvw1:sha256:7b21cd0058b497d7555471268929f21bb247f9562135ed230ee4762b8c4869a9",
+          "at": "2026-04-26T07:34:28Z"
         },
         {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T17:26:40Z"
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md:65] D1 lists `FreeFunction` alongside `add`/`modify`/`reference` as if it were an `action`, but D4 defines `FreeFunction` as a `TypeDefinitionKind` variant. That conflates two different schema axes and can mislead readers about which field they should set.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b555dec25e317ce3d2c427f513e0a688b43e9bba199c69fc34bb83c0f5a1b7ad",
+          "at": "2026-04-26T07:37:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "L1 is still defined as a legitimate forward-reference placeholder that can exist without any outgoing edges, but D1 later says isolated nodes should not normally appear and that any no-edge node is a sign of missing usage declarations. The ADR never reconciles those two cases, so a reader cannot tell whether an isolated node is an acceptable placeholder or a declaration defect.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:665f4dade3a14df91e6b05fd40b9e5a470900f488338fe861bb8bbc511ed9e53",
+          "at": "2026-04-26T07:39:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 contradicts itself about `action=reference` entries. Lines 65-66 require every reference declaration to be paired with a method/function declaration that uses it, but lines 68-71 then treat a `reference` entry with no current use as a normal, intentional state. That makes the operating rule ambiguous for the L1 forward-reference case the ADR is explicitly trying to preserve.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:414c59f001b9014d31448784965b428f8cfee72622e0aec6d306865a15ee81ba",
+          "at": "2026-04-26T07:41:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md:68-73` narrows “legitimate” isolated nodes to only forward declarations and pending `FreeFunction` entries, but the paired artifact `track/items/contract-map-phase2-edge-coverage-2026-04-25/contract-map.md` still contains several isolated nodes that do not fit either bucket (for example `ValidationError`, `TypeDefinitionKind`, `MemberDeclaration`, `TypeCatalogueEntry`, and `RenderContractMapOutput`). As written, the ADR overstates the resolution and no longer explains the graph state it is paired with.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 68,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8b2cae315352a215ddad906e9fe468ccaa2bde54fe3540965dea02976f2600c5",
+          "at": "2026-04-26T07:51:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`§3` says a consumer method/function that produces an edge must be declared as a `reference` entry, but `D1` later says the consumer-side entry action can be `add`, `modify`, or `reference` and is not limited to `reference`. Those rules describe incompatible classification requirements for the same kind of catalog entry.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8b2cae315352a215ddad906e9fe468ccaa2bde54fe3540965dea02976f2600c5",
+          "at": "2026-04-26T07:53:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:27:23Z"
+          "hash": "rvw1:sha256:ebf1bd3c5d66408e01aba4da101db36f34ed78ef07ef2fa045cce21347426c80",
+          "at": "2026-04-26T07:56:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebf1bd3c5d66408e01aba4da101db36f34ed78ef07ef2fa045cce21347426c80",
+          "at": "2026-04-26T07:57:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebf1bd3c5d66408e01aba4da101db36f34ed78ef07ef2fa045cce21347426c80",
+          "at": "2026-04-26T07:58:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebf1bd3c5d66408e01aba4da101db36f34ed78ef07ef2fa045cce21347426c80",
+          "at": "2026-04-26T07:58:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebf1bd3c5d66408e01aba4da101db36f34ed78ef07ef2fa045cce21347426c80",
+          "at": "2026-04-26T07:59:54Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:28:40Z"
+          "hash": "rvw1:sha256:ebf1bd3c5d66408e01aba4da101db36f34ed78ef07ef2fa045cce21347426c80",
+          "at": "2026-04-26T08:03:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says the only legitimate isolated nodes are forward-reference placeholders and pending `FreeFunction` entries, but the paired `track/items/contract-map-phase2-edge-coverage-2026-04-25/contract-map.md` still leaves several non-`FreeFunction` catalogue entries isolated (`ValidationError`, `TypeCatalogueEntry`, `MemberDeclaration`, `TypeCatalogueCodecError`, `RenderContractMapOutput`, `RenderContractMapError`, etc.). As written, the ADR overstates the resolution and does not explain the graph state it is paired with.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0553-contract-map-phase2-resolution.md",
+              "line": 68,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c6ae6791668f39daa0f80df47e4cc8c9b3a1b0d5dd222da03a540da61f5e7c30",
+          "at": "2026-04-26T08:07:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9503577e90db79c2d54d7a0abcf0566fccee44a18263f05e66539de315e16e55",
+          "at": "2026-04-26T08:10:59Z"
         }
       ]
     }

@@ -556,16 +556,29 @@ impl TypeCatalogueEntry {
     /// catalogue-side noise out of the contract map renderer's field-edge
     /// generation pass.
     ///
+    /// Field-bearing kinds accept only `MemberDeclaration::Field` items.
+    /// `MemberDeclaration::Variant` items are rejected so that in-memory
+    /// callers that bypass codec validation cannot silently introduce
+    /// variant members that `field_members()` would later drop.
+    ///
     /// # Errors
     ///
     /// Returns `SpecValidationError::EmptyDomainStateName` reused as a
-    /// generic invalid-construction signal when `members` is non-empty and
-    /// the entry's kind is not one of the four field-bearing kinds.
+    /// generic invalid-construction signal when:
+    /// - `members` is non-empty and the entry's kind is not one of the four
+    ///   field-bearing kinds, or
+    /// - the entry's kind is field-bearing and any member is a
+    ///   `MemberDeclaration::Variant`.
     pub fn with_members(
         mut self,
         members: Vec<MemberDeclaration>,
     ) -> Result<Self, SpecValidationError> {
         if !members.is_empty() && !is_field_bearing_kind(&self.kind) {
+            return Err(SpecValidationError::EmptyDomainStateName);
+        }
+        if is_field_bearing_kind(&self.kind)
+            && members.iter().any(|m| matches!(m, MemberDeclaration::Variant(_)))
+        {
             return Err(SpecValidationError::EmptyDomainStateName);
         }
         self.expected_members = members;
@@ -652,26 +665,6 @@ pub fn is_field_bearing_kind(kind: &TypeDefinitionKind) -> bool {
             | TypeDefinitionKind::Command
             | TypeDefinitionKind::Query
             | TypeDefinitionKind::ValueObject
-    )
-}
-
-/// IN-04 / spec semantics: only kinds that actually carry an
-/// `expected_methods` list qualify for the `declaration_only` dashed-border
-/// classDef when their method list is empty under `action=modify`.
-/// Non-method-bearing kinds (`Dto`, `Enum`, etc.) can have other genuine
-/// structural deltas (`expected_members`, variants), so they must NOT be
-/// marked as declaration-only on the basis of `methods_of(...).is_empty()`
-/// alone (PR #115 P1 finding).
-///
-/// `SecondaryAdapter` is intentionally excluded: it carries `implements` and
-/// impl edges rather than `expected_methods`, so the empty-methods gate does
-/// not apply (PR #115 r6 P1 finding). Centralised so renderer / future codec
-/// guards stay in sync.
-#[must_use]
-pub fn is_method_bearing_kind(kind: &TypeDefinitionKind) -> bool {
-    matches!(
-        kind,
-        TypeDefinitionKind::SecondaryPort { .. } | TypeDefinitionKind::ApplicationService { .. }
     )
 }
 
@@ -1467,5 +1460,85 @@ mod tests {
         } else {
             panic!("expected SecondaryAdapter");
         }
+    }
+
+    // --- with_members ---
+
+    #[test]
+    fn test_with_members_field_bearing_kind_accepts_field_members() {
+        for kind in [
+            TypeDefinitionKind::Dto,
+            TypeDefinitionKind::Command,
+            TypeDefinitionKind::Query,
+            TypeDefinitionKind::ValueObject,
+        ] {
+            let entry = TypeCatalogueEntry::new("MyType", "desc", kind, TypeAction::Add, true)
+                .unwrap()
+                .with_members(vec![MemberDeclaration::field("name", "String")])
+                .unwrap();
+            assert_eq!(entry.expected_members().len(), 1);
+        }
+    }
+
+    #[test]
+    fn test_with_members_field_bearing_kind_rejects_variant_member() {
+        for kind in [
+            TypeDefinitionKind::Dto,
+            TypeDefinitionKind::Command,
+            TypeDefinitionKind::Query,
+            TypeDefinitionKind::ValueObject,
+        ] {
+            let result = TypeCatalogueEntry::new("MyType", "desc", kind, TypeAction::Add, true)
+                .unwrap()
+                .with_members(vec![MemberDeclaration::variant("Active")]);
+            assert!(
+                matches!(result, Err(SpecValidationError::EmptyDomainStateName)),
+                "Variant member on field-bearing kind must be rejected"
+            );
+        }
+    }
+
+    #[test]
+    fn test_with_members_field_bearing_kind_rejects_mixed_field_and_variant() {
+        let result = TypeCatalogueEntry::new(
+            "MyDto",
+            "desc",
+            TypeDefinitionKind::Dto,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap()
+        .with_members(vec![
+            MemberDeclaration::field("name", "String"),
+            MemberDeclaration::variant("Active"),
+        ]);
+        assert!(
+            matches!(result, Err(SpecValidationError::EmptyDomainStateName)),
+            "mixed field+variant on field-bearing kind must be rejected"
+        );
+    }
+
+    #[test]
+    fn test_with_members_non_field_bearing_kind_rejects_nonempty_members() {
+        let kind = TypeDefinitionKind::Enum {
+            expected_variants: vec!["Active".into(), "Inactive".into()],
+        };
+        let result = TypeCatalogueEntry::new("Status", "desc", kind, TypeAction::Add, true)
+            .unwrap()
+            .with_members(vec![MemberDeclaration::field("name", "String")]);
+        assert!(
+            matches!(result, Err(SpecValidationError::EmptyDomainStateName)),
+            "non-field-bearing kind must reject nonempty members"
+        );
+    }
+
+    #[test]
+    fn test_with_members_non_field_bearing_kind_accepts_empty_members() {
+        let kind = TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] };
+        let entry = TypeCatalogueEntry::new("Status", "desc", kind, TypeAction::Add, true)
+            .unwrap()
+            .with_members(vec![])
+            .unwrap();
+        assert!(entry.expected_members().is_empty());
     }
 }

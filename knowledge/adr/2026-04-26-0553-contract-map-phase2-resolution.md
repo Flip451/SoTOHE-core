@@ -1,122 +1,158 @@
-# TDDD Contract Map Phase 2 — Known Limitations (L1-L4) 解消の記録と spec 精緻化
-
-## Status
-
-Accepted (2026-04-26)
+# TDDD Contract Map Phase 2 — 孤立ノードの解消とカタログ宣言ルールの確立
 
 ## Related ADRs
 
-- `knowledge/adr/2026-04-17-1528-tddd-contract-map.md` — refinement 対象の前 ADR。本 ADR は同 ADR § Known Limitations に記録された L1-L4 の解消経路と、Phase 2 実装で判明した spec 精緻化を post-merge record として残す。前 ADR は frozen (immutable record)。
-- `knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md` — Reality View。Contract Map との役割分担 (§D10) を規定
-- `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` — TypeDefinitionKind 13 variants taxonomy (§D1 / §D3)
-- `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` — multilayer 型カタログ・layer-agnostic 不変条件 (§D6)
-- `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md` — domain serde 依存除去 (hexagonal 純粋性)
+- `knowledge/adr/2026-04-17-1528-tddd-contract-map.md` — Contract Map の設計を決めた元の ADR。この ADR が「Phase 2 で解消する」として残していた課題 (Known Limitations L1-L4) が本 ADR の題材。元の ADR は main にマージ済みのため、解消記録はこちらに分離して残す。
+- `knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md` — Reality View (rustdoc ベースの実装状態確認ビュー)。Contract Map との役割分担を元の ADR で規定している。
+- `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` — TypeDefinitionKind の 13 variants 体系。D3 / D4 の前提。
+- `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` — 多層型カタログと layer-agnostic 制約の出所。
+- `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md` — domain 層から serde 依存を除去した ADR (hexagonal の純粋性維持)。
 
 ## Context
 
-### §1 前 ADR § Known Limitations の背景
+### §1 Contract Map とはどういうものか
 
-`knowledge/adr/2026-04-17-1528-tddd-contract-map.md` は、Contract Map の Phase 1 / Phase 1.5 dogfood 時点で **edge を持たずに孤立表示される型が 4 カテゴリ (L1-L4)、計 9 nodes** 存在することを Known Limitations として記録した。これらはいずれも設計ミスや実装バグではなく、カタログ仕様の初期スコープ制約に由来するものとして分類されていた。
+Contract Map は「型カタログに宣言されたエントリ」を全層まとめて 1 枚の mermaid 図に描くビューである。rustdoc のように「コードに存在する型すべて」を機械的に並べるのではなく、設計者が「これは設計上の契約だ」と明示的に宣言したエントリだけを対象にする。エントリには型 (struct / enum / trait 等) のほか、`FreeFunction` kind の関数宣言も含まれる。
 
-前 ADR は post-merge で immutable record となっているため、L1-L4 の解消記録は本 ADR に分離して残す。
+図にはエントリ同士の関係として、次の種類の矢印が描かれる:
 
-### §2 解消された制約の概要
+- **メソッド呼び出しの矢印**: ある型のメソッドの引数や戻り値に別の宣言済み型が登場すると矢印が出る
+- **trait 実装の矢印** (破線): ある型が別の宣言済み trait を実装していると破線矢印が出る
+- **フィールド参照の矢印** (Phase 2 で追加): 構造体のフィールドに別の宣言済み型が入っていると矢印が出る
 
-Phase 2 の実装により以下の能力が追加された:
+カタログに宣言されていない型 (`String` / `bool` / `Option<T>` 等の標準ライブラリ型や外部クレート型) は図に現れない。これは意図的な設計で、「宣言した契約だけを可視化する」という絞り込みがこのビューの価値の源泉になっている。
 
-1. **`unused_reference` / `declaration_only` classDef** — edge を持たない宣言型を dashed border で視覚識別する。isolation を隠すのではなく、意図的な「待機状態」や「宣言のみの型」であることを明示する可視化メカニズム。
-2. **`declaration_only` 適用対象の narrowing** — 当初の設計では `declaration_only` を `action=modify` 全般に適用する想定だったが、Phase 2 実装の PR レビューで `is_method_bearing_kind()` に限定する修正が入った。`free_function` / `value_object` 等の method を持たない kind には `declaration_only` を不適切に適用しないよう絞り込まれた。
-3. **field edge 描画** — `expected_members` を宣言した構造体から、参照先宣言型への field edge を描画する能力。外部型 (`String` / `bool` / `Option` / `Vec` 等) は CN-05 ルールに従い silently skip される。
-4. **`Interactor` → `ApplicationService` impl edge** — `TypeCatalogueEntry::declares_application_service` フィールドを追加し、`interactor` kind の型が application service trait を impl することを catalogue で宣言可能にした。trait impl edge の描画対象を `secondary_adapter` のみから `secondary_adapter + interactor` に拡張。
-5. **`TypeDefinitionKind::FreeFunction` variant** — catalogue schema に `free_function` kind を追加し、free function を catalogue entry として宣言可能にした。`expected_params` / `expected_returns` の宣言により、Phase 3 で param/return-type edge rendering を追加したときに自動的に edge が描画される基盤を確立した。
+### §2 Phase 1 / Phase 1.5 の段階で残っていた課題 (Known Limitations L1-L4)
 
-### §3 前 ADR § Known Limitations の L2 行の表現上の不正確さ
+元の ADR (`2026-04-17-1528`) は、Phase 1 / Phase 1.5 時点で Contract Map を自プロジェクトに実際に適用してみたところ、**宣言されているのに矢印が一本もなく孤立して表示される型が複数あった** と記録した。元の ADR は孤立の原因を 4 カテゴリに分類した:
 
-前 ADR § Known Limitations の L2 行には、`ContractMapRenderOptions` の解消経路として「free-function param edge」との表現が含まれていた。しかし Phase 2 の実際の解消経路は、`ContractMapRenderOptions` 自体を `action=modify` に変更し `expected_members` を宣言することで **field edge** を発生させる方式であった。`render_contract_map` 関数の `free_function` 種別化は L4 の対処に属し、L2b の `ContractMapRenderOptions` 解消は field edge による対処が正しい経路である。本 ADR はこの区別を明示的に記録する。
+| カテゴリ | 孤立していた理由 |
+|---|---|
+| **L1** 将来用の予約宣言 | `action=reference` として宣言してあるが、現時点ではまだどのメソッド引数にも戻り値にも出てこないため矢印が生まれない |
+| **L2a** メソッドを宣言していない型 | `action=modify` で宣言してあるが `expected_methods` が空なので、メソッド由来の矢印が発生しない |
+| **L2b** 構造体フィールド由来の依存 | ある型が別の構造体のフィールドに入っているが、Phase 1 では「フィールド参照の矢印」は最初から描かない方針だった |
+| **L3** Interactor の trait 実装 | Phase 1 の実装では trait 実装の矢印を `SecondaryAdapter` kind の型だけに出していたため、`Interactor` kind が application service trait を実装する関係が図に出なかった |
+| **L4** free function が返すエラー型 | 当時のカタログには「関数」という種類の宣言が存在しなかったため、関数を起点とした矢印が生まれる仕組みがなかった |
+
+### §3 孤立の真因: 使用元の宣言不足
+
+元の ADR の分類は「孤立した理由」を記述しているが、**根本的な原因は一つ**である: カタログ作成者が「その型を実際に使っている側の宣言」を書いていないことで矢印が生まれない。
+
+具体的に説明すると:
+
+- ある型 `T` がエラー型として存在するとき、`T` を返すメソッドや関数 (`fn foo() -> Result<X, T>` 等) を持つ型 (または `FreeFunction` kind の関数エントリ) をカタログに宣言しなければ、`T` へ向かう矢印は生まれない (使用する側のエントリの action は宣言の意図によって選ぶ — `reference` に限定されない)
+- `action=reference` で宣言した型も同様で、その型を引数や戻り値として使うメソッドの宣言がなければ矢印の接続先がない
+- フィールドに型を使っている構造体も、フィールドの宣言 (`expected_members`) を書かなければ矢印が出ない
+
+これは「仕様の制限」ではなく「**カタログ作成者が使用元の宣言を書いていない**」という記述の問題である。
+
+ただし、L2b / L3 / L4 については「使用元を書く手段そのものがスキーマに存在しなかった」という別の事情がある:
+
+- L2b: フィールド参照を矢印化する仕組みがなかった (Phase 1 で意図的に除外)
+- L3: `Interactor` kind が application service を実装する関係を宣言するフィールドがなかった
+- L4: 「関数」という kind がカタログスキーマに存在しなかった
+
+これらに対しては、**宣言を書けるようにするスキーマ拡張**が必要であり、本 ADR の Decision D2-D4 はその拡張を決定するものである。
 
 ## Decision
 
-### D1: L1 (forward-reference placeholders) の解消方針
+### D1: 孤立型への対処は「使用元を宣言する」を基本ルールとする
 
-**解消方針**: `action=reference` で宣言され、現時点で edge source / target いずれにも参加しない型を `unused_reference` classDef で dashed border 表示する。
+**問題の再定義**: カタログ上で型が孤立して見えるのは、その型を使っているメソッド・関数・フィールドを持つ型の宣言がカタログに書かれていないことが原因である。これは設計上の正常動作ではなく、**カタログ宣言の不足**を意味する。
 
-前 ADR が提示していた「未使用 reference の可視マーク (例: dashed border + `(unused)` ラベル)」の方向性を採用した。ラベル付与は mermaid の表記上困難であったため、classDef による dashed border のみで識別する実装とした。
+**採用する運用ルール**: カタログ作成者は、型を宣言するときに「その型がどこで使われるか」も一緒に宣言する。具体的には:
 
-L1 に分類されていた 5 nodes (`TaskId` / `CommitHash` / `TrackBranch` / `NonEmptyString` / `ReviewGroupName`) は、dogfood 時点ですべて `unused_reference` dashed border で識別される状態になった。これらは将来の port / service 拡張で参照されたときに自動的に edge が発生する設計であり、「待機」状態の型であることが可視化されている。
+1. あるエラー型やバリュータイプを宣言する場合、そのエラー型を発生させる・参照するメソッドまたは関数を持つ型 (または `FreeFunction` kind の関数エントリ) もカタログに宣言し、そのメソッド/関数のシグネチャを `expected_methods` または `expected_params` / `expected_returns` に記述する。使用する側のエントリの action (`add` / `modify` / `reference` 等) は宣言の意図によって選ぶ — `reference` に限定されない
+2. `action=reference` で型を宣言する場合、その型が引数や戻り値として使われるメソッド/関数を持つカタログエントリを対応づける (将来使用が確定しているが現時点では使用元がまだ存在しない予約宣言の場合を除く — 下記「正当なケース 1」参照)
 
-### D2: L2a (declaration-only 型) の解消方針
+**このルールの帰結**: 正しくカタログが書かれていれば、矢印のない孤立ノードは原則として現れない。矢印のない孤立ノードが生じた場合、まず次の 3 つの正当なケースに該当しないかを確認する:
 
-**解消方針**: `action=modify` かつ `expected_methods` が空の型 (宣言のみで method edge の起点を持たない型) を `declaration_only` classDef で dashed border 表示する。
+1. **将来用の予約宣言 (L1 相当)**: `action=reference` で宣言してある型が、現時点ではまだいかなるメソッド引数にも戻り値にも登場していない場合。これは「使用元の宣言が将来追加される予定だが今はない」という意図的な前置き宣言であり、設計上の正常動作である。
+2. **スキーマ拡張が未完了の場合 (D4 相当)**: `FreeFunction` kind の宣言は、`expected_params` / `expected_returns` を読んで矢印を描く処理が実装されるまでの間、矢印なしでノードが表示される。これは描画処理が将来拡張として切り出されている段階での過渡的な状態である。
+3. **D1 制定前に作られた既存カタログの過渡状態**: D1 の運用ルールはこれからカタログを作る・拡張する際に適用するルールである。D1 制定以前に作られた既存カタログには運用ルールがまだ適用されていないため、使用元の宣言が漏れたまま孤立ノードが残っている場合がある。これは「D1 ルールに従って使用元の宣言を後付けで追加する作業を段階的に行えば解消される」状態であり、ADR が現状の graph と矛盾していることを意味しない。
 
-適用対象は `is_method_bearing_kind()` が true の kind に限定した。具体的には `value_object` / `free_function` 等 method を持たない kind には `declaration_only` を適用しない。この narrowing は Phase 2 の PR レビューで判明した spec の不正確さを修正したものであり、前 ADR § Known Limitations の L2 行が暗示していた適用範囲より限定的である。
+上記 3 ケースのいずれにも当てはまらない孤立ノードは、「使用元の宣言が漏れている」というシグナルである。Contract Map を見て孤立を発見したとき、作業者は上記 3 ケースを確認したうえでカタログの宣言を見直す。
 
-`ValidationError` (dogfood 時点の L2a 例) は `declaration_only` dashed border で識別される状態になった。
+### D2: L2b の解消 — フィールド参照の矢印とスキーマ拡張
 
-### D3: L2b (field 参照型) の解消方針
+**何が必要か**: 構造体のフィールドに宣言済み型が入っている場合の矢印描画。これは L1 / L2a と違い、「書く手段がなかった」ケースである (Phase 1 では field edge を意図的に除外していた)。
 
-**解消方針**: `expected_members` を catalogue entry に宣言することで、構造体の各フィールドが参照する宣言型への field edge を描画する。
+**決定**: Phase 2 でフィールド参照の矢印描画機能を追加する。
 
-前 ADR § Known Limitations の L2 行に記述された「free-function param edge」との表現は不正確であった。`ContractMapRenderOptions` の解消経路は:
-- `action: reference` → `action: modify` への変更
-- `expected_members` に 5 フィールド (`layers` / `kind_filter` / `signal_overlay` / `action_overlay` / `include_spec_source_edges`) を宣言
+- `Dto` / `Command` / `Query` / `ValueObject` 等の構造体を宣言するとき、`expected_members` フィールドにメンバーを記述する
+- カタログレンダラーは `expected_members` を読み、宣言済み型への矢印 (field edge) を描く
+- カタログに宣言されていない型 (`String` / `bool` / `Option<T>` 等) はフィールドに書かれていても矢印は出ない (ノイズ抑制のための意図的な設計)
 
-という field edge による対処であり、free-function param edge ではない。この区別を本 ADR で訂正記録する。
-
-dogfood 検証で `ContractMapRenderOptions` から `TypeDefinitionKind` / `LayerId` への field edge 2 本が描画された。
-
-### D4: L3 (Interactor → ApplicationService impl edge) の解消方針
-
-**解消方針**: `TypeCatalogueEntry` に `declares_application_service: Option<String>` フィールドを追加し、`interactor` kind の型が実装する application service trait 名を catalogue で宣言可能にする。Contract Map renderer はこの宣言を読んで `-.impl.->` edge を描画する。
-
-前 ADR § Known Limitations は「§D4 (2) を `SecondaryAdapter` + `Interactor` kind に拡張」と記述していた。実際には新規フィールド (`declares_application_service`) の追加という形で実装された。trait impl edge の描画は `secondary_adapter` (既存の `trait_impls` フィールド経由) と `interactor` (新規の `declares_application_service` フィールド経由) で異なる入力経路を持つ。
-
-dogfood 検証で `RenderContractMapInteractor -.impl.-> RenderContractMap` の edge が描画された。
-
-### D5: L4 (free function の戻り値型) の解消方針 — 2 段階対処
-
-**解消方針**: L4 は段階的に対処した。
-
-**(i) 視覚識別**: `LoadAllCataloguesError` のように `action=reference` で宣言されていても edge source / target に参加しない型は、`unused_reference` classDef で dashed border 表示される (D1 と同じメカニズム)。
-
-**(ii) FreeFunction kind nodes として宣言基盤を確立**: `TypeDefinitionKind::FreeFunction` variant を catalogue schema に追加した。`load_all_catalogues` (infrastructure) および `render_contract_map` (domain) を `kind=free_function` + `expected_params` / `expected_returns` で catalogue に declare することで、これらの free function が Contract Map のノードとして表示される基盤を確立した。
-
-**Phase 3 スコープに残る点**: FreeFunction kind の `expected_params` / `expected_returns` を読んで param / return-type edge を実際に描画する処理は Phase 3 のスコープである。Phase 2 時点では FreeFunction node は `unused_reference` dashed border で表示されるが、edge は描画されない。Phase 3 で param / return-type edge rendering が実装されると、`load_all_catalogues` から `LoadAllCataloguesError` への edge が自動的に描画される。
-
-dogfood 検証でノード表示を確認:
+<!-- illustrative, non-canonical -->
+```mermaid
+Foo -->|.bar| Bar
 ```
-L14_infrastructure_load__all__catalogues[load_all_catalogues]:::free_function
-class L14_infrastructure_load__all__catalogues unused_reference
-L6_domain_render__contract__map[render_contract_map]:::free_function
-class L6_domain_render__contract__map unused_reference
-```
+
+これにより、宣言済み型のフィールド依存関係が Contract Map に現れるようになる。
+
+### D3: L3 の解消 — Interactor から ApplicationService への実装関係
+
+**何が必要か**: `Interactor` kind の型が application service trait を実装する関係を矢印として描く仕組み。Phase 1 では trait 実装の矢印を `SecondaryAdapter` kind に限定していたため、`Interactor` 側の実装関係が表現できなかった。
+
+**決定**: `TypeCatalogueEntry` に `declares_application_service: Option<String>` フィールドを追加する。
+
+- `Interactor` kind の型のカタログ宣言で `declares_application_service` に application service trait 名を書くと、Contract Map レンダラーがその宣言を読んで `-.impl.->` 矢印を描く
+- 矢印の入力経路は `secondary_adapter` (既存の `trait_impls` フィールド経由) と `interactor` (新規の `declares_application_service` フィールド経由) で分かれる
+
+これにより、hexagonal アーキテクチャにおける interactor と application service の関係が Contract Map に現れるようになる。
+
+### D4: L4 の解消 — `FreeFunction` kind の追加
+
+**何が必要か**: 自由関数を型カタログで管理するための種別。Phase 1 では「関数」という kind がスキーマに存在しなかった。
+
+**決定**: `TypeDefinitionKind::FreeFunction` variant をカタログスキーマに追加する。
+
+- `FreeFunction` kind の宣言には `expected_params` と `expected_returns` を書ける
+- カタログ作成者は自由関数を `FreeFunction` kind として宣言し、その引数型・戻り値型を `expected_params` / `expected_returns` に記述する
+- これにより、D1 のルールに従って「関数が返す型」「関数が受け取る型」へ向かう矢印を将来描けるようになる
+
+`expected_params` / `expected_returns` を読んで実際に矢印を描く処理は今後の拡張である。`FreeFunction` kind の追加は「宣言を書けるようにする基盤」であり、矢印描画の実装はその後の段階で行う。
 
 ## Rejected Alternatives
 
-### A1: 前 ADR § Known Limitations に直接 "Resolved" 注記を追記する
+### A1: 孤立ノードを破線で囲んで視覚識別する (`unused_reference` / `declaration_only` classDef)
 
-前 ADR のコメントには「Phase 2 完了時に各 L# を 'Resolved in <ADR / 実装 track の識別子>' 注記で埋めて記録を残す」とあった。この方針は `knowledge/conventions/adr.md` の post-merge immutability rule (許容される編集は typo 修正・broken cross-reference 修正・newer ADR への back-reference 追加のみ) に抵触する semantic amendment であるため、実施されなかった (一度試みられたが revert 済み)。本 ADR を新規作成して記録を残すことが正式な対処である。
+孤立している型を破線スタイルで囲み「待機中」や「宣言のみ」と示す方法 (`unused_reference` / `declaration_only` classDef) を一度検討したが、採用しない。
 
-### A2: L4 を完全解消してから Phase 3 scope なしで記録する
+**却下理由**:
 
-L4 の free function param / return-type edge rendering を Phase 2 内で完全に実装してから記録することも考えられたが、Phase 2 のスコープ (isolated nodes の edge coverage 改善) は FreeFunction kind の宣言基盤確立で達成されており、edge rendering の追加は Phase 3 の独立したスコープとして分離する方が scope creep を防げる。
+1. **真因を解決しない**: 破線は宣言不足を見た目で覆い隠す。D1 で定義した「使用元を宣言する」ルールに反する方向に誘導する — カタログ作成者が宣言不足を放置したまま図を「完成」と見なす動機を作る
+2. **意図的な後回しとミスの区別ができない**: 「将来使う予定だから今は矢印がない」のか「使用元の宣言を書き忘れているだけ」なのかが、破線からは判別できない。どちらも同じ見た目になる
+3. **D1 のルールで代替できる**: 使用元を正しく宣言すれば矢印が生まれ、孤立自体がなくなる。孤立が残るとしたら、それはカタログ見直しのシグナルとして機能させればよい
+
+### A2: L4 の矢印描画まで `FreeFunction` 追加と同時に実装する
+
+`FreeFunction` kind の追加だけでなく、`expected_params` / `expected_returns` から矢印を描く処理まで同一スコープで全部実装する選択肢もある。
+
+**却下理由**: スキーマ拡張 (宣言を書ける基盤) と矢印描画ロジックは独立した作業である。基盤を先に確定させ、矢印描画の詳細仕様を別の判断として分けることで、それぞれの決定が明確になる。
+
+### A3: 元の ADR に「解消済み」と書き足す
+
+元の ADR のコメントには「Phase 2 完了時に各 L# を "Resolved in …" 注記で埋めて記録を残す」という意図があった。しかし `knowledge/conventions/adr.md` の規則では、main にマージされた ADR への意味的な変更は認められていない (許されるのは typo 修正・壊れたリンクの修正・新しい ADR へのリンク追加のみ)。本 ADR を別ファイルとして起こすことが正式な対処である。
 
 ## Consequences
 
 ### 利点
 
-1. **完全 unidentified nodes がゼロになった** — Phase 1.5 時点の「edge も dashed-border 識別も無い」9 nodes が、edge 描画 (L2b / L3) または dashed border 視覚識別 (L1 / L2a / L4) によって対処済みの状態になった。L4 FreeFunction nodes はまだ edge を持たないが `unused_reference` dashed border で意図的な宣言であることが明示されており、D5 に記載の通り Phase 3 で param/return-type edge rendering が追加されると完全解消になる。
-2. **「待機中の型」と「未宣言の問題」が視覚的に区別できる** — `unused_reference` は意図的な forward-reference、`declaration_only` は method を持たない宣言型を識別し、genuine な問題を隠すことなく設計意図を伝える。
-3. **FreeFunction kind が catalogue schema に入った** — 自由関数を TDDD の管理対象として宣言できるようになった。Phase 3 で edge rendering が追加されると、関数の型依存関係が Contract Map 上で可視化される。
-4. **Interactor → ApplicationService 関係が Contract Map に表現できるようになった** — hexagonal アーキテクチャの interactor / application service 間の実装関係が 1 枚の図で把握できる。
+1. **カタログ宣言の姿勢が変わる** — 「型を宣言する」とは「型そのものと、その型の使われ方を一緒に宣言する」ことだという理解が定着する。孤立ノードは設計の完成サインではなく、宣言不足の発見サインになる
+2. **Contract Map の情報密度が上がる** — D2 (field edge) / D3 (interactor → application service impl edge) により、カタログに正しく宣言されていれば図に現れる関係が増える
+3. **`FreeFunction` がカタログの管理対象になる** — D4 により、自由関数も TDDD の宣言対象として扱えるようになる。自由関数が依存する型の関係は、矢印描画の実装が追加された後に Contract Map に現れる
+4. **hexagonal の interactor と application service の関係が図に出る** — D3 により、アーキテクチャの重要な接続が 1 枚の図で確認できる
 
-### コスト / リスク
+### コスト・注意点
 
-1. **`declaration_only` narrowing (D2) は型カタログ authoring のガイダンス更新が必要** — `is_method_bearing_kind()` の適用範囲を type-designer / spec-designer が把握している必要がある。
-2. **L4 の Phase 3 スコープ残項が「未完了」に見える懸念** — FreeFunction node は `unused_reference` として表示されるため、Phase 3 実装前は孤立ノードと区別がつかない。Phase 3 で edge rendering が追加された段階で初めて完全解消になる。
-3. **field edge は外部型を silently skip する** — CN-05 ルール (カタログ未宣言の型は edge 対象外) により、`bool` / `String` / `Option<T>` 等のフィールドは edge が発生しない。これは意図的な設計だが、フィールドの全体像が図から読めない場合がある。
+1. **使用元の宣言を書く手間が増える** — D1 のルールを徹底すると、型 1 件を追加するだけでなく、その型を使う側の宣言も一緒に書く必要がある。カタログ作成時の作業量が増える
+2. **`FreeFunction` の矢印描画は今後の拡張** — D4 の段階では宣言は書けるが、`expected_params` / `expected_returns` への矢印はまだ描かれない。矢印描画が実装されるまでは、`FreeFunction` ノードは矢印なしで図に表示される
+3. **フィールド参照の矢印は外部型をスキップする** — D2 で述べた通り、`String` / `bool` / `Option<T>` 等のカタログ未宣言の型はフィールドに書かれていても矢印が出ない。これは意図的な設計だが、フィールドの全体像が図に出ないことを事前に知っておく必要がある
 
 ## Reassess When
 
-- **Phase 3 で FreeFunction edge rendering が実装された場合** — L4 が完全解消となるため、本 ADR の D5 (Phase 3 スコープに残る点) を参照 ADR として新 ADR に記録する。
-- **`declaration_only` narrowing (D2) が運用上不便であることが判明した場合** — `is_method_bearing_kind()` の適用範囲に関する決定を見直す新 ADR を検討する。
-- **field edge の silently skip 範囲 (CN-05) を変更する場合** — 外部型への edge 描画を許容する設計変更が発生した場合、D3 との整合を確認する。
+- **`FreeFunction` の矢印描画が実装された場合** — `expected_params` / `expected_returns` を読んで矢印を描く処理が追加されると、D4 が完全な形になる。そのときは本 ADR を参照元として新たに記録する
+- **D1 の運用ルールが実際のカタログ作成で機能しないと判明した場合** — 「使用元も一緒に宣言する」ルールが作業負荷の面で難しいと判明したとき、補助的な視覚識別手段 (A1 の却下案を含む) を改めて検討する
+- **`expected_members` の適用範囲 (D2) を変更する場合** — field edge を描く kind の範囲を広げる・絞る設計変更が生じたとき、D2 の内容との整合を確認する
+- **`declares_application_service` (D3) の宣言形式を変更する場合** — より汎用的な「implements」フィールドに統合する等の設計変更が生じたとき、D3 との整合を確認する

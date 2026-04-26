@@ -844,6 +844,24 @@ fn type_definition_kind_from_dto(
             // short name (no `::`). Without this, a qualified name like
             // "domain::RegisterUser" decodes successfully but cannot match the
             // ApplicationService short-name index, silently dropping the impl edge.
+            //
+            // Additionally, empty strings and whitespace-only values are rejected.
+            // The `application_service_index` uses exact string match on
+            // `entry.name()`, so `None` is the canonical "no declaration" value and
+            // the empty string or whitespace-only string is not a valid alternative.
+            //
+            // Leading/trailing whitespace (e.g. `"RegisterUser "`) is NOT rejected
+            // here because `TypeCatalogueEntry::new` does not strip whitespace from
+            // names — it only rejects names whose trimmed form is empty. An
+            // `ApplicationService` entry named `"RegisterUser "` is therefore a valid
+            // domain object, and `declares_application_service: Some("RegisterUser ")`
+            // must be able to reference it via exact string match in
+            // `application_service_index`. Rejecting padded values here would
+            // silently break valid round-trips.
+            //
+            // Internal whitespace (e.g. `"My Service"`) is also allowed for the
+            // same reason: `declares_application_service` must be an exact match of
+            // the target `ApplicationService` entry name.
             if let Some(name) = declares_application_service.as_deref() {
                 if name.contains("::") {
                     return Err(TypeCatalogueCodecError::InvalidEntry {
@@ -851,6 +869,16 @@ fn type_definition_kind_from_dto(
                         reason: format!(
                             "interactor declares_application_service contains '::' — \
                              L1 catalogue entries must use last-segment short names: '{}'",
+                            name
+                        ),
+                    });
+                }
+                if name.trim().is_empty() {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "interactor declares_application_service is empty or \
+                             whitespace-only — use None to indicate no declaration: '{}'",
                             name
                         ),
                     });
@@ -1046,6 +1074,16 @@ fn type_catalogue_entry_to_dto(
             // JSON that decode would reject. Domain `Option<String>` is raw,
             // so callers could pass a qualified name; we surface the same
             // InvalidEntry error here to keep the round-trip invariant intact.
+            //
+            // Also mirror the empty/whitespace-only guard: `None` is the canonical
+            // representation for "no declaration". Empty strings and whitespace-only
+            // values cannot resolve in `application_service_index` (exact match), so
+            // they are rejected here as fail-fast enforcement.
+            //
+            // Leading/trailing whitespace (e.g. `"RegisterUser "`) is NOT rejected:
+            // `TypeCatalogueEntry::new` accepts such names, so they can appear as
+            // valid `ApplicationService` entries and must round-trip through the codec.
+            // Internal whitespace is also allowed for the same reason.
             if let Some(name) = declares_application_service.as_deref() {
                 if name.contains("::") {
                     return Err(TypeCatalogueCodecError::InvalidEntry {
@@ -1053,6 +1091,16 @@ fn type_catalogue_entry_to_dto(
                         reason: format!(
                             "interactor declares_application_service contains '::' — \
                              L1 catalogue entries must use last-segment short names: '{}'",
+                            name
+                        ),
+                    });
+                }
+                if name.trim().is_empty() {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry.name().to_owned(),
+                        reason: format!(
+                            "interactor declares_application_service is empty or \
+                             whitespace-only — use None to indicate no declaration: '{}'",
                             name
                         ),
                     });
@@ -2217,6 +2265,125 @@ mod tests {
         assert!(!encoded.contains("\"declares_application_service\""));
     }
 
+    #[test]
+    fn test_encode_interactor_rejects_blank_declares_application_service() {
+        // Encode-side mirror of the empty/padded guard (PR #115 r7 P1).
+        // The domain's `Option<String>` is raw and could hold `Some("")`, which the
+        // application_service_index cannot resolve, silently omitting the impl edge.
+        // The codec encode-side guard must reject it before serialization so that
+        // in-memory entries with blank values cannot produce valid JSON.
+        let kind =
+            TypeDefinitionKind::Interactor { declares_application_service: Some(String::new()) };
+        let entry = TypeCatalogueEntry::new(
+            "BlankServiceInteractor",
+            "bad interactor",
+            kind,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let doc = TypeCatalogueDocument::new(2, vec![entry]);
+        let err = encode(&doc).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(
+                    reason.contains("empty") || reason.contains("whitespace"),
+                    "expected empty/whitespace rejection message, got: {reason}"
+                );
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_encode_interactor_rejects_whitespace_only_declares_application_service() {
+        // Whitespace-only values (e.g. "   ") have a trimmed form that is empty, so
+        // they are caught by the empty/whitespace-only guard and rejected.
+        let kind =
+            TypeDefinitionKind::Interactor { declares_application_service: Some("   ".to_owned()) };
+        let entry = TypeCatalogueEntry::new(
+            "WhitespaceServiceInteractor",
+            "bad interactor",
+            kind,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let doc = TypeCatalogueDocument::new(2, vec![entry]);
+        let err = encode(&doc).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(
+                    reason.contains("whitespace"),
+                    "expected whitespace rejection message, got: {reason}"
+                );
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_encode_interactor_allows_padded_declares_application_service() {
+        // Padded names ("RegisterUser ") are allowed because `TypeCatalogueEntry::new`
+        // does not strip whitespace from names. An `ApplicationService` entry named
+        // "RegisterUser " is a valid domain object, and the codec must not reject an
+        // interactor that references it by exact name.
+        let kind = TypeDefinitionKind::Interactor {
+            declares_application_service: Some("RegisterUser ".to_owned()),
+        };
+        let entry = TypeCatalogueEntry::new(
+            "PaddedServiceInteractor",
+            "interactor declaring padded-name service",
+            kind,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let doc = TypeCatalogueDocument::new(2, vec![entry]);
+        let result = encode(&doc);
+        assert!(
+            result.is_ok(),
+            "padded declares_application_service must encode; got: {:?}",
+            result.as_ref().unwrap_err()
+        );
+        let encoded = result.unwrap();
+        assert!(
+            encoded.contains("\"RegisterUser \""),
+            "encoded JSON must contain 'RegisterUser ' with trailing space; got:\n{encoded}"
+        );
+    }
+
+    #[test]
+    fn test_encode_interactor_allows_internal_space_declares_application_service() {
+        // Internal-space names (e.g. "My Service") are permitted because catalogue entry
+        // names may contain spaces, and `application_service_index` resolves by exact
+        // string match. If a corresponding `ApplicationService` entry named "My Service"
+        // exists, the impl edge will resolve correctly.
+        let kind = TypeDefinitionKind::Interactor {
+            declares_application_service: Some("My Service".to_owned()),
+        };
+        let entry = TypeCatalogueEntry::new(
+            "SpacedServiceInteractor",
+            "interactor declaring internal-space service",
+            kind,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let doc = TypeCatalogueDocument::new(2, vec![entry]);
+        let result = encode(&doc);
+        assert!(
+            result.is_ok(),
+            "internal-space declares_application_service must encode; got: {:?}",
+            result.as_ref().unwrap_err()
+        );
+        let encoded = result.unwrap();
+        assert!(
+            encoded.contains("\"My Service\""),
+            "encoded JSON must contain 'My Service'; got:\n{encoded}"
+        );
+    }
+
     // --- T006 / IN-05: expected_members round-trip + reject ---
 
     #[test]
@@ -2412,19 +2579,19 @@ mod tests {
     #[test]
     fn test_encode_dto_with_variant_member_rejected_at_codec() {
         // Encode-side mirror of the Variant-in-field-bearing guard (PR #115 P1).
-        // The domain's with_members accepts Variant on field-bearing kinds (it only
-        // rejects members on NON-field-bearing kinds). Without the encode-side guard,
-        // a Dto carrying MemberDeclaration::Variant would be silently serialised,
-        // and decode would then silently strip the variant (zero field-edge, no error).
-        // The codec encode-side guard must reject it before serialization.
+        //
+        // As of PR #115 r7, the domain's `with_members` also rejects Variant members
+        // on field-bearing kinds (Dto / Command / Query / ValueObject), so normal
+        // callers can no longer construct such an entry via the public API. The codec's
+        // `encode_member_list` guard is now defense-in-depth; this test exercises it
+        // directly to ensure the codec guard cannot regress independently.
         use domain::tddd::catalogue::MemberDeclaration;
+        // Direct call to the private `encode_member_list` helper (accessible within
+        // the same file's test module) with a field-bearing kind and a Variant member,
+        // bypassing the domain's with_members guard to test the codec path in isolation.
         let kind = TypeDefinitionKind::Dto;
-        let entry = TypeCatalogueEntry::new("StatusDto", "bad dto", kind, TypeAction::Add, true)
-            .unwrap()
-            .with_members(vec![MemberDeclaration::variant("Active".to_owned())])
-            .unwrap(); // domain allows Variant on field-bearing kinds — codec must catch it
-        let doc = TypeCatalogueDocument::new(2, vec![entry]);
-        let err = encode(&doc).unwrap_err();
+        let members = vec![MemberDeclaration::variant("Active".to_owned())];
+        let err = encode_member_list("StatusDto", &members, &kind).unwrap_err();
         match err {
             TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
                 assert!(
@@ -2501,6 +2668,130 @@ mod tests {
             "expected InvalidEntry for `::` in declares_application_service, got: {:?}",
             err
         );
+    }
+
+    #[test]
+    fn test_decode_interactor_rejects_blank_declares_application_service() {
+        // Blank string is not a valid declares_application_service — None is the
+        // canonical representation for "no declaration". Some("") would be silently
+        // unresolvable in application_service_index, so codec rejects it fail-fast.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "BlankInteractor",
+      "kind": "interactor",
+      "description": "interactor with blank declares_application_service",
+      "declares_application_service": ""
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for blank declares_application_service, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_interactor_rejects_whitespace_only_declares_application_service() {
+        // Whitespace-only string is treated the same as blank — reject to avoid silent
+        // misconfiguration. None is the canonical "no declaration" representation.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "WhitespaceInteractor",
+      "kind": "interactor",
+      "description": "interactor with whitespace-only declares_application_service",
+      "declares_application_service": "   "
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for whitespace-only declares_application_service, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_interactor_allows_padded_declares_application_service() {
+        // Trailing-space padded names like "RegisterUser " are allowed because
+        // `TypeCatalogueEntry::new` does not strip whitespace from names — it only
+        // rejects whitespace-only names. An `ApplicationService` entry named
+        // "RegisterUser " is therefore a valid domain object, and
+        // `declares_application_service: Some("RegisterUser ")` must be able to
+        // reference it via exact string match in `application_service_index`.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "PaddedInteractor",
+      "kind": "interactor",
+      "description": "interactor with trailing-space declares_application_service",
+      "declares_application_service": "RegisterUser "
+    }
+  ]
+}"#;
+        let result = decode(json);
+        assert!(
+            result.is_ok(),
+            "padded declares_application_service must be allowed; got: {:?}",
+            result.unwrap_err()
+        );
+        let doc = result.unwrap();
+        if let TypeDefinitionKind::Interactor { declares_application_service } =
+            doc.entries()[0].kind()
+        {
+            assert_eq!(
+                declares_application_service.as_deref(),
+                Some("RegisterUser "),
+                "padded declares_application_service must round-trip without trimming"
+            );
+        } else {
+            panic!("expected Interactor kind");
+        }
+    }
+
+    #[test]
+    fn test_decode_interactor_allows_internal_space_declares_application_service() {
+        // Internal-space names like "Register User" are allowed — catalogue entry names
+        // may legitimately contain spaces, and the `application_service_index` uses exact
+        // string match against `entry.name()`. If a corresponding `ApplicationService`
+        // entry named "Register User" exists, the impl edge resolves correctly.
+        // Only empty strings and whitespace-only strings are rejected.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SpacedInteractor",
+      "kind": "interactor",
+      "description": "interactor with internal-space declares_application_service",
+      "declares_application_service": "Register User"
+    }
+  ]
+}"#;
+        let result = decode(json);
+        assert!(
+            result.is_ok(),
+            "internal-space declares_application_service must be allowed; got: {:?}",
+            result.unwrap_err()
+        );
+        let doc = result.unwrap();
+        if let TypeDefinitionKind::Interactor { declares_application_service } =
+            doc.entries()[0].kind()
+        {
+            assert_eq!(
+                declares_application_service.as_deref(),
+                Some("Register User"),
+                "declares_application_service must round-trip internal spaces"
+            );
+        } else {
+            panic!("expected Interactor kind");
+        }
     }
 
     #[test]

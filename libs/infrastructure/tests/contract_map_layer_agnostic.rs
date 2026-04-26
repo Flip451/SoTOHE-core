@@ -174,10 +174,9 @@ use domain::tddd::catalogue::{
 
 /// Build a fixture-agnostic catalogue set covering every Phase 2 renderer
 /// feature: FreeFunction node (IN-01), Interactor `-.impl.->` edge (IN-02),
-/// `unused_reference` dashed border (IN-03), `declaration_only` dashed
-/// border (IN-04), Field-derived edges (IN-05), action overlay (IN-06),
-/// signal overlay (IN-07). All entries live in the first layer in
-/// `layer_names`; the renderer is invoked with both overlay flags on.
+/// Field-derived edges (IN-05), action overlay (IN-06), signal overlay
+/// (IN-07). All entries live in the first layer in `layer_names`; the
+/// renderer is invoked with both overlay flags on.
 ///
 /// The helper exists so each fixture can run the same Phase 2 assertion
 /// suite against its own layer naming, proving the renderer never
@@ -229,22 +228,21 @@ fn render_phase2_features_for(layer_names: &[&str]) -> String {
             true,
         )
         .unwrap(),
-        // IN-03: action=Reference + no edges → unused_reference dashed border.
+        // action=Reference fixture entry — referenced by IN-06 action
+        // overlay assertion below (`reference_action` annotation).
         TypeCatalogueEntry::new(
             "ForwardRef",
-            "forward-reference placeholder",
+            "reference-action sample for IN-06 overlay test",
             TypeDefinitionKind::ValueObject,
             TypeAction::Reference,
             true,
         )
         .unwrap(),
-        // IN-04: action=Modify + method-bearing kind + empty methods →
-        // declaration_only dashed border (PR #115 fix narrowed the gate
-        // to method-bearing kinds; ValidationErr-style ErrorType examples
-        // are no longer marked declaration_only).
+        // action=Modify + Yellow signal fixture — referenced by IN-06
+        // (modify_action) and IN-07 (yellow_signal) overlay assertions below.
         TypeCatalogueEntry::new(
             "ValidationErr",
-            "method-bearing port modify with no method-level delta",
+            "modify-action + yellow-signal sample for IN-06 / IN-07 overlay tests",
             TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
             TypeAction::Modify,
             true,
@@ -356,22 +354,10 @@ fn assert_phase2_features_present(out: &str, primary_layer: &str) {
         out.contains(&format!("{impl_id} -.impl.-> {svc_id}")),
         "Interactor impl edge `{impl_id} -.impl.-> {svc_id}` must appear; got:\n{out}"
     );
-    // IN-03: unused_reference classDef + class line binding ForwardRef by its
-    // layer-specific node id.
-    // Class line format: `    class {id} unused_reference` (4-space indent).
+    // Compute node ids for `ForwardRef` and `ValidationErr` for use by
+    // IN-06 (action overlay) and IN-07 (signal overlay) assertions below.
     let fwd_id = nid("ForwardRef");
-    assert!(out.contains("classDef unused_reference"), "unused_reference classDef must appear");
-    assert!(
-        out.contains(&format!("class {fwd_id} unused_reference")),
-        "unused_reference class line for {fwd_id} must appear; got:\n{out}"
-    );
-    // IN-04: declaration_only classDef + class line binding ValidationErr.
     let verr_id = nid("ValidationErr");
-    assert!(out.contains("classDef declaration_only"), "declaration_only classDef must appear");
-    assert!(
-        out.contains(&format!("class {verr_id} declaration_only")),
-        "declaration_only class line for {verr_id} must appear; got:\n{out}"
-    );
     // IN-05: full field-edge line from ThingDto to ThingId.
     // Edge label is `escape_edge_label(".id")` = `"\".id\""`.
     // Full edge: `    {dto_id} -->|".id"| {thing_id}` (4-space indent).

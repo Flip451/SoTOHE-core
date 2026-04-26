@@ -121,13 +121,6 @@ pub fn render_contract_map(
     out.push_str("    classDef query fill:#f3e5f5,stroke:#8e24aa\n");
     out.push_str("    classDef factory fill:#fff8e1,stroke:#f9a825\n");
     out.push_str("    classDef free_function fill:#e8eaf6,stroke:#3949ab\n");
-    // T005 / IN-03 / IN-04: dashed-border classDefs for the L1 / L2
-    // categories. `unused_reference` flags `action=reference` entries that
-    // never appear as an edge source or target (forward-reference
-    // placeholders); `declaration_only` flags `action=modify` entries whose
-    // expected_methods list is empty (declarative-only modifications).
-    out.push_str("    classDef unused_reference stroke-dasharray: 4 4\n");
-    out.push_str("    classDef declaration_only stroke-dasharray: 4 4\n");
     // T007 / IN-06 / ADR §D5: action overlay classDefs. Only emitted when
     // `opts.action_overlay = true`. `add_action` is the default and carries
     // no classDef (preserves existing visual baseline for unmarked entries).
@@ -213,10 +206,6 @@ pub fn render_contract_map(
     //     (present in `type_index`) become edge targets — references to
     //     external types (e.g. `String`, `Result`) are ignored.
     let mut edges: BTreeSet<String> = BTreeSet::new();
-    // T005 / IN-03: track every node id that appears as an edge source or
-    // target so the post-loop classDef pass can flag `action=reference`
-    // entries that never participate in any edge as `unused_reference`.
-    let mut used_ids: BTreeSet<String> = BTreeSet::new();
     for (src_layer, entry) in &entries {
         let src_id = node_id(src_layer, entry.name());
 
@@ -232,8 +221,6 @@ pub fn render_contract_map(
                             "    {src_id} -->|{label}| {dst_id}",
                             label = escape_edge_label(method.name()),
                         ));
-                        used_ids.insert(src_id.clone());
-                        used_ids.insert(dst_id.clone());
                     }
                 }
             }
@@ -254,8 +241,6 @@ pub fn render_contract_map(
                                     param.name()
                                 )),
                             ));
-                            used_ids.insert(src_id.clone());
-                            used_ids.insert(dst_id.clone());
                         }
                     }
                 }
@@ -270,8 +255,6 @@ pub fn render_contract_map(
                 if let Some(port_ids) = port_index.get(impl_decl.trait_name()) {
                     for port_id in port_ids {
                         edges.insert(format!("    {src_id} -.impl.-> {port_id}"));
-                        used_ids.insert(src_id.clone());
-                        used_ids.insert(port_id.clone());
                     }
                 }
             }
@@ -288,8 +271,6 @@ pub fn render_contract_map(
             if let Some(svc_ids) = application_service_index.get(name) {
                 for svc_id in svc_ids {
                     edges.insert(format!("    {src_id} -.impl.-> {svc_id}"));
-                    used_ids.insert(src_id.clone());
-                    used_ids.insert(svc_id.clone());
                 }
             }
         }
@@ -319,8 +300,6 @@ pub fn render_contract_map(
                                 "    {src_id} -->|{label}| {dst_id}",
                                 label = escape_edge_label(&format!(".{field_name}")),
                             ));
-                            used_ids.insert(src_id.clone());
-                            used_ids.insert(dst_id.clone());
                         }
                     }
                 }
@@ -330,41 +309,6 @@ pub fn render_contract_map(
 
     for edge in &edges {
         out.push_str(edge);
-        out.push('\n');
-    }
-
-    // T005 / IN-03 / IN-04: classDef applications for L1 / L2 categories.
-    //
-    // - `unused_reference` (IN-03 / L1): `action=reference` AND the node id
-    //   never appears in any edge → render with dashed border to mark the
-    //   entry as an intentional forward-reference placeholder.
-    // - `declaration_only` (IN-04 / L2): `action=modify` AND `methods_of(kind)`
-    //   is empty → render with dashed border to mark the entry as a
-    //   declarative-only modification (no method-level changes), regardless
-    //   of whether other edges reach the node.
-    let mut class_lines: BTreeSet<String> = BTreeSet::new();
-    for (layer, entry) in &entries {
-        let id = node_id(layer, entry.name());
-        if entry.action() == crate::tddd::catalogue::TypeAction::Reference
-            && !used_ids.contains(&id)
-        {
-            class_lines.insert(format!("    class {id} unused_reference"));
-        }
-        // declaration_only gates on `is_method_bearing_kind` (not just
-        // `methods_of(...).is_empty()`) — non-method-bearing kinds (Dto,
-        // Enum, etc.) can have other genuine structural deltas like
-        // `expected_members` or variant changes, so they must NOT be
-        // marked declaration-only just because their methods list is
-        // structurally absent (PR #115 P1 finding).
-        if entry.action() == crate::tddd::catalogue::TypeAction::Modify
-            && crate::tddd::catalogue::is_method_bearing_kind(entry.kind())
-            && methods_of(entry.kind()).is_empty()
-        {
-            class_lines.insert(format!("    class {id} declaration_only"));
-        }
-    }
-    for line in &class_lines {
-        out.push_str(line);
         out.push('\n');
     }
 
@@ -1427,8 +1371,7 @@ mod tests {
     #[test]
     fn test_render_contract_map_action_overlay_disabled_omits_classdefs_and_annotations() {
         // action_overlay=false → no action-overlay classDef header lines and
-        // no `:::*_action` annotations. The unrelated dashed-border classDefs
-        // (unused_reference / declaration_only from T005) remain present.
+        // no `:::*_action` annotations.
         let domain = layer("domain");
         let domain_doc = doc(vec![
             TypeCatalogueEntry::new(
@@ -1455,11 +1398,6 @@ mod tests {
         assert!(
             !text.contains(":::modify_action"),
             "action overlay annotation must be absent; output was:\n{text}"
-        );
-        // Unrelated T005 classDefs remain present unconditionally.
-        assert!(
-            text.contains("classDef unused_reference"),
-            "unused_reference classDef must remain present (T005 is independent of action_overlay flag)"
         );
     }
 
@@ -1550,198 +1488,6 @@ mod tests {
         let result =
             secondary_port_entry.with_members(vec![MemberDeclaration::field("x", "SomeType")]);
         assert!(result.is_err(), "with_members must reject field on a method-bearing kind");
-    }
-
-    // --- T005 / IN-03 / IN-04: dashed-border classDefs ---
-
-    #[test]
-    fn test_render_contract_map_unused_reference_classdef_for_orphan_reference_entry() {
-        let domain = layer("domain");
-        let domain_doc = doc(vec![
-            // Orphan reference entry — no edges in or out.
-            TypeCatalogueEntry::new(
-                "TaskId",
-                "Forward-reference placeholder",
-                TypeDefinitionKind::ValueObject,
-                TypeAction::Reference,
-                true,
-            )
-            .unwrap(),
-        ]);
-        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
-        catalogues.insert(domain.clone(), domain_doc);
-        let content = render_contract_map(
-            &catalogues,
-            std::slice::from_ref(&domain),
-            &ContractMapRenderOptions::empty(),
-        );
-        let text = content.as_ref();
-        assert!(
-            text.contains("classDef unused_reference"),
-            "unused_reference classDef definition must appear; output was:\n{text}"
-        );
-        assert!(
-            text.contains("class L6_domain_TaskId unused_reference"),
-            "unused_reference class application must target TaskId; output was:\n{text}"
-        );
-    }
-
-    #[test]
-    fn test_render_contract_map_no_unused_reference_when_reference_entry_is_edge_target() {
-        // Reference entry that IS an edge target → no unused_reference classDef.
-        let domain = layer("domain");
-        let exec_method =
-            vec![MethodDeclaration::new("find", Some("&self".to_owned()), vec![], "TaskId", false)];
-        let domain_doc = doc(vec![
-            entry("Repo", TypeDefinitionKind::ApplicationService { expected_methods: exec_method }),
-            TypeCatalogueEntry::new(
-                "TaskId",
-                "Reference but used as method return type",
-                TypeDefinitionKind::ValueObject,
-                TypeAction::Reference,
-                true,
-            )
-            .unwrap(),
-        ]);
-        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
-        catalogues.insert(domain.clone(), domain_doc);
-        let content = render_contract_map(
-            &catalogues,
-            std::slice::from_ref(&domain),
-            &ContractMapRenderOptions::empty(),
-        );
-        let text = content.as_ref();
-        assert!(
-            !text.contains("class L6_domain_TaskId unused_reference"),
-            "TaskId is an edge target — must NOT carry unused_reference classDef; output was:\n{text}"
-        );
-    }
-
-    #[test]
-    fn test_render_contract_map_declaration_only_classdef_for_modify_empty_methods() {
-        // action=modify + method-bearing kind + expected_methods empty →
-        // declaration_only classDef. The PR #115 fix narrowed the gate to
-        // method-bearing kinds (SecondaryPort / ApplicationService);
-        // SecondaryAdapter and non-method-bearing kinds (Dto / Enum / etc.)
-        // are excluded: SecondaryAdapter carries `implements` + impl edges
-        // (not expected_methods), and non-method-bearing kinds can have
-        // other genuine deltas like expected_members / variants.
-        let domain = layer("domain");
-        let domain_doc = doc(vec![
-            TypeCatalogueEntry::new(
-                "DeclarativeOnlyPort",
-                "Modified port without any method-level delta",
-                TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
-                TypeAction::Modify,
-                true,
-            )
-            .unwrap(),
-        ]);
-        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
-        catalogues.insert(domain.clone(), domain_doc);
-        let content = render_contract_map(
-            &catalogues,
-            std::slice::from_ref(&domain),
-            &ContractMapRenderOptions::empty(),
-        );
-        let text = content.as_ref();
-        assert!(
-            text.contains("classDef declaration_only"),
-            "declaration_only classDef definition must appear; output was:\n{text}"
-        );
-        assert!(
-            text.contains("class L6_domain_DeclarativeOnlyPort declaration_only"),
-            "declaration_only must apply to a method-bearing modify entry with empty methods; output was:\n{text}"
-        );
-    }
-
-    #[test]
-    fn test_render_contract_map_no_declaration_only_for_non_method_bearing_modify() {
-        // PR #115 P1 fix: a non-method-bearing kind with action=Modify (e.g.,
-        // ErrorType with empty variants, or Dto with empty members) MUST NOT
-        // receive declaration_only — `methods_of(...)` is trivially empty for
-        // these kinds and a real structural delta on `expected_variants` /
-        // `expected_members` would make the dashed marker semantically
-        // misleading.
-        let domain = layer("domain");
-        let domain_doc = doc(vec![
-            TypeCatalogueEntry::new(
-                "AppError",
-                "Error type modify without variant declarations",
-                TypeDefinitionKind::ErrorType { expected_variants: vec![] },
-                TypeAction::Modify,
-                true,
-            )
-            .unwrap(),
-            TypeCatalogueEntry::new(
-                "WidgetDto",
-                "Dto modify without member declarations",
-                TypeDefinitionKind::Dto,
-                TypeAction::Modify,
-                true,
-            )
-            .unwrap(),
-        ]);
-        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
-        catalogues.insert(domain.clone(), domain_doc);
-        let content = render_contract_map(
-            &catalogues,
-            std::slice::from_ref(&domain),
-            &ContractMapRenderOptions::empty(),
-        );
-        let text = content.as_ref();
-        assert!(
-            !text.contains("class L6_domain_AppError declaration_only"),
-            "ErrorType (non-method-bearing) must NOT receive declaration_only; output was:\n{text}"
-        );
-        assert!(
-            !text.contains("class L6_domain_WidgetDto declaration_only"),
-            "Dto (non-method-bearing) must NOT receive declaration_only; output was:\n{text}"
-        );
-    }
-
-    #[test]
-    fn test_render_contract_map_no_declaration_only_for_modify_secondary_adapter() {
-        // PR #115 r6 P1 fix: SecondaryAdapter with action=Modify and an empty
-        // `implements` list must NOT receive declaration_only.  SecondaryAdapter
-        // carries `implements` and impl edges — not `expected_methods` — so the
-        // IN-04 empty-methods gate does not apply.  The adapter may still carry
-        // real `implements` contract deltas that would be hidden by the
-        // dashed-border overlay.
-        //
-        // `node_id` uses `l.len()` as the numeric prefix: "infra" (5 chars)
-        // → prefix `L5_infra_`.  The positive assertion on the node shape
-        // confirms the prefix is correct so the negative assertion cannot be
-        // vacuously true.
-        let infra = layer("infra");
-        let infra_doc = doc(vec![
-            TypeCatalogueEntry::new(
-                "PostgresUserRepo",
-                "Secondary adapter with no implements listed yet",
-                TypeDefinitionKind::SecondaryAdapter { implements: vec![] },
-                TypeAction::Modify,
-                true,
-            )
-            .unwrap(),
-        ]);
-        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
-        catalogues.insert(infra.clone(), infra_doc);
-        let content = render_contract_map(
-            &catalogues,
-            std::slice::from_ref(&infra),
-            &ContractMapRenderOptions::empty(),
-        );
-        let text = content.as_ref();
-        // Positive guard: the node must actually appear in the output so the
-        // negative assertion below cannot be vacuously true from a wrong prefix.
-        assert!(
-            text.contains("L5_infra_PostgresUserRepo"),
-            "node L5_infra_PostgresUserRepo must appear in output (prefix sanity); output was:\n{text}"
-        );
-        assert!(
-            !text.contains("class L5_infra_PostgresUserRepo declaration_only"),
-            "SecondaryAdapter (modify, empty implements) must NOT receive declaration_only; output was:\n{text}"
-        );
     }
 
     #[test]
