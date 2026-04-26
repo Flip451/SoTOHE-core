@@ -152,6 +152,7 @@ pub fn render_contract_map(
                 .map(|sigs| {
                     sigs.iter().any(|s| {
                         s.type_name() == entry.name()
+                            && s.kind_tag() == entry.kind().kind_tag()
                             && matches!(
                                 s.signal(),
                                 ConfidenceSignal::Yellow | ConfidenceSignal::Red
@@ -179,7 +180,13 @@ pub fn render_contract_map(
                     if let Some(sigs) =
                         catalogues.get(*layer).and_then(TypeCatalogueDocument::signals)
                     {
-                        if let Some(s) = sigs.iter().find(|s| s.type_name() == entry.name()) {
+                        // Lookup by (type_name, kind_tag) — name-only match
+                        // would mis-select a signal record in a delete+add
+                        // migration pair where the same name is declared with
+                        // two different kinds (PR #115 P1 finding).
+                        if let Some(s) = sigs.iter().find(|s| {
+                            s.type_name() == entry.name() && s.kind_tag() == entry.kind().kind_tag()
+                        }) {
                             match s.signal() {
                                 ConfidenceSignal::Yellow => shape.push_str(":::yellow_signal"),
                                 ConfidenceSignal::Red => shape.push_str(":::red_signal"),

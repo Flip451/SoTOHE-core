@@ -802,6 +802,60 @@
           "findings": [],
           "hash": "rvw1:sha256:40113e9d902d01f4dfb583fac681afbe5cd632778fb7992a43ebc86e22c92121",
           "at": "2026-04-26T03:58:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d30b0ada48324404e2e8d575e54b3e9412629b0f7225ed4184eee1edb55d11b",
+          "at": "2026-04-26T04:57:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d30b0ada48324404e2e8d575e54b3e9412629b0f7225ed4184eee1edb55d11b",
+          "at": "2026-04-26T04:59:38Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:43:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 73,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:45:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:48:07Z"
         }
       ]
     },
@@ -1099,6 +1153,50 @@
           "findings": [],
           "hash": "rvw1:sha256:72beb1305433397ecdf569c0be2fd52ef012934ea523b4497e973cc7ab96bc19",
           "at": "2026-04-26T04:17:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `free_function` encode-side `InvalidEntry` path is not covered by a direct regression test. The existing round-trip tests only exercise valid, already-decoded documents, so this branch can regress silently if the mirror check is removed or loosened later.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 1040,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:08eba052b9445352a989ff003274f7166612d953bfd4a45bdd2f1127a6330d3d",
+          "at": "2026-04-26T04:57:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08eba052b9445352a989ff003274f7166612d953bfd4a45bdd2f1127a6330d3d",
+          "at": "2026-04-26T04:58:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new encode-side FreeFunction validation has no encode error-path coverage. Existing tests cover successful free_function round trips and decode-side `::` rejection, but removing these new `encode(&TypeCatalogueDocument)` checks would not fail the suite even though this PR is specifically fixing that public encode invariant. Add encode tests that construct a FreeFunction with a qualified param type and a qualified return type and assert `InvalidEntry`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 1040,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:08eba052b9445352a989ff003274f7166612d953bfd4a45bdd2f1127a6330d3d",
+          "at": "2026-04-26T05:00:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94c16a48d179d078c90a8c58e0526cf54b2264059f3d6f002d128918b54f536a",
+          "at": "2026-04-26T05:02:45Z"
         }
       ]
     },
@@ -1168,46 +1266,6 @@
           "findings": [],
           "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
           "at": "2026-04-26T03:28:40Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:43:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 73,
-              "category": "workflow_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:45:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:48:07Z"
         }
       ]
     }

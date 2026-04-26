@@ -1038,10 +1038,39 @@ fn type_catalogue_entry_to_dto(
             TypeDefinitionKindDto::SecondaryAdapter { implements: dtos }
         }
         TypeDefinitionKind::FreeFunction { expected_params, expected_returns } => {
-            let params = expected_params
-                .iter()
-                .map(|p| ParamDto { name: p.name().to_owned(), ty: p.ty().to_owned() })
-                .collect();
+            // Mirror the decode-side L1 enforcement so encode never produces
+            // JSON that decode would reject (PR #115 P1 finding). Domain
+            // `ParamDeclaration` and the returns `Vec<String>` accept raw
+            // strings, so callers could embed qualified names like
+            // `domain::TaskId`; we surface the same `InvalidEntry` error
+            // here to keep the round-trip invariant intact.
+            let mut params = Vec::with_capacity(expected_params.len());
+            for p in expected_params {
+                if p.ty().contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry.name().to_owned(),
+                        reason: format!(
+                            "free_function param '{}' ty contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{}'",
+                            p.name(),
+                            p.ty()
+                        ),
+                    });
+                }
+                params.push(ParamDto { name: p.name().to_owned(), ty: p.ty().to_owned() });
+            }
+            for ret in expected_returns {
+                if ret.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry.name().to_owned(),
+                        reason: format!(
+                            "free_function return type contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{}'",
+                            ret
+                        ),
+                    });
+                }
+            }
             TypeDefinitionKindDto::FreeFunction {
                 expected_params: params,
                 expected_returns: expected_returns.clone(),
@@ -2956,5 +2985,64 @@ mod tests {
             matches!(err, TypeCatalogueCodecError::UnsupportedSchemaVersion(u32::MAX)),
             "expected UnsupportedSchemaVersion(u32::MAX) for overflow schema_version, got: {err:?}"
         );
+    }
+
+    // --- PR #115 encode-side L1 enforcement for FreeFunction ---
+
+    #[test]
+    fn test_encode_free_function_rejects_qualified_param_ty() {
+        // Encode-side mirror of the decode-side L1 check (PR #115 P1 fix).
+        // Domain types accept raw strings, so a caller can construct a
+        // FreeFunction with a qualified param ty without going through decode.
+        // Encode must reject it with InvalidEntry.
+        let kind = TypeDefinitionKind::FreeFunction {
+            expected_params: vec![ParamDeclaration::new("id", "domain::TrackId")],
+            expected_returns: vec![],
+        };
+        let entry =
+            TypeCatalogueEntry::new("load_track", "Load a track", kind, TypeAction::Add, true)
+                .unwrap();
+        let doc = TypeCatalogueDocument::new(2, vec![entry]);
+        let err = encode(&doc).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(
+                    reason.contains("'::'"),
+                    "expected '::' rejection for qualified param ty, got: {reason}"
+                );
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_encode_free_function_rejects_qualified_return_type() {
+        // Encode-side mirror of the decode-side L1 check (PR #115 P1 fix).
+        // Domain types accept raw strings, so a caller can construct a
+        // FreeFunction with a qualified return type without going through decode.
+        // Encode must reject it with InvalidEntry.
+        let kind = TypeDefinitionKind::FreeFunction {
+            expected_params: vec![],
+            expected_returns: vec!["domain::LoadError".to_owned()],
+        };
+        let entry = TypeCatalogueEntry::new(
+            "load_catalogue",
+            "Load catalogue",
+            kind,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let doc = TypeCatalogueDocument::new(2, vec![entry]);
+        let err = encode(&doc).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(
+                    reason.contains("'::'"),
+                    "expected '::' rejection for qualified return type, got: {reason}"
+                );
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
     }
 }
