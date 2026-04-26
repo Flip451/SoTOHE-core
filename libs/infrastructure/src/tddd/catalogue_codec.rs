@@ -21,7 +21,7 @@
 use std::path::PathBuf;
 
 use domain::tddd::catalogue::{
-    MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl,
+    MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl, is_field_bearing_kind,
 };
 use domain::{
     ConfidenceSignal, ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
@@ -639,7 +639,7 @@ fn type_catalogue_entry_from_dto(
     let action = type_action_from_dto(dto.action);
     let spec_refs = spec_refs_from_dtos(&dto.name, &dto.spec_refs)?;
     let informal_grounds = informal_grounds_from_dtos(&dto.name, &dto.informal_grounds)?;
-    let members = decode_member_list(&dto.name, &dto.expected_members)?;
+    let members = decode_member_list(&dto.name, &dto.expected_members, &dto.kind)?;
     let entry = TypeCatalogueEntry::with_refs(
         &dto.name,
         &dto.description,
@@ -656,14 +656,34 @@ fn type_catalogue_entry_from_dto(
 /// T006 / IN-05: decode `Vec<MemberDto>` → `Vec<MemberDeclaration>`. L1
 /// enforcement: `Field.ty` must not contain `::` (last-segment short names
 /// only, mirrors the existing method/return validation).
+///
+/// PR #115 P1: field-bearing kinds (Dto / Command / Query / ValueObject) drive
+/// field-edge rendering. A `Variant` member in such a kind is a contract
+/// violation — the renderer's `field_members` filter silently skips variants,
+/// so an unchecked decode would produce zero-edge entries with no error signal.
+/// `kind_tag` enables the codec to reject the illegal combination at the
+/// decode boundary, before any data reaches the domain.
 fn decode_member_list(
     entry_name: &str,
     dtos: &[MemberDto],
+    kind_tag: &TypeDefinitionKindDto,
 ) -> Result<Vec<MemberDeclaration>, TypeCatalogueCodecError> {
+    let kind_is_field_bearing = is_field_bearing_dto_kind(kind_tag);
     let mut decls = Vec::with_capacity(dtos.len());
     for m in dtos {
         match m {
             MemberDto::Variant { name } => {
+                if kind_is_field_bearing {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members variant '{}' is not valid for a field-bearing kind \
+                             (dto/command/query/value_object) — variants belong to enum/error_type \
+                             kinds. Use {{\"kind\":\"field\",...}} for struct-field members.",
+                            name
+                        ),
+                    });
+                }
                 decls.push(MemberDeclaration::variant(name.clone()));
             }
             MemberDto::Field { name, ty } => {
@@ -682,6 +702,19 @@ fn decode_member_list(
         }
     }
     Ok(decls)
+}
+
+/// Returns `true` when the DTO kind is one of the four field-bearing kinds
+/// (Dto / Command / Query / ValueObject). Mirrors `is_field_bearing_kind` from
+/// the domain layer, applied to the DTO type before domain conversion.
+fn is_field_bearing_dto_kind(kind: &TypeDefinitionKindDto) -> bool {
+    matches!(
+        kind,
+        TypeDefinitionKindDto::Dto {}
+            | TypeDefinitionKindDto::Command {}
+            | TypeDefinitionKindDto::Query {}
+            | TypeDefinitionKindDto::ValueObject {}
+    )
 }
 
 /// Decode `Vec<SpecRefDto>` → `Vec<SpecRef>`.
@@ -1079,7 +1112,8 @@ fn type_catalogue_entry_to_dto(
     };
     let spec_refs = spec_refs_to_dtos(entry.spec_refs());
     let informal_grounds = informal_grounds_to_dtos(entry.informal_grounds());
-    let expected_members = encode_member_list(entry.name(), entry.expected_members())?;
+    let expected_members =
+        encode_member_list(entry.name(), entry.expected_members(), entry.kind())?;
     Ok(TypeCatalogueEntryDto {
         name: entry.name().to_owned(),
         description: entry.description().to_owned(),
@@ -1099,14 +1133,33 @@ fn type_catalogue_entry_to_dto(
 /// strings, so a `Field { ty: "domain::UserId" }` could be constructed by
 /// callers; surfacing the same `InvalidEntry` error here keeps the
 /// round-trip invariant intact.
+///
+/// PR #115 P1: mirrors the decode-side Variant-in-field-bearing-kind guard
+/// for encode symmetry. A `MemberDeclaration::Variant` on a field-bearing
+/// entry kind (Dto / Command / Query / ValueObject) is rejected so the
+/// round-trip invariant holds and callers cannot produce malformed documents
+/// by constructing domain objects directly without going through decode.
 fn encode_member_list(
     entry_name: &str,
     members: &[MemberDeclaration],
+    entry_kind: &TypeDefinitionKind,
 ) -> Result<Vec<MemberDto>, TypeCatalogueCodecError> {
+    let kind_is_field_bearing = is_field_bearing_kind(entry_kind);
     let mut out = Vec::with_capacity(members.len());
     for m in members {
         match m {
             MemberDeclaration::Variant(name) => {
+                if kind_is_field_bearing {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members variant '{}' is not valid for a field-bearing kind \
+                             (dto/command/query/value_object) — variants belong to enum/error_type \
+                             kinds. Use MemberDeclaration::field for struct-field members.",
+                            name
+                        ),
+                    });
+                }
                 out.push(MemberDto::Variant { name: name.clone() });
             }
             MemberDeclaration::Field { name, ty } => {
@@ -2229,6 +2282,158 @@ mod tests {
             "expected InvalidEntry for `::` in member field ty, got: {:?}",
             err
         );
+    }
+
+    // --- PR #115 P1: Variant-in-field-bearing-kind rejection ---
+
+    #[test]
+    fn test_decode_dto_with_variant_member_rejected() {
+        // field-bearing kinds (dto/command/query/value_object) must not contain
+        // Variant members — the renderer's field_members filter silently skips
+        // variants, so an unchecked decode produces zero field-edges with no
+        // error signal (PR #115 P1 finding).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "StatusDto",
+      "kind": "dto",
+      "description": "dto with a variant member — invalid",
+      "expected_members": [
+        { "kind": "variant", "name": "Active" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for Variant member on dto, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_command_with_variant_member_rejected() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "CreateUserCommand",
+      "kind": "command",
+      "description": "command with a variant member — invalid",
+      "expected_members": [
+        { "kind": "variant", "name": "SomeVariant" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for Variant member on command, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_query_with_variant_member_rejected() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "GetUserQuery",
+      "kind": "query",
+      "description": "query with a variant member — invalid",
+      "expected_members": [
+        { "kind": "variant", "name": "SomeVariant" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for Variant member on query, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_value_object_with_variant_member_rejected() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackIdVo",
+      "kind": "value_object",
+      "description": "value_object with a variant member — invalid",
+      "expected_members": [
+        { "kind": "variant", "name": "SomeVariant" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for Variant member on value_object, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_dto_with_mixed_members_containing_variant_rejected() {
+        // When expected_members contains BOTH field and variant entries for a
+        // field-bearing kind, the codec must reject on the first variant hit
+        // rather than silently accepting the field-only subset.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "MixedDto",
+      "kind": "dto",
+      "description": "dto with mixed field and variant members",
+      "expected_members": [
+        { "kind": "field", "name": "id", "ty": "UserId" },
+        { "kind": "variant", "name": "BadVariant" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for mixed field+variant on dto, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_encode_dto_with_variant_member_rejected_at_codec() {
+        // Encode-side mirror of the Variant-in-field-bearing guard (PR #115 P1).
+        // The domain's with_members accepts Variant on field-bearing kinds (it only
+        // rejects members on NON-field-bearing kinds). Without the encode-side guard,
+        // a Dto carrying MemberDeclaration::Variant would be silently serialised,
+        // and decode would then silently strip the variant (zero field-edge, no error).
+        // The codec encode-side guard must reject it before serialization.
+        use domain::tddd::catalogue::MemberDeclaration;
+        let kind = TypeDefinitionKind::Dto;
+        let entry = TypeCatalogueEntry::new("StatusDto", "bad dto", kind, TypeAction::Add, true)
+            .unwrap()
+            .with_members(vec![MemberDeclaration::variant("Active".to_owned())])
+            .unwrap(); // domain allows Variant on field-bearing kinds — codec must catch it
+        let doc = TypeCatalogueDocument::new(2, vec![entry]);
+        let err = encode(&doc).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(
+                    reason.contains("variant"),
+                    "expected variant rejection message, got: {reason}"
+                );
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
     }
 
     #[test]

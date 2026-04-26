@@ -661,15 +661,17 @@ pub fn is_field_bearing_kind(kind: &TypeDefinitionKind) -> bool {
 /// Non-method-bearing kinds (`Dto`, `Enum`, etc.) can have other genuine
 /// structural deltas (`expected_members`, variants), so they must NOT be
 /// marked as declaration-only on the basis of `methods_of(...).is_empty()`
-/// alone (PR #115 P1 finding). Centralised so renderer / future codec
+/// alone (PR #115 P1 finding).
+///
+/// `SecondaryAdapter` is intentionally excluded: it carries `implements` and
+/// impl edges rather than `expected_methods`, so the empty-methods gate does
+/// not apply (PR #115 r6 P1 finding). Centralised so renderer / future codec
 /// guards stay in sync.
 #[must_use]
 pub fn is_method_bearing_kind(kind: &TypeDefinitionKind) -> bool {
     matches!(
         kind,
-        TypeDefinitionKind::SecondaryPort { .. }
-            | TypeDefinitionKind::ApplicationService { .. }
-            | TypeDefinitionKind::SecondaryAdapter { .. }
+        TypeDefinitionKind::SecondaryPort { .. } | TypeDefinitionKind::ApplicationService { .. }
     )
 }
 

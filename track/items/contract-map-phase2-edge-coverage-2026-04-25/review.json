@@ -1,107 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 921,
-              "category": "factual"
-            },
-            {
-              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 925,
-              "category": "factual"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:15:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:16:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 919,
-              "category": "docs"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:18:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T17:26:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:27:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:28:40Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:33:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:35:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
-          "at": "2026-04-26T05:26:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
-          "at": "2026-04-26T05:27:19Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -267,6 +166,104 @@
           "findings": [],
           "hash": "rvw1:sha256:2acf035f48acba3cd7446bf818e57f11efd9021137372cfe571261b18f6a3800",
           "at": "2026-04-26T05:44:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new SecondaryAdapter regression test asserts against `L6_infrastructure_PostgresUserRepo`, but `node_id()` length-prefixes layer names, so this node renders as `L14_infrastructure_PostgresUserRepo`. As written, the assertion never inspects the actual node and would still pass if `declaration_only` were incorrectly applied.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 1731,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:52e8ed59520593022231ad22482e5eaf54ef91b3de93d9a09f6b9d6618dd8bd6",
+          "at": "2026-04-26T06:28:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new regression test never exercises the real Mermaid class line because it looks for `L6_infrastructure_PostgresUserRepo`, but `layer(\"infrastructure\")` renders as `L14_infrastructure_PostgresUserRepo`. As written, the assertion cannot fail even if `declaration_only` is reintroduced, so this does not actually protect the SecondaryAdapter fix.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 1731,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:52e8ed59520593022231ad22482e5eaf54ef91b3de93d9a09f6b9d6618dd8bd6",
+          "at": "2026-04-26T06:28:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97775dbfb93e8882ead4fef7ac967e46c3a08f142f213e7aa7b7a6d0dd11f7c4",
+          "at": "2026-04-26T06:32:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97775dbfb93e8882ead4fef7ac967e46c3a08f142f213e7aa7b7a6d0dd11f7c4",
+          "at": "2026-04-26T06:33:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97775dbfb93e8882ead4fef7ac967e46c3a08f142f213e7aa7b7a6d0dd11f7c4",
+          "at": "2026-04-26T06:35:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97775dbfb93e8882ead4fef7ac967e46c3a08f142f213e7aa7b7a6d0dd11f7c4",
+          "at": "2026-04-26T06:38:41Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:43:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 73,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:45:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:48:07Z"
         }
       ]
     },
@@ -622,6 +619,59 @@
           "findings": [],
           "hash": "rvw1:sha256:307abb2fcf328711b6c6c69bcb30f967c2fd67e9c6bcdcde6fd73fe5120ed283",
           "at": "2026-04-26T05:18:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a87c1c8f4407932a72fcfd25a3422402dedc73612088723ad2fd21afd1f49804",
+          "at": "2026-04-26T06:32:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a87c1c8f4407932a72fcfd25a3422402dedc73612088723ad2fd21afd1f49804",
+          "at": "2026-04-26T06:34:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a87c1c8f4407932a72fcfd25a3422402dedc73612088723ad2fd21afd1f49804",
+          "at": "2026-04-26T06:39:18Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:33:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:35:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
+          "at": "2026-04-26T05:26:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0eeeb006a3e615845685e678a5cfd53229e741fd6f1970e81da5d9fd7fa51783",
+          "at": "2026-04-26T05:27:19Z"
         }
       ]
     },
@@ -1344,43 +1394,72 @@
         }
       ]
     },
-    "harness-policy": {
+    "other": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 921,
+              "category": "factual"
+            },
+            {
+              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 925,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:15:40Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:43:03Z"
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:16:57Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
+              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
               "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 73,
-              "category": "workflow_correctness"
+              "file": "knowledge/strategy/TODO.md",
+              "line": 919,
+              "category": "docs"
             }
           ],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:45:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:46:05Z"
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:18:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:48:07Z"
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T17:26:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:27:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:28:40Z"
         }
       ]
     }

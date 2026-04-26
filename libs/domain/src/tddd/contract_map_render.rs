@@ -1621,10 +1621,11 @@ mod tests {
     fn test_render_contract_map_declaration_only_classdef_for_modify_empty_methods() {
         // action=modify + method-bearing kind + expected_methods empty →
         // declaration_only classDef. The PR #115 fix narrowed the gate to
-        // method-bearing kinds (SecondaryPort / ApplicationService /
-        // SecondaryAdapter); non-method-bearing kinds (Dto / Enum / etc.)
-        // are excluded because their `methods_of(...)` is structurally
-        // empty even when they have other genuine deltas.
+        // method-bearing kinds (SecondaryPort / ApplicationService);
+        // SecondaryAdapter and non-method-bearing kinds (Dto / Enum / etc.)
+        // are excluded: SecondaryAdapter carries `implements` + impl edges
+        // (not expected_methods), and non-method-bearing kinds can have
+        // other genuine deltas like expected_members / variants.
         let domain = layer("domain");
         let domain_doc = doc(vec![
             TypeCatalogueEntry::new(
@@ -1696,6 +1697,50 @@ mod tests {
         assert!(
             !text.contains("class L6_domain_WidgetDto declaration_only"),
             "Dto (non-method-bearing) must NOT receive declaration_only; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_no_declaration_only_for_modify_secondary_adapter() {
+        // PR #115 r6 P1 fix: SecondaryAdapter with action=Modify and an empty
+        // `implements` list must NOT receive declaration_only.  SecondaryAdapter
+        // carries `implements` and impl edges — not `expected_methods` — so the
+        // IN-04 empty-methods gate does not apply.  The adapter may still carry
+        // real `implements` contract deltas that would be hidden by the
+        // dashed-border overlay.
+        //
+        // `node_id` uses `l.len()` as the numeric prefix: "infra" (5 chars)
+        // → prefix `L5_infra_`.  The positive assertion on the node shape
+        // confirms the prefix is correct so the negative assertion cannot be
+        // vacuously true.
+        let infra = layer("infra");
+        let infra_doc = doc(vec![
+            TypeCatalogueEntry::new(
+                "PostgresUserRepo",
+                "Secondary adapter with no implements listed yet",
+                TypeDefinitionKind::SecondaryAdapter { implements: vec![] },
+                TypeAction::Modify,
+                true,
+            )
+            .unwrap(),
+        ]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(infra.clone(), infra_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&infra),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        // Positive guard: the node must actually appear in the output so the
+        // negative assertion below cannot be vacuously true from a wrong prefix.
+        assert!(
+            text.contains("L5_infra_PostgresUserRepo"),
+            "node L5_infra_PostgresUserRepo must appear in output (prefix sanity); output was:\n{text}"
+        );
+        assert!(
+            !text.contains("class L5_infra_PostgresUserRepo declaration_only"),
+            "SecondaryAdapter (modify, empty implements) must NOT receive declaration_only; output was:\n{text}"
         );
     }
 
