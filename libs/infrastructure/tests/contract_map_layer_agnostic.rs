@@ -238,11 +238,14 @@ fn render_phase2_features_for(layer_names: &[&str]) -> String {
             true,
         )
         .unwrap(),
-        // IN-04: action=Modify + empty methods → declaration_only dashed border.
+        // IN-04: action=Modify + method-bearing kind + empty methods →
+        // declaration_only dashed border (PR #115 fix narrowed the gate
+        // to method-bearing kinds; ValidationErr-style ErrorType examples
+        // are no longer marked declaration_only).
         TypeCatalogueEntry::new(
             "ValidationErr",
-            "modify with no method delta",
-            TypeDefinitionKind::ErrorType { expected_variants: vec![] },
+            "method-bearing port modify with no method-level delta",
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
             TypeAction::Modify,
             true,
         )
@@ -273,9 +276,11 @@ fn render_phase2_features_for(layer_names: &[&str]) -> String {
 
     // Attach a Yellow signal to ValidationErr to exercise IN-07 signal
     // overlay alongside the IN-06 action overlay below.
+    // Signal kind_tag must match the entry's kind_tag — PR #115 fix made
+    // signal overlay lookup `(type_name, kind_tag)`-keyed.
     let signals = vec![TypeSignal::new(
         "ValidationErr",
-        "error_type",
+        "secondary_port",
         ConfidenceSignal::Yellow,
         true,
         vec![],
@@ -395,8 +400,9 @@ fn assert_phase2_features_present(out: &str, primary_layer: &str) {
     // `ValidationErr` has action=Modify and Yellow signal → shape ends with
     // `:::modify_action:::yellow_signal`.
     assert!(out.contains("classDef yellow_signal"), "yellow_signal classDef must appear");
+    // ValidationErr is a SecondaryPort — shape is `[[ValidationErr]]` (subroutine).
     assert!(
-        out.contains(&format!("{verr_id}>ValidationErr]:::modify_action:::yellow_signal")),
+        out.contains(&format!("{verr_id}[[ValidationErr]]:::modify_action:::yellow_signal")),
         "yellow_signal must be applied inline to {verr_id}; got:\n{out}"
     );
 }

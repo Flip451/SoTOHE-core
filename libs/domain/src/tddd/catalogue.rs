@@ -655,6 +655,24 @@ pub fn is_field_bearing_kind(kind: &TypeDefinitionKind) -> bool {
     )
 }
 
+/// IN-04 / spec semantics: only kinds that actually carry an
+/// `expected_methods` list qualify for the `declaration_only` dashed-border
+/// classDef when their method list is empty under `action=modify`.
+/// Non-method-bearing kinds (`Dto`, `Enum`, etc.) can have other genuine
+/// structural deltas (`expected_members`, variants), so they must NOT be
+/// marked as declaration-only on the basis of `methods_of(...).is_empty()`
+/// alone (PR #115 P1 finding). Centralised so renderer / future codec
+/// guards stay in sync.
+#[must_use]
+pub fn is_method_bearing_kind(kind: &TypeDefinitionKind) -> bool {
+    matches!(
+        kind,
+        TypeDefinitionKind::SecondaryPort { .. }
+            | TypeDefinitionKind::ApplicationService { .. }
+            | TypeDefinitionKind::SecondaryAdapter { .. }
+    )
+}
+
 // ---------------------------------------------------------------------------
 // TypeSignal
 // ---------------------------------------------------------------------------

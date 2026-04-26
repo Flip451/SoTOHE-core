@@ -350,7 +350,14 @@ pub fn render_contract_map(
         {
             class_lines.insert(format!("    class {id} unused_reference"));
         }
+        // declaration_only gates on `is_method_bearing_kind` (not just
+        // `methods_of(...).is_empty()`) — non-method-bearing kinds (Dto,
+        // Enum, etc.) can have other genuine structural deltas like
+        // `expected_members` or variant changes, so they must NOT be
+        // marked declaration-only just because their methods list is
+        // structurally absent (PR #115 P1 finding).
         if entry.action() == crate::tddd::catalogue::TypeAction::Modify
+            && crate::tddd::catalogue::is_method_bearing_kind(entry.kind())
             && methods_of(entry.kind()).is_empty()
         {
             class_lines.insert(format!("    class {id} declaration_only"));
@@ -1612,14 +1619,18 @@ mod tests {
 
     #[test]
     fn test_render_contract_map_declaration_only_classdef_for_modify_empty_methods() {
-        // action=modify + expected_methods empty → declaration_only classDef
-        // regardless of whether the node is an edge target.
+        // action=modify + method-bearing kind + expected_methods empty →
+        // declaration_only classDef. The PR #115 fix narrowed the gate to
+        // method-bearing kinds (SecondaryPort / ApplicationService /
+        // SecondaryAdapter); non-method-bearing kinds (Dto / Enum / etc.)
+        // are excluded because their `methods_of(...)` is structurally
+        // empty even when they have other genuine deltas.
         let domain = layer("domain");
         let domain_doc = doc(vec![
             TypeCatalogueEntry::new(
-                "ValidationError",
-                "Modified but no method-level changes",
-                TypeDefinitionKind::ErrorType { expected_variants: vec![] },
+                "DeclarativeOnlyPort",
+                "Modified port without any method-level delta",
+                TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
                 TypeAction::Modify,
                 true,
             )
@@ -1638,8 +1649,53 @@ mod tests {
             "declaration_only classDef definition must appear; output was:\n{text}"
         );
         assert!(
-            text.contains("class L6_domain_ValidationError declaration_only"),
-            "declaration_only class application must target ValidationError; output was:\n{text}"
+            text.contains("class L6_domain_DeclarativeOnlyPort declaration_only"),
+            "declaration_only must apply to a method-bearing modify entry with empty methods; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_no_declaration_only_for_non_method_bearing_modify() {
+        // PR #115 P1 fix: a non-method-bearing kind with action=Modify (e.g.,
+        // ErrorType with empty variants, or Dto with empty members) MUST NOT
+        // receive declaration_only — `methods_of(...)` is trivially empty for
+        // these kinds and a real structural delta on `expected_variants` /
+        // `expected_members` would make the dashed marker semantically
+        // misleading.
+        let domain = layer("domain");
+        let domain_doc = doc(vec![
+            TypeCatalogueEntry::new(
+                "AppError",
+                "Error type modify without variant declarations",
+                TypeDefinitionKind::ErrorType { expected_variants: vec![] },
+                TypeAction::Modify,
+                true,
+            )
+            .unwrap(),
+            TypeCatalogueEntry::new(
+                "WidgetDto",
+                "Dto modify without member declarations",
+                TypeDefinitionKind::Dto,
+                TypeAction::Modify,
+                true,
+            )
+            .unwrap(),
+        ]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            !text.contains("class L6_domain_AppError declaration_only"),
+            "ErrorType (non-method-bearing) must NOT receive declaration_only; output was:\n{text}"
+        );
+        assert!(
+            !text.contains("class L6_domain_WidgetDto declaration_only"),
+            "Dto (non-method-bearing) must NOT receive declaration_only; output was:\n{text}"
         );
     }
 

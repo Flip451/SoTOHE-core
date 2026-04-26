@@ -1,6 +1,46 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:43:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 73,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:45:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:48:07Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -661,24 +701,6 @@
         }
       ]
     },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:33:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:35:29Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -816,46 +838,38 @@
           "findings": [],
           "hash": "rvw1:sha256:3d30b0ada48324404e2e8d575e54b3e9412629b0f7225ed4184eee1edb55d11b",
           "at": "2026-04-26T04:59:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:558a963ee38fe540d2cf5f8be18fe34622b16610b7e13bb6f12ccc3620d42cb5",
+          "at": "2026-04-26T05:17:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:558a963ee38fe540d2cf5f8be18fe34622b16610b7e13bb6f12ccc3620d42cb5",
+          "at": "2026-04-26T05:18:38Z"
         }
       ]
     },
-    "harness-policy": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:43:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 73,
-              "category": "workflow_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:45:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:46:05Z"
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:33:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:48:07Z"
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:35:29Z"
         }
       ]
     },
@@ -1197,6 +1211,20 @@
           "findings": [],
           "hash": "rvw1:sha256:94c16a48d179d078c90a8c58e0526cf54b2264059f3d6f002d128918b54f536a",
           "at": "2026-04-26T05:02:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:307abb2fcf328711b6c6c69bcb30f967c2fd67e9c6bcdcde6fd73fe5120ed283",
+          "at": "2026-04-26T05:16:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:307abb2fcf328711b6c6c69bcb30f967c2fd67e9c6bcdcde6fd73fe5120ed283",
+          "at": "2026-04-26T05:18:00Z"
         }
       ]
     },
