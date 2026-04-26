@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-26T20:42:38Z",
-  "declaration_hash": "bd1a6ed2a8de84d50a62920868131ec018fd9e83d8b964eb354b24be56f23b36",
+  "generated_at": "2026-04-26T23:22:46Z",
+  "declaration_hash": "6739152d2df117660c0fe001a96bc4f35ecfb2470ddbd05a8ce6fcefc7361364",
   "signals": [
     {
       "type_name": "TypeDefinitionKind",
@@ -134,6 +134,12 @@
         "Terminal",
         "To"
       ]
+    },
+    {
+      "type_name": "ConsistencyReport",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

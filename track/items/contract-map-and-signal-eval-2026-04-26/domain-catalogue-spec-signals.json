@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "bd1a6ed2a8de84d50a62920868131ec018fd9e83d8b964eb354b24be56f23b36",
+  "catalogue_declaration_hash": "6739152d2df117660c0fe001a96bc4f35ecfb2470ddbd05a8ce6fcefc7361364",
   "signals": [
     {
       "type_name": "TypeDefinitionKind",
@@ -68,6 +68,10 @@
     },
     {
       "type_name": "TypestateTransitions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ConsistencyReport",
       "signal": "blue"
     }
   ]

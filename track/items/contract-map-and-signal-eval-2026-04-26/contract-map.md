@@ -22,6 +22,7 @@ flowchart LR
         L6_domain_TypeCatalogueEntry(TypeCatalogueEntry)
         L6_domain_TypeAction{{TypeAction}}
         L6_domain_TypestateTransitions{{TypestateTransitions}}
+        L6_domain_ConsistencyReport[ConsistencyReport]
     end
     subgraph usecase [usecase]
         L7_usecase_RenderContractMap[/RenderContractMap\]

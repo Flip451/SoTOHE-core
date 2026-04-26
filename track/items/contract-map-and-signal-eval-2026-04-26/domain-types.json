@@ -283,6 +283,26 @@
           "hash": "6160aeeac13f534b9efbbe22107dfd0e6e428b9beaa0f4cc844cf7773f874f03"
         }
       ]
+    },
+    {
+      "name": "ConsistencyReport",
+      "description": "Result of a bidirectional consistency check between the type catalogue (spec) and the crate's public API (code), with baseline-aware filtering. Modified in T008 (D4 bundle): adds baseline_red_functions field (free functions with signature changes or deletions, group 3 Red) and undeclared_functions field (free functions not in declarations or baseline, group 4). Private fields, public getters.",
+      "approved": true,
+      "action": "modify",
+      "kind": "dto",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-07",
+          "hash": "bc735849f6a0a1b552f62b5ccb707c13ce49d0327b6dd3c9cd9aaf37d813215c"
+        },
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-08",
+          "hash": "1517086066a6b62cb835c90ddb57bcf688cf1fcb692c7cc567dd0524b2b476aa"
+        }
+      ]
     }
   ]
 }

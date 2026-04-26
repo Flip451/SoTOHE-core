@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Contract Map 表示拡張 + signal 評価拡張 (両輪)
 
-## Tasks (8/10 resolved)
+## Tasks (9/10 resolved)
 
 ### S1 — Signal Evaluator Action-Awareness (bootstrap fix)
 
@@ -44,7 +44,7 @@
 > T008 は T001 (action-aware ヘルパー) を基盤として、3 種類の照合軸をすべて追加する。
 > IN-10 の workspace-only 絞り込みは origin_crate フィールドを参照する (T004 完了が前提)。
 
-- [ ] **T008**: signal 評価器を expected_members / declares_application_service / SecondaryAdapter::implements / FreeFunction に対応させる。(a) expected_members: struct ベース 9 kind の evaluator を新規実装し、forward miss (宣言したフィールドが TypeNode::members にない) / reverse extra (宣言にないフィールドが TypeNode::members にある) を §S action 別 mapping で評価する (AC-05)。(b) declares_application_service (Interactor): Interactor evaluator を新規実装し、forward miss (宣言した trait が TypeNode::trait_impls にない) / reverse extra (workspace 由来 trait が declares_application_service に含まれていない) を §S action 別 mapping + origin_crate フィルタ (IN-10) で評価する (AC-04)。(c) implements (SecondaryAdapter): SecondaryAdapter の implements reverse check に origin_crate フィルタ (IN-10) を適用し、TypeNode::trait_impls のうち workspace 由来 (TraitImplEntry::origin_crate が workspace crate 一覧と一致) の trait のみを対象として、implements Vec に含まれていない workspace 由来 trait を reverse extra として §S action 別 mapping で評価する。Interactor (b) と SecondaryAdapter (c) は同一の workspace-origin フィルタヘルパーを共有する (DRY)。(d) FreeFunction: evaluator を新規実装し、TypeGraph::functions との forward / reverse check を module_path スコープ付きで実装する (CN-07 のスコープ制約を遵守) (AC-06)。unit tests を追加する。
+- [x] **T008**: signal 評価器を expected_members / declares_application_service / SecondaryAdapter::implements / FreeFunction に対応させる。(a) expected_members: struct ベース 9 kind の evaluator を新規実装し、forward miss (宣言したフィールドが TypeNode::members にない) / reverse extra (宣言にないフィールドが TypeNode::members にある) を §S action 別 mapping で評価する (AC-05)。(b) declares_application_service (Interactor): Interactor evaluator を新規実装し、forward miss (宣言した trait が TypeNode::trait_impls にない) / reverse extra (workspace 由来 trait が declares_application_service に含まれていない) を §S action 別 mapping + origin_crate フィルタ (IN-10) で評価する (AC-04)。(c) implements (SecondaryAdapter): SecondaryAdapter の implements reverse check に origin_crate フィルタ (IN-10) を適用し、TypeNode::trait_impls のうち workspace 由来 (TraitImplEntry::origin_crate が workspace crate 一覧と一致) の trait のみを対象として、implements Vec に含まれていない workspace 由来 trait を reverse extra として §S action 別 mapping で評価する。Interactor (b) と SecondaryAdapter (c) は同一の workspace-origin フィルタヘルパーを共有する (DRY)。(d) FreeFunction: evaluator を新規実装し、TypeGraph::functions との forward / reverse check を module_path スコープ付きで実装する (CN-07 のスコープ制約を遵守) (AC-06)。unit tests を追加する。
 
 ### S6 — Contract Map Edge Extension
 

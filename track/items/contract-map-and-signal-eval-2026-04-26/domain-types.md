@@ -31,4 +31,5 @@
 | TraitImplBaselineEntry | dto | — | — | 🔵 | 🔵 |
 | FunctionInfo | dto | modify | — | 🔵 | 🔵 |
 | SchemaExport | dto | modify | — | 🔵 | 🔵 |
+| ConsistencyReport | dto | modify | — | 🔵 | 🔵 |
 
