@@ -1,0 +1,372 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:41:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:42:44Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2852d09ff64925d8e5163308a3d41eac27561255499a318e7704f0fe40d2afe",
+          "at": "2026-04-26T08:43:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`expected_members: []` is described here as the only legitimate case for a unit-like struct, but D2 later explicitly allows empty `expected_members` for `UseCase`/`Interactor`/`Factory`, `Dto`/`Command`/`Query`, `Typestate`, and `SecondaryAdapter` when they have no public fields. Those rules conflict, so the empty-vec semantics for `expected_members` are not internally consistent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 87,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:982085e4df020c890ce0f76312dd30e167c8ce246fc3316bbdf5e0a7d3c121ae",
+          "at": "2026-04-26T14:43:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:982085e4df020c890ce0f76312dd30e167c8ce246fc3316bbdf5e0a7d3c121ae",
+          "at": "2026-04-26T14:46:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4’s `FreeFunction` schema only declares `expected_params` and `expected_returns`, but the same section later treats `async`/sync as part of signature matching. Because the catalog-side declaration has no field for that dimension, the plan cannot represent or validate async mismatches as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 248,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:982085e4df020c890ce0f76312dd30e167c8ce246fc3316bbdf5e0a7d3c121ae",
+          "at": "2026-04-26T14:48:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 broadens reverse checking to every workspace-origin trait impl, but that conflicts with the earlier secondary-adapter scope decision that excludes infrastructure-internal traits. As written, traits like `GitRepository`/`GhClient` would become contract violations even though they are intentionally out of scope, so this check will produce false positives on the existing workspace.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 234,
+              "category": "contradiction"
+            },
+            {
+              "message": "D4 models free functions as `functions: HashMap<String, FunctionNode>` keyed only by the short name, but it never records a module path or any other namespace. That means two public functions with the same name in different modules cannot be represented safely, and the later 'same module' reverse-extra rule has no identifier to evaluate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 261,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:982085e4df020c890ce0f76312dd30e167c8ce246fc3316bbdf5e0a7d3c121ae",
+          "at": "2026-04-26T14:51:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`expected_members` semantics are inconsistent: this section says empty `Vec` is valid only for unit-like structs, but the `UseCase`/`Interactor`/`Factory` and `SecondaryAdapter` rules immediately below also allow empty `Vec` for structs that simply have no public fields. Those two rules cannot both hold without redefining the empty-`Vec` rule.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 168,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:982085e4df020c890ce0f76312dd30e167c8ce246fc3316bbdf5e0a7d3c121ae",
+          "at": "2026-04-26T14:52:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new empty-`Vec` criterion says empty `Vec` is allowed whenever a struct has zero public fields, but the same ADR still requires tuple structs to be declared by positional indices (for example `struct Email(String)` must use `\"0\"`). That makes tuple structs with private fields both eligible for omission and required to be listed, so the `expected_members` rule is internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 141,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:95ceaf62b3a1a832ddd1b2a4d85e9897b741cf438d228671fbe46e94c11620af",
+          "at": "2026-04-26T14:55:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3’s reverse-check inclusion rule is too broad: it treats every trait whose `origin_crate` is in the workspace as in-scope, which would also pull in infrastructure-local traits such as `GitRepository` and `GhClient`. That conflicts with the earlier SecondaryAdapter track decision that those internal traits are out of scope, so `SystemGitRepo` / `SystemGhClient` would become false positives.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 232,
+              "category": "contradiction"
+            },
+            {
+              "message": "The zero-member exception for `expected_members` is too broad to be implementable as written. The plan allows `expected_members: []` for tuple structs with all fields private, but the current TypeGraph export path still emits tuple fields, so those structs do not actually appear member-less in the data the evaluator reads.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 168,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:5c7e410fa399d358de04405b2bb9db4e8f9d4d3d25882589c3922e7aa6b9fd3a",
+          "at": "2026-04-26T15:00:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c154279a2ed3cf360d18cf29fca7e1079f28ea86e8da1bbb0704600a5431a05d",
+          "at": "2026-04-26T15:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c154279a2ed3cf360d18cf29fca7e1079f28ea86e8da1bbb0704600a5431a05d",
+          "at": "2026-04-26T15:12:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 says a FreeFunction signature match includes async-ness, and the TypeGraph/baseline entries both carry `is_async`, but the catalog declaration shape only has `expected_params` and `expected_returns`. That leaves no catalog-side value to compare against `is_async`, so the proposed 3-way bundle is internally incomplete and the stated forward-miss rule cannot be implemented as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 250,
+              "category": "contradiction"
+            },
+            {
+              "message": "This paragraph says adding `TypeBaselineEntry::trait_impls` resolves the above missing baseline state, but the only missing baseline item listed immediately above is the `functions` map for D4. As written, D3's trait-impl baseline addition is presented as resolving D4's missing functions snapshot, which contradicts the surrounding bundle explanation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 80,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c154279a2ed3cf360d18cf29fca7e1079f28ea86e8da1bbb0704600a5431a05d",
+          "at": "2026-04-26T15:17:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "§3 says `declares_application_service` needs no TypeGraph extension because `TypeNode::trait_impls` already exists, but the ADR later makes `TraitImplEntry::origin_crate` a required D3 TypeGraph schema extension and bundles it with baseline `trait_impls`. This contradiction undermines the 3-part schema bundle invariant and could lead the implementation plan to omit the required TypeGraph update.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 91,
+              "category": "contradiction"
+            },
+            {
+              "message": "The D3 consequence states type-designer declaration omissions are detected as `reverse extra` and therefore Red, but §S explicitly maps `reverse extra` to Yellow for `modify` and `delete` actions. This leaves an action-neutral `reverse extra -> Red` assertion in the ADR, contradicting the action-specific signal table.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 400,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:451d7ac75d4ef804c4d5b98954a1d3c98c677471aecae35d7652099a690718b9",
+          "at": "2026-04-26T15:23:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4’s reverse-extra rule is defined as detecting undeclared free functions in the same module, but the proposed TypeGraph/baseline bundle only stores `params`, `returns`, and `is_async` for each function and never defines the `functions` map key as module-qualified or stores a `module_path`. Without module identity, the evaluator cannot distinguish same-named functions in different modules or enumerate extras only within the declared module, so the D4 signal rule is not executable while the ADR claims the three-schema bundle is complete.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 300,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:780a5c7d423db92daf30db4dd09fd7bb0eb857c6804feb8927e781aa38e685e3",
+          "at": "2026-04-26T15:26:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 says same-named free functions in different modules are distinguished by `name + module_path`, but the proposed `TypeGraph::functions` / baseline schema is still `HashMap<String, FunctionNode>` keyed by the short name. With that shape, two `my_func` definitions in different modules collide before `module_path` can disambiguate them, so the plan cannot satisfy its own reverse/forward matching rule for module-scoped free functions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 297,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f67b087fbd04048c533d1c24a82efa18da89875a603a1a6a4070b96a5b08e9dc",
+          "at": "2026-04-26T15:31:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4's baseline bundle is internally contradictory: this paragraph says `TypeBaseline` will add `functions: HashMap<String, FunctionBaselineEntry>`, but the same section already requires a tuple key `HashMap<(String, Option<String>), FunctionBaselineEntry>` and D4 later relies on that tuple key to avoid same-name function collisions across modules. This leaves the planned baseline schema ambiguous for implementers.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 81,
+              "category": "contradiction"
+            },
+            {
+              "message": "The D4 signal summary still defines `reverse extra` by function name alone, while the D4 decision later defines the matching axis as `(name, module_path)` and explicitly says same-name functions in different modules must not be treated as reverse extras. These two rules conflict and would produce different signal behavior for common free-function names such as `new`, `build`, or `parse` across modules.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 124,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f078531f6225abf97ef4f94d49a57286bdfd0b2681f6689114a893a27f950370",
+          "at": "2026-04-26T15:38:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4's catalog-side `FreeFunction` shape only adds `expected_params`, `expected_returns`, and `expected_is_async`, but the same decision later defines matching and reverse-extra evaluation by `(name, module_path)`. Since the catalogue declaration has no field that supplies the declared `module_path`, the type-designer cannot distinguish same-named functions in different modules or scope reverse-extra checks to the declared module. That makes the claimed catalog/TypeGraph/baseline bundle incomplete as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 247,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR gives incompatible D4 reverse-extra definitions. Here it says an implementation function is extra when its `(name, module_path)` pair is undeclared, which implies a same-named function in another module is extra if that pair was not declared. Later D4 narrows reverse extra to undeclared names within the same `module_path` and says different-module same-name functions are not extras. Those rules lead to different evaluator behavior, so the plan needs one canonical reverse-check scope.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 124,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2547381b4496fbb8d51c07e3986a9cc197a713420575b261694770bf77d92b63",
+          "at": "2026-04-26T15:44:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 specifies `TypeBaseline::functions` as `HashMap<(String, Option<String>), FunctionBaselineEntry>` for a JSON baseline, but serde JSON map keys must serialize as strings. Without defining a string key/newtype/custom serialization, baseline capture for this schema cannot be written/read, so the D4 three-way bundle is not executable as stated.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 288,
+              "category": "infeasibility"
+            },
+            {
+              "message": "A9 says the adopted D3 approach uses “catalogue declaration based” range selection, but D3’s actual decision is to reverse-check all workspace-origin traits via `TraitImplEntry::origin_crate`. That contradiction can steer implementation back to catalogue-only scoping, which would miss undeclared workspace traits that D3 is meant to detect.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "line": 359,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:daae9f2cb58857123495345323db98640c4811a9812b9b5f5b2303f53c4a7c93",
+          "at": "2026-04-26T15:48:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c340f511f28299fa9421a1b6fee4c7d93113de6cfc2d588fc88561c835c37a3",
+          "at": "2026-04-26T15:54:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d45deaa5dc9be1b2cb3c86010350c3c996d6dc1aa94424f94a8f9a4e3dd87ce9",
+          "at": "2026-04-26T16:12:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 says this track resolves Contract Map limitation §L2 as a whole, but §L2 explicitly includes field-reference and mutation-only/declaration-only cases, while OS-03 puts field edges out of scope and the in-scope/acceptance items only cover the FreeFunction part of §L2. This makes the plan overclaim the scope: implementers can satisfy the scoped work while the stated goal remains false. Narrow GO-03 to the specific §L2 subcase being handled, or bring the remaining §L2 remediation into scope with acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d45deaa5dc9be1b2cb3c86010350c3c996d6dc1aa94424f94a8f9a4e3dd87ce9",
+          "at": "2026-04-26T16:13:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-09 requires FreeFunction parameter/return references to be rendered as “method call edge”, but the ADR being implemented defines FreeFunction integration only as edges from the FreeFunction node to expected_params/expected_returns; “method call edge” is specifically for `A.method()` references. This mislabels the new edge semantics and can drive an implementation to emit method-shaped edges for non-method free functions instead of the D4 FreeFunction edges.",
+              "severity": "P1",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+              "line": 450,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:d45deaa5dc9be1b2cb3c86010350c3c996d6dc1aa94424f94a8f9a4e3dd87ce9",
+          "at": "2026-04-26T16:16:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 claims this track resolves ADR 2026-04-17-1528 §L2 as a whole, but §L2 also covers field-reference and mutation-only declaration cases while OS-03 explicitly keeps field edges out of scope. This makes the goal broader than the scoped work can satisfy; narrow GO-03 to the FreeFunction-argument part of §L2, or move the remaining §L2 cases into scope with acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+              "line": 28,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-03 says an empty expected_members Vec is a design error except for marker structs, but the ADR permits empty expected_members whenever TypeGraph exposes zero public members, including unit-like structs, all-private-field structs, and UseCase/Interactor/Factory structs that receive dependencies via constructors. As written, this constraint would overconstrain valid catalogue entries and contradicts the ADR’s D2 semantics.",
+              "severity": "P1",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+              "line": 288,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:18cc346825e77bedb653adba3762909214e4396da10eca25f60a562b97b7d343",
+          "at": "2026-04-26T16:19:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b4b574ee187bf3e79f703654f97c1d169b38428cb9d254a841c39a7a9b5f5c7",
+          "at": "2026-04-26T16:23:00Z"
+        }
+      ]
+    }
+  }
+}
