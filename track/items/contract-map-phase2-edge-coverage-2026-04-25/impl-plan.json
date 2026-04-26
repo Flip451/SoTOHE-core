@@ -4,65 +4,56 @@
     {
       "id": "T001",
       "description": "Add TypeDefinitionKind::FreeFunction variant to catalogue.rs (domain). Extend kind_tag() match arm, update node_shape() and methods_of() in contract_map_render.rs to handle FreeFunction. Extend evaluate_type_signals to treat FreeFunction with existence-check-only forward check (same path as ValueObject). Update test_render_contract_map_emits_13_shape_variants to 14 variants and add a test_all_fourteen_kind_tags_are_unique test. Expected params/returns fields are declared in the domain variant for future renderer use. Domain layer only — no serde, no I/O.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "in_progress"
     },
     {
       "id": "T002",
       "description": "Add free_function kind support to catalogue_codec.rs (infrastructure). Add FreeFunction variant to TypeDefinitionKindDto with optional expected_params (Vec<ParamDto>) and expected_returns (Vec<String>). Extend decode/encode conversion paths (type_definition_kind_from_dto / type_catalogue_entry_to_dto). free_function is NOT existence-only — it carries expected_params and expected_returns as its own designated fields; do NOT add it to EXISTENCE_ONLY_KINDS. Important: the Phase 1.5 stale-field guard uses #[serde(flatten)] + internally-tagged enum, which means serde silently drops cross-kind fields rather than rejecting them (known serde limitation documented in the codec). Add an explicit guard block for 'free_function' kind in Phase 1.5 that rejects forbidden fields (expected_methods, expected_variants, transitions_to, implements) — the same pattern as the existing existence-only guard — so illegal fields on free_function entries are caught at the codec boundary. Add codec round-trip tests covering free_function with and without params/returns, and a rejection test for a free_function entry carrying expected_methods. AC-01 CI gate (13 → 14 kind tags) passes.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "in_progress"
     },
     {
       "id": "T003",
       "description": "Extend TypeDefinitionKind::Interactor in catalogue.rs (domain) to carry an optional declares_application_service: Option<String> field for the impl-edge target. Update contract_map_render.rs: build an application_service_index (ApplicationService kind only, parallel to port_index) and emit -.impl.-> edges from Interactor entries whose declares_application_service is Some(name) and name resolves in application_service_index. Add unit tests: Interactor with declares_application_service produces the impl edge; Interactor without it produces no edge; name not in application_service_index produces no edge. Domain layer only.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "Extend catalogue_codec.rs (infrastructure) to decode/encode the new declares_application_service field on Interactor entries. Add declares_application_service: Option<String> to the Interactor variant of TypeDefinitionKindDto (serde default/skip). Extend stale-field guard: interactor now allows declares_application_service alongside the existing empty-fields rule. Add codec round-trip tests: Interactor with declares_application_service round-trips correctly; Interactor without the field decodes to None. Update usecase-types.json catalogue entry for RenderContractMapInteractor to set declares_application_service: RenderContractMap once codec is in place.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "Implement unused_reference and declaration_only dashed-border classDef rendering in contract_map_render.rs (domain). After building type_index and edges, compute the set of node_ids that appear as an edge source or target. Entries where action=reference AND node_id is absent from the edge set get classDef unused_reference (stroke-dasharray). Entries where action=modify AND expected_methods is empty get classDef declaration_only (stroke-dasharray) regardless of edge presence. Add both classDef definitions to the mermaid header. Add unit tests: reference entry with no edges renders with unused_reference; reference entry that IS an edge target does not; modify+empty-methods entry renders with declaration_only.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T006",
       "description": "Implement field edge generation in contract_map_render.rs (domain) and extend the catalogue codec (infrastructure) to decode/encode expected_members. (1) Domain: add expected_members: Vec<MemberDeclaration> to TypeCatalogueEntry struct and new_with_members constructor (or extend existing with_refs). Add field_members_of() helper that returns MemberDeclaration::Field items for the four eligible kinds (dto, command, query, value_object). In the edge-building loop, iterate field_members_of(), extract type name tokens via extract_type_names, resolve against type_index (declared types only), and emit F -->|\".field_name\"| T edges. External types (String, bool, u32, etc.) absent from type_index are silently skipped. (2) Infrastructure: extend TypeCatalogueEntryDto in catalogue_codec.rs to include optional expected_members: Vec<MemberDto> (serde default/skip). Extend encode/decode conversion paths to round-trip MemberDeclaration::Field items. The existing stale-field guard must permit expected_members for the four eligible entry kinds. (3) Unit tests: same-layer field edge, cross-layer field edge, external type produces no edge, method-bearing kind (secondary_port) produces no field edge; codec round-trip for a dto entry with expected_members.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T007",
       "description": "Implement action overlay in contract_map_render.rs (domain). When opts.action_overlay=true, add action-specific classDef lines to the mermaid header (modify_action: stroke-dasharray for dashed border; delete_action: line-through text + light fill; reference_action: sparse stroke-dasharray for dotted border; add_action is the default — no extra classDef). Attach :::action_classDef to each node shape string based on entry.action(). When action_overlay=false, action-overlay-specific classDef lines (modify_action/delete_action/reference_action) and :::action_classDef annotations are absent from output — other Phase 2 additions (unused_reference, declaration_only classDefs from T005) are always present regardless of this flag. Unit tests: action_overlay=true produces each action classDef and node annotation; action_overlay=false produces output without action-overlay classDefs (regression guard for the action overlay feature only).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T008",
       "description": "Implement signal overlay in contract_map_render.rs (domain). When opts.signal_overlay=true, read TypeCatalogueDocument.signals() for each layer's document. For each entry, look up its TypeSignal by type name. Map signal values to classDef: Yellow -> fill:#fff3e0; Red -> fill:#ffebee; Blue -> no classDef change (default colour). Add signal-specific classDef lines to the mermaid header only when at least one Yellow or Red signal is present. Attach :::signal_classDef to node shape strings for Yellow/Red entries. When signals() is None for a layer's document, produce the same output as signal_overlay=false for that layer — no signal-specific classDef header lines and no :::signal_classDef annotations (complete silence, not 'treat as Blue with classDef'). When signal_overlay=false, signal-overlay-specific classDef lines and :::signal_classDef annotations are absent from output — other Phase 2 additions are always present. Unit tests: Blue/Yellow/Red/None for four nodes; signal_overlay=false produces output without signal-overlay classDefs; signals()=None produces identical output to signal_overlay=false (not just Blue treatment).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T009",
       "description": "Extend layer-agnostic integration tests in libs/infrastructure/tests/contract_map_layer_agnostic.rs. For each of the three fixtures (fixture_2layers, fixture_3layers_default, fixture_custom_names), add fixture catalogue entries covering: a FreeFunction kind node (IN-01); an Interactor entry with declares_application_service pointing to an ApplicationService entry to verify -.impl.-> edge (IN-02); a reference action entry with no edges to verify unused_reference classDef (IN-03); a modify+empty-methods entry to verify declaration_only classDef (IN-04); dto/command/query/value_object entries with MemberDeclaration::Field to verify field edges (IN-05); ContractMapRenderOptions with action_overlay=true and signal_overlay=true to verify overlay classDef (IN-06/07). Assert that no layer names from other fixtures appear in the output (existing no-leak invariant). All assertions must pass with the layer names of the current fixture only.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T010",
       "description": "Phase 2 dogfood and close-out. (1) Update this track's own catalogue data now that Phase 2 schema is in place: (a) change domain-types.json render_contract_map entry kind from value_object placeholder to free_function (with expected_params and expected_returns per IN-01); (b) add expected_members (MemberDeclaration::Field entries) to ContractMapRenderOptions in domain-types.json so it produces field edges (IN-05); (c) add a new infrastructure-types.json entry for load_all_catalogues (catalogue_bulk_loader::load_all_catalogues) with kind=free_function, action=reference, expected_returns=[\"LoadAllCataloguesError\"] — this entry is the L4 edge source preparation; can only be added after T002 ships the free_function codec. Run sotp track contract-map for track contract-map-phase2-edge-coverage-2026-04-25. (2) Verify that all 9 Phase 1 isolated nodes are now resolved: L3 (RenderContractMapInteractor) has gained a -.impl.-> edge; L4 resolution is two-part: (i) LoadAllCataloguesError (action=reference, no edges) receives unused_reference dashed border via T005 — it is now visually identified as an intentional declaration rather than an invisible isolated node; (ii) load_all_catalogues and render_contract_map are added as FreeFunction kind nodes in the catalogue, establishing the edge source for Phase 3 return-type edge rendering; ContractMapRenderOptions (L2) has gained field edges; L1 nodes (TaskId/CommitHash/TrackBranch/NonEmptyString/ReviewGroupName) render with unused_reference dashed border; ValidationError renders with declaration_only dashed border. Record results in track/items/contract-map-phase2-edge-coverage-2026-04-25/verification.md. (3) Add Resolved in contract-map-phase2-edge-coverage-2026-04-25 notes to ADR knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Known Limitations for each L1/L2/L3/L4 category. Run cargo make ci and confirm all checks pass (fmt-check, clippy, nextest, test-doc, deny, python-lint, scripts-selftest, check-layers, verify-*).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
+    "summary": [],
     "sections": [
       {
         "id": "S01",
@@ -72,7 +63,9 @@
           "domain 層内完結 — serde 依存なし、I/O なし (CN-02 準拠)。",
           "14 variant 体系を確立する (GO-02、AC-01 の domain 側)。"
         ],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ]
       },
       {
         "id": "S02",
@@ -82,7 +75,9 @@
           "Phase 2 Yellow 状態だった domain-types.json の render_contract_map エントリが Blue 化するための codec 基盤。",
           "AC-01 の CI ゲート (test_all_fourteen_kind_tags_are_unique) が通る (CN-03: 既存 13 variants の kind_tag は変更しない)。"
         ],
-        "task_ids": ["T002"]
+        "task_ids": [
+          "T002"
+        ]
       },
       {
         "id": "S03",
@@ -91,7 +86,9 @@
           "TypeDefinitionKind::Interactor に declares_application_service: Option<String> を追加し、renderer で application_service_index を用いた -.impl.-> edge を描画する (GO-03、IN-02、AC-02)。",
           "Domain 層内完結。"
         ],
-        "task_ids": ["T003"]
+        "task_ids": [
+          "T003"
+        ]
       },
       {
         "id": "S04",
@@ -100,7 +97,9 @@
           "catalogue_codec.rs の Interactor DTO に declares_application_service を追加し、T003 で追加したフィールドの encode/decode を実装する (IN-02 の codec 側)。",
           "usecase-types.json の RenderContractMapInteractor エントリを更新して declares_application_service: RenderContractMap を設定する。"
         ],
-        "task_ids": ["T004"]
+        "task_ids": [
+          "T004"
+        ]
       },
       {
         "id": "S05",
@@ -109,7 +108,9 @@
           "unused_reference classDef (action=reference かつ edge なし) と declaration_only classDef (action=modify かつ expected_methods 空、edge の有無は問わない) を renderer に実装する (GO-05、IN-03、IN-04、AC-03、AC-04)。",
           "Phase 1 の 9 件孤立ノードのうち L1 (TaskId 等の forward-reference) と L2 (ValidationError) が視覚的に識別可能になる。"
         ],
-        "task_ids": ["T005"]
+        "task_ids": [
+          "T005"
+        ]
       },
       {
         "id": "S06",
@@ -119,7 +120,9 @@
           "MemberDeclaration は既存 domain 型。domain → infrastructure 逆依存禁止を維持 (CN-02)。",
           "対象 4 kind 限定でノイズ制御 (CN-05)。"
         ],
-        "task_ids": ["T006"]
+        "task_ids": [
+          "T006"
+        ]
       },
       {
         "id": "S07",
@@ -128,7 +131,9 @@
           "ContractMapRenderOptions.action_overlay=true の場合に action ごとの classDef (modify/delete/reference) を renderer に追加する (GO-04、IN-06、AC-06)。",
           "action_overlay=false の場合は action-overlay-specific classDef と annotation が出力されない (他の Phase 2 追加は常時適用)。layer-agnostic 不変条件を満たす (CN-01)。"
         ],
-        "task_ids": ["T007"]
+        "task_ids": [
+          "T007"
+        ]
       },
       {
         "id": "S08",
@@ -137,7 +142,9 @@
           "ContractMapRenderOptions.signal_overlay=true の場合に TypeCatalogueDocument.signals() から signal 値を取得してノード fill color を適用する (GO-04、IN-07、AC-07)。",
           "signals()=None のフォールバック処理を含む (ADR §Q2 前者推奨、CN-06)。"
         ],
-        "task_ids": ["T008"]
+        "task_ids": [
+          "T008"
+        ]
       },
       {
         "id": "S09",
@@ -146,7 +153,9 @@
           "3 fixture (2 層 / 3 層デフォルト / 独自層名) に Phase 2 全拡張 (FreeFunction / impl-edge / dashed-border / field edge / overlay) の layer-agnostic 動作テストを追加する (IN-10、AC-08)。",
           "他 fixture の層名が混入しないことを既存の assert_no_foreign_layers で継続検証する (CN-01)。"
         ],
-        "task_ids": ["T009"]
+        "task_ids": [
+          "T009"
+        ]
       },
       {
         "id": "S10",
@@ -155,7 +164,9 @@
           "Phase 2 完了後の dogfood 実行と結果の verification.md への記録、ADR §Known Limitations の L1-L4 Resolved 注記、cargo make ci 全通過 (IN-11、AC-09、AC-10)。",
           "ADR 編集は adr-editor capability 経由で実施 (orchestrator が判断)。"
         ],
-        "task_ids": ["T010"]
+        "task_ids": [
+          "T010"
+        ]
       }
     ]
   }

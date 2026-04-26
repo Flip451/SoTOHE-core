@@ -165,6 +165,7 @@ const SECTIONS: &[Section] = &[
     Section { heading: "## Queries", kind_tag: "query" },
     Section { heading: "## Factories", kind_tag: "factory" },
     Section { heading: "## Secondary Adapters", kind_tag: "secondary_adapter" },
+    Section { heading: "## Free Functions", kind_tag: "free_function" },
 ];
 
 /// Renders the full `domain-types.md` document for a `TypeCatalogueDocument`.
@@ -365,6 +366,23 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
         | TypeDefinitionKind::Factory => "\u{2014}".to_owned(),
+        TypeDefinitionKind::FreeFunction { expected_params, expected_returns } => {
+            let params_str = expected_params
+                .iter()
+                .map(|p| format!("{}: {}", p.name(), p.ty()))
+                .collect::<Vec<_>>()
+                .join(", ");
+            let returns_str = if expected_returns.is_empty() {
+                String::new()
+            } else {
+                format!(" -> {}", expected_returns.join(", "))
+            };
+            if params_str.is_empty() && returns_str.is_empty() {
+                "\u{2014}".to_owned()
+            } else {
+                format!("fn ({params_str}){returns_str}")
+            }
+        }
         TypeDefinitionKind::SecondaryAdapter { implements } => {
             if implements.is_empty() {
                 "\u{2014}".to_owned()
@@ -676,6 +694,52 @@ mod tests {
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| UserFactory | factory |"), "missing factory row");
+    }
+
+    #[test]
+    fn test_render_free_function_entry_row_with_params_and_returns() {
+        // FreeFunction with params and returns renders `fn (name: Ty) -> R` in Details.
+        let entry = make_entry(
+            "load_all_catalogues",
+            TypeDefinitionKind::FreeFunction {
+                expected_params: vec![
+                    domain::tddd::catalogue::ParamDeclaration::new("track_id", "TrackId"),
+                    domain::tddd::catalogue::ParamDeclaration::new("rules", "ArchitectureRules"),
+                ],
+                expected_returns: vec!["LoadAllCataloguesError".into(), "LayerId".into()],
+            },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
+        assert!(
+            output.contains("| load_all_catalogues | free_function |"),
+            "missing free_function row"
+        );
+        assert!(
+            output.contains("fn (track_id: TrackId, rules: ArchitectureRules)"),
+            "missing fn signature"
+        );
+        assert!(output.contains("-> LoadAllCataloguesError, LayerId"), "missing return types");
+        assert!(output.contains("## Free Functions"), "missing ## Free Functions section");
+    }
+
+    #[test]
+    fn test_render_free_function_entry_row_empty_shows_em_dash() {
+        // FreeFunction with no params and no returns renders em-dash in Details.
+        let entry = make_entry(
+            "noop",
+            TypeDefinitionKind::FreeFunction { expected_params: vec![], expected_returns: vec![] },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc, "domain-types.json", None);
+        assert!(output.contains("| noop | free_function |"), "missing free_function row");
+        // Details column should be em-dash when both params and returns are empty.
+        let noop_row =
+            output.lines().find(|l| l.starts_with("| noop |")).expect("noop row must be present");
+        assert!(
+            noop_row.contains("\u{2014}"),
+            "empty FreeFunction must show em-dash in Details, got: {noop_row}"
+        );
     }
 
     #[test]
@@ -1119,6 +1183,10 @@ mod tests {
             TypeDefinitionKind::Query,
             TypeDefinitionKind::Factory,
             TypeDefinitionKind::SecondaryAdapter { implements: Vec::new() },
+            TypeDefinitionKind::FreeFunction {
+                expected_params: Vec::new(),
+                expected_returns: Vec::new(),
+            },
         ];
         let all_kind_tags: HashSet<&str> = samples.iter().map(|k| k.kind_tag()).collect();
 

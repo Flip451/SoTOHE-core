@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-25T23:41:27Z",
-  "declaration_hash": "2d3735bf53a851a65931a11e7002968a040afa28a88fad14ed9a2fd178fcb343",
+  "generated_at": "2026-04-26T01:27:12Z",
+  "declaration_hash": "3513661f481674c2d7573f6a731cd93e5ad287b4d1e32d6c396bb2dcdbd98e76",
   "signals": [
     {
       "type_name": "render_contract_map",
@@ -159,6 +159,28 @@
       "found_items": [
         "Field",
         "Variant"
+      ]
+    },
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ApplicationService",
+        "Command",
+        "Dto",
+        "Enum",
+        "ErrorType",
+        "Factory",
+        "FreeFunction",
+        "Interactor",
+        "Query",
+        "SecondaryAdapter",
+        "SecondaryPort",
+        "Typestate",
+        "UseCase",
+        "ValueObject"
       ]
     }
   ]

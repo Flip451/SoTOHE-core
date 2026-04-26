@@ -192,6 +192,16 @@ enum TypeDefinitionKindDto {
         #[serde(default)]
         implements: Vec<TraitImplDeclDto>,
     },
+    /// Free function declared in the catalogue (T002 / ADR
+    /// `2026-04-17-1528-tddd-contract-map.md` § Known Limitations §L4).
+    /// Carries `expected_params` / `expected_returns` for renderer / future
+    /// signal evaluators; not existence-only — explicit own fields.
+    FreeFunction {
+        #[serde(default)]
+        expected_params: Vec<ParamDto>,
+        #[serde(default)]
+        expected_returns: Vec<String>,
+    },
 }
 
 /// T006 method signature DTO — mirrors `MethodDeclaration`.
@@ -277,8 +287,14 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
             // Existence-only kinds must not carry any structural fields.
             const EXISTENCE_ONLY_KINDS: &[&str] =
                 &["use_case", "interactor", "dto", "command", "query", "factory", "value_object"];
-            const FORBIDDEN_FIELDS_EXISTENCE_ONLY: &[&str] =
-                &["expected_methods", "expected_variants", "transitions_to", "implements"];
+            const FORBIDDEN_FIELDS_EXISTENCE_ONLY: &[&str] = &[
+                "expected_methods",
+                "expected_variants",
+                "transitions_to",
+                "implements",
+                "expected_params",
+                "expected_returns",
+            ];
             if EXISTENCE_ONLY_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_EXISTENCE_ONLY {
@@ -295,13 +311,41 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     }
                 }
             }
+            // `free_function` carries `expected_params` / `expected_returns`
+            // but must not carry fields belonging to other structured variants.
+            // Without this guard `#[serde(flatten)]` + internally-tagged enum
+            // would silently drop those fields (same reason the existence-only
+            // and secondary_adapter guards exist).
+            if kind == "free_function" {
+                const FORBIDDEN_FIELDS_FREE_FUNCTION: &[&str] =
+                    &["expected_methods", "expected_variants", "transitions_to", "implements"];
+                if let Some(obj) = entry_obj {
+                    for forbidden in FORBIDDEN_FIELDS_FREE_FUNCTION {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind 'free_function' does not support field '{}' — \
+                                     use 'expected_params' / 'expected_returns'",
+                                    forbidden
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
             // `secondary_adapter` carries `implements` but must not carry fields
             // belonging to other structured variants (`expected_methods`,
             // `expected_variants`, `transitions_to`).  Without this guard those
             // fields would be silently dropped by serde.
             if kind == "secondary_adapter" {
-                const FORBIDDEN_FIELDS_SECONDARY_ADAPTER: &[&str] =
-                    &["expected_methods", "expected_variants", "transitions_to"];
+                const FORBIDDEN_FIELDS_SECONDARY_ADAPTER: &[&str] = &[
+                    "expected_methods",
+                    "expected_variants",
+                    "transitions_to",
+                    "expected_params",
+                    "expected_returns",
+                ];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_SECONDARY_ADAPTER {
                         if obj.contains_key(*forbidden) {
@@ -318,22 +362,29 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 }
             }
             // Structured non-existence-only kinds (`typestate`, `enum`, `error_type`,
-            // `secondary_port`, `application_service`) do not carry `implements`.
+            // `secondary_port`, `application_service`) do not carry `implements`,
+            // `expected_params`, or `expected_returns`.
             // Without this guard, a payload like `{"kind":"enum","implements":[...]}`
-            // would be silently accepted with the `implements` field dropped by serde.
+            // or `{"kind":"enum","expected_params":[...]}` would be silently accepted
+            // with the cross-kind field dropped by serde.
             const STRUCTURED_KINDS: &[&str] =
                 &["typestate", "enum", "error_type", "secondary_port", "application_service"];
+            const FORBIDDEN_FIELDS_STRUCTURED: &[&str] =
+                &["implements", "expected_params", "expected_returns"];
             if STRUCTURED_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
-                    if obj.contains_key("implements") {
-                        return Err(TypeCatalogueCodecError::InvalidEntry {
-                            name: name.to_owned(),
-                            reason: format!(
-                                "kind '{}' does not support field 'implements' — \
-                                 'implements' is only valid for 'secondary_adapter'",
-                                kind
-                            ),
-                        });
+                    for forbidden in FORBIDDEN_FIELDS_STRUCTURED {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind '{}' does not support field '{}' — \
+                                     'implements' is only valid for 'secondary_adapter', \
+                                     'expected_params'/'expected_returns' only for 'free_function'",
+                                    kind, forbidden
+                                ),
+                            });
+                        }
                     }
                 }
             }
@@ -630,6 +681,38 @@ fn type_definition_kind_from_dto(
             let decls = decode_trait_impl_list(entry_name, implements)?;
             Ok(TypeDefinitionKind::SecondaryAdapter { implements: decls })
         }
+        TypeDefinitionKindDto::FreeFunction { expected_params, expected_returns } => {
+            let mut params = Vec::with_capacity(expected_params.len());
+            for p in expected_params {
+                if p.ty.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "free_function param '{}' ty contains '::' — L1 catalogue entries \
+                             must use last-segment short names: '{}'",
+                            p.name, p.ty
+                        ),
+                    });
+                }
+                params.push(ParamDeclaration::new(p.name.clone(), p.ty.clone()));
+            }
+            for ret in expected_returns {
+                if ret.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "free_function return type contains '::' — L1 catalogue entries \
+                             must use last-segment short names: '{}'",
+                            ret
+                        ),
+                    });
+                }
+            }
+            Ok(TypeDefinitionKind::FreeFunction {
+                expected_params: params,
+                expected_returns: expected_returns.clone(),
+            })
+        }
     }
 }
 
@@ -779,6 +862,16 @@ fn type_catalogue_entry_to_dto(
         TypeDefinitionKind::SecondaryAdapter { implements } => {
             let dtos = encode_trait_impl_list(entry.name(), implements)?;
             TypeDefinitionKindDto::SecondaryAdapter { implements: dtos }
+        }
+        TypeDefinitionKind::FreeFunction { expected_params, expected_returns } => {
+            let params = expected_params
+                .iter()
+                .map(|p| ParamDto { name: p.name().to_owned(), ty: p.ty().to_owned() })
+                .collect();
+            TypeDefinitionKindDto::FreeFunction {
+                expected_params: params,
+                expected_returns: expected_returns.clone(),
+            }
         }
     };
     let spec_refs = spec_refs_to_dtos(entry.spec_refs());
@@ -1640,9 +1733,11 @@ mod tests {
     }
 
     #[test]
-    fn test_round_trip_all_13_variants() {
-        // Verifies that all 13 TypeDefinitionKind variants round-trip through
-        // JSON encode/decode correctly.
+    fn test_round_trip_all_14_variants() {
+        // Verifies that all 14 TypeDefinitionKind variants round-trip through
+        // JSON encode/decode correctly. Entry count is 15 because two `typestate`
+        // entries (Draft non-terminal + Published terminal) cover both transition
+        // shapes.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -1678,18 +1773,146 @@ mod tests {
       "kind": "secondary_adapter",
       "description": "adapter",
       "implements": [{ "trait_name": "TrackReader" }]
+    },
+    {
+      "name": "load_all_catalogues",
+      "kind": "free_function",
+      "description": "free function",
+      "expected_params": [{ "name": "track_id", "ty": "TrackId" }],
+      "expected_returns": ["LoadAllCataloguesError"]
     }
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert_eq!(doc.entries().len(), 14);
+        assert_eq!(doc.entries().len(), 15);
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
-        assert_eq!(doc2.entries().len(), 14);
+        assert_eq!(doc2.entries().len(), 15);
         for (a, b) in doc.entries().iter().zip(doc2.entries()) {
             assert_eq!(a.name(), b.name());
             assert_eq!(a.kind(), b.kind());
         }
+    }
+
+    // --- T002: free_function variant round-trip and rejection ---
+
+    #[test]
+    fn test_round_trip_free_function_with_params_and_returns() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "load_all_catalogues",
+      "kind": "free_function",
+      "description": "Load all per-layer catalogue documents",
+      "expected_params": [
+        { "name": "track_id", "ty": "TrackId" },
+        { "name": "rules", "ty": "ArchitectureRules" }
+      ],
+      "expected_returns": ["LoadAllCataloguesError", "LayerId"]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"free_function\""));
+        assert!(encoded.contains("\"track_id\""));
+        assert!(encoded.contains("\"LoadAllCataloguesError\""));
+    }
+
+    #[test]
+    fn test_round_trip_free_function_empty() {
+        // Empty expected_params + expected_returns should round-trip cleanly
+        // (the renderer just emits an em-dash for the Details column).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "noop", "kind": "free_function", "description": "no-arg sentinel" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        if let TypeDefinitionKind::FreeFunction { expected_params, expected_returns } =
+            doc.entries()[0].kind()
+        {
+            assert!(expected_params.is_empty());
+            assert!(expected_returns.is_empty());
+        } else {
+            panic!("expected FreeFunction kind");
+        }
+    }
+
+    #[test]
+    fn test_decode_free_function_rejects_expected_methods() {
+        // free_function carries expected_params / expected_returns but must
+        // reject method-bearing kind fields (expected_methods et al.).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "broken",
+      "kind": "free_function",
+      "description": "free function carrying forbidden expected_methods",
+      "expected_methods": [
+        { "name": "execute", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale expected_methods on free_function, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_free_function_rejects_module_path_in_param_ty() {
+        // L1 enforcement: param ty must not contain `::` (last-segment short names).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "leaky",
+      "kind": "free_function",
+      "description": "free function with full path in param ty",
+      "expected_params": [{ "name": "id", "ty": "domain::user::UserId" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for `::` in free_function param ty, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_free_function_rejects_module_path_in_return_type() {
+        // L1 enforcement: return type must not contain `::` (last-segment short names).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "leaky_returns",
+      "kind": "free_function",
+      "description": "free function with full path in return type",
+      "expected_returns": ["domain::user::UserId"]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for `::` in free_function return type, got: {:?}",
+            err
+        );
     }
 
     // --- T002: existence-only variant stale-field rejection (Phase 1.5) ---

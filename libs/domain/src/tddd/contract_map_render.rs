@@ -111,6 +111,7 @@ pub fn render_contract_map(
     out.push_str("    classDef command fill:#e3f2fd,stroke:#1976d2\n");
     out.push_str("    classDef query fill:#f3e5f5,stroke:#8e24aa\n");
     out.push_str("    classDef factory fill:#fff8e1,stroke:#f9a825\n");
+    out.push_str("    classDef free_function fill:#e8eaf6,stroke:#3949ab\n");
 
     // 4a. Subgraphs.
     for layer in &active_layers {
@@ -315,6 +316,7 @@ fn node_shape(layer: &LayerId, entry: &TypeCatalogueEntry) -> String {
         TypeDefinitionKind::Command => format!("{id}[{name}]:::command"),
         TypeDefinitionKind::Query => format!("{id}[{name}]:::query"),
         TypeDefinitionKind::Factory => format!("{id}[{name}]:::factory"),
+        TypeDefinitionKind::FreeFunction { .. } => format!("{id}[{name}]:::free_function"),
     }
 }
 
@@ -338,7 +340,8 @@ fn methods_of(kind: &TypeDefinitionKind) -> Vec<&MethodDeclaration> {
         | TypeDefinitionKind::Dto
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
-        | TypeDefinitionKind::Factory => Vec::new(),
+        | TypeDefinitionKind::Factory
+        | TypeDefinitionKind::FreeFunction { .. } => Vec::new(),
     }
 }
 
@@ -454,7 +457,7 @@ mod tests {
     }
 
     #[test]
-    fn test_render_contract_map_emits_13_shape_variants_correctly() {
+    fn test_render_contract_map_emits_14_shape_variants_correctly() {
         let l = layer("sample");
         let entries = vec![
             entry(
@@ -473,6 +476,13 @@ mod tests {
             entry("CmdK", TypeDefinitionKind::Command),
             entry("QryK", TypeDefinitionKind::Query),
             entry("FactK", TypeDefinitionKind::Factory),
+            entry(
+                "FreeFn",
+                TypeDefinitionKind::FreeFunction {
+                    expected_params: vec![],
+                    expected_returns: vec![],
+                },
+            ),
         ];
 
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
@@ -501,6 +511,10 @@ mod tests {
         assert!(text.contains("L6_sample_CmdK[CmdK]:::command"), "command rect + classDef");
         assert!(text.contains("L6_sample_QryK[QryK]:::query"), "query rect + classDef");
         assert!(text.contains("L6_sample_FactK[FactK]:::factory"), "factory rect + classDef");
+        assert!(
+            text.contains("L6_sample_FreeFn[FreeFn]:::free_function"),
+            "free_function rect + classDef"
+        );
     }
 
     #[test]

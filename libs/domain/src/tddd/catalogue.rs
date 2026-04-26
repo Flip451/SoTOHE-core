@@ -397,6 +397,19 @@ pub enum TypeDefinitionKind {
     ///
     /// See ADR `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md` §D1.
     SecondaryAdapter { implements: Vec<TraitImplDecl> },
+    /// A free function (not a type) declared in the catalogue so the renderer
+    /// can attach edges to its parameter and return types.
+    ///
+    /// `expected_params` and `expected_returns` are declared at L1 resolution
+    /// (last-segment short names, generics preserved). Phase 2 forward check
+    /// is existence-only (same evaluator path as `ValueObject`); a richer
+    /// signature check is deferred to a later phase that adds free-function
+    /// support to `TypeGraph` extraction.
+    ///
+    /// See ADR `knowledge/adr/2026-04-17-1528-tddd-contract-map.md`
+    /// § Known Limitations §L4 and `2026-04-13-1813-tddd-taxonomy-expansion`
+    /// §D1 (taxonomy extension).
+    FreeFunction { expected_params: Vec<ParamDeclaration>, expected_returns: Vec<String> },
 }
 
 impl TypeDefinitionKind {
@@ -417,6 +430,7 @@ impl TypeDefinitionKind {
             Self::Query => "query",
             Self::Factory => "factory",
             Self::SecondaryAdapter { .. } => "secondary_adapter",
+            Self::FreeFunction { .. } => "free_function",
         }
     }
 }
@@ -1047,7 +1061,7 @@ mod tests {
     }
 
     #[test]
-    fn test_all_thirteen_kind_tags_are_unique() {
+    fn test_all_fourteen_kind_tags_are_unique() {
         let tags = [
             TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal }
                 .kind_tag(),
@@ -1063,9 +1077,11 @@ mod tests {
             TypeDefinitionKind::Query.kind_tag(),
             TypeDefinitionKind::Factory.kind_tag(),
             TypeDefinitionKind::SecondaryAdapter { implements: vec![] }.kind_tag(),
+            TypeDefinitionKind::FreeFunction { expected_params: vec![], expected_returns: vec![] }
+                .kind_tag(),
         ];
         let unique: std::collections::HashSet<&str> = tags.iter().copied().collect();
-        assert_eq!(unique.len(), 13, "all 13 kind tags must be distinct");
+        assert_eq!(unique.len(), 14, "all 14 kind tags must be distinct");
     }
 
     #[test]

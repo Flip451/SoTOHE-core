@@ -23,6 +23,7 @@ flowchart LR
         L6_domain_NonEmptyString(NonEmptyString)
         L6_domain_ReviewGroupName(ReviewGroupName)
         L6_domain_MemberDeclaration{{MemberDeclaration}}
+        L6_domain_TypeDefinitionKind{{TypeDefinitionKind}}
     end
     subgraph usecase [usecase]
         L7_usecase_RenderContractMap[/RenderContractMap\]

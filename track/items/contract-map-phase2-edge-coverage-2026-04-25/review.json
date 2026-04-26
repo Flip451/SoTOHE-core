@@ -56,6 +56,54 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Routing `FreeFunction` through `evaluate_value_object()` makes the new kind depend on `profile.get_type(name)`, so it is not truly existence-only: a same-named type can turn the signal Blue/Red instead of the intended Yellow until function support exists in `TypeGraph`. This also leaves `Delete` entries for free functions validated against the wrong namespace.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2f24ff8cff2ffce82c809fc5c1205f71846890b323522e97e3d24fb4982f02da",
+          "at": "2026-04-25T23:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T00:54:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeAction::Delete` for `FreeFunction` is reported as Blue unconditionally even though `TypeGraph` cannot observe free functions. That means a catalogue entry can claim a free function was deleted and pass the signal check while the function still exists in source. Since this state is unverifiable until function extraction exists, it should not be treated as a successful deletion; return Yellow/unverifiable or disallow Delete for this kind.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 104,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T00:56:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efe74b48ea8a313e6f66619360fc28f2ca8044398367ee1380ed987c2fa047a1",
+          "at": "2026-04-26T01:14:45Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -439,6 +487,185 @@
           "findings": [],
           "hash": "rvw1:sha256:0ffd7b10a31b13145b9c49b1442c2d6a649cd77c6f09591911a5cd43e126d35d",
           "at": "2026-04-25T23:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5380a2cc33b65d7f1fbfd55de2471570ede57f0cd40e422de4c2ccff8f636f71",
+          "at": "2026-04-25T23:51:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5380a2cc33b65d7f1fbfd55de2471570ede57f0cd40e422de4c2ccff8f636f71",
+          "at": "2026-04-25T23:52:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b543c20933049df00947a18c3ccbc7bafb020ab325385dd0449c7f4afa654e0",
+          "at": "2026-04-26T00:53:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b543c20933049df00947a18c3ccbc7bafb020ab325385dd0449c7f4afa654e0",
+          "at": "2026-04-26T00:54:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This staged change adds a new decision-bearing domain catalogue entry for `TypeDefinitionKind`, but the plan-artifacts briefing says this scope is only the T001/T002 `todo` -> `in_progress` transition and that `<layer>-types` artifacts/contract-map should be unchanged. That is a semantic contradiction in the reviewed artifacts: the transition now also records the 13 -> 14 taxonomy change in `domain-types.json` and its generated views, so the plan-artifacts scope is no longer status-only.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/domain-types.json",
+              "line": 338,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2dbdf38737bf18317503265c84e0cf2991def3ee67c279f04f1fffee4b8c3426",
+          "at": "2026-04-26T01:19:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The TypeDefinitionKind catalogue entry overstates the L4 outcome as already resolving the isolated-node category, while the same track plan/spec say Phase 2 only adds FreeFunction as the basis for L4 and defers actual param/return edge rendering to Phase 3. This makes the plan artifacts inconsistent about whether L4 is resolved now or only prepared for later resolution.",
+              "severity": "P1",
+              "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/domain-types.json",
+              "line": 339,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2dbdf38737bf18317503265c84e0cf2991def3ee67c279f04f1fffee4b8c3426",
+          "at": "2026-04-26T01:22:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac3b09a81b5e56e8dacd694bfd41490eb77deee454ea3daf332f21a901dcfd90",
+          "at": "2026-04-26T01:27:01Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `FreeFunction` decode arm moves `expected_returns` in the validation loop and then uses it again in `expected_returns.clone()`, which triggers E0382 and prevents the crate from compiling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 681,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b25d292f3bda92f92bcc37a0fa3bcd44575bf02f4726d76a0ae43fd8a9dfa787",
+          "at": "2026-04-26T00:55:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This arm consumes `expected_returns` in `for ret in expected_returns` and then uses it again in `expected_returns: expected_returns.clone()`, which is a borrow-checker compile error (`use of moved value: expected_returns`). Iterate over `&expected_returns` or return the moved vector directly.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 681,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `FreeFunction` rendering branch is never reached because `render_type_catalogue()` still filters entries through the static `SECTIONS` list, and that list has no `free_function` section. Free-function entries will therefore be omitted from the generated `*-types.md` output even though this formatter exists.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 368,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b25d292f3bda92f92bcc37a0fa3bcd44575bf02f4726d76a0ae43fd8a9dfa787",
+          "at": "2026-04-26T00:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `for ret in expected_returns` loop moves the vector, so `expected_returns.clone()` below is a use-after-move compile error; this blocks the new `free_function` decode arm from building.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 695,
+              "category": "build"
+            },
+            {
+              "message": "This match arm is missing a trailing comma, so `render_details` does not parse. Add `,` after the `FreeFunction` arm before `SecondaryAdapter`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 385,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:4fe5c8b7158aa5d951f6c4e4eb627836ad42b064ddb7b61ea347426fc0f3a8ce",
+          "at": "2026-04-26T00:59:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`free_function`'s stale-field guard still only rejects `expected_methods` / `expected_variants` / `transitions_to` / `implements`. Because `expected_params` and `expected_returns` are now schema fields, malformed non-`free_function` payloads that include them will deserialize and silently drop them instead of being rejected at the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 314,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:4fe5c8b7158aa5d951f6c4e4eb627836ad42b064ddb7b61ea347426fc0f3a8ce",
+          "at": "2026-04-26T01:01:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "No test exercises the new `FreeFunction` markdown rendering path, so regressions in the `fn (...) -> ...` details format or the new section emission would still pass the current suite.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 369,
+              "category": "testing"
+            },
+            {
+              "message": "The new `expected_returns` L1 validation branch has no dedicated reject test; the added coverage only hits the `expected_params` path, so a broken `::` check on return types would go unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 699,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:85116a40a6a833d4c2987604357c478500313e5d77d8b108bfcefcf3b12c01d7",
+          "at": "2026-04-26T01:05:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9955d78b37f12dca49921241119b6f25912a519700df204ad0e12ce73cfc5b3e",
+          "at": "2026-04-26T01:09:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9955d78b37f12dca49921241119b6f25912a519700df204ad0e12ce73cfc5b3e",
+          "at": "2026-04-26T01:12:36Z"
         }
       ]
     }

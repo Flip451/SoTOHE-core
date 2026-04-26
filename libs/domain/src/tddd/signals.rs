@@ -65,6 +65,7 @@ fn evaluate_single(
             evaluate_enum(name, &kind_tag, expected_variants, profile)
         }
         TypeDefinitionKind::ValueObject => evaluate_value_object(name, &kind_tag, profile),
+        TypeDefinitionKind::FreeFunction { .. } => evaluate_free_function(name, &kind_tag),
         TypeDefinitionKind::ErrorType { expected_variants } => {
             evaluate_error_type(name, &kind_tag, expected_variants, profile)
         }
@@ -89,13 +90,29 @@ fn evaluate_single(
 /// Evaluates a `Delete`-action entry: absent from code → Blue, still present → Yellow.
 ///
 /// `SecondaryPort` and `ApplicationService` entries check `graph.get_trait()`; all other
-/// kinds check `graph.get_type()`.
+/// kinds check `graph.get_type()`. `FreeFunction` is always Blue because `TypeGraph` has no
+/// function namespace in Phase 2 — consulting `get_type` would silently match a coincidental
+/// same-named type.
 fn evaluate_delete(
     name: &str,
     kind_tag: &str,
     kind: &TypeDefinitionKind,
     profile: &TypeGraph,
 ) -> TypeSignal {
+    // FreeFunction: TypeGraph has no function namespace in Phase 2.
+    // A Delete entry for a free function is always Blue (nothing to remove from TypeGraph).
+    if matches!(kind, TypeDefinitionKind::FreeFunction { .. }) {
+        return TypeSignal::new(
+            name,
+            kind_tag,
+            ConfidenceSignal::Blue,
+            false,
+            vec![],
+            vec![],
+            vec![],
+        );
+    }
+
     let present = if matches!(
         kind,
         TypeDefinitionKind::SecondaryPort { .. } | TypeDefinitionKind::ApplicationService { .. }
@@ -243,6 +260,21 @@ fn evaluate_value_object(name: &str, kind_tag: &str, profile: &TypeGraph) -> Typ
     } else {
         red(name, kind_tag, true)
     }
+}
+
+/// Phase 2 existence-only evaluator for `FreeFunction` entries.
+///
+/// `TypeGraph` extraction does not include free functions in Phase 2 (function
+/// support is deferred to a later phase). Consulting `get_type(name)` would
+/// silently match a coincidentally same-named type (struct/enum) and produce a
+/// spurious Blue or Red signal. Instead, this evaluator always returns Yellow —
+/// the canonical "declared but not yet verifiable" signal for Phase 2 free
+/// functions.
+///
+/// The signal is intentional: the merge gate runs in interim mode during Phase 2
+/// and treats Yellow as a warning rather than a blocker.
+fn evaluate_free_function(name: &str, kind_tag: &str) -> TypeSignal {
+    yellow(name, kind_tag)
 }
 
 fn evaluate_error_type(
@@ -774,6 +806,73 @@ mod tests {
         let profile = TypeGraph::new(types, traits);
         let results = evaluate_type_signals(&[entry], &profile);
         assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+    }
+
+    // --- FreeFunction evaluator tests ---
+
+    #[test]
+    fn test_evaluate_free_function_is_always_yellow_when_absent() {
+        // FreeFunction is always Yellow regardless of profile state — TypeGraph has no
+        // function namespace in Phase 2, so no function lookup is performed.
+        let entry = TypeCatalogueEntry::new(
+            "my_free_fn",
+            "desc",
+            TypeDefinitionKind::FreeFunction { expected_params: vec![], expected_returns: vec![] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]); // nothing in profile
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(!results.first().unwrap().found_type());
+    }
+
+    #[test]
+    fn test_evaluate_free_function_is_yellow_even_when_same_named_type_exists() {
+        // Regression: routing FreeFunction through evaluate_value_object would
+        // silently match a coincidentally same-named struct type and return Blue/Red.
+        // The dedicated evaluator must always return Yellow regardless of profile content.
+        let entry = TypeCatalogueEntry::new(
+            "my_free_fn",
+            "desc",
+            TypeDefinitionKind::FreeFunction { expected_params: vec![], expected_returns: vec![] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Profile contains a same-named struct — must NOT change the signal.
+        let profile = make_profile(&["my_free_fn"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(
+            results.first().unwrap().signal(),
+            ConfidenceSignal::Yellow,
+            "FreeFunction must be Yellow even when a same-named type exists in the TypeGraph"
+        );
+        assert!(!results.first().unwrap().found_type());
+    }
+
+    #[test]
+    fn test_evaluate_free_function_delete_is_always_blue() {
+        // Delete action for FreeFunction must be Blue unconditionally — TypeGraph has
+        // no function namespace, so `get_type` must not be consulted.
+        let entry = TypeCatalogueEntry::new(
+            "old_fn",
+            "desc",
+            TypeDefinitionKind::FreeFunction { expected_params: vec![], expected_returns: vec![] },
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        // Even when a same-named type exists in the profile, the signal must be Blue.
+        let profile = make_profile(&["old_fn"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(
+            results.first().unwrap().signal(),
+            ConfidenceSignal::Blue,
+            "FreeFunction Delete must be Blue — TypeGraph has no function namespace"
+        );
+        assert!(!results.first().unwrap().found_type());
     }
 
     #[test]

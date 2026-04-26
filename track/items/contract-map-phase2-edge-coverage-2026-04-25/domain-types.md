@@ -5,6 +5,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | MemberDeclaration | enum | reference | Variant, Field | 🔵 | 🔵 |
+| TypeDefinitionKind | enum | modify | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, FreeFunction | 🔵 | 🔵 |
 
 ## Value Objects
 

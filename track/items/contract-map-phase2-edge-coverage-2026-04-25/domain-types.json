@@ -333,6 +333,46 @@
           "hash": "4789fc4142d10ed7b450d9a8dfbc8e07e9d83d875bcc2a555aed79dbe6047663"
         }
       ]
+    },
+    {
+      "name": "TypeDefinitionKind",
+      "description": "Domain enum representing the 14-variant taxonomy of type catalogue entries. Phase 2 adds the 14th variant FreeFunction (IN-01 / IN-09), establishing the structural basis for L4 isolated-node resolution identified in ADR Known Limitations. With FreeFunction in place, free functions can appear as rendered nodes in the contract-map (visual identification achieved in Phase 2); param/return-type edge rendering is deferred to Phase 3. action=modify records the baseline 13 → 14 structural change.",
+      "approved": true,
+      "action": "modify",
+      "kind": "enum",
+      "expected_variants": [
+        "Typestate",
+        "Enum",
+        "ValueObject",
+        "ErrorType",
+        "SecondaryPort",
+        "ApplicationService",
+        "UseCase",
+        "Interactor",
+        "Dto",
+        "Command",
+        "Query",
+        "Factory",
+        "SecondaryAdapter",
+        "FreeFunction"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-01",
+          "hash": "d15e9aad5cba130137e315d6ffd470d926195c2e07183a0c59b00ccc1ee4d85b"
+        },
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "IN-09",
+          "hash": "af83c88c34719f4146a7c43cf25f0657431655775a53201cf7bbf22f7e192edd"
+        },
+        {
+          "file": "track/items/contract-map-phase2-edge-coverage-2026-04-25/spec.json",
+          "anchor": "GO-02",
+          "hash": "65cf73753e963421f97fc9d2254840fe72672c0a54960fc881de769dad8ec010"
+        }
+      ]
     }
   ]
 }
