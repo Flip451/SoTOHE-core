@@ -20,6 +20,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
 
+use crate::ConfidenceSignal;
 use crate::tddd::LayerId;
 use crate::tddd::catalogue::{
     MethodDeclaration, TraitImplDecl, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
@@ -137,6 +138,32 @@ pub fn render_contract_map(
         );
         out.push_str("    classDef reference_action stroke-dasharray: 2 4\n");
     }
+    // T008 / IN-07 / ADR §D5: signal overlay classDefs. Only emitted when
+    // `opts.signal_overlay = true` AND the per-layer `signals()` payload
+    // contains at least one Yellow or Red signal. `Blue` keeps the default
+    // colour. When a layer's `signals()` is `None`, that layer contributes
+    // nothing to either the header gate or the per-node annotations
+    // (complete silence — not "treat as Blue with classDef").
+    let has_signal_to_show = opts.signal_overlay
+        && entries.iter().any(|(layer, entry)| {
+            catalogues
+                .get(*layer)
+                .and_then(TypeCatalogueDocument::signals)
+                .map(|sigs| {
+                    sigs.iter().any(|s| {
+                        s.type_name() == entry.name()
+                            && matches!(
+                                s.signal(),
+                                ConfidenceSignal::Yellow | ConfidenceSignal::Red
+                            )
+                    })
+                })
+                .unwrap_or(false)
+        });
+    if has_signal_to_show {
+        out.push_str("    classDef yellow_signal fill:#fff3e0\n");
+        out.push_str("    classDef red_signal fill:#ffebee\n");
+    }
 
     // 4a. Subgraphs.
     for layer in &active_layers {
@@ -144,7 +171,24 @@ pub fn render_contract_map(
         let _ = writeln!(out, "    subgraph {label} [{raw}]", raw = layer.as_ref());
         for (entry_layer, entry) in &entries {
             if entry_layer == layer {
-                let _ = writeln!(out, "        {}", node_shape(layer, entry, opts.action_overlay));
+                let mut shape = node_shape(layer, entry, opts.action_overlay);
+                // T008: append `:::yellow_signal` / `:::red_signal` for entries
+                // whose looked-up signal is Yellow / Red. Only when overlay is
+                // enabled AND the layer's `signals()` payload exists.
+                if opts.signal_overlay {
+                    if let Some(sigs) =
+                        catalogues.get(*layer).and_then(TypeCatalogueDocument::signals)
+                    {
+                        if let Some(s) = sigs.iter().find(|s| s.type_name() == entry.name()) {
+                            match s.signal() {
+                                ConfidenceSignal::Yellow => shape.push_str(":::yellow_signal"),
+                                ConfidenceSignal::Red => shape.push_str(":::red_signal"),
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+                let _ = writeln!(out, "        {shape}");
             }
         }
         out.push_str("    end\n");
@@ -487,7 +531,8 @@ mod tests {
     use super::*;
     use crate::tddd::catalogue::{
         MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction,
-        TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
+        TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
+        TypestateTransitions,
     };
 
     fn layer(name: &str) -> LayerId {
@@ -1135,6 +1180,158 @@ mod tests {
         assert!(
             !text.contains(" -.impl.-> "),
             "no impl edge expected when target is not an ApplicationService; output was:\n{text}"
+        );
+    }
+
+    // --- T008 / IN-07 / ADR §D5: signal overlay ---
+
+    fn doc_with_signals(
+        entries: Vec<TypeCatalogueEntry>,
+        signals: Vec<TypeSignal>,
+    ) -> TypeCatalogueDocument {
+        let mut d = doc(entries);
+        d.set_signals(signals);
+        d
+    }
+
+    #[test]
+    fn test_render_contract_map_signal_overlay_emits_classdefs_and_annotations() {
+        // signals() with Yellow + Red present → both classDefs in header, both
+        // node annotations applied. Blue → no annotation.
+        let domain = layer("domain");
+        let entries = vec![
+            entry("BlueOne", TypeDefinitionKind::ValueObject),
+            entry("YellowOne", TypeDefinitionKind::ValueObject),
+            entry("RedOne", TypeDefinitionKind::ValueObject),
+        ];
+        let signals = vec![
+            TypeSignal::new(
+                "BlueOne",
+                "value_object",
+                ConfidenceSignal::Blue,
+                true,
+                vec![],
+                vec![],
+                vec![],
+            ),
+            TypeSignal::new(
+                "YellowOne",
+                "value_object",
+                ConfidenceSignal::Yellow,
+                true,
+                vec![],
+                vec![],
+                vec![],
+            ),
+            TypeSignal::new(
+                "RedOne",
+                "value_object",
+                ConfidenceSignal::Red,
+                true,
+                vec![],
+                vec![],
+                vec![],
+            ),
+        ];
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), doc_with_signals(entries, signals));
+        let opts = ContractMapRenderOptions { signal_overlay: true, ..Default::default() };
+        let content = render_contract_map(&catalogues, std::slice::from_ref(&domain), &opts);
+        let text = content.as_ref();
+        assert!(text.contains("classDef yellow_signal"), "yellow_signal classDef must appear");
+        assert!(text.contains("classDef red_signal"), "red_signal classDef must appear");
+        assert!(
+            text.contains("L6_domain_YellowOne(YellowOne):::yellow_signal"),
+            "Yellow node must carry :::yellow_signal; output was:\n{text}"
+        );
+        assert!(
+            text.contains("L6_domain_RedOne(RedOne):::red_signal"),
+            "Red node must carry :::red_signal; output was:\n{text}"
+        );
+        assert!(
+            !text.contains(":::yellow_signal\n        L6_domain_BlueOne")
+                && !text.contains("L6_domain_BlueOne(BlueOne):::yellow_signal")
+                && !text.contains("L6_domain_BlueOne(BlueOne):::red_signal"),
+            "Blue node must NOT carry any signal classDef; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_signal_overlay_no_classdefs_when_all_blue() {
+        // signal_overlay=true but all entries are Blue → no signal classDef
+        // header lines (the gate fires only on at least one Yellow or Red).
+        let domain = layer("domain");
+        let entries = vec![entry("OnlyBlue", TypeDefinitionKind::ValueObject)];
+        let signals = vec![TypeSignal::new(
+            "OnlyBlue",
+            "value_object",
+            ConfidenceSignal::Blue,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )];
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), doc_with_signals(entries, signals));
+        let opts = ContractMapRenderOptions { signal_overlay: true, ..Default::default() };
+        let content = render_contract_map(&catalogues, std::slice::from_ref(&domain), &opts);
+        let text = content.as_ref();
+        assert!(
+            !text.contains("classDef yellow_signal"),
+            "yellow_signal classDef must NOT appear when no Yellow/Red signal"
+        );
+        assert!(
+            !text.contains("classDef red_signal"),
+            "red_signal classDef must NOT appear when no Yellow/Red signal"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_signal_overlay_silent_when_signals_none() {
+        // signals() == None → signal_overlay=true output equals signal_overlay=false
+        // output (complete silence — not "treat as Blue with classDef").
+        let domain = layer("domain");
+        let domain_doc = doc(vec![entry("NoSignals", TypeDefinitionKind::ValueObject)]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let opts_overlay = ContractMapRenderOptions { signal_overlay: true, ..Default::default() };
+        let opts_off = ContractMapRenderOptions::empty();
+        let with_overlay =
+            render_contract_map(&catalogues, std::slice::from_ref(&domain), &opts_overlay);
+        let without_overlay =
+            render_contract_map(&catalogues, std::slice::from_ref(&domain), &opts_off);
+        assert_eq!(
+            with_overlay.as_ref(),
+            without_overlay.as_ref(),
+            "signals()=None must produce identical output regardless of signal_overlay flag"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_signal_overlay_disabled_omits_classdefs_and_annotations() {
+        let domain = layer("domain");
+        let entries = vec![entry("YellowOne", TypeDefinitionKind::ValueObject)];
+        let signals = vec![TypeSignal::new(
+            "YellowOne",
+            "value_object",
+            ConfidenceSignal::Yellow,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )];
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), doc_with_signals(entries, signals));
+        let opts = ContractMapRenderOptions::empty();
+        let content = render_contract_map(&catalogues, std::slice::from_ref(&domain), &opts);
+        let text = content.as_ref();
+        assert!(
+            !text.contains("classDef yellow_signal"),
+            "yellow_signal classDef must be absent when signal_overlay=false"
+        );
+        assert!(
+            !text.contains(":::yellow_signal"),
+            "signal annotation must be absent when signal_overlay=false"
         );
     }
 

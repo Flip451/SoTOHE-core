@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD Contract Map Phase 2 — Edge coverage で孤立ノード 9 件 (L1-L4) を解消
 
-## Tasks (6/10 resolved)
+## Tasks (7/10 resolved)
 
 ### S01 — Domain: FreeFunction Kind Addition
 
@@ -53,14 +53,14 @@
 > ContractMapRenderOptions.action_overlay=true の場合に action ごとの classDef (modify/delete/reference) を renderer に追加する (GO-04、IN-06、AC-06)。
 > action_overlay=false の場合は action-overlay-specific classDef と annotation が出力されない (他の Phase 2 追加は常時適用)。layer-agnostic 不変条件を満たす (CN-01)。
 
-- [~] **T007**: Implement action overlay in contract_map_render.rs (domain). When opts.action_overlay=true, add action-specific classDef lines to the mermaid header (modify_action: stroke-dasharray for dashed border; delete_action: line-through text + light fill; reference_action: sparse stroke-dasharray for dotted border; add_action is the default — no extra classDef). Attach :::action_classDef to each node shape string based on entry.action(). When action_overlay=false, action-overlay-specific classDef lines (modify_action/delete_action/reference_action) and :::action_classDef annotations are absent from output — other Phase 2 additions (unused_reference, declaration_only classDefs from T005) are always present regardless of this flag. Unit tests: action_overlay=true produces each action classDef and node annotation; action_overlay=false produces output without action-overlay classDefs (regression guard for the action overlay feature only).
+- [x] **T007**: Implement action overlay in contract_map_render.rs (domain). When opts.action_overlay=true, add action-specific classDef lines to the mermaid header (modify_action: stroke-dasharray for dashed border; delete_action: line-through text + light fill; reference_action: sparse stroke-dasharray for dotted border; add_action is the default — no extra classDef). Attach :::action_classDef to each node shape string based on entry.action(). When action_overlay=false, action-overlay-specific classDef lines (modify_action/delete_action/reference_action) and :::action_classDef annotations are absent from output — other Phase 2 additions (unused_reference, declaration_only classDefs from T005) are always present regardless of this flag. Unit tests: action_overlay=true produces each action classDef and node annotation; action_overlay=false produces output without action-overlay classDefs (regression guard for the action overlay feature only). (`8294e5f049f14ae9d9e2f543f70403fbe5b5752c`)
 
 ### S08 — Domain: Signal Overlay
 
 > ContractMapRenderOptions.signal_overlay=true の場合に TypeCatalogueDocument.signals() から signal 値を取得してノード fill color を適用する (GO-04、IN-07、AC-07)。
 > signals()=None のフォールバック処理を含む (ADR §Q2 前者推奨、CN-06)。
 
-- [ ] **T008**: Implement signal overlay in contract_map_render.rs (domain). When opts.signal_overlay=true, read TypeCatalogueDocument.signals() for each layer's document. For each entry, look up its TypeSignal by type name. Map signal values to classDef: Yellow -> fill:#fff3e0; Red -> fill:#ffebee; Blue -> no classDef change (default colour). Add signal-specific classDef lines to the mermaid header only when at least one Yellow or Red signal is present. Attach :::signal_classDef to node shape strings for Yellow/Red entries. When signals() is None for a layer's document, produce the same output as signal_overlay=false for that layer — no signal-specific classDef header lines and no :::signal_classDef annotations (complete silence, not 'treat as Blue with classDef'). When signal_overlay=false, signal-overlay-specific classDef lines and :::signal_classDef annotations are absent from output — other Phase 2 additions are always present. Unit tests: Blue/Yellow/Red/None for four nodes; signal_overlay=false produces output without signal-overlay classDefs; signals()=None produces identical output to signal_overlay=false (not just Blue treatment).
+- [~] **T008**: Implement signal overlay in contract_map_render.rs (domain). When opts.signal_overlay=true, read TypeCatalogueDocument.signals() for each layer's document. For each entry, look up its TypeSignal by type name. Map signal values to classDef: Yellow -> fill:#fff3e0; Red -> fill:#ffebee; Blue -> no classDef change (default colour). Add signal-specific classDef lines to the mermaid header only when at least one Yellow or Red signal is present. Attach :::signal_classDef to node shape strings for Yellow/Red entries. When signals() is None for a layer's document, produce the same output as signal_overlay=false for that layer — no signal-specific classDef header lines and no :::signal_classDef annotations (complete silence, not 'treat as Blue with classDef'). When signal_overlay=false, signal-overlay-specific classDef lines and :::signal_classDef annotations are absent from output — other Phase 2 additions are always present. Unit tests: Blue/Yellow/Red/None for four nodes; signal_overlay=false produces output without signal-overlay classDefs; signals()=None produces identical output to signal_overlay=false (not just Blue treatment).
 
 ### S09 — Layer-Agnostic Integration Tests
 

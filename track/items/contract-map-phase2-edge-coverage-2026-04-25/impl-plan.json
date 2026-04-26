@@ -40,12 +40,13 @@
     {
       "id": "T007",
       "description": "Implement action overlay in contract_map_render.rs (domain). When opts.action_overlay=true, add action-specific classDef lines to the mermaid header (modify_action: stroke-dasharray for dashed border; delete_action: line-through text + light fill; reference_action: sparse stroke-dasharray for dotted border; add_action is the default — no extra classDef). Attach :::action_classDef to each node shape string based on entry.action(). When action_overlay=false, action-overlay-specific classDef lines (modify_action/delete_action/reference_action) and :::action_classDef annotations are absent from output — other Phase 2 additions (unused_reference, declaration_only classDefs from T005) are always present regardless of this flag. Unit tests: action_overlay=true produces each action classDef and node annotation; action_overlay=false produces output without action-overlay classDefs (regression guard for the action overlay feature only).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "8294e5f049f14ae9d9e2f543f70403fbe5b5752c"
     },
     {
       "id": "T008",
       "description": "Implement signal overlay in contract_map_render.rs (domain). When opts.signal_overlay=true, read TypeCatalogueDocument.signals() for each layer's document. For each entry, look up its TypeSignal by type name. Map signal values to classDef: Yellow -> fill:#fff3e0; Red -> fill:#ffebee; Blue -> no classDef change (default colour). Add signal-specific classDef lines to the mermaid header only when at least one Yellow or Red signal is present. Attach :::signal_classDef to node shape strings for Yellow/Red entries. When signals() is None for a layer's document, produce the same output as signal_overlay=false for that layer — no signal-specific classDef header lines and no :::signal_classDef annotations (complete silence, not 'treat as Blue with classDef'). When signal_overlay=false, signal-overlay-specific classDef lines and :::signal_classDef annotations are absent from output — other Phase 2 additions are always present. Unit tests: Blue/Yellow/Red/None for four nodes; signal_overlay=false produces output without signal-overlay classDefs; signals()=None produces identical output to signal_overlay=false (not just Blue treatment).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T009",
