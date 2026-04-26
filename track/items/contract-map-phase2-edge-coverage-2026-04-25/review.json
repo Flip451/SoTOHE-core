@@ -1,75 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 921,
-              "category": "factual"
-            },
-            {
-              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 925,
-              "category": "factual"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:15:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:16:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 919,
-              "category": "docs"
-            }
-          ],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T16:18:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
-          "at": "2026-04-25T17:26:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:27:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
-          "at": "2026-04-26T03:28:40Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -640,46 +571,38 @@
           "findings": [],
           "hash": "rvw1:sha256:51e123f8fb3b9e1e66d818d5d683284f62097d9bc285100ea0705750deb4ee1d",
           "at": "2026-04-26T04:03:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9441150d055de9615f432a8e5818c723a502875db951c29c760b2592f5db52ae",
+          "at": "2026-04-26T04:19:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9441150d055de9615f432a8e5818c723a502875db951c29c760b2592f5db52ae",
+          "at": "2026-04-26T04:20:04Z"
         }
       ]
     },
-    "harness-policy": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:43:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 73,
-              "category": "workflow_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:45:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:46:05Z"
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:33:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
-          "at": "2026-04-26T03:48:07Z"
+          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
+          "at": "2026-04-26T02:35:29Z"
         }
       ]
     },
@@ -926,6 +849,57 @@
           "findings": [],
           "hash": "rvw1:sha256:cd08157e93ee1ed2061fc47d0b6b9efaff05da6a07f32d106c294ef91442fa45",
           "at": "2026-04-26T03:23:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bbc9d899ccec36b4210312041ff6fd8029ad279062e3ffc979a3a9e84cf9b29",
+          "at": "2026-04-26T04:08:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009/IN-10 asks the layer-agnostic test catalogue to cover field edges for all field-bearing kinds, but the helper only creates a Dto field edge. A renderer regression that drops Command, Query, or ValueObject field-edge handling would still pass these infrastructure tests. Add field-bearing entries and assertions for the other allowed kinds.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/contract_map_layer_agnostic.rs",
+              "line": 250,
+              "category": "testing"
+            },
+            {
+              "message": "IN-06 covers the action overlay variants, including delete_action, but the test fixture has only Modify and Reference entries and the assertion never checks delete_action. A regression removing delete-action rendering would pass this layer-agnostic suite. Include a Delete entry and assert its classDef/node annotation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/contract_map_layer_agnostic.rs",
+              "line": 329,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:3bbc9d899ccec36b4210312041ff6fd8029ad279062e3ffc979a3a9e84cf9b29",
+          "at": "2026-04-26T04:10:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 2 assertions do not bind the edge source, label, and target together. For example, the IN-05 check passes whenever any `ThingDto -->|\".id\"|` edge exists and the `ThingId` node is present somewhere, even if the field edge targets the wrong node. The same loose substring pattern is used for the impl edge and overlay target checks, so these tests can pass without proving the IN-10 feature is attached to the intended type. Assert the full rendered Mermaid line using the layer-specific node ids.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/contract_map_layer_agnostic.rs",
+              "line": 326,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:3bbc9d899ccec36b4210312041ff6fd8029ad279062e3ffc979a3a9e84cf9b29",
+          "at": "2026-04-26T04:13:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72beb1305433397ecdf569c0be2fd52ef012934ea523b4497e973cc7ab96bc19",
+          "at": "2026-04-26T04:17:56Z"
         }
       ]
     },
@@ -1055,21 +1029,112 @@
         }
       ]
     },
-    "cli": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:33:59Z"
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:43:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new zero-findings guard tells the agent to run `bin/sotp review status`, but the repo's Claude permission hook explicitly denies that direct command whenever the cargo-make wrapper exists and points agents to `cargo make track-review-status` instead. This means the newly added completion gate can fail at the exact point it is supposed to unblock the loop, so the policy should use the wrapper command here.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 73,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:45:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:46:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7b64efebda4c186f2f81bd9789d4eec8bfb8b5cac2615a10d420e291b84d5b8c",
-          "at": "2026-04-26T02:35:29Z"
+          "hash": "rvw1:sha256:19cd30edfac6660516210140b6f0be5c6955e8c4c202ab2bf168927c1c837fd9",
+          "at": "2026-04-26T03:48:07Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims `/track:full-cycle` conflicts with `track-transition`, but the documented flow already moves `todo` tasks to `in_progress` in `/track:implement` before the post-commit `done --commit-hash` step. The alleged direct `todo -> done` path is not part of the workflow, so this records a non-existent inconsistency.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 921,
+              "category": "factual"
+            },
+            {
+              "message": "The remediation hypothesis is stale: `apps/cli/src/commands/hook.rs::emit_verdict()` already prints blocked reasons to stdout on a block verdict, and `libs/domain/src/guard/policy.rs` already returns the specific policy messages. The observed `No stderr output` therefore is not caused by missing stdout emission in `policy.rs`.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 925,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:15:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:16:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WF-83 records the post-commit transition command as `cargo make track-transition T<n> done --commit-hash <hash>`, but the wrapper requires the track directory before the task id (`<track_dir> <task_id> <status>`). The implementation errors with the usage string when that first argument is missing, so this TODO entry preserves an invalid command shape for the workflow it is documenting.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 919,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T16:18:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e015a9823c3e80713d5fc5e8a1de1926e518c652d81d9ebbb9d8ff7c80137b9",
+          "at": "2026-04-25T17:26:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:27:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6936b63b58da1877ceec0ee7ba905525402d0d045d50b1089451d9dcbd955c",
+          "at": "2026-04-26T03:28:40Z"
         }
       ]
     }

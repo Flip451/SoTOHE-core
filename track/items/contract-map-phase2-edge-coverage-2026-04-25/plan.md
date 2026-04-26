@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD Contract Map Phase 2 — Edge coverage で孤立ノード 9 件 (L1-L4) を解消
 
-## Tasks (7/10 resolved)
+## Tasks (8/10 resolved)
 
 ### S01 — Domain: FreeFunction Kind Addition
 
@@ -60,14 +60,14 @@
 > ContractMapRenderOptions.signal_overlay=true の場合に TypeCatalogueDocument.signals() から signal 値を取得してノード fill color を適用する (GO-04、IN-07、AC-07)。
 > signals()=None のフォールバック処理を含む (ADR §Q2 前者推奨、CN-06)。
 
-- [~] **T008**: Implement signal overlay in contract_map_render.rs (domain). When opts.signal_overlay=true, read TypeCatalogueDocument.signals() for each layer's document. For each entry, look up its TypeSignal by type name. Map signal values to classDef: Yellow -> fill:#fff3e0; Red -> fill:#ffebee; Blue -> no classDef change (default colour). Add signal-specific classDef lines to the mermaid header only when at least one Yellow or Red signal is present. Attach :::signal_classDef to node shape strings for Yellow/Red entries. When signals() is None for a layer's document, produce the same output as signal_overlay=false for that layer — no signal-specific classDef header lines and no :::signal_classDef annotations (complete silence, not 'treat as Blue with classDef'). When signal_overlay=false, signal-overlay-specific classDef lines and :::signal_classDef annotations are absent from output — other Phase 2 additions are always present. Unit tests: Blue/Yellow/Red/None for four nodes; signal_overlay=false produces output without signal-overlay classDefs; signals()=None produces identical output to signal_overlay=false (not just Blue treatment).
+- [x] **T008**: Implement signal overlay in contract_map_render.rs (domain). When opts.signal_overlay=true, read TypeCatalogueDocument.signals() for each layer's document. For each entry, look up its TypeSignal by type name. Map signal values to classDef: Yellow -> fill:#fff3e0; Red -> fill:#ffebee; Blue -> no classDef change (default colour). Add signal-specific classDef lines to the mermaid header only when at least one Yellow or Red signal is present. Attach :::signal_classDef to node shape strings for Yellow/Red entries. When signals() is None for a layer's document, produce the same output as signal_overlay=false for that layer — no signal-specific classDef header lines and no :::signal_classDef annotations (complete silence, not 'treat as Blue with classDef'). When signal_overlay=false, signal-overlay-specific classDef lines and :::signal_classDef annotations are absent from output — other Phase 2 additions are always present. Unit tests: Blue/Yellow/Red/None for four nodes; signal_overlay=false produces output without signal-overlay classDefs; signals()=None produces identical output to signal_overlay=false (not just Blue treatment). (`88a194d170b4442cbc24e507fa1bfb4dc6447c3a`)
 
 ### S09 — Layer-Agnostic Integration Tests
 
 > 3 fixture (2 層 / 3 層デフォルト / 独自層名) に Phase 2 全拡張 (FreeFunction / impl-edge / dashed-border / field edge / overlay) の layer-agnostic 動作テストを追加する (IN-10、AC-08)。
 > 他 fixture の層名が混入しないことを既存の assert_no_foreign_layers で継続検証する (CN-01)。
 
-- [ ] **T009**: Extend layer-agnostic integration tests in libs/infrastructure/tests/contract_map_layer_agnostic.rs. For each of the three fixtures (fixture_2layers, fixture_3layers_default, fixture_custom_names), add fixture catalogue entries covering: a FreeFunction kind node (IN-01); an Interactor entry with declares_application_service pointing to an ApplicationService entry to verify -.impl.-> edge (IN-02); a reference action entry with no edges to verify unused_reference classDef (IN-03); a modify+empty-methods entry to verify declaration_only classDef (IN-04); dto/command/query/value_object entries with MemberDeclaration::Field to verify field edges (IN-05); ContractMapRenderOptions with action_overlay=true and signal_overlay=true to verify overlay classDef (IN-06/07). Assert that no layer names from other fixtures appear in the output (existing no-leak invariant). All assertions must pass with the layer names of the current fixture only.
+- [~] **T009**: Extend layer-agnostic integration tests in libs/infrastructure/tests/contract_map_layer_agnostic.rs. For each of the three fixtures (fixture_2layers, fixture_3layers_default, fixture_custom_names), add fixture catalogue entries covering: a FreeFunction kind node (IN-01); an Interactor entry with declares_application_service pointing to an ApplicationService entry to verify -.impl.-> edge (IN-02); a reference action entry with no edges to verify unused_reference classDef (IN-03); a modify+empty-methods entry to verify declaration_only classDef (IN-04); dto/command/query/value_object entries with MemberDeclaration::Field to verify field edges (IN-05); ContractMapRenderOptions with action_overlay=true and signal_overlay=true to verify overlay classDef (IN-06/07). Assert that no layer names from other fixtures appear in the output (existing no-leak invariant). All assertions must pass with the layer names of the current fixture only.
 
 ### S10 — Dogfood, ADR Close-out, CI
 
