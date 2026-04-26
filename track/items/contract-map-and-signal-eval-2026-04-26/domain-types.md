@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TypeDefinitionKind | enum | modify | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, FreeFunction | 🟡 | 🔵 |
+| TypeDefinitionKind | enum | modify | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, FreeFunction | 🔵 | 🔵 |
 | MemberDeclaration | enum | reference | Variant, Field | 🔵 | 🔵 |
 | TypeAction | enum | reference | Add, Modify, Reference, Delete | 🔵 | 🔵 |
 | TypestateTransitions | enum | reference | Terminal, To | 🔵 | 🔵 |

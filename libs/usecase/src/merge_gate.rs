@@ -701,7 +701,7 @@ mod tests {
         TypeCatalogueEntry::new(
             name,
             "test",
-            TypeDefinitionKind::ValueObject,
+            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
             TypeAction::Add,
             true,
         )
@@ -1461,7 +1461,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackId",
             "test fixture",
-            TypeDefinitionKind::ValueObject,
+            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
             TypeAction::Add,
             true,
         )

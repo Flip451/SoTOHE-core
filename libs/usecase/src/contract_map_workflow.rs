@@ -232,12 +232,21 @@ mod tests {
         let infra = layer("infrastructure");
         let order = vec![domain.clone(), usecase.clone(), infra.clone()];
         let mut catalogues = BTreeMap::new();
-        catalogues.insert(domain, doc(vec![entry("User", TypeDefinitionKind::ValueObject)]));
+        catalogues.insert(
+            domain,
+            doc(vec![entry(
+                "User",
+                TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            )]),
+        );
         catalogues.insert(
             usecase,
             doc(vec![
-                entry("RegisterUser", TypeDefinitionKind::UseCase),
-                entry("RegisterUserCommand", TypeDefinitionKind::Command),
+                entry("RegisterUser", TypeDefinitionKind::UseCase { expected_members: Vec::new() }),
+                entry(
+                    "RegisterUserCommand",
+                    TypeDefinitionKind::Command { expected_members: Vec::new() },
+                ),
             ]),
         );
         catalogues.insert(infra, doc(vec![]));
@@ -386,7 +395,7 @@ mod tests {
         let interactor = RenderContractMapInteractor::new(loader, writer);
         let cmd = RenderContractMapCommand {
             track_id: track_id("t006"),
-            kind_filter: Some(vec![TypeDefinitionKind::UseCase]),
+            kind_filter: Some(vec![TypeDefinitionKind::UseCase { expected_members: Vec::new() }]),
             layer_filter: None,
         };
         let out = interactor.execute(&cmd).unwrap();

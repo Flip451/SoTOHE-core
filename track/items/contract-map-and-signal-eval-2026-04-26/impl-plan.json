@@ -9,7 +9,7 @@
     {
       "id": "T002",
       "description": "TypeDefinitionKind domain 型を拡張する。struct ベース 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) に expected_members: Vec<MemberDeclaration> フィールドを追加する。Interactor に declares_application_service: Vec<String> フィールドを追加する。FreeFunction variant (module_path / expected_params / expected_returns / expected_is_async) を新規追加する。kind_tag() も FreeFunction に対応させる。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T003",

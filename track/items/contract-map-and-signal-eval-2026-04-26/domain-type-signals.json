@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-26T18:07:19Z",
+  "generated_at": "2026-04-26T18:47:56Z",
   "declaration_hash": "55c0f6bf367b514e7338f7258c9281f76554d1685c12e47ad833d615cd707aa2",
   "signals": [
     {
       "type_name": "TypeDefinitionKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ApplicationService",
@@ -15,6 +15,7 @@
         "Enum",
         "ErrorType",
         "Factory",
+        "FreeFunction",
         "Interactor",
         "Query",
         "SecondaryAdapter",
@@ -22,9 +23,6 @@
         "Typestate",
         "UseCase",
         "ValueObject"
-      ],
-      "missing_items": [
-        "FreeFunction"
       ]
     },
     {

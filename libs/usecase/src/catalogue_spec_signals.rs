@@ -451,7 +451,7 @@ mod tests {
         TypeCatalogueEntry::with_refs(
             name,
             "test entry",
-            TypeDefinitionKind::ValueObject,
+            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
             TypeAction::Add,
             true,
             Vec::new(),

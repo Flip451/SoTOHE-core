@@ -427,8 +427,10 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         .map(|e| e.name())
         .collect();
     for entry in &entries {
-        if let TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(targets) } =
-            entry.kind()
+        if let TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::To(targets),
+            ..
+        } = entry.kind()
         {
             let valid_targets = if entry.action() == TypeAction::Delete {
                 &all_typestate_names
@@ -603,12 +605,14 @@ fn type_definition_kind_from_dto(
             } else {
                 TypestateTransitions::To(transitions_to.clone())
             };
-            Ok(TypeDefinitionKind::Typestate { transitions })
+            Ok(TypeDefinitionKind::Typestate { transitions, expected_members: Vec::new() })
         }
         TypeDefinitionKindDto::Enum { expected_variants } => {
             Ok(TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() })
         }
-        TypeDefinitionKindDto::ValueObject {} => Ok(TypeDefinitionKind::ValueObject),
+        TypeDefinitionKindDto::ValueObject {} => {
+            Ok(TypeDefinitionKind::ValueObject { expected_members: Vec::new() })
+        }
         TypeDefinitionKindDto::ErrorType { expected_variants } => {
             Ok(TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() })
         }
@@ -620,15 +624,31 @@ fn type_definition_kind_from_dto(
             let decls = decode_method_list(entry_name, expected_methods)?;
             Ok(TypeDefinitionKind::ApplicationService { expected_methods: decls })
         }
-        TypeDefinitionKindDto::UseCase {} => Ok(TypeDefinitionKind::UseCase),
-        TypeDefinitionKindDto::Interactor {} => Ok(TypeDefinitionKind::Interactor),
-        TypeDefinitionKindDto::Dto {} => Ok(TypeDefinitionKind::Dto),
-        TypeDefinitionKindDto::Command {} => Ok(TypeDefinitionKind::Command),
-        TypeDefinitionKindDto::Query {} => Ok(TypeDefinitionKind::Query),
-        TypeDefinitionKindDto::Factory {} => Ok(TypeDefinitionKind::Factory),
+        TypeDefinitionKindDto::UseCase {} => {
+            Ok(TypeDefinitionKind::UseCase { expected_members: Vec::new() })
+        }
+        TypeDefinitionKindDto::Interactor {} => Ok(TypeDefinitionKind::Interactor {
+            expected_members: Vec::new(),
+            declares_application_service: Vec::new(),
+        }),
+        TypeDefinitionKindDto::Dto {} => {
+            Ok(TypeDefinitionKind::Dto { expected_members: Vec::new() })
+        }
+        TypeDefinitionKindDto::Command {} => {
+            Ok(TypeDefinitionKind::Command { expected_members: Vec::new() })
+        }
+        TypeDefinitionKindDto::Query {} => {
+            Ok(TypeDefinitionKind::Query { expected_members: Vec::new() })
+        }
+        TypeDefinitionKindDto::Factory {} => {
+            Ok(TypeDefinitionKind::Factory { expected_members: Vec::new() })
+        }
         TypeDefinitionKindDto::SecondaryAdapter { implements } => {
             let decls = decode_trait_impl_list(entry_name, implements)?;
-            Ok(TypeDefinitionKind::SecondaryAdapter { implements: decls })
+            Ok(TypeDefinitionKind::SecondaryAdapter {
+                implements: decls,
+                expected_members: Vec::new(),
+            })
         }
     }
 }
@@ -748,7 +768,7 @@ fn type_catalogue_entry_to_dto(
     entry: &TypeCatalogueEntry,
 ) -> Result<TypeCatalogueEntryDto, TypeCatalogueCodecError> {
     let kind = match entry.kind() {
-        TypeDefinitionKind::Typestate { transitions } => {
+        TypeDefinitionKind::Typestate { transitions, .. } => {
             let transitions_to = match transitions {
                 TypestateTransitions::Terminal => vec![],
                 TypestateTransitions::To(v) => v.clone(),
@@ -758,7 +778,7 @@ fn type_catalogue_entry_to_dto(
         TypeDefinitionKind::Enum { expected_variants } => {
             TypeDefinitionKindDto::Enum { expected_variants: expected_variants.clone() }
         }
-        TypeDefinitionKind::ValueObject => TypeDefinitionKindDto::ValueObject {},
+        TypeDefinitionKind::ValueObject { .. } => TypeDefinitionKindDto::ValueObject {},
         TypeDefinitionKind::ErrorType { expected_variants } => {
             TypeDefinitionKindDto::ErrorType { expected_variants: expected_variants.clone() }
         }
@@ -770,15 +790,26 @@ fn type_catalogue_entry_to_dto(
             let dtos = encode_method_list(entry.name(), expected_methods)?;
             TypeDefinitionKindDto::ApplicationService { expected_methods: dtos }
         }
-        TypeDefinitionKind::UseCase => TypeDefinitionKindDto::UseCase {},
-        TypeDefinitionKind::Interactor => TypeDefinitionKindDto::Interactor {},
-        TypeDefinitionKind::Dto => TypeDefinitionKindDto::Dto {},
-        TypeDefinitionKind::Command => TypeDefinitionKindDto::Command {},
-        TypeDefinitionKind::Query => TypeDefinitionKindDto::Query {},
-        TypeDefinitionKind::Factory => TypeDefinitionKindDto::Factory {},
-        TypeDefinitionKind::SecondaryAdapter { implements } => {
+        TypeDefinitionKind::UseCase { .. } => TypeDefinitionKindDto::UseCase {},
+        TypeDefinitionKind::Interactor { .. } => TypeDefinitionKindDto::Interactor {},
+        TypeDefinitionKind::Dto { .. } => TypeDefinitionKindDto::Dto {},
+        TypeDefinitionKind::Command { .. } => TypeDefinitionKindDto::Command {},
+        TypeDefinitionKind::Query { .. } => TypeDefinitionKindDto::Query {},
+        TypeDefinitionKind::Factory { .. } => TypeDefinitionKindDto::Factory {},
+        TypeDefinitionKind::SecondaryAdapter { implements, .. } => {
             let dtos = encode_trait_impl_list(entry.name(), implements)?;
             TypeDefinitionKindDto::SecondaryAdapter { implements: dtos }
+        }
+        // FreeFunction: T002 adds the variant to domain but codec support (T003) is pending.
+        // Until the DTO schema is extended, encode FreeFunction as an error to prevent
+        // silent data loss (codec round-trip would drop the variant fields).
+        TypeDefinitionKind::FreeFunction { .. } => {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry.name().to_owned(),
+                reason: "FreeFunction codec support is pending (T003); \
+                         cannot encode to JSON until the DTO schema is extended"
+                    .to_owned(),
+            });
         }
     };
     let spec_refs = spec_refs_to_dtos(entry.spec_refs());
@@ -947,7 +978,7 @@ mod tests {
         let doc = decode(FULL_JSON).unwrap();
         assert!(matches!(
             doc.entries()[0].kind(),
-            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(v) } if v == &["Published"]
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(v), .. } if v == &["Published"]
         ));
     }
 
@@ -963,7 +994,7 @@ mod tests {
     #[test]
     fn test_decode_value_object_kind() {
         let doc = decode(FULL_JSON).unwrap();
-        assert!(matches!(doc.entries()[3].kind(), TypeDefinitionKind::ValueObject));
+        assert!(matches!(doc.entries()[3].kind(), TypeDefinitionKind::ValueObject { .. }));
     }
 
     #[test]
@@ -1462,7 +1493,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::UseCase));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::UseCase { .. }));
     }
 
     #[test]
@@ -1474,7 +1505,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Interactor));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Interactor { .. }));
     }
 
     #[test]
@@ -1486,7 +1517,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Dto));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Dto { .. }));
     }
 
     #[test]
@@ -1498,7 +1529,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Command));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Command { .. }));
     }
 
     #[test]
@@ -1510,7 +1541,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Query));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Query { .. }));
     }
 
     #[test]
@@ -1522,7 +1553,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Factory));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Factory { .. }));
     }
 
     // --- T002: new variant encode/round-trip tests ---
@@ -1781,7 +1812,7 @@ mod tests {
 }"#;
         let doc = decode(json).unwrap();
         let kind = doc.entries()[0].kind();
-        let TypeDefinitionKind::SecondaryAdapter { implements } = kind else {
+        let TypeDefinitionKind::SecondaryAdapter { implements, .. } = kind else {
             panic!("expected SecondaryAdapter kind, got {:?}", kind);
         };
         assert_eq!(implements.len(), 1);
@@ -1812,7 +1843,7 @@ mod tests {
 }"#;
         let doc = decode(json).unwrap();
         let kind = doc.entries()[0].kind();
-        let TypeDefinitionKind::SecondaryAdapter { implements } = kind else {
+        let TypeDefinitionKind::SecondaryAdapter { implements, .. } = kind else {
             panic!("expected SecondaryAdapter kind, got {:?}", kind);
         };
         assert_eq!(implements.len(), 2);

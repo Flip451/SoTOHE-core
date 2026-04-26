@@ -891,7 +891,7 @@ mod tests {
         domain::TypeCatalogueEntry::new(
             name,
             "desc",
-            domain::TypeDefinitionKind::ValueObject,
+            domain::TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
             action,
             true,
         )
