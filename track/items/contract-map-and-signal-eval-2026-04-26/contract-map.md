@@ -13,6 +13,8 @@ flowchart LR
         L6_domain_FunctionNode[FunctionNode]
         L6_domain_FunctionBaselineEntry[FunctionBaselineEntry]
         L6_domain_TraitImplBaselineEntry[TraitImplBaselineEntry]
+        L6_domain_FunctionInfo[FunctionInfo]
+        L6_domain_SchemaExport[SchemaExport]
         L6_domain_TypeCatalogueDocument(TypeCatalogueDocument)
         L6_domain_ContractMapRenderOptions(ContractMapRenderOptions)
         L6_domain_MemberDeclaration{{MemberDeclaration}}

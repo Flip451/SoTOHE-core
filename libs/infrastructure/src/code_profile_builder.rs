@@ -8,11 +8,20 @@
 //! `TypeNode::new` no longer takes a `method_return_types: HashSet<String>`
 //! argument — the legacy bridge is gone. `outgoing` is computed here from
 //! `FunctionInfo::return_type_names` ∩ typestate_names.
+//!
+//! T006 (S4): extends `build_type_graph` to populate:
+//! - `TypeGraph::functions` — free `FunctionNode`s extracted from
+//!   `SchemaExport::functions()`, keyed by `(short_name, module_path)`.
+//! - `TraitImplEntry::origin_crate` — populated by looking up the trait's
+//!   `crate_id` in the rustdoc JSON `paths`/`external_crates` tables
+//!   (passed in as `WorkspaceCrateSet`).
 
 use std::collections::{HashMap, HashSet};
 
-use domain::schema::{FunctionInfo, SchemaExport, TraitImplEntry, TraitNode, TypeGraph, TypeNode};
-use domain::tddd::catalogue::MethodDeclaration;
+use domain::schema::{
+    FunctionInfo, FunctionNode, SchemaExport, TraitImplEntry, TraitNode, TypeGraph, TypeNode,
+};
+use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration};
 
 /// Builds a [`TypeGraph`] from a [`SchemaExport`].
 ///
@@ -24,8 +33,14 @@ use domain::tddd::catalogue::MethodDeclaration;
 /// domain-types catalogue.  After building the graph, each node's `outgoing`
 /// field is populated with the subset of `method_return_types` that are in
 /// `typestate_names`.
+///
+/// T006 (S4) extensions:
+/// - `TypeGraph::functions` is populated from `SchemaExport::functions()`.
+/// - `TraitImplEntry::origin_crate` is populated from `SchemaExport::trait_origins()`.
 #[must_use]
 pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>) -> TypeGraph {
+    let trait_origins = schema.trait_origins();
+
     let mut types: HashMap<String, TypeNode> = HashMap::new();
 
     for type_info in schema.types() {
@@ -57,7 +72,7 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
             );
         }
 
-        // Collect trait impls (separate path — outgoing stays inherent-only)
+        // T006 (S4): Collect trait impls with origin_crate populated from SchemaExport::trait_origins.
         let trait_impl_entries: Vec<TraitImplEntry> = schema
             .impls()
             .iter()
@@ -65,7 +80,8 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
             .filter_map(|i| {
                 let trait_name = i.trait_name()?;
                 let methods = i.methods().iter().map(function_info_to_method_decl).collect();
-                Some(TraitImplEntry::new(trait_name, methods))
+                let origin = trait_origins.get(trait_name).cloned().unwrap_or_default();
+                Some(TraitImplEntry::with_origin_crate(trait_name, methods, origin))
             })
             .collect();
 
@@ -92,7 +108,25 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
         traits.insert(trait_info.name().to_string(), TraitNode::new(method_decls));
     }
 
-    TypeGraph::new(types, traits)
+    // T006 (S4): Build FunctionNode map from SchemaExport::functions().
+    let functions: HashMap<(String, Option<String>), FunctionNode> = schema
+        .functions()
+        .iter()
+        .map(|fi| {
+            let key = (fi.name().to_string(), fi.module_path().map(str::to_string));
+            let params: Vec<ParamDeclaration> = fi.params().to_vec();
+            let returns: Vec<String> = fi.return_type_names().to_vec();
+            let node = FunctionNode::new(
+                params,
+                returns,
+                fi.is_async(),
+                fi.module_path().map(str::to_string),
+            );
+            (key, node)
+        })
+        .collect();
+
+    TypeGraph::with_functions(types, traits, functions)
 }
 
 /// Converts a `FunctionInfo` (flat rustdoc-derived) into a `MethodDeclaration`
@@ -369,5 +403,133 @@ mod tests {
             !draft.outgoing().contains("Archived"),
             "Archived must not be in outgoing (not a typestate)"
         );
+    }
+
+    // --- T006 (S4): FunctionNode extraction ---
+
+    /// T006a: free functions from SchemaExport::functions() are stored in TypeGraph::functions.
+    #[test]
+    fn test_build_type_graph_free_function_stored_in_functions_map() {
+        let fn_info = FunctionInfo::new(
+            "render".to_string(),
+            None,
+            vec!["String".to_string()],
+            false,
+            vec![],
+            "String".to_string(),
+            None,
+            false,
+        );
+        let schema = SchemaExport::new("test".to_string(), vec![], vec![fn_info], vec![], vec![]);
+        let profile = build_type_graph(&schema, &HashSet::new());
+
+        // Free function with module_path=None is keyed as ("render", None).
+        assert!(profile.has_function("render", None));
+        assert!(!profile.has_function("render", Some("some::module")));
+    }
+
+    /// T006a: free function with module_path is keyed correctly.
+    #[test]
+    fn test_build_type_graph_free_function_with_module_path_keyed_correctly() {
+        let fn_info = FunctionInfo::with_module_path(
+            "build_baseline".to_string(),
+            None,
+            vec!["TypeBaseline".to_string()],
+            false,
+            vec![],
+            "TypeBaseline".to_string(),
+            None,
+            false,
+            Some("infra::tddd".to_string()),
+        );
+        let schema = SchemaExport::new("test".to_string(), vec![], vec![fn_info], vec![], vec![]);
+        let profile = build_type_graph(&schema, &HashSet::new());
+
+        assert!(profile.has_function("build_baseline", Some("infra::tddd")));
+        assert!(!profile.has_function("build_baseline", None));
+
+        let node = profile.get_function("build_baseline", Some("infra::tddd")).unwrap();
+        assert_eq!(node.module_path(), Some("infra::tddd"));
+        assert!(!node.is_async());
+    }
+
+    /// T006a: FunctionNode params are carried over from FunctionInfo.
+    #[test]
+    fn test_build_type_graph_free_function_params_carried_over() {
+        use domain::tddd::catalogue::ParamDeclaration;
+        let fn_info = FunctionInfo::new(
+            "compute".to_string(),
+            None,
+            vec![],
+            false,
+            vec![ParamDeclaration::new("x", "u32"), ParamDeclaration::new("y", "u32")],
+            "()".to_string(),
+            None,
+            true,
+        );
+        let schema = SchemaExport::new("test".to_string(), vec![], vec![fn_info], vec![], vec![]);
+        let profile = build_type_graph(&schema, &HashSet::new());
+
+        let node = profile.get_function("compute", None).unwrap();
+        assert_eq!(node.params().len(), 2);
+        assert_eq!(node.params()[0].name(), "x");
+        assert_eq!(node.params()[1].name(), "y");
+        assert!(node.is_async());
+    }
+
+    /// T006a: schema with no free functions produces empty TypeGraph::functions.
+    #[test]
+    fn test_build_type_graph_no_free_functions_produces_empty_functions() {
+        let schema = SchemaExport::new("test".to_string(), vec![], vec![], vec![], vec![]);
+        let profile = build_type_graph(&schema, &HashSet::new());
+        assert!(profile.functions().is_empty());
+    }
+
+    // --- T006 (S4): trait origin_crate from SchemaExport::trait_origins ---
+
+    /// T006b: trait_origins in SchemaExport are used to populate TraitImplEntry::origin_crate.
+    #[test]
+    fn test_build_type_graph_trait_impl_origin_crate_populated() {
+        let types = vec![TypeInfo::new("FsStore".to_string(), TypeKind::Struct, None, vec![])];
+        let impls = vec![ImplInfo::new(
+            "FsStore".to_string(),
+            Some("TrackReader".to_string()),
+            vec![method_returning("read", "()", true, Some("&self"))],
+        )];
+        let mut origins = std::collections::HashMap::new();
+        origins.insert("TrackReader".to_string(), "domain".to_string());
+        let schema = SchemaExport::with_trait_origins(
+            "infrastructure".to_string(),
+            types,
+            vec![],
+            vec![],
+            impls,
+            origins,
+        );
+        let profile = build_type_graph(&schema, &HashSet::new());
+
+        let node = profile.get_type("FsStore").unwrap();
+        assert_eq!(node.trait_impls().len(), 1);
+        assert_eq!(node.trait_impls()[0].trait_name(), "TrackReader");
+        assert_eq!(node.trait_impls()[0].origin_crate(), "domain");
+    }
+
+    /// T006b: trait without entry in trait_origins gets empty origin_crate.
+    #[test]
+    fn test_build_type_graph_trait_impl_unknown_origin_crate_is_empty() {
+        let types = vec![TypeInfo::new("Foo".to_string(), TypeKind::Struct, None, vec![])];
+        let impls = vec![ImplInfo::new(
+            "Foo".to_string(),
+            Some("Display".to_string()),
+            vec![method_returning("fmt", "()", true, Some("&self"))],
+        )];
+        // No entry for "Display" in trait_origins.
+        let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
+        let profile = build_type_graph(&schema, &HashSet::new());
+
+        let node = profile.get_type("Foo").unwrap();
+        assert_eq!(node.trait_impls().len(), 1);
+        assert_eq!(node.trait_impls()[0].trait_name(), "Display");
+        assert_eq!(node.trait_impls()[0].origin_crate(), "");
     }
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-26T19:45:25Z",
-  "declaration_hash": "d8774ee22c8778b083ddd54ef756839c2c544b60d029e256176c12ee0eed8d1c",
+  "generated_at": "2026-04-26T20:42:38Z",
+  "declaration_hash": "bd1a6ed2a8de84d50a62920868131ec018fd9e83d8b964eb354b24be56f23b36",
   "signals": [
     {
       "type_name": "TypeDefinitionKind",
@@ -63,6 +63,18 @@
     },
     {
       "type_name": "TraitImplBaselineEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FunctionInfo",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SchemaExport",
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": true

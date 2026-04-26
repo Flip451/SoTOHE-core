@@ -29,4 +29,6 @@
 | FunctionNode | dto | — | — | 🔵 | 🔵 |
 | FunctionBaselineEntry | dto | — | — | 🔵 | 🔵 |
 | TraitImplBaselineEntry | dto | — | — | 🔵 | 🔵 |
+| FunctionInfo | dto | modify | — | 🔵 | 🔵 |
+| SchemaExport | dto | modify | — | 🔵 | 🔵 |
 

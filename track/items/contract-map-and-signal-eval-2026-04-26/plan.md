@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Contract Map 表示拡張 + signal 評価拡張 (両輪)
 
-## Tasks (6/10 resolved)
+## Tasks (8/10 resolved)
 
 ### S1 — Signal Evaluator Action-Awareness (bootstrap fix)
 
@@ -35,8 +35,8 @@
 > T007 は baseline_builder / baseline_codec を拡張し、TypeGraph の新フィールドを baseline に正しく capture + serialize / deserialize する。
 > S3 の domain 型拡張が前提となるため S3 の完了後に着手する。
 
-- [ ] **T006**: build_type_graph (infrastructure 層) を拡張する。(a) rustdoc JSON の pub free function 情報を FunctionNode に変換して TypeGraph::functions に格納する。SchemaExport / schema_export.rs の free function 収集経路 (build_schema_export 内) を追加し、SchemaExport に fns フィールドを追加する。(b) rustdoc JSON の external_crates / paths から trait の定義 crate を特定し、TraitImplEntry::origin_crate に格納する。workspace crate 集合は architecture-rules.json の crates 一覧から取得する。両拡張の unit tests を追加する。
-- [ ] **T007**: baseline builder + codec (infrastructure 層) を拡張する。(a) baseline_builder.rs: TypeNode::trait_impls を TraitImplBaselineEntry の Vec に変換して TypeBaselineEntry::trait_impls に格納する。TypeGraph::functions を (short_name, module_path) → 完全修飾名文字列 key に変換して TypeBaseline::functions に格納する (D4 bundle: tuple key → string key 変換)。(b) baseline_codec.rs: TypeBaselineEntry::trait_impls の serde DTO (TraitImplBaselineEntryDto) を追加し encode / decode を実装する。TypeBaseline::functions の serde DTO (FunctionBaselineEntryDto) を追加し encode / decode を実装する。unit tests: AC-07 / AC-08 のベースライン capture ケースを追加する。
+- [x] **T006**: build_type_graph (infrastructure 層) を拡張する。(a) rustdoc JSON の pub free function 情報を FunctionNode に変換して TypeGraph::functions に格納する。SchemaExport / schema_export.rs の free function 収集経路 (build_schema_export 内) を追加し、SchemaExport に fns フィールドを追加する。(b) rustdoc JSON の external_crates / paths から trait の定義 crate を特定し、TraitImplEntry::origin_crate に格納する。workspace crate 集合は architecture-rules.json の crates 一覧から取得する。両拡張の unit tests を追加する。
+- [x] **T007**: baseline builder + codec (infrastructure 層) を拡張する。(a) baseline_builder.rs: TypeNode::trait_impls を TraitImplBaselineEntry の Vec に変換して TypeBaselineEntry::trait_impls に格納する。TypeGraph::functions を (short_name, module_path) → 完全修飾名文字列 key に変換して TypeBaseline::functions に格納する (D4 bundle: tuple key → string key 変換)。(b) baseline_codec.rs: TypeBaselineEntry::trait_impls の serde DTO (TraitImplBaselineEntryDto) を追加し encode / decode を実装する。TypeBaseline::functions の serde DTO (FunctionBaselineEntryDto) を追加し encode / decode を実装する。unit tests: AC-07 / AC-08 のベースライン capture ケースを追加する。
 
 ### S5 — Signal Evaluator Extension (expected_members / declares_application_service / FreeFunction)
 

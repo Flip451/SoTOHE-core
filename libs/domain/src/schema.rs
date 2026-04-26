@@ -19,6 +19,10 @@ use std::collections::{HashMap, HashSet};
 use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
 
 /// Top-level export result containing all public API elements of a crate.
+///
+/// T006 (S4): adds `trait_origins: HashMap<String, String>` mapping a trait's
+/// short name to the crate that defines it (e.g., `"TrackReader" → "domain"`).
+/// Populated by `build_schema_export` from rustdoc JSON `paths`/`external_crates`.
 #[derive(Debug, Clone)]
 pub struct SchemaExport {
     crate_name: String,
@@ -26,10 +30,13 @@ pub struct SchemaExport {
     functions: Vec<FunctionInfo>,
     traits: Vec<TraitInfo>,
     impls: Vec<ImplInfo>,
+    /// Maps trait short name → defining crate name.
+    /// `""` if the origin could not be determined.
+    trait_origins: HashMap<String, String>,
 }
 
 impl SchemaExport {
-    /// Creates a new schema export.
+    /// Creates a new schema export (backward-compatible: `trait_origins` defaults to empty).
     pub fn new(
         crate_name: String,
         types: Vec<TypeInfo>,
@@ -37,7 +44,19 @@ impl SchemaExport {
         traits: Vec<TraitInfo>,
         impls: Vec<ImplInfo>,
     ) -> Self {
-        Self { crate_name, types, functions, traits, impls }
+        Self { crate_name, types, functions, traits, impls, trait_origins: HashMap::new() }
+    }
+
+    /// Creates a new schema export with an explicit `trait_origins` map.
+    pub fn with_trait_origins(
+        crate_name: String,
+        types: Vec<TypeInfo>,
+        functions: Vec<FunctionInfo>,
+        traits: Vec<TraitInfo>,
+        impls: Vec<ImplInfo>,
+        trait_origins: HashMap<String, String>,
+    ) -> Self {
+        Self { crate_name, types, functions, traits, impls, trait_origins }
     }
 
     /// Returns the crate name.
@@ -63,6 +82,13 @@ impl SchemaExport {
     /// Returns the impl blocks.
     pub fn impls(&self) -> &[ImplInfo] {
         &self.impls
+    }
+
+    /// Returns the map of trait short name → defining crate name.
+    ///
+    /// Used by `build_type_graph` to populate `TraitImplEntry::origin_crate`.
+    pub fn trait_origins(&self) -> &HashMap<String, String> {
+        &self.trait_origins
     }
 }
 
@@ -167,10 +193,15 @@ pub struct FunctionInfo {
     receiver: Option<String>,
     /// Whether the function is declared `async fn`.
     is_async: bool,
+    /// Module path for free functions (e.g., `"domain::review"`). `None` if
+    /// not a free function, or if the module path could not be determined.
+    ///
+    /// T006 (S4): populated by `build_schema_export` using rustdoc `paths`.
+    module_path: Option<String>,
 }
 
 impl FunctionInfo {
-    /// Creates a new function info.
+    /// Creates a new function info (backward-compatible: `module_path` defaults to `None`).
     ///
     /// `has_self_receiver` is derived from `receiver` to prevent the illegal state
     /// where `has_self_receiver = true` but `receiver = None` (or vice versa).
@@ -201,6 +232,36 @@ impl FunctionInfo {
             returns,
             receiver,
             is_async,
+            module_path: None,
+        }
+    }
+
+    /// Creates a new function info with an explicit module path.
+    ///
+    /// T006 (S4): used by `build_schema_export` for free functions.
+    #[allow(clippy::too_many_arguments)]
+    pub fn with_module_path(
+        name: String,
+        docs: Option<String>,
+        return_type_names: Vec<String>,
+        _has_self_receiver: bool,
+        params: Vec<ParamDeclaration>,
+        returns: String,
+        receiver: Option<String>,
+        is_async: bool,
+        module_path: Option<String>,
+    ) -> Self {
+        let has_self_receiver = receiver.is_some();
+        Self {
+            name,
+            docs,
+            return_type_names,
+            has_self_receiver,
+            params,
+            returns,
+            receiver,
+            is_async,
+            module_path,
         }
     }
 
@@ -242,6 +303,13 @@ impl FunctionInfo {
     /// Returns `true` if the function is declared `async fn`.
     pub fn is_async(&self) -> bool {
         self.is_async
+    }
+
+    /// Returns the module path for this free function, if known.
+    ///
+    /// T006 (S4): populated for free functions extracted by `build_schema_export`.
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
     }
 }
 
