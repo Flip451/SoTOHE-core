@@ -9,7 +9,7 @@
 DESIGN.md shrink (~1073→~150 行、~923 行削除) は 500 行コミット制約に対応するため 3 タスクに分割する (T006: keep-zone rework + Canonical Blocks 削除 ~360 行差分、T007: Security Hardening 削除 ~443 行差分、T008: 残余セクション削除 ~201 行差分)。
 IN-01 の orphan 修正 (D6 #5 (c)(d)) は DESIGN.md 内の削除対象セクションに内包されているため、T008 の最終セクション削除で自然に解消される (T006-T008 の順序制約)。
 
-## Tasks (2/9 resolved)
+## Tasks (3/9 resolved)
 
 ### S001 — 非 DESIGN.md orphan 点訂正 (T001, T002)
 
@@ -27,8 +27,8 @@ IN-01 の orphan 修正 (D6 #5 (c)(d)) は DESIGN.md 内の削除対象セクシ
 > T005: `README.md` を ~140→≤80 行 (Tier 1 size limit) に縮約する。capability table 削除 / tmp/ 参照削除 / /track:design→/track:type-design 修正を適用する (IN-02 / AC-02)。
 > 各ファイルは独立しており依存関係がないため、T003/T004/T005 を別々の commit として順次適用できる。各 diff は 100 行以下のため atomicity 制約に収まる。
 
-- [~] **T003**: `START_HERE_HUMAN.md` を ~71 行から ~60 行 (≤80 行制約) に縮約する (IN-03)。存在しない `docs/` / `project-docs/` / `.claude/docs/` ディレクトリへの言及を削除し、実在ディレクトリのみを列挙する。保持: 最短 onboarding / 責務境界 / 必須レビュー・承認ポイント / 安全運用ルール。縮約後の行数が ≤80 行 (Tier 1 size limit) を満たすことを確認する (AC-03 / CN-01)。
-- [ ] **T004**: `LOCAL_DEVELOPMENT.md` を ~176 行から ~90 行 (≤100 行制約) に縮約する (IN-04)。Git Notes 節の詳細記述を `track/workflow.md` への参照リンクのみに変更する。'Phase 5/6 で Rust へ移行済み' 等の vague な表記は該当 ADR / track id を明示した記述に置換するか削除する。保持: Host Requirements / compose セットアップ / tools-daemon / Useful Commands / Troubleshooting。`tmp/` への永続的参照が残っている場合は削除する (CN-03)。縮約後の行数が ≤100 行を満たすことを確認する (AC-04)。
+- [x] **T003**: `START_HERE_HUMAN.md` を ~71 行から ~60 行 (≤80 行制約) に縮約する (IN-03)。存在しない `docs/` / `project-docs/` / `.claude/docs/` ディレクトリへの言及を削除し、実在ディレクトリのみを列挙する。保持: 最短 onboarding / 責務境界 / 必須レビュー・承認ポイント / 安全運用ルール。縮約後の行数が ≤80 行 (Tier 1 size limit) を満たすことを確認する (AC-03 / CN-01)。 (`6e6c258`)
+- [~] **T004**: `LOCAL_DEVELOPMENT.md` を ~176 行から ~90 行 (≤100 行制約) に縮約する (IN-04)。Git Notes 節の詳細記述を `track/workflow.md` への参照リンクのみに変更する。'Phase 5/6 で Rust へ移行済み' 等の vague な表記は該当 ADR / track id を明示した記述に置換するか削除する。保持: Host Requirements / compose セットアップ / tools-daemon / Useful Commands / Troubleshooting。`tmp/` への永続的参照が残っている場合は削除する (CN-03)。縮約後の行数が ≤100 行を満たすことを確認する (AC-04)。
 - [ ] **T005**: `README.md` を ~140 行から ≤80 行 (Tier 1 size limit) に縮約する (IN-02)。capability table を削除して `.harness/config/agent-profiles.json` へのリンクのみに置換する。`tmp/` への参照行をすべて削除する (CN-03)。`/track:design` の表記を `/track:type-design` に修正する (AC-02)。ロードマップは `knowledge/strategy/TODO-PLAN.md` リンクのみ残す。保持: Project pitch / SoT Chain 4 階層図 / 信号機評価説明 / クイックスタート (新コマンド体系)。縮約後の行数が ≤80 行を満たすことを確認する (AC-02)。
 
 ### S003 — DESIGN.md heavy shrink — 3 分割 (T006, T007, T008)
