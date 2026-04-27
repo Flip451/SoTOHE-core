@@ -2,175 +2,77 @@
 
 ## Quick Start
 
-Read `START_HERE_HUMAN.md` first if you are new to this repository.
+新規参加者は `START_HERE_HUMAN.md` を最初に読むこと。
 
 ## Host Requirements
 
-- Python 3.11+ is optional on the host machine (required only for `scripts/` Python helpers; not needed for hooks).
-- host-side Python package management should use `uv` (when Python is installed).
-- `.tool-versions` は `python 3.12.8` を pin しており、asdf 利用時は `python3` 解決に使われる。
-- Docker compose 実行は `HOST_UID` / `HOST_GID` を使ってホスト user に寄せる。Linux で uid/gid が `1000:1000` 以外なら `export HOST_UID=$(id -u) HOST_GID=$(id -g)` を shell profile に入れる。
-- `guides-*` / `conventions-*` / `architecture-rules-*` などの Python helper はホスト上で `python3` を直接実行する。これらのタスクは `python3` がインストールされている環境でのみ動作する。
-- ホスト側の検証は `cargo make verify-*` タスク（`sotp verify` サブコマンド、Rust CLI）で実行される。Python 検証スクリプトは Phase 5/6 で Rust へ移行済み。
-- Python test は Docker 経由で実行する（`cargo make guides-selftest`, `cargo make scripts-selftest`）。
-- `*-local` タスクは内部専用（private）で、直接実行しない。
-- Security and advisory Claude Code hooks (`skill-compliance`, `block-direct-git-ops`, `block-test-file-deletion`) are dispatched via `bin/sotp hook dispatch ...` (Rust). Other hooks (`TeammateIdle`, `PreCompact`, `PermissionRequest`) use inline shell commands or prompts defined directly in `.claude/settings.json`.
+- Docker + docker compose（必須）
+- Python 3.11+ はオプション。ただし `guides-*` / `conventions-*` / `architecture-rules-*` などのタスクはホスト上で `python3` を直接呼ぶため、これらを使う場合は必須
+- `.tool-versions` は `python 3.12.8` を pin（asdf 利用時の `python3` 解決に使われる）
+- Linux で uid/gid が `1000:1000` 以外なら `export HOST_UID=$(id -u) HOST_GID=$(id -g)` を shell profile に追加する
+- `verify-*` ゲートは Docker compose 経由（`sotp verify` Rust CLI）で実行する。`verify-latest-track` のみホスト直実行
+- Python helper のテストは Docker 経由（`cargo make guides-selftest`, `cargo make scripts-selftest`）
+- `*-local` タスクは内部実装（直接実行しない）
+- Claude Code hooks（`skill-compliance`, `block-direct-git-ops`, `block-test-file-deletion`）は `bin/sotp hook dispatch ...` で dispatch される
 
-1. Build tool image:
-
-```bash
-cargo make build-tools
-```
-
-Optional (pre-build dev watcher image only):
+## Compose Setup
 
 ```bash
-cargo make build-dev
+cargo make build-tools   # tool image build
+cargo make up            # dev watcher 起動
+cargo make logs          # ログ
+cargo make down          # 停止
 ```
 
-2. Start the dev watcher service:
+`up/down/logs/ps` は dev overlay（`compose.dev.yml`）を使用する。`app` サービスは `bacon`-based のウォッチャーコンテナで、HTTP サーバではない。`tools` サービスは ephemeral で `docker compose run --rm ...` wrapper（`fmt`, `clippy`, `test`, `ci` 等）から起動される。Cargo cache / `target` / pytest cache は repo bind mount を使う。
+
+### tools-daemon（反復作業の高速化）
+
+`tools-daemon` コンテナを起動しておくと、`*-exec` 系タスク（`test-exec`, `clippy-exec`, `fmt-exec`, `check-exec`, `llvm-cov-exec`, `test-one-exec`）を `docker compose exec` 経由で実行でき、`run --rm` の起動オーバーヘッドを回避できる。
 
 ```bash
-cargo make up
+cargo make tools-up      # 起動（バックグラウンド）
+cargo make tools-down    # 停止
 ```
 
-3. Watch dev watcher logs:
-
-```bash
-cargo make logs
-```
-
-4. Stop compose services:
-
-```bash
-cargo make down
-```
-
-`up/down/logs/ps` use the dev overlay by default.
-The `app` service in that overlay is a `bacon`-based watcher container for local feedback,
-not a long-running HTTP server.
-`tools` is intended to be ephemeral and is used via `docker compose run --rm ...` wrapper tasks (`fmt`, `clippy`, `test`, `ci`, etc.).
-The runtime image built from `Dockerfile` starts the minimal `apps/server` HTTP server, while the compose.dev `app` service remains a watcher-only container.
-Cargo cache / `target` / pytest cache は repo bind mount 側を使う。`target_cache` named volume は使わないため、ホストの `rust-analyzer` と compose 実行で成果物を共有できる。
-
-### tools-daemon コンテナを使う（オプション、反復作業の高速化）
-
-`tools-daemon` コンテナを起動しておくと、`*-exec` 系タスク (`test-exec`, `clippy-exec`,
-`fmt-exec`, `check-exec`, `llvm-cov-exec`, `test-one-exec`) を `docker compose exec`
-経由で実行でき、毎回 `run --rm` でコンテナを起動するオーバーヘッドを回避できる。
-
-```bash
-# 開発開始時に tools-daemon を起動（バックグラウンド）
-cargo make tools-up
-
-# 開発終了時に停止
-cargo make tools-down
-```
-
-`tools-daemon` は `tools` サービスと同じイメージ・ボリュームを使用し、
-`sleep infinity` で常駐する。反復作業では `cargo make test-exec` / `test-one-exec` /
-`clippy-exec` / `fmt-exec` / `check-exec` / `llvm-cov-exec`
-を高速化できる。
-一方で `cargo make ci`、`deny`、`verify-*` などの最終ゲートは `run --rm` のまま維持される。
+`cargo make ci` / `deny` などの最終ゲートは `run --rm` のまま維持される。`verify-latest-track` はホスト直実行（Docker なし）。
 
 ## Useful Commands
 
-- List tasks: `cargo make help`
-- Open tools shell: `cargo make shell`
-- Show compose services: `cargo make ps`
-- Start bacon watcher in dev watcher container: `cargo make bacon`
-- Start headless bacon test watcher in dev watcher container: `cargo make bacon-test`
-- Fast single test with daemon: `cargo make test-one-exec <test_name>`
-- Fast full test suite with daemon: `cargo make test-exec`
-- Fast check/clippy with daemon: `cargo make check-exec`, `cargo make clippy-exec`
-- Fast coverage with daemon: `cargo make llvm-cov-exec`
-- Dependency hygiene after dependency changes: `cargo make deny`, `cargo make machete`
-- External guide setup flow: `cargo make guides-setup`
-- External guide registry: `cargo make guides-list`
-- Fetch one external guide locally: `cargo make guides-fetch <guide-id>`
-- Push the active track branch: `cargo make track-pr-push`
-- Create or reuse the active track PR: `cargo make track-pr-ensure`
-- Run the PR review helper: `cargo make track-pr-review`
+`cargo make help` でカテゴリ付きタスク一覧を表示する。主要 wrapper（`bacon`, `test-exec`, `track-pr-*` 等）は表示一覧から確認する。
 
-外部長文ガイドの運用ルールは `knowledge/external/POLICY.md` を参照する。
-`.harness/config/agent-profiles.json` が capability-to-provider 割り当ての SSoT である。
+外部長文ガイドの運用ルール: `knowledge/external/POLICY.md`
+capability-to-provider マッピング: `.harness/config/agent-profiles.json`
 
 ## Git Notes (Optional)
 
-このテンプレートは `git notes` で実装トレーサビリティを記録する。
-notes はデフォルトで `git fetch` / `git push` に含まれないため、
-チーム開発やマシン間で共有するには以下を設定する:
-
-```bash
-# clone ごとに一度実行（fetch 時に notes を自動取得）
-git config --add remote.origin.fetch "+refs/notes/*:refs/notes/*"
-
-# notes を remote に push
-git push origin "refs/notes/*"
-```
-
-notes は補助情報であり、失われてもワークフローは壊れない。
-詳細は `track/workflow.md` の「Git Notes」セクションを参照。
+`git notes` で実装トレーサビリティを記録する。設定方法・remote 共有手順・運用詳細は `track/workflow.md` の「Git Notes」セクションを参照する。
 
 ## Troubleshooting
 
-### `cargo make build-tools` fails
+### `cargo make build-tools` が失敗する
 
-```text
-Error: failed to solve: ...
-```
-
-- Docker BuildKit が有効か確認: `export DOCKER_BUILDKIT=1`
-- Docker デーモンが起動しているか確認: `docker info`
-- ディスク容量を確認: `docker system df`、不要イメージを削除: `docker system prune`
+- Docker BuildKit が有効か: `export DOCKER_BUILDKIT=1`
+- Docker デーモンが起動しているか: `docker info`
+- ディスク容量: `docker system df` / 不要イメージ削除 `docker system prune`
 
 ### `cargo make up` / `cargo make logs` でコンテナが起動しない
 
-```text
-Error response from daemon: ...
-```
+- ログ確認: `cargo make logs`
+- 再作成: `cargo make down && cargo make build-tools && cargo make up`
+- ボリュームリセット: `docker compose down -v`
 
-- ログを確認: `cargo make logs`
-- コンテナを再作成: `cargo make down && cargo make build-tools && cargo make up`
-- ボリュームをリセット（キャッシュ削除）: `docker compose down -v`
-
-注:
-
-- `cargo make up` は `compose.dev.yml` の `app` サービスを起動する
-- この `app` は `bacon` ウォッチャーであり、HTTP ポートを公開する本番サーバではない
+注: `cargo make up` は `compose.dev.yml` の `app`（`bacon` ウォッチャー）を起動するもので、HTTP ポートを公開する本番サーバではない。
 
 ### sccache が効かない / ビルドが遅い
 
-- sccache キャッシュディレクトリが存在するか確認: `ls -la .cache/sccache`
-- キャッシュ削除で初期化: `rm -rf .cache/sccache`
-
-#### 複数プロジェクト間でキャッシュを共有する（オプション）
-
-デフォルトでは sccache データは bind mount でリポジトリ直下の `./.cache/sccache` に保存される。
-`SCCACHE_HOST_DIR` を指定すると別のホストディレクトリをマウントし、複数プロジェクト・複数コンテナ間で
-キャッシュを再利用できる。
-
-```bash
-# ~/.bashrc / ~/.zshrc などに追記して恒久設定にすることを推奨
-export SCCACHE_HOST_DIR="$HOME/.cache/sccache"
-export HOST_UID="$(id -u)"
-export HOST_GID="$(id -g)"
-
-# ディレクトリを作成してから compose を起動する
-mkdir -p "$SCCACHE_HOST_DIR"
-cargo make build-tools
-```
-
-設定後は `docker compose down -v` でボリュームを削除してもキャッシュが失われない。
+- キャッシュディレクトリの存在: `ls -la .cache/sccache` / 初期化 `rm -rf .cache/sccache`
+- 複数プロジェクト間でキャッシュ共有する場合は `SCCACHE_HOST_DIR` を `~/.bashrc` / `~/.zshrc` に設定し、`mkdir -p "$SCCACHE_HOST_DIR"` してから `cargo make build-tools` する
 
 ### `cargo make ci` でテストが通らない
 
-1. ローカルでテストを確認: `cargo make test`
-2. clippy エラーを確認: `cargo make clippy`
-3. フォーマットを確認: `cargo make fmt-check`
-4. 依存関係を確認: `cargo make deny`
-5. レイヤー違反を確認: `cargo make check-layers`
+`cargo make test` / `clippy` / `fmt-check` / `deny` / `check-layers` を個別に実行して問題を切り分ける。
 
 ### Permission denied (scripts/)
 
-Python スクリプトは実行権限不要。`cargo make` 経由で `python3` を呼び出すため、`chmod +x` は不要。
+Python スクリプトは実行権限不要。`cargo make` 経由で `python3` を呼ぶため `chmod +x` は不要。

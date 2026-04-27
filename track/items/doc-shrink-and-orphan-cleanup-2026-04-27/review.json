@@ -1,0 +1,422 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dbc24bcbc14a331152687cbf0294f4e833569a0466e3e451d1f33ea34a4344b",
+          "at": "2026-04-27T12:57:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dbc24bcbc14a331152687cbf0294f4e833569a0466e3e451d1f33ea34a4344b",
+          "at": "2026-04-27T12:58:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee5040ea4c7f9ad9a75bbd1347da49a35732f10446fb952acdd3150f946544f0",
+          "at": "2026-04-27T13:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Python is not actually optional here: `cargo make` wrappers such as `guides-*`, `conventions-*`, and `architecture-rules-*` invoke `python3` on the host, so those documented tasks will fail on a machine without host Python even if `scripts/` is never run manually.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 10,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:640b1c2030ad5064ade5d2127be39458bd65d615e63828ee8d90997793fff2cd",
+          "at": "2026-04-27T13:32:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Host requirements now imply Python is only needed for `scripts/` helpers, but several documented `cargo make` tasks (`guides-*`, `conventions-*`, `architecture-rules-*`) still invoke `python3` directly on the host, so users without host Python cannot run them.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 10,
+              "category": "factual error"
+            },
+            {
+              "message": "The tools-daemon note says `ci` / `deny` / `verify-*` remain `run --rm`, but `cargo make verify-latest-track` is a host task that calls `cargo make --allow-private verify-latest-track-local` directly, so this statement is false for at least one `verify-*` gate.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 38,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:640b1c2030ad5064ade5d2127be39458bd65d615e63828ee8d90997793fff2cd",
+          "at": "2026-04-27T13:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This says host-side verification is run via `cargo make verify-*`, but most `verify-*` tasks are actually docker-compose wrappers in `Makefile.toml` (`verify-arch-docs`, `verify-track-registry`, `verify-orchestra`, etc.); only `verify-latest-track` runs directly on the host. The wording will mislead readers about where the verification family executes.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 13,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea3ea145e03b510b14b5abb79d035a65a0d9677d04830d8ce8337760ee4ce7f8",
+          "at": "2026-04-27T13:37:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:926191777393080e28989ea1026463c66833d14adbe99918cc7491f7606b46ac",
+          "at": "2026-04-27T13:38:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:926191777393080e28989ea1026463c66833d14adbe99918cc7491f7606b46ac",
+          "at": "2026-04-27T13:40:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01a8313a402f2c5f769731413f6d2982b5c12b6c4992a91c647e0c1367985546",
+          "at": "2026-04-27T13:49:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01a8313a402f2c5f769731413f6d2982b5c12b6c4992a91c647e0c1367985546",
+          "at": "2026-04-27T13:51:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eaf634b94a45bb0a383206067151221d4969e20d7a483aa563259b6ed2f1cdd0",
+          "at": "2026-04-27T13:55:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eaf634b94a45bb0a383206067151221d4969e20d7a483aa563259b6ed2f1cdd0",
+          "at": "2026-04-27T13:56:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62aa3080b5bcfa7755f9f8eec0fde0b0ae3b13c65f355ea4a5f76405604a438a",
+          "at": "2026-04-27T14:00:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62aa3080b5bcfa7755f9f8eec0fde0b0ae3b13c65f355ea4a5f76405604a438a",
+          "at": "2026-04-27T14:01:29Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a4fb35c356e800e7b8eb140f7e88e866388a31d55871422bdeac461606217cd",
+          "at": "2026-04-27T12:37:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 accepts `README.md` at ≤90 lines, but CN-01 in the same spec says Tier 1 files, explicitly including `README.md`, must be ≤80 lines. That means an 81-90 line README would satisfy the acceptance criterion while violating the plan's stated Tier 1 constraint.",
+              "severity": "P1",
+              "file": "track/items/doc-shrink-and-orphan-cleanup-2026-04-27/spec.json",
+              "line": 272,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-04 makes `LOCAL_DEVELOPMENT.md` pass at ≤120 lines even though IN-04 and the D3 target cited by the spec require shrinking it to about 90 lines. This leaves the shrink target non-binding, so a materially under-shrunk file could satisfy the plan's acceptance gate.",
+              "severity": "P1",
+              "file": "track/items/doc-shrink-and-orphan-cleanup-2026-04-27/spec.json",
+              "line": 300,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9a4fb35c356e800e7b8eb140f7e88e866388a31d55871422bdeac461606217cd",
+          "at": "2026-04-27T12:43:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 enumerates five `.claude/docs/` observation lines for DESIGN.md (874 / 1019 / 1023 / 1024 / 1025), but AC-06 and T008 describe D6 #5(d) as only four observations (`4 件`, `1/4`, `2-4/4`). This is a semantic contradiction in the plan-artifact coverage for the orphan cleanup; align the count/list so the acceptance criterion and task text describe the same observation set.",
+              "severity": "P1",
+              "file": "track/items/doc-shrink-and-orphan-cleanup-2026-04-27/spec.md",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:77de7ef4f81ac03888a4f143b5c5544c40904aade284ed9c71dadf2ac6e78f42",
+          "at": "2026-04-27T12:48:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b2dceb03a4bc56fbcaafe94caa0e3d9dd80e7d163bf005ec13478792478764",
+          "at": "2026-04-27T12:52:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b7a6dc08a431a24dbe06ef6b6664cb21d7cf4e766272b9603afeac3ad72c35",
+          "at": "2026-04-27T12:56:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b7a6dc08a431a24dbe06ef6b6664cb21d7cf4e766272b9603afeac3ad72c35",
+          "at": "2026-04-27T12:57:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b7a6dc08a431a24dbe06ef6b6664cb21d7cf4e766272b9603afeac3ad72c35",
+          "at": "2026-04-27T12:58:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:16:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:20:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:22:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:23:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da3cc09c69a104fe3526405225f7a74893ad4b2f2448bf614fa2d93a55d57e45",
+          "at": "2026-04-27T13:25:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da3cc09c69a104fe3526405225f7a74893ad4b2f2448bf614fa2d93a55d57e45",
+          "at": "2026-04-27T13:26:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73fa9dbf3ae40f0d75b60673efac76c146ac20d439f1519c8d513dad5a534627",
+          "at": "2026-04-27T13:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73fa9dbf3ae40f0d75b60673efac76c146ac20d439f1519c8d513dad5a534627",
+          "at": "2026-04-27T13:32:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60503e226c682b6263229244f254ec0c4689f195f27a730955498fee8d03289a",
+          "at": "2026-04-27T13:44:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60503e226c682b6263229244f254ec0c4689f195f27a730955498fee8d03289a",
+          "at": "2026-04-27T13:44:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c4274ac288db89a8eca9ab09932428655f1ae2c7df4fe9dd1de1a4584374004",
+          "at": "2026-04-27T13:49:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c4274ac288db89a8eca9ab09932428655f1ae2c7df4fe9dd1de1a4584374004",
+          "at": "2026-04-27T13:50:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ef982feb6891e5de8dbb2844572116c8cd8f8781b3c7ed12eeff54ab5d64f65",
+          "at": "2026-04-27T13:55:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ef982feb6891e5de8dbb2844572116c8cd8f8781b3c7ed12eeff54ab5d64f65",
+          "at": "2026-04-27T13:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f47796241319645e411d90e232e353710f1649b2a33cc3fdb9ea1a1b9fb14485",
+          "at": "2026-04-27T14:00:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f47796241319645e411d90e232e353710f1649b2a33cc3fdb9ea1a1b9fb14485",
+          "at": "2026-04-27T14:01:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4647979263840e8aeee8704347a91bd802b5824fa5c32004dd7b235c6af80d84",
+          "at": "2026-04-27T14:03:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4647979263840e8aeee8704347a91bd802b5824fa5c32004dd7b235c6af80d84",
+          "at": "2026-04-27T14:04:27Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3561a729aad7379f6e30abb54f0f69268056a2a115e8cc1331ece34819f21f5d",
+          "at": "2026-04-27T12:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This now tells users to create schema_version 5 metadata with `status: planned`, but v5 metadata is identity-only and rejects `status` as a legacy field. Following this instruction produces invalid metadata instead of a valid plan-only track; status needs to be derived from `impl-plan.json` rather than written in `metadata.json`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan-only.md",
+              "line": 17,
+              "category": "factual_error"
+            },
+            {
+              "message": "This check still describes `status: planned` as part of the planning-only metadata condition even though schema_version 5 no longer stores `status`; v5 planning status is derived. As written, the activation instructions ask reviewers to confirm a field that valid v5 metadata must not contain.",
+              "severity": "P1",
+              "file": ".claude/commands/track/activate.md",
+              "line": 13,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:3561a729aad7379f6e30abb54f0f69268056a2a115e8cc1331ece34819f21f5d",
+          "at": "2026-04-27T13:00:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd1a2d785892a31958b6df5f9c538b7843569de3632af404c5379116179644a",
+          "at": "2026-04-27T13:06:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd1a2d785892a31958b6df5f9c538b7843569de3632af404c5379116179644a",
+          "at": "2026-04-27T13:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f853dea1e9f6a9e9ec681cf60054b977859fece58bd8258231b7acbf9ad347ea",
+          "at": "2026-04-27T13:20:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a239d51a99a904436e080f2b87ca1dea4b1ebfb8242d7702d368793cb6d541",
+          "at": "2026-04-27T13:27:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a239d51a99a904436e080f2b87ca1dea4b1ebfb8242d7702d368793cb6d541",
+          "at": "2026-04-27T13:28:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad667b00538e712cc25e1ee1b16861126c939a782dde4accf95255a27f0e95a5",
+          "at": "2026-04-27T13:44:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad667b00538e712cc25e1ee1b16861126c939a782dde4accf95255a27f0e95a5",
+          "at": "2026-04-27T13:44:34Z"
+        }
+      ]
+    }
+  }
+}

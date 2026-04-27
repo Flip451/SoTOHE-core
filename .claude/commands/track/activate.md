@@ -10,7 +10,7 @@ Arguments:
 
 Execution:
 - Read `track/items/$ARGUMENTS/metadata.json`, `spec.md`, and `plan.md`.
-- Confirm the target track is planning-only: `schema_version: 3`, `status: planned`, and `branch: null`.
+- Confirm the target track is planning-only: `schema_version: 5` and `branch: null`.
 - Confirm the worktree is clean before activation if materialization has not happened yet.
 - Run:
   `cargo make track-activate '$ARGUMENTS'`

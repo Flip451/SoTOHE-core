@@ -1,0 +1,62 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+version: "1.0"
+signals: { blue: 30, yellow: 0, red: 0 }
+---
+
+# Tier 1/2 narrative の縮約 + orphan 監査残項目を 1 track にまとめる (parent ADR D6 #3 + #4 + #5 統合)
+
+## Goal
+
+- [GO-01] parent ADR D3 が指定する 4 ファイル (`knowledge/DESIGN.md` / `README.md` / `START_HERE_HUMAN.md` / `LOCAL_DEVELOPMENT.md`) を規定の目標行数まで縮約し、SoT との重複 narrative を取り除く。縮約後も各ファイルは ADR D1 が定める tier 制約 (Tier 1: ≤80 行の入口 / Tier 2: 1 トピック 1 文書) を満たす [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める, knowledge/adr/2026-04-27-0554-doc-reorganization.md#D1: 文書 4-tier 構造を確立し、それぞれの責務と制約を明文化する]
+- [GO-02] 監査で検出された orphan 残項目 (a) `metadata.json schema_version` 旧値 / (c) `domain-types.json` 単数形 / (d) `.claude/docs/` 参照 を各ファイルで修正し、現行 SoT (schema_version 5 / `<layer>-types.json` 複数形 / `knowledge/` ディレクトリ) と一致した状態にする。D6 #5 の (b) 項 (`cargo make spec-approve` 参照) は Bad example 保持 / historical note として対応不要 [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ), knowledge/adr/2026-04-27-0554-doc-reorganization.md#D5: 再発防止運用ルール (5 条) を確立する]
+- [GO-03] D6 #3 / #4 / #5 を 1 track に統合して実施する。各項目の作業性質が同質 (doc-only) で対象ファイル群が重複しており、track 分割のオーバーヘッドが個別作業量を上回ると判断した。D6 ロードマップは「推奨 track 構成」であり強制ではない [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)]
+
+## Scope
+
+### In Scope
+- [IN-01] `knowledge/DESIGN.md` を ~1073 行から ~150 行に縮約する。ADR D3 が指定する削除対象節を除去する: `## Canonical Blocks` 全節 / `## Shell Command Guard` historical / `## Security Hardening: Rust Migration` 完了済み migration record / `## Auto Mode (MEMO-15 Design Spike)` / `## Domain Types Registry` / Changelog。保持する内容: Overview / Architecture diagram (Mermaid) / Module Structure 表 (層と責務のみ、Key Types 列は削除) / Key Design Decisions 表は ADR 索引へのリンクに置換。加えて `knowledge/DESIGN.md` 内の `.claude/docs/` 参照 4 件 (D6 #5 (d) 項; 874 行付近 + 1019-1025 行付近の 3 件) および `domain-types.json` 単数形 (D6 #5 (c) 項; 1037-1039 行付近) を修正する [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める] [tasks: T006, T007, T008]
+- [IN-02] `README.md` を ~140 行から ≤80 行に縮約する (ADR D1 Tier 1 size limit)。ADR D3 が指定する削除・修正内容を適用する: capability table 削除 (`.harness/config/agent-profiles.json` へのリンクのみ残す) / `tmp/` 参照削除 / `/track:design` → `/track:type-design` 命名修正 / ロードマップは `knowledge/strategy/TODO-PLAN.md` リンクのみ。保持する内容: Project pitch / SoT Chain 4 階層図 / 信号機評価説明 / クイックスタート (新コマンド体系) [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める] [tasks: T005]
+- [IN-03] `START_HERE_HUMAN.md` を ~71 行から ~60 行に縮約する。ADR D3 が指定する削除・修正内容を適用する: 存在しない `docs/` / `project-docs/` / `.claude/docs/` ディレクトリへの言及を削除し、実在ディレクトリのみを列挙する。保持する内容: 最短 onboarding / 責務境界 / 必須レビュー・承認ポイント / 安全運用ルール。Tier 1 の ≤80 行制約を満たす状態を維持する [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める, knowledge/adr/2026-04-27-0554-doc-reorganization.md#D1: 文書 4-tier 構造を確立し、それぞれの責務と制約を明文化する] [tasks: T003]
+- [IN-04] `LOCAL_DEVELOPMENT.md` を ~176 行から ~90 行に縮約する。ADR D3 が指定する削除・修正内容を適用する: Git Notes 節は `track/workflow.md` への参照リンクのみに変更 / 'Phase 5/6 で Rust へ移行済み' 表記は該当 ADR / track id を明示する記述に置換。保持する内容: Host Requirements / compose セットアップ / tools-daemon / Useful Commands / Troubleshooting [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める] [tasks: T004]
+- [IN-05] `DEVELOPER_AI_WORKFLOW.md` 内の `domain-types.json` 単数形 (D6 #5 (c) 項; 95 / 209 / 243 行付近) を `<layer>-types.json` / `domain-types.json` 複数形の正式表記に修正する。`DEVELOPER_AI_WORKFLOW.md` の全体サイズは維持し (Tier 2 workflow narrative SSoT)、監査 HIGH 残項目の細部修正のみ行う [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める, knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)] [tasks: T002]
+- [IN-06] `.claude/commands/track/activate.md` (13 行目) と `.claude/commands/track/plan-only.md` (17 行目) の `schema_version: 3` を `schema_version: 5` (現行最新) に修正する (D6 #5 (a) 項)。これらは Tier 0 ファイルだが、参照値が現行 SoT (`metadata.json` の `schema_version: 5`) と乖離しているため修正対象とする。Tier 0 の他の内容には変更を加えない [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D4: SSoT 単一化マッピングを表で定義する] [tasks: T001]
+- [IN-07] `track/workflow.md` (156 行目) の `schema_version: 3` を `schema_version: 5` に修正する (D6 #5 (a) 項)。`track/workflow.md` は Tier 2 ファイルであり、D4 の `metadata.json` schema SSoT マッピング「doc では `schema_version` 数値のみ参照可」に従い数値を現行最新に更新する [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D4: SSoT 単一化マッピングを表で定義する] [tasks: T001]
+- [IN-08] `knowledge/strategy/tddd-implementation-plan.md` (80 行目付近) の `domain-types.json` 単数形 (D6 #5 (c) 項) を現行正式表記に修正する。この Tier 3 ファイルは Knowledge Base に属し (ADR D1)、サイズ制約はないが値の正確性は維持する [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ), knowledge/adr/2026-04-27-0554-doc-reorganization.md#D1: 文書 4-tier 構造を確立し、それぞれの責務と制約を明文化する] [tasks: T002]
+
+### Out of Scope
+- [OS-01] D6 #1 (`doc-decluttering-deletes-2026-04-27`) および D6 #2 (`track-traceability-merge-2026-04-27`) は完了済み (PR #119 / #120 / #121 相当) であり、本 track では再実施しない [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)]
+- [OS-02] D6 #6 (任意) `doc-rules-enforcement-2026-04-XX` — D5.2 の line count check CI gate 化は本 track のスコープ外。ADR D6 が明示的に任意 (optional) として別 track に割り当てた項目であり、本 track は doc-only の手動修正に特化する [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)]
+- [OS-03] D6 #5 (b) 項 — `knowledge/conventions/workflow-ceremony-minimization.md:28` の `cargo make spec-approve` 参照は Bad example として意図的に保持する。`knowledge/research/` 内の歴史的 research note の参照も対応不要。これらは ADR D1 Tier 0 / Tier 3 の性質に合致した意図的な記述である [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D1: 文書 4-tier 構造を確立し、それぞれの責務と制約を明文化する]
+- [OS-04] parent ADR (`knowledge/adr/2026-04-27-0554-doc-reorganization.md`) を含む既存 ADR の本文編集は本 track のスコープ外。ADR D6 は本 ADR を「方針のみ」と定め実装を別 track に委ねており、実装 track が親 ADR を編集する必要はない [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)]
+- [OS-05] Rust ソースコード変更 (`libs/` / `apps/` / `crates/` 配下) は本 track のスコープ外。本 track は doc / config ファイルの修正のみを行う [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#Neutral]
+- [OS-06] `DEVELOPER_AI_WORKFLOW.md` の全体的なリストラクチャリングや大規模削減は本 track のスコープ外。ADR D3 が明示的に「Tier 2 の workflow narrative SSoT として現状サイズを維持し、細部修正のみ」と定めており、本 track は IN-05 で示した `domain-types.json` 単数形の点訂正のみ行う [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める]
+
+## Constraints
+- [CN-01] 縮約後の各ファイルは ADR D1 の tier 制約を満たすこと。Tier 1 ファイル (`README.md` / `START_HERE_HUMAN.md`) は ≤80 行。Tier 2 ファイル (`knowledge/DESIGN.md` / `LOCAL_DEVELOPMENT.md`) は 1 トピック 1 文書の原則を維持し、SoT を restate する節を含まない [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D1: 文書 4-tier 構造を確立し、それぞれの責務と制約を明文化する, knowledge/adr/2026-04-27-0554-doc-reorganization.md#D5: 再発防止運用ルール (5 条) を確立する] [tasks: T003, T004, T005, T006]
+- [CN-02] SoT への restate を新規に書き込まない。縮約した箇所に SoT へのリンクのみ書き、内容を再掲しない。`knowledge/DESIGN.md` の `## Key Design Decisions` 表は ADR 索引へのリンクに置換し、個別 ADR の内容を本文中に要約しない [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D4: SSoT 単一化マッピングを表で定義する] [tasks: T005, T006]
+- [CN-03] `tmp/` への永続的参照を新たに書き込まない。縮約後のファイルに `tmp/` パスへの参照が残っている場合は削除する。`README.md` にある `tmp/vision-v6-draft.md` 等の既存 tmp/ 参照は削除対象 [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D5: 再発防止運用ルール (5 条) を確立する] [tasks: T004, T005]
+- [CN-04] IN-06 の Tier 0 ファイル (`.claude/commands/track/activate.md` / `.claude/commands/track/plan-only.md`) の修正は `schema_version` 値の点訂正に限定する。Tier 0 ファイルの構造・他の内容には変更を加えない (D1 の Tier 0 immutable 原則に準拠) [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D1: 文書 4-tier 構造を確立し、それぞれの責務と制約を明文化する] [tasks: T001]
+- [CN-05] 本 track の変更対象は doc / config ファイルのみとし、Rust ソースコードには変更を加えない。`cargo make ci` を通過する必要があるが、Rust コードへの変更がないため fmt-check / clippy / nextest / deny / check-layers は既存の通過状態を維持する [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#Neutral] [tasks: T009]
+
+## Acceptance Criteria
+- [ ] [AC-01] `knowledge/DESIGN.md` の行数が ≤200 行 (目標 ~150 行) になっている。ADR D3 が削除対象として指定した節 (`## Canonical Blocks` / `## Shell Command Guard` / `## Security Hardening: Rust Migration` / `## Auto Mode (MEMO-15 Design Spike)` / `## Domain Types Registry` / Changelog) がファイルに存在しない。`## Key Design Decisions` が ADR 索引へのリンクに置換されている [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める] [tasks: T006, T007, T008]
+- [ ] [AC-02] `README.md` の行数が ≤80 行 (Tier 1 size limit 遵守) になっている。capability table が削除され `.harness/config/agent-profiles.json` へのリンクに置換されている。`tmp/` を参照する行が存在しない。`/track:design` の表記が `/track:type-design` に修正されている [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める, knowledge/adr/2026-04-27-0554-doc-reorganization.md#D5: 再発防止運用ルール (5 条) を確立する] [tasks: T005]
+- [ ] [AC-03] `START_HERE_HUMAN.md` の行数が ≤80 行 (目標 ~60 行) になっている (Tier 1 size limit 遵守)。`docs/` / `project-docs/` / `.claude/docs/` への言及が存在しない [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める, knowledge/adr/2026-04-27-0554-doc-reorganization.md#D1: 文書 4-tier 構造を確立し、それぞれの責務と制約を明文化する] [tasks: T003]
+- [ ] [AC-04] `LOCAL_DEVELOPMENT.md` の行数が ≤100 行 (目標 ~90 行) になっている。Git Notes 節の詳細記述が `track/workflow.md` への参照リンクのみに置換されている。'Phase 5/6 で Rust へ移行済み' 等の vague な表記が削除または ADR / track id を明示した記述に置換されている [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D3: Heavy shrink 対象 (4 ファイル) のスコープを定める] [tasks: T004]
+- [ ] [AC-05] `knowledge/DESIGN.md` / `DEVELOPER_AI_WORKFLOW.md` / `knowledge/strategy/tddd-implementation-plan.md` の各ファイルに `domain-types.json` (単数形・単一名のみの表記) が残存しない。現行正式表記 (`<layer>-types.json` / 複数 layer を示す表記) に統一されている [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)] [tasks: T002, T008]
+- [ ] [AC-06] `knowledge/DESIGN.md` 内に `.claude/docs/` を参照する行が残存しない (D6 #5 (d) 項の観測箇所 4 件すべてが削除または修正されている) [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)] [tasks: T008]
+- [ ] [AC-07] `.claude/commands/track/activate.md` / `.claude/commands/track/plan-only.md` / `track/workflow.md` の各ファイルで `schema_version` の値が `5` になっている (旧値 `3` が残存しない) [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#D4: SSoT 単一化マッピングを表で定義する] [tasks: T001]
+- [ ] [AC-08] `cargo make ci` が pass する。Rust コードへの変更はないため fmt-check / clippy / nextest / deny / check-layers はそのまま通過する。`.claude/` および `track/` 配下のドキュメント修正による verify-* への影響がないことも確認する [adr: knowledge/adr/2026-04-27-0554-doc-reorganization.md#Neutral] [tasks: T009]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/workflow-ceremony-minimization.md#Rules
+- knowledge/conventions/pre-track-adr-authoring.md#Rules
+- knowledge/conventions/source-attribution.md#Rules
+- .claude/rules/04-coding-principles.md#No Panics in Library Code
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 30  🟡 0  🔴 0
+
