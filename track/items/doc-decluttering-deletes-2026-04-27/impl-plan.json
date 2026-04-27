@@ -4,14 +4,14 @@
     {
       "id": "T001",
       "description": "ADR コミット準備 + Tier 1 リンク更新 + 削除対象 narrative ファイル削除 + scratch ファイル削除 + ADR index 更新をひとつの commit にまとめる。具体的には: (1) `CLAUDE.md` priority references から `knowledge/WORKFLOW.md` 行を削除する (IN-04 / AC-04)。(2) `knowledge/WORKFLOW.md` をリポジトリから削除する (IN-01 / AC-01)。(3) `knowledge/architecture.md` をリポジトリから削除する (IN-02 / AC-02)。(4) worktree 上の `repomix-output.*` ファイル群 (repomix-output.txt / repomix-output.xml / repomix-output.1.txt / repomix-output.1.xml / repomix-output.2.txt / repomix-output.2.xml) をローカル削除する (IN-03 / AC-03)。(5) `knowledge/adr/2026-04-27-0554-doc-reorganization.md` を staging に含める (CN-04 / AC-06)。(6) `knowledge/adr/README.md` の「ドキュメント運用」セクションに新規 ADR のエントリを追加する (CN-02 例外 2)。すべてをひとつの commit にまとめることで CN-04 を満たす。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "4429a833b1b905373636e77696915421f36f8ad2"
     },
     {
       "id": "T002",
       "description": "`cargo make ci` を実行して全 gate が pass することを確認する (AC-05)。Rust コードへの変更はないため fmt-check / clippy / test / deny / check-layers はそのまま通過する想定。削除による verify-* への影響がないことを確認し、T001 の commit が clean であることを最終確認する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "4429a833b1b905373636e77696915421f36f8ad2"
     }
   ],
   "plan": {

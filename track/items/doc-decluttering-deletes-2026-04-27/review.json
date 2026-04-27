@@ -1,46 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8fbb945aca4267796606634428f88ad5d2a2a4f50a85122d813031488482a8a3",
-          "at": "2026-04-27T07:54:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `knowledge/WORKFLOW.md` is incomplete as-is: `knowledge/README.md:10` still advertises that file in the reading order, and `scripts/test_verify_scripts.py:278` still calls `read_text()` on the deleted path, so this change will leave a dead index entry and make the test fail with `FileNotFoundError`.",
-              "severity": "P1",
-              "file": "scripts/test_verify_scripts.py",
-              "line": 278,
-              "category": "broken-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:8fbb945aca4267796606634428f88ad5d2a2a4f50a85122d813031488482a8a3",
-          "at": "2026-04-27T07:57:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eefcf8614998908ddf2385ac749fc31ea871a1cb7149c602eae147635bd53335",
-          "at": "2026-04-27T08:02:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eefcf8614998908ddf2385ac749fc31ea871a1cb7149c602eae147635bd53335",
-          "at": "2026-04-27T08:04:39Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -343,6 +303,20 @@
           "findings": [],
           "hash": "rvw1:sha256:9e97b33a000c246e20a319ec70a203c18423efd3a8f94f35da0395287aa5b5da",
           "at": "2026-04-27T07:37:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeb7834b0717bb305d8ada37ed861bd6f61e1f6f5b6411b3551f7746571740f4",
+          "at": "2026-04-27T08:09:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeb7834b0717bb305d8ada37ed861bd6f61e1f6f5b6411b3551f7746571740f4",
+          "at": "2026-04-27T08:11:26Z"
         }
       ]
     },
@@ -361,6 +335,46 @@
           "findings": [],
           "hash": "rvw1:sha256:3184d3ae6c64f7be27a988b6fb2bf07087cd2f81f2b5d7f3d20dabff693587ee",
           "at": "2026-04-27T08:05:24Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8fbb945aca4267796606634428f88ad5d2a2a4f50a85122d813031488482a8a3",
+          "at": "2026-04-27T07:54:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `knowledge/WORKFLOW.md` is incomplete as-is: `knowledge/README.md:10` still advertises that file in the reading order, and `scripts/test_verify_scripts.py:278` still calls `read_text()` on the deleted path, so this change will leave a dead index entry and make the test fail with `FileNotFoundError`.",
+              "severity": "P1",
+              "file": "scripts/test_verify_scripts.py",
+              "line": 278,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8fbb945aca4267796606634428f88ad5d2a2a4f50a85122d813031488482a8a3",
+          "at": "2026-04-27T07:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eefcf8614998908ddf2385ac749fc31ea871a1cb7149c602eae147635bd53335",
+          "at": "2026-04-27T08:02:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eefcf8614998908ddf2385ac749fc31ea871a1cb7149c602eae147635bd53335",
+          "at": "2026-04-27T08:04:39Z"
         }
       ]
     },
