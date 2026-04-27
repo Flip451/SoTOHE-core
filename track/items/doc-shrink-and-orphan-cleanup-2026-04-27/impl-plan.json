@@ -34,12 +34,13 @@
     {
       "id": "T006",
       "description": "`knowledge/DESIGN.md` の keep-zone (L1-73) を rework し、続けて `## Canonical Blocks` セクション (L74-428、~355 行) を削除する (IN-01、第1分割)。rework 内容: (a) `## Module Structure` 表から `Key Types` 列を削除して層と責務のみの表に変換する。(b) `## Key Design Decisions` 表を `knowledge/adr/README.md` への索引リンク 1 行に置換し、個別 ADR 詳細の再掲を排除する (CN-02)。(c) `## Agent Roles` 表を `.harness/config/agent-profiles.json` への参照リンクに置換する (CN-02)。その後 `## Canonical Blocks` セクション全体 (見出しから次の L2 見出し直前まで) を削除する。本タスクの diff は ~360 行以内で 500 行制約に収まる。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3ecf6c5"
     },
     {
       "id": "T007",
       "description": "`knowledge/DESIGN.md` の `## Security Hardening: Rust Migration` セクション (L429-871、~443 行) を削除する (IN-01、第2分割)。このセクションは完了済みの Python→Rust migration record であり ADR D3 の削除対象。見出し `## Security Hardening: Rust Migration` から次の L2 見出し `## Feature Branch Strategy` 直前まで全行を削除する。本タスクの diff は ~443 行で 500 行制約に収まる。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",
