@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
+          "at": "2026-04-27T11:30:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
+          "at": "2026-04-27T11:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec7ad03dcc29fbd4d5f87037ffd02f2f3858293beb1974df5133abbff8c96915",
+          "at": "2026-04-27T11:34:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec7ad03dcc29fbd4d5f87037ffd02f2f3858293beb1974df5133abbff8c96915",
+          "at": "2026-04-27T11:35:20Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -154,38 +186,42 @@
           "findings": [],
           "hash": "rvw1:sha256:699cac4eeaed4c04d679435067f824f27ef1fbb1053e85fe0a5034037ca26caf",
           "at": "2026-04-27T11:35:58Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary says the track only changes `.claude/` markdown files, but T003 explicitly allows residual-ref sweeps and surgical fixes in `knowledge/conventions/`, `.harness/config/`, `architecture-rules.json`, and `Makefile.toml` as well. That makes the declared edit scope internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/impl-plan.json",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f4323407e0a536fd06058003b08bb08af021b899635869965f75d3cd7baad4ac",
+          "at": "2026-04-27T11:39:59Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
-          "at": "2026-04-27T11:30:21Z"
+          "hash": "rvw1:sha256:d16f463b9354195826957d6228fddcea2f67eb545ec7e7ae1f5799471cd20e4f",
+          "at": "2026-04-27T11:40:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d16f463b9354195826957d6228fddcea2f67eb545ec7e7ae1f5799471cd20e4f",
+          "at": "2026-04-27T11:43:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
-          "at": "2026-04-27T11:31:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec7ad03dcc29fbd4d5f87037ffd02f2f3858293beb1974df5133abbff8c96915",
-          "at": "2026-04-27T11:34:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec7ad03dcc29fbd4d5f87037ffd02f2f3858293beb1974df5133abbff8c96915",
-          "at": "2026-04-27T11:35:20Z"
+          "hash": "rvw1:sha256:d16f463b9354195826957d6228fddcea2f67eb545ec7e7ae1f5799471cd20e4f",
+          "at": "2026-04-27T11:45:43Z"
         }
       ]
     }
