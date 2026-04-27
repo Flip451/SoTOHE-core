@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ce5b2360edfce69ca540c1f6741308bc78b30fa97b0a077cfd3efaa837cbd9",
+          "at": "2026-04-27T01:51:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR attributes `std::env::set_var` becoming unsafe to “Rust 1.80+”, and repeats that framing later, but this workspace is Rust 2024/MSRV 1.85 and the `set_var` unsafety is a Rust 2024 edition change. The race rationale is still valid, but the version claim in the planning artifact is semantically wrong and should be corrected to avoid misleading future readers.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+              "line": 18,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a0ce5b2360edfce69ca540c1f6741308bc78b30fa97b0a077cfd3efaa837cbd9",
+          "at": "2026-04-27T01:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ce5b2360edfce69ca540c1f6741308bc78b30fa97b0a077cfd3efaa837cbd9",
+          "at": "2026-04-27T01:57:40Z"
+        }
+      ]
+    }
+  }
+}

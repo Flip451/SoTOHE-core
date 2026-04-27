@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "llvm-cov を nextest 経路に統一",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "`cargo make llvm-cov` が nextest 経由で実行されるように `Makefile.toml` の `llvm-cov-local` task を切り替え、`cargo make test` (nextest) と test harness を統一することで、harness 差に起因する乖離を解消する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+          "anchor": "D1: `Makefile.toml` の `llvm-cov-local` task で `cargo llvm-cov nextest` 経由に切り替える"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`Makefile.toml` の `llvm-cov-local` task の args を `[\"llvm-cov\", \"nextest\", \"--html\", \"--all-features\", \"--locked\"]` に変更する。変更対象は L445-449 周辺の 1 task のみ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+            "anchor": "D1: `Makefile.toml` の `llvm-cov-local` task で `cargo llvm-cov nextest` 経由に切り替える"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "`apps/cli/src/commands/review/tests.rs` の env mutation 方式 (`env_lock()` / `EnvVarGuard`) の DI 化・`serial_test` クレート導入など、env mutation 方式そのものの改善は本 track のスコープ外。ADR D2 で別 track として deferred されている",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+            "anchor": "D2: env mutation 方式そのもの (DI 化 / `serial_test`) の対応は別 track として deferred する"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "`RUST_TEST_THREADS=1` で libtest を直列化するアプローチは ADR で却下されており、本 track では採用しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+            "anchor": "B. `RUST_TEST_THREADS=1` で libtest を直列化する"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "`cargo make llvm-cov` を CI から撤去することは ADR で却下されており、本 track では採用しない。coverage は CI 補助指標として維持する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+            "anchor": "C. `cargo make llvm-cov` を撤去する (coverage を諦める)"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "変更範囲は `Makefile.toml` の `llvm-cov-local` task のみとする。他の task・crate・テストコードへの変更は行わない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+          "anchor": "D1: `Makefile.toml` の `llvm-cov-local` task で `cargo llvm-cov nextest` 経由に切り替える"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "修正後も `cargo make llvm-cov` が外部インターフェースとして維持される。inner task の実装を切り替えるのみで、呼び出し側の compose ラッパー (`llvm-cov` task) への変更は不要",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+          "anchor": "D1: `Makefile.toml` の `llvm-cov-local` task で `cargo llvm-cov nextest` 経由に切り替える"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`cargo make llvm-cov` が正常終了し、全テスト (2062 件以上) が pass して HTML カバレッジレポートが生成される。`apps/cli/src/commands/review/tests.rs` の 13 テストで失敗が発生しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+          "anchor": "D1: `Makefile.toml` の `llvm-cov-local` task で `cargo llvm-cov nextest` 経由に切り替える"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`cargo make test` と `cargo make llvm-cov` が同一テスト群を同一 nextest harness で実行し、両コマンドで pass/fail の結果が一致する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+          "anchor": "D1: `Makefile.toml` の `llvm-cov-local` task で `cargo llvm-cov nextest` 経由に切り替える"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全て pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-27-0124-llvm-cov-nextest-harness-alignment.md",
+          "anchor": "Positive"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/07-dev-environment.md",
+      "anchor": "Task Runner: cargo-make"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Commands"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    }
+  ],
+  "signals": {
+    "blue": 10,
+    "yellow": 0,
+    "red": 0
+  }
+}
