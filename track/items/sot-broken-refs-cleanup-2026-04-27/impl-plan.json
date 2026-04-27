@@ -4,12 +4,13 @@
     {
       "id": "T001",
       "description": "`.claude/rules/` 配下の 3 ファイルの broken ref を surgical edit で修正する。(1) `.claude/rules/08-orchestration.md` の Source Of Truth リスト (35 行目) から `TRACK_TRACEABILITY.md` 参照行を削除し、Operational split 節 (48 行目) の `TRACK_TRACEABILITY.md` 説明行も削除する (IN-01 / AC-03)。(2) `.claude/rules/09-maintainer-checklist.md` の 13 行目の `knowledge/WORKFLOW.md` を `DEVELOPER_AI_WORKFLOW.md` に書き換え、18 行目の `TRACK_TRACEABILITY.md` を `track/workflow.md` に書き換える (IN-02 / AC-04)。(3) `.claude/rules/10-guardrails.md` の 144 行目 Operational details リストの `knowledge/WORKFLOW.md` を `DEVELOPER_AI_WORKFLOW.md` に書き換える (IN-03 / AC-05)。各変更は broken ref 箇所のみに限定し、ファイルの構造・意味・その他の内容は変更しない (CN-02)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "bac60c2"
     },
     {
       "id": "T002",
       "description": "`.claude/commands/track/setup.md` と `.claude/agents/adr-editor.md` の broken ref を surgical edit で修正する。(1) `.claude/commands/track/setup.md` の 13 行目の `Confirm required top-level docs exist` リストから `knowledge/WORKFLOW.md` エントリを削除する (IN-04 / AC-06)。(2) `.claude/agents/adr-editor.md` の 61 行目の track artifacts 例示リストから `TRACK_TRACEABILITY.md` エントリを削除する (IN-05 / AC-07)。各変更は broken ref 箇所のみに限定し、ファイルの構造・意味・その他の内容は変更しない (CN-02)。新規ファイルの作成・redirect stub の追加は行わない (CN-03)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",

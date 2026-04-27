@@ -58,7 +58,7 @@ Opus is chosen because ADR decisions have long-lasting cross-track implications;
   - (b) **Indexical / deictic phrases binding the ADR to a specific track lifecycle**: `本トラック` / `このトラック` / `〜トラック内で実施` / `〜トラック scope に追加` etc. These are forward-looking commitments to a particular track that contradict the cross-track durability of an ADR — once that track is archived, the ADR's meaning becomes ambiguous. The decision should read cleanly a year later when the originating track is long archived.
   - (c) **Implementation history**: when / in which task / by which commit a decision was implemented.
 
-  All of (a)(b)(c) belong in track artifacts (`impl-plan.json`, `metadata.json`, commit messages, `TRACK_TRACEABILITY.md`) — not in the ADR.
+  All of (a)(b)(c) belong in track artifacts (`impl-plan.json`, `metadata.json`, commit messages) — not in the ADR.
 
   **Permitted**: past-tense provenance in `## Context` (e.g. `"2026-04-25 の xxx-2026-04-25 トラックで実施された投資調査の結果〜"` — historical fact, not commitment) and cross-references to other ADR files under `knowledge/adr/` (encouraged for `## Related`).
 
