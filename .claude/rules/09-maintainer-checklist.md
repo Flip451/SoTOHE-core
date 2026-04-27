@@ -10,12 +10,10 @@ Always consider:
 
 - user-facing docs:
   - `DEVELOPER_AI_WORKFLOW.md`
-  - `knowledge/WORKFLOW.md`
 - track docs:
   - `track/workflow.md`
   - `track/tech-stack.md`
   - `track/registry.md`
-  - `TRACK_TRACEABILITY.md`
 - enforcement:
   - `Makefile.toml`
   - `sotp verify` subcommands (Rust CLI, replaces deleted `scripts/verify_*.py`)

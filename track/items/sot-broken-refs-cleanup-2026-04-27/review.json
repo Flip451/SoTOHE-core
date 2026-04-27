@@ -126,6 +126,38 @@
           "findings": [],
           "hash": "rvw1:sha256:5e9c90081a7e3998990b0e776f7fbae56d1a17e53d7604c93dc9c2aadd4a44d7",
           "at": "2026-04-27T11:08:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42e5a8e3ce68e6792edb897620cee5fa34a9ba79ed85e8cec044f1915369a244",
+          "at": "2026-04-27T11:30:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42e5a8e3ce68e6792edb897620cee5fa34a9ba79ed85e8cec044f1915369a244",
+          "at": "2026-04-27T11:31:47Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
+          "at": "2026-04-27T11:30:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
+          "at": "2026-04-27T11:31:01Z"
         }
       ]
     }
