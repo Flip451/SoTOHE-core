@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "`LOCAL_DEVELOPMENT.md` を ~176 行から ~90 行 (≤100 行制約) に縮約する (IN-04)。Git Notes 節の詳細記述を `track/workflow.md` への参照リンクのみに変更する。'Phase 5/6 で Rust へ移行済み' 等の vague な表記は該当 ADR / track id を明示した記述に置換するか削除する。保持: Host Requirements / compose セットアップ / tools-daemon / Useful Commands / Troubleshooting。`tmp/` への永続的参照が残っている場合は削除する (CN-03)。縮約後の行数が ≤100 行を満たすことを確認する (AC-04)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "e0b7cbc"
     },
     {
       "id": "T005",
       "description": "`README.md` を ~140 行から ≤80 行 (Tier 1 size limit) に縮約する (IN-02)。capability table を削除して `.harness/config/agent-profiles.json` へのリンクのみに置換する。`tmp/` への参照行をすべて削除する (CN-03)。`/track:design` の表記を `/track:type-design` に修正する (AC-02)。ロードマップは `knowledge/strategy/TODO-PLAN.md` リンクのみ残す。保持: Project pitch / SoT Chain 4 階層図 / 信号機評価説明 / クイックスタート (新コマンド体系)。縮約後の行数が ≤80 行を満たすことを確認する (AC-02)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",
