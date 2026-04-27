@@ -306,6 +306,72 @@ pub fn find_binding<'a>(
     bindings.iter().find(|b| b.layer_id == layer_id)
 }
 
+/// Parses all crate names listed in the `layers[]` array of an
+/// `architecture-rules.json` content string, regardless of whether each layer
+/// has TDDD enabled.
+///
+/// The returned `HashSet` contains every `layers[].crate` value and is
+/// suitable for use as the `workspace_crates` argument passed to
+/// `domain::check_consistency` so that the IN-10 reverse checks (workspace-
+/// origin trait filter for Interactor / SecondaryAdapter) are active in the
+/// verify and signal-evaluation paths.
+///
+/// When the `layers` key is absent from an otherwise valid JSON object, the
+/// field defaults to `[]` (via `#[serde(default)]`) and an empty `HashSet`
+/// is returned — consistent with graceful degradation for IN-10 suppression.
+///
+/// # Errors
+///
+/// Returns `serde_json::Error` when `json` is not valid JSON.
+pub fn parse_workspace_crate_names(
+    json: &str,
+) -> Result<std::collections::HashSet<String>, serde_json::Error> {
+    #[derive(serde::Deserialize)]
+    struct Root {
+        #[serde(default)]
+        layers: Vec<Layer>,
+    }
+
+    #[derive(serde::Deserialize)]
+    struct Layer {
+        #[serde(rename = "crate")]
+        crate_name: String,
+    }
+
+    let root: Root = serde_json::from_str(json)?;
+    Ok(root.layers.into_iter().map(|l| l.crate_name).collect())
+}
+
+/// Loads workspace crate names from `architecture-rules.json` at `path`.
+///
+/// Returns an empty set when the file does not exist (no symlink at the leaf),
+/// so callers that tolerate missing files degrade gracefully to "no workspace
+/// crates known" (IN-10 checks are suppressed rather than causing a hard error).
+/// Any other I/O error or JSON parse failure is returned as `Err`.
+///
+/// # Errors
+///
+/// Returns [`LoadTdddLayersError::Io`] for I/O failures and
+/// [`LoadTdddLayersError::Parse`] for JSON errors.
+pub fn load_workspace_crate_names(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<std::collections::HashSet<String>, LoadTdddLayersError> {
+    match crate::track::symlink_guard::reject_symlinks_below(path, trusted_root) {
+        Ok(true) => {
+            let content = std::fs::read_to_string(path)
+                .map_err(|e| LoadTdddLayersError::Io { path: path.to_path_buf(), source: e })?;
+            parse_workspace_crate_names(&content)
+                .map_err(|e| LoadTdddLayersError::Parse(TdddLayerParseError::Json(e)))
+        }
+        Ok(false) => {
+            // File genuinely absent — degrade to empty (IN-10 suppressed).
+            Ok(std::collections::HashSet::new())
+        }
+        Err(e) => Err(LoadTdddLayersError::Io { path: path.to_path_buf(), source: e }),
+    }
+}
+
 /// Error returned by [`load_tddd_layers_from_path`].
 #[derive(Debug, thiserror::Error)]
 pub enum LoadTdddLayersError {
@@ -749,6 +815,97 @@ mod tests {
         match err {
             LoadTdddLayersError::Io { .. } => {} // expected — symlink rejected
             other => panic!("expected Io error for symlink leaf, got {other:?}"),
+        }
+    }
+
+    // --- parse_workspace_crate_names() (Finding 2 / IN-10 fix) ---
+
+    #[test]
+    fn test_parse_workspace_crate_names_returns_all_layer_crates_regardless_of_tddd() {
+        // All layers must be returned — both tddd-enabled and disabled — because
+        // the set is used for IN-10 workspace-origin filtering, not TDDD routing.
+        let json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
+            { "crate": "usecase", "tddd": { "enabled": false } },
+            { "crate": "infrastructure" }
+          ]
+        }"#;
+        let names = parse_workspace_crate_names(json).unwrap();
+        assert!(names.contains("domain"), "domain should be present");
+        assert!(names.contains("usecase"), "usecase should be present");
+        assert!(names.contains("infrastructure"), "infrastructure should be present");
+        assert_eq!(names.len(), 3);
+    }
+
+    #[test]
+    fn test_parse_workspace_crate_names_empty_layers_returns_empty_set() {
+        let json = r#"{ "layers": [] }"#;
+        let names = parse_workspace_crate_names(json).unwrap();
+        assert!(names.is_empty());
+    }
+
+    #[test]
+    fn test_parse_workspace_crate_names_absent_layers_key_returns_empty_set() {
+        // `layers` defaults to `[]` via `#[serde(default)]`, so a missing key
+        // does not error — it returns an empty set.
+        let json = r#"{}"#;
+        let names = parse_workspace_crate_names(json).unwrap();
+        assert!(names.is_empty());
+    }
+
+    #[test]
+    fn test_parse_workspace_crate_names_invalid_json_returns_error() {
+        let result = parse_workspace_crate_names("not json");
+        assert!(result.is_err());
+    }
+
+    // --- load_workspace_crate_names() (Finding 2 / IN-10 fix) ---
+
+    #[test]
+    fn test_load_workspace_crate_names_returns_empty_on_absent_file() {
+        // When architecture-rules.json is absent, the function must degrade
+        // gracefully to an empty set (IN-10 checks suppressed rather than
+        // causing a hard error).
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("architecture-rules.json");
+
+        let names = load_workspace_crate_names(&path, dir.path()).unwrap();
+        assert!(names.is_empty(), "absent file must yield empty set, got {names:?}");
+    }
+
+    #[test]
+    fn test_load_workspace_crate_names_returns_names_from_real_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("architecture-rules.json");
+        let json = r#"{
+          "layers": [
+            { "crate": "domain" },
+            { "crate": "usecase", "tddd": { "enabled": false } },
+            { "crate": "infrastructure", "tddd": { "enabled": true } }
+          ]
+        }"#;
+        std::fs::write(&path, json).unwrap();
+
+        let names = load_workspace_crate_names(&path, dir.path()).unwrap();
+        assert!(names.contains("domain"));
+        assert!(names.contains("usecase"));
+        assert!(names.contains("infrastructure"));
+        assert_eq!(names.len(), 3);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_workspace_crate_names_broken_symlink_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("architecture-rules.json");
+        let missing_target = dir.path().join("does-not-exist.json");
+        std::os::unix::fs::symlink(&missing_target, &path).unwrap();
+
+        let err = load_workspace_crate_names(&path, dir.path()).unwrap_err();
+        match err {
+            LoadTdddLayersError::Io { .. } => {} // expected — symlink rejected
+            other => panic!("expected Io error for broken symlink, got {other:?}"),
         }
     }
 }

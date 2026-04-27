@@ -78,6 +78,7 @@ tmp/
 .track-template-dev
 repomix-output.txt
 repomix-output.xml
+repomix-output.*
 
 # --- Local Claude Code settings override (not version-controlled) ---
 .claude/settings.local.json

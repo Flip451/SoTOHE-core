@@ -1,0 +1,170 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TypeCatalogueCodecError",
+      "description": "Codec error for the type-catalogue JSON file. Modified to support FreeFunction kind decode/encode (IN-13) and expected_members / declares_application_service required field validation.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "Validation",
+        "UnsupportedSchemaVersion",
+        "InvalidEntry"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-13",
+          "hash": "e29e59241a0b79e2f0dee92c280dd528d99848b02165e59711be418e5fd244a0"
+        }
+      ]
+    },
+    {
+      "name": "BaselineCodecError",
+      "description": "Codec error for domain-types-baseline.json. Modified to support functions map and trait_impls decode/encode (D3/D4 bundle).",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "InvalidTimestamp"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-06",
+          "hash": "3033276d2ca13fc1f4cd760c751e0c42e015878538ea558fec133df51530bf41"
+        },
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-07",
+          "hash": "bc735849f6a0a1b552f62b5ccb707c13ce49d0327b6dd3c9cd9aaf37d813215c"
+        }
+      ]
+    },
+    {
+      "name": "FsCatalogueLoader",
+      "description": "Filesystem-backed CatalogueLoader implementation. Loads all TDDD-enabled catalogues from the track directory. Referenced.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "CatalogueLoader"
+        }
+      ],
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-13",
+          "hash": "e29e59241a0b79e2f0dee92c280dd528d99848b02165e59711be418e5fd244a0"
+        }
+      ]
+    },
+    {
+      "name": "FsContractMapWriter",
+      "description": "Filesystem-backed ContractMapWriter implementation. Writes contract-map.md atomically. Referenced.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ContractMapWriter"
+        }
+      ],
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "2b40296ba332ff52991bf94aee66b8d33e2b7c354148a147bd044ad6f4ffc2f5"
+        }
+      ]
+    },
+    {
+      "name": "FsCatalogueSpecSignalsStore",
+      "description": "Filesystem-backed CatalogueSpecSignalsWriter implementation. Writes <layer>-catalogue-spec-signals.json atomically. Referenced.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "CatalogueSpecSignalsWriter"
+        }
+      ],
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "994222325ce718d00c9a1607ac8b79e149e940243111091d6ee35b3c91b7a729"
+        }
+      ]
+    },
+    {
+      "name": "LoadAllCataloguesError",
+      "description": "Error surfaced by the bulk catalogue loader when any layer fails to load. Referenced.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "LayerBindings",
+        "ArchRulesParse",
+        "Io",
+        "CatalogueNotFound",
+        "Decode",
+        "TopologicalSortFailed",
+        "InvalidLayerId"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-13",
+          "hash": "e29e59241a0b79e2f0dee92c280dd528d99848b02165e59711be418e5fd244a0"
+        }
+      ]
+    },
+    {
+      "name": "TypeGraphRenderOptions",
+      "description": "Options controlling the type-graph mermaid render (edge_set, truncate). Referenced.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-08",
+          "hash": "1517086066a6b62cb835c90ddb57bcf688cf1fcb692c7cc567dd0524b2b476aa"
+        }
+      ]
+    },
+    {
+      "name": "MemberDeclarationDto",
+      "description": "Serde DTO for MemberDeclaration (enum Variant / struct Field). Referenced.",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "Variant",
+        "Field"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "6160aeeac13f534b9efbbe22107dfd0e6e428b9beaa0f4cc844cf7773f874f03"
+        },
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-13",
+          "hash": "e29e59241a0b79e2f0dee92c280dd528d99848b02165e59711be418e5fd244a0"
+        }
+      ]
+    }
+  ]
+}

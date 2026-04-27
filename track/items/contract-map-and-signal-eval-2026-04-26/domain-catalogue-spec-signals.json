@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6739152d2df117660c0fe001a96bc4f35ecfb2470ddbd05a8ce6fcefc7361364",
+  "signals": [
+    {
+      "type_name": "TypeDefinitionKind",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeGraph",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitImplEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeBaselineEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeBaseline",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FunctionNode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FunctionBaselineEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitImplBaselineEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FunctionInfo",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SchemaExport",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapRenderOptions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MethodDeclaration",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeAction",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypestateTransitions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ConsistencyReport",
+      "signal": "blue"
+    }
+  ]
+}

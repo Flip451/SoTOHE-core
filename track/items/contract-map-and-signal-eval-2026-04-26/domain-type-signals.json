@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-26T23:22:46Z",
+  "declaration_hash": "6739152d2df117660c0fe001a96bc4f35ecfb2470ddbd05a8ce6fcefc7361364",
+  "signals": [
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ApplicationService",
+        "Command",
+        "Dto",
+        "Enum",
+        "ErrorType",
+        "Factory",
+        "FreeFunction",
+        "Interactor",
+        "Query",
+        "SecondaryAdapter",
+        "SecondaryPort",
+        "Typestate",
+        "UseCase",
+        "ValueObject"
+      ]
+    },
+    {
+      "type_name": "TypeGraph",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitImplEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeBaselineEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeBaseline",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FunctionNode",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FunctionBaselineEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitImplBaselineEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FunctionInfo",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SchemaExport",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapRenderOptions",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
+    },
+    {
+      "type_name": "MethodDeclaration",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeAction",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Add",
+        "Delete",
+        "Modify",
+        "Reference"
+      ]
+    },
+    {
+      "type_name": "TypestateTransitions",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Terminal",
+        "To"
+      ]
+    },
+    {
+      "type_name": "ConsistencyReport",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

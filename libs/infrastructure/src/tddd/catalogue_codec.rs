@@ -20,7 +20,9 @@
 
 use std::path::PathBuf;
 
-use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration, TraitImplDecl};
+use domain::tddd::catalogue::{
+    MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl,
+};
 use domain::{
     ConfidenceSignal, ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
     SpecElementId, SpecRef, SpecValidationError, TypeAction, TypeCatalogueDocument,
@@ -145,6 +147,21 @@ fn is_add_action(action: &TypeActionDto) -> bool {
     matches!(action, TypeActionDto::Add)
 }
 
+/// DTO for a single `MemberDeclaration` (enum variant or struct field).
+///
+/// T003: Added to support `expected_members` in struct-based 9 kinds.
+/// Internally-tagged on `"kind"` to distinguish `"variant"` from `"field"`.
+///
+/// JSON shapes:
+/// - variant: `{ "kind": "variant", "name": "SomeName" }`
+/// - field:   `{ "kind": "field", "name": "some_field", "ty": "SomeType" }`
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+enum MemberDeclarationDto {
+    Variant { name: String },
+    Field { name: String, ty: String },
+}
+
 /// Internally-tagged enum for kind-specific fields.
 ///
 /// serde enforces that each variant's fields are present in the JSON.
@@ -153,17 +170,27 @@ fn is_add_action(action: &TypeActionDto) -> bool {
 /// T002: `TraitPort` removed; `SecondaryPort` and `ApplicationService` added
 /// (same shape — `expected_methods`). Seven existence-check-only variants
 /// added: `UseCase`, `Interactor`, `Dto`, `Command`, `Query`, `Factory`.
+///
+/// T003: struct-based 9 kinds now carry `expected_members: Vec<MemberDeclarationDto>`.
+/// `Interactor` additionally carries `declares_application_service: Vec<String>`.
+/// `FreeFunction` variant added with `module_path`, `expected_params`,
+/// `expected_returns`, and `expected_is_async` fields.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 enum TypeDefinitionKindDto {
     Typestate {
         transitions_to: Vec<String>,
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
     },
     #[serde(rename = "enum")]
     Enum {
         expected_variants: Vec<String>,
     },
-    ValueObject {},
+    ValueObject {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+    },
     ErrorType {
         expected_variants: Vec<String>,
     },
@@ -175,22 +202,61 @@ enum TypeDefinitionKindDto {
     ApplicationService {
         expected_methods: Vec<MethodDto>,
     },
-    /// Struct-only use case; existence check only.
-    UseCase {},
-    /// ApplicationService implementation struct; existence check only.
-    Interactor {},
-    /// Pure data-transfer object struct; existence check only.
-    Dto {},
-    /// CQRS command object struct; existence check only.
-    Command {},
-    /// CQRS query object struct; existence check only.
-    Query {},
-    /// Aggregate/entity factory struct; existence check only.
-    Factory {},
+    /// Struct-only use case.
+    UseCase {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+    },
+    /// ApplicationService implementation struct.
+    Interactor {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+        /// ApplicationService trait names declared by this interactor.
+        /// When serialized, omitted if empty (use `skip_serializing_if` so that
+        /// round-trips of interactors without declarations don't emit an empty
+        /// array and then fail the non-empty validation on re-decode).
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        declares_application_service: Vec<String>,
+    },
+    /// Pure data-transfer object struct.
+    Dto {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+    },
+    /// CQRS command object struct.
+    Command {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+    },
+    /// CQRS query object struct.
+    Query {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+    },
+    /// Aggregate/entity factory struct.
+    Factory {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+    },
     /// Struct implementing one or more hexagonal secondary port traits.
     SecondaryAdapter {
         #[serde(default)]
         implements: Vec<TraitImplDeclDto>,
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+    },
+    /// T003: Module-public free function declaration.
+    FreeFunction {
+        /// Sub-module path within the crate (e.g. `"utils"`), or absent for
+        /// top-level declarations.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        module_path: Option<String>,
+        #[serde(default)]
+        expected_params: Vec<ParamDto>,
+        #[serde(default)]
+        expected_returns: Vec<String>,
+        #[serde(default)]
+        expected_is_async: bool,
     },
 }
 
@@ -262,10 +328,16 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
     //
     // `#[serde(flatten)]` + internally-tagged enum means `deny_unknown_fields` on
     // `TypeCatalogueEntryDto` does not propagate to the individual variant struct
-    // deserialization (known serde limitation).  Fields like `expected_methods` or
-    // `expected_variants` on `use_case`/`interactor`/`dto`/`command`/`query`/`factory`
-    // would be silently dropped by serde instead of triggering an error.  This pass
-    // catches illegal kind/field combinations at the codec boundary, before Phase 2.
+    // deserialization (known serde limitation).  Fields that belong to other
+    // variants would be silently dropped by serde instead of triggering an error.
+    // This pass catches illegal kind/field combinations at the codec boundary,
+    // before Phase 2.
+    //
+    // T003: Updated to reflect that struct-based 9 kinds now carry `expected_members`
+    // (no longer existence-only).  Added validation for:
+    // - `enum` / `error_type`: `expected_variants` must not be empty.
+    // - `interactor`: `declares_application_service` must not be empty when present.
+    // - `free_function`: must not carry trait/enum-specific fields.
     if let Some(entries) = raw.get("type_definitions").and_then(|v| v.as_array()) {
         for entry in entries {
             let entry_obj = entry.as_object();
@@ -274,20 +346,27 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 .and_then(|o| o.get("name"))
                 .and_then(|v| v.as_str())
                 .unwrap_or("<unnamed>");
-            // Existence-only kinds must not carry any structural fields.
-            const EXISTENCE_ONLY_KINDS: &[&str] =
+
+            // Kinds that must not carry `expected_methods`, `expected_variants`,
+            // `transitions_to`, or `implements`.
+            // T003: `value_object` is still existence-only for those fields.
+            // Struct-based kinds (use_case, interactor, dto, command, query, factory,
+            // typestate, secondary_adapter) now carry `expected_members`, so
+            // `expected_members` is NOT forbidden for them.
+            // `free_function` is similarly treated as its own structured kind.
+            const STRUCT_AND_EXISTENCE_KINDS: &[&str] =
                 &["use_case", "interactor", "dto", "command", "query", "factory", "value_object"];
-            const FORBIDDEN_FIELDS_EXISTENCE_ONLY: &[&str] =
+            const FORBIDDEN_FIELDS_STRUCT_KINDS: &[&str] =
                 &["expected_methods", "expected_variants", "transitions_to", "implements"];
-            if EXISTENCE_ONLY_KINDS.contains(&kind) {
+            if STRUCT_AND_EXISTENCE_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
-                    for forbidden in FORBIDDEN_FIELDS_EXISTENCE_ONLY {
+                    for forbidden in FORBIDDEN_FIELDS_STRUCT_KINDS {
                         if obj.contains_key(*forbidden) {
                             return Err(TypeCatalogueCodecError::InvalidEntry {
                                 name: name.to_owned(),
                                 reason: format!(
                                     "kind '{}' does not support field '{}' — \
-                                     existence-only kinds carry no structural fields",
+                                     this kind only supports 'expected_members' for member declarations",
                                     kind, forbidden
                                 ),
                             });
@@ -295,10 +374,49 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     }
                 }
             }
-            // `secondary_adapter` carries `implements` but must not carry fields
-            // belonging to other structured variants (`expected_methods`,
-            // `expected_variants`, `transitions_to`).  Without this guard those
-            // fields would be silently dropped by serde.
+
+            // `enum` and `error_type`: `expected_variants` must not be empty.
+            if kind == "enum" || kind == "error_type" {
+                if let Some(obj) = entry_obj {
+                    let variants = obj
+                        .get("expected_variants")
+                        .and_then(|v| v.as_array())
+                        .map_or(0, |arr| arr.len());
+                    if variants == 0 {
+                        return Err(TypeCatalogueCodecError::InvalidEntry {
+                            name: name.to_owned(),
+                            reason: format!(
+                                "kind '{}' requires at least one entry in 'expected_variants' — \
+                                 empty or absent 'expected_variants' is not allowed",
+                                kind
+                            ),
+                        });
+                    }
+                }
+            }
+
+            // `interactor`: `declares_application_service` must not be empty when present.
+            if kind == "interactor" {
+                if let Some(obj) = entry_obj {
+                    if let Some(das) = obj.get("declares_application_service") {
+                        let len = das.as_array().map_or(0, |arr| arr.len());
+                        if len == 0 {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: "kind 'interactor': 'declares_application_service' must \
+                                         not be an empty array — either omit the field or list \
+                                         at least one ApplicationService trait name"
+                                    .to_owned(),
+                            });
+                        }
+                    }
+                }
+            }
+
+            // `secondary_adapter` carries `implements` and `expected_members` but must
+            // not carry fields belonging to other structured variants (`expected_methods`,
+            // `expected_variants`, `transitions_to`).  Without this guard those fields
+            // would be silently dropped by serde.
             if kind == "secondary_adapter" {
                 const FORBIDDEN_FIELDS_SECONDARY_ADAPTER: &[&str] =
                     &["expected_methods", "expected_variants", "transitions_to"];
@@ -317,13 +435,90 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     }
                 }
             }
-            // Structured non-existence-only kinds (`typestate`, `enum`, `error_type`,
-            // `secondary_port`, `application_service`) do not carry `implements`.
-            // Without this guard, a payload like `{"kind":"enum","implements":[...]}`
-            // would be silently accepted with the `implements` field dropped by serde.
-            const STRUCTURED_KINDS: &[&str] =
-                &["typestate", "enum", "error_type", "secondary_port", "application_service"];
-            if STRUCTURED_KINDS.contains(&kind) {
+
+            // `free_function` must not carry trait/enum/typestate-specific fields or
+            // `expected_members` (which belongs to struct-based kinds, not to free functions).
+            if kind == "free_function" {
+                const FORBIDDEN_FIELDS_FREE_FUNCTION: &[&str] = &[
+                    "expected_methods",
+                    "expected_variants",
+                    "expected_members",
+                    "transitions_to",
+                    "implements",
+                ];
+                if let Some(obj) = entry_obj {
+                    for forbidden in FORBIDDEN_FIELDS_FREE_FUNCTION {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind 'free_function' does not support field '{}' — \
+                                     use 'expected_params'/'expected_returns'/'module_path' for \
+                                     function declarations",
+                                    forbidden
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+
+            // `typestate` carries `transitions_to` and `expected_members` but must not
+            // carry fields belonging to other variants (`expected_methods`, `expected_variants`).
+            // Without this guard those fields would be silently dropped by serde.
+            if kind == "typestate" {
+                const FORBIDDEN_FIELDS_TYPESTATE: &[&str] =
+                    &["expected_methods", "expected_variants"];
+                if let Some(obj) = entry_obj {
+                    for forbidden in FORBIDDEN_FIELDS_TYPESTATE {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind 'typestate' does not support field '{}' — \
+                                     use 'transitions_to'/'expected_members' for typestate declarations",
+                                    forbidden
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+
+            // `enum`, `error_type`, `secondary_port`, `application_service` do not carry
+            // `expected_members` (that field belongs to struct-based kinds only).  Without
+            // this guard a malformed entry would have the field silently dropped by serde.
+            const KINDS_FORBIDDING_EXPECTED_MEMBERS: &[&str] =
+                &["enum", "error_type", "secondary_port", "application_service"];
+            if KINDS_FORBIDDING_EXPECTED_MEMBERS.contains(&kind) {
+                if let Some(obj) = entry_obj {
+                    if obj.contains_key("expected_members") {
+                        return Err(TypeCatalogueCodecError::InvalidEntry {
+                            name: name.to_owned(),
+                            reason: format!(
+                                "kind '{}' does not support field 'expected_members' — \
+                                 'expected_members' is only valid for struct-based kinds",
+                                kind
+                            ),
+                        });
+                    }
+                }
+            }
+
+            // Structured non-struct kinds (`typestate`, `enum`, `error_type`,
+            // `secondary_port`, `application_service`, `free_function`) do not carry
+            // `implements`.  Without this guard, a payload like
+            // `{"kind":"enum","implements":[...]}` would be silently accepted with
+            // the `implements` field dropped by serde.
+            const KINDS_FORBIDDING_IMPLEMENTS: &[&str] = &[
+                "typestate",
+                "enum",
+                "error_type",
+                "secondary_port",
+                "application_service",
+                "free_function",
+            ];
+            if KINDS_FORBIDDING_IMPLEMENTS.contains(&kind) {
                 if let Some(obj) = entry_obj {
                     if obj.contains_key("implements") {
                         return Err(TypeCatalogueCodecError::InvalidEntry {
@@ -331,6 +526,46 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                             reason: format!(
                                 "kind '{}' does not support field 'implements' — \
                                  'implements' is only valid for 'secondary_adapter'",
+                                kind
+                            ),
+                        });
+                    }
+                }
+            }
+
+            // `free_function`-specific fields (`module_path`, `expected_params`,
+            // `expected_returns`, `expected_is_async`) must not appear on any other kind.
+            // Without this guard those fields would be silently dropped by serde when
+            // deserialised into a different variant.
+            if kind != "free_function" {
+                const FREE_FUNCTION_FIELDS: &[&str] =
+                    &["module_path", "expected_params", "expected_returns", "expected_is_async"];
+                if let Some(obj) = entry_obj {
+                    for field in FREE_FUNCTION_FIELDS {
+                        if obj.contains_key(*field) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind '{}' does not support field '{}' — \
+                                     '{}' is only valid for 'free_function'",
+                                    kind, field, field
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+
+            // `declares_application_service` is specific to `interactor` and must not
+            // appear on any other kind.  Without this guard it would be silently dropped.
+            if kind != "interactor" {
+                if let Some(obj) = entry_obj {
+                    if obj.contains_key("declares_application_service") {
+                        return Err(TypeCatalogueCodecError::InvalidEntry {
+                            name: name.to_owned(),
+                            reason: format!(
+                                "kind '{}' does not support field 'declares_application_service' — \
+                                 that field is only valid for 'interactor'",
                                 kind
                             ),
                         });
@@ -427,8 +662,10 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         .map(|e| e.name())
         .collect();
     for entry in &entries {
-        if let TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(targets) } =
-            entry.kind()
+        if let TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::To(targets),
+            ..
+        } = entry.kind()
         {
             let valid_targets = if entry.action() == TypeAction::Delete {
                 &all_typestate_names
@@ -597,18 +834,22 @@ fn type_definition_kind_from_dto(
     dto: &TypeDefinitionKindDto,
 ) -> Result<TypeDefinitionKind, TypeCatalogueCodecError> {
     match dto {
-        TypeDefinitionKindDto::Typestate { transitions_to } => {
+        TypeDefinitionKindDto::Typestate { transitions_to, expected_members } => {
             let transitions = if transitions_to.is_empty() {
                 TypestateTransitions::Terminal
             } else {
                 TypestateTransitions::To(transitions_to.clone())
             };
-            Ok(TypeDefinitionKind::Typestate { transitions })
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::Typestate { transitions, expected_members: members })
         }
         TypeDefinitionKindDto::Enum { expected_variants } => {
             Ok(TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() })
         }
-        TypeDefinitionKindDto::ValueObject {} => Ok(TypeDefinitionKind::ValueObject),
+        TypeDefinitionKindDto::ValueObject { expected_members } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::ValueObject { expected_members: members })
+        }
         TypeDefinitionKindDto::ErrorType { expected_variants } => {
             Ok(TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() })
         }
@@ -620,15 +861,66 @@ fn type_definition_kind_from_dto(
             let decls = decode_method_list(entry_name, expected_methods)?;
             Ok(TypeDefinitionKind::ApplicationService { expected_methods: decls })
         }
-        TypeDefinitionKindDto::UseCase {} => Ok(TypeDefinitionKind::UseCase),
-        TypeDefinitionKindDto::Interactor {} => Ok(TypeDefinitionKind::Interactor),
-        TypeDefinitionKindDto::Dto {} => Ok(TypeDefinitionKind::Dto),
-        TypeDefinitionKindDto::Command {} => Ok(TypeDefinitionKind::Command),
-        TypeDefinitionKindDto::Query {} => Ok(TypeDefinitionKind::Query),
-        TypeDefinitionKindDto::Factory {} => Ok(TypeDefinitionKind::Factory),
-        TypeDefinitionKindDto::SecondaryAdapter { implements } => {
+        TypeDefinitionKindDto::UseCase { expected_members } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::UseCase { expected_members: members })
+        }
+        TypeDefinitionKindDto::Interactor { expected_members, declares_application_service } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::Interactor {
+                expected_members: members,
+                declares_application_service: declares_application_service.clone(),
+            })
+        }
+        TypeDefinitionKindDto::Dto { expected_members } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::Dto { expected_members: members })
+        }
+        TypeDefinitionKindDto::Command { expected_members } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::Command { expected_members: members })
+        }
+        TypeDefinitionKindDto::Query { expected_members } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::Query { expected_members: members })
+        }
+        TypeDefinitionKindDto::Factory { expected_members } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::Factory { expected_members: members })
+        }
+        TypeDefinitionKindDto::SecondaryAdapter { implements, expected_members } => {
             let decls = decode_trait_impl_list(entry_name, implements)?;
-            Ok(TypeDefinitionKind::SecondaryAdapter { implements: decls })
+            let members = decode_member_list(entry_name, expected_members)?;
+            Ok(TypeDefinitionKind::SecondaryAdapter {
+                implements: decls,
+                expected_members: members,
+            })
+        }
+        TypeDefinitionKindDto::FreeFunction {
+            module_path,
+            expected_params,
+            expected_returns,
+            expected_is_async,
+        } => {
+            let params = decode_free_function_param_list(entry_name, expected_params)?;
+            // L1 enforcement: `expected_returns` strings must not contain `::`.
+            for ret in expected_returns {
+                if ret.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_returns value contains '::' — L1 catalogue entries \
+                             must use last-segment short names: '{ret}'"
+                        ),
+                    });
+                }
+            }
+            Ok(TypeDefinitionKind::FreeFunction {
+                module_path: module_path.clone(),
+                expected_params: params,
+                expected_returns: expected_returns.clone(),
+                expected_is_async: *expected_is_async,
+            })
         }
     }
 }
@@ -647,6 +939,79 @@ fn decode_method_list(
         decls.push(method_from_dto(entry_name, m)?);
     }
     Ok(decls)
+}
+
+/// Decode a `Vec<MemberDeclarationDto>` into `Vec<MemberDeclaration>`.
+///
+/// L1 enforcement: member names and `Field.ty` must not contain `::` (last-segment only).
+fn decode_member_list(
+    entry_name: &str,
+    dtos: &[MemberDeclarationDto],
+) -> Result<Vec<MemberDeclaration>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(dtos.len());
+    for m in dtos {
+        match m {
+            MemberDeclarationDto::Variant { name } => {
+                if name.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members variant name contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{name}'"
+                        ),
+                    });
+                }
+                out.push(MemberDeclaration::variant(name.clone()));
+            }
+            MemberDeclarationDto::Field { name, ty } => {
+                if name.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members field name contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{name}'"
+                        ),
+                    });
+                }
+                if ty.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members field '{name}' ty contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{ty}'"
+                        ),
+                    });
+                }
+                out.push(MemberDeclaration::field(name.clone(), ty.clone()));
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// Decode `expected_params` for a `FreeFunction` entry.
+///
+/// Reuses `ParamDto` (same shape as method params) and applies the same
+/// L1 enforcement (no `::` in `ty`).
+fn decode_free_function_param_list(
+    entry_name: &str,
+    dtos: &[ParamDto],
+) -> Result<Vec<ParamDeclaration>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(dtos.len());
+    for p in dtos {
+        if p.ty.contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "expected_params param '{}' ty contains '::' — L1 catalogue entries \
+                     must use last-segment short names: '{}'",
+                    p.name, p.ty
+                ),
+            });
+        }
+        out.push(ParamDeclaration::new(p.name.clone(), p.ty.clone()));
+    }
+    Ok(out)
 }
 
 /// Decode a `Vec<TraitImplDeclDto>` into `Vec<TraitImplDecl>`.
@@ -748,18 +1113,39 @@ fn type_catalogue_entry_to_dto(
     entry: &TypeCatalogueEntry,
 ) -> Result<TypeCatalogueEntryDto, TypeCatalogueCodecError> {
     let kind = match entry.kind() {
-        TypeDefinitionKind::Typestate { transitions } => {
+        TypeDefinitionKind::Typestate { transitions, expected_members } => {
             let transitions_to = match transitions {
                 TypestateTransitions::Terminal => vec![],
                 TypestateTransitions::To(v) => v.clone(),
             };
-            TypeDefinitionKindDto::Typestate { transitions_to }
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::Typestate { transitions_to, expected_members: members }
         }
         TypeDefinitionKind::Enum { expected_variants } => {
+            if expected_variants.is_empty() {
+                return Err(TypeCatalogueCodecError::InvalidEntry {
+                    name: entry.name().to_owned(),
+                    reason: "kind 'enum' requires at least one entry in 'expected_variants' — \
+                             empty 'expected_variants' is not allowed"
+                        .to_owned(),
+                });
+            }
             TypeDefinitionKindDto::Enum { expected_variants: expected_variants.clone() }
         }
-        TypeDefinitionKind::ValueObject => TypeDefinitionKindDto::ValueObject {},
+        TypeDefinitionKind::ValueObject { expected_members } => {
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::ValueObject { expected_members: members }
+        }
         TypeDefinitionKind::ErrorType { expected_variants } => {
+            if expected_variants.is_empty() {
+                return Err(TypeCatalogueCodecError::InvalidEntry {
+                    name: entry.name().to_owned(),
+                    reason:
+                        "kind 'error_type' requires at least one entry in 'expected_variants' — \
+                             empty 'expected_variants' is not allowed"
+                            .to_owned(),
+                });
+            }
             TypeDefinitionKindDto::ErrorType { expected_variants: expected_variants.clone() }
         }
         TypeDefinitionKind::SecondaryPort { expected_methods } => {
@@ -770,15 +1156,67 @@ fn type_catalogue_entry_to_dto(
             let dtos = encode_method_list(entry.name(), expected_methods)?;
             TypeDefinitionKindDto::ApplicationService { expected_methods: dtos }
         }
-        TypeDefinitionKind::UseCase => TypeDefinitionKindDto::UseCase {},
-        TypeDefinitionKind::Interactor => TypeDefinitionKindDto::Interactor {},
-        TypeDefinitionKind::Dto => TypeDefinitionKindDto::Dto {},
-        TypeDefinitionKind::Command => TypeDefinitionKindDto::Command {},
-        TypeDefinitionKind::Query => TypeDefinitionKindDto::Query {},
-        TypeDefinitionKind::Factory => TypeDefinitionKindDto::Factory {},
-        TypeDefinitionKind::SecondaryAdapter { implements } => {
-            let dtos = encode_trait_impl_list(entry.name(), implements)?;
-            TypeDefinitionKindDto::SecondaryAdapter { implements: dtos }
+        TypeDefinitionKind::UseCase { expected_members } => {
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::UseCase { expected_members: members }
+        }
+        TypeDefinitionKind::Interactor { expected_members, declares_application_service } => {
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::Interactor {
+                expected_members: members,
+                declares_application_service: declares_application_service.clone(),
+            }
+        }
+        TypeDefinitionKind::Dto { expected_members } => {
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::Dto { expected_members: members }
+        }
+        TypeDefinitionKind::Command { expected_members } => {
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::Command { expected_members: members }
+        }
+        TypeDefinitionKind::Query { expected_members } => {
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::Query { expected_members: members }
+        }
+        TypeDefinitionKind::Factory { expected_members } => {
+            let members = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::Factory { expected_members: members }
+        }
+        TypeDefinitionKind::SecondaryAdapter { implements, expected_members } => {
+            let impl_dtos = encode_trait_impl_list(entry.name(), implements)?;
+            let member_dtos = encode_member_list(entry.name(), expected_members)?;
+            TypeDefinitionKindDto::SecondaryAdapter {
+                implements: impl_dtos,
+                expected_members: member_dtos,
+            }
+        }
+        TypeDefinitionKind::FreeFunction {
+            module_path,
+            expected_params,
+            expected_returns,
+            expected_is_async,
+        } => {
+            let param_dtos = encode_free_function_param_list(entry.name(), expected_params)?;
+            // L1 enforcement at encode time: mirror the same check as the decode path so
+            // `encode(doc)` never produces JSON that `decode` would immediately reject.
+            for ret in expected_returns {
+                if ret.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry.name().to_owned(),
+                        reason: format!(
+                            "expected_returns value contains '::' — L1 catalogue entries \
+                             must use last-segment short names: '{ret}'"
+                        ),
+                    });
+                }
+            }
+            TypeDefinitionKindDto::FreeFunction {
+                module_path: module_path.clone(),
+                expected_params: param_dtos,
+                expected_returns: expected_returns.clone(),
+                expected_is_async: *expected_is_async,
+            }
         }
     };
     let spec_refs = spec_refs_to_dtos(entry.spec_refs());
@@ -852,6 +1290,80 @@ fn encode_trait_impl_list(
         });
     }
     Ok(dtos)
+}
+
+/// Encode a `Vec<MemberDeclaration>` into `Vec<MemberDeclarationDto>`.
+///
+/// L1 enforcement at encode time: member names and `Field.ty` must not contain `::`
+/// (mirrors `decode_member_list`).
+fn encode_member_list(
+    entry_name: &str,
+    members: &[MemberDeclaration],
+) -> Result<Vec<MemberDeclarationDto>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(members.len());
+    for m in members {
+        match m {
+            MemberDeclaration::Variant(name) => {
+                if name.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members variant name contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{name}'"
+                        ),
+                    });
+                }
+                out.push(MemberDeclarationDto::Variant { name: name.clone() });
+            }
+            MemberDeclaration::Field { name, ty } => {
+                if name.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members field name contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{name}'"
+                        ),
+                    });
+                }
+                if ty.contains("::") {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "expected_members field '{name}' ty contains '::' — L1 catalogue \
+                             entries must use last-segment short names: '{ty}'"
+                        ),
+                    });
+                }
+                out.push(MemberDeclarationDto::Field { name: name.clone(), ty: ty.clone() });
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// Encode `expected_params` for a `FreeFunction` entry.
+///
+/// Applies the same L1 enforcement as `encode_method_list` (no `::` in `ty`).
+fn encode_free_function_param_list(
+    entry_name: &str,
+    params: &[ParamDeclaration],
+) -> Result<Vec<ParamDto>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(params.len());
+    for p in params {
+        if p.ty().contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "expected_params param '{}' ty contains '::' — L1 catalogue entries \
+                     must use last-segment short names: '{}'",
+                    p.name(),
+                    p.ty()
+                ),
+            });
+        }
+        out.push(ParamDto { name: p.name().to_owned(), ty: p.ty().to_owned() });
+    }
+    Ok(out)
 }
 
 fn method_to_dto(
@@ -947,7 +1459,7 @@ mod tests {
         let doc = decode(FULL_JSON).unwrap();
         assert!(matches!(
             doc.entries()[0].kind(),
-            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(v) } if v == &["Published"]
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(v), .. } if v == &["Published"]
         ));
     }
 
@@ -963,7 +1475,7 @@ mod tests {
     #[test]
     fn test_decode_value_object_kind() {
         let doc = decode(FULL_JSON).unwrap();
-        assert!(matches!(doc.entries()[3].kind(), TypeDefinitionKind::ValueObject));
+        assert!(matches!(doc.entries()[3].kind(), TypeDefinitionKind::ValueObject { .. }));
     }
 
     #[test]
@@ -1462,7 +1974,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::UseCase));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::UseCase { .. }));
     }
 
     #[test]
@@ -1474,7 +1986,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Interactor));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Interactor { .. }));
     }
 
     #[test]
@@ -1486,7 +1998,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Dto));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Dto { .. }));
     }
 
     #[test]
@@ -1498,7 +2010,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Command));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Command { .. }));
     }
 
     #[test]
@@ -1510,7 +2022,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Query));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Query { .. }));
     }
 
     #[test]
@@ -1522,7 +2034,7 @@ mod tests {
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Factory));
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Factory { .. }));
     }
 
     // --- T002: new variant encode/round-trip tests ---
@@ -1781,7 +2293,7 @@ mod tests {
 }"#;
         let doc = decode(json).unwrap();
         let kind = doc.entries()[0].kind();
-        let TypeDefinitionKind::SecondaryAdapter { implements } = kind else {
+        let TypeDefinitionKind::SecondaryAdapter { implements, .. } = kind else {
             panic!("expected SecondaryAdapter kind, got {:?}", kind);
         };
         assert_eq!(implements.len(), 1);
@@ -1812,7 +2324,7 @@ mod tests {
 }"#;
         let doc = decode(json).unwrap();
         let kind = doc.entries()[0].kind();
-        let TypeDefinitionKind::SecondaryAdapter { implements } = kind else {
+        let TypeDefinitionKind::SecondaryAdapter { implements, .. } = kind else {
             panic!("expected SecondaryAdapter kind, got {:?}", kind);
         };
         assert_eq!(implements.len(), 2);
@@ -2251,6 +2763,329 @@ mod tests {
                 "kind '{kind_str}' did not round-trip correctly"
             );
         }
+    }
+
+    // --- T003: AC-01 — enum/error_type empty expected_variants rejected ---
+
+    #[test]
+    fn test_ac01_decode_enum_with_empty_expected_variants_rejected() {
+        // AC-01: schema validation must reject `"kind": "enum"` with an empty
+        // `expected_variants` array.  An enum with zero variants is semantically
+        // meaningless and indicates a schema authoring error.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "EmptyEnum", "kind": "enum", "description": "enum with no variants", "expected_variants": [] }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for empty expected_variants on enum, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_ac01_decode_error_type_with_empty_expected_variants_rejected() {
+        // AC-01: same constraint applies to `"kind": "error_type"`.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "EmptyError", "kind": "error_type", "description": "error type with no variants", "expected_variants": [] }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for empty expected_variants on error_type, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_ac01_decode_enum_without_expected_variants_field_rejected() {
+        // AC-01: absent `expected_variants` on `enum` is also rejected (serde requires
+        // the field for the `Enum` variant; missing field → JSON error).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "MissingVariants", "kind": "enum", "description": "no field" }
+  ]
+}"#;
+        assert!(decode(json).is_err(), "expected error for missing expected_variants on enum");
+    }
+
+    // --- T003: AC-02 — interactor declares_application_service empty array rejected ---
+
+    #[test]
+    fn test_ac02_decode_interactor_with_empty_declares_application_service_rejected() {
+        // AC-02: `"kind": "interactor"` with an explicit empty
+        // `declares_application_service` array must be rejected by schema validation.
+        // Empty array means the author wrote the field but left it unpopulated,
+        // which indicates a schema authoring error.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "BadInteractor",
+      "kind": "interactor",
+      "description": "interactor with empty declares_application_service",
+      "declares_application_service": []
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for empty declares_application_service on interactor, \
+             got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_ac02_decode_interactor_without_declares_application_service_succeeds() {
+        // AC-02 complement: `interactor` without `declares_application_service` is
+        // valid (the field is optional; absence means the interactor does not declare
+        // its ApplicationService trait(s) in the catalogue yet).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "SaveInteractor", "kind": "interactor", "description": "interactor, no DAS field" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        assert!(
+            matches!(kind, TypeDefinitionKind::Interactor { declares_application_service, .. }
+                     if declares_application_service.is_empty()),
+            "interactor without field should have empty declares_application_service"
+        );
+    }
+
+    #[test]
+    fn test_ac02_decode_interactor_with_non_empty_declares_application_service_succeeds() {
+        // AC-02 complement: `interactor` with a non-empty
+        // `declares_application_service` is valid and must decode correctly.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RenderContractMapInteractor",
+      "kind": "interactor",
+      "description": "interactor with DAS",
+      "declares_application_service": ["RenderContractMap"]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::Interactor { declares_application_service, .. } = kind else {
+            panic!("expected Interactor kind, got {kind:?}");
+        };
+        assert_eq!(declares_application_service, &["RenderContractMap"]);
+    }
+
+    #[test]
+    fn test_ac02_round_trip_interactor_with_declares_application_service() {
+        // AC-02 round-trip: a non-empty `declares_application_service` must survive
+        // encode → decode.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RenderContractMapInteractor",
+      "kind": "interactor",
+      "description": "interactor",
+      "declares_application_service": ["RenderContractMap", "AnotherService"]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        assert!(
+            encoded.contains("\"declares_application_service\""),
+            "encoded output must contain declares_application_service"
+        );
+        let doc2 = decode(&encoded).unwrap();
+        let TypeDefinitionKind::Interactor { declares_application_service, .. } =
+            doc2.entries()[0].kind()
+        else {
+            panic!("expected Interactor");
+        };
+        assert_eq!(declares_application_service, &["RenderContractMap", "AnotherService"]);
+    }
+
+    // --- T003: AC-03 — FreeFunction decode/encode ---
+
+    #[test]
+    fn test_ac03_decode_free_function_minimal() {
+        // AC-03: decode a minimal `"kind": "free_function"` entry (no params,
+        // no returns, not async, no module_path).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "compute_hash",
+      "kind": "free_function",
+      "description": "Computes a hash from the given input."
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::FreeFunction {
+            module_path,
+            expected_params,
+            expected_returns,
+            expected_is_async,
+        } = kind
+        else {
+            panic!("expected FreeFunction kind, got {kind:?}");
+        };
+        assert!(module_path.is_none());
+        assert!(expected_params.is_empty());
+        assert!(expected_returns.is_empty());
+        assert!(!expected_is_async);
+    }
+
+    #[test]
+    fn test_ac03_decode_free_function_with_all_fields() {
+        // AC-03: decode a fully-specified `free_function` entry.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "build_contract_map",
+      "kind": "free_function",
+      "description": "Builds the contract map.",
+      "module_path": "render",
+      "expected_params": [
+        { "name": "options", "ty": "ContractMapRenderOptions" }
+      ],
+      "expected_returns": ["Result<ContractMap, RenderError>"],
+      "expected_is_async": false
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::FreeFunction {
+            module_path,
+            expected_params,
+            expected_returns,
+            expected_is_async,
+        } = kind
+        else {
+            panic!("expected FreeFunction kind, got {kind:?}");
+        };
+        assert_eq!(module_path.as_deref(), Some("render"));
+        assert_eq!(expected_params.len(), 1);
+        assert_eq!(expected_params[0].name(), "options");
+        assert_eq!(expected_params[0].ty(), "ContractMapRenderOptions");
+        assert_eq!(expected_returns, &["Result<ContractMap, RenderError>"]);
+        assert!(!expected_is_async);
+    }
+
+    #[test]
+    fn test_ac03_decode_free_function_async_with_module_path() {
+        // AC-03: async free function in a sub-module.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "fetch_metadata",
+      "kind": "free_function",
+      "description": "Fetches track metadata asynchronously.",
+      "module_path": "http",
+      "expected_params": [
+        { "name": "url", "ty": "TrackUrl" }
+      ],
+      "expected_returns": ["Result<TrackMetadata, FetchError>"],
+      "expected_is_async": true
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::FreeFunction { expected_is_async, module_path, .. } = kind else {
+            panic!("expected FreeFunction");
+        };
+        assert!(expected_is_async);
+        assert_eq!(module_path.as_deref(), Some("http"));
+    }
+
+    #[test]
+    fn test_ac03_round_trip_free_function() {
+        // AC-03: encode → decode round-trip for a FreeFunction entry.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "build_contract_map",
+      "kind": "free_function",
+      "description": "Builds the contract map.",
+      "module_path": "render",
+      "expected_params": [
+        { "name": "options", "ty": "ContractMapRenderOptions" }
+      ],
+      "expected_returns": ["Result<ContractMap, RenderError>"],
+      "expected_is_async": false
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        assert!(encoded.contains("\"free_function\""));
+        assert!(encoded.contains("\"module_path\""));
+        assert!(encoded.contains("\"expected_params\""));
+        assert!(encoded.contains("\"expected_returns\""));
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_ac03_free_function_param_ty_with_double_colon_rejected() {
+        // AC-03: L1 enforcement — param ty containing `::` must be rejected.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "compute_hash",
+      "kind": "free_function",
+      "description": "hash fn",
+      "expected_params": [
+        { "name": "input", "ty": "std::io::Read" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for '::' in free_function param ty, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_ac03_free_function_with_stale_expected_methods_rejected() {
+        // AC-03: `free_function` must not carry `expected_methods` (Phase 1.5 guard).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "compute_hash",
+      "kind": "free_function",
+      "description": "hash fn",
+      "expected_methods": [
+        { "name": "run", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale expected_methods on free_function, got: {err:?}"
+        );
     }
 
     #[test]

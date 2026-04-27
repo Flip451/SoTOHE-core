@@ -284,6 +284,26 @@ pub enum TrackCommand {
         layer: Option<String>,
     },
 
+    /// Emit canonical SHA-256 hashes for spec.json elements (helper for
+    /// catalogue Blue promotion: type-designer feeds the printed hash into
+    /// `spec_refs[].hash` so `sotp verify catalogue-spec-refs` passes).
+    ///
+    /// When `--anchor <id>` is supplied, prints only that anchor's hash on
+    /// stdout (single 64-hex line). When omitted, prints a JSON object
+    /// mapping every element id to its hash, sorted by id.
+    SpecElementHash {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Optional single-anchor lookup. When omitted, every element is emitted.
+        #[arg(long)]
+        anchor: Option<String>,
+    },
+
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     ///
     /// Idempotent: if the baseline file already exists it is kept as-is. Re-capturing
@@ -462,6 +482,9 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 kind_filter,
                 layers,
             )
+        }
+        TrackCommand::SpecElementHash { items_dir, track_id, anchor } => {
+            tddd::spec_element_hash::execute_spec_element_hash(items_dir, track_id, anchor)
         }
         TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, layer } => {
             tddd::baseline::execute_baseline_capture(items_dir, track_id, workspace_root, layer)

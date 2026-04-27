@@ -344,8 +344,24 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
         }
     };
 
+    // Load workspace crate names from architecture-rules.json for IN-10 reverse checks.
+    // Degrading to empty on file-absent is intentional: the check is suppressed
+    // rather than causing a hard error in legacy setups that predate the multilayer rules file.
+    let arch_rules_path = args.project_root.join("architecture-rules.json");
+    let workspace_crates = match infrastructure::verify::tddd_layers::load_workspace_crate_names(
+        &arch_rules_path,
+        &args.project_root,
+    ) {
+        Ok(names) => names,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("cannot read architecture-rules.json: {e}"),
+            )]);
+        }
+    };
+
     // Run bidirectional consistency check with baseline-aware 4-group evaluation.
-    evaluate_consistency_from_components(&doc, &graph, &baseline)
+    evaluate_consistency_from_components(&doc, &graph, &baseline, &workspace_crates)
 }
 
 /// Core spec-code consistency evaluation given pre-built domain components.
@@ -358,12 +374,15 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
 /// * `doc` — decoded `TypeCatalogueDocument` (entries read from `domain-types.json`)
 /// * `graph` — `TypeGraph` built from the schema export
 /// * `baseline` — decoded `TypeBaseline` from `domain-types-baseline.json`
+/// * `workspace_crates` — crate names from `architecture-rules.json` layers; enables
+///   IN-10 workspace-origin reverse checks.  Pass an empty set to suppress them.
 fn evaluate_consistency_from_components(
     doc: &domain::TypeCatalogueDocument,
     graph: &domain::TypeGraph,
     baseline: &domain::TypeBaseline,
+    workspace_crates: &std::collections::HashSet<String>,
 ) -> VerifyOutcome {
-    let report = domain::check_consistency(doc.entries(), graph, baseline);
+    let report = domain::check_consistency(doc.entries(), graph, baseline, workspace_crates);
     let findings = consistency_report_to_findings(&report);
     print_consistency_report_json(&report);
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
@@ -425,6 +444,11 @@ fn consistency_report_to_findings(
             "undeclared new trait in code: `{name}` — add to domain-types.json"
         )));
     }
+    for name in report.undeclared_functions() {
+        findings.push(domain::verify::VerifyFinding::error(format!(
+            "undeclared new free function in code: `{name}` — add a FreeFunction entry to domain-types.json"
+        )));
+    }
 
     // Group 3: baseline structural changes or deletions → Red.
     for name in report.baseline_red_types() {
@@ -435,6 +459,11 @@ fn consistency_report_to_findings(
     for name in report.baseline_red_traits() {
         findings.push(domain::verify::VerifyFinding::error(format!(
             "undeclared structural change to baseline trait: `{name}` — add to domain-types.json"
+        )));
+    }
+    for name in report.baseline_red_functions() {
+        findings.push(domain::verify::VerifyFinding::error(format!(
+            "undeclared structural change or deletion of baseline free function: `{name}` — add a FreeFunction entry to domain-types.json"
         )));
     }
 
@@ -1351,7 +1380,7 @@ mod tests {
         domain::TypeCatalogueEntry::new(
             name,
             "desc",
-            domain::TypeDefinitionKind::ValueObject,
+            domain::TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
             action,
             true,
         )
@@ -1382,6 +1411,7 @@ mod tests {
             &[entry],
             &empty_graph_for_test(),
             &empty_baseline_for_test(),
+            &std::collections::HashSet::new(),
         );
 
         assert!(!report.delete_errors().is_empty(), "delete_errors must be non-empty");
@@ -1404,8 +1434,12 @@ mod tests {
     #[test]
     fn test_consistency_report_to_findings_with_empty_report_produces_no_findings() {
         // No entries at all — empty report must produce no findings.
-        let report =
-            domain::check_consistency(&[], &empty_graph_for_test(), &empty_baseline_for_test());
+        let report = domain::check_consistency(
+            &[],
+            &empty_graph_for_test(),
+            &empty_baseline_for_test(),
+            &std::collections::HashSet::new(),
+        );
         let findings = consistency_report_to_findings(&report);
         assert!(findings.is_empty(), "clean report must produce no findings: {findings:?}");
     }
@@ -1425,7 +1459,12 @@ mod tests {
             )]),
             HashMap::new(),
         );
-        let report = domain::check_consistency(&[entry], &empty_graph_for_test(), &baseline);
+        let report = domain::check_consistency(
+            &[entry],
+            &empty_graph_for_test(),
+            &baseline,
+            &std::collections::HashSet::new(),
+        );
 
         let findings = consistency_report_to_findings(&report);
         // Contradiction should produce exactly one warning finding.
@@ -1454,7 +1493,12 @@ mod tests {
             )]),
             HashMap::new(),
         );
-        let report = domain::check_consistency(&[entry], &empty_graph_for_test(), &baseline);
+        let report = domain::check_consistency(
+            &[entry],
+            &empty_graph_for_test(),
+            &baseline,
+            &std::collections::HashSet::new(),
+        );
         assert!(
             !report.contradictions().is_empty(),
             "precondition: must have at least one contradiction"
@@ -1485,6 +1529,7 @@ mod tests {
             &[entry],
             &empty_graph_for_test(),
             &empty_baseline_for_test(),
+            &std::collections::HashSet::new(),
         );
         assert!(!report.delete_errors().is_empty(), "precondition: must have delete errors");
 
@@ -1515,6 +1560,7 @@ mod tests {
             &doc,
             &empty_graph_for_test(),
             &empty_baseline_for_test(),
+            &std::collections::HashSet::new(),
         );
         // Must have error-severity findings so the CLI exits 1.
         let has_errors =
@@ -1540,8 +1586,12 @@ mod tests {
             HashMap::new(),
         );
         let doc = make_doc_with_entry(entry);
-        let outcome =
-            evaluate_consistency_from_components(&doc, &empty_graph_for_test(), &baseline);
+        let outcome = evaluate_consistency_from_components(
+            &doc,
+            &empty_graph_for_test(),
+            &baseline,
+            &std::collections::HashSet::new(),
+        );
         // Must have only warning-severity findings (no errors) — exit code 0.
         let has_errors =
             outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
@@ -1557,6 +1607,7 @@ mod tests {
             &empty_doc_for_test(),
             &empty_graph_for_test(),
             &empty_baseline_for_test(),
+            &std::collections::HashSet::new(),
         );
         assert!(outcome.findings().is_empty(), "empty report must produce zero findings");
         let exit = print_outcome("test", &outcome);

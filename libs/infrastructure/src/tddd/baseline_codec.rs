@@ -14,7 +14,10 @@ use std::marker::PhantomData;
 
 use domain::schema::TypeKind;
 use domain::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
-use domain::{Timestamp, TraitBaselineEntry, TypeBaseline, TypeBaselineEntry, ValidationError};
+use domain::{
+    FunctionBaselineEntry, Timestamp, TraitBaselineEntry, TraitImplBaselineEntry, TypeBaseline,
+    TypeBaselineEntry, ValidationError,
+};
 use serde::de::{Error as _, MapAccess, Visitor};
 use serde::{Deserialize, Deserializer, Serialize};
 
@@ -93,6 +96,9 @@ struct BaselineDto {
     types: BTreeMap<String, TypeEntryDto>,
     #[serde(deserialize_with = "deserialize_no_duplicate_keys")]
     traits: BTreeMap<String, TraitEntryDto>,
+    /// T007 (S4): free functions keyed by fully-qualified name string.
+    #[serde(default, deserialize_with = "deserialize_no_duplicate_keys")]
+    functions: BTreeMap<String, FunctionEntryDto>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -103,6 +109,9 @@ struct TypeEntryDto {
     members: Vec<MemberDto>,
     #[serde(default)]
     methods: Vec<MethodDto>,
+    /// T007 (S4): trait implementations with origin crate info.
+    #[serde(default)]
+    trait_impls: Vec<TraitImplEntryDto>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -110,6 +119,30 @@ struct TypeEntryDto {
 struct TraitEntryDto {
     #[serde(default)]
     methods: Vec<MethodDto>,
+}
+
+/// T007 (S4): DTO for a single trait implementation on a type.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct TraitImplEntryDto {
+    trait_name: String,
+    #[serde(default)]
+    origin_crate: String,
+}
+
+/// T007 (S4): DTO for a free function entry in the baseline.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FunctionEntryDto {
+    #[serde(default)]
+    params: Vec<ParamDto>,
+    /// Return type names (last-segment short names).
+    #[serde(default)]
+    returns: Vec<String>,
+    #[serde(default)]
+    is_async: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    module_path: Option<String>,
 }
 
 /// Member DTO — discriminator `kind` selects `variant` vs `field`.
@@ -171,7 +204,11 @@ pub fn decode(json: &str) -> Result<TypeBaseline, BaselineCodecError> {
             entry_dto.members.into_iter().map(member_from_dto).collect();
         let methods: Vec<MethodDeclaration> =
             entry_dto.methods.into_iter().map(method_from_dto).collect();
-        types.insert(name, TypeBaselineEntry::new(kind, members, methods));
+        // T007 (S4): decode trait_impls.
+        let trait_impls: Vec<TraitImplBaselineEntry> =
+            entry_dto.trait_impls.into_iter().map(trait_impl_from_dto).collect();
+        types
+            .insert(name, TypeBaselineEntry::with_trait_impls(kind, members, methods, trait_impls));
     }
 
     let mut traits = HashMap::with_capacity(dto.traits.len());
@@ -181,7 +218,16 @@ pub fn decode(json: &str) -> Result<TypeBaseline, BaselineCodecError> {
         traits.insert(name, TraitBaselineEntry::new(methods));
     }
 
-    Ok(TypeBaseline::new(dto.schema_version, captured_at, types, traits))
+    // T007 (S4): decode functions map.
+    let mut functions = HashMap::with_capacity(dto.functions.len());
+    for (fq_name, fn_dto) in dto.functions {
+        let params: Vec<ParamDeclaration> = fn_dto.params.into_iter().map(param_from_dto).collect();
+        let entry =
+            FunctionBaselineEntry::new(params, fn_dto.returns, fn_dto.is_async, fn_dto.module_path);
+        functions.insert(fq_name, entry);
+    }
+
+    Ok(TypeBaseline::with_functions(dto.schema_version, captured_at, types, traits, functions))
 }
 
 /// Encodes a `TypeBaseline` to a pretty-printed JSON string.
@@ -263,6 +309,8 @@ fn baseline_to_dto(baseline: &TypeBaseline) -> BaselineDto {
                     kind: type_kind_to_str(entry.kind()).to_owned(),
                     members: entry.members().iter().map(member_to_dto).collect(),
                     methods: entry.methods().iter().map(method_to_dto).collect(),
+                    // T007 (S4): encode trait_impls.
+                    trait_impls: entry.trait_impls().iter().map(trait_impl_to_dto).collect(),
                 },
             )
         })
@@ -279,12 +327,50 @@ fn baseline_to_dto(baseline: &TypeBaseline) -> BaselineDto {
         })
         .collect();
 
+    // T007 (S4): encode functions map using BTreeMap for deterministic key order.
+    let functions: BTreeMap<String, FunctionEntryDto> = baseline
+        .functions()
+        .iter()
+        .map(|(fq_name, entry)| {
+            let params: Vec<ParamDto> = entry
+                .params()
+                .iter()
+                .map(|p| ParamDto { name: p.name().to_string(), ty: p.ty().to_string() })
+                .collect();
+            (
+                fq_name.clone(),
+                FunctionEntryDto {
+                    params,
+                    returns: entry.returns().to_vec(),
+                    is_async: entry.is_async(),
+                    module_path: entry.module_path().map(str::to_string),
+                },
+            )
+        })
+        .collect();
+
     BaselineDto {
         schema_version: baseline.schema_version(),
         captured_at: baseline.captured_at().as_str().to_owned(),
         types,
         traits,
+        functions,
     }
+}
+
+fn trait_impl_from_dto(dto: TraitImplEntryDto) -> TraitImplBaselineEntry {
+    TraitImplBaselineEntry::new(dto.trait_name, dto.origin_crate)
+}
+
+fn trait_impl_to_dto(entry: &TraitImplBaselineEntry) -> TraitImplEntryDto {
+    TraitImplEntryDto {
+        trait_name: entry.trait_name().to_string(),
+        origin_crate: entry.origin_crate().to_string(),
+    }
+}
+
+fn param_from_dto(dto: ParamDto) -> ParamDeclaration {
+    ParamDeclaration::new(dto.name, dto.ty)
 }
 
 // ---------------------------------------------------------------------------
@@ -467,5 +553,175 @@ mod tests {
         let bl = decode(SAMPLE_JSON).unwrap();
         let encoded = encode(&bl).unwrap();
         let _: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+    }
+
+    /// Existing JSON without `functions` field decodes without error (backward compatibility).
+    #[test]
+    fn test_decode_json_without_functions_field_defaults_to_empty() {
+        let bl = decode(SAMPLE_JSON).unwrap();
+        assert!(bl.functions().is_empty());
+    }
+
+    // --- AC-07: TraitImplBaselineEntryDto encode/decode ---
+
+    /// AC-07: trait_impls field in TypeEntryDto is encoded and decoded correctly.
+    #[test]
+    fn test_decode_type_entry_with_trait_impls() {
+        let json = r#"{
+  "schema_version": 2,
+  "captured_at": "2026-04-13T00:00:00Z",
+  "types": {
+    "FsStore": {
+      "kind": "struct",
+      "trait_impls": [
+        { "trait_name": "TrackReader", "origin_crate": "domain" },
+        { "trait_name": "Display", "origin_crate": "std" }
+      ]
+    }
+  },
+  "traits": {}
+}"#;
+        let bl = decode(json).unwrap();
+        let entry = bl.get_type("FsStore").unwrap();
+        let impls = entry.trait_impls();
+        assert_eq!(impls.len(), 2);
+
+        let track_reader = impls.iter().find(|i| i.trait_name() == "TrackReader").unwrap();
+        assert_eq!(track_reader.origin_crate(), "domain");
+
+        let display = impls.iter().find(|i| i.trait_name() == "Display").unwrap();
+        assert_eq!(display.origin_crate(), "std");
+    }
+
+    /// AC-07: default (empty) trait_impls field decodes correctly.
+    #[test]
+    fn test_decode_type_entry_without_trait_impls_defaults_to_empty() {
+        let json = r#"{
+  "schema_version": 2,
+  "captured_at": "2026-04-13T00:00:00Z",
+  "types": { "Plain": { "kind": "struct" } },
+  "traits": {}
+}"#;
+        let bl = decode(json).unwrap();
+        let entry = bl.get_type("Plain").unwrap();
+        assert!(entry.trait_impls().is_empty());
+    }
+
+    /// AC-07: round-trip of trait_impls preserves trait_name and origin_crate.
+    #[test]
+    fn test_round_trip_preserves_trait_impls() {
+        let json = r#"{
+  "schema_version": 2,
+  "captured_at": "2026-04-13T00:00:00Z",
+  "types": {
+    "Store": {
+      "kind": "struct",
+      "trait_impls": [
+        { "trait_name": "Repo", "origin_crate": "domain" }
+      ]
+    }
+  },
+  "traits": {}
+}"#;
+        let bl = decode(json).unwrap();
+        let encoded = encode(&bl).unwrap();
+        let bl2 = decode(&encoded).unwrap();
+
+        let entry2 = bl2.get_type("Store").unwrap();
+        assert_eq!(entry2.trait_impls().len(), 1);
+        assert_eq!(entry2.trait_impls()[0].trait_name(), "Repo");
+        assert_eq!(entry2.trait_impls()[0].origin_crate(), "domain");
+    }
+
+    // --- AC-08: FunctionBaselineEntryDto encode/decode ---
+
+    /// AC-08: functions field is decoded correctly from JSON.
+    #[test]
+    fn test_decode_functions_field() {
+        let json = r#"{
+  "schema_version": 2,
+  "captured_at": "2026-04-13T00:00:00Z",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "infra::tddd::build_baseline": {
+      "params": [{ "name": "graph", "ty": "TypeGraph" }],
+      "returns": ["TypeBaseline"],
+      "is_async": false,
+      "module_path": "infra::tddd"
+    },
+    "top_fn": {
+      "params": [],
+      "returns": [],
+      "is_async": true
+    }
+  }
+}"#;
+        let bl = decode(json).unwrap();
+        assert_eq!(bl.functions().len(), 2);
+
+        let entry = bl.get_function("infra::tddd::build_baseline").unwrap();
+        assert_eq!(entry.params().len(), 1);
+        assert_eq!(entry.params()[0].name(), "graph");
+        assert_eq!(entry.params()[0].ty(), "TypeGraph");
+        assert_eq!(entry.returns(), &["TypeBaseline"]);
+        assert!(!entry.is_async());
+        assert_eq!(entry.module_path(), Some("infra::tddd"));
+
+        let top = bl.get_function("top_fn").unwrap();
+        assert!(top.params().is_empty());
+        assert!(top.returns().is_empty());
+        assert!(top.is_async());
+        assert!(top.module_path().is_none());
+    }
+
+    /// AC-08: round-trip of functions map preserves all fields.
+    #[test]
+    fn test_round_trip_preserves_functions() {
+        let json = r#"{
+  "schema_version": 2,
+  "captured_at": "2026-04-13T00:00:00Z",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "crate::mod_a::fn_one": {
+      "params": [{ "name": "x", "ty": "u32" }],
+      "returns": ["String"],
+      "is_async": false,
+      "module_path": "crate::mod_a"
+    }
+  }
+}"#;
+        let bl = decode(json).unwrap();
+        let encoded = encode(&bl).unwrap();
+        let bl2 = decode(&encoded).unwrap();
+
+        assert_eq!(bl2.functions().len(), 1);
+        let entry = bl2.get_function("crate::mod_a::fn_one").unwrap();
+        assert_eq!(entry.params().len(), 1);
+        assert_eq!(entry.params()[0].name(), "x");
+        assert_eq!(entry.returns(), &["String"]);
+        assert_eq!(entry.module_path(), Some("crate::mod_a"));
+    }
+
+    /// AC-08: encode emits functions in deterministic (BTreeMap) key order.
+    #[test]
+    fn test_encode_functions_sorted_deterministically() {
+        let json = r#"{
+  "schema_version": 2,
+  "captured_at": "2026-04-13T00:00:00Z",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "z_fn": { "params": [], "returns": [], "is_async": false },
+    "a_fn": { "params": [], "returns": [], "is_async": false }
+  }
+}"#;
+        let bl = decode(json).unwrap();
+        let encoded = encode(&bl).unwrap();
+        // BTreeMap ensures alphabetical key order in encoded JSON.
+        let a_pos = encoded.find("a_fn").unwrap();
+        let z_pos = encoded.find("z_fn").unwrap();
+        assert!(a_pos < z_pos, "a_fn must appear before z_fn in encoded JSON");
     }
 }

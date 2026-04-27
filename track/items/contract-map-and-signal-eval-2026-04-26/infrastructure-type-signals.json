@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-26T23:22:47Z",
+  "declaration_hash": "8f41edc17a319cbf7120f1a2346055e97d867addf22c5f0afc13f151aaf6c5d7",
+  "signals": [
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "Validation",
+        "UnsupportedSchemaVersion",
+        "InvalidEntry"
+      ]
+    },
+    {
+      "type_name": "BaselineCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json",
+        "UnsupportedSchemaVersion",
+        "InvalidTimestamp"
+      ]
+    },
+    {
+      "type_name": "FsCatalogueLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoader"
+      ]
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ContractMapWriter"
+      ]
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueSpecSignalsWriter"
+      ]
+    },
+    {
+      "type_name": "LoadAllCataloguesError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "LayerBindings",
+        "ArchRulesParse",
+        "Io",
+        "CatalogueNotFound",
+        "Decode",
+        "TopologicalSortFailed",
+        "InvalidLayerId"
+      ]
+    },
+    {
+      "type_name": "TypeGraphRenderOptions",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MemberDeclarationDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
+    }
+  ]
+}

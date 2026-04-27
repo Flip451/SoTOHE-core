@@ -19,6 +19,14 @@ use std::collections::{HashMap, HashSet};
 use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
 
 /// Top-level export result containing all public API elements of a crate.
+///
+/// T006 (S4): adds `trait_origins: HashMap<String, String>` mapping a trait's
+/// stable fully-qualified definition path to the crate that defines it
+/// (e.g., `"domain::ports::TrackReader" → "domain"`).
+/// Keyed by def_path rather than short name to avoid collisions when two
+/// distinct traits share the same short name (e.g., a local `Display` and
+/// `std::fmt::Display`).  Populated by `build_schema_export` from rustdoc
+/// JSON `paths`/`external_crates`.
 #[derive(Debug, Clone)]
 pub struct SchemaExport {
     crate_name: String,
@@ -26,10 +34,13 @@ pub struct SchemaExport {
     functions: Vec<FunctionInfo>,
     traits: Vec<TraitInfo>,
     impls: Vec<ImplInfo>,
+    /// Maps trait def_path (stable fully-qualified definition path) → defining crate name.
+    /// `""` if the origin could not be determined.
+    trait_origins: HashMap<String, String>,
 }
 
 impl SchemaExport {
-    /// Creates a new schema export.
+    /// Creates a new schema export (backward-compatible: `trait_origins` defaults to empty).
     pub fn new(
         crate_name: String,
         types: Vec<TypeInfo>,
@@ -37,7 +48,19 @@ impl SchemaExport {
         traits: Vec<TraitInfo>,
         impls: Vec<ImplInfo>,
     ) -> Self {
-        Self { crate_name, types, functions, traits, impls }
+        Self { crate_name, types, functions, traits, impls, trait_origins: HashMap::new() }
+    }
+
+    /// Creates a new schema export with an explicit `trait_origins` map.
+    pub fn with_trait_origins(
+        crate_name: String,
+        types: Vec<TypeInfo>,
+        functions: Vec<FunctionInfo>,
+        traits: Vec<TraitInfo>,
+        impls: Vec<ImplInfo>,
+        trait_origins: HashMap<String, String>,
+    ) -> Self {
+        Self { crate_name, types, functions, traits, impls, trait_origins }
     }
 
     /// Returns the crate name.
@@ -63,6 +86,17 @@ impl SchemaExport {
     /// Returns the impl blocks.
     pub fn impls(&self) -> &[ImplInfo] {
         &self.impls
+    }
+
+    /// Returns the map of trait def_path → defining crate name.
+    ///
+    /// The key is the stable fully-qualified definition path of the trait as
+    /// found in `krate.paths` (e.g., `"std::fmt::Display"`), not the short
+    /// name.  Used by `build_type_graph` together with
+    /// `ImplInfo::trait_def_path` to populate `TraitImplEntry::origin_crate`
+    /// without short-name aliasing.
+    pub fn trait_origins(&self) -> &HashMap<String, String> {
+        &self.trait_origins
     }
 }
 
@@ -167,10 +201,15 @@ pub struct FunctionInfo {
     receiver: Option<String>,
     /// Whether the function is declared `async fn`.
     is_async: bool,
+    /// Module path for free functions (e.g., `"domain::review"`). `None` if
+    /// not a free function, or if the module path could not be determined.
+    ///
+    /// T006 (S4): populated by `build_schema_export` using rustdoc `paths`.
+    module_path: Option<String>,
 }
 
 impl FunctionInfo {
-    /// Creates a new function info.
+    /// Creates a new function info (backward-compatible: `module_path` defaults to `None`).
     ///
     /// `has_self_receiver` is derived from `receiver` to prevent the illegal state
     /// where `has_self_receiver = true` but `receiver = None` (or vice versa).
@@ -201,6 +240,36 @@ impl FunctionInfo {
             returns,
             receiver,
             is_async,
+            module_path: None,
+        }
+    }
+
+    /// Creates a new function info with an explicit module path.
+    ///
+    /// T006 (S4): used by `build_schema_export` for free functions.
+    #[allow(clippy::too_many_arguments)]
+    pub fn with_module_path(
+        name: String,
+        docs: Option<String>,
+        return_type_names: Vec<String>,
+        _has_self_receiver: bool,
+        params: Vec<ParamDeclaration>,
+        returns: String,
+        receiver: Option<String>,
+        is_async: bool,
+        module_path: Option<String>,
+    ) -> Self {
+        let has_self_receiver = receiver.is_some();
+        Self {
+            name,
+            docs,
+            return_type_names,
+            has_self_receiver,
+            params,
+            returns,
+            receiver,
+            is_async,
+            module_path,
         }
     }
 
@@ -242,6 +311,13 @@ impl FunctionInfo {
     /// Returns `true` if the function is declared `async fn`.
     pub fn is_async(&self) -> bool {
         self.is_async
+    }
+
+    /// Returns the module path for this free function, if known.
+    ///
+    /// T006 (S4): populated for free functions extracted by `build_schema_export`.
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
     }
 }
 
@@ -285,16 +361,36 @@ pub struct ImplInfo {
     trait_name: Option<String>,
     /// Methods defined in this impl block.
     methods: Vec<FunctionInfo>,
+    /// Stable fully-qualified definition path of the trait from rustdoc `paths`
+    /// (e.g., `"std::fmt::Display"`).  `None` for inherent impls or when the
+    /// trait id is not present in `krate.paths`.  Used by
+    /// `code_profile_builder` to key into `SchemaExport::trait_origins` (which
+    /// is keyed by def_path, not by short name) so that two traits with the
+    /// same short name are never confused.
+    trait_def_path: Option<String>,
 }
 
 impl ImplInfo {
-    /// Creates a new impl info.
+    /// Creates a new impl info (backward-compatible: `trait_def_path` defaults to `None`).
     pub fn new(
         target_type: String,
         trait_name: Option<String>,
         methods: Vec<FunctionInfo>,
     ) -> Self {
-        Self { target_type, trait_name, methods }
+        Self { target_type, trait_name, methods, trait_def_path: None }
+    }
+
+    /// Creates a new impl info with an explicit `trait_def_path`.
+    ///
+    /// `trait_def_path` should be the fully-qualified definition path of the
+    /// trait as found in `krate.paths` (e.g., `"std::fmt::Display"`).
+    pub fn with_trait_def_path(
+        target_type: String,
+        trait_name: Option<String>,
+        methods: Vec<FunctionInfo>,
+        trait_def_path: Option<String>,
+    ) -> Self {
+        Self { target_type, trait_name, methods, trait_def_path }
     }
 
     /// Returns the target type name.
@@ -310,6 +406,15 @@ impl ImplInfo {
     /// Returns the methods.
     pub fn methods(&self) -> &[FunctionInfo] {
         &self.methods
+    }
+
+    /// Returns the stable fully-qualified definition path of the trait, if known.
+    ///
+    /// `None` for inherent impls or when the trait id was not found in
+    /// `krate.paths` during schema export.  When present, consumers should
+    /// prefer this over `trait_name` for keying into `SchemaExport::trait_origins`.
+    pub fn trait_def_path(&self) -> Option<&str> {
+        self.trait_def_path.as_deref()
     }
 }
 
@@ -349,17 +454,34 @@ pub trait SchemaExporter {
 ///
 /// Constructed from `SchemaExport` by infrastructure. The domain evaluation
 /// layer uses only this type — no raw string parsing needed.
+///
+/// T004 (S3): adds `functions: HashMap<(String, Option<String>), FunctionNode>`
+/// for in-memory free-function lookup keyed by `(short_name, module_path)`.
+/// JSON serialization (T007 `baseline_codec`) converts the tuple key to a
+/// fully-qualified string at codec boundaries.
 #[derive(Debug, Clone)]
 pub struct TypeGraph {
     types: HashMap<String, TypeNode>,
     traits: HashMap<String, TraitNode>,
+    /// Free functions indexed by `(short_name, module_path)`.
+    functions: HashMap<(String, Option<String>), FunctionNode>,
 }
 
 impl TypeGraph {
-    /// Creates a new `TypeGraph`.
+    /// Creates a new `TypeGraph` (backward-compatible: `functions` defaults to empty).
     #[must_use]
     pub fn new(types: HashMap<String, TypeNode>, traits: HashMap<String, TraitNode>) -> Self {
-        Self { types, traits }
+        Self { types, traits, functions: HashMap::new() }
+    }
+
+    /// Creates a new `TypeGraph` with an explicit `functions` map.
+    #[must_use]
+    pub fn with_functions(
+        types: HashMap<String, TypeNode>,
+        traits: HashMap<String, TraitNode>,
+        functions: HashMap<(String, Option<String>), FunctionNode>,
+    ) -> Self {
+        Self { types, traits, functions }
     }
 
     /// Returns `true` if a type with the given name exists in the profile.
@@ -384,6 +506,28 @@ impl TypeGraph {
     #[must_use]
     pub fn get_impl(&self, type_name: &str, trait_name: &str) -> Option<&TraitImplEntry> {
         self.types.get(type_name)?.trait_impls().iter().find(|i| i.trait_name() == trait_name)
+    }
+
+    /// Returns `true` if a function with the given `(short_name, module_path)` key exists.
+    #[must_use]
+    pub fn has_function(&self, short_name: &str, module_path: Option<&str>) -> bool {
+        self.functions.contains_key(&(short_name.to_string(), module_path.map(str::to_string)))
+    }
+
+    /// Returns the `FunctionNode` for the given `(short_name, module_path)` key, if present.
+    #[must_use]
+    pub fn get_function(
+        &self,
+        short_name: &str,
+        module_path: Option<&str>,
+    ) -> Option<&FunctionNode> {
+        self.functions.get(&(short_name.to_string(), module_path.map(str::to_string)))
+    }
+
+    /// Returns the functions map.
+    #[must_use]
+    pub fn functions(&self) -> &HashMap<(String, Option<String>), FunctionNode> {
+        &self.functions
     }
 
     /// Returns an iterator over all type names in this graph.
@@ -486,17 +630,34 @@ impl TypeNode {
 /// Represents one `impl TraitName for TypeName { ... }` block. The evaluator
 /// uses this to verify that a `SecondaryAdapter` entry's declared trait
 /// implementations actually exist in the crate profile.
+///
+/// T004 (S3): adds `origin_crate` to distinguish workspace-owned traits from
+/// external/std traits. Signal evaluators (T008 IN-10) filter on this field
+/// to avoid false-positive reverse extras for external crate traits.
 #[derive(Debug, Clone)]
 pub struct TraitImplEntry {
     trait_name: String,
     methods: Vec<MethodDeclaration>,
+    /// The crate that defines this trait (e.g., `"domain"`, `"std"`).
+    /// `""` (empty string) when the origin could not be determined.
+    origin_crate: String,
 }
 
 impl TraitImplEntry {
     /// Creates a new `TraitImplEntry`.
     #[must_use]
     pub fn new(trait_name: impl Into<String>, methods: Vec<MethodDeclaration>) -> Self {
-        Self { trait_name: trait_name.into(), methods }
+        Self { trait_name: trait_name.into(), methods, origin_crate: String::new() }
+    }
+
+    /// Creates a new `TraitImplEntry` with an explicit `origin_crate`.
+    #[must_use]
+    pub fn with_origin_crate(
+        trait_name: impl Into<String>,
+        methods: Vec<MethodDeclaration>,
+        origin_crate: impl Into<String>,
+    ) -> Self {
+        Self { trait_name: trait_name.into(), methods, origin_crate: origin_crate.into() }
     }
 
     /// Returns the trait name (last-segment short name).
@@ -509,6 +670,75 @@ impl TraitImplEntry {
     #[must_use]
     pub fn methods(&self) -> &[MethodDeclaration] {
         &self.methods
+    }
+
+    /// Returns the crate that defines this trait.
+    ///
+    /// Returns an empty string when the origin is unknown (default for entries
+    /// created via `TraitImplEntry::new` before T006 populates the field).
+    #[must_use]
+    pub fn origin_crate(&self) -> &str {
+        &self.origin_crate
+    }
+}
+
+// ---------------------------------------------------------------------------
+// FunctionNode — a public free function in the crate, indexed for evaluation
+// ---------------------------------------------------------------------------
+
+/// A public free function in the crate, as indexed for TDDD evaluation.
+///
+/// T004 (S3): new type. Represents a top-level `pub fn` (not a method).
+/// Stored in `TypeGraph::functions` under the key `(short_name, module_path)`.
+/// Serialization/deserialization (T007 `baseline_codec`) uses a fully-qualified
+/// string key (`"crate::module::fn_name"`) — the in-memory tuple key is
+/// converted at codec boundaries.
+#[derive(Debug, Clone)]
+pub struct FunctionNode {
+    /// Structured parameter list at L1 resolution (excluding any self receiver).
+    params: Vec<ParamDeclaration>,
+    /// Return type names extracted from the return type (last-segment short names).
+    returns: Vec<String>,
+    /// Whether the function is declared `async fn`.
+    is_async: bool,
+    /// Module path for scoped lookup (e.g., `"domain::review"`). `None` if unknown.
+    module_path: Option<String>,
+}
+
+impl FunctionNode {
+    /// Creates a new `FunctionNode`.
+    #[must_use]
+    pub fn new(
+        params: Vec<ParamDeclaration>,
+        returns: Vec<String>,
+        is_async: bool,
+        module_path: Option<String>,
+    ) -> Self {
+        Self { params, returns, is_async, module_path }
+    }
+
+    /// Returns the structured parameter list (L1 resolution, no self receiver).
+    #[must_use]
+    pub fn params(&self) -> &[ParamDeclaration] {
+        &self.params
+    }
+
+    /// Returns the return type names (last-segment short names).
+    #[must_use]
+    pub fn returns(&self) -> &[String] {
+        &self.returns
+    }
+
+    /// Returns `true` if the function is declared `async fn`.
+    #[must_use]
+    pub fn is_async(&self) -> bool {
+        self.is_async
+    }
+
+    /// Returns the module path, if known.
+    #[must_use]
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
     }
 }
 
@@ -702,5 +932,114 @@ mod tests {
         let names: Vec<&str> = node.methods().iter().map(MethodDeclaration::name).collect();
         assert_eq!(names, vec!["save", "find"]);
         assert_eq!(node.methods().len(), 2);
+    }
+
+    // --- T004 (S3): TraitImplEntry::origin_crate ---
+
+    #[test]
+    fn test_trait_impl_entry_new_has_empty_origin_crate() {
+        let entry = TraitImplEntry::new("Display", vec![]);
+        assert_eq!(entry.origin_crate(), "");
+    }
+
+    #[test]
+    fn test_trait_impl_entry_with_origin_crate_stores_value() {
+        let entry = TraitImplEntry::with_origin_crate("TrackReader", vec![], "domain");
+        assert_eq!(entry.trait_name(), "TrackReader");
+        assert_eq!(entry.origin_crate(), "domain");
+        assert!(entry.methods().is_empty());
+    }
+
+    #[test]
+    fn test_trait_impl_entry_with_origin_crate_external() {
+        let entry = TraitImplEntry::with_origin_crate("Display", vec![], "std");
+        assert_eq!(entry.origin_crate(), "std");
+    }
+
+    // --- T004 (S3): FunctionNode ---
+
+    #[test]
+    fn test_function_node_accessors() {
+        let params = vec![ParamDeclaration::new("id", "TrackId")];
+        let returns = vec!["Option<Track>".to_string()];
+        let node = FunctionNode::new(
+            params.clone(),
+            returns.clone(),
+            false,
+            Some("domain::track".to_string()),
+        );
+        assert_eq!(node.params().len(), 1);
+        assert_eq!(node.params()[0].name(), "id");
+        assert_eq!(node.returns(), &["Option<Track>"]);
+        assert!(!node.is_async());
+        assert_eq!(node.module_path(), Some("domain::track"));
+    }
+
+    #[test]
+    fn test_function_node_async_flag() {
+        let node = FunctionNode::new(vec![], vec!["()".to_string()], true, None);
+        assert!(node.is_async());
+        assert!(node.module_path().is_none());
+    }
+
+    // --- T004 (S3): TypeGraph::functions ---
+
+    #[test]
+    fn test_type_graph_new_has_empty_functions() {
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        assert!(graph.functions().is_empty());
+    }
+
+    #[test]
+    fn test_type_graph_with_functions_stores_entries() {
+        let mut functions = HashMap::new();
+        let key = ("build_baseline".to_string(), Some("infra::tddd".to_string()));
+        let node = FunctionNode::new(
+            vec![],
+            vec!["TypeBaseline".to_string()],
+            false,
+            Some("infra::tddd".to_string()),
+        );
+        functions.insert(key.clone(), node);
+
+        let graph = TypeGraph::with_functions(HashMap::new(), HashMap::new(), functions);
+        assert!(graph.has_function("build_baseline", Some("infra::tddd")));
+        assert!(!graph.has_function("build_baseline", None));
+        assert!(!graph.has_function("other_fn", Some("infra::tddd")));
+    }
+
+    #[test]
+    fn test_type_graph_get_function_returns_correct_node() {
+        let mut functions = HashMap::new();
+        let node = FunctionNode::new(
+            vec![ParamDeclaration::new("x", "u32")],
+            vec!["String".to_string()],
+            false,
+            None,
+        );
+        functions.insert(("render".to_string(), None), node);
+
+        let graph = TypeGraph::with_functions(HashMap::new(), HashMap::new(), functions);
+        let result = graph.get_function("render", None);
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().params().len(), 1);
+    }
+
+    #[test]
+    fn test_type_graph_get_function_returns_none_for_missing() {
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        assert!(graph.get_function("nonexistent", None).is_none());
+    }
+
+    #[test]
+    fn test_type_graph_has_function_with_no_module_path() {
+        let mut functions = HashMap::new();
+        functions.insert(
+            ("top_level_fn".to_string(), None),
+            FunctionNode::new(vec![], vec![], false, None),
+        );
+        let graph = TypeGraph::with_functions(HashMap::new(), HashMap::new(), functions);
+        assert!(graph.has_function("top_level_fn", None));
+        assert!(!graph.has_function("top_level_fn", Some("some::module")));
     }
 }

@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RenderContractMap",
+      "description": "Primary (driving) port trait for the contract map rendering use case. Extended by IN-11 to trigger edge drawing for interactor→application_service and FreeFunction edges.",
+      "approved": true,
+      "action": "reference",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RenderContractMapCommand"
+            }
+          ],
+          "returns": "Result<RenderContractMapOutput, RenderContractMapError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "2b40296ba332ff52991bf94aee66b8d33e2b7c354148a147bd044ad6f4ffc2f5"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapInteractor",
+      "description": "Implementation of RenderContractMap. Orchestrates CatalogueLoader and ContractMapWriter. Extended to support FreeFunction edges and interactor→application_service edges (IN-11).",
+      "approved": true,
+      "action": "reference",
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RenderContractMap"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "2b40296ba332ff52991bf94aee66b8d33e2b7c354148a147bd044ad6f4ffc2f5"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapCommand",
+      "description": "Command for the render-contract-map use case. Carries track_id and render options.",
+      "approved": true,
+      "action": "reference",
+      "kind": "command",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "2b40296ba332ff52991bf94aee66b8d33e2b7c354148a147bd044ad6f4ffc2f5"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapError",
+      "description": "Error type for the contract map rendering use case.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "2b40296ba332ff52991bf94aee66b8d33e2b7c354148a147bd044ad6f4ffc2f5"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapOutput",
+      "description": "Output of the render-contract-map use case. Carries written file path and layer count.",
+      "approved": true,
+      "action": "reference",
+      "kind": "dto",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "2b40296ba332ff52991bf94aee66b8d33e2b7c354148a147bd044ad6f4ffc2f5"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignals",
+      "description": "Primary port trait for the refresh-catalogue-spec-signals use case (SoT Chain ②).",
+      "approved": true,
+      "action": "reference",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RefreshCatalogueSpecSignalsCommand"
+            }
+          ],
+          "returns": "Result<(), RefreshCatalogueSpecSignalsError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "994222325ce718d00c9a1607ac8b79e149e940243111091d6ee35b3c91b7a729"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignalsInteractor",
+      "description": "Implementation of RefreshCatalogueSpecSignals. Reads catalogue, evaluates signals against spec, writes catalogue-spec-signals JSON.",
+      "approved": true,
+      "action": "reference",
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RefreshCatalogueSpecSignals"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "994222325ce718d00c9a1607ac8b79e149e940243111091d6ee35b3c91b7a729"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignalsCommand",
+      "description": "Command for the refresh-catalogue-spec-signals use case. Carries branch, track_id, layer_id.",
+      "approved": true,
+      "action": "reference",
+      "kind": "command",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "994222325ce718d00c9a1607ac8b79e149e940243111091d6ee35b3c91b7a729"
+        }
+      ]
+    },
+    {
+      "name": "RefreshCatalogueSpecSignalsError",
+      "description": "Error type for the refresh-catalogue-spec-signals use case.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "NonActiveTrack",
+        "BranchTrackMismatch",
+        "CatalogueNotFound",
+        "FetchError",
+        "InvalidCatalogueHash",
+        "WriteFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "994222325ce718d00c9a1607ac8b79e149e940243111091d6ee35b3c91b7a729"
+        }
+      ]
+    }
+  ]
+}

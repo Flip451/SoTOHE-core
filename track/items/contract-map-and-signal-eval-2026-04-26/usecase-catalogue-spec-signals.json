@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "fd7afcbf75f065c750f972841e59e641820784bc4de0f7b0c71fc9d17957cb17",
+  "signals": [
+    {
+      "type_name": "RenderContractMap",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsError",
+      "signal": "blue"
+    }
+  ]
+}

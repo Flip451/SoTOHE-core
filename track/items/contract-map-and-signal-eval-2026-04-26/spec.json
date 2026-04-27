@@ -1,0 +1,532 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Contract Map 表示拡張 + signal 評価拡張 (両輪)",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "カタログ schema (expected_members / declares_application_service / FreeFunction kind) / TypeGraph schema / baseline schema の 3 者を同時に拡張し、「宣言できるが照合できない」「照合可能だが baseline で capture できない」という不正状態が表現できない構造を実現する (Core invariant: Make Illegal States Unrepresentable)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant: カタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張は同時に決め、同時に実装する"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "§S の action 別 forward miss / reverse extra mapping (add / modify / delete / reference × Blue / Yellow / Red) を signal 評価器に実装し、宣言の action semantic が信号に正しく反映されることを保証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "§S 信号機評価の原則"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "Contract Map の既知限界のうち §L2 (FreeFunction 引数型サブケース) / §L3 / §L4 を解消し、FreeFunction 引数型 edge・interactor → application_service edge・FreeFunction エラー型 edge が描画されることで Contract Map の edge 密度を向上させる。§L2 の mutation-only declaration サブケースおよび field 参照サブケースは OS-03 の通り本 track のスコープ外であり、この goal は §L2 全体の解消を意味しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "struct ベース 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) にカタログ schema フィールド expected_members を追加し、必須化する。空の Vec は許容するが省略は不可とする (schema validation で拒否)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D2: フィールド宣言 (`expected_members`) を struct ベースの全 9 種に追加し、必須化する"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "enum ベース / trait ベース kind (Enum / ErrorType / SecondaryPort / ApplicationService) の内部宣言フィールド (expected_variants / expected_methods) を必須化する。Enum / ErrorType は空の Vec を schema レベルで禁止する。SecondaryPort / ApplicationService は空の Vec を許容する (marker trait 宣言のため)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D2-2: enum ベース / trait ベース kind の内部宣言 field を必須化し、`Enum` / `ErrorType` では空の Vec を禁止する"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "Interactor kind にカタログ schema フィールド declares_application_service: Vec<String> を追加し、必須化かつ空の Vec を禁止する。このフィールドは Interactor が実装する ApplicationService trait 名を 1 件以上列挙することを schema 制約として強制する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "TypeGraph に関数名前空間 functions: HashMap<(String, Option<String>), FunctionNode> (in-memory、key は (short_name, module_path) tuple) を追加する。build_type_graph (infrastructure 層) が rustdoc JSON の公開 free function 情報を FunctionNode に変換して格納する責務を持つ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "TypeGraph の TraitImplEntry に origin_crate: String フィールドを追加する。build_type_graph が rustdoc JSON の external_crates / paths 情報から trait の定義 crate を特定して格納する。workspace crate 集合は architecture-rules.json の crates 一覧または Cargo.toml workspace メンバーから取得する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+          },
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "Core invariant: カタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張は同時に決め、同時に実装する"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "baseline schema に TypeBaselineEntry::trait_impls: Vec<TraitImplBaselineEntry> フィールドを追加する (D3 bundle)。baseline builder (infrastructure 層) が TypeNode::trait_impls を TraitImplBaselineEntry の Vec に変換して格納する責務を持つ。このフィールドにより modify action での trait impl 残骸評価が成立する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "baseline schema に TypeBaseline::functions: HashMap<String, FunctionBaselineEntry> (key は完全修飾名文字列 module_path::name、module_path が None の場合は name 単独) を追加する (D4 bundle)。FunctionBaselineEntry は params / returns / is_async / module_path を持つ。JSON serialization の制約により TypeGraph の tuple key とは異なる string key を使う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "TypeDefinitionKind に FreeFunction variant を追加し、カタログに module_path / expected_params / expected_returns / expected_is_async を宣言できるようにする。module_path が None のとき TypeGraph 上でも module_path: None の関数と照合する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+          },
+          {
+            "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+            "anchor": "D1: `TypeDefinitionKind` に 7 新 variants を追加する"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "signal 評価器を §S の action 別 mapping に従って拡張する。forward miss / reverse extra × action (add / modify / delete / reference) の組み合わせで Blue / Yellow / Red を決定する。modify は forward miss / reverse extra の両方を Yellow に吸収する。reference は forward miss / reverse extra の両方を Red とする。delete は型が存在しない場合 Blue、存在する場合 Yellow とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "§S 信号機評価の原則"
+          },
+          {
+            "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+            "anchor": "Decision"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "Interactor / SecondaryAdapter の reverse check を workspace 由来 trait に限定する。TraitImplEntry::origin_crate が architecture-rules.json の workspace crate 一覧と一致する trait のみを reverse check 対象とし、std / 外部クレート由来 trait を自動除外する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "Contract Map の edge 描画ロジックを拡張し、interactor → application_service の trait-impl edge (ADR 2026-04-17-1528 §L3) および FreeFunction の expected_params / expected_returns 型への edge (ADR 2026-04-17-1528 §L2 / §L4) を描画可能にする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+          },
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+          },
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Known Limitations (to be resolved in Phase 2+)"
+          }
+        ]
+      },
+      {
+        "id": "IN-12",
+        "text": "D1 の孤立型運用ルールとして、Contract Map 上で edge を持たない宣言型が存在するとき、「その型を使う側の宣言を追加する」ことで edge を発生させる運用ルールが type-designer に適用される。孤立を隠す機構 (破線マスキング等) は追加しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D1: 孤立型への対処は「使う側の宣言を追加する」運用ルールとする"
+          }
+        ]
+      },
+      {
+        "id": "IN-13",
+        "text": "カタログ schema の既存 codec (catalogue_codec) / baseline codec (baseline_codec) を schema 拡張に追わせる。expected_members 必須化・declares_application_service 必須化・FreeFunction kind の追加・trait_impls フィールド追加・functions マップ追加が serde の decode / encode で正しく動作することを確認する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "Core invariant: カタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張は同時に決め、同時に実装する"
+          },
+          {
+            "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+            "anchor": "1. `/track:design` 時に TypeGraph の構造スナップショットをベースラインとして保存"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "infrastructure 内部 trait (GitRepository / GhClient 等、ADR 2026-04-15-1636 D5 でカタログ対象外と決定した trait) を reverse check 対象から除外する追加フィルタの実装。現時点の D3 では workspace 由来 trait を一律対象とし、infrastructure 内部 trait の false positive は Reassess When 事項として記録する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+          },
+          {
+            "file": "knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md",
+            "anchor": "Status"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "baseline diff view (カタログと baseline の 4 グループ差分 A\\B / A∩B / B\\A / ∁(A∪B)∩C の色分け) は本 track のスコープ外。Contract Map の既存 Phase 3 拡張として別 track で扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Implementation Phases"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "field edge (struct フィールド参照に基づく Contract Map edge) の追加は本 track のスコープ外。ADR 2026-04-17-1528 §D4 で Phase 2 以降のスコープとされている",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "D4: エッジの意味論"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "spec_source edge (カタログエントリから spec セクションへの外向き edge) の追加は本 track のスコープ外。ADR 2026-04-17-1528 の Phase 3 拡張として分離する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Implementation Phases"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "existing CLI → infrastructure 直接パターンで構成された type-graph CLI の usecase 層介在リファクタは本 track のスコープ外。ADR 2026-04-17-1528 の Notes for track planning に従い、Contract Map の実装とは意図的に切り離す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+            "anchor": "Notes for track planning"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "rustdoc JSON が free function の引数型・戻り値型を照合に必要な精度で提供できない場合の代替設計は本 track のスコープ外。D4 の Reassess When 事項として記録し、実測で判明した場合に別 ADR で再評価する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "カタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張は 1 つの実装作業の中で同時に完了させる。いずれか 1 つだけを先行させる「段階分離」は Core invariant 違反として採用しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant: カタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張は同時に決め、同時に実装する"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "内部宣言フィールド (expected_members / expected_variants / expected_methods / declares_application_service) はすべて必須フィールドとし、Option 型にしない。省略を許容すると照合を放棄できる抜け穴が生まれ、TDDD の「宣言が契約になる」原則と矛盾する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant: カタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張は同時に決め、同時に実装する"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "expected_members の空の Vec は「TypeGraph に公開メンバーがゼロ個と現れる struct」という明示的宣言として扱い、forward check + reverse check の両方を適用する。空の Vec が正当となるケースは unit-like struct・全フィールドが private な struct・UseCase / Interactor / Factory / SecondaryAdapter など constructor で依存を受け取り public field を持たない struct を含む。これらいずれの場合も、実装側に公開メンバーが 1 件以上あれば reverse check が extra として検出する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D2: フィールド宣言 (`expected_members`) を struct ベースの全 9 種に追加し、必須化する"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "tuple struct の公開フィールドは位置インデックス文字列 (\"0\" / \"1\" / ...) を name として expected_members に宣言する。named field を持つ struct は公開フィールド名をそのまま使う。rustdoc JSON の出力規則と 1:1 対応させる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D2: フィールド宣言 (`expected_members`) を struct ベースの全 9 種に追加し、必須化する"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "Interactor の declares_application_service は空の Vec を schema レベルで禁止する。Interactor の本義は ApplicationService trait の実装であり、trait impl なしの Interactor は設計上の誤りとして schema が拒否する。同様に Enum / ErrorType の expected_variants の空 Vec も禁止する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+        },
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D2-2: enum ベース / trait ベース kind の内部宣言 field を必須化し、`Enum` / `ErrorType` では空の Vec を禁止する"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "TypeGraph の functions マップの key は in-memory のみで使う tuple (String, Option<String>) とする。baseline の functions マップの key は JSON serialization の制約から完全修飾名文字列 (module_path::name / name) とする。この key 方式の差異は serde JSON が map key として文字列しか受け付けない制約に由来し、意図的な設計である",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "FreeFunction の reverse check は「カタログに何らかの FreeFunction 宣言がある module_path を対象として、その module_path 内に宣言された名前の集合に含まれない名前の関数が実装にある」ケースのみを検出する。カタログで宣言がない module_path に存在する関数は reverse check の対象外とし、別モジュールの同名関数を誤検出しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "§S 信号機評価の原則"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "layer-agnostic 不変条件を維持する。Contract Map の拡張実装 (edge 描画・FreeFunction ノード表示) は architecture-rules.json の layers[] を走査して取得し、層名 (domain / usecase / infrastructure 等) をコードにハードコードしない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "§4.5 layer-agnostic 不変条件"
+        },
+        {
+          "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+          "anchor": "Status"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "struct ベース 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) の catalogue entry を expected_members フィールドなしで記述した場合、schema validation が拒否し (deserialize error / schema check error)、sotp track type-signals がエラー終了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D2: フィールド宣言 (`expected_members`) を struct ベースの全 9 種に追加し、必須化する"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "Enum / ErrorType の catalogue entry を expected_variants: [] (空 Vec) で記述した場合、schema validation が拒否し、sotp track type-signals がエラー終了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D2-2: enum ベース / trait ベース kind の内部宣言 field を必須化し、`Enum` / `ErrorType` では空の Vec を禁止する"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "Interactor の catalogue entry を declares_application_service フィールドなし、または declares_application_service: [] (空 Vec) で記述した場合、schema validation が拒否し、sotp track type-signals がエラー終了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "Interactor の catalogue entry で declares_application_service に宣言した trait 名が TypeNode::trait_impls に存在しない場合 (forward miss)、action に応じた signal が返る: add → Yellow、reference → Red、modify → Yellow。workspace 由来 trait が declares_application_service に含まれていない場合 (reverse extra)、action に応じた signal が返る: add → Red、modify → Yellow、reference → Red",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+        },
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "§S 信号機評価の原則"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "expected_members に宣言したフィールド名 / 型が TypeNode::members に存在しない場合 (forward miss)、action に応じた signal が返る。expected_members に宣言されていないメンバーが TypeNode::members に存在する場合 (reverse extra)、action に応じた signal が返る。forward / reverse の両方が完全一致の場合 Blue が返る",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D2: フィールド宣言 (`expected_members`) を struct ベースの全 9 種に追加し、必須化する"
+        },
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "§S 信号機評価の原則"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "FreeFunction kind の catalogue entry が sotp track type-signals で処理され、TypeGraph::functions の対応エントリと forward / reverse check が実行される。forward miss (宣言した関数名 + module_path + signature と一致する実装がない) は action 別 signal を返す。reverse extra (宣言のある module_path 内に宣言されていない名前の関数が存在する) は action 別 signal を返す",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+        },
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "§S 信号機評価の原則"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "sotp track baseline-capture が FunctionBaselineEntry を TypeBaseline::functions に格納する。modify action の FreeFunction で「baseline の signature」と「現在の signature」の diff が正しく機能し、変更途中の残骸 (reverse extra) が Yellow として評価される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "sotp track baseline-capture が TypeBaselineEntry::trait_impls を格納する。modify action の Interactor で「baseline 時点の trait impl リスト」と「現在の trait impl リスト」の diff が正しく機能し、変更前の trait impl 残骸が Yellow として評価される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "Contract Map (sotp track contract-map) の出力に FreeFunction ノードが含まれ、FreeFunction ノードから expected_params に記述された各型への参照 edge および expected_returns に記述された型への参照 edge が描画される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D4: free function 宣言 (`FreeFunction` kind) はカタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張を同時に決める"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "Contract Map の出力に Interactor → ApplicationService trait-impl edge (破線矢印 -.impl.->) が描画される (ADR 2026-04-17-1528 §L3 の解消)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "D3: interactor の ApplicationService 実装宣言 (`declares_application_service`) を `Interactor` に追加する"
+        },
+        {
+          "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+          "anchor": "Known Limitations (to be resolved in Phase 2+)"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "§S の action 別 signal mapping が全ての組み合わせで正しく動作する unit test が存在し、cargo make test が pass する。具体的には: (1) add × forward miss → Yellow / reverse extra → Red、(2) modify × forward miss → Yellow / reverse extra → Yellow、(3) delete × 型なし → Blue / 型あり → Yellow、(4) reference × forward miss → Red / reverse extra → Red、(5) 全 action × 完全一致 → Blue",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "§S 信号機評価の原則"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "cargo make ci (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-*) が全て pass する。check-layers で architecture-rules.json のレイヤー依存ルールに違反しないことを確認する。新規実装 (schema 拡張 codec / signal 評価器拡張 / build_type_graph 拡張 / baseline builder 拡張 / Contract Map render 拡張) の unit test がすべて pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant: カタログ schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張は同時に決め、同時に実装する"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Make Illegal States Unrepresentable"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 42,
+    "yellow": 0,
+    "red": 0
+  }
+}
