@@ -138,3 +138,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | ADR | Status | Date |
 |-----|--------|------|
 | [agent-router フックを skill 遵守フックに置換](2026-04-08-1200-remove-agent-router-hook.md) | Accepted | 2026-04-08 |
+
+### テスト・CI ツーリング
+
+| ADR | Status | Date |
+|-----|--------|------|
+| [`cargo make llvm-cov` を nextest 経路に統一する](2026-04-27-0124-llvm-cov-nextest-harness-alignment.md) | — | 2026-04-27 |
