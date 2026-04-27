@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0116f6240b738714dc1ebdff2433ee07b6cfe13477b0b7d7d5d01e1d5a92e9d0",
+          "at": "2026-04-27T09:21:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0116f6240b738714dc1ebdff2433ee07b6cfe13477b0b7d7d5d01e1d5a92e9d0",
+          "at": "2026-04-27T09:28:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0116f6240b738714dc1ebdff2433ee07b6cfe13477b0b7d7d5d01e1d5a92e9d0",
+          "at": "2026-04-27T09:29:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0116f6240b738714dc1ebdff2433ee07b6cfe13477b0b7d7d5d01e1d5a92e9d0",
+          "at": "2026-04-27T09:30:50Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -63,6 +95,74 @@
           "findings": [],
           "hash": "rvw1:sha256:cfa8896408e917701d4e5f97507c376a46e9d742ffc364dc02345770e672285e",
           "at": "2026-04-27T09:03:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The onboarding assertion no longer checks the specific section targets that this rewrite is meant to wire (`Task Workflow`, `track/registry.md` 更新ルール, `Quality Gates`). As written, any future regression that mentions `track/workflow.md` elsewhere will still pass, so this test no longer protects the intended link mapping.",
+              "severity": "P1",
+              "file": "scripts/test_verify_scripts.py",
+              "line": 201,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:79f86001fe8d06f2fbc7bb1d1504a125f57471ec7c81f538662766f80d267456",
+          "at": "2026-04-27T09:23:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d02de8f12bd7c4cddeefaf251da18324aac01e4b31a6992b909f999a489aa946",
+          "at": "2026-04-27T09:25:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d02de8f12bd7c4cddeefaf251da18324aac01e4b31a6992b909f999a489aa946",
+          "at": "2026-04-27T09:26:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d02de8f12bd7c4cddeefaf251da18324aac01e4b31a6992b909f999a489aa946",
+          "at": "2026-04-27T09:29:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d02de8f12bd7c4cddeefaf251da18324aac01e4b31a6992b909f999a489aa946",
+          "at": "2026-04-27T09:31:00Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ada6dfafbe7b21c66541f825d61682d65cf64e1645a5332edba2300b4a8e0f7",
+          "at": "2026-04-27T09:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ada6dfafbe7b21c66541f825d61682d65cf64e1645a5332edba2300b4a8e0f7",
+          "at": "2026-04-27T09:27:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ada6dfafbe7b21c66541f825d61682d65cf64e1645a5332edba2300b4a8e0f7",
+          "at": "2026-04-27T09:29:39Z"
         }
       ]
     }
