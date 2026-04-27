@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # verify チェーンを file 存在ベースの phase 責務分離に揃える
 
-## Tasks (0/3 resolved)
+## Tasks (1/3 resolved)
 
 ### S1 — Infrastructure: latest_track.rs phase-aware skip (IN-01 + IN-05 partial)
 
@@ -9,7 +9,7 @@
 > T001 は `impl-plan.json` の存在を判定キーとして使い、不在時は spec/plan チェックを丸ごと SKIP する。これは convention Examples の「`impl-plan.json` 存在検出時のみ task 項目をチェックする」と同じ条件分岐を spec/plan チェックに拡張したもの (CN-03)。
 > Phase 0 PASS の unit test を同タスクで追加する (IN-05 のうち `latest_track.rs` 分担)。
 
-- [~] **T001**: `libs/infrastructure/src/verify/latest_track.rs` の `verify` 関数を改修する。`impl-plan.json` が不在の場合 (Phase 0 / Phase 1 / Phase 2) は `spec.md` / `spec.json` / `plan.md` の存在チェックを SKIP し、`impl-plan.json` が存在する場合のみ全 artifact の存在を要求する。また、Phase 0 状態 (`impl-plan.json` absent / `spec.json` absent / `plan.md` absent) で PASS することを確認する unit test `test_phase0_track_with_no_artifacts_passes` を追加する。
+- [x] **T001**: `libs/infrastructure/src/verify/latest_track.rs` の `verify` 関数を改修する。`impl-plan.json` が不在の場合 (Phase 0 / Phase 1 / Phase 2) は `spec.md` / `spec.json` / `plan.md` の存在チェックを SKIP し、`impl-plan.json` が存在する場合のみ全 artifact の存在を要求する。また、Phase 0 状態 (`impl-plan.json` absent / `spec.json` absent / `plan.md` absent) で PASS することを確認する unit test `test_phase0_track_with_no_artifacts_passes` を追加する。 (`797fce5b926a838dd12aa2b19b0a5103ab1738f7`)
 
 ### S2 — Infrastructure: view_freshness.rs plan.md absent silent SKIP (IN-02 + IN-05 partial)
 
