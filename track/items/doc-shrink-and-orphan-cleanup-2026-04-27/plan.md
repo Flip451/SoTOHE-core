@@ -9,7 +9,7 @@
 DESIGN.md shrink (~1073→~150 行、~923 行削除) は 500 行コミット制約に対応するため 3 タスクに分割する (T006: keep-zone rework + Canonical Blocks 削除 ~360 行差分、T007: Security Hardening 削除 ~443 行差分、T008: 残余セクション削除 ~201 行差分)。
 IN-01 の orphan 修正 (D6 #5 (c)(d)) は DESIGN.md 内の削除対象セクションに内包されているため、T008 の最終セクション削除で自然に解消される (T006-T008 の順序制約)。
 
-## Tasks (0/9 resolved)
+## Tasks (1/9 resolved)
 
 ### S001 — 非 DESIGN.md orphan 点訂正 (T001, T002)
 
@@ -17,8 +17,8 @@ IN-01 の orphan 修正 (D6 #5 (c)(d)) は DESIGN.md 内の削除対象セクシ
 > T002: `DEVELOPER_AI_WORKFLOW.md` (3 箇所) と `knowledge/strategy/tddd-implementation-plan.md` (1 箇所) の `domain-types.json` 単数形を現行複数 layer 表記に修正する (IN-05 / IN-08 / AC-05 部分)。DEVELOPER_AI_WORKFLOW.md の全体サイズは維持する (OS-06)。
 > 2 タスクをまとめて commit することで orphan 点訂正セットを 1 差分として管理できる。diff は合計数行 (~10 行以下) のため atomicity 制約に十分収まる。
 
-- [~] **T001**: `schema_version` 旧値 (3→5) の point fix を 3 ファイルに適用する。(1) `.claude/commands/track/activate.md` 13 行目の `schema_version: 3` を `schema_version: 5` に書き換える (IN-06)。(2) `.claude/commands/track/plan-only.md` 17 行目の `schema_version: 3` を `schema_version: 5` に書き換える (IN-06)。(3) `track/workflow.md` 156 行目の `schema_version: 3` を `schema_version: 5` に書き換える (IN-07)。各変更は値の点訂正のみに限定し、Tier 0 ファイルの構造・他の内容には変更を加えない (CN-04)。
-- [ ] **T002**: `domain-types.json` 単数形を `DEVELOPER_AI_WORKFLOW.md` と `knowledge/strategy/tddd-implementation-plan.md` で現行正式表記に修正する。(1) `DEVELOPER_AI_WORKFLOW.md` の 95 / 209 / 243 行付近に存在する `domain-types.json` 単数形の表記を `<layer>-types.json` などの現行複数 layer を示す正式表記に書き換える (IN-05)。(2) `knowledge/strategy/tddd-implementation-plan.md` の 80 行付近の `domain-types.json` 単数形を現行正式表記に書き換える (IN-08)。`DEVELOPER_AI_WORKFLOW.md` の全体サイズは維持し (OS-06)、細部修正のみ行う。
+- [x] **T001**: `schema_version` 旧値 (3→5) の point fix を 3 ファイルに適用する。(1) `.claude/commands/track/activate.md` 13 行目の `schema_version: 3` を `schema_version: 5` に書き換える (IN-06)。(2) `.claude/commands/track/plan-only.md` 17 行目の `schema_version: 3` を `schema_version: 5` に書き換える (IN-06)。(3) `track/workflow.md` 156 行目の `schema_version: 3` を `schema_version: 5` に書き換える (IN-07)。各変更は値の点訂正のみに限定し、Tier 0 ファイルの構造・他の内容には変更を加えない (CN-04)。 (`3ad771e`)
+- [~] **T002**: `domain-types.json` 単数形を `DEVELOPER_AI_WORKFLOW.md` と `knowledge/strategy/tddd-implementation-plan.md` で現行正式表記に修正する。(1) `DEVELOPER_AI_WORKFLOW.md` の 95 / 209 / 243 行付近に存在する `domain-types.json` 単数形の表記を `<layer>-types.json` などの現行複数 layer を示す正式表記に書き換える (IN-05)。(2) `knowledge/strategy/tddd-implementation-plan.md` の 80 行付近の `domain-types.json` 単数形を現行正式表記に書き換える (IN-08)。`DEVELOPER_AI_WORKFLOW.md` の全体サイズは維持し (OS-06)、細部修正のみ行う。
 
 ### S002 — 小規模 doc shrink (T003, T004, T005)
 

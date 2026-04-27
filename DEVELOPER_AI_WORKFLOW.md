@@ -206,7 +206,7 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 4. (任意) `[Claude Code]` `/track:commit <message>`
    - 計画 artifact をコミットする（レビュー有無にかかわらず）
 4b. (任意・TDDD) `[Claude Code]` `/track:type-design`
-   - 実装前に全 TDDD 有効レイヤーの型カタログ（`domain-types.json`・`usecase-types.json` 等）を宣言・確認する（TDDD フロー推奨）
+   - 実装前に全 TDDD 有効レイヤーの型カタログ `<layer>-types.json`（`domain-types.json`・`usecase-types.json` 等）を宣言・確認する（TDDD フロー推奨）
 5. `[Claude Code]` `/track:implement` または `/track:full-cycle <task>`
    - `/track:implement`: 対話しながら並列実装
    - `/track:full-cycle <task>`: 自律実装（TDDD 使用時は事前にステップ 4b 推奨）
@@ -240,7 +240,7 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 2. Claude Code が `track/registry.md`, `track/items/<id>/spec.md`, `track/items/<id>/plan.md` を読み、`observations.md` が存在する場合はそれも合わせて状況を整理し、次に使うべきコマンドを提案する
    - 例: `/track:plan`, `/track:implement`, `/track:review`, `/track:ci`
 
-   > **TDDD 参考**: 型を新規追加・変更する場合は、実装前に標準フローの任意ステップ 4b（`/track:type-design`）で各レイヤーの型カタログ（`domain-types.json`・`usecase-types.json` 等）に型を宣言することを推奨する（Yellow = WIP 宣言 → `/track:implement` で実装 → Blue 確定。未宣言の型がコードに存在すると Red = TDDD 違反）。`/track:status` はトラック状態に基づいてコマンドを提案するため、設計フェーズが必要かどうかは開発者自身が判断して明示的に実行する。
+   > **TDDD 参考**: 型を新規追加・変更する場合は、実装前に標準フローの任意ステップ 4b（`/track:type-design`）で各レイヤーの型カタログ `<layer>-types.json`（`domain-types.json`・`usecase-types.json` 等）に型を宣言することを推奨する（Yellow = WIP 宣言 → `/track:implement` で実装 → Blue 確定。未宣言の型がコードに存在すると Red = TDDD 違反）。`/track:status` はトラック状態に基づいてコマンドを提案するため、設計フェーズが必要かどうかは開発者自身が判断して明示的に実行する。
 
 3. 開発者が提案を採用するか、別の進め方を指示する
 4. Claude Code がコマンドを実行し、必要なら active profile に応じて specialist capability / Agent Teams を使う

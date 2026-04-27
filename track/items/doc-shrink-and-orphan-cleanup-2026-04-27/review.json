@@ -1,6 +1,85 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3561a729aad7379f6e30abb54f0f69268056a2a115e8cc1331ece34819f21f5d",
+          "at": "2026-04-27T12:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This now tells users to create schema_version 5 metadata with `status: planned`, but v5 metadata is identity-only and rejects `status` as a legacy field. Following this instruction produces invalid metadata instead of a valid plan-only track; status needs to be derived from `impl-plan.json` rather than written in `metadata.json`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan-only.md",
+              "line": 17,
+              "category": "factual_error"
+            },
+            {
+              "message": "This check still describes `status: planned` as part of the planning-only metadata condition even though schema_version 5 no longer stores `status`; v5 planning status is derived. As written, the activation instructions ask reviewers to confirm a field that valid v5 metadata must not contain.",
+              "severity": "P1",
+              "file": ".claude/commands/track/activate.md",
+              "line": 13,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:3561a729aad7379f6e30abb54f0f69268056a2a115e8cc1331ece34819f21f5d",
+          "at": "2026-04-27T13:00:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd1a2d785892a31958b6df5f9c538b7843569de3632af404c5379116179644a",
+          "at": "2026-04-27T13:06:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd1a2d785892a31958b6df5f9c538b7843569de3632af404c5379116179644a",
+          "at": "2026-04-27T13:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f853dea1e9f6a9e9ec681cf60054b977859fece58bd8258231b7acbf9ad347ea",
+          "at": "2026-04-27T13:20:33Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dbc24bcbc14a331152687cbf0294f4e833569a0466e3e451d1f33ea34a4344b",
+          "at": "2026-04-27T12:57:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dbc24bcbc14a331152687cbf0294f4e833569a0466e3e451d1f33ea34a4344b",
+          "at": "2026-04-27T12:58:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee5040ea4c7f9ad9a75bbd1347da49a35732f10446fb952acdd3150f946544f0",
+          "at": "2026-04-27T13:15:54Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -74,71 +153,34 @@
           "findings": [],
           "hash": "rvw1:sha256:c0b7a6dc08a431a24dbe06ef6b6664cb21d7cf4e766272b9603afeac3ad72c35",
           "at": "2026-04-27T12:58:51Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9dbc24bcbc14a331152687cbf0294f4e833569a0466e3e451d1f33ea34a4344b",
-          "at": "2026-04-27T12:57:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9dbc24bcbc14a331152687cbf0294f4e833569a0466e3e451d1f33ea34a4344b",
-          "at": "2026-04-27T12:58:58Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3561a729aad7379f6e30abb54f0f69268056a2a115e8cc1331ece34819f21f5d",
-          "at": "2026-04-27T12:56:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This now tells users to create schema_version 5 metadata with `status: planned`, but v5 metadata is identity-only and rejects `status` as a legacy field. Following this instruction produces invalid metadata instead of a valid plan-only track; status needs to be derived from `impl-plan.json` rather than written in `metadata.json`.",
-              "severity": "P1",
-              "file": ".claude/commands/track/plan-only.md",
-              "line": 17,
-              "category": "factual_error"
-            },
-            {
-              "message": "This check still describes `status: planned` as part of the planning-only metadata condition even though schema_version 5 no longer stores `status`; v5 planning status is derived. As written, the activation instructions ask reviewers to confirm a field that valid v5 metadata must not contain.",
-              "severity": "P1",
-              "file": ".claude/commands/track/activate.md",
-              "line": 13,
-              "category": "factual_error"
-            }
-          ],
-          "hash": "rvw1:sha256:3561a729aad7379f6e30abb54f0f69268056a2a115e8cc1331ece34819f21f5d",
-          "at": "2026-04-27T13:00:20Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2fd1a2d785892a31958b6df5f9c538b7843569de3632af404c5379116179644a",
-          "at": "2026-04-27T13:06:38Z"
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:16:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:20:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:22:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2fd1a2d785892a31958b6df5f9c538b7843569de3632af404c5379116179644a",
-          "at": "2026-04-27T13:08:46Z"
+          "hash": "rvw1:sha256:d76efde484c0e7e290d89dc2afb6c32dba8b658ad7bcf7c98ad1c0659331630c",
+          "at": "2026-04-27T13:23:12Z"
         }
       ]
     }
