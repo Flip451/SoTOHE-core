@@ -222,6 +222,20 @@
           "findings": [],
           "hash": "rvw1:sha256:d16f463b9354195826957d6228fddcea2f67eb545ec7e7ae1f5799471cd20e4f",
           "at": "2026-04-27T11:45:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9133695b71ccdcf2f15a2ee2adfc899dcbd18346c1c16da542df46ee74a161b5",
+          "at": "2026-04-27T11:55:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9133695b71ccdcf2f15a2ee2adfc899dcbd18346c1c16da542df46ee74a161b5",
+          "at": "2026-04-27T11:56:45Z"
         }
       ]
     }

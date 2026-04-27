@@ -158,11 +158,11 @@
       },
       {
         "id": "OS-07",
-        "text": "parent ADR (`knowledge/adr/2026-04-27-0554-doc-reorganization.md`) の本文編集は本 track のスコープ外。本 track は post-merge ADR の本文を変更せず、D6 #5 orphan-stragglers の subset として informal_grounds で位置付ける。これはユーザー判断によるものであり、ADR への entry 追加は行わない",
-        "informal_grounds": [
+        "text": "parent ADR (`knowledge/adr/2026-04-27-0554-doc-reorganization.md`) を含む既存 ADR の本文編集は本 track のスコープ外。post-merge ADR は `knowledge/conventions/adr.md` Lifecycle ルールにより immutable (typo 修正 / broken cross-reference 修正 / newer ADR への back-reference 追加 を除く semantic 変更は禁止)。本 track は broken reference cleanup に特化しており ADR への entry 追加は対象外",
+        "adr_refs": [
           {
-            "kind": "user_directive",
-            "summary": "本 track 開始時ユーザー判断: parent ADR D6 への entry 追加編集は行わない。D6 5 番 orphan-stragglers の subset として informal_grounds で明記する形とする"
+            "file": "knowledge/adr/2026-04-27-0554-doc-reorganization.md",
+            "anchor": "D6: 実装ロードマップは別 track 群で段階化する (本 ADR は方針のみ)"
           }
         ]
       }
@@ -311,8 +311,8 @@
     }
   ],
   "signals": {
-    "blue": 26,
-    "yellow": 1,
+    "blue": 27,
+    "yellow": 0,
     "red": 0
   }
 }
