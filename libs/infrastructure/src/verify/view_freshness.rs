@@ -81,10 +81,52 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             }
         }
 
-        // plan.md must exist if metadata.json exists (it's a generated view)
-        if !plan_path.is_file() {
+        // plan.md absent: silent SKIP (file existence = phase status).
+        // Phase 0/1/2 tracks (pre-implementation) may not yet have plan.md
+        // rendered; treat the absence as "not yet rendered" rather than as a
+        // freshness failure. This matches `validate_track_snapshots` in
+        // `libs/infrastructure/src/track/render.rs:621-624`.
+        //
+        // Use symlink_metadata to distinguish genuine absence (NotFound →
+        // silent skip) from other filesystem states (permission error, etc.
+        // → surface as a finding), mirroring the absent-vs-corrupted split
+        // in render.rs:621-624. Symlinks are followed via `metadata` to
+        // detect dangling symlinks and non-file symlink targets (treated as
+        // corrupted track state).
+        let sym_meta = match std::fs::symlink_metadata(&plan_path) {
+            Ok(m) => m,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue, // Genuine absence.
+            Err(e) => {
+                findings
+                    .push(VerifyFinding::error(format!("{track_name}/plan.md: cannot stat: {e}")));
+                continue;
+            }
+        };
+        if sym_meta.file_type().is_symlink() {
+            match std::fs::metadata(&plan_path) {
+                Ok(target) if target.is_file() => {} // Valid symlink to a regular file — proceed.
+                Ok(_) => {
+                    findings.push(VerifyFinding::error(format!(
+                        "{track_name}/plan.md: symlink target is not a regular file (corrupted track state)"
+                    )));
+                    continue;
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    findings.push(VerifyFinding::error(format!(
+                        "{track_name}/plan.md: dangling symlink (target missing)"
+                    )));
+                    continue;
+                }
+                Err(e) => {
+                    findings.push(VerifyFinding::error(format!(
+                        "{track_name}/plan.md: cannot follow symlink: {e}"
+                    )));
+                    continue;
+                }
+            }
+        } else if !sym_meta.is_file() {
             findings.push(VerifyFinding::error(format!(
-                "{track_name}/plan.md: missing — run `cargo make track-sync-views` to generate"
+                "{track_name}/plan.md: not a regular file (corrupted track state)"
             )));
             continue;
         }
@@ -218,7 +260,10 @@ mod tests {
     }
 
     #[test]
-    fn test_view_freshness_errors_when_plan_md_missing() {
+    fn test_view_freshness_skips_when_plan_md_absent() {
+        // Phase 0/1/2 tracks may not yet have plan.md rendered. The freshness
+        // validator must silently SKIP these tracks, matching the behavior of
+        // `validate_track_snapshots` in `libs/infrastructure/src/track/render.rs`.
         let tmp = TempDir::new().unwrap();
         let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("no-plan");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -231,10 +276,32 @@ mod tests {
             "updated_at": "2026-01-01T00:00:00Z",
         });
         std::fs::write(track_dir.join("metadata.json"), metadata.to_string()).unwrap();
-        // No plan.md — should report as missing (fail-closed)
+        // No plan.md — should be SKIPPED silently (not a freshness failure).
         let outcome = verify(tmp.path());
-        assert!(outcome.has_errors());
-        assert!(outcome.findings()[0].to_string().contains("missing"));
+        assert!(outcome.is_ok(), "plan.md absent must be a silent skip, not a finding");
+    }
+
+    #[test]
+    fn test_view_freshness_passes_when_plan_md_absent() {
+        // Companion test: minimum Phase 0 fixture (only metadata.json) must
+        // PASS. Asserts the explicit positive contract — `verify` returns a
+        // pass outcome with no findings — separate from the rename above.
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("phase0-bare");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata = serde_json::json!({
+            "schema_version": 5,
+            "id": "phase0-bare",
+            "branch": "track/phase0-bare",
+            "title": "Phase 0 Bare",
+            "created_at": "2026-04-27T00:00:00Z",
+            "updated_at": "2026-04-27T00:00:00Z",
+        });
+        std::fs::write(track_dir.join("metadata.json"), metadata.to_string()).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(outcome.is_ok());
+        assert!(outcome.findings().is_empty());
     }
 
     #[test]

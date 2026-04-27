@@ -17,7 +17,7 @@
 > T002 は `plan.md` absent の FAIL を `continue` に変更し、`validate_track_snapshots` と同じ挙動に揃える (IN-02)。
 > 既存テスト `test_view_freshness_errors_when_plan_md_missing` のアサーション反転と改名、および Phase 0 PASS の unit test 追加を同タスクで行う (IN-05 のうち `view_freshness.rs` 分担)。
 
-- [ ] **T002**: `libs/infrastructure/src/verify/view_freshness.rs` の `plan.md` absent FAIL (lines 84-90) を `continue` (silent SKIP) に変更し、`libs/infrastructure/src/track/render.rs:621-624` の `validate_track_snapshots` と同じ挙動に揃える。`plan.md` absent 状態で PASS することを確認する unit test `test_view_freshness_passes_when_plan_md_absent` を追加し、既存テスト `test_view_freshness_errors_when_plan_md_missing` を `test_view_freshness_skips_when_plan_md_absent` に改名してアサーションを PASS に更新する。
+- [~] **T002**: `libs/infrastructure/src/verify/view_freshness.rs` の `plan.md` absent FAIL (lines 84-90) を `continue` (silent SKIP) に変更し、`libs/infrastructure/src/track/render.rs:621-624` の `validate_track_snapshots` と同じ挙動に揃える。`plan.md` absent 状態で PASS することを確認する unit test `test_view_freshness_passes_when_plan_md_absent` を追加し、既存テスト `test_view_freshness_errors_when_plan_md_missing` を `test_view_freshness_skips_when_plan_md_absent` に改名してアサーションを PASS に更新する。
 
 ### S3 — CLI: verify_catalogue_spec_refs.rs catalogue-first branching + test split (IN-03 + IN-04)
 
