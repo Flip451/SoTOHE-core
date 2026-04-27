@@ -16,6 +16,53 @@
           "findings": [],
           "hash": "rvw1:sha256:474022b9867fc0d5e0fa8384a98536751441a781060fd1c62dff4894419ceb85",
           "at": "2026-04-27T08:59:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01ea17ae2317b0de0ccb049331a945dfa4e8286920e08125c8bc4b59b7f1bbd6",
+          "at": "2026-04-27T09:04:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The catalogue-driven mapping table names inputs that do not match the actual `TypeDefinitionKind` model: `Typestate` is not driven by `transitions_to`, `FreeFunction` is not `params`/`returns`, and `SecondaryAdapter` does not have a top-level `expected_methods` field. A generator following this table would read the wrong catalogue fields instead of `transitions`, `expected_params`/`expected_returns`/`expected_is_async`, and `implements` with nested method declarations.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-27-rust-unit-test-generation.md",
+              "line": 77,
+              "category": "factual_error_semantic"
+            },
+            {
+              "message": "The target filter says `A\\B + A∩B` means “new/changed types only”, but in TDDD-02 this is simply the declared catalogue set `A`; TDDD-03 further allows `A∩B` entries to be `action: reference`, i.e. unchanged context declarations. Set membership alone therefore cannot select only new/changed types, so the proposed generation scope would include reference-only existing types unless it also filters by `TypeAction`.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-27-rust-unit-test-generation.md",
+              "line": 147,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:01ea17ae2317b0de0ccb049331a945dfa4e8286920e08125c8bc4b59b7f1bbd6",
+          "at": "2026-04-27T09:06:37Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfa8896408e917701d4e5f97507c376a46e9d742ffc364dc02345770e672285e",
+          "at": "2026-04-27T09:02:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfa8896408e917701d4e5f97507c376a46e9d742ffc364dc02345770e672285e",
+          "at": "2026-04-27T09:03:53Z"
         }
       ]
     }
