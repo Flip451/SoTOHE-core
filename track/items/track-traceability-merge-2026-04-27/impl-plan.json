@@ -4,20 +4,20 @@
     {
       "id": "T001",
       "description": "`TRACK_TRACEABILITY.md §5` の registry.md 更新ルール (trigger → required updates テーブル) を `track/workflow.md` に merge する。追加位置は `## Generated Views` セクションの直前あるいは `## plan.md と metadata.json SSoT` セクション内の適切な位置とし、`track/workflow.md` の文体・スタイルに合わせて統合する。重複するルール (既に `track/workflow.md` に記載済みのもの) は追加しない (CN-03)。Tier 0 SoT ファイルは変更しない (CN-02)。これにより IN-01 / AC-01 を満たす。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "aae807d"
     },
     {
       "id": "T002",
       "description": "`track/workflow.md` 内に残っている `TRACK_TRACEABILITY.md` への参照 2 箇所 (「`TRACK_TRACEABILITY.md` を参照する」旨の記述) を削除または自己参照に置き換え、broken link を解消する (IN-03 / AC-03)。その後、`TRACK_TRACEABILITY.md` ファイル自体を削除する (IN-02 / AC-02)。T001 の merge 完了後に実施する (CN-01)。migration shim は作成しない (CN-04)。Tier 0 SoT ファイルへの残存参照は変更しない (CN-02)。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5e0ab39"
     },
     {
       "id": "T003",
       "description": "`cargo make ci` を実行して全 gate が pass することを確認する (AC-04)。Rust コードへの変更はないため fmt-check / clippy / test / deny / check-layers はそのまま通過する想定。`TRACK_TRACEABILITY.md` 削除による verify-* (verify-latest-track / verify-view-freshness 等) への影響がないことを確認し、T001/T002 の変更が clean であることを最終確認する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5e0ab39"
     }
   ],
   "plan": {
