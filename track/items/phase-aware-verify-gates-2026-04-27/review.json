@@ -16,6 +16,82 @@
           "findings": [],
           "hash": "rvw1:sha256:b39b0b02a966c73f93807ecee5e82f83e2542fd5d3d96981f2080ffd8315a678",
           "at": "2026-04-27T05:07:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aff6fe3f260ecb6fc98f4a3fcfb8f947294316a56245e20bc13ff22d34916d0",
+          "at": "2026-04-27T05:19:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aff6fe3f260ecb6fc98f4a3fcfb8f947294316a56245e20bc13ff22d34916d0",
+          "at": "2026-04-27T05:20:39Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd8d2fe14c0902dc4f0dfb32c91b7c11029adc21d42e967f969498a27b2ee7ab",
+          "at": "2026-04-27T04:41:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd8d2fe14c0902dc4f0dfb32c91b7c11029adc21d42e967f969498a27b2ee7ab",
+          "at": "2026-04-27T04:43:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Path::is_file()` treats more than a missing file as false, including dangling symlinks, directories, and unreadable paths. This change turns those corruption cases into silent skips, so a broken `plan.md` will no longer surface as a verify failure. If the intent is only to skip when the file is truly absent, the check needs to distinguish `NotFound` from other states.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 89,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:fe2fdeef1d11acc9479885342676fa430589b2f5db5d4ff024ba1c7bd062fa1c",
+          "at": "2026-04-27T04:51:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Path::is_file()` is broader than \"plan.md is absent\": it also returns false for dangling symlinks and some filesystem errors, so this `continue` now silently skips corrupted `plan.md` states instead of surfacing a finding. The skip should only apply after confirming the file is genuinely missing, matching the absent-vs-corrupted split used in `validate_track_snapshots`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 89,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:fe2fdeef1d11acc9479885342676fa430589b2f5db5d4ff024ba1c7bd062fa1c",
+          "at": "2026-04-27T04:52:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f9135a7d3e71ca8806292371e92c61c9aa448a087b5385e2e67cb44da78df8e",
+          "at": "2026-04-27T04:55:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f9135a7d3e71ca8806292371e92c61c9aa448a087b5385e2e67cb44da78df8e",
+          "at": "2026-04-27T04:56:36Z"
         }
       ]
     },
@@ -133,68 +209,6 @@
           "findings": [],
           "hash": "rvw1:sha256:5abb7c0e098df61a6a8d24aa968a10bc03c917184293b1d5ea8f5088401fe26d",
           "at": "2026-04-27T05:10:33Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bd8d2fe14c0902dc4f0dfb32c91b7c11029adc21d42e967f969498a27b2ee7ab",
-          "at": "2026-04-27T04:41:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bd8d2fe14c0902dc4f0dfb32c91b7c11029adc21d42e967f969498a27b2ee7ab",
-          "at": "2026-04-27T04:43:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Path::is_file()` treats more than a missing file as false, including dangling symlinks, directories, and unreadable paths. This change turns those corruption cases into silent skips, so a broken `plan.md` will no longer surface as a verify failure. If the intent is only to skip when the file is truly absent, the check needs to distinguish `NotFound` from other states.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
-              "line": 89,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:fe2fdeef1d11acc9479885342676fa430589b2f5db5d4ff024ba1c7bd062fa1c",
-          "at": "2026-04-27T04:51:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Path::is_file()` is broader than \"plan.md is absent\": it also returns false for dangling symlinks and some filesystem errors, so this `continue` now silently skips corrupted `plan.md` states instead of surfacing a finding. The skip should only apply after confirming the file is genuinely missing, matching the absent-vs-corrupted split used in `validate_track_snapshots`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/view_freshness.rs",
-              "line": 89,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:fe2fdeef1d11acc9479885342676fa430589b2f5db5d4ff024ba1c7bd062fa1c",
-          "at": "2026-04-27T04:52:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f9135a7d3e71ca8806292371e92c61c9aa448a087b5385e2e67cb44da78df8e",
-          "at": "2026-04-27T04:55:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f9135a7d3e71ca8806292371e92c61c9aa448a087b5385e2e67cb44da78df8e",
-          "at": "2026-04-27T04:56:36Z"
         }
       ]
     }

@@ -104,8 +104,19 @@ pub fn execute_verify_catalogue_spec_refs(
         }
         Ok(_) => {}
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Track directory absent — downstream reads (spec.json, catalogues,
-            // signals) will produce a clear error message. Don't short-circuit here.
+            // Track directory absent — fail-closed. ADR D2.3's "catalogue absent
+            // → silent PASS" gate is meant for Phase 0/1 *real* tracks (the
+            // directory exists, no catalogue yet), not for typos or stale CI
+            // variables. Without this explicit check, a non-existent `track_id`
+            // would resolve every catalogue as absent under
+            // `any_enabled_catalogue_present` and silently pass, regressing
+            // fail-closed behavior (the previous code reached
+            // `read_spec_element_hashes` and surfaced the missing artifact via
+            // a clear I/O error).
+            return Err(CliError::Message(format!(
+                "track directory does not exist: {} (check the track_id)",
+                track_dir.display()
+            )));
         }
         Err(e) => {
             return Err(CliError::Message(format!(
@@ -586,6 +597,26 @@ mod tests {
 
         let result = execute_verify_catalogue_spec_refs(items_dir, "../evil".to_owned(), ws, true);
         assert!(result.is_err());
+    }
+
+    // Fail-closed regression guard: a non-existent track directory (typo or
+    // stale CI variable) must NOT be silently swallowed by the Phase 0/1
+    // catalogue-absent gate. Without an explicit existence check, every
+    // catalogue path under the missing directory would resolve as absent and
+    // `any_enabled_catalogue_present` would return false, producing a false
+    // PASS. The verifier must surface a clear error instead.
+    #[test]
+    fn verify_fails_when_track_dir_missing() {
+        let dir = tempfile::tempdir().unwrap();
+        let ws = dir.path().to_path_buf();
+        let items_dir = ws.join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+        write_architecture_rules(&ws);
+        // Deliberately do NOT create the track directory.
+
+        let result =
+            execute_verify_catalogue_spec_refs(items_dir, "no-such-track".to_owned(), ws, true);
+        assert!(result.is_err(), "non-existent track directory must fail-closed: {result:?}");
     }
 
     // ADR D2.3: catalogue absent + spec.json absent → silent PASS (Phase 0/1).
