@@ -141,6 +141,6 @@ Inline review within Claude Code's main context (self-review) is not a substitut
 Operational details live in:
 
 - `track/workflow.md`
-- `knowledge/WORKFLOW.md`
+- `DEVELOPER_AI_WORKFLOW.md`
 - `.claude/settings.json`
 - `.claude/hooks/`

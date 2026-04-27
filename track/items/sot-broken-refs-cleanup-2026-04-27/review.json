@@ -1,0 +1,243 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
+          "at": "2026-04-27T11:30:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d537192a81f4d9aad2b2b9a8791d9bef203304e1be87e8c904c284ea6b8f3dcc",
+          "at": "2026-04-27T11:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec7ad03dcc29fbd4d5f87037ffd02f2f3858293beb1974df5133abbff8c96915",
+          "at": "2026-04-27T11:34:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec7ad03dcc29fbd4d5f87037ffd02f2f3858293beb1974df5133abbff8c96915",
+          "at": "2026-04-27T11:35:20Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GO-02` claims this track will leave the repository with zero references to deleted files, but the plan only verifies Tier 0 SoT paths: `T003`/`AC-01`/`AC-02` grep `.claude/`, `knowledge/adr/`, `knowledge/conventions/`, `.harness/config/`, `architecture-rules.json`, and `Makefile.toml`. The plan never validates the rest of the repository, so the stated repo-wide end state is stronger than the scope the plan actually checks.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/spec.json",
+              "line": 22,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3a4bd48ba678f1050e5cf17abfabf2e353f88618820ec127113ee4ec422fb08f",
+          "at": "2026-04-27T10:45:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GO-02` claims this track will leave the repository with zero references to deleted files, but the plan only verifies Tier 0 SoT surfaces: `T003` and `AC-01`/`AC-02` sweep `.claude/`, `knowledge/adr/`, `knowledge/conventions/`, `.harness/config/`, `architecture-rules.json`, and `Makefile.toml`. It does not re-check the previously cleaned Tier 1/2 docs, so the stated repo-wide end state is broader than what this plan actually establishes.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/spec.json",
+              "line": 22,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3a4bd48ba678f1050e5cf17abfabf2e353f88618820ec127113ee4ec422fb08f",
+          "at": "2026-04-27T10:46:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:208f157e1c28cab70ae1ec5d150e752914ec51f276be39195c93bd9a67da55f3",
+          "at": "2026-04-27T10:48:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:208f157e1c28cab70ae1ec5d150e752914ec51f276be39195c93bd9a67da55f3",
+          "at": "2026-04-27T10:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-03 says the `.claude/rules/08-orchestration.md` Source Of Truth list composition will not be changed, but IN-01/AC-03/T001 require deleting the `TRACK_TRACEABILITY.md` entry from that same list. This leaves the plan with conflicting instructions for a required edit; OS-03 should explicitly exempt the broken-ref removal or the task should be changed.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/spec.json",
+              "line": 121,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:208f157e1c28cab70ae1ec5d150e752914ec51f276be39195c93bd9a67da55f3",
+          "at": "2026-04-27T10:55:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41f723b39d944a29e25fc278ddfa7ec1b5d84c083080e0ab006472b37d8eb904",
+          "at": "2026-04-27T10:56:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003/AC-01/AC-02 include `knowledge/adr/` in the zero-hit grep target for `TRACK_TRACEABILITY.md` and `knowledge/WORKFLOW.md`, while OS-07 says the parent ADR will not be edited and the cited ADR D2 itself necessarily names those deleted files. As written the sweep either fails, or it must edit out-of-scope ADR text, so the plan cannot satisfy its own acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/impl-plan.json",
+              "line": 18,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:41f723b39d944a29e25fc278ddfa7ec1b5d84c083080e0ab006472b37d8eb904",
+          "at": "2026-04-27T10:59:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe41eb344c2335a3f87ebf8786f1d21718b1e91a6df2a8a5b21070a81c967a00",
+          "at": "2026-04-27T11:02:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 says the track will make deleted-file references zero across the Tier 0 set including `knowledge/adr/`, but the same spec later excludes `knowledge/adr/` from the grep scope because the parent ADR intentionally records those names, and OS-07 forbids editing that ADR. As written, the acceptance criteria can pass while this goal remains unmet; narrow GO-02 to the action-file sweep scope or explicitly exempt ADR history.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/spec.json",
+              "line": 22,
+              "category": "contradiction"
+            },
+            {
+              "message": "OS-06 states the operation target is only markdown/text files under `.claude/`, while IN-06/T003 require sweeping `.claude/skills/`, `knowledge/conventions/`, `.harness/config/`, `architecture-rules.json`, and `Makefile.toml`, and T003 says any additional residual references found there will be edited in the same task. That leaves the plan contradictory if the sweep finds a non-`.claude` residual reference: either edit outside OS-06 or fail AC-01/AC-02.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/spec.json",
+              "line": 151,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fe41eb344c2335a3f87ebf8786f1d21718b1e91a6df2a8a5b21070a81c967a00",
+          "at": "2026-04-27T11:04:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9c90081a7e3998990b0e776f7fbae56d1a17e53d7604c93dc9c2aadd4a44d7",
+          "at": "2026-04-27T11:05:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9c90081a7e3998990b0e776f7fbae56d1a17e53d7604c93dc9c2aadd4a44d7",
+          "at": "2026-04-27T11:08:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42e5a8e3ce68e6792edb897620cee5fa34a9ba79ed85e8cec044f1915369a244",
+          "at": "2026-04-27T11:30:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42e5a8e3ce68e6792edb897620cee5fa34a9ba79ed85e8cec044f1915369a244",
+          "at": "2026-04-27T11:31:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:699cac4eeaed4c04d679435067f824f27ef1fbb1053e85fe0a5034037ca26caf",
+          "at": "2026-04-27T11:35:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:699cac4eeaed4c04d679435067f824f27ef1fbb1053e85fe0a5034037ca26caf",
+          "at": "2026-04-27T11:35:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary says the track only changes `.claude/` markdown files, but T003 explicitly allows residual-ref sweeps and surgical fixes in `knowledge/conventions/`, `.harness/config/`, `architecture-rules.json`, and `Makefile.toml` as well. That makes the declared edit scope internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/sot-broken-refs-cleanup-2026-04-27/impl-plan.json",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f4323407e0a536fd06058003b08bb08af021b899635869965f75d3cd7baad4ac",
+          "at": "2026-04-27T11:39:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d16f463b9354195826957d6228fddcea2f67eb545ec7e7ae1f5799471cd20e4f",
+          "at": "2026-04-27T11:40:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d16f463b9354195826957d6228fddcea2f67eb545ec7e7ae1f5799471cd20e4f",
+          "at": "2026-04-27T11:43:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d16f463b9354195826957d6228fddcea2f67eb545ec7e7ae1f5799471cd20e4f",
+          "at": "2026-04-27T11:45:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9133695b71ccdcf2f15a2ee2adfc899dcbd18346c1c16da542df46ee74a161b5",
+          "at": "2026-04-27T11:55:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9133695b71ccdcf2f15a2ee2adfc899dcbd18346c1c16da542df46ee74a161b5",
+          "at": "2026-04-27T11:56:45Z"
+        }
+      ]
+    }
+  }
+}

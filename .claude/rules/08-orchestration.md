@@ -32,7 +32,6 @@ Read these first before planning or implementation:
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
 - `track/items/<id>/observations.md` (optional — manual observation log)
-- `TRACK_TRACEABILITY.md`
 - `knowledge/DESIGN.md`
 - `.claude/rules/`
 - `knowledge/external/POLICY.md`
@@ -45,7 +44,6 @@ Operational split:
 - `CLAUDE.md`: maintainer/reference guide
 - `track/workflow.md`: day-to-day workflow rules
 - `knowledge/conventions/`: project-specific engineering rules and implementation policies
-- `TRACK_TRACEABILITY.md`: `plan.md` state transitions and registry update rules
 - `knowledge/external/guides.json`: registry for long-form external guides cached outside git
 - `knowledge/external/POLICY.md`: operating policy for external long-form guides
 - `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
