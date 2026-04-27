@@ -7,10 +7,9 @@ and architecture decisions live here.
 
 1. `conventions/README.md` — Project-specific engineering rules and implementation policies
 2. `adr/README.md` — Architecture Decision Records
-3. `WORKFLOW.md` — Development workflow details
-4. `external/POLICY.md` — External long-form guide operating policy
-5. `external/guides.json` — External guide registry
-6. `strategy/TODO-PLAN.md` — Strategic roadmap
+3. `external/POLICY.md` — External long-form guide operating policy
+4. `external/guides.json` — External guide registry
+5. `strategy/TODO-PLAN.md` — Strategic roadmap
 
 ## Directory Structure
 

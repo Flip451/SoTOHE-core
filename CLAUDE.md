@@ -12,7 +12,6 @@ Priority references:
 - `track/items/<id>/plan.md`
 - `track/items/<id>/observations.md` (optional — manual observation log)
 - `knowledge/DESIGN.md`
-- `knowledge/WORKFLOW.md`
 - `knowledge/adr/README.md`
 - `knowledge/strategy/TODO-PLAN.md`
 - `.harness/config/agent-profiles.json`

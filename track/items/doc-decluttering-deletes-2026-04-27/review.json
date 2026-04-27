@@ -1,0 +1,414 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 requires every non-deleted file to stop referencing `knowledge/WORKFLOW.md` and `knowledge/architecture.md`, but CN-02 forbids changing Tier 0 SoT files, and this plan explicitly notes that some Tier 0 files still reference `knowledge/WORKFLOW.md`. As written, the acceptance criterion cannot be satisfied without violating the constraint.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 217,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan summary tells the reviewer to consult an `Open Questions` section for the AC-04 exception, but neither `spec.json` nor `impl-plan.json` defines such a section. That leaves the stated exception path unresolved.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
+              "line": 22,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:235f08de93c2bb9ae823b975c4c069d913aae5b8b979a421d9a62375dac1f608",
+          "at": "2026-04-27T06:40:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 is incompatible with CN-02 as written: CN-02 forbids changing Tier 0 SoT files, but the plan still treats the stale `knowledge/WORKFLOW.md` links in those unchanged files as part of AC-04. That makes the acceptance criterion impossible to satisfy without narrowing AC-04 or widening the scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 217,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan summary defers the AC-04/CN-02 issue to an `Open Questions` section, but no such section exists in the plan artifacts. The referenced resolution path is therefore dangling.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
+              "line": 22,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:235f08de93c2bb9ae823b975c4c069d913aae5b8b979a421d9a62375dac1f608",
+          "at": "2026-04-27T06:42:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 is not satisfiable as written under CN-02: this plan explicitly says Tier 0 SoT files still contain `knowledge/WORKFLOW.md` references and will not be changed in this track, but AC-04 requires no remaining references in any non-deleted file. The text points to an `Open Questions` section, but no such section exists in the reviewed artifacts, so the contradiction is unresolved.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
+              "line": 22,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:235f08de93c2bb9ae823b975c4c069d913aae5b8b979a421d9a62375dac1f608",
+          "at": "2026-04-27T06:44:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OS-04` assigns `DEVELOPER_AI_WORKFLOW.md` edits to `orphan-stragglers-...`, but ADR D6 only uses that track for residual audit items (`metadata.json schema_version`, `cargo make spec-approve` cleanup, `domain-types.json` singular replacement, `.claude/docs/` refs). That makes the out-of-scope ownership statement factually wrong and points follow-up work at the wrong track.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.md",
+              "line": 27,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:6b6f88d255d0d1163062c4520104fa256b8f59abd1f19405f9b26e91d53a2d85",
+          "at": "2026-04-27T06:46:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 still promises that no broken links remain, but the same plan explicitly preserves Tier 0 broken references under CN-02 (see plan.md line 20 / impl-plan.json line 22). Narrow GO-02 to the Tier 1/2 derived docs, or the goal conflicts with the allowed residual state.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:720667d648b7534e3ddbbe6d682d29774f211232dabd2bee542fe6fe9c95e45c",
+          "at": "2026-04-27T06:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e91a927a19fb6b9d1b6bf76128799323177f72f1fe385193996073c89f2c64",
+          "at": "2026-04-27T06:52:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 defines Tier 0 rules as only `.claude/rules/01-*.md`, but the same ADR later treats `.claude/rules/08-orchestration.md` as a SSoT and the plan's AC-04 exception relies on `.claude/rules/09...` and `10...` being Tier 0. As written, the Tier 0 boundary is contradictory, so the link-cleanup exception is not grounded in the ADR's own tier definition.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-27-0554-doc-reorganization.md",
+              "line": 36,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-02 says ADR files and track artifacts are Tier 0 files that this track does not change, with changes limited to Tier 1 links and deleted Tier 2 narrative files. CN-04 then requires the pre-merge ADR to be committed in T001. Without an explicit CN-04 exception, the required task violates CN-02's own change boundary.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 156,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan summary says the track implements ADR D2's confirmed \"3 file deletions\" as `knowledge/WORKFLOW.md` / `knowledge/architecture.md` / `repomix-output.*`, but ADR D2's third file is `TRACK_TRACEABILITY.md` and `repomix-output.*` is only an additional scratch cleanup. Since OS-01 excludes `TRACK_TRACEABILITY.md`, T001 is a subset of D2 plus scratch cleanup, not the complete D2 3-file deletion.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
+              "line": 19,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:18e91a927a19fb6b9d1b6bf76128799323177f72f1fe385193996073c89f2c64",
+          "at": "2026-04-27T06:58:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 classifies Tier 0 rules as only `.claude/rules/01-*.md`, but the spec and plan rely on all `.claude/rules/` files being Tier 0 so that existing references in `.claude/rules/09-*` and `.claude/rules/10-*` are exempt from AC-04/CN-02. This is a semantic contradiction in the tier boundary that determines which broken links must be fixed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-27-0554-doc-reorganization.md",
+              "line": 36,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2 lists `TRACK_TRACEABILITY.md` under the immediate deletion targets, while the spec explicitly makes its deletion out of scope and CN-03 says it must not be changed until a later merge track. The artifacts therefore disagree on whether this file is part of the immediate delete plan.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-27-0554-doc-reorganization.md",
+              "line": 49,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-02 says ADR and track artifact Tier 0 files are not changed in this track and limits changes to Tier 1 link cleanup plus deleted Tier 2 narrative files, but CN-04/T001 require adding the pre-merge ADR to the implementation commit. Without an explicit exception, the constraints cannot all be satisfied.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 156,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:18e91a927a19fb6b9d1b6bf76128799323177f72f1fe385193996073c89f2c64",
+          "at": "2026-04-27T07:01:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 forbids modifying existing Tier 0 SoT files, and its only stated exception is the new pre-merge ADR file. However this change also updates the existing ADR index `knowledge/adr/README.md`, which is a Tier 0 ADR/ADR-index document. As written, the plan cannot both keep CN-02 and include the required ADR README entry; add an explicit exception for the ADR index update or remove that update from this track.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 156,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan summary misidentifies ADR D2's three deletion targets as `knowledge/WORKFLOW.md`, `knowledge/architecture.md`, and `repomix-output.*`. ADR D2's third file is `TRACK_TRACEABILITY.md`; `repomix-output.*` is only additional scratch cleanup, and the spec explicitly moves `TRACK_TRACEABILITY.md` out of this track. This makes T001 read as if it implements all three ADR D2 deletions when it intentionally does not.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
+              "line": 19,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:d3d04fc86ae5d4e3716521b584135c25f304085806f793a06a43de700faabe8c",
+          "at": "2026-04-27T07:05:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 still expands Tier 0 from ADR D1's `.claude/rules/01-*.md` to all `.claude/rules/*.md` and treats the ADR glob as a representative example. The ADR table is the normative tier definition and its glob only covers `01-*`, so the plan still relies on a broader Tier 0 boundary than the ADR actually defines. That keeps the AC-04/CN-02 exception for `.claude/rules/09-*` and `10-*` semantically ambiguous.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 156,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR bans permanent `tmp/...` references in D5.4, but the same ADR's permanent Related section records `tmp/2026-04-27-0432-*` paths as references. Since `tmp/` is described as scratch and durable information must be moved under `knowledge/` or `track/items/<id>/research/`, the ADR contradicts its own recurrence-prevention rule before it is committed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-27-0554-doc-reorganization.md",
+              "line": 199,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6f41b924355871ea79edd2443c84d81b72a77a66d06c3053d66589d0e531462d",
+          "at": "2026-04-27T07:09:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is no longer semantically aligned with ADR D1's Tier 0 definition. ADR D1 classifies `.claude/agents/**/*.md` and `track/tech-stack.md` as Tier 0 and already lists `.claude/rules/`, but CN-02 omits those Tier 0 entries and still says ADR D1 used `.claude/rules/01-*.md`. Since CN-02 is the constraint that protects Tier 0 files during this track, the plan now contains a stale/partial Tier 0 boundary rather than the ADR's boundary.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 156,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fed026079fc85c065a598eea2ac6405ea684980a04044fd2fe908722d4eb0a8d",
+          "at": "2026-04-27T07:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 now says ADR D1 only listed `.claude/rules/01-*.md` as an example and then broadens it to all `.claude/rules/*.md`, but the ADR D1 table already lists `.claude/rules/` directly. That leaves the spec explaining a mismatch that no longer exists, so the constraint is inconsistent with the ADR text it claims to interpret.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.md",
+              "line": 33,
+              "category": "contradiction"
+            },
+            {
+              "message": "D3 sets the README shrink target to about 90 lines, while D1 defines Tier 1 entry-point indexes as `≤80 行` and D5 explicitly says `README.md` must be 80 lines or less. A follow-up track could satisfy this D3 target while still violating the ADR's own Tier 1 constraint, so the roadmap has conflicting targets.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-27-0554-doc-reorganization.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fed026079fc85c065a598eea2ac6405ea684980a04044fd2fe908722d4eb0a8d",
+          "at": "2026-04-27T07:19:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is not aligned with ADR D1's Tier 0 boundary. ADR D1 classifies `.claude/agents/**/*.md` and `track/tech-stack.md` as Tier 0, but CN-02's protected Tier 0 list omits both while claiming to define the existing Tier 0 SoT files that this track must not modify. That leaves the constraint's Tier 0 boundary stale relative to the ADR it references.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "line": 156,
+              "category": "contradiction"
+            },
+            {
+              "message": "D3 sets the README shrink target to about 90 lines, but D1 defines Tier 1 entry-point indexes as `≤80 行` and D5 explicitly says `README.md` must be 80 lines or less. A later track could satisfy the D3 roadmap target while still violating the ADR's own Tier 1 constraint.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-27-0554-doc-reorganization.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9607765bb332b768aeda5a24df2a44a259859306d16f36053bb364c976d4c296",
+          "at": "2026-04-27T07:24:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9607765bb332b768aeda5a24df2a44a259859306d16f36053bb364c976d4c296",
+          "at": "2026-04-27T07:26:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 enumerates the single commit contents but omits `knowledge/adr/README.md`, even though CN-02 explicitly treats adding the new ADR index entry as the required terminal update for this ADR. Following this plan could satisfy the listed ADR file staging while leaving the ADR index change outside the required first commit, so the implementation plan does not fully cover the plan-artifacts scope.",
+              "severity": "P1",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
+              "line": 6,
+              "category": "task_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9607765bb332b768aeda5a24df2a44a259859306d16f36053bb364c976d4c296",
+          "at": "2026-04-27T07:28:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan defines this track as a doc-decluttering/delete-only commit, but the scoped changes include a new research artifact about Rust unit-test generation. This is unrelated to the declared T001 contents and contradicts the ADR/spec framing that `knowledge/research/` is unaffected by this doc-reorganization track.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-27-rust-unit-test-generation.md",
+              "line": 1,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9e97b33a000c246e20a319ec70a203c18423efd3a8f94f35da0395287aa5b5da",
+          "at": "2026-04-27T07:34:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e97b33a000c246e20a319ec70a203c18423efd3a8f94f35da0395287aa5b5da",
+          "at": "2026-04-27T07:37:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeb7834b0717bb305d8ada37ed861bd6f61e1f6f5b6411b3551f7746571740f4",
+          "at": "2026-04-27T08:09:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeb7834b0717bb305d8ada37ed861bd6f61e1f6f5b6411b3551f7746571740f4",
+          "at": "2026-04-27T08:11:26Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3184d3ae6c64f7be27a988b6fb2bf07087cd2f81f2b5d7f3d20dabff693587ee",
+          "at": "2026-04-27T08:03:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3184d3ae6c64f7be27a988b6fb2bf07087cd2f81f2b5d7f3d20dabff693587ee",
+          "at": "2026-04-27T08:05:24Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8fbb945aca4267796606634428f88ad5d2a2a4f50a85122d813031488482a8a3",
+          "at": "2026-04-27T07:54:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `knowledge/WORKFLOW.md` is incomplete as-is: `knowledge/README.md:10` still advertises that file in the reading order, and `scripts/test_verify_scripts.py:278` still calls `read_text()` on the deleted path, so this change will leave a dead index entry and make the test fail with `FileNotFoundError`.",
+              "severity": "P1",
+              "file": "scripts/test_verify_scripts.py",
+              "line": 278,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8fbb945aca4267796606634428f88ad5d2a2a4f50a85122d813031488482a8a3",
+          "at": "2026-04-27T07:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eefcf8614998908ddf2385ac749fc31ea871a1cb7149c602eae147635bd53335",
+          "at": "2026-04-27T08:02:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eefcf8614998908ddf2385ac749fc31ea871a1cb7149c602eae147635bd53335",
+          "at": "2026-04-27T08:04:39Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e1b8e78ffe2a639f4e3b4cd371477b8c3c434139f12d259ed626f40a48f1a6",
+          "at": "2026-04-27T07:51:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e1b8e78ffe2a639f4e3b4cd371477b8c3c434139f12d259ed626f40a48f1a6",
+          "at": "2026-04-27T07:55:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e1b8e78ffe2a639f4e3b4cd371477b8c3c434139f12d259ed626f40a48f1a6",
+          "at": "2026-04-27T08:01:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e1b8e78ffe2a639f4e3b4cd371477b8c3c434139f12d259ed626f40a48f1a6",
+          "at": "2026-04-27T08:04:03Z"
+        }
+      ]
+    }
+  }
+}
