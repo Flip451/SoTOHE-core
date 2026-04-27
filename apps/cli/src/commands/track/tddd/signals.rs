@@ -419,13 +419,16 @@ pub(crate) fn evaluate_and_write_signals(
     // workspace_crates enables IN-10 reverse checks for Interactor/SecondaryAdapter.
     let report = domain::check_consistency(doc.entries(), profile, baseline, workspace_crates);
 
-    // Convert undeclared types/traits (group 4) to Red TypeSignals.
+    // Convert undeclared types/traits/functions (group 4) to Red TypeSignals.
     // Capture the count before appending group-3 baseline reds so the summary
     // WARN line only fires for truly new undeclared items (not baseline changes/deletions).
-    let undeclared_signals =
+    let undeclared_type_trait_signals =
         domain::undeclared_to_signals(report.undeclared_types(), report.undeclared_traits());
-    let undeclared_count = undeclared_signals.len();
-    let mut reverse_signals = undeclared_signals;
+    let undeclared_function_signals =
+        domain::undeclared_functions_to_signals(report.undeclared_functions());
+    let undeclared_count = undeclared_type_trait_signals.len() + undeclared_function_signals.len();
+    let mut reverse_signals = undeclared_type_trait_signals;
+    reverse_signals.extend(undeclared_function_signals);
 
     // Baseline Red: structural changes or deletions (group 3).
     // `found_type` is true when the name still exists in the code (structural change),
@@ -447,6 +450,25 @@ pub(crate) fn evaluate_and_write_signals(
         reverse_signals.push(domain::TypeSignal::new(
             name.clone(),
             "baseline_changed_trait",
+            domain::ConfidenceSignal::Red,
+            found_type,
+            vec![],
+            vec![],
+            vec![],
+        ));
+    }
+    for fq_name in report.baseline_red_functions() {
+        // Parse fq_name back to (short_name, module_path) for graph lookup.
+        // fq_name is "module_path::short_name" when module_path is Some, or just
+        // "short_name" otherwise. Use rfind so nested module paths split correctly.
+        let (short_name, module_path) = match fq_name.rfind("::") {
+            Some(idx) => (&fq_name[idx + 2..], Some(&fq_name[..idx])),
+            None => (fq_name.as_str(), None),
+        };
+        let found_type = profile.get_function(short_name, module_path).is_some();
+        reverse_signals.push(domain::TypeSignal::new(
+            fq_name.clone(),
+            "baseline_changed_function",
             domain::ConfidenceSignal::Red,
             found_type,
             vec![],

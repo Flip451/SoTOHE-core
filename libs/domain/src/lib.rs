@@ -66,7 +66,9 @@ pub use tddd::consistency::{
     ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,
     check_type_signals,
 };
-pub use tddd::signals::{evaluate_type_signals, undeclared_to_signals};
+pub use tddd::signals::{
+    evaluate_type_signals, undeclared_functions_to_signals, undeclared_to_signals,
+};
 pub use tddd::type_signals_doc::{
     TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
 };

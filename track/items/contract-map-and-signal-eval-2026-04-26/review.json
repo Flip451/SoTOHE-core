@@ -1,42 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
-          "at": "2026-04-26T08:41:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
-          "at": "2026-04-26T08:42:44Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
-          "at": "2026-04-26T17:04:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
-          "at": "2026-04-26T17:05:21Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -52,680 +16,6 @@
           "findings": [],
           "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
           "at": "2026-04-26T18:32:24Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This command reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the sibling spec-verification paths. A symlinked track directory or spec file can therefore escape the trusted tree and make the CLI hash an arbitrary file.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 37,
-              "category": "security"
-            },
-            {
-              "message": "The new public subcommand has no tests in this change for the happy path and the failure branches (`--anchor` hit/miss, invalid track id, malformed/missing spec.json). Given the file I/O and branching here, regressions will go unguarded.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 25,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
-          "at": "2026-04-26T17:42:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This helper reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the neighboring TDDD commands. A symlinked `items_dir`, track directory, or `spec.json` can make the CLI hash files outside the trusted tree and leak their contents via stdout.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 34,
-              "category": "security"
-            },
-            {
-              "message": "No tests were added for the new public `execute_spec_element_hash` path, so the success case and the failure paths introduced here (`missing spec.json`, schema failure, missing anchor) are not covered.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 25,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
-          "at": "2026-04-26T17:44:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new tests only assert that `execute_spec_element_hash` succeeds or fails; they never verify stdout. That leaves the core behavior of this command unprotected, so a regression that prints the wrong format (for example JSON in `--anchor` mode or a single hash in map mode) would still pass the suite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
-              "line": 164,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b53989cab77f8c2f92e9a4242f486f40664a8cb51b8e39b6c31369faebc39603",
-          "at": "2026-04-26T17:48:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
-          "at": "2026-04-26T17:52:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
-          "at": "2026-04-26T17:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
-          "at": "2026-04-26T18:31:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
-          "at": "2026-04-26T18:33:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9e664c50c267ca406eae03eb2e254fe9b8e582655cc636c5440294a88899366",
-          "at": "2026-04-27T00:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9e664c50c267ca406eae03eb2e254fe9b8e582655cc636c5440294a88899366",
-          "at": "2026-04-27T00:10:14Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e0c992a9fc6f29190426c6a780b8cbb6b0b4c3e5d8280f954b4cfcde25689fe",
-          "at": "2026-04-26T17:06:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_error_type` never checks for undeclared enum variants, so an `ErrorType` whose code enum has extra members still returns `Blue` whenever all expected variants are present. That drops the reverse-extra half of the new §S action mapping for error types.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 392,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6e0c992a9fc6f29190426c6a780b8cbb6b0b4c3e5d8280f954b4cfcde25689fe",
-          "at": "2026-04-26T17:08:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_error_type` still has the old `expected_variants.is_empty()` early return, so an `ErrorType` entry with no declared variants never reaches the new reverse-extra check. If code contains undeclared enum variants, this path still reports `Blue` with no `extra_items`, which contradicts the new action-aware §S mapping.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 375,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:d1016efa1b223265adbcbbc27de0fbaa3f2ce031ef6b0184f5b9e62ff5d111cd",
-          "at": "2026-04-26T17:19:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d1016efa1b223265adbcbbc27de0fbaa3f2ce031ef6b0184f5b9e62ff5d111cd",
-          "at": "2026-04-26T17:22:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_error_type` short-circuits to `Blue` when `expected_variants` is empty, which bypasses the new reverse-extra check entirely. That means an `ErrorType` declared with no variants can still come back `Blue` even if the code enum contains extra variants, so the §S action-aware mapping is not applied consistently for error types.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 376,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:d1016efa1b223265adbcbbc27de0fbaa3f2ce031ef6b0184f5b9e62ff5d111cd",
-          "at": "2026-04-26T17:25:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_secondary_adapter` still only checks the trait names declared in `implements`; it never scans the code's full `trait_impls` set for undeclared implementations. As a result, an adapter that implements an extra workspace trait can never emit the reverse-extra signal required by §S, so `modify`/`reference` cases can be misclassified as Blue/Yellow instead of Yellow/Red.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
-              "line": 498,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d2afa498a1f7cfedffaa9756fd3c429eb5b53e31c8c118259ef355a7164969c0",
-          "at": "2026-04-26T17:30:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b17f595de01c4b5f67ebd5907d5877b47d7f071934636eb3c83b6f2b862b4cc4",
-          "at": "2026-04-26T17:34:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b17f595de01c4b5f67ebd5907d5877b47d7f071934636eb3c83b6f2b862b4cc4",
-          "at": "2026-04-26T17:36:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FreeFunction` carries `module_path` specifically to disambiguate functions in different modules, but the renderer still keys both `node_id` and the lookup index only by `entry.name()`. Two valid entries like `foo::run` and `bar::run` will collapse into one node and merged edges, so the contract map becomes incorrect for same-named free functions.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
-              "line": 99,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:a96eb27464aec8b3b7acc860bb0c46d5033d9aca2c9809f0d5c094c7c611ad30",
-          "at": "2026-04-26T18:33:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a96eb27464aec8b3b7acc860bb0c46d5033d9aca2c9809f0d5c094c7c611ad30",
-          "at": "2026-04-26T18:34:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The renderer coverage test is still the old 13-kind fixture and never constructs `TypeDefinitionKind::FreeFunction`, so the new public `FreeFunction` rendering path (`node_shape`/`methods_of`) can regress without this test catching it. T002 makes this a 14th kind; add a FreeFunction entry and assertion here, and rename the test accordingly.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 466,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:a96eb27464aec8b3b7acc860bb0c46d5033d9aca2c9809f0d5c094c7c611ad30",
-          "at": "2026-04-26T18:36:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f15fbc5f9f220f79c3e8a21cd458e9876dcdd00e7c7ef8259b370fbbf50c9b9",
-          "at": "2026-04-26T18:39:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0dacb40fd98cb4abbc5545ca9fbc2d61b4038bc9c211db5a5432ad075c485b6c",
-          "at": "2026-04-26T19:38:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0dacb40fd98cb4abbc5545ca9fbc2d61b4038bc9c211db5a5432ad075c485b6c",
-          "at": "2026-04-26T19:40:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91cf7dad3c7b7477c84b33eb70d930b68e9a368ec1ffe31cd0127aeef1dac7b3",
-          "at": "2026-04-26T19:59:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public schema extension APIs are not covered by tests: `SchemaExport::with_trait_origins`/`trait_origins` and `FunctionInfo::with_module_path`/`module_path` have no assertions in the in-file test module. Existing coverage only exercises `SchemaExport::new` and unrelated module-path APIs, so a regression that drops trait origins or a function module path would pass. Add focused happy-path/default-value tests for these new fields.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 51,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:91cf7dad3c7b7477c84b33eb70d930b68e9a368ec1ffe31cd0127aeef1dac7b3",
-          "at": "2026-04-26T20:00:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91cf7dad3c7b7477c84b33eb70d930b68e9a368ec1ffe31cd0127aeef1dac7b3",
-          "at": "2026-04-26T20:01:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_members_check` treats reverse extras as name-only, so a field whose name matches but whose type differs is never counted as extra. For `Add` entries that underreports the reverse-extra side and can turn a spec/code type mismatch into Yellow instead of Red.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 854,
-              "category": "correctness"
-            },
-            {
-              "message": "`FreeFunction` delete entries are not handled with delete semantics: the reverse pass explicitly skips `TypeAction::Delete`, and the forward result is still derived from `missing_items` only. A deleted function that is still present can therefore come back Blue instead of the required Yellow.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 983,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2118cc218bd1eff267b87620d6fec89dfec7bbe22248ad70ee2492e05c34e183",
-          "at": "2026-04-26T21:02:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FreeFunction` entries with `TypeAction::Delete` are handled incorrectly: the forward evaluator never inverts the presence check the way `evaluate_delete` does for other kinds, and the new reverse-extra pass explicitly skips `Delete`. As a result, a free function that should be considered \"not yet deleted\" can stay `Blue`, and a deleted-but-still-absent function can be reported `Yellow` instead of `Blue`.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 88,
-              "category": "behavioral"
-            }
-          ],
-          "hash": "rvw1:sha256:2118cc218bd1eff267b87620d6fec89dfec7bbe22248ad70ee2492e05c34e183",
-          "at": "2026-04-26T21:06:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FreeFunction` delete entries skip the module-scoped reverse-extra pass entirely. That means a module with only `delete` catalogue entries can still contain undeclared functions and be reported Blue, even though `signal_for_reverse_extra` says delete should still surface reverse extras as Yellow.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
-              "line": 88,
-              "category": null
-            },
-            {
-              "message": "`FreeFunction` lookup now scopes by `(name, module_path)`, but consistency still collapses signals and entry matching to `(type_name, kind_tag)` only. If two free functions share the same short name in different modules, their signals become indistinguishable and one module's status can mask the other in coverage/yellow/red checks.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
-              "line": 415,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:91515db9bed90a854fef4bbddbd1be0ac4224ebfdb7f20ce01618d193181180a",
-          "at": "2026-04-26T21:11:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new FreeFunction test block never exercises `module_path=None`; every case hard-codes `Some(\"usecase::track\")`. That leaves the top-level lookup/reverse-scope branch in `evaluate_free_function` and `evaluate_delete` unverified, even though the brief explicitly called for `None`/`Some` coverage.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
-              "line": 2866,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:806c62c17b7081c49ac0cb33935ff75ad617f39f2a096f908bc02987eac91eab",
-          "at": "2026-04-26T21:17:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_consistency` still only computes undeclared `types` and `traits`; it never inspects `graph.functions()` or `baseline.functions()`. After adding `TypeDefinitionKind::FreeFunction` and `TypeGraph::functions`, an undeclared public `fn` can still slip through the consistency path with no reverse signal, so the new free-function surface is only partially validated.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
-              "line": 223,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:82f5b71e3b547f1fc313873af8e031927a4d1ee0471fa3447d500f3af2f28687",
-          "at": "2026-04-26T21:21:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_consistency` still classifies every non-trait entry with `baseline.has_type(name)`, so `FreeFunction` declarations are never matched against `baseline.functions()`. As a result, `add`/`modify`/`reference` contradictions and `delete` validation are wrong for free functions: a function that already exists in the baseline will be treated as absent, producing false `delete_errors` and missing baseline contradictions.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 331,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:898a8a6bc2fa9bc5f4b1d0e571d6c3732a873db8b2fa59d3e419b7438c64a4f0",
-          "at": "2026-04-26T21:29:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_consistency` never iterates `baseline.functions()`, so free functions captured in `TypeBaseline::functions` are never compared the way types and traits are. As a result, a baseline free function that is deleted or structurally changed in code is silently ignored instead of producing a group-3 Red/skipped outcome, which leaves the new function baseline snapshot unused for drift detection.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 231,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:fcf8fbd1380a32c27ddba2656917851c15636c0be6f3c2751cb8ed5f06ae36a9",
-          "at": "2026-04-26T21:33:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
-          "at": "2026-04-26T21:43:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_free_function` always constructs `TypeSignal` with an empty `found_items` vector, so a matching FreeFunction never records the signature that was found. That drops evidence from the serialized signal/CLI output and makes FreeFunction results inconsistent with the other evaluators, which all populate `found_items`.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 1037,
-              "category": "behavioral"
-            }
-          ],
-          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
-          "at": "2026-04-26T21:48:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
-          "at": "2026-04-26T21:53:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_type_signals` keys coverage by only `(entry.name(), kind_tag)`, but `FreeFunction` identity is `(name, module_path)`. Two declared functions with the same short name in different modules collapse to one key, so a missing or stale signal for one module can still satisfy coverage as long as another `foo/free_function` signal exists. That weakens the fail-closed gate for CN-07 module-scoped functions.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 526,
-              "category": null
-            },
-            {
-              "message": "The reverse-signal conversion path still only handles undeclared types and traits. `check_consistency` now records `undeclared_functions`, but existing callers using this public helper will not get Red `TypeSignal`s for new undeclared free functions, so AC-06 group-4 drift can be collected in the report and then omitted from the signal gate.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 1097,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
-          "at": "2026-04-26T21:58:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_consistency` is supposed to skip unchanged baseline functions in group 3, but the FreeFunction post-pass marks every same-module function that is not declared in the current catalogue as a reverse extra before the baseline filter runs. For a track that adds `new_fn` in a module already containing unchanged baseline function `old_fn`, `old_fn` is skipped by `baseline.has_function` later, yet the forward signal for `new_fn` is already Red due to this block. The reverse-extra calculation needs to account for baseline functions or be applied after baseline filtering in the consistency path.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 91,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
-          "at": "2026-04-26T22:02:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Typestate entries are part of the struct-based expected_members set, but evaluate_typestate never verifies that the matched TypeNode is a Struct. A public enum or type alias with the same name, no outgoing transitions, and matching/empty members can return Blue for a Typestate declaration, unlike the other struct-based evaluators that reject non-struct kinds. Add the same TypeKind::Struct guard before evaluating transitions/members.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 343,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
-          "at": "2026-04-26T22:06:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "FreeFunction signals still drop `module_path` here and are keyed only by `(type_name, kind_tag)`. That makes two `save_track` entries in different modules collide in `check_type_signals`, so the gate cannot distinguish or cover them independently.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
-              "line": 1042,
-              "category": "correctness"
-            },
-            {
-              "message": "`delete_errors` records only `name` for `FreeFunction` deletes. Because free functions are keyed by `(name, module_path)` everywhere else and same short names are valid in different modules, invalid-delete diagnostics become ambiguous and the CLI can suppress or report the wrong signal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
-              "line": 431,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b069b06bc7b9baf1c6b070d925bc8d167fd8fa3dfb3343eef12ff190466eb1a8",
-          "at": "2026-04-26T22:14:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f6301b9fa7f0319c5057805cde1a6e6221e1b03d38adbdf62425aaf2e67a2a1d",
-          "at": "2026-04-26T22:23:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_consistency` is baseline-aware, but it calls `evaluate_type_signals` before the group-3 baseline skip logic. This FreeFunction reverse pass then marks every same-module function not declared in the current catalogue as an extra, including unchanged functions that exist in the baseline and should be skipped. A track adding `new_fn` in a module that already has unchanged baseline `old_fn` will get a Red signal for `new_fn` even though `old_fn` is correctly skipped later by `baseline.has_function`. The reverse-extra calculation needs to account for baseline functions in the consistency path.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signals.rs",
-              "line": 91,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:f6301b9fa7f0319c5057805cde1a6e6221e1b03d38adbdf62425aaf2e67a2a1d",
-          "at": "2026-04-26T22:29:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Switching `FreeFunction` signals to fully-qualified `type_name` values (`module_path::name`) is not backward-compatible with the repo’s existing signal consumers, which still match and render signals by the catalogue entry’s short `name`. As a result, free-function rows will stop being associated with their signals unless every downstream consumer is updated in lockstep.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
-              "line": 1107,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:2d08ea4d8db79786ce10c27cd1e14554f36b4810752dbfb99406f11de54a33c7",
-          "at": "2026-04-26T22:37:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_type_signals` still keys coverage by `(type_name, kind_tag)`, while FreeFunction signals use only the short function name. Two FreeFunction entries with the same name in different modules therefore collapse to one key, so a missing or stale signal for one module can be masked and the gate can pass with incomplete coverage.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
-              "line": 538,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:3ee70d6495c76688788e887a605c69567d4fac1827f6d2a69816d2b6f4806dcf",
-          "at": "2026-04-26T22:45:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3b0c3a78bfaa20fed184dc7394bf3191276d2a55c0bdffef109c1f07e75d9e61",
-          "at": "2026-04-26T22:51:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The FreeFunction coverage check only compares total counts, so a stale or wrong FreeFunction signal can satisfy coverage for a different entry. For example, one `FreeFunction` entry named `save_track` plus one Blue `free_function` signal named `delete_track` has equal counts, passes this block, has no Red/Yellow, and `check_type_signals` returns pass even though `save_track` was never evaluated. This violates the gate's \"every entry must have a matching signal\" rule; use at least a per-short-name multiset/count check while keeping the duplicate-module count handling.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 553,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:3b0c3a78bfaa20fed184dc7394bf3191276d2a55c0bdffef109c1f07e75d9e61",
-          "at": "2026-04-26T22:54:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53b2c71e27b3d35c29972f485b30269a86e10e5794b7c9b5fc52e5df332801c2",
-          "at": "2026-04-26T22:59:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Group-3 FreeFunction baseline comparison uses full ParamDeclaration equality, so a baseline function whose parameter binding name changes but whose parameter types/order, returns, and async flag are unchanged is reported as baseline_red_functions. The FreeFunction evaluator’s signature matcher intentionally ignores parameter names and compares only types/order, so undeclared baseline functions are judged by a stricter rule than declared FreeFunction entries and can produce false Red drift signals.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 323,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:53b2c71e27b3d35c29972f485b30269a86e10e5794b7c9b5fc52e5df332801c2",
-          "at": "2026-04-26T23:03:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_type_signals` no longer has a general Red-signal gate for non-empty catalogues. As a result, any Red `TypeSignal` from `check_consistency` or `undeclared_functions_to_signals()` is ignored unless the catalogue is empty or there is also a declared Yellow entry, which contradicts the documented \"Any Red signal -> error\" rule and regresses the existing red-signal test.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 550,
-              "category": "behavioral coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:b86166fa09d9edff0eef579c3273e61fec1e20ba5c5a8053b39391e5bba6ad43",
-          "at": "2026-04-26T23:08:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b86166fa09d9edff0eef579c3273e61fec1e20ba5c5a8053b39391e5bba6ad43",
-          "at": "2026-04-26T23:12:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b86166fa09d9edff0eef579c3273e61fec1e20ba5c5a8053b39391e5bba6ad43",
-          "at": "2026-04-26T23:15:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Interactor → ApplicationService edge path does not suppress self-loops. Because node IDs are built from layer + name only, a same-layer Interactor and ApplicationService with the same short name collapse to the same `src_id`, and this block will emit `L... -.impl.-> L...` instead of skipping the broken edge like the other edge builders do.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
-              "line": 215,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:b7606ac7f0e4542c4c9af821da719551255ba12433d9ffd100d0dfddd3ea8f0d",
-          "at": "2026-04-26T23:31:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7606ac7f0e4542c4c9af821da719551255ba12433d9ffd100d0dfddd3ea8f0d",
-          "at": "2026-04-26T23:33:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7606ac7f0e4542c4c9af821da719551255ba12433d9ffd100d0dfddd3ea8f0d",
-          "at": "2026-04-26T23:35:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d1b0a911104b6f53564dbe570b0e5ed36418cfa20b6a00f23f575d41cb57ac02",
-          "at": "2026-04-27T00:07:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d1b0a911104b6f53564dbe570b0e5ed36418cfa20b6a00f23f575d41cb57ac02",
-          "at": "2026-04-27T00:08:43Z"
         }
       ]
     },
@@ -1378,6 +668,726 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This command reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the sibling spec-verification paths. A symlinked track directory or spec file can therefore escape the trusted tree and make the CLI hash an arbitrary file.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 37,
+              "category": "security"
+            },
+            {
+              "message": "The new public subcommand has no tests in this change for the happy path and the failure branches (`--anchor` hit/miss, invalid track id, malformed/missing spec.json). Given the file I/O and branching here, regressions will go unguarded.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 25,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
+          "at": "2026-04-26T17:42:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This helper reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the neighboring TDDD commands. A symlinked `items_dir`, track directory, or `spec.json` can make the CLI hash files outside the trusted tree and leak their contents via stdout.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 34,
+              "category": "security"
+            },
+            {
+              "message": "No tests were added for the new public `execute_spec_element_hash` path, so the success case and the failure paths introduced here (`missing spec.json`, schema failure, missing anchor) are not covered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 25,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:df027225431f0c713b388de78cdb0c538717985e7ba55ec1a202b16468bd00e9",
+          "at": "2026-04-26T17:44:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new tests only assert that `execute_spec_element_hash` succeeds or fails; they never verify stdout. That leaves the core behavior of this command unprotected, so a regression that prints the wrong format (for example JSON in `--anchor` mode or a single hash in map mode) would still pass the suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "line": 164,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b53989cab77f8c2f92e9a4242f486f40664a8cb51b8e39b6c31369faebc39603",
+          "at": "2026-04-26T17:48:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
+          "at": "2026-04-26T17:52:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d171f4339bd7c113dfae681a9174ace8a2464d14b6c0e4e8d39012480867fd0",
+          "at": "2026-04-26T17:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
+          "at": "2026-04-26T18:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
+          "at": "2026-04-26T18:33:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9e664c50c267ca406eae03eb2e254fe9b8e582655cc636c5440294a88899366",
+          "at": "2026-04-27T00:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9e664c50c267ca406eae03eb2e254fe9b8e582655cc636c5440294a88899366",
+          "at": "2026-04-27T00:10:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7199df1b3ebf5e27d6e9511aff7c20220adf3d8798dcdc246db4aa393de6471",
+          "at": "2026-04-27T00:36:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7199df1b3ebf5e27d6e9511aff7c20220adf3d8798dcdc246db4aa393de6471",
+          "at": "2026-04-27T00:37:56Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:41:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:42:44Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e0c992a9fc6f29190426c6a780b8cbb6b0b4c3e5d8280f954b4cfcde25689fe",
+          "at": "2026-04-26T17:06:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_error_type` never checks for undeclared enum variants, so an `ErrorType` whose code enum has extra members still returns `Blue` whenever all expected variants are present. That drops the reverse-extra half of the new §S action mapping for error types.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 392,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6e0c992a9fc6f29190426c6a780b8cbb6b0b4c3e5d8280f954b4cfcde25689fe",
+          "at": "2026-04-26T17:08:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_error_type` still has the old `expected_variants.is_empty()` early return, so an `ErrorType` entry with no declared variants never reaches the new reverse-extra check. If code contains undeclared enum variants, this path still reports `Blue` with no `extra_items`, which contradicts the new action-aware §S mapping.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 375,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:d1016efa1b223265adbcbbc27de0fbaa3f2ce031ef6b0184f5b9e62ff5d111cd",
+          "at": "2026-04-26T17:19:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1016efa1b223265adbcbbc27de0fbaa3f2ce031ef6b0184f5b9e62ff5d111cd",
+          "at": "2026-04-26T17:22:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_error_type` short-circuits to `Blue` when `expected_variants` is empty, which bypasses the new reverse-extra check entirely. That means an `ErrorType` declared with no variants can still come back `Blue` even if the code enum contains extra variants, so the §S action-aware mapping is not applied consistently for error types.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 376,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:d1016efa1b223265adbcbbc27de0fbaa3f2ce031ef6b0184f5b9e62ff5d111cd",
+          "at": "2026-04-26T17:25:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_secondary_adapter` still only checks the trait names declared in `implements`; it never scans the code's full `trait_impls` set for undeclared implementations. As a result, an adapter that implements an extra workspace trait can never emit the reverse-extra signal required by §S, so `modify`/`reference` cases can be misclassified as Blue/Yellow instead of Yellow/Red.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 498,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d2afa498a1f7cfedffaa9756fd3c429eb5b53e31c8c118259ef355a7164969c0",
+          "at": "2026-04-26T17:30:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17f595de01c4b5f67ebd5907d5877b47d7f071934636eb3c83b6f2b862b4cc4",
+          "at": "2026-04-26T17:34:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17f595de01c4b5f67ebd5907d5877b47d7f071934636eb3c83b6f2b862b4cc4",
+          "at": "2026-04-26T17:36:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FreeFunction` carries `module_path` specifically to disambiguate functions in different modules, but the renderer still keys both `node_id` and the lookup index only by `entry.name()`. Two valid entries like `foo::run` and `bar::run` will collapse into one node and merged edges, so the contract map becomes incorrect for same-named free functions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 99,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a96eb27464aec8b3b7acc860bb0c46d5033d9aca2c9809f0d5c094c7c611ad30",
+          "at": "2026-04-26T18:33:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a96eb27464aec8b3b7acc860bb0c46d5033d9aca2c9809f0d5c094c7c611ad30",
+          "at": "2026-04-26T18:34:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The renderer coverage test is still the old 13-kind fixture and never constructs `TypeDefinitionKind::FreeFunction`, so the new public `FreeFunction` rendering path (`node_shape`/`methods_of`) can regress without this test catching it. T002 makes this a 14th kind; add a FreeFunction entry and assertion here, and rename the test accordingly.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 466,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a96eb27464aec8b3b7acc860bb0c46d5033d9aca2c9809f0d5c094c7c611ad30",
+          "at": "2026-04-26T18:36:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f15fbc5f9f220f79c3e8a21cd458e9876dcdd00e7c7ef8259b370fbbf50c9b9",
+          "at": "2026-04-26T18:39:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0dacb40fd98cb4abbc5545ca9fbc2d61b4038bc9c211db5a5432ad075c485b6c",
+          "at": "2026-04-26T19:38:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0dacb40fd98cb4abbc5545ca9fbc2d61b4038bc9c211db5a5432ad075c485b6c",
+          "at": "2026-04-26T19:40:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91cf7dad3c7b7477c84b33eb70d930b68e9a368ec1ffe31cd0127aeef1dac7b3",
+          "at": "2026-04-26T19:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public schema extension APIs are not covered by tests: `SchemaExport::with_trait_origins`/`trait_origins` and `FunctionInfo::with_module_path`/`module_path` have no assertions in the in-file test module. Existing coverage only exercises `SchemaExport::new` and unrelated module-path APIs, so a regression that drops trait origins or a function module path would pass. Add focused happy-path/default-value tests for these new fields.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 51,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:91cf7dad3c7b7477c84b33eb70d930b68e9a368ec1ffe31cd0127aeef1dac7b3",
+          "at": "2026-04-26T20:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91cf7dad3c7b7477c84b33eb70d930b68e9a368ec1ffe31cd0127aeef1dac7b3",
+          "at": "2026-04-26T20:01:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_members_check` treats reverse extras as name-only, so a field whose name matches but whose type differs is never counted as extra. For `Add` entries that underreports the reverse-extra side and can turn a spec/code type mismatch into Yellow instead of Red.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 854,
+              "category": "correctness"
+            },
+            {
+              "message": "`FreeFunction` delete entries are not handled with delete semantics: the reverse pass explicitly skips `TypeAction::Delete`, and the forward result is still derived from `missing_items` only. A deleted function that is still present can therefore come back Blue instead of the required Yellow.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 983,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2118cc218bd1eff267b87620d6fec89dfec7bbe22248ad70ee2492e05c34e183",
+          "at": "2026-04-26T21:02:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FreeFunction` entries with `TypeAction::Delete` are handled incorrectly: the forward evaluator never inverts the presence check the way `evaluate_delete` does for other kinds, and the new reverse-extra pass explicitly skips `Delete`. As a result, a free function that should be considered \"not yet deleted\" can stay `Blue`, and a deleted-but-still-absent function can be reported `Yellow` instead of `Blue`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 88,
+              "category": "behavioral"
+            }
+          ],
+          "hash": "rvw1:sha256:2118cc218bd1eff267b87620d6fec89dfec7bbe22248ad70ee2492e05c34e183",
+          "at": "2026-04-26T21:06:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FreeFunction` delete entries skip the module-scoped reverse-extra pass entirely. That means a module with only `delete` catalogue entries can still contain undeclared functions and be reported Blue, even though `signal_for_reverse_extra` says delete should still surface reverse extras as Yellow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 88,
+              "category": null
+            },
+            {
+              "message": "`FreeFunction` lookup now scopes by `(name, module_path)`, but consistency still collapses signals and entry matching to `(type_name, kind_tag)` only. If two free functions share the same short name in different modules, their signals become indistinguishable and one module's status can mask the other in coverage/yellow/red checks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "line": 415,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:91515db9bed90a854fef4bbddbd1be0ac4224ebfdb7f20ce01618d193181180a",
+          "at": "2026-04-26T21:11:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new FreeFunction test block never exercises `module_path=None`; every case hard-codes `Some(\"usecase::track\")`. That leaves the top-level lookup/reverse-scope branch in `evaluate_free_function` and `evaluate_delete` unverified, even though the brief explicitly called for `None`/`Some` coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 2866,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:806c62c17b7081c49ac0cb33935ff75ad617f39f2a096f908bc02987eac91eab",
+          "at": "2026-04-26T21:17:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_consistency` still only computes undeclared `types` and `traits`; it never inspects `graph.functions()` or `baseline.functions()`. After adding `TypeDefinitionKind::FreeFunction` and `TypeGraph::functions`, an undeclared public `fn` can still slip through the consistency path with no reverse signal, so the new free-function surface is only partially validated.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "line": 223,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:82f5b71e3b547f1fc313873af8e031927a4d1ee0471fa3447d500f3af2f28687",
+          "at": "2026-04-26T21:21:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_consistency` still classifies every non-trait entry with `baseline.has_type(name)`, so `FreeFunction` declarations are never matched against `baseline.functions()`. As a result, `add`/`modify`/`reference` contradictions and `delete` validation are wrong for free functions: a function that already exists in the baseline will be treated as absent, producing false `delete_errors` and missing baseline contradictions.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 331,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:898a8a6bc2fa9bc5f4b1d0e571d6c3732a873db8b2fa59d3e419b7438c64a4f0",
+          "at": "2026-04-26T21:29:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_consistency` never iterates `baseline.functions()`, so free functions captured in `TypeBaseline::functions` are never compared the way types and traits are. As a result, a baseline free function that is deleted or structurally changed in code is silently ignored instead of producing a group-3 Red/skipped outcome, which leaves the new function baseline snapshot unused for drift detection.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 231,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:fcf8fbd1380a32c27ddba2656917851c15636c0be6f3c2751cb8ed5f06ae36a9",
+          "at": "2026-04-26T21:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
+          "at": "2026-04-26T21:43:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_free_function` always constructs `TypeSignal` with an empty `found_items` vector, so a matching FreeFunction never records the signature that was found. That drops evidence from the serialized signal/CLI output and makes FreeFunction results inconsistent with the other evaluators, which all populate `found_items`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 1037,
+              "category": "behavioral"
+            }
+          ],
+          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
+          "at": "2026-04-26T21:48:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
+          "at": "2026-04-26T21:53:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_type_signals` keys coverage by only `(entry.name(), kind_tag)`, but `FreeFunction` identity is `(name, module_path)`. Two declared functions with the same short name in different modules collapse to one key, so a missing or stale signal for one module can still satisfy coverage as long as another `foo/free_function` signal exists. That weakens the fail-closed gate for CN-07 module-scoped functions.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 526,
+              "category": null
+            },
+            {
+              "message": "The reverse-signal conversion path still only handles undeclared types and traits. `check_consistency` now records `undeclared_functions`, but existing callers using this public helper will not get Red `TypeSignal`s for new undeclared free functions, so AC-06 group-4 drift can be collected in the report and then omitted from the signal gate.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 1097,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
+          "at": "2026-04-26T21:58:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_consistency` is supposed to skip unchanged baseline functions in group 3, but the FreeFunction post-pass marks every same-module function that is not declared in the current catalogue as a reverse extra before the baseline filter runs. For a track that adds `new_fn` in a module already containing unchanged baseline function `old_fn`, `old_fn` is skipped by `baseline.has_function` later, yet the forward signal for `new_fn` is already Red due to this block. The reverse-extra calculation needs to account for baseline functions or be applied after baseline filtering in the consistency path.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 91,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
+          "at": "2026-04-26T22:02:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Typestate entries are part of the struct-based expected_members set, but evaluate_typestate never verifies that the matched TypeNode is a Struct. A public enum or type alias with the same name, no outgoing transitions, and matching/empty members can return Blue for a Typestate declaration, unlike the other struct-based evaluators that reject non-struct kinds. Add the same TypeKind::Struct guard before evaluating transitions/members.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 343,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6c123994ecc7c480e946d8ad7d29540e6445dcdf2d8b0691685d2e7f0cbc013e",
+          "at": "2026-04-26T22:06:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "FreeFunction signals still drop `module_path` here and are keyed only by `(type_name, kind_tag)`. That makes two `save_track` entries in different modules collide in `check_type_signals`, so the gate cannot distinguish or cover them independently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 1042,
+              "category": "correctness"
+            },
+            {
+              "message": "`delete_errors` records only `name` for `FreeFunction` deletes. Because free functions are keyed by `(name, module_path)` everywhere else and same short names are valid in different modules, invalid-delete diagnostics become ambiguous and the CLI can suppress or report the wrong signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "line": 431,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b069b06bc7b9baf1c6b070d925bc8d167fd8fa3dfb3343eef12ff190466eb1a8",
+          "at": "2026-04-26T22:14:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6301b9fa7f0319c5057805cde1a6e6221e1b03d38adbdf62425aaf2e67a2a1d",
+          "at": "2026-04-26T22:23:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_consistency` is baseline-aware, but it calls `evaluate_type_signals` before the group-3 baseline skip logic. This FreeFunction reverse pass then marks every same-module function not declared in the current catalogue as an extra, including unchanged functions that exist in the baseline and should be skipped. A track adding `new_fn` in a module that already has unchanged baseline `old_fn` will get a Red signal for `new_fn` even though `old_fn` is correctly skipped later by `baseline.has_function`. The reverse-extra calculation needs to account for baseline functions in the consistency path.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signals.rs",
+              "line": 91,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f6301b9fa7f0319c5057805cde1a6e6221e1b03d38adbdf62425aaf2e67a2a1d",
+          "at": "2026-04-26T22:29:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Switching `FreeFunction` signals to fully-qualified `type_name` values (`module_path::name`) is not backward-compatible with the repo’s existing signal consumers, which still match and render signals by the catalogue entry’s short `name`. As a result, free-function rows will stop being associated with their signals unless every downstream consumer is updated in lockstep.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 1107,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2d08ea4d8db79786ce10c27cd1e14554f36b4810752dbfb99406f11de54a33c7",
+          "at": "2026-04-26T22:37:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_type_signals` still keys coverage by `(type_name, kind_tag)`, while FreeFunction signals use only the short function name. Two FreeFunction entries with the same name in different modules therefore collapse to one key, so a missing or stale signal for one module can be masked and the gate can pass with incomplete coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "line": 538,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:3ee70d6495c76688788e887a605c69567d4fac1827f6d2a69816d2b6f4806dcf",
+          "at": "2026-04-26T22:45:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b0c3a78bfaa20fed184dc7394bf3191276d2a55c0bdffef109c1f07e75d9e61",
+          "at": "2026-04-26T22:51:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The FreeFunction coverage check only compares total counts, so a stale or wrong FreeFunction signal can satisfy coverage for a different entry. For example, one `FreeFunction` entry named `save_track` plus one Blue `free_function` signal named `delete_track` has equal counts, passes this block, has no Red/Yellow, and `check_type_signals` returns pass even though `save_track` was never evaluated. This violates the gate's \"every entry must have a matching signal\" rule; use at least a per-short-name multiset/count check while keeping the duplicate-module count handling.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 553,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:3b0c3a78bfaa20fed184dc7394bf3191276d2a55c0bdffef109c1f07e75d9e61",
+          "at": "2026-04-26T22:54:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53b2c71e27b3d35c29972f485b30269a86e10e5794b7c9b5fc52e5df332801c2",
+          "at": "2026-04-26T22:59:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Group-3 FreeFunction baseline comparison uses full ParamDeclaration equality, so a baseline function whose parameter binding name changes but whose parameter types/order, returns, and async flag are unchanged is reported as baseline_red_functions. The FreeFunction evaluator’s signature matcher intentionally ignores parameter names and compares only types/order, so undeclared baseline functions are judged by a stricter rule than declared FreeFunction entries and can produce false Red drift signals.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 323,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:53b2c71e27b3d35c29972f485b30269a86e10e5794b7c9b5fc52e5df332801c2",
+          "at": "2026-04-26T23:03:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_type_signals` no longer has a general Red-signal gate for non-empty catalogues. As a result, any Red `TypeSignal` from `check_consistency` or `undeclared_functions_to_signals()` is ignored unless the catalogue is empty or there is also a declared Yellow entry, which contradicts the documented \"Any Red signal -> error\" rule and regresses the existing red-signal test.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 550,
+              "category": "behavioral coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b86166fa09d9edff0eef579c3273e61fec1e20ba5c5a8053b39391e5bba6ad43",
+          "at": "2026-04-26T23:08:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b86166fa09d9edff0eef579c3273e61fec1e20ba5c5a8053b39391e5bba6ad43",
+          "at": "2026-04-26T23:12:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b86166fa09d9edff0eef579c3273e61fec1e20ba5c5a8053b39391e5bba6ad43",
+          "at": "2026-04-26T23:15:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Interactor → ApplicationService edge path does not suppress self-loops. Because node IDs are built from layer + name only, a same-layer Interactor and ApplicationService with the same short name collapse to the same `src_id`, and this block will emit `L... -.impl.-> L...` instead of skipping the broken edge like the other edge builders do.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 215,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:b7606ac7f0e4542c4c9af821da719551255ba12433d9ffd100d0dfddd3ea8f0d",
+          "at": "2026-04-26T23:31:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7606ac7f0e4542c4c9af821da719551255ba12433d9ffd100d0dfddd3ea8f0d",
+          "at": "2026-04-26T23:33:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7606ac7f0e4542c4c9af821da719551255ba12433d9ffd100d0dfddd3ea8f0d",
+          "at": "2026-04-26T23:35:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1b0a911104b6f53564dbe570b0e5ed36418cfa20b6a00f23f575d41cb57ac02",
+          "at": "2026-04-27T00:07:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1b0a911104b6f53564dbe570b0e5ed36418cfa20b6a00f23f575d41cb57ac02",
+          "at": "2026-04-27T00:08:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d8a7da5cd610ff888e77d0d596a326ac930e3cba93fcb300d4acb3beb248ce7",
+          "at": "2026-04-27T00:33:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d8a7da5cd610ff888e77d0d596a326ac930e3cba93fcb300d4acb3beb248ce7",
+          "at": "2026-04-27T00:34:18Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -1664,6 +1674,24 @@
           "findings": [],
           "hash": "rvw1:sha256:1e913581475473ecee6f4b2c5e6bccfe2456b5f52f63de7f85b45a488e0aec03",
           "at": "2026-04-27T00:22:11Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
+          "at": "2026-04-26T17:04:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
+          "at": "2026-04-26T17:05:21Z"
         }
       ]
     }

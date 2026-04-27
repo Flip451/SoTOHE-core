@@ -444,6 +444,11 @@ fn consistency_report_to_findings(
             "undeclared new trait in code: `{name}` — add to domain-types.json"
         )));
     }
+    for name in report.undeclared_functions() {
+        findings.push(domain::verify::VerifyFinding::error(format!(
+            "undeclared new free function in code: `{name}` — add a FreeFunction entry to domain-types.json"
+        )));
+    }
 
     // Group 3: baseline structural changes or deletions → Red.
     for name in report.baseline_red_types() {
@@ -454,6 +459,11 @@ fn consistency_report_to_findings(
     for name in report.baseline_red_traits() {
         findings.push(domain::verify::VerifyFinding::error(format!(
             "undeclared structural change to baseline trait: `{name}` — add to domain-types.json"
+        )));
+    }
+    for name in report.baseline_red_functions() {
+        findings.push(domain::verify::VerifyFinding::error(format!(
+            "undeclared structural change or deletion of baseline free function: `{name}` — add a FreeFunction entry to domain-types.json"
         )));
     }
 
