@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e513da66ce1fcc85f9e7162fb572454e069256e3ccc01bd71cacfbf9b33fa340",
+          "at": "2026-04-27T02:13:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e513da66ce1fcc85f9e7162fb572454e069256e3ccc01bd71cacfbf9b33fa340",
+          "at": "2026-04-27T02:16:26Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -31,6 +49,35 @@
           "findings": [],
           "hash": "rvw1:sha256:a0ce5b2360edfce69ca540c1f6741308bc78b30fa97b0a077cfd3efaa837cbd9",
           "at": "2026-04-27T01:57:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` no longer carries `commit_hash` for T001. That contradicts the plan intent in the briefing, which says the hash should remain `null` until the later `/track:commit` step updates it, so downstream renderers cannot distinguish \"not yet committed\" from \"field omitted\".",
+              "severity": "P1",
+              "file": "track/items/llvm-cov-nextest-harness-alignment-2026-04-27/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09474442f86e7e73bb2c7b526e6782af07a11d0666978dd4ba10fd118857520e",
+          "at": "2026-04-27T02:13:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09474442f86e7e73bb2c7b526e6782af07a11d0666978dd4ba10fd118857520e",
+          "at": "2026-04-27T02:15:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09474442f86e7e73bb2c7b526e6782af07a11d0666978dd4ba10fd118857520e",
+          "at": "2026-04-27T02:16:34Z"
         }
       ]
     }

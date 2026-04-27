@@ -4,8 +4,7 @@
     {
       "id": "T001",
       "description": "Change `llvm-cov-local` task args in `Makefile.toml` from `[\"llvm-cov\", \"--html\", \"--all-features\"]` to `[\"llvm-cov\", \"nextest\", \"--html\", \"--all-features\", \"--locked\"]`, aligning the coverage harness with `cargo make test` (nextest). No other files are modified.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {

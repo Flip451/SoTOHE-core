@@ -446,7 +446,7 @@ args = ["clippy", "--locked", "--tests", "--all-features", "--", "-D", "warnings
 private = true
 description = "[internal] Generate HTML coverage report"
 command = "cargo"
-args = ["llvm-cov", "--html", "--all-features"]
+args = ["llvm-cov", "nextest", "--html", "--all-features", "--locked"]
 
 [tasks.check-layers-local]
 private = true
