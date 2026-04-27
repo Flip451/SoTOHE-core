@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-27T04:31:25Z",
+  "declaration_hash": "7bdc81a9e7384bdd60bb86536759af10ca6e7898e27eeccb9075aa7f50681346",
+  "signals": [
+    {
+      "type_name": "VerifyOutcome",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyFinding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Severity",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Error",
+        "Info",
+        "Warning"
+      ]
+    }
+  ]
+}

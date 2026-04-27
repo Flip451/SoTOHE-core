@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TdddLayerBinding",
+      "description": "Binding of a TDDD-enabled layer from architecture-rules.json. Used by verify_catalogue_spec_refs (CLI layer) to enumerate catalogue files per layer. The catalogue_spec_signal_enabled() accessor controls which layers participate in ref-integrity verification. Type contract is unchanged; it is referenced here to anchor IN-03 at the infrastructure boundary.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "IN-03",
+          "hash": "6df9c92572c9ddfbe8ea636fd4343094f0064e771446e02d341472b6dd28cdf2"
+        }
+      ]
+    },
+    {
+      "name": "PlanArtifactRefsError",
+      "description": "Error type from the plan_artifact_refs verifier in infrastructure::verify. This type is referenced to document the error taxonomy in the infrastructure::verify module cluster where latest_track.rs and view_freshness.rs live. Variant structure is unchanged; the changes to those modules are free-function body changes that produce VerifyOutcome.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "Io",
+        "UnresolvedSpecRef",
+        "SpecHashMismatch",
+        "InvalidAnchor",
+        "CoverageViolation"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "9e6a8b94d8aeaf3c3f2fa2e425dd146797c046d9941e4dbbbcaade6e142fbd80"
+        },
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "0eee088f8ee37f14dee820b94b081a06d5e43fde1e6b46ce13b08dfbf515954f"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "49bc7ba2be19d6e2859e8657b6a733df0f14a36b439cb0dd19acca80235ae8e9",
+  "signals": [
+    {
+      "type_name": "TdddLayerBinding",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PlanArtifactRefsError",
+      "signal": "blue"
+    }
+  ]
+}

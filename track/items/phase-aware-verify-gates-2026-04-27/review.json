@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR omits the required `## Status` section entirely. The repository's ADR convention explicitly requires that section, so this record is not conformant and its lifecycle state is ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-27-0324-phase-aware-verify-gates.md",
+              "line": 1,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:5b05b7208379583ddc35104076c86eec94a1fc144ae370bd83785adcd9f6e9dc",
+          "at": "2026-04-27T04:18:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b05b7208379583ddc35104076c86eec94a1fc144ae370bd83785adcd9f6e9dc",
+          "at": "2026-04-27T04:26:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b05b7208379583ddc35104076c86eec94a1fc144ae370bd83785adcd9f6e9dc",
+          "at": "2026-04-27T04:29:02Z"
+        }
+      ]
+    }
+  }
+}
