@@ -21,8 +21,12 @@ use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclarat
 /// Top-level export result containing all public API elements of a crate.
 ///
 /// T006 (S4): adds `trait_origins: HashMap<String, String>` mapping a trait's
-/// short name to the crate that defines it (e.g., `"TrackReader" → "domain"`).
-/// Populated by `build_schema_export` from rustdoc JSON `paths`/`external_crates`.
+/// stable fully-qualified definition path to the crate that defines it
+/// (e.g., `"domain::ports::TrackReader" → "domain"`).
+/// Keyed by def_path rather than short name to avoid collisions when two
+/// distinct traits share the same short name (e.g., a local `Display` and
+/// `std::fmt::Display`).  Populated by `build_schema_export` from rustdoc
+/// JSON `paths`/`external_crates`.
 #[derive(Debug, Clone)]
 pub struct SchemaExport {
     crate_name: String,
@@ -30,7 +34,7 @@ pub struct SchemaExport {
     functions: Vec<FunctionInfo>,
     traits: Vec<TraitInfo>,
     impls: Vec<ImplInfo>,
-    /// Maps trait short name → defining crate name.
+    /// Maps trait def_path (stable fully-qualified definition path) → defining crate name.
     /// `""` if the origin could not be determined.
     trait_origins: HashMap<String, String>,
 }
@@ -84,9 +88,13 @@ impl SchemaExport {
         &self.impls
     }
 
-    /// Returns the map of trait short name → defining crate name.
+    /// Returns the map of trait def_path → defining crate name.
     ///
-    /// Used by `build_type_graph` to populate `TraitImplEntry::origin_crate`.
+    /// The key is the stable fully-qualified definition path of the trait as
+    /// found in `krate.paths` (e.g., `"std::fmt::Display"`), not the short
+    /// name.  Used by `build_type_graph` together with
+    /// `ImplInfo::trait_def_path` to populate `TraitImplEntry::origin_crate`
+    /// without short-name aliasing.
     pub fn trait_origins(&self) -> &HashMap<String, String> {
         &self.trait_origins
     }
@@ -353,16 +361,36 @@ pub struct ImplInfo {
     trait_name: Option<String>,
     /// Methods defined in this impl block.
     methods: Vec<FunctionInfo>,
+    /// Stable fully-qualified definition path of the trait from rustdoc `paths`
+    /// (e.g., `"std::fmt::Display"`).  `None` for inherent impls or when the
+    /// trait id is not present in `krate.paths`.  Used by
+    /// `code_profile_builder` to key into `SchemaExport::trait_origins` (which
+    /// is keyed by def_path, not by short name) so that two traits with the
+    /// same short name are never confused.
+    trait_def_path: Option<String>,
 }
 
 impl ImplInfo {
-    /// Creates a new impl info.
+    /// Creates a new impl info (backward-compatible: `trait_def_path` defaults to `None`).
     pub fn new(
         target_type: String,
         trait_name: Option<String>,
         methods: Vec<FunctionInfo>,
     ) -> Self {
-        Self { target_type, trait_name, methods }
+        Self { target_type, trait_name, methods, trait_def_path: None }
+    }
+
+    /// Creates a new impl info with an explicit `trait_def_path`.
+    ///
+    /// `trait_def_path` should be the fully-qualified definition path of the
+    /// trait as found in `krate.paths` (e.g., `"std::fmt::Display"`).
+    pub fn with_trait_def_path(
+        target_type: String,
+        trait_name: Option<String>,
+        methods: Vec<FunctionInfo>,
+        trait_def_path: Option<String>,
+    ) -> Self {
+        Self { target_type, trait_name, methods, trait_def_path }
     }
 
     /// Returns the target type name.
@@ -378,6 +406,15 @@ impl ImplInfo {
     /// Returns the methods.
     pub fn methods(&self) -> &[FunctionInfo] {
         &self.methods
+    }
+
+    /// Returns the stable fully-qualified definition path of the trait, if known.
+    ///
+    /// `None` for inherent impls or when the trait id was not found in
+    /// `krate.paths` during schema export.  When present, consumers should
+    /// prefer this over `trait_name` for keying into `SchemaExport::trait_origins`.
+    pub fn trait_def_path(&self) -> Option<&str> {
+        self.trait_def_path.as_deref()
     }
 }
 

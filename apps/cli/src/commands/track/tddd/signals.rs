@@ -19,7 +19,7 @@ use infrastructure::track::atomic_write::atomic_write_file;
 use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
 use infrastructure::track::symlink_guard::reject_symlinks_below;
 use infrastructure::verify::tddd_layers::{
-    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
+    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path, load_workspace_crate_names,
 };
 
 use crate::CliError;
@@ -371,6 +371,17 @@ fn execute_type_signals_for_layer(
         }
     };
 
+    // Load workspace crate names from architecture-rules.json for IN-10 reverse checks.
+    let arch_rules_path = workspace_root.join("architecture-rules.json");
+    let workspace_crates = match load_workspace_crate_names(&arch_rules_path, workspace_root) {
+        Ok(names) => names,
+        Err(e) => {
+            return Err(CliError::Message(format!(
+                "cannot read architecture-rules.json for workspace_crates: {e}"
+            )));
+        }
+    };
+
     // Delegate to the core evaluator (nightly-free, directly testable).
     let signal_file_name = binding.signal_file();
     evaluate_and_write_signals(
@@ -380,6 +391,7 @@ fn execute_type_signals_for_layer(
         &catalogue_path,
         &track_dir,
         &signal_file_name,
+        &workspace_crates,
     )
 }
 
@@ -401,9 +413,11 @@ pub(crate) fn evaluate_and_write_signals(
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
     signal_file_name: &str,
+    workspace_crates: &std::collections::HashSet<String>,
 ) -> Result<ExitCode, CliError> {
     // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
-    let report = domain::check_consistency(doc.entries(), profile, baseline);
+    // workspace_crates enables IN-10 reverse checks for Interactor/SecondaryAdapter.
+    let report = domain::check_consistency(doc.entries(), profile, baseline, workspace_crates);
 
     // Convert undeclared types/traits (group 4) to Red TypeSignals.
     // Capture the count before appending group-3 baseline reds so the summary
@@ -914,7 +928,12 @@ mod tests {
     #[test]
     fn test_print_action_diagnostics_with_clean_report_returns_ok() {
         // A report with no contradictions and no delete errors must return Ok.
-        let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
+        let report = domain::check_consistency(
+            &[],
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &std::collections::HashSet::new(),
+        );
         let result = print_action_diagnostics(&report);
         assert!(result.is_ok(), "clean report must return Ok: {result:?}");
     }
@@ -923,7 +942,12 @@ mod tests {
     fn test_print_action_diagnostics_with_delete_error_returns_cli_error() {
         // action=delete on a type not in baseline → delete_errors non-empty → Err.
         let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
-        let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
+        let report = domain::check_consistency(
+            &[entry],
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &std::collections::HashSet::new(),
+        );
         assert!(!report.delete_errors().is_empty(), "delete_errors must be non-empty");
         let result = print_action_diagnostics(&report);
         assert!(result.is_err(), "delete error must return Err: {result:?}");
@@ -941,7 +965,12 @@ mod tests {
         // (File-write invariant for execute_type_signals is covered by the
         // fact that print_action_diagnostics is called before atomic_write_file.)
         let entry = make_entry_d("Phantom", domain::TypeAction::Delete);
-        let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
+        let report = domain::check_consistency(
+            &[entry],
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &std::collections::HashSet::new(),
+        );
         // Calling the function must not panic and must return Err.
         let result = print_action_diagnostics(&report);
         assert!(result.is_err(), "must return Err for delete_errors");
@@ -957,7 +986,12 @@ mod tests {
 
         let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
         let doc = domain::TypeCatalogueDocument::new(1, vec![entry.clone()]);
-        let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
+        let report = domain::check_consistency(
+            &[entry],
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &std::collections::HashSet::new(),
+        );
 
         assert!(
             !report.delete_errors().is_empty(),
@@ -992,7 +1026,12 @@ mod tests {
 
         // A report with no errors: empty entries against empty baseline/graph.
         let doc = domain::TypeCatalogueDocument::new(1, vec![]);
-        let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
+        let report = domain::check_consistency(
+            &[],
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &std::collections::HashSet::new(),
+        );
 
         assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
 
@@ -1028,6 +1067,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-type-signals.json",
+            &std::collections::HashSet::new(),
         );
 
         assert!(result.is_err(), "delete error must cause evaluate_and_write_signals to fail");
@@ -1064,6 +1104,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-type-signals.json",
+            &std::collections::HashSet::new(),
         );
 
         assert!(result.is_ok(), "clean report must succeed: {result:?}");
@@ -1128,6 +1169,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-type-signals.json",
+            &std::collections::HashSet::new(),
         );
 
         assert!(result.is_ok(), "clean report must succeed: {result:?}");
@@ -1165,6 +1207,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-type-signals.json",
+            &std::collections::HashSet::new(),
         );
 
         let err = result.unwrap_err();
@@ -1195,6 +1238,7 @@ mod tests {
             &domain_types_path,
             &track_dir,
             "domain-type-signals.json",
+            &std::collections::HashSet::new(),
         );
 
         let err = result.unwrap_err();

@@ -180,17 +180,22 @@ impl ConsistencyReport {
 /// Groups 3+4 replace the old undeclared-types reverse check.
 ///
 /// `workspace_crates` is forwarded to `evaluate_type_signals` for workspace-origin
-/// trait reverse checks (IN-10). Pass an empty set for backward-compatible behavior
-/// (no workspace-trait reverse signals).
+/// trait reverse checks (IN-10).  Pass a non-empty set (derived from
+/// `architecture-rules.json` layers) to enable the reverse checks; pass an empty
+/// set to suppress them (backward-compatible).
+///
+/// # Notes
+///
+/// Domain code must NOT read `architecture-rules.json` directly. The caller
+/// (infrastructure or CLI layer) is responsible for parsing the file and passing
+/// the resulting `HashSet<String>` here.
 #[must_use]
 pub fn check_consistency(
     entries: &[TypeCatalogueEntry],
     graph: &TypeGraph,
     baseline: &TypeBaseline,
+    workspace_crates: &HashSet<String>,
 ) -> ConsistencyReport {
-    // Backward-compatible: no workspace_crates → no workspace-origin reverse checks.
-    let workspace_crates = std::collections::HashSet::new();
-
     // Collect baseline FQ function names so the forward-signal post-pass can exclude
     // them from the reverse-extra check (baseline functions are handled by group-3).
     let baseline_fn_fq_names: std::collections::HashSet<String> =
@@ -202,7 +207,7 @@ pub fn check_consistency(
     let mut forward_signals = evaluate_type_signals_with_baseline(
         entries,
         graph,
-        &workspace_crates,
+        workspace_crates,
         &baseline_fn_fq_names,
     );
 
@@ -737,7 +742,7 @@ mod tests {
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&[], &graph, &empty_baseline());
+        let report = check_consistency(&[], &graph, &empty_baseline(), &HashSet::new());
         assert_eq!(report.undeclared_types(), &["NewType"]);
         assert_eq!(report.skipped_count(), 0);
     }
@@ -766,7 +771,7 @@ mod tests {
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(report.skipped_count(), 1);
         assert!(report.undeclared_types().is_empty());
         assert!(report.baseline_red_types().is_empty());
@@ -792,7 +797,7 @@ mod tests {
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(report.baseline_red_types(), &["ChangedType"]);
         assert_eq!(report.skipped_count(), 0);
     }
@@ -807,7 +812,7 @@ mod tests {
 
         let graph = TypeGraph::new(HashMap::new(), HashMap::new());
 
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(report.baseline_red_types(), &["DeletedType"]);
         assert_eq!(report.skipped_count(), 0);
     }
@@ -849,7 +854,7 @@ mod tests {
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&[entry], &graph, &bl);
+        let report = check_consistency(&[entry], &graph, &bl, &HashSet::new());
         assert_eq!(report.forward_signals().len(), 1);
         assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
         // Not counted as skipped (it's declared → forward check handles it)
@@ -876,7 +881,7 @@ mod tests {
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        let report = check_consistency(&[entry], &graph, &empty_baseline(), &HashSet::new());
         assert_eq!(report.forward_signals().len(), 1);
         assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
         assert!(report.undeclared_types().is_empty());
@@ -903,7 +908,7 @@ mod tests {
         traits.insert("CreateUseCase".to_string(), TraitNode::new(vec![method]));
         let graph = TypeGraph::new(HashMap::new(), traits);
 
-        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        let report = check_consistency(&[entry], &graph, &empty_baseline(), &HashSet::new());
         // Forward check passes (Blue) — trait was found via get_trait.
         assert_eq!(report.forward_signals().len(), 1);
         assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
@@ -930,7 +935,7 @@ mod tests {
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        let report = check_consistency(&[entry], &graph, &empty_baseline(), &HashSet::new());
         // Forward check passes (Blue) — type was found via get_type.
         assert_eq!(report.forward_signals().len(), 1);
         assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
@@ -949,7 +954,7 @@ mod tests {
         traits.insert("MyTrait".to_string(), TraitNode::new(vec![unit_method("method_a")]));
         let graph = TypeGraph::new(HashMap::new(), traits);
 
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(report.skipped_count(), 1);
         assert!(report.baseline_red_traits().is_empty());
     }
@@ -968,7 +973,7 @@ mod tests {
         );
         let graph = TypeGraph::new(HashMap::new(), traits);
 
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(report.baseline_red_traits(), &["MyTrait"]);
         assert_eq!(report.skipped_count(), 0);
     }
@@ -1029,7 +1034,7 @@ mod tests {
         }
         let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&entries, &graph, &bl);
+        let report = check_consistency(&entries, &graph, &bl, &HashSet::new());
 
         // Groups 1+2: 2 forward signals
         assert_eq!(report.forward_signals().len(), 2);
@@ -1058,7 +1063,7 @@ mod tests {
             "Foo",
             TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
         )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert_eq!(report.contradictions().len(), 1);
         assert_eq!(
             report.contradictions()[0].kind(),
@@ -1078,7 +1083,7 @@ mod tests {
         .unwrap();
         let graph = TypeGraph::new(HashMap::new(), HashMap::new());
         let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert!(report.contradictions().is_empty());
     }
 
@@ -1094,7 +1099,7 @@ mod tests {
         .unwrap();
         let graph = TypeGraph::new(HashMap::new(), HashMap::new());
         let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert_eq!(report.contradictions().len(), 1);
         assert_eq!(
             report.contradictions()[0].kind(),
@@ -1117,7 +1122,7 @@ mod tests {
             "Foo",
             TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
         )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert!(report.contradictions().is_empty());
     }
 
@@ -1133,7 +1138,7 @@ mod tests {
         .unwrap();
         let graph = TypeGraph::new(HashMap::new(), HashMap::new());
         let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert_eq!(report.contradictions().len(), 1);
         assert_eq!(
             report.contradictions()[0].kind(),
@@ -1157,7 +1162,7 @@ mod tests {
             "Foo",
             TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
         )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert_eq!(report.contradictions().len(), 1);
         assert_eq!(
             report.contradictions()[0].kind(),
@@ -1177,7 +1182,7 @@ mod tests {
         .unwrap();
         let graph = TypeGraph::new(HashMap::new(), HashMap::new());
         let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert_eq!(report.delete_errors(), &["Ghost"]);
     }
 
@@ -1196,7 +1201,7 @@ mod tests {
         .unwrap();
         let graph = TypeGraph::new(HashMap::new(), HashMap::new());
         let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert_eq!(report.delete_errors(), &["Ghost"]);
         assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Red);
         assert!(!report.forward_signals()[0].found_type());
@@ -1217,7 +1222,7 @@ mod tests {
             "Foo",
             TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
         )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
+        let report = check_consistency(&[entry], &graph, &baseline, &HashSet::new());
         assert!(report.delete_errors().is_empty());
     }
 
@@ -1608,7 +1613,7 @@ mod tests {
             std::collections::HashMap::new(),
             std::collections::HashMap::new(),
         );
-        let report = check_consistency(&entries, &graph, &baseline);
+        let report = check_consistency(&entries, &graph, &baseline, &HashSet::new());
         assert!(
             report.undeclared_types().is_empty(),
             "SecondaryAdapter declared in entries must not appear in undeclared_types \
@@ -1641,7 +1646,7 @@ mod tests {
     fn test_group4_undeclared_function_in_module_is_reported() {
         // A function in code, not declared as FreeFunction entry, not in baseline → undeclared.
         let graph = empty_graph_with_fn("save_track", Some("usecase::track"));
-        let report = check_consistency(&[], &graph, &empty_baseline());
+        let report = check_consistency(&[], &graph, &empty_baseline(), &HashSet::new());
         assert_eq!(
             report.undeclared_functions(),
             &["usecase::track::save_track"],
@@ -1654,7 +1659,7 @@ mod tests {
     fn test_group4_undeclared_top_level_function_is_reported() {
         // A top-level function (module_path=None), not declared → undeclared.
         let graph = empty_graph_with_fn("top_fn", None);
-        let report = check_consistency(&[], &graph, &empty_baseline());
+        let report = check_consistency(&[], &graph, &empty_baseline(), &HashSet::new());
         assert_eq!(
             report.undeclared_functions(),
             &["top_fn"],
@@ -1679,7 +1684,7 @@ mod tests {
         )
         .unwrap();
         let graph = empty_graph_with_fn("save_track", Some("usecase::track"));
-        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        let report = check_consistency(&[entry], &graph, &empty_baseline(), &HashSet::new());
         assert!(
             report.undeclared_functions().is_empty(),
             "declared FreeFunction must not appear in undeclared_functions: {:?}",
@@ -1722,7 +1727,7 @@ mod tests {
             FunctionNode::new(vec![], vec![], false, Some("usecase::track".to_string())),
         );
         let graph = TypeGraph::with_functions(types, std::collections::HashMap::new(), functions);
-        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        let report = check_consistency(&[entry], &graph, &empty_baseline(), &HashSet::new());
         // The struct "save_track" is not in declared_type_names (FreeFunction excluded),
         // so it should appear as an undeclared type.
         assert!(
@@ -1770,7 +1775,7 @@ mod tests {
             std::collections::HashMap::new(),
             functions,
         );
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(report.skipped_count(), 1, "unchanged baseline function must be skipped");
         assert!(report.baseline_red_functions().is_empty());
         assert!(report.undeclared_functions().is_empty());
@@ -1788,7 +1793,7 @@ mod tests {
             std::collections::HashMap::new(),
             std::collections::HashMap::new(),
         );
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(
             report.baseline_red_functions(),
             &["usecase::track::save_track"],
@@ -1825,7 +1830,7 @@ mod tests {
             std::collections::HashMap::new(),
             functions,
         );
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(
             report.baseline_red_functions(),
             &["usecase::track::save_track"],
@@ -1846,7 +1851,7 @@ mod tests {
             std::collections::HashMap::new(),
             std::collections::HashMap::new(),
         );
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(
             report.baseline_red_functions(),
             &["top_fn"],
@@ -1876,7 +1881,7 @@ mod tests {
         )
         .unwrap();
         let graph = empty_graph_with_fn("save_track", Some("usecase::track"));
-        let report = check_consistency(&[entry], &graph, &bl);
+        let report = check_consistency(&[entry], &graph, &bl, &HashSet::new());
         assert!(
             report.baseline_red_functions().is_empty(),
             "declared+baseline function must not appear in baseline_red_functions: {:?}",
@@ -1930,7 +1935,7 @@ mod tests {
             functions,
         );
 
-        let report = check_consistency(&[new_fn_entry], &graph, &bl);
+        let report = check_consistency(&[new_fn_entry], &graph, &bl, &HashSet::new());
 
         // new_fn forward signal must be Blue (found in code, no missing items).
         // old_fn must NOT appear as extra_items on new_fn's signal.
@@ -1990,7 +1995,7 @@ mod tests {
             std::collections::HashMap::new(),
             functions,
         );
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert!(
             report.baseline_red_functions().is_empty(),
             "param binding rename must not produce Red drift: {:?}",
@@ -2028,7 +2033,7 @@ mod tests {
             std::collections::HashMap::new(),
             functions,
         );
-        let report = check_consistency(&[], &graph, &bl);
+        let report = check_consistency(&[], &graph, &bl, &HashSet::new());
         assert_eq!(
             report.baseline_red_functions(),
             &["usecase::track::save_track"],

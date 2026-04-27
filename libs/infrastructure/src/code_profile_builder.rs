@@ -73,6 +73,9 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
         }
 
         // T006 (S4): Collect trait impls with origin_crate populated from SchemaExport::trait_origins.
+        // trait_origins is keyed by def_path (stable fully-qualified trait path) to avoid
+        // aliasing when two traits share the same short name. We prefer the def_path lookup
+        // via ImplInfo::trait_def_path() and fall back to an empty origin when unavailable.
         let trait_impl_entries: Vec<TraitImplEntry> = schema
             .impls()
             .iter()
@@ -80,7 +83,13 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
             .filter_map(|i| {
                 let trait_name = i.trait_name()?;
                 let methods = i.methods().iter().map(function_info_to_method_decl).collect();
-                let origin = trait_origins.get(trait_name).cloned().unwrap_or_default();
+                // Look up origin by def_path (stable identity); fall back to empty string
+                // when the def_path is unavailable (inherent impl or missing paths entry).
+                let origin = i
+                    .trait_def_path()
+                    .and_then(|dp| trait_origins.get(dp))
+                    .cloned()
+                    .unwrap_or_default();
                 Some(TraitImplEntry::with_origin_crate(trait_name, methods, origin))
             })
             .collect();
@@ -487,17 +496,21 @@ mod tests {
 
     // --- T006 (S4): trait origin_crate from SchemaExport::trait_origins ---
 
-    /// T006b: trait_origins in SchemaExport are used to populate TraitImplEntry::origin_crate.
+    /// T006b: trait_origins (keyed by def_path) and ImplInfo::trait_def_path are used
+    /// together to populate TraitImplEntry::origin_crate.
     #[test]
     fn test_build_type_graph_trait_impl_origin_crate_populated() {
         let types = vec![TypeInfo::new("FsStore".to_string(), TypeKind::Struct, None, vec![])];
-        let impls = vec![ImplInfo::new(
+        // Provide the def_path so the lookup succeeds.
+        let impls = vec![ImplInfo::with_trait_def_path(
             "FsStore".to_string(),
             Some("TrackReader".to_string()),
             vec![method_returning("read", "()", true, Some("&self"))],
+            Some("domain::ports::TrackReader".to_string()),
         )];
         let mut origins = std::collections::HashMap::new();
-        origins.insert("TrackReader".to_string(), "domain".to_string());
+        // Key is def_path, not short name.
+        origins.insert("domain::ports::TrackReader".to_string(), "domain".to_string());
         let schema = SchemaExport::with_trait_origins(
             "infrastructure".to_string(),
             types,
@@ -514,16 +527,17 @@ mod tests {
         assert_eq!(node.trait_impls()[0].origin_crate(), "domain");
     }
 
-    /// T006b: trait without entry in trait_origins gets empty origin_crate.
+    /// T006b: trait without entry in trait_origins (or with no def_path) gets empty origin_crate.
     #[test]
     fn test_build_type_graph_trait_impl_unknown_origin_crate_is_empty() {
         let types = vec![TypeInfo::new("Foo".to_string(), TypeKind::Struct, None, vec![])];
+        // ImplInfo::new leaves trait_def_path as None — origin lookup falls back to "".
         let impls = vec![ImplInfo::new(
             "Foo".to_string(),
             Some("Display".to_string()),
             vec![method_returning("fmt", "()", true, Some("&self"))],
         )];
-        // No entry for "Display" in trait_origins.
+        // No entry in trait_origins and no def_path on the impl.
         let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
         let profile = build_type_graph(&schema, &HashSet::new());
 
@@ -531,5 +545,46 @@ mod tests {
         assert_eq!(node.trait_impls().len(), 1);
         assert_eq!(node.trait_impls()[0].trait_name(), "Display");
         assert_eq!(node.trait_impls()[0].origin_crate(), "");
+    }
+
+    /// T006b: two traits with the same short name get distinct origin_crate values
+    /// because the lookup is keyed by def_path, not short name.
+    #[test]
+    fn test_build_type_graph_same_short_name_traits_get_distinct_origins() {
+        let types = vec![TypeInfo::new("MyType".to_string(), TypeKind::Struct, None, vec![])];
+        let impls = vec![
+            ImplInfo::with_trait_def_path(
+                "MyType".to_string(),
+                Some("Display".to_string()),
+                vec![],
+                Some("local::Display".to_string()),
+            ),
+            ImplInfo::with_trait_def_path(
+                "MyType".to_string(),
+                Some("Display".to_string()),
+                vec![method_returning("fmt", "()", true, Some("&self"))],
+                Some("std::fmt::Display".to_string()),
+            ),
+        ];
+        let mut origins = std::collections::HashMap::new();
+        origins.insert("local::Display".to_string(), "my_crate".to_string());
+        origins.insert("std::fmt::Display".to_string(), "std".to_string());
+        let schema = SchemaExport::with_trait_origins(
+            "my_crate".to_string(),
+            types,
+            vec![],
+            vec![],
+            impls,
+            origins,
+        );
+        let profile = build_type_graph(&schema, &HashSet::new());
+
+        let node = profile.get_type("MyType").unwrap();
+        // Both impls are present; each has its own correct origin.
+        assert_eq!(node.trait_impls().len(), 2);
+        let local_display = node.trait_impls().iter().find(|t| t.origin_crate() == "my_crate");
+        let std_display = node.trait_impls().iter().find(|t| t.origin_crate() == "std");
+        assert!(local_display.is_some(), "expected my_crate origin for local Display");
+        assert!(std_display.is_some(), "expected std origin for std::fmt::Display");
     }
 }

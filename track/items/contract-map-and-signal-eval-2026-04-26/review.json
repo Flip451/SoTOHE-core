@@ -1,6 +1,60 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:41:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
+          "at": "2026-04-26T08:42:44Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
+          "at": "2026-04-26T17:04:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
+          "at": "2026-04-26T17:05:21Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
+          "at": "2026-04-26T18:31:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
+          "at": "2026-04-26T18:32:24Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -89,24 +143,20 @@
           "findings": [],
           "hash": "rvw1:sha256:21d37a4687fbebbc4dc9cf4fc12cbed1be92306ad19ee3761fcb4a6702d78b0c",
           "at": "2026-04-26T18:33:15Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
-          "at": "2026-04-26T08:41:40Z"
+          "hash": "rvw1:sha256:e9e664c50c267ca406eae03eb2e254fe9b8e582655cc636c5440294a88899366",
+          "at": "2026-04-27T00:07:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a3209ae6d41c186969b0fdab01f41d64fadc792a3947c8ddfd7944856917849c",
-          "at": "2026-04-26T08:42:44Z"
+          "hash": "rvw1:sha256:e9e664c50c267ca406eae03eb2e254fe9b8e582655cc636c5440294a88899366",
+          "at": "2026-04-27T00:10:14Z"
         }
       ]
     },
@@ -662,247 +712,20 @@
           "findings": [],
           "hash": "rvw1:sha256:b7606ac7f0e4542c4c9af821da719551255ba12433d9ffd100d0dfddd3ea8f0d",
           "at": "2026-04-26T23:35:22Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:64df03482598220e60b235b821fd187f27999e6122605c3dc4be58e769e92f50",
-          "at": "2026-04-26T18:34:35Z"
+          "hash": "rvw1:sha256:d1b0a911104b6f53564dbe570b0e5ed36418cfa20b6a00f23f575d41cb57ac02",
+          "at": "2026-04-27T00:07:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:64df03482598220e60b235b821fd187f27999e6122605c3dc4be58e769e92f50",
-          "at": "2026-04-26T18:37:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`typestate` is missing from the cross-kind rejection pass, so payloads like `{ \"kind\": \"typestate\", \"expected_methods\": [...] }` or `{ \"kind\": \"typestate\", \"expected_variants\": [...] }` will be accepted and those stale keys silently dropped by serde. That leaves the new codec partially validating the new schema instead of rejecting illegal field combinations at the boundary.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 357,
-              "category": null
-            },
-            {
-              "message": "`FreeFunction` decode/encode validates param/member L1 identifiers, but `expected_returns` is copied through verbatim with no `::` check. A fully-qualified return like `std::io::Error` will round-trip instead of being rejected, which breaks the same L1 rule enforced for method returns and lets invalid catalogue data through.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 1065,
-              "category": null
-            },
-            {
-              "message": "`MemberDeclarationDto` is the only nested leaf DTO here without `#[serde(deny_unknown_fields)]`, so typos or stale keys inside `expected_members` entries are silently discarded instead of failing decode. That creates an inconsistent, lossy input path compared with the other DTOs in this codec.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 158,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:b919609b949e6e4d81750c0171c5c2a30257e5a1e3f846f42465c70c492708b1",
-          "at": "2026-04-26T19:09:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Phase 1.5 validation never rejects `expected_members` on kinds that do not define it (`enum`, `error_type`, `secondary_port`, `application_service`, `free_function`). Because `TypeCatalogueEntryDto` flattens the kind payload and does not deny unknown fields, those extra members are silently discarded by serde and malformed catalogues are accepted.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 357,
-              "category": null
-            },
-            {
-              "message": "`typestate` is no longer covered by the stale-field guard for `expected_methods` / `expected_variants`. The later `implements` check is the only typestate-specific filter, so a typestate entry carrying those foreign fields will still decode successfully and the data will be dropped.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 460,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:b919609b949e6e4d81750c0171c5c2a30257e5a1e3f846f42465c70c492708b1",
-          "at": "2026-04-26T19:11:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FreeFunction` now validates `expected_params`, but `expected_returns` is never L1-checked for `::` on either decode or encode. That lets qualified return paths such as `std::io::Error` slip through even though the file-level contract says returns strings containing `::` must be rejected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 859,
-              "category": "correctness"
-            },
-            {
-              "message": "The new non-empty `expected_variants` rule for `enum`/`error_type` is enforced only during `decode()`. `encode()` still serializes `Enum { expected_variants: vec![] }` and `ErrorType { expected_variants: vec![] }` unchanged, so a public caller can emit JSON that this codec rejects on the next read.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 1054,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:979fac921a4523f46fb12fca21fe9ca980283abf43550ad3f5150b57c9618b25",
-          "at": "2026-04-26T19:15:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Phase 1.5 still only rejects a subset of stale fields. New fields introduced in this patch (`module_path`, `expected_params`, `expected_returns`, `expected_is_async`, `declares_application_service`) are not blocked on unrelated kinds, so payloads such as `{\"kind\":\"enum\",\"module_path\":\"x\"}` or `{\"kind\":\"typestate\",\"expected_params\":[...]}` decode successfully with those fields silently dropped.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 350,
-              "category": "validation"
-            },
-            {
-              "message": "`MemberDeclarationDto` is a tagged enum without `deny_unknown_fields`, unlike the other nested DTOs. Extra keys inside `expected_members[]` entries are therefore accepted and discarded instead of failing the decode, which breaks strict schema validation for the new member codec.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 147,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:e6dc05aa88f9095709fdc70c5a57b32f692a4ef543bb774646f00d6b0a4be3db",
-          "at": "2026-04-26T19:18:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`decode_member_list` / `encode_member_list` only validate `Field.ty` for `::`; they never reject `::` in the member identifier itself. As a result, `expected_members` can carry impossible names like `foo::Bar` in both `Variant` and `Field.name`, and the codec will accept/emit them instead of enforcing the new L1 rule.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 947,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:1b348b906fc2e9dd885d8f45c282cad9f1b0cfc31ebd9186a3bc115d52454118",
-          "at": "2026-04-26T19:23:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab53c86ffdd73ee2a855d6b34dfca9d01c75924441ea99e4a065ed2a43c46566",
-          "at": "2026-04-26T19:26:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab53c86ffdd73ee2a855d6b34dfca9d01c75924441ea99e4a065ed2a43c46566",
-          "at": "2026-04-26T19:28:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_trait_origins` collapses all impls by the trait short name and keeps the first entry seen. If a crate has two traits with the same short name (for example `std::fmt::Display` and a local `foo::Display`), `TraitImplEntry::origin_crate` becomes whichever one happened to be visited first in `krate.index.values()`. Because that iteration order comes from a `HashMap`, the result is nondeterministic and can mislabel trait origins, which breaks the downstream filtering that depends on this field.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 298,
-              "category": null
-            },
-            {
-              "message": "The new rustdoc extraction path in `schema_export.rs` has no direct test coverage for the added behavior: `functions()` population and `trait_origins` derivation. The existing integration tests still only assert non-empty types/traits/impls and parseable JSON, so regressions in `extract_module_path` or `build_trait_origins` would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 135,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:df15b4981cbb8fcde3ea693b24a8fed96f78fdad1915468205705dbc33fecccc",
-          "at": "2026-04-26T20:00:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_trait_origins` collapses all trait definitions to a `short_name -> crate` map, so a crate that defines its own trait with the same short name as an external trait will mislabel the external impls. For example, if the crate has a local `Display` and also implements `std::fmt::Display`, every `Display` impl is assigned `origin_crate = crate_name`, which breaks the new workspace/external filtering for common name collisions.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 317,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:65e2e75c1265a908e6a4a78c7326bd64e5f50dd5f5705b2bc2b2c8dbee3db567",
-          "at": "2026-04-26T20:11:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_trait_origins` says the alphabetically-first full path should win when two external traits share a short name, but the `and_modify` branch overwrites an earlier external entry with any later external entry. That makes `origin_crate` wrong for external/external collisions (the last path wins instead of the first).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 323,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:65e2e75c1265a908e6a4a78c7326bd64e5f50dd5f5705b2bc2b2c8dbee3db567",
-          "at": "2026-04-26T20:16:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a0f5cd9d3694a574809627164b01dc663aa414fef65b9e29cd8c51d4bf0aa01",
-          "at": "2026-04-26T20:21:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_trait_origins` deduplicates candidates by `trait_path.path`, but rustdoc's `Path.path` is the use-site path, not the definition path, and can be just `Display`/an alias. If a local trait and an external trait with the same short/use path are implemented in different modules, the `contains_key` check makes whichever impl happens to appear first in `krate.index.values()` win before the later local-precedence collapse runs, so `origin_crate` can be nondeterministic or wrong. Key the deterministic map from `krate.paths[trait_id].path` (or include the trait id) and only collapse to the short-name lookup key afterward.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export.rs",
-              "line": 307,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:2a0f5cd9d3694a574809627164b01dc663aa414fef65b9e29cd8c51d4bf0aa01",
-          "at": "2026-04-26T20:25:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d9ddb1dde3d416f8ff392424ca3ec960900264b9972d8622e11057fd899ffbc",
-          "at": "2026-04-26T20:33:36Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
-          "at": "2026-04-26T17:04:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49089ad45a293283e4cd3b25856efc08af1d4bb2970bf1be154401caf39c668e",
-          "at": "2026-04-26T17:05:21Z"
+          "hash": "rvw1:sha256:d1b0a911104b6f53564dbe570b0e5ed36418cfa20b6a00f23f575d41cb57ac02",
+          "at": "2026-04-27T00:08:43Z"
         }
       ]
     },
@@ -1555,21 +1378,292 @@
         }
       ]
     },
-    "usecase": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
-          "at": "2026-04-26T18:31:50Z"
+          "hash": "rvw1:sha256:64df03482598220e60b235b821fd187f27999e6122605c3dc4be58e769e92f50",
+          "at": "2026-04-26T18:34:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5e24e34dbe3992c8a280c862e29b2986f10d8005348d77492620b6fc330d0e1d",
-          "at": "2026-04-26T18:32:24Z"
+          "hash": "rvw1:sha256:64df03482598220e60b235b821fd187f27999e6122605c3dc4be58e769e92f50",
+          "at": "2026-04-26T18:37:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`typestate` is missing from the cross-kind rejection pass, so payloads like `{ \"kind\": \"typestate\", \"expected_methods\": [...] }` or `{ \"kind\": \"typestate\", \"expected_variants\": [...] }` will be accepted and those stale keys silently dropped by serde. That leaves the new codec partially validating the new schema instead of rejecting illegal field combinations at the boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 357,
+              "category": null
+            },
+            {
+              "message": "`FreeFunction` decode/encode validates param/member L1 identifiers, but `expected_returns` is copied through verbatim with no `::` check. A fully-qualified return like `std::io::Error` will round-trip instead of being rejected, which breaks the same L1 rule enforced for method returns and lets invalid catalogue data through.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 1065,
+              "category": null
+            },
+            {
+              "message": "`MemberDeclarationDto` is the only nested leaf DTO here without `#[serde(deny_unknown_fields)]`, so typos or stale keys inside `expected_members` entries are silently discarded instead of failing decode. That creates an inconsistent, lossy input path compared with the other DTOs in this codec.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 158,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b919609b949e6e4d81750c0171c5c2a30257e5a1e3f846f42465c70c492708b1",
+          "at": "2026-04-26T19:09:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Phase 1.5 validation never rejects `expected_members` on kinds that do not define it (`enum`, `error_type`, `secondary_port`, `application_service`, `free_function`). Because `TypeCatalogueEntryDto` flattens the kind payload and does not deny unknown fields, those extra members are silently discarded by serde and malformed catalogues are accepted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 357,
+              "category": null
+            },
+            {
+              "message": "`typestate` is no longer covered by the stale-field guard for `expected_methods` / `expected_variants`. The later `implements` check is the only typestate-specific filter, so a typestate entry carrying those foreign fields will still decode successfully and the data will be dropped.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 460,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b919609b949e6e4d81750c0171c5c2a30257e5a1e3f846f42465c70c492708b1",
+          "at": "2026-04-26T19:11:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FreeFunction` now validates `expected_params`, but `expected_returns` is never L1-checked for `::` on either decode or encode. That lets qualified return paths such as `std::io::Error` slip through even though the file-level contract says returns strings containing `::` must be rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 859,
+              "category": "correctness"
+            },
+            {
+              "message": "The new non-empty `expected_variants` rule for `enum`/`error_type` is enforced only during `decode()`. `encode()` still serializes `Enum { expected_variants: vec![] }` and `ErrorType { expected_variants: vec![] }` unchanged, so a public caller can emit JSON that this codec rejects on the next read.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 1054,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:979fac921a4523f46fb12fca21fe9ca980283abf43550ad3f5150b57c9618b25",
+          "at": "2026-04-26T19:15:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.5 still only rejects a subset of stale fields. New fields introduced in this patch (`module_path`, `expected_params`, `expected_returns`, `expected_is_async`, `declares_application_service`) are not blocked on unrelated kinds, so payloads such as `{\"kind\":\"enum\",\"module_path\":\"x\"}` or `{\"kind\":\"typestate\",\"expected_params\":[...]}` decode successfully with those fields silently dropped.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 350,
+              "category": "validation"
+            },
+            {
+              "message": "`MemberDeclarationDto` is a tagged enum without `deny_unknown_fields`, unlike the other nested DTOs. Extra keys inside `expected_members[]` entries are therefore accepted and discarded instead of failing the decode, which breaks strict schema validation for the new member codec.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 147,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:e6dc05aa88f9095709fdc70c5a57b32f692a4ef543bb774646f00d6b0a4be3db",
+          "at": "2026-04-26T19:18:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode_member_list` / `encode_member_list` only validate `Field.ty` for `::`; they never reject `::` in the member identifier itself. As a result, `expected_members` can carry impossible names like `foo::Bar` in both `Variant` and `Field.name`, and the codec will accept/emit them instead of enforcing the new L1 rule.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 947,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:1b348b906fc2e9dd885d8f45c282cad9f1b0cfc31ebd9186a3bc115d52454118",
+          "at": "2026-04-26T19:23:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab53c86ffdd73ee2a855d6b34dfca9d01c75924441ea99e4a065ed2a43c46566",
+          "at": "2026-04-26T19:26:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab53c86ffdd73ee2a855d6b34dfca9d01c75924441ea99e4a065ed2a43c46566",
+          "at": "2026-04-26T19:28:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_trait_origins` collapses all impls by the trait short name and keeps the first entry seen. If a crate has two traits with the same short name (for example `std::fmt::Display` and a local `foo::Display`), `TraitImplEntry::origin_crate` becomes whichever one happened to be visited first in `krate.index.values()`. Because that iteration order comes from a `HashMap`, the result is nondeterministic and can mislabel trait origins, which breaks the downstream filtering that depends on this field.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 298,
+              "category": null
+            },
+            {
+              "message": "The new rustdoc extraction path in `schema_export.rs` has no direct test coverage for the added behavior: `functions()` population and `trait_origins` derivation. The existing integration tests still only assert non-empty types/traits/impls and parseable JSON, so regressions in `extract_module_path` or `build_trait_origins` would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 135,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:df15b4981cbb8fcde3ea693b24a8fed96f78fdad1915468205705dbc33fecccc",
+          "at": "2026-04-26T20:00:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_trait_origins` collapses all trait definitions to a `short_name -> crate` map, so a crate that defines its own trait with the same short name as an external trait will mislabel the external impls. For example, if the crate has a local `Display` and also implements `std::fmt::Display`, every `Display` impl is assigned `origin_crate = crate_name`, which breaks the new workspace/external filtering for common name collisions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 317,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:65e2e75c1265a908e6a4a78c7326bd64e5f50dd5f5705b2bc2b2c8dbee3db567",
+          "at": "2026-04-26T20:11:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_trait_origins` says the alphabetically-first full path should win when two external traits share a short name, but the `and_modify` branch overwrites an earlier external entry with any later external entry. That makes `origin_crate` wrong for external/external collisions (the last path wins instead of the first).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 323,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:65e2e75c1265a908e6a4a78c7326bd64e5f50dd5f5705b2bc2b2c8dbee3db567",
+          "at": "2026-04-26T20:16:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a0f5cd9d3694a574809627164b01dc663aa414fef65b9e29cd8c51d4bf0aa01",
+          "at": "2026-04-26T20:21:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_trait_origins` deduplicates candidates by `trait_path.path`, but rustdoc's `Path.path` is the use-site path, not the definition path, and can be just `Display`/an alias. If a local trait and an external trait with the same short/use path are implemented in different modules, the `contains_key` check makes whichever impl happens to appear first in `krate.index.values()` win before the later local-precedence collapse runs, so `origin_crate` can be nondeterministic or wrong. Key the deterministic map from `krate.paths[trait_id].path` (or include the trait id) and only collapse to the short-name lookup key afterward.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 307,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2a0f5cd9d3694a574809627164b01dc663aa414fef65b9e29cd8c51d4bf0aa01",
+          "at": "2026-04-26T20:25:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d9ddb1dde3d416f8ff392424ca3ec960900264b9972d8622e11057fd899ffbc",
+          "at": "2026-04-26T20:33:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Treating a missing `layers` key as `Vec::default()` makes a malformed `architecture-rules.json` indistinguishable from an intentionally empty config, so `load_workspace_crate_names` will silently return an empty workspace set and suppress IN-10 checks instead of surfacing the misconfiguration.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 328,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:2f7714774be21cb2184a7bd3158c3e82b5ed6c6b9f2383ea96fa1a064f9d58b7",
+          "at": "2026-04-27T00:08:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_workspace_crate_names` now treats a missing `layers` key as `[]` because of `#[serde(default)]`, so a malformed `architecture-rules.json` like `{}` silently yields an empty workspace-crate set and suppresses IN-10 checks instead of failing closed. The docstring says a missing `layers` key should error, so this weakens correctness for JSON-valid but schema-invalid configs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 328,
+              "category": null
+            },
+            {
+              "message": "This code now preserves both same-short-name trait impls, but the graph still exposes only `trait_name` to consumers. `TypeGraph::get_impl` and the downstream signal checks still resolve by short name, so a type that implements both local `Display` and `std::fmt::Display` will match whichever entry happens to come first in `schema.impls()`, making trait-impl evaluation nondeterministic in the collision case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 83,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2f7714774be21cb2184a7bd3158c3e82b5ed6c6b9f2383ea96fa1a064f9d58b7",
+          "at": "2026-04-27T00:11:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `krate.paths` has no entry for a trait, this code still manufactures a `trait_def_path` from `p.path` and then keys `trait_origins` on that synthetic string. `p.path` is a use-site spelling, not a stable definition identity, so two different traits can still alias or vary across imports and the collision fix can regress in exactly the missing-`paths` case. If the definition path is unavailable, keep it `None` and let the origin resolve empty instead of inventing a key.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 172,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c2d13a557dd669b58fcf3e8b1f731c3c52d78eb7a9ceb942843b0543314289ba",
+          "at": "2026-04-27T00:17:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e913581475473ecee6f4b2c5e6bccfe2456b5f52f63de7f85b45a488e0aec03",
+          "at": "2026-04-27T00:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e913581475473ecee6f4b2c5e6bccfe2456b5f52f63de7f85b45a488e0aec03",
+          "at": "2026-04-27T00:22:11Z"
         }
       ]
     }

@@ -165,13 +165,28 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
                 continue;
             }
             let target = format_type(&i.for_);
-            let trait_name = i
-                .trait_
-                .as_ref()
-                .map(|p| p.path.rsplit("::").next().unwrap_or(&p.path).to_string());
+            let (trait_name, trait_def_path) = match &i.trait_ {
+                Some(p) => {
+                    let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
+                    // Stable def_path from krate.paths.  When the trait id is absent from
+                    // krate.paths the use-site `p.path` is NOT a stable identity key — it
+                    // is an import-spelling that can alias different traits.  Keep the
+                    // def_path as `None` so the origin lookup in code_profile_builder
+                    // gracefully degrades to an empty origin rather than recording a
+                    // potentially wrong mapping.
+                    let def_path = krate.paths.get(&p.id).map(|s| s.path.join("::"));
+                    (Some(short), def_path)
+                }
+                None => (None, None),
+            };
             let methods = extract_methods(&i.items, krate);
             if !methods.is_empty() || trait_name.is_some() {
-                impls.push(ImplInfo::new(target, trait_name, methods));
+                impls.push(ImplInfo::with_trait_def_path(
+                    target,
+                    trait_name,
+                    methods,
+                    trait_def_path,
+                ));
             }
             continue;
         }
@@ -274,31 +289,28 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
     )
 }
 
-/// Builds a map of trait short name → defining crate name from rustdoc metadata.
+/// Builds a map of trait def_path → defining crate name from rustdoc metadata.
 ///
 /// For each impl block that implements a named trait, looks up the trait's `Id`
 /// in `krate.paths` to find its `crate_id`, then resolves the crate name from
 /// `krate.external_crates`. `crate_id == 0` means the trait is defined in the
 /// current crate (`crate_name`).
 ///
-/// The deduplication key is the trait's **definition path** from `krate.paths`
-/// (a stable, canonical path) rather than the use-site `Path.path` string (which
-/// may be an alias or relative path). This ensures that different use-site
-/// spellings of the same trait are deduplicated correctly.
+/// The map key is the trait's **stable fully-qualified definition path** from
+/// `krate.paths` (e.g., `"std::fmt::Display"`), not the short name.  Keying
+/// by def_path avoids aliasing when two distinct traits share the same short
+/// name (e.g., a local `Display` and `std::fmt::Display`): both get their own
+/// entry, so `code_profile_builder` can resolve each impl independently via
+/// `ImplInfo::trait_def_path`.
 ///
-/// When two different traits share the same short name (e.g., a local `Display`
-/// and `std::fmt::Display`), the local-crate trait (`crate_id == 0`) takes
-/// precedence; if both are external, the one with the alphabetically-first
-/// definition path wins, making the result deterministic regardless of the
-/// `HashMap` iteration order of `krate.index`.
+/// When a trait id is absent from `krate.paths` the use-site `Path.path`
+/// string is used as a fallback key so the entry is still reachable.
 fn build_trait_origins(
     crate_name: &str,
     krate: &rustdoc_types::Crate,
 ) -> std::collections::HashMap<String, String> {
-    // Collect unique trait definitions via a BTreeMap keyed by the trait's
-    // canonical definition path (from krate.paths) to ensure deterministic
-    // ordering and correct deduplication across different use-site spellings.
-    let mut by_def_path: std::collections::BTreeMap<String, (String, String)> =
+    // Keyed by def_path (stable); BTreeMap for deterministic iteration.
+    let mut by_def_path: std::collections::BTreeMap<String, String> =
         std::collections::BTreeMap::new();
 
     for item in krate.index.values() {
@@ -311,40 +323,23 @@ fn build_trait_origins(
             None => continue,
         };
         // Use the definition path from krate.paths (stable, canonical) as the
-        // deduplication key. Fall back to the use-site path only when the trait
-        // id is not present in the paths table.
+        // key. Fall back to the use-site path only when the trait id is not
+        // present in the paths table.
         let def_path = krate
             .paths
             .get(&trait_path.id)
             .map(|s| s.path.join("::"))
             .unwrap_or_else(|| trait_path.path.clone());
         if by_def_path.contains_key(&def_path) {
+            // Already recorded (same trait, different use-site spelling).
             continue;
         }
-        let short_name = def_path.rsplit("::").next().unwrap_or(&def_path).to_string();
         let origin = resolve_trait_origin(crate_name, &trait_path.id, krate);
-        by_def_path.insert(def_path, (short_name, origin));
+        by_def_path.insert(def_path, origin);
     }
 
-    // Collapse definition-path entries to short_name → origin.
-    // If two definition paths share the same short name, prefer the local-crate
-    // trait (origin == crate_name); otherwise the BTreeMap iteration order
-    // (alphabetically first definition path) wins, which is deterministic.
-    let mut origins = std::collections::HashMap::new();
-    for (short_name, origin) in by_def_path.into_values() {
-        origins
-            .entry(short_name)
-            .and_modify(|existing: &mut String| {
-                // Overwrite only when the new origin is the local crate; otherwise
-                // keep the existing (alphabetically-first) external crate name.
-                if origin == crate_name {
-                    *existing = origin.clone();
-                }
-            })
-            .or_insert(origin);
-    }
-
-    origins
+    // Return def_path → origin directly (no collapse to short_name).
+    by_def_path.into_iter().collect()
 }
 
 /// Resolves the origin crate name for a trait `Id`.
@@ -951,7 +946,7 @@ mod tests {
         assert_eq!(result, "");
     }
 
-    /// T006b: build_trait_origins maps local trait short name → crate_name.
+    /// T006b: build_trait_origins maps local trait def_path → crate_name.
     #[test]
     fn test_build_trait_origins_local_trait_maps_to_crate_name() {
         let (impl_id, impl_item) = make_impl_item(1, "my_crate::MyTrait", 10);
@@ -963,10 +958,11 @@ mod tests {
         let krate = minimal_krate(index, paths, std::collections::HashMap::new());
 
         let origins = build_trait_origins("my_crate", &krate);
-        assert_eq!(origins.get("MyTrait"), Some(&"my_crate".to_string()));
+        // Key is def_path "my_crate::MyTrait", not the short name "MyTrait".
+        assert_eq!(origins.get("my_crate::MyTrait"), Some(&"my_crate".to_string()));
     }
 
-    /// T006b: build_trait_origins maps external trait short name → external crate name.
+    /// T006b: build_trait_origins maps external trait def_path → external crate name.
     #[test]
     fn test_build_trait_origins_external_trait_maps_to_external_crate_name() {
         let (impl_id, impl_item) = make_impl_item(1, "std::fmt::Display", 20);
@@ -980,15 +976,17 @@ mod tests {
         let krate = minimal_krate(index, paths, external_crates);
 
         let origins = build_trait_origins("my_crate", &krate);
-        assert_eq!(origins.get("Display"), Some(&"std".to_string()));
+        // Key is def_path "std::fmt::Display", not the short name "Display".
+        assert_eq!(origins.get("std::fmt::Display"), Some(&"std".to_string()));
     }
 
-    /// T006b: when two traits share the same short name, the local-crate trait wins
-    /// deterministically (not first-seen order from HashMap).
+    /// T006b: when two traits share the same short name both get separate entries keyed
+    /// by their distinct def_paths — no aliasing, no one-wins-all collapse.
     #[test]
-    fn test_build_trait_origins_local_crate_wins_short_name_conflict() {
-        // local::Display (crate_id 0) and std::fmt::Display (crate_id 1) share "Display".
-        // The local trait must win regardless of insertion/iteration order.
+    fn test_build_trait_origins_distinct_def_paths_preserved_for_same_short_name() {
+        // local::Display (crate_id 0) and std::fmt::Display (crate_id 1) share "Display"
+        // as a short name. In the old short-name-keyed map one entry overwrote the other;
+        // now both are preserved under their distinct def_paths.
         let (impl_id_local, impl_item_local) = make_impl_item(1, "local::Display", 10);
         let (impl_id_ext, impl_item_ext) = make_impl_item(2, "std::fmt::Display", 20);
         let local_trait_id = rustdoc_types::Id(10);
@@ -1005,7 +1003,10 @@ mod tests {
         let krate = minimal_krate(index, paths, external_crates);
 
         let origins = build_trait_origins("my_crate", &krate);
-        // Local trait (crate_id == 0, origin == "my_crate") must take precedence.
-        assert_eq!(origins.get("Display"), Some(&"my_crate".to_string()));
+        // Both traits are independently reachable by their def_path.
+        assert_eq!(origins.get("local::Display"), Some(&"my_crate".to_string()));
+        assert_eq!(origins.get("std::fmt::Display"), Some(&"std".to_string()));
+        // The old short-name key is gone — no ambiguous "Display" entry.
+        assert!(!origins.contains_key("Display"));
     }
 }
