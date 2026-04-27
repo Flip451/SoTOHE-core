@@ -23,7 +23,6 @@ Priority references:
 - `architecture-rules.json`
 - `knowledge/external/POLICY.md`
 - `knowledge/external/guides.json`
-- `TRACK_TRACEABILITY.md`
 
 Operating notes:
 

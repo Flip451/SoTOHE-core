@@ -147,27 +147,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
         pattern: "D[Infra Layer] --> C",
         label: "workflow mermaid dependency direction",
     },
-    // Traceability markers.
-    RequireLine {
-        rel_path: "TRACK_TRACEABILITY.md",
-        pattern: "Responsibility Split (Fixed)",
-        label: "traceability role section",
-    },
-    RequireLine {
-        rel_path: "TRACK_TRACEABILITY.md",
-        pattern: "scripts-selftest-local",
-        label: "traceability scripts selftest gate",
-    },
-    RequireLine {
-        rel_path: "TRACK_TRACEABILITY.md",
-        pattern: "verify-latest-track-local",
-        label: "traceability latest-track gate",
-    },
-    RequireLine {
-        rel_path: "TRACK_TRACEABILITY.md",
-        pattern: "cargo make ci",
-        label: "traceability ci overview",
-    },
     // Developer workflow references.
     RequireLine {
         rel_path: "DEVELOPER_AI_WORKFLOW.md",
