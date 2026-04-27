@@ -99,6 +99,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Phase command 共通構造 + subagent 内部 pipeline 決定](2026-04-22-0829-plan-command-structural-refinements.md) | — | 2026-04-22 |
 | [sotp track branch create: main 上の activation commit regression 修正](2026-04-22-1432-branch-create-commit-ordering.md) | — | 2026-04-22 |
 | [verification.md を observations.md に改名 — 役割を手動観測ログに限定](2026-04-24-2356-verification-md-rename-observations-md.md) | — | 2026-04-24 |
+| [verify チェーンを file 存在ベースの phase 責務分離に揃える](2026-04-27-0324-phase-aware-verify-gates.md) | — | 2026-04-27 |
 
 ### ADR 運用
 

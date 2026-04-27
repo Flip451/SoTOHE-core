@@ -46,6 +46,18 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         Ok(Some(track_dir)) => {
             let mut outcome = VerifyOutcome::pass();
 
+            // Phase-aware skip (file existence = phase status): when
+            // impl-plan.json is absent, the track is in Phase 0 / 1 / 2
+            // (pre-implementation). spec.json / spec.md / plan.md are not
+            // yet required at these phases, so skip the existence checks.
+            // impl-plan.json presence is the marker for Phase 3+ where
+            // artifact validation kicks in (per
+            // knowledge/conventions/workflow-ceremony-minimization.md Rules
+            // "file existence = phase status").
+            if !track_dir.join("impl-plan.json").is_file() {
+                return outcome;
+            }
+
             // spec.md is optional when spec.json is present (spec.md is a
             // generated read-only view in that case). Validate whichever
             // artifact exists; require at least one.
@@ -1007,42 +1019,34 @@ mod tests {
     }
 
     #[test]
-    fn test_activated_track_missing_impl_plan_derives_planned_fallback() {
-        // After T025 removed `check_impl_plan_presence`, an activated
-        // (branch-materialized) v5 track without impl-plan.json is a
-        // legitimate Phase 0-2 state — `derive_track_status` returns Planned
-        // via its fallback and `verify` proceeds to check the track's
-        // markdown artifacts. The old "activation invariant" error was
-        // dropped because /track:init materialises the branch before any
-        // Phase 1-3 artifact is authored.
+    fn test_phase0_track_with_no_artifacts_passes() {
+        // T001 (phase-aware verify gates): when impl-plan.json is absent
+        // (Phase 0 / 1 / 2 — pre-implementation), spec/plan existence checks
+        // are skipped. A branch-materialized v5 track that only has metadata
+        // must therefore pass even without spec.md / spec.json / plan.md.
+        // This implements "file existence = phase status" from
+        // knowledge/conventions/workflow-ceremony-minimization.md and
+        // supersedes the prior Planned-fallback-with-artifact-validation
+        // behavior introduced by T025.
         let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("activated-no-plan");
+        let dir = tmp.path().join(TRACK_ITEMS_DIR).join("phase0-track");
         fs::create_dir_all(&dir).unwrap();
-        let meta = make_metadata_v5("activated-no-plan", r#""track/activated-no-plan""#, "");
+        let meta = make_metadata_v5("phase0-track", r#""track/phase0-track""#, "");
         fs::write(dir.join("metadata.json"), meta).unwrap();
-        // Intentionally omit impl-plan.json (legitimate Phase 0 state).
+        // Intentionally omit impl-plan.json, spec.json, spec.md, plan.md
+        // (Phase 0 state — only metadata.json + branch exists).
 
         let outcome = verify(tmp.path());
-        // The track is processed without the activation-invariant error; any
-        // remaining findings are about the missing markdown artifacts
-        // (spec.md / plan.md), not the invariant itself.
+        assert!(
+            outcome.is_ok(),
+            "Phase 0 track (impl-plan.json absent) must pass — spec/plan checks skipped: {:#?}",
+            outcome.findings()
+        );
+        // Regression guard: activation-invariant error from T025 must not appear.
         let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
-        // Guard 1: activation-invariant error must not appear after T025.
         assert!(
             !msgs.iter().any(|m| m.contains("activation invariant")),
-            "activation-invariant error must not fire after T025, got: {msgs:?}"
-        );
-        // Guard 2: the verifier still reports the expected follow-on findings
-        // about missing markdown artifacts (spec.md and plan.md are absent).
-        // This ensures `verify` actually processed the track via the Planned
-        // fallback rather than silently skipping or returning zero findings.
-        assert!(
-            outcome.has_errors(),
-            "verifier must report missing-artifact errors for the Planned fallback path: {msgs:?}"
-        );
-        assert!(
-            msgs.iter().any(|m| m.contains("spec")),
-            "missing spec.md finding expected in fallback path, got: {msgs:?}"
+            "activation-invariant error must not fire, got: {msgs:?}"
         );
     }
 

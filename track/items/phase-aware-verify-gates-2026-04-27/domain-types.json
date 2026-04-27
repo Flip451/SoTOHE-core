@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "VerifyOutcome",
+      "description": "Outcome of a verification check. The three target verify functions (verify-latest-track-local, verify-view-freshness-local, verify-catalogue-spec-refs-local) must produce VerifyOutcome::pass() for Phase 0 inputs after this track's changes. Type contract is unchanged; only the infrastructure control-flow logic that constructs the outcome is modified.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "9e6a8b94d8aeaf3c3f2fa2e425dd146797c046d9941e4dbbbcaade6e142fbd80"
+        },
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "0eee088f8ee37f14dee820b94b081a06d5e43fde1e6b46ce13b08dfbf515954f"
+        },
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "a51791d1a30a6436c7d06db5011678bdf5225466b40487527853f6c300d42418"
+        }
+      ]
+    },
+    {
+      "name": "VerifyFinding",
+      "description": "A single verification finding. Phase 0 PASS behavior requires that no VerifyFinding of Severity::Error is emitted for absent artifacts when impl-plan.json is absent. Type contract is unchanged; the change is in the infrastructure control-flow that decides whether to construct an error-level VerifyFinding.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "9e6a8b94d8aeaf3c3f2fa2e425dd146797c046d9941e4dbbbcaade6e142fbd80"
+        },
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "0eee088f8ee37f14dee820b94b081a06d5e43fde1e6b46ce13b08dfbf515954f"
+        }
+      ]
+    },
+    {
+      "name": "Severity",
+      "description": "Severity level for a verification finding (Info / Warning / Error). The Error variant is the gate-failing signal. Phase 0 PASS requires that the infrastructure verify functions do not produce Error-severity findings when artifacts are absent and impl-plan.json is not present. Type contract and variants are unchanged.",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "Info",
+        "Warning",
+        "Error"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/phase-aware-verify-gates-2026-04-27/spec.json",
+          "anchor": "CN-01",
+          "hash": "54cc1cdfa9de88b14e9d91db15eb2fe8f832b0afa0fb61a55dab007d335017c4"
+        }
+      ]
+    }
+  ]
+}

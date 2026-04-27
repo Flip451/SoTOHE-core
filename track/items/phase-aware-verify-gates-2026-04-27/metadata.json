@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "phase-aware-verify-gates-2026-04-27",
+  "title": "verify チェーンを file 存在ベースの phase 責務分離に揃える",
+  "branch": "track/phase-aware-verify-gates-2026-04-27",
+  "created_at": "2026-04-27T03:31:22Z",
+  "updated_at": "2026-04-27T03:31:22Z"
+}

@@ -104,8 +104,19 @@ pub fn execute_verify_catalogue_spec_refs(
         }
         Ok(_) => {}
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Track directory absent — downstream reads (spec.json, catalogues,
-            // signals) will produce a clear error message. Don't short-circuit here.
+            // Track directory absent — fail-closed. ADR D2.3's "catalogue absent
+            // → silent PASS" gate is meant for Phase 0/1 *real* tracks (the
+            // directory exists, no catalogue yet), not for typos or stale CI
+            // variables. Without this explicit check, a non-existent `track_id`
+            // would resolve every catalogue as absent under
+            // `any_enabled_catalogue_present` and silently pass, regressing
+            // fail-closed behavior (the previous code reached
+            // `read_spec_element_hashes` and surfaced the missing artifact via
+            // a clear I/O error).
+            return Err(CliError::Message(format!(
+                "track directory does not exist: {} (check the track_id)",
+                track_dir.display()
+            )));
         }
         Err(e) => {
             return Err(CliError::Message(format!(
@@ -162,6 +173,16 @@ pub fn execute_verify_catalogue_spec_refs(
         ));
     }
 
+    // ADR D2.3 (file existence = phase status): silent PASS when no enabled
+    // layer's catalogue file exists. Phase 0/1 tracks have no catalogue yet,
+    // so spec.json is not a SoT Chain ② requirement. As soon as at least one
+    // catalogue exists, spec.json becomes required and a missing spec.json
+    // continues to fail (handled by `read_spec_element_hashes`).
+    if !any_enabled_catalogue_present(&bindings, &track_dir, &items_dir)? {
+        println!("[OK] catalogue-spec-refs: no findings");
+        return Ok(ExitCode::SUCCESS);
+    }
+
     let spec_element_hashes = read_spec_element_hashes(&track_dir, &items_dir)?;
 
     let mut all_findings: Vec<SpecRefFinding> = Vec::new();
@@ -198,6 +219,48 @@ pub fn execute_verify_catalogue_spec_refs(
         eprintln!("[FAIL] catalogue-spec-refs: {} finding(s)", all_findings.len());
         Ok(ExitCode::FAILURE)
     }
+}
+
+/// Detect whether any TDDD-enabled layer with `catalogue_spec_signal` opt-in
+/// has its catalogue file present under `track_dir`.
+///
+/// Used as the Phase 0/1 gate (ADR D2.3): when no enabled catalogue exists,
+/// the verifier returns silent PASS without consulting `spec.json`. Once at
+/// least one catalogue is present, the SoT Chain ② contract activates and
+/// `spec.json` becomes a hard requirement.
+///
+/// `items_dir` is the symlink-guard trusted root — every path component
+/// between `items_dir` and the catalogue leaf is verified to be a real
+/// (non-symlink) entry before existence is reported. Symlinks that escape
+/// the workspace are rejected with `Err`; dangling symlinks below `items_dir`
+/// are reported as absent (mirrors `verify_one_layer`'s lenient absent path).
+///
+/// # Errors
+///
+/// Returns `CliError` when a symlink that escapes the trusted root is
+/// detected for any candidate catalogue path.
+fn any_enabled_catalogue_present(
+    bindings: &[TdddLayerBinding],
+    track_dir: &Path,
+    items_dir: &Path,
+) -> Result<bool, CliError> {
+    for binding in bindings {
+        if !binding.catalogue_spec_signal_enabled() {
+            continue;
+        }
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        let present = reject_symlinks_below(&catalogue_path, items_dir).map_err(|e| {
+            CliError::Message(format!(
+                "symlink guard: refusing to read catalogue '{}' for layer '{}': {e}",
+                catalogue_path.display(),
+                binding.layer_id()
+            ))
+        })?;
+        if present {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }
 
 /// Read spec.json from the local workspace and build a map of per-element
@@ -536,8 +599,32 @@ mod tests {
         assert!(result.is_err());
     }
 
+    // Fail-closed regression guard: a non-existent track directory (typo or
+    // stale CI variable) must NOT be silently swallowed by the Phase 0/1
+    // catalogue-absent gate. Without an explicit existence check, every
+    // catalogue path under the missing directory would resolve as absent and
+    // `any_enabled_catalogue_present` would return false, producing a false
+    // PASS. The verifier must surface a clear error instead.
     #[test]
-    fn verify_fails_when_spec_missing() {
+    fn verify_fails_when_track_dir_missing() {
+        let dir = tempfile::tempdir().unwrap();
+        let ws = dir.path().to_path_buf();
+        let items_dir = ws.join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+        write_architecture_rules(&ws);
+        // Deliberately do NOT create the track directory.
+
+        let result =
+            execute_verify_catalogue_spec_refs(items_dir, "no-such-track".to_owned(), ws, true);
+        assert!(result.is_err(), "non-existent track directory must fail-closed: {result:?}");
+    }
+
+    // ADR D2.3: catalogue absent + spec.json absent → silent PASS (Phase 0/1).
+    // No catalogue means SoT Chain ② is not yet active, so the missing
+    // spec.json is not a violation. Mirrors the `validate_track_snapshots`
+    // file-existence-driven phase model.
+    #[test]
+    fn verify_passes_when_catalogue_absent_and_spec_absent() {
         let dir = tempfile::tempdir().unwrap();
         let ws = dir.path().to_path_buf();
         let track_id = "test-track";
@@ -545,10 +632,38 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_architecture_rules(&ws);
-        // No spec.json
+        // No spec.json AND no catalogue → Phase 0/1 state.
 
         let result = execute_verify_catalogue_spec_refs(items_dir, track_id.to_owned(), ws, true);
-        assert!(result.is_err());
+        assert!(
+            result.is_ok(),
+            "Phase 0/1 (no catalogue, no spec.json) must produce silent PASS: {result:?}"
+        );
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS, "Phase 0/1 must produce zero findings");
+    }
+
+    // ADR D2.3: catalogue present + spec.json absent → FAIL (SoT Chain ②).
+    // The catalogue's spec_refs[] cite anchor ids in spec.json — without
+    // spec.json, ref integrity cannot be verified. Treat as a hard error to
+    // surface the contract violation rather than silently bypassing.
+    #[test]
+    fn verify_fails_when_catalogue_present_and_spec_absent() {
+        let dir = tempfile::tempdir().unwrap();
+        let ws = dir.path().to_path_buf();
+        let track_id = "test-track";
+        let items_dir = ws.join("track/items");
+        let track_dir = items_dir.join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        write_architecture_rules(&ws);
+        // Catalogue present (any non-empty entry forces the spec.json read path).
+        write_catalogue_with_dangling(&track_dir);
+        // Deliberately no spec.json.
+
+        let result = execute_verify_catalogue_spec_refs(items_dir, track_id.to_owned(), ws, true);
+        assert!(
+            result.is_err(),
+            "catalogue present + spec.json absent must FAIL (SoT Chain ② violation)"
+        );
     }
 
     // Absent catalogue file for a layer must be silently skipped (lenient CI path).
