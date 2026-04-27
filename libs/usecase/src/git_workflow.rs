@@ -184,7 +184,6 @@ pub fn validate_planning_only_commit_paths(
                 "track/registry.md"
                     | "track/tech-stack.md"
                     | "knowledge/DESIGN.md"
-                    | "knowledge/architecture.md"
                     | "architecture-rules.json"
             )
         {
@@ -447,26 +446,6 @@ mod tests {
                 "track/registry.md".to_owned(),
                 "track/tech-stack.md".to_owned(),
                 "knowledge/DESIGN.md".to_owned(),
-            ],
-        );
-
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn validate_planning_only_commit_paths_allows_knowledge_architecture() {
-        let result = validate_planning_only_commit_paths(
-            &ExplicitTrackBranch {
-                display_path: "track/items/example".to_owned(),
-                expected_branch: None,
-                status: Some("planned".to_owned()),
-                schema_version: 3,
-            },
-            &[
-                "track/items/example/spec.md".to_owned(),
-                "track/registry.md".to_owned(),
-                "knowledge/architecture.md".to_owned(),
-                "architecture-rules.json".to_owned(),
             ],
         );
 

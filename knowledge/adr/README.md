@@ -107,6 +107,12 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [ADR 自動導出: SSoT → ADR 候補検出の設計](2026-03-24-0930-adr-auto-derivation-design.md) | Accepted (設計のみ) | 2026-03-24 |
 
+### ドキュメント運用
+
+| ADR | Status | Date |
+|-----|--------|------|
+| [運用ドキュメント断捨離方針 — SoT 一本化と narrative 重複の解消](2026-04-27-0554-doc-reorganization.md) | — | 2026-04-27 |
+
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 
 | ADR | Status | Date |
