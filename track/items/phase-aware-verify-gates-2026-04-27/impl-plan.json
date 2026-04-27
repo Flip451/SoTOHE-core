@@ -16,7 +16,7 @@
     {
       "id": "T003",
       "description": "`apps/cli/src/commands/verify_catalogue_spec_refs.rs` の `read_spec_element_hashes` を改修する。catalogue file の存在を先に検出する分岐に変更する: catalogue absent → silent PASS (早期リターン)、catalogue present + `spec.json` absent → 引き続き FAIL (SoT Chain ② 違反)、catalogue present + `spec.json` present → 従来どおり ref integrity 検査。既存テスト `verify_fails_when_spec_missing` を 2 ケースに分割する: `verify_passes_when_catalogue_absent_and_spec_absent` (Phase 0 状態で PASS) と `verify_fails_when_catalogue_present_and_spec_absent` (SoT Chain ② 違反検出を残す)。",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {
