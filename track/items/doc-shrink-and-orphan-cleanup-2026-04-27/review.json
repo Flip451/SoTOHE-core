@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a4fb35c356e800e7b8eb140f7e88e866388a31d55871422bdeac461606217cd",
+          "at": "2026-04-27T12:37:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 accepts `README.md` at ≤90 lines, but CN-01 in the same spec says Tier 1 files, explicitly including `README.md`, must be ≤80 lines. That means an 81-90 line README would satisfy the acceptance criterion while violating the plan's stated Tier 1 constraint.",
+              "severity": "P1",
+              "file": "track/items/doc-shrink-and-orphan-cleanup-2026-04-27/spec.json",
+              "line": 272,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-04 makes `LOCAL_DEVELOPMENT.md` pass at ≤120 lines even though IN-04 and the D3 target cited by the spec require shrinking it to about 90 lines. This leaves the shrink target non-binding, so a materially under-shrunk file could satisfy the plan's acceptance gate.",
+              "severity": "P1",
+              "file": "track/items/doc-shrink-and-orphan-cleanup-2026-04-27/spec.json",
+              "line": 300,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9a4fb35c356e800e7b8eb140f7e88e866388a31d55871422bdeac461606217cd",
+          "at": "2026-04-27T12:43:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 enumerates five `.claude/docs/` observation lines for DESIGN.md (874 / 1019 / 1023 / 1024 / 1025), but AC-06 and T008 describe D6 #5(d) as only four observations (`4 件`, `1/4`, `2-4/4`). This is a semantic contradiction in the plan-artifact coverage for the orphan cleanup; align the count/list so the acceptance criterion and task text describe the same observation set.",
+              "severity": "P1",
+              "file": "track/items/doc-shrink-and-orphan-cleanup-2026-04-27/spec.md",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:77de7ef4f81ac03888a4f143b5c5544c40904aade284ed9c71dadf2ac6e78f42",
+          "at": "2026-04-27T12:48:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b2dceb03a4bc56fbcaafe94caa0e3d9dd80e7d163bf005ec13478792478764",
+          "at": "2026-04-27T12:52:52Z"
+        }
+      ]
+    }
+  }
+}

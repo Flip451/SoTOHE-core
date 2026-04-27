@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "doc-shrink-and-orphan-cleanup-2026-04-27",
+  "title": "Tier 1/2 narrative の縮約 + orphan 監査残項目を 1 track にまとめる (parent ADR D6 #3 + #4 + #5 統合)",
+  "branch": "track/doc-shrink-and-orphan-cleanup-2026-04-27",
+  "created_at": "2026-04-27T12:08:59Z",
+  "updated_at": "2026-04-27T12:08:59Z"
+}
