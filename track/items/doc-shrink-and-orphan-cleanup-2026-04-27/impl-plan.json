@@ -40,12 +40,13 @@
     {
       "id": "T007",
       "description": "`knowledge/DESIGN.md` の `## Security Hardening: Rust Migration` セクション (L429-871、~443 行) を削除する (IN-01、第2分割)。このセクションは完了済みの Python→Rust migration record であり ADR D3 の削除対象。見出し `## Security Hardening: Rust Migration` から次の L2 見出し `## Feature Branch Strategy` 直前まで全行を削除する。本タスクの diff は ~443 行で 500 行制約に収まる。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "1cf5344"
     },
     {
       "id": "T008",
       "description": "`knowledge/DESIGN.md` の残余セクション (L872-1073、~201 行) を削除する (IN-01、第3分割)。削除対象: `## Feature Branch Strategy` (L874 の `.claude/docs/` 参照含む、D6 #5 (d) 項 1/4 を包含) / `## Open Questions` / `## Changelog` / `## Auto Mode (MEMO-15 Design Spike)` (L1019-1025 の `.claude/docs/` 参照含む、D6 #5 (d) 項 2-4/4 を包含) / `## Domain Types Registry` (L1037-1039 の `domain-types.json` 単数形含む、D6 #5 (c) 項を包含)。これらのセクションを削除することで AC-05 / AC-06 の DESIGN.md 内残存参照もゼロになる。本タスクの diff は ~201 行で 500 行制約に収まる。T006-T008 完了後に `knowledge/DESIGN.md` の行数が ≤200 行 (目標 ~150 行) を満たすことを確認する (AC-01)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T009",
