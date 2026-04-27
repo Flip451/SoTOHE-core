@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "sot-broken-refs-cleanup-2026-04-27",
+  "title": "Tier 0 SoT 内の `TRACK_TRACEABILITY.md` / `knowledge/WORKFLOW.md` への broken reference を解消する",
+  "branch": "track/sot-broken-refs-cleanup-2026-04-27",
+  "created_at": "2026-04-27T10:30:39Z",
+  "updated_at": "2026-04-27T10:30:39Z"
+}

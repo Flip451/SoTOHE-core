@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "`.claude/rules/` 配下の 3 ファイルの broken ref を surgical edit で修正する。(1) `.claude/rules/08-orchestration.md` の Source Of Truth リスト (35 行目) から `TRACK_TRACEABILITY.md` 参照行を削除し、Operational split 節 (48 行目) の `TRACK_TRACEABILITY.md` 説明行も削除する (IN-01 / AC-03)。(2) `.claude/rules/09-maintainer-checklist.md` の 13 行目の `knowledge/WORKFLOW.md` を `DEVELOPER_AI_WORKFLOW.md` に書き換え、18 行目の `TRACK_TRACEABILITY.md` を `track/workflow.md` に書き換える (IN-02 / AC-04)。(3) `.claude/rules/10-guardrails.md` の 144 行目 Operational details リストの `knowledge/WORKFLOW.md` を `DEVELOPER_AI_WORKFLOW.md` に書き換える (IN-03 / AC-05)。各変更は broken ref 箇所のみに限定し、ファイルの構造・意味・その他の内容は変更しない (CN-02)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "`.claude/commands/track/setup.md` と `.claude/agents/adr-editor.md` の broken ref を surgical edit で修正する。(1) `.claude/commands/track/setup.md` の 13 行目の `Confirm required top-level docs exist` リストから `knowledge/WORKFLOW.md` エントリを削除する (IN-04 / AC-06)。(2) `.claude/agents/adr-editor.md` の 61 行目の track artifacts 例示リストから `TRACK_TRACEABILITY.md` エントリを削除する (IN-05 / AC-07)。各変更は broken ref 箇所のみに限定し、ファイルの構造・意味・その他の内容は変更しない (CN-02)。新規ファイルの作成・redirect stub の追加は行わない (CN-03)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Tier 0 SoT の action ファイル群を対象に `TRACK_TRACEABILITY.md` および `knowledge/WORKFLOW.md` への残存参照をゼロ件確認する grep sweep を実施する (IN-06)。対象ディレクトリ: `.claude/rules/` / `.claude/commands/` / `.claude/agents/` / `.claude/skills/` / `knowledge/conventions/` / `.harness/config/` / `architecture-rules.json` / `Makefile.toml`。`knowledge/adr/` は削除対象ファイル名を D2 で意図的に記録しているため sweep 対象から除外する。T001 / T002 の修正後に sweep を行い、AC-01 (TRACK_TRACEABILITY.md 参照ゼロ件) と AC-02 (knowledge/WORKFLOW.md 参照ゼロ件) を確認する。追加の残存参照が見つかった場合は同タスク内で surgical edit を実施し再確認する。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "`cargo make ci` を実行して全 gate が pass することを確認する (AC-08)。Rust コードへの変更はないため fmt-check / clippy / test / deny / check-layers はそのまま通過する想定。`.claude/` 配下のドキュメント修正による verify-* (verify-latest-track / verify-view-freshness / verify-plan-artifact-refs 等) への影響がないことを確認し、T001/T002/T003 の変更が clean であることを最終確認する。",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "本 track は Tier 0 SoT ファイル群 (`.claude/rules/` / `.claude/commands/` / `.claude/agents/`) に残存する `TRACK_TRACEABILITY.md` および `knowledge/WORKFLOW.md` への broken reference 7 箇所を surgical edit で解消する。",
+      "Rust コードへの変更はゼロ。操作対象は `.claude/` 配下の markdown ファイルのみ。",
+      "タスク構成: T001 (`.claude/rules/` 3 ファイル修正) → T002 (`.claude/commands/` / `.claude/agents/` 2 ファイル修正) → T003 (Tier 0 全体 grep sweep + 追加残存参照の修正) → T004 (`cargo make ci` gate 確認)。",
+      "CN-02 の surgical edit 原則に従い、各変更は broken ref の箇所のみに限定する。`TRACK_TRACEABILITY.md` は `track/workflow.md` へ、`knowledge/WORKFLOW.md` は `DEVELOPER_AI_WORKFLOW.md` へ書き換えるか、内容が消失した参照行は削除する (CN-01)。CN-03 に従い redirect stub は作成しない。"
+    ],
+    "sections": [
+      {
+        "id": "S001",
+        "title": ".claude/rules/ の broken ref 修正 (T001)",
+        "description": [
+          "IN-01: `.claude/rules/08-orchestration.md` の Source Of Truth リスト (35 行目) と Operational split 節 (48 行目) から `TRACK_TRACEABILITY.md` の 2 参照行を削除する。`TRACK_TRACEABILITY.md` の内容は `track/workflow.md` に merge 済みであり削除が正しい対応 (ADR D2)。",
+          "IN-02: `.claude/rules/09-maintainer-checklist.md` の `knowledge/WORKFLOW.md` 参照 (13 行目) を `DEVELOPER_AI_WORKFLOW.md` に書き換え、`TRACK_TRACEABILITY.md` 参照 (18 行目) を `track/workflow.md` に書き換える。代替 SSoT が存在するため削除より書き換えが情報を保持できる (CN-01)。",
+          "IN-03: `.claude/rules/10-guardrails.md` の Operational details リストの `knowledge/WORKFLOW.md` 参照 (144 行目) を `DEVELOPER_AI_WORKFLOW.md` に書き換える。`DEVELOPER_AI_WORKFLOW.md` が workflow narrative SSoT として ADR D2 で確定している (CN-01)。",
+          "CN-02: 変更は各 broken ref 箇所のみに限定し、ファイルの構造・意味・その他の内容は変更しない (surgical edit)。"
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S002",
+        "title": ".claude/commands/ と .claude/agents/ の broken ref 修正 (T002)",
+        "description": [
+          "IN-04: `.claude/commands/track/setup.md` の `Confirm required top-level docs exist` リスト (13 行目) から `knowledge/WORKFLOW.md` エントリを削除する。このファイルはリポジトリに存在しないため existence check リストからエントリを除去するのが正しい対応 (CN-01)。",
+          "IN-05: `.claude/agents/adr-editor.md` の track artifacts 例示リスト (61 行目) から `TRACK_TRACEABILITY.md` エントリを削除する。このファイルは存在しないため例示から除去する。",
+          "CN-02: 変更は各 broken ref 箇所のみに限定し、ファイルの構造・意味・その他の内容は変更しない (surgical edit)。CN-03: redirect stub・alias ファイルは作成しない。"
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S003",
+        "title": "Tier 0 grep sweep — 残存参照ゼロ確認 (T003)",
+        "description": [
+          "IN-06: T001 / T002 の修正後に Tier 0 SoT の action ファイル群を grep して `TRACK_TRACEABILITY.md` 参照ゼロ件 (AC-01) と `knowledge/WORKFLOW.md` 参照ゼロ件 (AC-02) を確認する。",
+          "対象: `.claude/rules/` / `.claude/commands/` / `.claude/agents/` / `.claude/skills/` / `knowledge/conventions/` / `.harness/config/` / `architecture-rules.json` / `Makefile.toml`。`knowledge/adr/` は削除対象ファイル名を D2 で意図的に記録しているため sweep 対象から除外する。",
+          "追加の残存参照が発見された場合は同タスク内で surgical edit を実施し再 sweep する。これにより briefing 観測事実以外の参照も漏れなく解消できる。"
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S004",
+        "title": "CI gate 確認 (T004)",
+        "description": [
+          "T001 / T002 / T003 完了後に `cargo make ci` を実行し全 gate が pass することを確認する (AC-08)。",
+          "本 track では Rust ソースコードを一切変更しないため fmt-check / clippy / test / deny / check-layers は変更前後で差異がない想定。",
+          "verify-* (verify-latest-track / verify-view-freshness / verify-plan-artifact-refs 等) がドキュメント修正により誤検出しないことを確認する。"
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      }
+    ]
+  }
+}
