@@ -9,7 +9,7 @@
 DESIGN.md shrink (~1073→~150 行、~923 行削除) は 500 行コミット制約に対応するため 3 タスクに分割する (T006: keep-zone rework + Canonical Blocks 削除 ~360 行差分、T007: Security Hardening 削除 ~443 行差分、T008: 残余セクション削除 ~201 行差分)。
 IN-01 の orphan 修正 (D6 #5 (c)(d)) は DESIGN.md 内の削除対象セクションに内包されているため、T008 の最終セクション削除で自然に解消される (T006-T008 の順序制約)。
 
-## Tasks (7/9 resolved)
+## Tasks (9/9 resolved)
 
 ### S001 — 非 DESIGN.md orphan 点訂正 (T001, T002)
 
@@ -40,7 +40,7 @@ IN-01 の orphan 修正 (D6 #5 (c)(d)) は DESIGN.md 内の削除対象セクシ
 
 - [x] **T006**: `knowledge/DESIGN.md` の keep-zone (L1-73) を rework し、続けて `## Canonical Blocks` セクション (L74-428、~355 行) を削除する (IN-01、第1分割)。rework 内容: (a) `## Module Structure` 表から `Key Types` 列を削除して層と責務のみの表に変換する。(b) `## Key Design Decisions` 表を `knowledge/adr/README.md` への索引リンク 1 行に置換し、個別 ADR 詳細の再掲を排除する (CN-02)。(c) `## Agent Roles` 表を `.harness/config/agent-profiles.json` への参照リンクに置換する (CN-02)。その後 `## Canonical Blocks` セクション全体 (見出しから次の L2 見出し直前まで) を削除する。本タスクの diff は ~360 行以内で 500 行制約に収まる。 (`3ecf6c5`)
 - [x] **T007**: `knowledge/DESIGN.md` の `## Security Hardening: Rust Migration` セクション (L429-871、~443 行) を削除する (IN-01、第2分割)。このセクションは完了済みの Python→Rust migration record であり ADR D3 の削除対象。見出し `## Security Hardening: Rust Migration` から次の L2 見出し `## Feature Branch Strategy` 直前まで全行を削除する。本タスクの diff は ~443 行で 500 行制約に収まる。 (`1cf5344`)
-- [~] **T008**: `knowledge/DESIGN.md` の残余セクション (L872-1073、~201 行) を削除する (IN-01、第3分割)。削除対象: `## Feature Branch Strategy` (L874 の `.claude/docs/` 参照含む、D6 #5 (d) 項 1/4 を包含) / `## Open Questions` / `## Changelog` / `## Auto Mode (MEMO-15 Design Spike)` (L1019-1025 の `.claude/docs/` 参照含む、D6 #5 (d) 項 2-4/4 を包含) / `## Domain Types Registry` (L1037-1039 の `domain-types.json` 単数形含む、D6 #5 (c) 項を包含)。これらのセクションを削除することで AC-05 / AC-06 の DESIGN.md 内残存参照もゼロになる。本タスクの diff は ~201 行で 500 行制約に収まる。T006-T008 完了後に `knowledge/DESIGN.md` の行数が ≤200 行 (目標 ~150 行) を満たすことを確認する (AC-01)。
+- [x] **T008**: `knowledge/DESIGN.md` の残余セクション (L872-1073、~201 行) を削除する (IN-01、第3分割)。削除対象: `## Feature Branch Strategy` (L874 の `.claude/docs/` 参照含む、D6 #5 (d) 項 1/4 を包含) / `## Open Questions` / `## Changelog` / `## Auto Mode (MEMO-15 Design Spike)` (L1019-1025 の `.claude/docs/` 参照含む、D6 #5 (d) 項 2-4/4 を包含) / `## Domain Types Registry` (L1037-1039 の `domain-types.json` 単数形含む、D6 #5 (c) 項を包含)。これらのセクションを削除することで AC-05 / AC-06 の DESIGN.md 内残存参照もゼロになる。本タスクの diff は ~201 行で 500 行制約に収まる。T006-T008 完了後に `knowledge/DESIGN.md` の行数が ≤200 行 (目標 ~150 行) を満たすことを確認する (AC-01)。 (`7f5aa00`)
 
 ### S004 — CI gate 確認 (T009)
 
@@ -48,4 +48,4 @@ IN-01 の orphan 修正 (D6 #5 (c)(d)) は DESIGN.md 内の削除対象セクシ
 > Rust ソースコードへの変更がゼロであるため fmt-check / clippy / nextest / deny / check-layers は変更前後で差異がない想定。
 > verify-* (verify-latest-track / verify-view-freshness / verify-plan-artifact-refs) がドキュメント修正により誤検出しないことを確認する。特に DESIGN.md / README.md 等への broken ref 検証が DESIGN.md 縮約後も通過することを確認する。
 
-- [ ] **T009**: `cargo make ci` を実行して全 gate が pass することを確認する (AC-08)。Rust コードへの変更はないため fmt-check / clippy / nextest / deny / check-layers はそのまま通過する想定。verify-latest-track / verify-view-freshness / verify-plan-artifact-refs 等の verify-* がドキュメント修正により誤検出しないことを確認し、T001-T008 の全変更が clean であることを最終確認する。
+- [x] **T009**: `cargo make ci` を実行して全 gate が pass することを確認する (AC-08)。Rust コードへの変更はないため fmt-check / clippy / nextest / deny / check-layers はそのまま通過する想定。verify-latest-track / verify-view-freshness / verify-plan-artifact-refs 等の verify-* がドキュメント修正により誤検出しないことを確認し、T001-T008 の全変更が clean であることを最終確認する。
