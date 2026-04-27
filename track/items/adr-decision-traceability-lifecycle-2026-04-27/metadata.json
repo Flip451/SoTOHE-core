@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "adr-decision-traceability-lifecycle-2026-04-27",
+  "title": "ADR decision の根拠 trace 信号機評価 + 個別 lifecycle 管理",
+  "branch": "track/adr-decision-traceability-lifecycle-2026-04-27",
+  "created_at": "2026-04-27T14:47:18Z",
+  "updated_at": "2026-04-27T14:47:18Z"
+}
