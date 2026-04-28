@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3957d092d95db9b1ebc064e940153cd2db024980be7e3ded9091de269da51a5",
+          "at": "2026-04-28T19:28:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR defines two incompatible commit-hint predicates: Context/D1 say the hint is for “all scopes completed and at least one zero_findings”, but D5 makes the implementation condition `check-approved OK` plus `review.json` existence and D5.2 explicitly allows an all-Empty diff with zero zero_findings to emit the hint. That leaves implementers with conflicting requirements for whether `>=1 zero_findings` is mandatory; either D5 should include that predicate or the earlier decision text should be relaxed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+              "line": 196,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d3957d092d95db9b1ebc064e940153cd2db024980be7e3ded9091de269da51a5",
+          "at": "2026-04-28T19:30:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 defines the commit hint condition as all scopes complete plus at least one `zero_findings`, but D5 changes the executable condition to `check-approved` OK plus `review.json` existence, and D5.2 explicitly says that an all-`NotRequired::Empty` case can still emit the hint. Those statements conflict on whether a real zero-findings review is required before recommending `/track:commit`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+              "line": 194,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d3957d092d95db9b1ebc064e940153cd2db024980be7e3ded9091de269da51a5",
+          "at": "2026-04-28T19:31:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ed02a57a9112d3c5927fd1a4b0ac278885d24be73357c66a8bf58abb5605ee",
+          "at": "2026-04-28T19:33:06Z"
+        }
+      ]
+    }
+  }
+}

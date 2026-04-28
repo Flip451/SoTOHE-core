@@ -157,3 +157,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | ADR | Status | Date |
 |-----|--------|------|
 | [`cargo make llvm-cov` を nextest 経路に統一する](2026-04-27-0124-llvm-cov-nextest-harness-alignment.md) | — | 2026-04-27 |
+
+### Review コマンド / API
+
+| ADR | Status | Date |
+|-----|--------|------|
+| [`sotp review results` で review.json 直読みを置き換える](2026-04-28-1905-review-results-command.md) | — | 2026-04-28 |
