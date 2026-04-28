@@ -34,7 +34,8 @@
     {
       "id": "T006",
       "description": "CLI の verify.rs に sotp verify adr-signals サブコマンドを実装する。既存 verify サブコマンド群 (TechStack / LatestTrack / ArchDocs 等) と同じ構成パターンに従い、verify.rs の `VerifyCommand` enum に `AdrSignals(VerifyArgs)` variant を追加する。execute 分岐では `FsAdrFileAdapter::new(adr_dir)` と `VerifyAdrSignalsInteractor::new(Arc::new(adapter))` を直接構築し (AdrSignalsVerifyAdapter のような中間 composition struct は追加しない — 既存 verify サブコマンド群に中間 composition struct を持つ前例がなく、CLI match arm で直接構築するパターンが確立されている)、`VerifyAdrSignals::verify(VerifyAdrSignalsCommand)` を呼び出す。AdrVerifyReport の red_count が 1 以上なら exit 1、ゼロなら exit 0 (AC-01)。🔴 がある場合は stderr にエラーメッセージ (red_count 含む集計) を出力する (AC-01)。integration test (2 種): (1) interactor-level — tests/fixtures/adr/ 配下にテスト用 ADR fixture ファイル (全 5 typestate variant: proposed / accepted / implemented / superseded / deprecated それぞれを status に持つ decision を含む front-matter 付き + grandfathered 付きを各 1 件) を配置し、Rust 統合テスト内で FsAdrFileAdapter を fixture ディレクトリパスを指定して直接構築し (FsAdrFileAdapter は adr_dir: PathBuf を constructor 引数に取るため任意のパスを注入可能)、VerifyAdrSignalsInteractor を呼び出して AdrVerifyReport.red_count == 0 を検証する。(2) CLI wiring-level — verify.rs の execute 分岐を通じて FsAdrFileAdapter と VerifyAdrSignalsInteractor を直接構築するが、`FsAdrFileAdapter::new(adr_dir)` の `adr_dir` に tests/fixtures/adr/ の絶対パスを渡すことで knowledge/adr/ への依存を避ける。🔴 decision を含む fixture ディレクトリ と 🔴 のない fixture ディレクトリの両方で `VerifyAdrSignals::verify(VerifyAdrSignalsCommand)` を呼び出して AdrVerifyReport の red_count を検証し、red_count >= 1 → exit 1 / red_count == 0 → exit 0 の分岐 (AC-01) を unit test レベルでカバーする。両テストとも実 knowledge/adr/ への依存はなく T008/T009 前に実行可能。前提: T001-T005 完了。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "2d65d72b909577c735284f4027fdcbdf299d38f9"
     },
     {
       "id": "T007",
@@ -44,7 +45,7 @@
     {
       "id": "T008",
       "description": "本トラックの親 ADR (knowledge/adr/2026-04-27-1234-adr-decision-traceability-lifecycle.md) に YAML front-matter を追加する (IN-04 / AC-03)。D1-D4 の全 decision を decisions[] 配列に encode する。各 decision に status フィールドを設定する (status の値は typestate-based dispatch で決まる 5 値 proposed / accepted / implemented / superseded / deprecated のいずれか) と user_decision_ref (ユーザーが承認した会話参照) を設定し、各 decision が 🔵 または 🟡 に評価されるようにする。これにより本 ADR が新フォーマットの最初の適合例になる (AC-03)。ADR の MD body (## Context / ## Decision 以下の narrative) は一切変更しない (CN-01)。前提: T006 完了後 (sotp verify adr-signals が実行可能になった後)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T009",

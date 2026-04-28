@@ -1,3 +1,20 @@
+---
+adr_id: 2026-04-27-1234-adr-decision-traceability-lifecycle
+decisions:
+  - id: D1
+    user_decision_ref: "chat_segment:session-8223577e-33f7-4ba0-9539-6e9e287e9676:2026-04-25"
+    status: accepted
+  - id: D2
+    user_decision_ref: "chat_segment:session-8223577e-33f7-4ba0-9539-6e9e287e9676:2026-04-25"
+    status: accepted
+  - id: D3
+    user_decision_ref: "chat_segment:session-8223577e-33f7-4ba0-9539-6e9e287e9676:2026-04-25"
+    candidate_selection: "from:[A,B,C,D,E] chose:A"
+    status: accepted
+  - id: D4
+    user_decision_ref: "chat_segment:session-8223577e-33f7-4ba0-9539-6e9e287e9676:2026-04-25"
+    status: proposed
+---
 # ADR decision の根拠 trace 信号機評価と decision 個別 lifecycle 管理 — MD + YAML front-matter フォーマット採用
 
 ## Context
