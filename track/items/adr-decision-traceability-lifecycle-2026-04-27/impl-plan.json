@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "infrastructure 層の FsAdrFileAdapter (filesystem adapter) を実装する。`FsAdrFileAdapter` struct を infrastructure に追加し、`AdrFilePort` secondary port trait を実装する: FsAdrFileAdapter は constructor 引数 `adr_dir: PathBuf` を受け取り (catalogue の expected_members に adr_dir: PathBuf フィールドとして宣言済み)、list_adr_paths は self.adr_dir/*.md を glob 走査して PathBuf の Vec を返す (本番デプロイでは knowledge/adr/ を渡す; テストでは fixture ディレクトリを渡すことで knowledge/adr/ への依存を避ける)、read_adr_frontmatter は PathBuf を値で受け取り (port 署名 CN-05 準拠) 指定パスのファイルを UTF-8 で読み込み `parse_adr_frontmatter` free function で AdrFrontMatter にパースして返す (YAML パースを adapter 内部でカプセル化することで usecase が parse_adr_frontmatter を直接参照しない設計: CN-05)。AdrFrontMatterCodecError は AdrFilePortError::ReadFile に変換して adapter 内で吸収する。No Panics in Library Code 原則に従い、glob エラー・IO エラー・parse エラーはすべて Result で返す。unit tests: tests/fixtures/adr/ 配下の test fixture ファイルを adr_dir に指定して list / read+parse の正常ケース (全 5 typestate variant が正しく decode される — それぞれ AdrDecisionEntry::ProposedDecision / AcceptedDecision / ImplementedDecision / SupersededDecision / DeprecatedDecision として返ること)、存在しないファイルの read での IO エラーケース、front-matter なしファイルでの fail-closed ケース (AdrFilePortError::ReadFile が返ること)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "79a6fbbf0db2d718d4ada5fcd43331ee9692b872"
     },
     {
       "id": "T005",
       "description": "usecase 層を実装する。`VerifyAdrSignalsCommand` (フィールドなし CQRS command; unit struct) / `VerifyAdrSignalsError` error 型 (AdrFileListing / AdrFileRead の 2 variants のみ — FrontMatterDecode は含まない: YAML parse 失敗は adapter 内部で AdrFilePortError::ReadFile に変換される / SignalEval は含まない: evaluate_adr_decision は infallible で usecase に error path がない) / `VerifyAdrSignals` application service trait (verify メソッド: VerifyAdrSignalsCommand → Result<AdrVerifyReport, VerifyAdrSignalsError>) / `VerifyAdrSignalsInteractor` struct を usecase 層に追加する。Interactor は Arc<dyn AdrFilePort> を保持し、次のステップで orchestrate する: (1) list_adr_paths、(2) read_adr_frontmatter(path) per file — usecase は AdrFrontMatter domain 型を直接受け取る (YAML パースは adapter 内部で完結し CN-05 を満たす)、(3) frontmatter.decisions の各 AdrDecisionEntry に対して domain::adr_decision::evaluate_adr_decision を呼ぶ (infallible: ? 演算子不要、直接 DecisionGrounds を得る — evaluate_adr_decision は pattern-match で ProposedDecision / AcceptedDecision / ImplementedDecision / SupersededDecision / DeprecatedDecision のいずれの variant からも AdrDecisionCommon を取り出して grounds を評価する)、(4) 返ってきた DecisionGrounds を AdrVerifyReport に集積する。unit tests: AdrFilePort の mock (mockall) を使い、正常ケース (全 decision が non-red → red_count == 0 の AdrVerifyReport を Ok で返す) / 🔴 decision あり (red_count > 0 の AdrVerifyReport を Ok で返す — exit-code 判定は CLI 層 T006 の責務) / listing error → AdrFileListing error / read_adr_frontmatter error → AdrFileRead error の各ケースを検証する。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",

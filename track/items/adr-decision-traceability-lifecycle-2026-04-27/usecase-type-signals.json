@@ -1,31 +1,44 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T08:09:47Z",
+  "generated_at": "2026-04-28T08:21:11Z",
   "declaration_hash": "3fff26f6df8752cedc568bc07d5410ba99ac3fd35403d570a04144e1bd8ba52b",
   "signals": [
     {
       "type_name": "VerifyAdrSignals",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyReport, VerifyAdrSignalsError>"
+      ]
     },
     {
       "type_name": "VerifyAdrSignalsCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "VerifyAdrSignalsInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "found_items": [
+        "impl VerifyAdrSignals"
+      ],
+      "missing_items": [
+        "port: Arc<dyn AdrFilePort>"
+      ]
     },
     {
       "type_name": "VerifyAdrSignalsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AdrFileListing",
+        "AdrFileRead"
+      ]
     }
   ]
 }

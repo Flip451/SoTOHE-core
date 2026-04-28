@@ -4,13 +4,13 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| VerifyAdrSignalsError | error_type | — | AdrFileListing, AdrFileRead | 🟡 | 🔵 |
+| VerifyAdrSignalsError | error_type | — | AdrFileListing, AdrFileRead | 🔵 | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| VerifyAdrSignals | application_service | — | fn verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyReport, VerifyAdrSignalsError> | 🟡 | 🔵 |
+| VerifyAdrSignals | application_service | — | fn verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyReport, VerifyAdrSignalsError> | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -22,5 +22,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| VerifyAdrSignalsCommand | command | — | — | 🟡 | 🔵 |
+| VerifyAdrSignalsCommand | command | — | — | 🔵 | 🔵 |
 
