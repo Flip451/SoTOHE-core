@@ -4,17 +4,19 @@
     {
       "id": "T001",
       "description": "core Python scripts and registry SSoT deletion. (1) Delete scripts/external_guides.py (IN-01 / AC-01). (2) Delete scripts/test_external_guides.py (IN-01 / AC-01). (3) Delete scripts/atomic_write.py (IN-03 / AC-03). (4) Delete scripts/test_atomic_write.py (IN-03 / AC-03). (5) Delete knowledge/external/POLICY.md (IN-02 / AC-02). (6) Delete knowledge/external/guides.json (IN-02 / AC-02). (7) Remove knowledge/external/ directory (IN-02 / AC-02 — directory becomes untracked once all files are deleted). All are independent file deletions with no implementation code changes. Diff is pure deletion only.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "7c73fbc7efe88d054f78704463e4398f3bdb0508"
     },
     {
       "id": "T002",
       "description": "Evaluate and modify scripts/track_resolution.py, then delete Makefile.toml guides tasks and update scripts-selftest-local args. (1) Open scripts/track_resolution.py and check whether latest_legacy_track_dir() has callers other than external_guides.py. If the remaining public functions become test-only after external_guides.py deletion, delete scripts/track_resolution.py and scripts/test_track_resolution.py entirely. Otherwise delete only the latest_legacy_track_dir() function and fix any call sites (IN-04 / AC-04). (2) Similarly evaluate scripts/track_schema.py residual usage after external_guides.py deletion; delete entirely if no remaining callers (IN-04 judgment basis). (3) Delete the following task definition blocks from Makefile.toml: [tasks.guides-list] / [tasks.guides-fetch] / [tasks.guides-usage] / [tasks.guides-setup] / [tasks.guides-clean] / [tasks.guides-add] / [tasks.guides-selftest] / [tasks.guides-selftest-local] (IN-05 / AC-05). (4) Remove scripts/test_atomic_write.py and scripts/test_external_guides.py from the args of [tasks.scripts-selftest-local] in Makefile.toml. Also remove scripts/test_track_resolution.py from args if track_resolution.py was fully deleted (IN-06 / AC-06).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "7c73fbc7efe88d054f78704463e4398f3bdb0508"
     },
     {
       "id": "T003",
       "description": "Delete slash command and remove all doc references to deleted artifacts. (1) Delete .claude/commands/guide/add.md (IN-07 / AC-07). (2) Remove the knowledge/external/POLICY.md and knowledge/external/guides.json reference lines from the priority references section of CLAUDE.md (IN-08 / AC-08). (3) Remove the scripts/external_guides.py reference line from the enforcement section of .claude/rules/09-maintainer-checklist.md, and remove the 'external guides' mention from the Python helpers description (IN-08 / AC-08). (4) Remove all references to knowledge/external/guides.json / knowledge/external/POLICY.md / guides-fetch / guides-list etc. from DEVELOPER_AI_WORKFLOW.md (IN-08 / AC-08). (5) Remove the same kinds of references from LOCAL_DEVELOPMENT.md (IN-08 / AC-08). (6) Remove external guides references from .claude/settings.json (IN-08 / AC-08). (7) Remove external guides references from .claude/commands/track/catchup.md (IN-08 / AC-08). (8) Remove external guides references from track/workflow.md including Guiding Principles item 10 and any guides auto-injection description in the /track:plan section (IN-08 / AC-08). Each file modification is a surgical deletion of reference lines only; file structure and other content are not changed.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",

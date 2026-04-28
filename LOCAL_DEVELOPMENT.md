@@ -7,11 +7,11 @@
 ## Host Requirements
 
 - Docker + docker compose（必須）
-- Python 3.11+ はオプション。ただし `guides-*` / `conventions-*` / `architecture-rules-*` などのタスクはホスト上で `python3` を直接呼ぶため、これらを使う場合は必須
+- Python 3.11+ はオプション。ただし `conventions-*` / `architecture-rules-*` などのタスクはホスト上で `python3` を直接呼ぶため、これらを使う場合は必須
 - `.tool-versions` は `python 3.12.8` を pin（asdf 利用時の `python3` 解決に使われる）
 - Linux で uid/gid が `1000:1000` 以外なら `export HOST_UID=$(id -u) HOST_GID=$(id -g)` を shell profile に追加する
 - `verify-*` ゲートは Docker compose 経由（`sotp verify` Rust CLI）で実行する。`verify-latest-track` のみホスト直実行
-- Python helper のテストは Docker 経由（`cargo make guides-selftest`, `cargo make scripts-selftest`）
+- Python helper のテストは Docker 経由（`cargo make scripts-selftest`）
 - `*-local` タスクは内部実装（直接実行しない）
 - Claude Code hooks（`skill-compliance`, `block-direct-git-ops`, `block-test-file-deletion`）は `bin/sotp hook dispatch ...` で dispatch される
 
@@ -41,7 +41,6 @@ cargo make tools-down    # 停止
 
 `cargo make help` でカテゴリ付きタスク一覧を表示する。主要 wrapper（`bacon`, `test-exec`, `track-pr-*` 等）は表示一覧から確認する。
 
-外部長文ガイドの運用ルール: `knowledge/external/POLICY.md`
 capability-to-provider マッピング: `.harness/config/agent-profiles.json`
 
 ## Git Notes (Optional)

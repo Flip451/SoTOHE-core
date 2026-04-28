@@ -32,12 +32,6 @@ Summarize the current project state for the newcomer:
 5. Show recent git log (last 10 commits) for context
 6. Read `knowledge/conventions/README.md` — list active convention docs
 
-### Phase 4: External guides setup (optional)
-
-If `knowledge/external/guides.json` has entries:
-1. Run `cargo make guides-fetch` to download cached guides
-2. Report which guides were fetched and their purpose
-
 ## Output format
 
 1. Environment status: each bootstrap step (pass/fail)
@@ -47,5 +41,4 @@ If `knowledge/external/guides.json` has entries:
    - Current tech stack decisions
    - Active conventions
    - Recent commit history (1-line summary)
-4. External guides: fetched / none configured
-5. Suggested next actions for the newcomer
+4. Suggested next actions for the newcomer

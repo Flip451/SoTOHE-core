@@ -26,9 +26,9 @@
   - Claude Code: `orchestrator` / `spec-designer` / `impl-planner` / `type-designer` / `adr-editor` / `implementer`
   - Codex: `reviewer`
   - Gemini: `researcher`
-- `guides-*` / `conventions-*` / `architecture-rules-*` は `cargo make` wrapper 経由で実行する。
+- `conventions-*` / `architecture-rules-*` は `cargo make` wrapper 経由で実行する。
 - ローカルの `python3` 解決が不安定な場合は `.tool-versions` の Python 3.12.8 を使うか、ホスト側の検証スクリプトと `cargo make --allow-private verify-orchestra-local` に対して `PYTHON_BIN=/path/to/python3.12 ...` を使う。
-- Python test（`guides-selftest` / `scripts-selftest`）は Docker 経由で `pytest` を実行する。
+- Python test（`scripts-selftest`）は Docker 経由で `pytest` を実行する。
 - `*-local` タスクは内部専用（private）。
 
 ### 0.2 最初にやること（初回のみ）
@@ -347,45 +347,12 @@ cargo make bacon-test  # テスト寄りの継続チェック
 ### 4.3 Claude Code で使う補助・管理系 slash command
 
 以下は Terminal コマンドではなく、Claude Code 上で使う補助・管理系の slash command。
-`/track:*` の日常導線とは別系列だが、規約や外部ガイドのような一次資料を整備する正式な入口も含む。
-
-#### 4.3.1 外部の長文ガイドを導入する場合
-
-著作権とコンテキスト消費の両方に配慮するため、外部ガイドは git に本文を含めず、
-索引だけを管理し、必要な本文だけをローカルキャッシュへ取得する。
-
-運用方針の参照先:
-
-- `knowledge/external/POLICY.md`
-- `knowledge/external/guides.json`
-
-`/track:plan`, `/track:implement`, `/track:full-cycle`、`/track:type-design` では、プロンプトと最新トラックの
-`spec.md` / `plan.md` を走査し、`trigger_keywords` に一致すると該当ガイドの要約が
-追加コンテキストとして自動注入される。
-
-```bash
-cargo make guides-setup                 # 導入フローを表示
-cargo make guides-list                  # 利用可能な外部ガイドを一覧表示
-cargo make guides-usage                 # 最小コンテキスト参照ルールを表示
-cargo make guides-fetch <guide-id>      # 必要なガイドだけローカルに取得
-cargo make guides-add -- ...            # ガイド定義を正規化して追加
-```
-
-注: 原文は `.cache/external-guides/` に保存され、git 管理しない。
+`/track:*` の日常導線とは別系列だが、規約のような一次資料を整備する正式な入口も含む。
 
 注: 層依存ルールの機械可読な真実の源泉は `architecture-rules.json`。
 `deny.toml` はこの定義へ揃える（`cargo make check-layers` で検証）。
 
-新しい外部ガイドを索引へ追加する時は `/guide:add` を使う。`/guide:*` は `/track:*` とは別系列の Claude Code 用補助 slash command で、日常のタスク進行には含めず、外部ガイドを追加したい時だけ使う。
-
-使い方:
-
-1. `[Claude Code]` `/guide:add`
-2. Claude Code が `source_url`, `title`, `license` など不足項目だけ確認する
-3. `id`, `raw_url`, `cache_path` の提案内容を確認する
-4. Claude Code が `knowledge/external/guides.json` へ反映し、`cargo make guides-list` で表示確認する
-
-#### 4.3.2 Project Conventions に正式な規約を追加する場合
+#### 4.3.1 Project Conventions に正式な規約を追加する場合
 
 詳細は §1.3 を参照。`/conventions:add <name>` は `Project Conventions` を一次資料として整備する正式入口であり、日常の `/track:*` 導線とは別系列でも重要度は高い。
 
