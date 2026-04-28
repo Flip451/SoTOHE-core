@@ -26,8 +26,10 @@ pub mod track_phase;
 pub mod verify;
 
 pub use adr_decision::{
-    AcceptedDecision, AdrDecisionCommon, AdrDecisionCommonError, AdrDecisionEntry, DecisionGrounds,
+    AcceptedDecision, AdrDecisionCommon, AdrDecisionCommonError, AdrDecisionEntry, AdrFilePort,
+    AdrFilePortError, AdrFrontMatter, AdrFrontMatterError, AdrVerifyReport, DecisionGrounds,
     DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
+    evaluate_adr_decision,
 };
 pub use decision::Decision;
 pub use error::{

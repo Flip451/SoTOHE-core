@@ -1,9 +1,13 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "83d5442e6715c703280508b8167890fad94086987b8c415373928f97c278a666",
+  "catalogue_declaration_hash": "b3b99409f65fdcfc73ca12414bf432209ad5409fe76bd2b8ec7d65aa2048cbd3",
   "signals": [
     {
       "type_name": "AdrFrontMatter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrFrontMatterError",
       "signal": "blue"
     },
     {

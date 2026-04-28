@@ -2,11 +2,10 @@
 
 /// Orthogonal classification of the grounds for a single ADR decision.
 ///
-/// This enum is used by `AdrSignalEvaluator` (T002) to express the signal
-/// produced after inspecting an entry's
-/// [`crate::adr_decision::AdrDecisionCommon`] fields. The classification is
-/// independent of lifecycle state: every lifecycle typestate embeds
-/// `AdrDecisionCommon`, so grounds can be evaluated uniformly.
+/// Produced by [`crate::adr_decision::evaluate_adr_decision`] after inspecting
+/// the embedded [`crate::adr_decision::AdrDecisionCommon`] fields. The
+/// classification is independent of lifecycle state: every lifecycle typestate
+/// embeds `AdrDecisionCommon`, so grounds can be evaluated uniformly.
 ///
 /// Signal mapping:
 ///

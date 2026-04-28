@@ -1,118 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
-          "at": "2026-04-28T03:03:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AcceptedDecision::implement` accepts any `String` and returns `ImplementedDecision` directly, so callers can create an implemented typestate with `implemented_in == \"\"`. That violates the stated invariant that implemented decisions must carry the commit/reference where they were actualized; validate this field in all `ImplementedDecision` creation paths or use a validated value type/`Result`.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 75,
-              "category": "validation"
-            },
-            {
-              "message": "`AcceptedDecision::supersede` accepts any `String` and returns `SupersededDecision` directly, so callers can create a superseded typestate with an empty `superseded_by` reference. Since `SupersededDecision::new` has the same issue, the terminal state can exist without the required ADR anchor; validate this field in all supersession creation paths or use a validated value type/`Result`.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 84,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
-          "at": "2026-04-28T03:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AcceptedDecision::implement` accepts an arbitrary `String` and constructs `ImplementedDecision` directly, and `ImplementedDecision::new` has the same shape. This allows `implemented_in == \"\"`, so the domain can represent an implemented decision with no commit/reference even though the catalogue describes `implemented_in` as the required actualization reference and says the typestate should make that invalid state impossible. Validate the value in every creation path or use a validated reference type.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 75,
-              "category": "logic"
-            },
-            {
-              "message": "`AcceptedDecision::supersede` accepts an arbitrary `String` and constructs `SupersededDecision` directly; `ImplementedDecision::supersede` and `SupersededDecision::new` do the same. This allows `superseded_by == \"\"`, leaving a terminal superseded decision without the required ADR anchor/back-reference, contrary to the typestate invariant. Validate the value in every creation path or use a validated reference type.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 84,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
-          "at": "2026-04-28T03:10:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
-          "at": "2026-04-28T03:16:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ImplementedDecision` validates `implemented_in` in constructors/transitions, but the field is public, so callers can directly construct or later mutate an `ImplementedDecision` with an empty `implemented_in`. That makes the invalid state the constructor is trying to reject representable outside the module.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 131,
-              "category": null
-            },
-            {
-              "message": "`SupersededDecision` validates `superseded_by` in constructors/transitions, but the field is public, so callers can directly construct or later mutate a `SupersededDecision` with an empty `superseded_by`. That bypasses the domain invariant for this terminal state.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 191,
-              "category": null
-            },
-            {
-              "message": "This intra-doc link targets `crate::adr_decision::AdrSignalEvaluator`, which is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/grounds.rs",
-              "line": 5,
-              "category": null
-            },
-            {
-              "message": "This intra-doc link targets `crate::adr_decision::AdrFrontMatter::decisions`, but `AdrFrontMatter` is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/entry.rs",
-              "line": 8,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
-          "at": "2026-04-28T03:18:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
-          "at": "2026-04-28T03:25:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
-          "at": "2026-04-28T03:27:42Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -1622,6 +1510,278 @@
           "findings": [],
           "hash": "rvw1:sha256:144e737783cddfcdba87eb664824b1e619fd4d8dcec32a17e2f66ec2aefbd164",
           "at": "2026-04-28T05:06:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9edeca4a69a3b8dfeb580b9c4816adacafadf2d1be11afd206953e0d438edc13",
+          "at": "2026-04-28T05:34:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrDecisionCommon` is still shown as 🟡 even though this T001 review explicitly covers `AdrDecisionCommon` alongside the typestate cluster, `AdrDecisionEntry`, `DecisionGrounds`, and `AdrDecisionCommonError`; the accepted Yellow exception only covers `ImplementedDecision` / `SupersededDecision`. This leaves the rendered plan artifact inconsistent with the stated T001 signal promotion scope.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9edeca4a69a3b8dfeb580b9c4816adacafadf2d1be11afd206953e0d438edc13",
+          "at": "2026-04-28T05:36:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrDecisionCommon` still reports a Yellow signal even though the briefing's T001 scope explicitly includes `AdrDecisionCommon` among the implemented domain typestate cluster entries expected to move from Yellow to Blue. The accepted deviations only explain the remaining Yellow state for `ImplementedDecision` and `SupersededDecision`, so this rendered view contradicts the stated T001 signal update intent.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.md",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9edeca4a69a3b8dfeb580b9c4816adacafadf2d1be11afd206953e0d438edc13",
+          "at": "2026-04-28T05:38:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9edeca4a69a3b8dfeb580b9c4816adacafadf2d1be11afd206953e0d438edc13",
+          "at": "2026-04-28T05:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:884ac50857491fbdc75855c5f9adcc9fcf6d9960b373b5d2b4f14a879e3c9308",
+          "at": "2026-04-28T05:47:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan source records progress changes (`T001` as done and `T002` as in_progress) even though the briefing for this plan-artifacts pass says `impl-plan.json` is unchanged and the T002 re-review should only reflect derived signal updates. Since `plan.md` is generated from this source, it now reports `Tasks (1/12 resolved)`, which contradicts the stated signal-only review scope.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:884ac50857491fbdc75855c5f9adcc9fcf6d9960b373b5d2b4f14a879e3c9308",
+          "at": "2026-04-28T05:50:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T002 signal-delta briefing states that impl-plan.json is unchanged, but this file has progress mutations in the reviewed diff: T001 is now marked done with a commit hash and T002 is now marked in_progress. For this plan-artifacts scope, that contradicts the stated no-plan-artifact-change intent and makes the generated plan.md update out of scope for the round.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:884ac50857491fbdc75855c5f9adcc9fcf6d9960b373b5d2b4f14a879e3c9308",
+          "at": "2026-04-28T05:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:884ac50857491fbdc75855c5f9adcc9fcf6d9960b373b5d2b4f14a879e3c9308",
+          "at": "2026-04-28T05:54:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:884ac50857491fbdc75855c5f9adcc9fcf6d9960b373b5d2b4f14a879e3c9308",
+          "at": "2026-04-28T05:55:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d810135466bfb9c35480d1953ee5481658b9f07cfcafd0f66b860de1d6d8fbc",
+          "at": "2026-04-28T06:02:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d810135466bfb9c35480d1953ee5481658b9f07cfcafd0f66b860de1d6d8fbc",
+          "at": "2026-04-28T06:05:05Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:03:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AcceptedDecision::implement` accepts any `String` and returns `ImplementedDecision` directly, so callers can create an implemented typestate with `implemented_in == \"\"`. That violates the stated invariant that implemented decisions must carry the commit/reference where they were actualized; validate this field in all `ImplementedDecision` creation paths or use a validated value type/`Result`.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 75,
+              "category": "validation"
+            },
+            {
+              "message": "`AcceptedDecision::supersede` accepts any `String` and returns `SupersededDecision` directly, so callers can create a superseded typestate with an empty `superseded_by` reference. Since `SupersededDecision::new` has the same issue, the terminal state can exist without the required ADR anchor; validate this field in all supersession creation paths or use a validated value type/`Result`.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 84,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AcceptedDecision::implement` accepts an arbitrary `String` and constructs `ImplementedDecision` directly, and `ImplementedDecision::new` has the same shape. This allows `implemented_in == \"\"`, so the domain can represent an implemented decision with no commit/reference even though the catalogue describes `implemented_in` as the required actualization reference and says the typestate should make that invalid state impossible. Validate the value in every creation path or use a validated reference type.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 75,
+              "category": "logic"
+            },
+            {
+              "message": "`AcceptedDecision::supersede` accepts an arbitrary `String` and constructs `SupersededDecision` directly; `ImplementedDecision::supersede` and `SupersededDecision::new` do the same. This allows `superseded_by == \"\"`, leaving a terminal superseded decision without the required ADR anchor/back-reference, contrary to the typestate invariant. Validate the value in every creation path or use a validated reference type.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 84,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:10:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
+          "at": "2026-04-28T03:16:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplementedDecision` validates `implemented_in` in constructors/transitions, but the field is public, so callers can directly construct or later mutate an `ImplementedDecision` with an empty `implemented_in`. That makes the invalid state the constructor is trying to reject representable outside the module.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 131,
+              "category": null
+            },
+            {
+              "message": "`SupersededDecision` validates `superseded_by` in constructors/transitions, but the field is public, so callers can directly construct or later mutate a `SupersededDecision` with an empty `superseded_by`. That bypasses the domain invariant for this terminal state.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 191,
+              "category": null
+            },
+            {
+              "message": "This intra-doc link targets `crate::adr_decision::AdrSignalEvaluator`, which is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/grounds.rs",
+              "line": 5,
+              "category": null
+            },
+            {
+              "message": "This intra-doc link targets `crate::adr_decision::AdrFrontMatter::decisions`, but `AdrFrontMatter` is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/entry.rs",
+              "line": 8,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
+          "at": "2026-04-28T03:18:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
+          "at": "2026-04-28T03:25:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
+          "at": "2026-04-28T03:27:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFrontMatter::new` accepts any `adr_id`, including the empty string, so callers can construct a front-matter value that violates the required `adr_id` invariant. The domain layer already treats missing `adr_id` as invalid at the parse boundary, so this public infallible constructor leaves an illegal state representable in domain code.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/front_matter.rs",
+              "line": 21,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:93616d74c3f0b2da22df0dae4eee4fb814ffc7cc3fc4902f7ad545bd8ef175b1",
+          "at": "2026-04-28T05:49:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AdrFrontMatter::new lets callers construct a front-matter object with an empty `adr_id`, so the domain still admits an illegal state instead of enforcing the required identifier invariant at construction time.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/front_matter.rs",
+              "line": 21,
+              "category": "invariant"
+            },
+            {
+              "message": "The evaluator test module only covers five single-branch cases plus two precedence checks; it does not exercise the full 5 typestate × 4 grounds matrix requested in the briefing, leaving several `evaluate_adr_decision` paths unverified.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/evaluator.rs",
+              "line": 74,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:93616d74c3f0b2da22df0dae4eee4fb814ffc7cc3fc4902f7ad545bd8ef175b1",
+          "at": "2026-04-28T05:51:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cac21624a0cf4d3159fa54a5faee3a193431b1ab64f9c22b17410d68c83a14e",
+          "at": "2026-04-28T05:54:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cac21624a0cf4d3159fa54a5faee3a193431b1ab64f9c22b17410d68c83a14e",
+          "at": "2026-04-28T05:55:59Z"
         }
       ]
     }

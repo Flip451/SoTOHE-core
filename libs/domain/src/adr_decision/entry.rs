@@ -11,9 +11,9 @@ use super::state::{
 /// `Vec` to hold decisions at any lifecycle state while each typestate remains a
 /// distinct, compile-time-typed value.
 ///
-/// `AdrSignalEvaluator::evaluate` pattern-matches on this enum to extract the
-/// embedded [`crate::adr_decision::AdrDecisionCommon`] grounds fields from
-/// whichever typestate variant is present.
+/// [`crate::adr_decision::evaluate_adr_decision`] pattern-matches on this
+/// enum to extract the embedded [`crate::adr_decision::AdrDecisionCommon`]
+/// grounds fields from whichever typestate variant is present.
 ///
 /// No serde derives — serde lives in the infrastructure DTO layer (CN-05).
 #[derive(Debug, Clone, PartialEq, Eq)]

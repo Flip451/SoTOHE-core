@@ -42,6 +42,27 @@
       ]
     },
     {
+      "name": "AdrFrontMatterError",
+      "description": "Validation error type for AdrFrontMatter::new() construction. EmptyAdrId rejects empty adr_id values at the domain boundary so an unidentified ADR cannot enter the typestate cluster. Domain-layer error type so the value-object constructor surfaces no usecase / infrastructure types in its signature (CN-05).",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "EmptyAdrId"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        }
+      ]
+    },
+    {
       "name": "AdrDecisionCommon",
       "description": "Common fields shared by every AdrDecisionEntry variant regardless of lifecycle state: the decision id (e.g. 'D1'), optional user_decision_ref and review_finding_ref (grounds trace fields evaluated by evaluate_adr_decision), optional candidate_selection (encodes candidate A/B/C selection per D3), and the grandfathered flag (exempts from signal verification per D4). Extracted as a separate value object so each typestate embeds it rather than repeating fields. No serde in domain.",
       "approved": true,
@@ -383,10 +404,10 @@
     },
     {
       "name": "evaluate_adr_decision",
-      "description": "Pure domain free function that classifies a single AdrDecisionEntry into a DecisionGrounds signal. spec IN-07 calls this a '純粋関数' (pure function) — stateless, no I/O, no struct wrapper needed. Pattern-matches on the AdrDecisionEntry variant and extracts the embedded AdrDecisionCommon grounds fields (user_decision_ref, review_finding_ref, grandfathered) from whichever typestate is present. All five typestate variants carry AdrDecisionCommon, so evaluation is uniform across lifecycle states. Infallible: all AdrDecisionEntry values reaching this function are well-formed (codec validates at the infrastructure boundary). Located in the adr_decision submodule so the usecase interactor can call it without depending on infrastructure (CN-05). free_function kind: the spec explicitly names a pure function; there is no state to encapsulate in a struct, and a zero-field struct with a method is semantically identical to a free function but obscures the statelessness.",
+      "description": "Pure domain free function that classifies a single AdrDecisionEntry into a DecisionGrounds signal. spec IN-07 calls this a '純粋関数' (pure function) — stateless, no I/O, no struct wrapper needed. Pattern-matches on the AdrDecisionEntry variant and extracts the embedded AdrDecisionCommon grounds fields (user_decision_ref, review_finding_ref, grandfathered) from whichever typestate is present. All five typestate variants carry AdrDecisionCommon, so evaluation is uniform across lifecycle states. Infallible: all AdrDecisionEntry values reaching this function are well-formed (codec validates at the infrastructure boundary). Located in the adr_decision::evaluator submodule so the usecase interactor can call it without depending on infrastructure (CN-05). free_function kind: the spec explicitly names a pure function; there is no state to encapsulate in a struct, and a zero-field struct with a method is semantically identical to a free function but obscures the statelessness.",
       "approved": true,
       "kind": "free_function",
-      "module_path": "adr_decision",
+      "module_path": "domain::adr_decision::evaluator",
       "expected_params": [
         {
           "name": "entry",

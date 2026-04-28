@@ -1,13 +1,26 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T05:41:33Z",
-  "declaration_hash": "83d5442e6715c703280508b8167890fad94086987b8c415373928f97c278a666",
+  "generated_at": "2026-04-28T06:06:14Z",
+  "declaration_hash": "b3b99409f65fdcfc73ca12414bf432209ad5409fe76bd2b8ec7d65aa2048cbd3",
   "signals": [
     {
       "type_name": "AdrFrontMatter",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "adr_id: String",
+        "decisions: Vec<AdrDecisionEntry>"
+      ]
+    },
+    {
+      "type_name": "AdrFrontMatterError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyAdrId"
+      ]
     },
     {
       "type_name": "AdrDecisionCommon",
@@ -119,29 +132,39 @@
     {
       "type_name": "evaluate_adr_decision",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "fn evaluate_adr_decision(entry: AdrDecisionEntry) -> DecisionGrounds"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AdrVerifyReport",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "blue_count: usize",
+        "red_count: usize",
+        "yellow_count: usize"
+      ]
     },
     {
       "type_name": "AdrFilePortError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ListPaths",
+        "ReadFile"
+      ]
     },
     {
       "type_name": "AdrFilePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn list_adr_paths(&self) -> Result<Vec<PathBuf>, AdrFilePortError>",
+        "fn read_adr_frontmatter(&self, path: PathBuf) -> Result<AdrFrontMatter, AdrFilePortError>"
+      ]
     }
   ]
 }

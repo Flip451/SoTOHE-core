@@ -7,6 +7,7 @@ flowchart LR
     classDef free_function fill:#f1f8e9,stroke:#558b2f
     subgraph domain [domain]
         L6_domain_AdrFrontMatter(AdrFrontMatter)
+        L6_domain_AdrFrontMatterError>AdrFrontMatterError]
         L6_domain_AdrDecisionCommon(AdrDecisionCommon)
         L6_domain_AdrDecisionCommonError>AdrDecisionCommonError]
         L6_domain_ProposedDecision([ProposedDecision])
