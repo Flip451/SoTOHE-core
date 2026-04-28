@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says `external_guides.py` is the only current Python caller of `atomic_write.py`, but the roadmap ADR still treats `track_registry.py` as another caller. As written, this makes the deletion chain incomplete: removing `atomic_write.py` here would strand an existing caller unless Phase 1 is part of the same change set.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 25,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2 asks for semantic edits to the already-merged roadmap ADR (body note plus decision metadata changes). That conflicts with `knowledge/conventions/pre-track-adr-authoring.md`, which only allows post-merge ADR edits for typos, broken cross-references, or adding a back-reference. The supersede should be expressed without rewriting the merged ADR's decision state.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 63,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8224d9b19c6f68abee9c3f7448e4acede62125ce556f30c7743ecf9b7e6ffb6a",
+          "at": "2026-04-28T13:17:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 asks for a semantic rewrite of the post-merge roadmap ADR: it changes the Phase 3 decision's front-matter `status` to `superseded` and adds `superseded_by`. The pre-track ADR convention only allows post-merge edits for typos, broken cross-references, or adding a newer-ADR back-reference, so this supersession procedure is not executable as written. It needs to be represented as a new ADR/back-reference rather than a semantic edit to the merged roadmap ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 64,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8224d9b19c6f68abee9c3f7448e4acede62125ce556f30c7743ecf9b7e6ffb6a",
+          "at": "2026-04-28T13:19:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Context line 20 calls `guide:add` a skill, but D1 line 49 identifies the same entry point as the `/guide:add` slash command and explicitly says there is no `.claude/skills/` counterpart. That is an internal semantic mismatch about the deletion target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 20,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09f9fd4b96fcdf2f68082aa7f1ecf3661ec34cbf7023957491f611b5fc280ce0",
+          "at": "2026-04-28T13:27:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09f9fd4b96fcdf2f68082aa7f1ecf3661ec34cbf7023957491f611b5fc280ce0",
+          "at": "2026-04-28T13:31:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Context lists the remaining interactive registration path as being called from a `guide:add` skill, but D1 later identifies the concrete artifact as `.claude/commands/guide/add.md` and explicitly says there is no corresponding `.claude/skills/` definition. Since this plan is deciding which artifact to remove, the command-vs-skill contradiction should be resolved in the ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 20,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2 says the Roadmap ADR handling follows the post-merge editing rules in `pre-track-adr-authoring.md`, but that convention does not define the immutable post-merge rule being relied on and instead permits direct rewrites of existing ADRs. The three allowed post-merge edit cases are in `knowledge/conventions/adr.md`, so this compliance reference points at the wrong source of authority.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 67,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:09f9fd4b96fcdf2f68082aa7f1ecf3661ec34cbf7023957491f611b5fc280ce0",
+          "at": "2026-04-28T13:35:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR says the remaining external_guides uses are only the cargo-make wrappers, `/guide:add`, and the registry, but the current Rust UserPromptSubmit hook still loads `knowledge/external/guides.json` and injects matching guide summaries for `/track:` prompts via `guides_codec` / `skill_compliance`. As written, D1 plans to delete the registry and Python helper without accounting for that active Rust-side AI-session path, so the removal plan is semantically incomplete and would leave the hook behavior silently degraded or partially orphaned.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 17,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:4709b8d978d6369a16e81f76a95d2a73c61f86f668b4d9394186a46fc48d1bbb",
+          "at": "2026-04-28T13:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4709b8d978d6369a16e81f76a95d2a73c61f86f668b4d9394186a46fc48d1bbb",
+          "at": "2026-04-28T13:43:58Z"
+        }
+      ]
+    }
+  }
+}
