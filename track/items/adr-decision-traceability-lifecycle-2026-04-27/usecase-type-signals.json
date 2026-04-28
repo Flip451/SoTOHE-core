@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-28T02:54:12Z",
+  "declaration_hash": "dfa408e1499c628b015bcc5aa22562dbe86b4ea14b769790d8eca106f7dd82ba",
+  "signals": [
+    {
+      "type_name": "VerifyAdrSignals",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyAdrSignalsCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyAdrSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyAdrSignalsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

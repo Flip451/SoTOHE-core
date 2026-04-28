@@ -20,7 +20,7 @@ description: |
 
 Translate the track's ADR (design decisions) and spec.json (behavioral contract) into **per-layer TDDD catalogue entries** (`<layer>-types.json`). For each type the spec and ADR require:
 
-- Pick the correct `TypeDefinitionKind` from the 13 variants listed in **Kind Field Schemas** below
+- Pick the correct `TypeDefinitionKind` from the 14 variants listed in **Kind Field Schemas** below
 - Author kind-specific fields (`expected_methods`, `expected_variants`, `transitions_to`, `implements`)
 - Set `action` (add / modify / reference / delete) against the existing baseline
 - Cite upstream SoT via structured refs (`spec_refs[]` for spec elements, `informal_grounds[]` for unpersisted grounds that still need promotion before merge)
@@ -141,20 +141,295 @@ Do NOT emit Rust code, module trees, or inline trait signatures outside the cata
 | `query` | — | CQRS query object (existence check) |
 | `factory` | — | aggregate/entity factory struct (existence check) |
 | `secondary_adapter` | `implements: Vec<TraitImplDecl>` | `{ trait_name, expected_methods? }` — impl target is a `secondary_port` |
+| `free_function` | `expected_params`, `expected_returns`, `expected_is_async` | top-level or sub-module pub fn (non-method); `module_path` is optional |
 
 `MethodDeclaration` shape: `{ name, receiver: "&self" | "&mut self" | "self" | null, params: [{ name, ty }], returns, is_async: bool }`. All `ty` / `returns` values MUST use last-segment names only (no `::`).
 
 ## Design Principles (MUST follow)
 
-Apply `.claude/rules/04-coding-principles.md` via kind selection:
+Apply `.claude/rules/04-coding-principles.md` via kind selection. **Read § Make Illegal States Unrepresentable / § Enum-first / § Typestate before drafting any catalogue entry whose subject involves status / state / phase / lifecycle / step / variant-specific data.** The decision below is binding — it is not a wording preference.
 
-- **Variant-dependent data** (state-specific fields) → prefer `typestate` over `enum` when transitions exist; prefer `enum` over `struct + Option<T>` when a finite state set has no transitions
+### Kind selection decision tree
+
+```
+subject is a top-level pub fn (non-method, not attached to a struct/trait)?
+└── YES → kind: free_function (use expected_params / expected_returns / expected_is_async)
+
+subject is a named type (struct / enum / trait)?
+└── type carries variant-specific or state-specific data?
+    ├── YES — fields differ per state / variant
+    │   │
+    │   ├── state machine has TRANSITIONS (proposed → accepted → ...)?
+    │   │   ├── YES → kind: typestate per state + transitions_to
+    │   │   │        + enum wrapper with expected_variants listing the typestate names
+    │   │   │        (heterogeneous Vec / persistence boundary)
+    │   │   │
+    │   │   └── NO  → kind: enum with expected_variants
+    │   │            (rust impl uses variant payloads; catalogue only lists names)
+    │   │
+    │   └── derived from external persistence (YAML / JSON / DB)?
+    │       └── domain: typestate (no serde)
+    │           infrastructure: dto + codec that dispatches → typestate variants
+    │
+    └── NO — flat data, no states
+        ├── primitive value with validation? → kind: value_object (newtype)
+        ├── error? → kind: error_type + thiserror
+        ├── trait driven from outside? → kind: application_service
+        ├── trait driving infrastructure? → kind: secondary_port
+        ├── struct implementing application_service? → kind: interactor
+        ├── struct implementing secondary_port? → kind: secondary_adapter
+        ├── pure data carrier crossing serde boundary? → kind: dto
+        ├── CQRS command / query? → kind: command / query
+        └── pure computation struct, no trait? → kind: use_case
+```
+
+### Other principles
+
 - **Primitive obsession** → wrap in `value_object` with appropriate validation in the constructor
 - **Trait direction**:
   - Driven by infrastructure (repository, store, writer) → `secondary_port`
   - Drives the usecase from outside (CLI handler, HTTP handler) → `application_service`
 - **Error types** → `error_type` with thiserror variants; avoid `Box<dyn Error>` in domain
 - **No serde in domain** → domain ports and value objects are serde-free; serde / DTO conversion lives in infrastructure (the catalogue codec operates in infrastructure, not domain)
+
+## Catalogue Pattern Cookbook
+
+The decision tree above maps to concrete catalogue shapes. **Use these as the starting point** — adapt names and fields to the track's domain, not the structure.
+
+### Pattern 1: Typestate cluster + enum wrapper (state machine + heterogeneous Vec)
+
+Use this when the type carries state-specific data AND has state transitions (lifecycle / phase / pipeline stage). The Rust impl uses one struct per state plus a state-erasing enum at the heterogeneous boundary (Vec membership, persistence). The catalogue uses `kind: typestate` per state and a separate `kind: enum` for the wrapper.
+
+**Example: ADR decision lifecycle (`Proposed → Accepted → Implemented → Superseded | Deprecated`)**
+
+```jsonc
+// domain-types.json — partial
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "AdrDecisionCommon",
+      "description": "Common fields shared across all lifecycle states.",
+      "kind": "value_object",
+      "expected_members": [
+        { "kind": "field", "name": "id", "ty": "String" },
+        { "kind": "field", "name": "user_decision_ref", "ty": "Option<String>" },
+        { "kind": "field", "name": "review_finding_ref", "ty": "Option<String>" },
+        { "kind": "field", "name": "candidate_selection", "ty": "Option<String>" },
+        { "kind": "field", "name": "grandfathered", "ty": "bool" }
+      ]
+    },
+    {
+      "name": "ProposedDecision",
+      "description": "Typestate for a newly drafted decision awaiting review.",
+      "kind": "typestate",
+      "transitions_to": ["AcceptedDecision", "DeprecatedDecision"],
+      "expected_members": [
+        { "kind": "field", "name": "common", "ty": "AdrDecisionCommon" }
+      ]
+    },
+    {
+      "name": "ImplementedDecision",
+      "description": "Typestate for a decision that has been implemented.",
+      "kind": "typestate",
+      "transitions_to": ["SupersededDecision", "DeprecatedDecision"],
+      "expected_members": [
+        { "kind": "field", "name": "common", "ty": "AdrDecisionCommon" },
+        { "kind": "field", "name": "implemented_in", "ty": "String" }
+      ]
+    },
+    {
+      "name": "SupersededDecision",
+      "description": "Terminal typestate for a decision replaced by a later decision.",
+      "kind": "typestate",
+      "transitions_to": [],
+      "expected_members": [
+        { "kind": "field", "name": "common", "ty": "AdrDecisionCommon" },
+        { "kind": "field", "name": "superseded_by", "ty": "String" }
+      ]
+    },
+    // ... AcceptedDecision, DeprecatedDecision entries follow the same pattern
+    {
+      "name": "AdrDecisionEntry",
+      "description": "Enum wrapper for heterogeneous Vec<AdrDecisionEntry> membership.",
+      "kind": "enum",
+      "expected_variants": [
+        "ProposedDecision",
+        "AcceptedDecision",
+        "ImplementedDecision",
+        "SupersededDecision",
+        "DeprecatedDecision"
+      ]
+    }
+  ]
+}
+```
+
+Anti-pattern (do NOT do this):
+
+```jsonc
+// Wrong: flat enum with status string + Option<...> for state-specific data.
+// Allows illegal combinations like Proposed { superseded_by: Some(...) } to compile.
+{
+  "name": "DecisionStatus",
+  "kind": "enum",
+  "expected_variants": ["Proposed", "Accepted", "Implemented", "Superseded", "Deprecated"]
+},
+{
+  "name": "AdrDecisionEntry",
+  "kind": "value_object",
+  "expected_members": [
+    { "kind": "field", "name": "status", "ty": "DecisionStatus" },
+    { "kind": "field", "name": "implemented_in", "ty": "Option<String>" },
+    { "kind": "field", "name": "superseded_by", "ty": "Option<String>" }
+  ]
+}
+```
+
+The flat-enum + Option<T> shape is the typical violation flagged by `.claude/rules/04-coding-principles.md` § Enum-first / § Typestate. The catalogue makes the violation visible via `kind` selection — typestate cluster is the structural fix, not a style preference.
+
+### Pattern 2: Pure enum (finite values, no transitions)
+
+Use this when the value set is finite AND no transitions exist. Rust may use variant payloads (`enum SomeResult { Success, Failure(FailureDetail) }`); the catalogue records only variant names plus the carried types as separate catalogue entries.
+
+```jsonc
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FailureDetail",
+      "description": "Carried type for the Failure variant.",
+      "kind": "value_object",
+      "expected_members": [
+        { "kind": "field", "name": "message", "ty": "String" }
+      ]
+    },
+    {
+      "name": "SomeResult",
+      "description": "Finite result enum with no state transitions.",
+      "kind": "enum",
+      "expected_variants": ["Success", "Failure"]
+    }
+  ]
+}
+```
+
+Catalogue limitation: enum variant payload types (e.g., `Failure(FailureDetail)`) are NOT recorded in `expected_variants`. This is intentional — the catalogue verifies variant existence by name; payload presence is verified at the `expected_members` level on the carried type. If the carried type needs traceability, declare it as a separate catalogue entry (as `FailureDetail` above).
+
+### Pattern 3: Persistence boundary (YAML / JSON → typestate via DTO + codec)
+
+Use this when the typestate is loaded from external storage. Domain stays serde-free (CN-05); infrastructure runs the dispatch.
+
+```jsonc
+// infrastructure-types.json — partial
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "AdrDecisionDto",
+      "description": "Serde-capable DTO for ADR decision front-matter (serde lives here, not in domain).",
+      "kind": "dto",
+      "expected_members": [
+        { "kind": "field", "name": "id", "ty": "String" },
+        { "kind": "field", "name": "status", "ty": "String" },
+        { "kind": "field", "name": "implemented_in", "ty": "Option<String>" },
+        { "kind": "field", "name": "superseded_by", "ty": "Option<String>" }
+      ]
+    },
+    {
+      "name": "AdrFrontMatterCodec",
+      "description": "Dispatches on status: String to typestate variant constructor; unknown values surface as AdrFrontMatterCodecError::InvalidDecisionField.",
+      "kind": "use_case",
+      "expected_members": []
+    },
+    {
+      "name": "AdrFrontMatterCodecError",
+      "description": "Codec error type for ADR front-matter parsing failures.",
+      "kind": "error_type",
+      "expected_variants": ["YamlParse", "MissingAdrId", "InvalidDecisionField"]
+    }
+  ]
+}
+```
+
+The codec absorbs DTO-shape inconsistencies (e.g. `Implemented` without `implemented_in`) and surfaces them as `InvalidDecisionField` — domain never sees the malformed shape.
+
+### Pattern 4: Hexagonal port + adapter pair (canonical hexagonal architecture)
+
+```jsonc
+// domain-types.json
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "AdrFilePortError",
+      "description": "Error type for domain-level ADR file port failures.",
+      "kind": "error_type",
+      "expected_variants": ["ListPaths", "ReadFile"]
+    },
+    {
+      "name": "AdrFilePort",
+      "description": "Secondary port for ADR file enumeration and front-matter parsing.",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_adr_frontmatter",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "PathBuf" }],
+          "returns": "Result<AdrFrontMatter, AdrFilePortError>",
+          "is_async": false
+        }
+      ]
+    }
+  ]
+}
+
+// infrastructure-types.json
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsAdrFileAdapter",
+      "description": "Filesystem adapter implementing AdrFilePort.",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "AdrFilePort",
+          "expected_methods": [
+            {
+              "name": "read_adr_frontmatter",
+              "receiver": "&self",
+              "params": [{ "name": "path", "ty": "PathBuf" }],
+              "returns": "Result<AdrFrontMatter, AdrFilePortError>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "expected_members": [
+        { "kind": "field", "name": "adr_dir", "ty": "PathBuf" }
+      ]
+    }
+  ]
+}
+```
+
+Notes:
+- The port's error type lives in domain (CN-05). Adapter-specific failures are absorbed into the port's error variants by the adapter.
+- `returns` strings use concrete generics — write `"Result<T, E>"` not bare `"Result"`. The codec only rejects strings containing `::` (last-segment enforcement); bare `"Result"` passes the codec but loses type information needed for forward checks.
+- `params[].ty` and `returns` use last-segment names only — `PathBuf`, not `std::path::PathBuf`.
+- Object-safety: prefer owned types (`PathBuf`) over unsized borrowed types (`&Path`) in port method signatures so `Arc<dyn Port>` works without lifetime gymnastics.
+
+### Quick self-check before writing
+
+Before saving the catalogue, scan the draft and confirm:
+
+1. Every type carrying state-specific data has either `kind: typestate` (transitions exist) or its variant-specific data is declared as separate catalogue entries (no transitions). No type should have a `status: SomeEnum` field plus `Option<...>` fields gated by that status.
+2. Every state-machine wrapper enum lists all typestate variant names in `expected_variants` so the contract-map renderer can draw the wrapper-to-state edges (when supported).
+3. Every method `returns` value is a concrete generic (e.g., `"Result<T, E>"` not bare `"Result"`). The codec rejects `::` but accepts bare `"Result"` — use the full generic to preserve forward-check information.
+4. Every domain port method's parameter and return types name only domain types (no usecase/infrastructure imports).
+5. No `kind: typestate` for primitives or struct-only carriers without transitions — that is `value_object`.
+6. Every type with `kind: enum` whose intended Rust impl uses variant payloads (e.g., `MyEnum { Variant(SomeType) }`) declares `SomeType` as a separate catalogue entry — payloads are not visible in `expected_variants` alone.
 
 ### Action rules
 

@@ -1,0 +1,503 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "AdrFrontMatter",
+      "description": "Parsed representation of a single ADR file's YAML front-matter block. Wraps the deserialized adr_id + decisions[] payload as a domain value object. Construction from raw YAML text delegates to the infrastructure AdrFrontMatterCodec; domain holds only the validated form. serde-free in domain — deserialization lives in the infrastructure adapter per CN-05 hexagonal rule.",
+      "approved": true,
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "adr_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "decisions",
+          "ty": "Vec<AdrDecisionEntry>"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-01",
+          "hash": "105ae75779800a8927507857533956d55ee5e2f12b44923b3c0423eee7c50d89"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-03",
+          "hash": "b9b42512b3895fe05b4791da3d2aa24fdf6ab07c5207e29435ac02a86ccb1c96"
+        }
+      ]
+    },
+    {
+      "name": "AdrDecisionCommon",
+      "description": "Common fields shared by every AdrDecisionEntry variant regardless of lifecycle state: the decision id (e.g. 'D1'), optional user_decision_ref and review_finding_ref (grounds trace fields used by AdrSignalEvaluator), optional candidate_selection (encodes candidate A/B/C selection per D3), and the grandfathered flag (exempts from signal verification per D4). Extracted as a separate value object so each typestate embeds it rather than repeating fields. No serde in domain.",
+      "approved": true,
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "user_decision_ref",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "review_finding_ref",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "candidate_selection",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "grandfathered",
+          "ty": "bool"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-01",
+          "hash": "105ae75779800a8927507857533956d55ee5e2f12b44923b3c0423eee7c50d89"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Embedded into each lifecycle typestate (ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision) as the shared grounds payload, so each typestate struct carries only its relevant fields plus the shared common block."
+        }
+      ]
+    },
+    {
+      "name": "ProposedDecision",
+      "description": "Typestate for a decision that is newly drafted and awaiting review. Carries only AdrDecisionCommon (id, user_decision_ref, review_finding_ref, candidate_selection, grandfathered). No state-specific payload beyond the common fields — the proposal is open, no implementation or supersession reference exists yet. Outgoing transitions: to AcceptedDecision (review-complete) or DeprecatedDecision (withdrawn before acceptance). No serde in domain.",
+      "approved": true,
+      "kind": "typestate",
+      "transitions_to": [
+        "AcceptedDecision",
+        "DeprecatedDecision"
+      ],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "common",
+          "ty": "AdrDecisionCommon"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-03",
+          "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Replaces the Proposed variant of the old flat AdrDecisionEntry enum. Per 04-coding-principles.md typestate rule: state transitions exist in the lifecycle (proposed -> accepted -> implemented), so typestate is preferred over enum. Each state is its own type carrying only the fields valid in that state."
+        }
+      ]
+    },
+    {
+      "name": "AcceptedDecision",
+      "description": "Typestate for a decision that has completed review and is ready for implementation. Carries only AdrDecisionCommon. No state-specific payload — acceptance means the decision is ratified but implementation has not started yet. Outgoing transitions: to ImplementedDecision (implementation complete), SupersededDecision (replaced by a later decision before implementation), or DeprecatedDecision (withdrawn after acceptance). No serde in domain.",
+      "approved": true,
+      "kind": "typestate",
+      "transitions_to": [
+        "ImplementedDecision",
+        "SupersededDecision",
+        "DeprecatedDecision"
+      ],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "common",
+          "ty": "AdrDecisionCommon"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-03",
+          "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Replaces the Accepted variant of the old flat AdrDecisionEntry enum. AcceptedDecision has no extra payload versus ProposedDecision but is a distinct typestate because it unlocks the ImplementedDecision transition that Proposed cannot reach."
+        }
+      ]
+    },
+    {
+      "name": "ImplementedDecision",
+      "description": "Typestate for a decision that has been fully implemented. Carries AdrDecisionCommon plus implemented_in: String — the commit hash or reference where the decision was actualized. The implemented_in field is structurally present only in this state; it cannot appear in ProposedDecision or AcceptedDecision, eliminating the Option<implemented_in> field that would otherwise pollute those states. Outgoing transitions: to SupersededDecision (implementation is later replaced) or DeprecatedDecision (implementation is retired). No serde in domain.",
+      "approved": true,
+      "kind": "typestate",
+      "transitions_to": [
+        "SupersededDecision",
+        "DeprecatedDecision"
+      ],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "common",
+          "ty": "AdrDecisionCommon"
+        },
+        {
+          "kind": "field",
+          "name": "implemented_in",
+          "ty": "String"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-03",
+          "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Replaces the Implemented variant of the old flat AdrDecisionEntry enum. implemented_in is now a required String (not Option) because it cannot be None in this state — the typestate makes the invalid state (Implemented with no commit ref) structurally impossible."
+        }
+      ]
+    },
+    {
+      "name": "SupersededDecision",
+      "description": "Typestate for a decision that has been replaced by a later decision in a subsequent ADR. Carries AdrDecisionCommon plus superseded_by: String — the ADR anchor reference (e.g. '2026-04-28-0001-some-adr.md#D2') identifying the superseding decision. Terminal state: no outgoing transitions. The superseded_by field is structurally present only in this state, making it impossible for other lifecycle states to carry a supersession reference. No serde in domain.",
+      "approved": true,
+      "kind": "typestate",
+      "transitions_to": [],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "common",
+          "ty": "AdrDecisionCommon"
+        },
+        {
+          "kind": "field",
+          "name": "superseded_by",
+          "ty": "String"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-03",
+          "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Replaces the Superseded variant of the old flat AdrDecisionEntry enum. superseded_by is now a required String (not Option) because it cannot be None in this state — the typestate makes the invalid state (Superseded with no back-reference) structurally impossible. Terminal: no further transitions."
+        }
+      ]
+    },
+    {
+      "name": "DeprecatedDecision",
+      "description": "Typestate for a decision that has been retired without replacement. Carries only AdrDecisionCommon. No state-specific payload — deprecation is a retirement marker with no forward reference. Terminal state: no outgoing transitions. This state differs from SupersededDecision in that deprecation signals voluntary retirement rather than replacement; the distinction is valuable for lifecycle reporting (OS-02 notes advanced queries are out-of-scope but the structural distinction is established here). No serde in domain.",
+      "approved": true,
+      "kind": "typestate",
+      "transitions_to": [],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "common",
+          "ty": "AdrDecisionCommon"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-03",
+          "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Replaces the Deprecated variant of the old flat AdrDecisionEntry enum. Terminal with no extra payload. Structurally distinguishable from SupersededDecision at the type level — a Deprecated entry has no superseded_by reference, making it impossible to confuse the two end states."
+        }
+      ]
+    },
+    {
+      "name": "AdrDecisionEntry",
+      "description": "Enum wrapper providing the heterogeneous-collection boundary for Vec<AdrDecisionEntry> in AdrFrontMatter::decisions. Each variant holds one of the five lifecycle typestate types (ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision), allowing the Vec to hold decisions at any lifecycle state while each typestate node remains a distinct catalogue entry that the contract-map renderer can draw as individual nodes. AdrSignalEvaluator::evaluate pattern-matches on this enum to extract the embedded AdrDecisionCommon grounds fields from whichever typestate variant is present. AdrFrontMatterCodec dispatches on the YAML status string to construct the correct variant. No serde in domain — serde lives in the infrastructure DTO layer per CN-05.",
+      "approved": true,
+      "action": "modify",
+      "kind": "enum",
+      "expected_variants": [
+        "ProposedDecision",
+        "AcceptedDecision",
+        "ImplementedDecision",
+        "SupersededDecision",
+        "DeprecatedDecision"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-01",
+          "hash": "105ae75779800a8927507857533956d55ee5e2f12b44923b3c0423eee7c50d89"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-03",
+          "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "Restructured from an enum with five flat string-named variants (Proposed/Accepted/Implemented/Superseded/Deprecated) to an enum whose variants carry typestate types (ProposedDecision/AcceptedDecision/ImplementedDecision/SupersededDecision/DeprecatedDecision). The typestate types are the individual catalogue nodes; this enum is the heterogeneous-collection boundary only (04-coding-principles.md persistence-from-serde pattern: typestate per state + state-erasing enum at heterogeneous boundary). expected_variants list the typestate type names so the contract-map renderer draws AdrDecisionEntry -> ProposedDecision edges etc."
+        }
+      ]
+    },
+    {
+      "name": "DecisionGrounds",
+      "description": "Enum-first classification of the grounds for a single ADR decision. UserDecisionRef = user explicitly approved (maps to blue ConfidenceSignal); ReviewFindingRef = emerged from review process (yellow); Grandfathered = legacy decision exempt from signal check per D4; NoGrounds = no trace field and not grandfathered (red). Each variant carries structurally distinct data — no struct+Option needed.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "UserDecisionRef",
+        "ReviewFindingRef",
+        "Grandfathered",
+        "NoGrounds"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-07",
+          "hash": "7d227c235c9c4fe09b4abf157b7f2988bf07107a487e2ec8361720228f62cd17"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-02",
+          "hash": "948d255f2c35e278d1381aaa09f56fef44fe0fa183fbfcf1ac64dc468e4beeda"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-03",
+          "hash": "af70dcdaf4434abad9d42fb129f4e90f404f089081df8a2aa6ad3a980cbe6f7f"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    },
+    {
+      "name": "AdrSignalEvaluator",
+      "description": "Pure domain computation struct. Exposes an evaluate method that takes an AdrDecisionEntry ref and returns a DecisionGrounds classification by pattern-matching on the enum variant and extracting the embedded AdrDecisionCommon grounds fields from whichever typestate is present. All five typestate variants (ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision) carry AdrDecisionCommon, so the evaluator can uniformly access user_decision_ref, review_finding_ref, and grandfathered regardless of lifecycle state. No I/O dependency — filesystem access is usecase/infra concern per CN-05. Placed in domain so the usecase interactor can call it without depending on infrastructure. evaluate is infallible: all reachable AdrDecisionEntry values are well-formed (validation occurs in AdrFrontMatterCodec at the infrastructure boundary). Kind use_case captures its role as a pure computation unit with no port interface.",
+      "approved": true,
+      "kind": "use_case",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-07",
+          "hash": "7d227c235c9c4fe09b4abf157b7f2988bf07107a487e2ec8361720228f62cd17"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-02",
+          "hash": "948d255f2c35e278d1381aaa09f56fef44fe0fa183fbfcf1ac64dc468e4beeda"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    },
+    {
+      "name": "AdrVerifyReport",
+      "description": "Aggregate result of evaluating all decisions across all ADR files in a single verify-adr-signals run. Contains a summary count of blue/yellow/red decisions across all evaluated files. Returned by VerifyAdrSignalsInteractor and consumed by the CLI layer for exit-code determination. The red_count drives non-zero exit per AC-01.",
+      "approved": true,
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "blue_count",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "yellow_count",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "red_count",
+          "ty": "usize"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-02",
+          "hash": "2881ca598d2cd0177afebb0365e61dc5caffefde6af8d315f8afa805ded5e828"
+        }
+      ]
+    },
+    {
+      "name": "AdrFilePortError",
+      "description": "Error type for domain-level ADR file port failures. ListPaths: I/O error enumerating the ADR directory (e.g. directory not found, permission denied). ReadFile: failure to read or fully parse an ADR file — covers both I/O read errors AND YAML front-matter parse errors (AdrFrontMatterCodecError), since the adapter absorbs all per-file failures into this single opaque variant so the port signature remains infrastructure-free (CN-05). Domain-layer type so AdrFilePort (domain port) does not name any usecase or infrastructure type in its signature. The usecase VerifyAdrSignalsError wraps these variants (AdrFileListing / AdrFileRead).",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "ListPaths",
+        "ReadFile"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    },
+    {
+      "name": "AdrFilePort",
+      "description": "Secondary port (driven by infrastructure) for ADR file enumeration and front-matter parsing. Abstracts filesystem access AND YAML decoding from the usecase layer per CN-05 hexagonal rule. The interactor depends on this trait; FsAdrFileAdapter in infrastructure implements it. list_adr_paths returns Vec<PathBuf> of discovered ADR file paths; read_adr_frontmatter takes a path and returns Result<AdrFrontMatter, AdrFilePortError> — IO and parse errors propagate as errors so the adapter satisfies no-panic and the interactor can surface failures via VerifyAdrSignalsError.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "list_adr_paths",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Vec<PathBuf>, AdrFilePortError>",
+          "is_async": false
+        },
+        {
+          "name": "read_adr_frontmatter",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "path",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<AdrFrontMatter, AdrFilePortError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "read_adr_frontmatter parameter changed from '&Path' to 'PathBuf' to satisfy the constraint that domain port method signatures reference only domain types with no unsized owned Path. PathBuf is an owned concrete type safe in trait object method signatures."
+        }
+      ]
+    }
+  ]
+}

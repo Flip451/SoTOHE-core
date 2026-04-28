@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e8e94a617a4d4441487da3a5f013a0e10c5e7260769f70faeefdd63103e15138",
+  "signals": [
+    {
+      "type_name": "FsAdrFileAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrFrontMatterCodec",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrFrontMatterCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrFrontMatterDto",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrDecisionDto",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrSignalsVerifyAdapter",
+      "signal": "blue"
+    }
+  ]
+}

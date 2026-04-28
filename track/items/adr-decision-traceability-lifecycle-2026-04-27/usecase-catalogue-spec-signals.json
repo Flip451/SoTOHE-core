@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "dfa408e1499c628b015bcc5aa22562dbe86b4ea14b769790d8eca106f7dd82ba",
+  "signals": [
+    {
+      "type_name": "VerifyAdrSignals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyAdrSignalsCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyAdrSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyAdrSignalsError",
+      "signal": "blue"
+    }
+  ]
+}

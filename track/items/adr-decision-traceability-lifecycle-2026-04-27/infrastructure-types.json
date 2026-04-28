@@ -1,0 +1,248 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsAdrFileAdapter",
+      "description": "Filesystem adapter implementing the AdrFilePort secondary port. Walks knowledge/adr/*.md on the real filesystem; reads and YAML-parses file contents using AdrFrontMatterCodec internally. Encapsulates both I/O and parsing so the usecase layer receives domain AdrFrontMatter objects directly (CN-05). Follows the existing Fs-prefix adapter naming convention (FsTrackStore, FsCatalogueLoader, FsCatalogueSpecSignalsStore). Holds a codec instance and the ADR directory path.",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "AdrFilePort",
+          "expected_methods": [
+            {
+              "name": "list_adr_paths",
+              "receiver": "&self",
+              "params": [],
+              "returns": "Result<Vec<PathBuf>, AdrFilePortError>",
+              "is_async": false
+            },
+            {
+              "name": "read_adr_frontmatter",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "path",
+                  "ty": "PathBuf"
+                }
+              ],
+              "returns": "Result<AdrFrontMatter, AdrFilePortError>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "adr_dir",
+          "ty": "PathBuf"
+        },
+        {
+          "kind": "field",
+          "name": "codec",
+          "ty": "AdrFrontMatterCodec"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    },
+    {
+      "name": "AdrFrontMatterCodec",
+      "description": "Infrastructure struct responsible for YAML parsing of ADR front-matter strings into AdrFrontMatter domain value objects. Uses the existing Frontmatter utility to extract the YAML block, then uses serde_yaml to deserialize into AdrFrontMatterDto before constructing domain types. For each AdrDecisionDto, dispatches on status: String to construct the correct domain typestate struct and wraps it in the matching AdrDecisionEntry variant (ProposedDecision | AcceptedDecision | ImplementedDecision | SupersededDecision | DeprecatedDecision), carrying state-specific fields (implemented_in into ImplementedDecision, superseded_by into SupersededDecision) and embedding AdrDecisionCommon for the shared grounds fields. Status strings that do not match a known variant surface as AdrFrontMatterCodecError::InvalidDecisionField. The codec enforces explicit-key-presence detection via a serde_yaml::Value intermediate pass (Option A): before typed DTO deserialization, the raw YAML block is parsed to serde_yaml::Value and each decision mapping is inspected for the explicit presence of the 'implemented_in' and 'superseded_by' keys regardless of their value (i.e. 'key: null' counts as key present). If either key is present on a status that does not own it, the codec immediately returns InvalidDecisionField — this is necessary because serde Option<String> deserialization cannot distinguish 'key: null' from 'key absent', so a typed forbidden-when check on Some(_) would silently accept 'implemented_in: null' on status 'proposed'. The explicit-key-presence check closes this gap: (a) forbidden-when-key-present — 'implemented_in' key present on any status other than 'implemented' → InvalidDecisionField; 'superseded_by' key present on any status other than 'superseded' → InvalidDecisionField. After the key-presence pass succeeds, the typed DTO is deserialized and (b) required-when-value — status 'implemented' requires implemented_in: Some(_), status 'superseded' requires superseded_by: Some(_), else InvalidDecisionField. Together, (a) and (b) uphold the typestate invariant that state-specific payloads cannot appear (even as null) outside their owning state. serde(deny_unknown_fields) on AdrDecisionDto additionally rejects unknown schema fields. serde derives live here, not in domain (CN-05 hexagonal rule). Not a port adapter — it is a pure parsing utility struct with no port interface to implement. Kind use_case captures its role as a pure computation unit. Proxy expected_members omitted: the catalogue codec does not render expected_methods for use_case kind; the method semantics (fn parse(&self, yaml: &str) -> Result<AdrFrontMatter, AdrFrontMatterCodecError>) are described here in prose (documented codec gap).",
+      "approved": true,
+      "kind": "use_case",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-03",
+          "hash": "b9b42512b3895fe05b4791da3d2aa24fdf6ab07c5207e29435ac02a86ccb1c96"
+        }
+      ]
+    },
+    {
+      "name": "AdrFrontMatterCodecError",
+      "description": "Error type for YAML front-matter parse failures within AdrFrontMatterCodec. YamlParse wraps serde_yaml errors; MissingAdrId covers missing required adr_id field; InvalidDecisionField covers per-decision field validation failures. Infrastructure-layer concern — does not propagate serde types into domain.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "YamlParse",
+        "MissingAdrId",
+        "InvalidDecisionField"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-07",
+          "hash": "59f56f89288c7676056131c979e5ad282ea081bc27b1b962ab317d7912d68bef"
+        }
+      ]
+    },
+    {
+      "name": "AdrFrontMatterDto",
+      "description": "Serde-derived DTO mirroring the YAML front-matter schema (adr_id + decisions[] array). Used as the intermediate deserialization target inside AdrFrontMatterCodec before converting to domain AdrFrontMatter value object. serde(deny_unknown_fields) to fail on schema drift. Infrastructure-only — never exported to domain or usecase layers.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "adr_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "decisions",
+          "ty": "Vec<AdrDecisionDto>"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        }
+      ]
+    },
+    {
+      "name": "AdrDecisionDto",
+      "description": "Serde-derived DTO for a single element of the decisions[] array. Covers all schema fields from D3: id (required), user_decision_ref (Option), review_finding_ref (Option), candidate_selection (Option), status (required String — validated and dispatched to AdrDecisionEntry variant by AdrFrontMatterCodec), superseded_by (Option<String>, required when status is 'superseded'), implemented_in (Option<String>, required when status is 'implemented'), grandfathered (Option<bool>, defaults to false). Note: serde Option<String> cannot distinguish 'key: null' from 'key absent'; AdrFrontMatterCodec performs an explicit-key-presence check on the raw serde_yaml::Value before deserializing this DTO, so that 'implemented_in: null' on a non-'implemented' status is caught as InvalidDecisionField before reaching this struct. AdrFrontMatterCodec converts this to the appropriate AdrDecisionEntry enum variant: unknown status values surface as AdrFrontMatterCodecError::InvalidDecisionField; misplaced state-specific fields (implemented_in key present on non-'implemented' status, superseded_by key present on non-'superseded' status) also surface as InvalidDecisionField via the key-presence pre-check to uphold the typestate invariant. Infrastructure-only — never exported to domain or usecase layers.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "user_decision_ref",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "review_finding_ref",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "candidate_selection",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "superseded_by",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "implemented_in",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "grandfathered",
+          "ty": "Option<bool>"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        }
+      ]
+    },
+    {
+      "name": "AdrSignalsVerifyAdapter",
+      "description": "Top-level infrastructure-layer composition struct wired at the CLI composition root. Assembles VerifyAdrSignalsInteractor with FsAdrFileAdapter injected and exposes it for use by the CLI 'verify adr-signals' subcommand. This is a wiring/composition struct — it does not implement any secondary port. Named *Adapter to indicate it is the CLI-facing wiring point. Kind use_case captures its role as a composition unit with no port trait. This type lives in the infrastructure layer (declared in infrastructure-types.json); kind use_case is a catalogue classification (pure computation/wiring unit with no port interface), not a layer designation.",
+      "approved": true,
+      "kind": "use_case",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "interactor",
+          "ty": "VerifyAdrSignalsInteractor"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-03",
+          "hash": "de9902961a8189d8d1c095f442b6fe0befda6f08bf0cc35596281cd5331bab4b"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-02",
+          "hash": "2881ca598d2cd0177afebb0365e61dc5caffefde6af8d315f8afa805ded5e828"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-08",
+          "hash": "e7c7c90bf3349d2af98a02d623cc825a127bb8c08ba4b1f84fac958983c359e9"
+        }
+      ]
+    }
+  ]
+}

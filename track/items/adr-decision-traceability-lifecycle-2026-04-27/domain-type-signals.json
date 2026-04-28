@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-28T02:54:12Z",
+  "declaration_hash": "64e234fc62e8aade8180f0fcc2963d16a2218d842e11d68c192d066fadbfb321",
+  "signals": [
+    {
+      "type_name": "AdrFrontMatter",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrDecisionCommon",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ProposedDecision",
+      "kind_tag": "typestate",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AcceptedDecision",
+      "kind_tag": "typestate",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ImplementedDecision",
+      "kind_tag": "typestate",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SupersededDecision",
+      "kind_tag": "typestate",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "DeprecatedDecision",
+      "kind_tag": "typestate",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrDecisionEntry",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "DecisionGrounds",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrSignalEvaluator",
+      "kind_tag": "use_case",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrVerifyReport",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrFilePortError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrFilePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

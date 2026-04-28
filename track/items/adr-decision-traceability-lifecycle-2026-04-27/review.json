@@ -1,6 +1,135 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new guidance says bare `Result` return types are rejected, but the catalogue codec only enforces the no-`::` rule on `returns`/`ty`. A plain `Result` string is accepted today, so this checklist would incorrectly ban a valid signature and diverge from the actual codec semantics.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 382,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:c0c507debb3e1fdbb903486bdf9060c27bd54e43ff5405abf201596366161807",
+          "at": "2026-04-28T00:45:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c66688c98ceebdd9f22f7754ee7e0329c5d64d6d5b4dcf214dc2304e7d0a9c",
+          "at": "2026-04-28T00:49:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Broken section reference: this newly added instruction tells agents to read `.claude/rules/04-coding-principles.md` § Hybrid, but that file has no `Hybrid` section or heading. Agents following the harness policy will chase a non-existent rule section before drafting state/lifecycle catalogue entries.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 149,
+              "category": "broken_ref"
+            },
+            {
+              "message": "The kind schema guidance is stale relative to the catalogue enum: `TypeDefinitionKind` now has 14 serialized kinds, including `free_function`, but this table and the new kind-selection flow only cover the older 13-kind set. That contradicts `libs/domain/src/tddd/catalogue.rs` and leaves no documented harness-policy path for valid `free_function` catalogue entries.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 127,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:f6c66688c98ceebdd9f22f7754ee7e0329c5d64d6d5b4dcf214dc2304e7d0a9c",
+          "at": "2026-04-28T00:51:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Pattern 2 uses stale review-v2 type names (`NonEmptyFindings` / `Finding`), but the current codebase exposes `NonEmptyReviewerFindings` / `ReviewerFinding`. A reader copying this example will end up with unresolved refs that do not exist in the repo.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 282,
+              "category": "broken refs"
+            }
+          ],
+          "hash": "rvw1:sha256:ce2c5a90153ea4538e9a96b6e52843be4fd13271c741daedcb73d7555f8808b4",
+          "at": "2026-04-28T00:54:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file now advertises `free_function` as a valid catalogue kind, but the selection guidance never mentions it. There is no decision-tree branch or cookbook example for choosing `free_function`, so a type-designer following this file has no documented path to emit the new kind.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 144,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `NonEmptyReviewerFindings` example uses a named `inner` member, but the current schema convention for tuple structs is positional names (`\"0\"`, `\"1\"`, ...). Copying this example would produce an `expected_members` shape that cannot match the rustdoc output for the actual tuple struct in `libs/domain/src/review_v2/types.rs`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 289,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:d8a2dab119d462b27dda37057947dcb831733359d0c1c12548a9c3e4ae1df780",
+          "at": "2026-04-28T00:58:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new catalogue cookbook snippets are not actually loadable by the codec. Pattern 1 omits the required `description` field on every entry, and Patterns 2-4 omit the required top-level `schema_version` / `type_definitions` document wrapper entirely. As written, these examples cannot round-trip through `catalogue_codec`, so they do not provide an actionable catalogue template.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 208,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:35c074ab685302b2d4ec91a131c22c2ada22423e2fce297c456533a1f701a1f5",
+          "at": "2026-04-28T01:03:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Pattern 1's `AdrDecisionCommon` example omits `candidate_selection`, but that field is part of the lifecycle's shared payload in the ADR track spec. As written, the cookbook no longer mirrors the actual common struct and can teach authors an incomplete typestate model.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 211,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:e602dc8f95a6d8b2fdabe8bff5a0f0c52820f16b882ea2839008e7eef327bc24",
+          "at": "2026-04-28T01:07:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f7f2e7783d0be4b592c6822dd320d17e29974ac43ad0dac5a32d249d8126fbb",
+          "at": "2026-04-28T01:11:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f7f2e7783d0be4b592c6822dd320d17e29974ac43ad0dac5a32d249d8126fbb",
+          "at": "2026-04-28T01:13:35Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -16,6 +145,1023 @@
           "findings": [],
           "hash": "rvw1:sha256:c2140d8d54f0d80947c43a5983dee600685e31c98b2daa25547065220515064b",
           "at": "2026-04-27T15:03:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 / ADR D3 require `candidate_selection` in each decision record, but `AdrDecisionEntry` is modeled without it, and the downstream tasks only ever construct `id/user_decision_ref/review_finding_ref/status/...`. As written, the plan cannot preserve the full front-matter schema it claims to standardize.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 35,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AdrSignalEvaluator` is described here as returning `(DecisionGrounds, ConfidenceSignal)`, but the implementation plan only models `DecisionGrounds` and never adds a `ConfidenceSignal` value to this track. That leaves the evaluator API inconsistent across the artifacts and makes T002/T005 ambiguous.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 138,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7d75a8c2d5a65b8b9794f3935a89df2a875e692c23772ebf431e77e11c59dab1",
+          "at": "2026-04-27T15:56:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFilePort.read_adr_content` is declared with `path: Path` by value, but `Path` is unsized and cannot be used as a by-value Rust parameter. This port signature needs `&Path` or `PathBuf`, otherwise the trait cannot be implemented.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 230,
+              "category": "infeasibility"
+            },
+            {
+              "message": "IN-01 declares `candidate_selection` as part of every decision record, but the downstream type catalogues and tasks never model or preserve that field. As written, the plan standardizes a schema element it does not implement.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+              "line": 55,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AdrSignalEvaluator` is tagged as `use_case` in the generated domain catalogue, but the plan and contract map place it in the domain layer as a pure function. That leaves the rendered artifacts inconsistent about where this type belongs.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 137,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AdrFrontMatterCodec` and `AdrSignalsVerifyAdapter` are tagged as `use_case` in this infrastructure catalogue, but the plan and contract map treat both as infrastructure-layer components. The generated layer view will therefore disagree with the rest of the track.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7d75a8c2d5a65b8b9794f3935a89df2a875e692c23772ebf431e77e11c59dab1",
+          "at": "2026-04-27T15:59:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 omits `candidate_selection` from `AdrDecisionEntry`, but IN-01 and the `AdrDecisionEntry` catalogue both treat it as part of the front-matter schema. As written, the plan would standardize a decision record shape that drops one of the declared fields.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 21,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AdrSignalEvaluator` is described as returning `(DecisionGrounds, ConfidenceSignal)`, but T002 and the rest of this track only model `DecisionGrounds` and never introduce a `ConfidenceSignal` type. That leaves the evaluator API inconsistent across the artifacts and makes T002/T005 impossible to pin down.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 138,
+              "category": "contradiction"
+            },
+            {
+              "message": "`VerifyAdrSignalsInteractor` is specified to perform front-matter parsing via the infrastructure `AdrFrontMatterCodec`, but CN-05 says the usecase layer must not depend on infrastructure. The track does not define any port or trait to mediate that boundary, so the interactor description violates the declared hexagonal layering.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 67,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4aacf0722de04904ce70d6353cb94f09386e49617cffaad2e6bf64ec6798ac01",
+          "at": "2026-04-27T16:06:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's integration test assumes two later mutations are already in place: the parent ADR's new front-matter from T008 and the grandfathered backfill from T009. As ordered, S6 cannot reach a passing state before S8, so this task is not executable without deferring the test or using a temporary fixture.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T007 adds `verify-adr-signals` into `cargo make ci` before the repository has been made compliant by T008/T009/T011. That would make the newly added CI gate fail immediately on the existing ADR corpus, so the gate cannot be merged in the stated order unless it is staged behind a temporary bypass.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 73,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:5184fb49f00356a95b4906d9ede4e3740ca74ae61a96cc706155cbebf067fa62",
+          "at": "2026-04-27T16:09:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 is gated on T008/T009 being completed, but the S8 section states that T008-T011 depend on T007 being complete. That creates a circular dependency, so the plan cannot be executed from a clean state without breaking one of those prerequisites.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 71,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:965082e1e37d928a36548f50a2bfe1ba8fce8ec42d02df92b5dc225ffb466929",
+          "at": "2026-04-27T16:13:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010’s required front-matter field list omits `candidate_selection`, even though IN-01 / D3 standardize it as part of the decision schema. As written, the adr-editor/convention update can preserve a narrower record shape than the plan claims to standardize.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:91fbea380f44911aca86c44cef09982c01e8d69b2b497adec14fb4fda3235ff0",
+          "at": "2026-04-27T16:15:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T009` defines grandfathered back-fill as `adr_id + decisions: [{id, grandfathered: true}, ...]`, but `T001` makes `status` a required field on every `AdrDecisionEntry`, and `T003` says the codec must still materialize the domain object from partial front-matter. The plan never specifies a default status for grandfathered entries, so the back-fill path is underspecified and the schema cannot be implemented as written.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b67b77bab337a377428a8d77a0aaa82e0ecb53f01a6bdd516094fa89c0980994",
+          "at": "2026-04-27T16:18:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrDecisionDto` is described as making every field `Option` to tolerate partial front-matter, but the plan elsewhere requires `status` to be present even for grandfathered back-fill and treats `adr_id` as mandatory. As written, the codec schema and the migration rules disagree on whether a minimal grandfathered ADR is valid.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
+              "line": 133,
+              "category": "contradiction"
+            },
+            {
+              "message": "T010 expands the update scope to `.claude/commands/adr/add.md` and other related files if needed, but OS-05 says this track must not make spillover changes to any convention/command file beyond `adr-editor.md` and `adr.md`. The task is self-contradictory about which files are allowed to change.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:82f1a199cb4a347a63d6ad12b8ff03aecea308253bb19e1c049ddd776c395444",
+          "at": "2026-04-27T16:20:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1cd6e62a80fbd88cadd541258c8a99825ae6acc67d8a1d1b174f5d62688cc85",
+          "at": "2026-04-27T16:24:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006’s integration test is not executable as written: `verify adr-signals` is defined to discover ADRs from the workspace-root `knowledge/adr` tree with no path override, but the test fixture is placed under `tests/`. Unless the test creates a temporary workspace or the command gains an ADR-dir override, that fixture will never be scanned.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d1cd6e62a80fbd88cadd541258c8a99825ae6acc67d8a1d1b174f5d62688cc85",
+          "at": "2026-04-27T16:26:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` describes `AdrSignalEvaluator::evaluate` as taking `AdrDecisionEntry` by value, but the domain contract for the same type says the method should take `&AdrDecisionEntry`. That leaves the planned API shape inconsistent across the plan and type catalogue, so implementers would have to choose between two conflicting signatures.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bf8797adc08c219e3354e09501b0ea9d4ae5ba8d57373fbe5bb01fb783260a55",
+          "at": "2026-04-27T16:28:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aab01d81740000fc3cbbfe65346eef54dc8521d2818fa34371c0f825f48d6614",
+          "at": "2026-04-27T16:30:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aab01d81740000fc3cbbfe65346eef54dc8521d2818fa34371c0f825f48d6614",
+          "at": "2026-04-27T16:33:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aab01d81740000fc3cbbfe65346eef54dc8521d2818fa34371c0f825f48d6614",
+          "at": "2026-04-27T16:35:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This summary says the implementation proceeds `domain → usecase → infrastructure → CLI`, but the detailed task breakdown in the same file puts the infrastructure codec/adapter/composition-root work in T003-T004 before the usecase interactor in T005. The plan's execution order is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:37e85d06d6b11643f13434af70d5fac72579375536861dbdfe8b79d2ad6244dc",
+          "at": "2026-04-27T16:56:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary is internally inconsistent about implementation order: line 6 says the track is built in the order `domain → usecase → infrastructure → CLI`, but line 7 immediately describes the T001-T006 phase as `domain → infrastructure → usecase → CLI`. Those two sequences conflict.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "T006's integration test is not executable as written: the command is defined to discover ADRs from `knowledge/adr/*.md`, but the test fixture is placed under `tests/`. Without a temporary workspace or an ADR-root override, that fixture will never be scanned by `sotp verify adr-signals`.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:37e85d06d6b11643f13434af70d5fac72579375536861dbdfe8b79d2ad6244dc",
+          "at": "2026-04-27T16:57:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFilePort::read_adr_frontmatter` is specified to return `AdrFrontMatter` by value here, but T003/T004/T005 require front-matter parse and file-read failures to be propagated as errors (`MissingAdrId`, `FrontMatterDecode`, `read_adr_frontmatter error`). With a non-`Result` return type, the planned pipeline cannot surface those failures without panics or sentinels, so the use case is not implementable as written.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 291,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:570af1335585cbe1d5060aea611cf4ff61b34f9dabaf8ce31c19c190292b5736",
+          "at": "2026-04-27T17:02:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 specifies `AdrFilePort::read_adr_frontmatter` as infallible (`-> AdrFrontMatter`), but T003/T004/T005 all require front-matter absence, IO, and parse failures to propagate as `Result` and include `read_adr_frontmatter error` cases. With the current signature, the filesystem adapter cannot satisfy the no-panic/error-propagation requirement.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 30,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`VerifyAdrSignals` is specified to return plain `AdrVerifyReport`, but T005/T006 define `VerifyAdrSignalsError` and rely on listing/read/decode failures reaching the CLI. Without a `Result` return on the application service, the use case cannot express the failure modes the plan depends on.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 19,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:570af1335585cbe1d5060aea611cf4ff61b34f9dabaf8ce31c19c190292b5736",
+          "at": "2026-04-27T17:04:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyAdrSignals.verify` is specified to return plain `AdrVerifyReport`, but this same artifact defines `VerifyAdrSignalsError` with file-listing, file-read, front-matter decode, and signal-eval failure modes, and T005 explicitly expects those error cases. As written, the application-service contract cannot propagate the planned failures.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 19,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`AdrFilePort.read_adr_frontmatter` is specified as `path: Path` -> `AdrFrontMatter`, but `Path` is unsized and cannot be passed by value in Rust, and the plain return type leaves no channel for the IO/parse errors that T004/T005 require. This port contract is not implementable as planned.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 312,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:570af1335585cbe1d5060aea611cf4ff61b34f9dabaf8ce31c19c190292b5736",
+          "at": "2026-04-27T17:10:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFilePort::read_adr_frontmatter` is declared here to return plain `AdrFrontMatter`, but T004/T005 also require IO/YAML failures to propagate as `Result` (`AdrFileRead` / `FrontMatterDecode`). With the current signature there is no error channel, so the planned read-path error handling is unimplementable without either changing the trait or introducing panics/sentinel values.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 30,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:570af1335585cbe1d5060aea611cf4ff61b34f9dabaf8ce31c19c190292b5736",
+          "at": "2026-04-27T17:13:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFilePort::read_adr_frontmatter` is specified to return raw `AdrFrontMatter` here, but T004/T005 require filesystem and YAML parsing failures to propagate as `Result`. As written, the port has no error channel, so the adapter cannot satisfy the no-panic/error-propagation design.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 312,
+              "category": "contradiction"
+            },
+            {
+              "message": "`VerifyAdrSignals::verify` returns raw `AdrVerifyReport` here, but T005 introduces `VerifyAdrSignalsError` and explicitly requires listing/read/decode/signal failures to be exercised. Without a `Result`-style return, the interactor cannot surface those failure modes.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:570af1335585cbe1d5060aea611cf4ff61b34f9dabaf8ce31c19c190292b5736",
+          "at": "2026-04-27T17:20:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1db2baaaf20309ee9b218ab971b581e61b8043ab85bc35d2bfc25a472193cd27",
+          "at": "2026-04-27T17:24:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1db2baaaf20309ee9b218ab971b581e61b8043ab85bc35d2bfc25a472193cd27",
+          "at": "2026-04-27T17:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's integration test fixtures live under `tests/`, but `verify adr-signals` is defined to scan only `knowledge/adr/*.md` and T006 does not add any ADR-dir override or workspace remapping. As written, the fixture files will never be discovered, so the test cannot pass.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The `AdrFilePort.read_adr_frontmatter` contract takes `path: Path` by value. `Path` is unsized, so this is not a valid Rust parameter type; the port needs `&Path` or `PathBuf` to be implementable.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 304,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6c4c89b8a96e364703033bd9e3c71e74657468b7218dc1c91531654e454993cd",
+          "at": "2026-04-27T17:37:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyAdrSignalsInteractor` is modeled as holding `port: AdrFilePort`, but the plan says this dependency is kept through a trait object. A bare trait type is not a storable Rust field, so the catalogue needs a boxed or generic trait-object form (`Box<dyn AdrFilePort>` or equivalent) for this interactor to be implementable.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 79,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T006 claims the integration test can run against fixtures under `tests/` without depending on the real `knowledge/adr/` tree, but the command/adapter shape gives no way to point the verifier at an alternate ADR root. As written, the test will still enumerate the workspace-root ADR directory unless the plan adds workspace re-rooting or an explicit directory override.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6c4c89b8a96e364703033bd9e3c71e74657468b7218dc1c91531654e454993cd",
+          "at": "2026-04-27T17:39:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16c4ce47b1b13d797d95261d550c3faac13343c6817fac6dee77bdba4a5f51fe",
+          "at": "2026-04-27T17:41:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFilePort.read_adr_frontmatter` declares the parameter type as `Path` by value, while the implementation plan describes the port as taking `&Path`. `std::path::Path` is unsized, so this trait method is not implementable as written; the contract needs `&Path` or `PathBuf` before `FsAdrFileAdapter` and the `Arc<dyn AdrFilePort>` interactor can compile.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 309,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T006 says the integration test will place ADR fixtures under `tests/` and run `sotp verify adr-signals` before T008/T009 without depending on the real `knowledge/adr/`, but the spec defines the command as scanning `knowledge/adr/*.md` and the planned CLI command has no ADR-directory override. As written, those fixtures will not be discovered, so the stated integration test path is not executable.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:16c4ce47b1b13d797d95261d550c3faac13343c6817fac6dee77bdba4a5f51fe",
+          "at": "2026-04-27T17:44:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The method contract declares `VerifyAdrSignals.verify` as returning bare `Result`, and the same bare return shape is used for the ADR file port methods. The catalogue schema preserves concrete generic return strings, while the surrounding plan requires declared domain outputs such as `AdrVerifyReport` and `AdrFrontMatter`; as written, the contract is not an executable Rust signature and drops the domain return types the use case is supposed to expose.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 19,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:16c4ce47b1b13d797d95261d550c3faac13343c6817fac6dee77bdba4a5f51fe",
+          "at": "2026-04-27T17:49:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_adr_frontmatter` is modeled as taking `path: Path` by value here, but `Path` is unsized and cannot be passed by value in Rust. The plan needs `&Path` (as already described in T002/T004) or `PathBuf`; otherwise the port trait and filesystem adapter cannot compile.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 331,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`VerifyAdrSignalsError` still models a `FrontMatterDecode` variant for YAML parse failures, but the round-5 domain port/error model only exposes `AdrFilePortError::{ListPaths, ReadFile}` and `read_adr_frontmatter` returns `AdrFrontMatter` directly. As written, parse failures have no route from the adapter into this variant, so the error taxonomy is inconsistent and that failure path is unreachable.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 109,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6ec0d851c2608b07b6ce965b235a6e0d5fbab4bd353ce60f1a7eed922fef059f",
+          "at": "2026-04-27T23:11:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFilePort.read_adr_frontmatter` is rendered as `path: Path` in the catalogue, but `Path` is unsized and cannot be passed by value in Rust. The port contract is therefore non-compilable as written; it needs `&Path` (matching the plan text in T002) or an owned `PathBuf`.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.md",
+              "line": 29,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`T005` asks the usecase-layer unit tests to assert a \"non-zero exit\" for a red decision, but exit-code handling is only defined at the CLI layer in `T006`/`AC-01`. The interactor boundary is `Result<AdrVerifyReport, VerifyAdrSignalsError>`, so this test contract mixes CLI behavior into the usecase and is not implementable at that layer.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6ec0d851c2608b07b6ce965b235a6e0d5fbab4bd353ce60f1a7eed922fef059f",
+          "at": "2026-04-27T23:14:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's integration test is not executable as written: `verify adr-signals` is defined to scan `knowledge/adr/*.md`, but the fixture files are placed under `tests/` and the plan does not add any ADR-root override or temporary workspace remapping. As written, those fixtures will never be discovered by the command.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`VerifyAdrSignalsError` still exposes a `FrontMatterDecode` variant, but the round-5 port model makes `read_adr_frontmatter` return `AdrFrontMatter` and only `AdrFilePortError::{ListPaths, ReadFile}`. YAML parse failures are already absorbed by the infrastructure codec/adapter layer, so the use case has no path to emit `FrontMatterDecode`; that failure mode is inconsistent and unreachable.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 116,
+              "category": "contradiction"
+            },
+            {
+              "message": "The summary says the track will be implemented in `domain → usecase → infrastructure → CLI` order, but the next line says `domain → infrastructure → usecase → CLI`. The plan is internally inconsistent about the execution order, so readers cannot tell which layering sequence is authoritative.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:460a9547add6444bffb24bb68a5bd956030ec154d5e1ae33e5dd113ed43faa41",
+          "at": "2026-04-27T23:17:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 is assigned solely to T006, but T006's stated integration test explicitly skips the CLI entrypoint and only asserts `VerifyAdrSignalsInteractor.red_count == 0`. That leaves the required `verify-adr-signals` exit-1 / stderr behavior uncovered, so the coverage map overstates AC-01 coverage.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/task-coverage.json",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5ff3c92cc86a54b89852ae797e34fc7f1d049f56f9f914c969af6cda93f1b434",
+          "at": "2026-04-27T23:22:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0314a0b936ce41df922c9f897d810a6808204c86037f2ca04df8e2048dcc183e",
+          "at": "2026-04-27T23:26:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` still describes `AdrFilePort::read_adr_frontmatter` as taking `&Path` and returning `AdrFrontMatter`, while the catalogue contract now declares `Result<AdrFrontMatter, AdrFilePortError>` and later tasks require read/parse failures to propagate. If implemented from this task text, the domain port would lack the error channel needed by T004/T005, contradicting the round-5 return-type fix.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0314a0b936ce41df922c9f897d810a6808204c86037f2ca04df8e2048dcc183e",
+          "at": "2026-04-27T23:28:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae11d25263f33d8da10195f3dd11499f7f6798a030ee2a34e2e5df17462aaf59",
+          "at": "2026-04-27T23:30:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyAdrSignalsError` still declares `SignalEval` wrapping `AdrSignalEvalError`, but the domain catalogue and plan define `AdrSignalEvaluator::evaluate` as deterministic `&AdrDecisionEntry -> DecisionGrounds`; `AdrSignalEvalError` is produced during decision construction/validation, which the codec maps into read/decode errors before the usecase sees it. This leaves the usecase error variant unreachable unless the evaluator signature is changed to return a `Result` or the variant is removed.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 110,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AdrFilePortError::ReadFile` is defined here as an I/O read error only, while the port/usecase/adapter descriptions require YAML parse failures to be absorbed into the same `ReadFile` path. That makes the error taxonomy contradictory for implementers deciding whether parse failures are represented by `AdrFrontMatterCodecError`, `AdrFilePortError::ReadFile`, or a separate variant.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 292,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ae11d25263f33d8da10195f3dd11499f7f6798a030ee2a34e2e5df17462aaf59",
+          "at": "2026-04-27T23:34:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFrontMatterCodec` is still classified as `use_case`, but its members include `AdrFrontMatterDto`, an infrastructure-only DTO. That violates the hexagonal boundary rule in the review brief: use-case entries cannot depend on infrastructure types.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
+              "line": 74,
+              "category": "architecture"
+            },
+            {
+              "message": "`AdrSignalsVerifyAdapter` is also classified as `use_case`, but it owns `FsAdrFileAdapter`, an infrastructure adapter. That creates the same forbidden use-case-to-infrastructure dependency and leaves the CLI composition entry outside the layer rules the plan is meant to enforce.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
+              "line": 237,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:8645e62252ee0f72c7e17016167982f34a56b39d51d079235cb9d2a74a0e7143",
+          "at": "2026-04-27T23:37:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bef2ae60a04bb2db98404a232be2d8b0b1a85edb07365d4ee79c8eff195cb4a",
+          "at": "2026-04-27T23:40:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 still instructs the CLI wiring to call `VerifyAdrSignals::verify()` with no argument, but `usecase-types.json` defines the application-service method as `verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyReport, VerifyAdrSignalsError>`. Implementing the task literally would not match the planned trait signature; the task should construct/pass `VerifyAdrSignalsCommand`.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 36,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:0bef2ae60a04bb2db98404a232be2d8b0b1a85edb07365d4ee79c8eff195cb4a",
+          "at": "2026-04-27T23:44:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c93863b774e7499b63d4aa85b91f10699bcfb20ecc4e9f730ce1e413284c7428",
+          "at": "2026-04-27T23:47:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 instructs the CLI to call `VerifyAdrSignals::verify(VerifyAdrSignalsCommand {})`, while `VerifyAdrSignalsCommand` is described as a fieldless unit struct in the usecase catalogue. A Rust unit-like struct is constructed as `VerifyAdrSignalsCommand`, not with braces, so following the plan literally produces an invalid call unless the command is instead defined as an empty braced struct.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 36,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c93863b774e7499b63d4aa85b91f10699bcfb20ecc4e9f730ce1e413284c7428",
+          "at": "2026-04-27T23:49:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:948669919e571503564fe07c49fa3a86b4695e63da97c9aac342c65025915b8e",
+          "at": "2026-04-27T23:52:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:948669919e571503564fe07c49fa3a86b4695e63da97c9aac342c65025915b8e",
+          "at": "2026-04-27T23:55:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82ebff9f9d1b749e08ff05c98cf02ee5882239d06857eb92ceb0b8db2611ee8c",
+          "at": "2026-04-28T00:44:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrDecisionEntry` is declared with `action: \"modify\"`, but the implementation plan for T001 says to add the `AdrDecisionEntry` enum wrapper as a new domain type. That gives the plan two conflicting baseline-operation intents for the same type, which can misdirect the TDDD action semantics and implementation tracking.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 284,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:82ebff9f9d1b749e08ff05c98cf02ee5882239d06857eb92ceb0b8db2611ee8c",
+          "at": "2026-04-28T00:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 defines `AdrDecisionDto` with both `implemented_in` and `superseded_by` as globally accepted optional fields and only validates that they are present for `implemented` / `superseded`; it never requires `InvalidDecisionField` when those fields appear on the wrong lifecycle status. Because `serde(deny_unknown_fields)` will not reject known fields, YAML such as `status: proposed` plus `implemented_in` would parse and then be silently dropped when constructing `ProposedDecision`, contradicting the typestate invariant that state-specific payloads cannot appear outside their owning state.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:82ebff9f9d1b749e08ff05c98cf02ee5882239d06857eb92ceb0b8db2611ee8c",
+          "at": "2026-04-28T01:19:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003/T004 never exercise `AdrFrontMatterCodecError::YamlParse`. The planned tests cover schema drift, invalid status, and missing-state-field cases, but not a syntactically malformed front-matter fixture, so the codec's raw parse-failure path would remain unverified despite being part of the public error surface.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 33,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:de639d376b0b07d0af7329f359b5ab7685c781f0decf5ea4365a8e7e622c19fb",
+          "at": "2026-04-28T01:24:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:394321fa79013b1b92404bcb82b793d18726e0a3c0124d50d23be88b2ed2331a",
+          "at": "2026-04-28T01:28:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new forbidden-when validation only checks `Option::Some(_)`, but `AdrDecisionDto` still models `implemented_in`/`superseded_by` as `Option<String>`. That means a YAML field written as `implemented_in:` or `superseded_by:` on the wrong status deserializes to `None` and slips past the rejection, so the plan does not actually enforce the stated typestate invariant for explicit null-valued state-specific keys.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 33,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:394321fa79013b1b92404bcb82b793d18726e0a3c0124d50d23be88b2ed2331a",
+          "at": "2026-04-28T01:29:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa1de650f78178498fcb28e17124d721206be01fe749db7a94ba86bbee4eb4ba",
+          "at": "2026-04-28T01:33:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` says `AdrDecisionCommon` is built from each DTO's `grounds` field, but `AdrDecisionDto` does not define any `grounds` field in this scope. The codec needs to derive `AdrDecisionCommon` from the explicit trace fields (`user_decision_ref`, `review_finding_ref`, `candidate_selection`, `grandfathered`) instead; as written, this task description points implementers at a non-existent input and is semantically wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 18,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:fa1de650f78178498fcb28e17124d721206be01fe749db7a94ba86bbee4eb4ba",
+          "at": "2026-04-28T01:34:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 still leaves a bypass for state-specific keys on the wrong status: `implemented_in:` / `implemented_in: null` and `superseded_by:` / `superseded_by: null` are explicitly treated as acceptable because they deserialize to `None`, so the planned forbidden-when check only rejects non-null values. That contradicts the stated claim that the codec closes the gap and that state-specific payloads cannot appear outside their owning state.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ec99837242b06dc5420196ae638460cb51fe6b491f960298880cdc3af0dd7de0",
+          "at": "2026-04-28T01:36:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's CLI-level test is not executable as written: `sotp verify adr-signals` scans `knowledge/adr/*.md` from the workspace root, but the plan only puts the red/no-red fixtures under `tests/fixtures/adr/` and never defines an ADR-dir override or temporary workspace remap. The execute-branch test therefore has no way to point the command at those fixtures.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 58,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:de33e97f95be172eebfcb490c2b3d999e567f19678677fdc6ec4c6830b350f99",
+          "at": "2026-04-28T01:40:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c44d02ec431953712f664829293a809b94ac26b650490e8711fe6d4f00bc42a1",
+          "at": "2026-04-28T01:42:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 still says `list_adr_paths` should glob `knowledge/adr/*.md`, but the same plan and catalogue model `FsAdrFileAdapter` as carrying an injected `adr_dir: PathBuf`, and T006 depends on pointing that adapter at `tests/fixtures/adr/` for the fixture-based tests. If the glob root stays hardcoded, the interactor/CLI test plan cannot be implemented as written.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c44d02ec431953712f664829293a809b94ac26b650490e8711fe6d4f00bc42a1",
+          "at": "2026-04-28T01:44:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6af3bb8906c544bddf483d375f42e6a67bf54c4f44547102ea481c591ee06cdd",
+          "at": "2026-04-28T01:51:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6af3bb8906c544bddf483d375f42e6a67bf54c4f44547102ea481c591ee06cdd",
+          "at": "2026-04-28T01:53:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFrontMatterCodec` is still described as constructing `AdrDecisionEntry` variants named `Proposed | Accepted | Implemented | Superseded | Deprecated`, but the refreshed domain catalogue now defines `AdrDecisionEntry` as a wrapper over the typestate variants `ProposedDecision`, `AcceptedDecision`, `ImplementedDecision`, `SupersededDecision`, and `DeprecatedDecision`. The stale variant names make this codec contract inconsistent with the actual enum shape.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
+              "line": 67,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6af3bb8906c544bddf483d375f42e6a67bf54c4f44547102ea481c591ee06cdd",
+          "at": "2026-04-28T01:56:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's forbidden-when rule only rejects `implemented_in`/`superseded_by` when they deserialize to `Some(_)`, so YAML like `status: proposed` with `implemented_in:` or `implemented_in: null` still passes. That means the plan does not fully enforce the stated invariant that state-specific payloads cannot appear outside their owning lifecycle state.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5835808cb665da506d61a8446fc328c9ef4eae1494574cf1fb2dd7612814d6e3",
+          "at": "2026-04-28T01:59:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98ba25d81a19f1cd606c1a3cc028f5da26cdd5b229517a77eda57d4634638cbf",
+          "at": "2026-04-28T02:02:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98ba25d81a19f1cd606c1a3cc028f5da26cdd5b229517a77eda57d4634638cbf",
+          "at": "2026-04-28T02:04:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98ba25d81a19f1cd606c1a3cc028f5da26cdd5b229517a77eda57d4634638cbf",
+          "at": "2026-04-28T02:09:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98ba25d81a19f1cd606c1a3cc028f5da26cdd5b229517a77eda57d4634638cbf",
+          "at": "2026-04-28T02:12:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98ba25d81a19f1cd606c1a3cc028f5da26cdd5b229517a77eda57d4634638cbf",
+          "at": "2026-04-28T02:17:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 defines the grandfathered back-fill as `adr_id + decisions[]` where each decision only gets `status: accepted` and `grandfathered: true`, but the same plan/catalogue makes `AdrDecisionDto.id` a required field. Following T009 as written would create back-filled ADR front matter that the codec rejects, so AC-04/CI pass is not achievable without also assigning an `id` for each grandfathered decision entry.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:98ba25d81a19f1cd606c1a3cc028f5da26cdd5b229517a77eda57d4634638cbf",
+          "at": "2026-04-28T02:21:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7c1e986e8773980ff780644464618e2f8ccd47721f939cff6fa3dc86275ba5a",
+          "at": "2026-04-28T02:24:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 narrows forbidden-when validation to `Some(_)` and explicitly permits `implemented_in:` / `implemented_in: null` on the wrong lifecycle status. That contradicts the catalogue contract for `AdrDecisionDto`, which says `implemented_in` / `superseded_by` are forbidden on any non-owning status and that misplaced state-specific fields present on those statuses surface as `InvalidDecisionField`. As written, a `proposed` decision can still contain a state-specific key in YAML and pass the codec, so the forbidden-when direction is not enforced at the field-presence level.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c1e986e8773980ff780644464618e2f8ccd47721f939cff6fa3dc86275ba5a",
+          "at": "2026-04-28T02:30:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ddf01c26c9bbbca023be0c249ed437f43009aa01d8710638fa9d4c01565d45fd",
+          "at": "2026-04-28T02:32:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 now defines the second test as a CLI composition-level check that calls `VerifyAdrSignals::verify` and asserts only `AdrVerifyReport.red_count`, while the same plan's S6 summary still requires a CLI-level test that verifies exit code and stderr output. Those are conflicting test requirements for AC-01, so the plan no longer gives a single executable verification target for the CLI behavior.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ddf01c26c9bbbca023be0c249ed437f43009aa01d8710638fa9d4c01565d45fd",
+          "at": "2026-04-28T02:35:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:869ad5599c8a7ddcaa28fe7e8c68a66ae0b4b23c6d011daa17d57783c2560f5d",
+          "at": "2026-04-28T02:38:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:869ad5599c8a7ddcaa28fe7e8c68a66ae0b4b23c6d011daa17d57783c2560f5d",
+          "at": "2026-04-28T02:41:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 claims the codec fully enforces that state-specific fields are forbidden on the wrong lifecycle status, but the planned check only rejects `implemented_in`/`superseded_by` when they deserialize as `Some(_)` while the DTO models them as `Option<String>`. YAML such as `status: proposed` with an explicit `implemented_in:` or `implemented_in: null` deserializes to `None`, so the key's presence is still accepted and silently dropped, contradicting the stated typestate invariant that these fields cannot appear outside their owning state.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c74404c05549cdfc1267b243f0c59ad0580420118dd85296ce82df527551c766",
+          "at": "2026-04-28T02:46:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40f845442457277bc32c990ce483af11c508667ac6c3b15290e8b440cc93ec08",
+          "at": "2026-04-28T02:51:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40f845442457277bc32c990ce483af11c508667ac6c3b15290e8b440cc93ec08",
+          "at": "2026-04-28T02:53:33Z"
         }
       ]
     }
