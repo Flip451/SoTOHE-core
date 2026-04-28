@@ -1,5 +1,30 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1447975e2d69e5fb2f3097c1c1953d83b410c4016eca582a74b9cfd44b5ee6e8",
-  "signals": []
+  "catalogue_declaration_hash": "a31527392c4ee6c4ad951a641dc43e6260758cd3ea54e7a77f1d9c8538129e64",
+  "signals": [
+    {
+      "type_name": "GuideEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GuideMatch",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ComplianceContext",
+      "signal": "blue"
+    },
+    {
+      "type_name": "check_compliance",
+      "signal": "blue"
+    },
+    {
+      "type_name": "find_matching_guides",
+      "signal": "blue"
+    },
+    {
+      "type_name": "trigger_matches",
+      "signal": "blue"
+    }
+  ]
 }

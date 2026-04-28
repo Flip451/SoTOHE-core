@@ -55,6 +55,95 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e35825893d072d9259892c8bb6876ca8896d7f80f8ad563d4755e1c669607d3",
+          "at": "2026-04-28T16:34:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e35825893d072d9259892c8bb6876ca8896d7f80f8ad563d4755e1c669607d3",
+          "at": "2026-04-28T16:35:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e35825893d072d9259892c8bb6876ca8896d7f80f8ad563d4755e1c669607d3",
+          "at": "2026-04-28T16:39:15Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
+          "at": "2026-04-28T15:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
+          "at": "2026-04-28T15:16:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30cc40abcacc8db41dc5ed4b4232d47753ea3313354a6ed04d93401179d64550",
+          "at": "2026-04-28T16:34:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30cc40abcacc8db41dc5ed4b4232d47753ea3313354a6ed04d93401179d64550",
+          "at": "2026-04-28T16:36:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30cc40abcacc8db41dc5ed4b4232d47753ea3313354a6ed04d93401179d64550",
+          "at": "2026-04-28T16:39:12Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:015bb237aa091fc6537ff85b37d1b8734b35f0cd0c06886e42822cee2f7fc928",
+          "at": "2026-04-28T16:34:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:015bb237aa091fc6537ff85b37d1b8734b35f0cd0c06886e42822cee2f7fc928",
+          "at": "2026-04-28T16:35:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:015bb237aa091fc6537ff85b37d1b8734b35f0cd0c06886e42822cee2f7fc928",
+          "at": "2026-04-28T16:39:40Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -237,24 +326,6 @@
           "findings": [],
           "hash": "rvw1:sha256:e25e1cb75564be0c4a1ad140b5c54ca43808e2b811a32c5e404aad3c23c93eef",
           "at": "2026-04-28T15:57:24Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
-          "at": "2026-04-28T15:14:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
-          "at": "2026-04-28T15:16:48Z"
         }
       ]
     },
@@ -489,6 +560,242 @@
           "findings": [],
           "hash": "rvw1:sha256:c63ba34c5365cad4f6d39c800089c772613faaa0df64325d9695b38994074415",
           "at": "2026-04-28T15:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The top-level summary still says the track is \"deletion-only with zero Rust source code changes\" and that deletion targets span \"6 categories\", but T006 now explicitly deletes Rust code and introduces a seventh category. That makes the summary inconsistent with the rest of the plan. The same stale wording also appears in `impl-plan.json`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/external-guides-removal-2026-04-28/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d96647f154ccc69c93f8a0e8dc6d00d8a6da0cc1e8372ecd5e7e26008eff617",
+          "at": "2026-04-28T16:35:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The top-level summary still says the track is \"deletion-only with zero Rust source code changes\" and that deletion targets span 6 categories, but T006/S006 add a Rust deletion category (external_guides integration code). The overview is now inconsistent with the actual scope and should be updated.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d96647f154ccc69c93f8a0e8dc6d00d8a6da0cc1e8372ecd5e7e26008eff617",
+          "at": "2026-04-28T16:36:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2984c2bec02a770716f8803c03796f8344032a5678dbfd410ee23010a245cf3f",
+          "at": "2026-04-28T16:37:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 says it verifies that all IN-10 orphan Rust code is removed, but its identifier grep list omits `guide_limit`, even though IN-10(c) explicitly requires removing the `guide_limit: usize` parameter from `check_compliance()`. As written, a leftover `guide_limit` parameter could satisfy AC-11's grep checks, so the acceptance criterion is not semantically aligned with the in-scope deletion target.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+              "line": 340,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2984c2bec02a770716f8803c03796f8344032a5678dbfd410ee23010a245cf3f",
+          "at": "2026-04-28T16:40:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 says it verifies deletion of the orphan Rust code listed in IN-10, but its identifier grep omits `guide_limit`, even though IN-10/T006 explicitly require removing the `guide_limit: usize` parameter from `check_compliance()`. A leftover `guide_limit` parameter could satisfy the stated AC-11 machine check, so the plan does not enforce one of its own deletion targets.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+              "line": 340,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2984c2bec02a770716f8803c03796f8344032a5678dbfd410ee23010a245cf3f",
+          "at": "2026-04-28T16:43:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006/S006 restates AC-11's identifier-grep requirement but omits `guide_limit` from the list, while `spec.json` AC-11 explicitly requires `guide_limit` to be absent and IN-10 includes removing the `guide_limit: usize` parameter. An implementer following this plan could run the listed grep set and believe AC-11 is satisfied while leaving `guide_limit` behind. Add `guide_limit` to the T006/S006 verification list and regenerate `plan.md`.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/impl-plan.json",
+              "line": 119,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8e10eafc58a79018cce2f945b55907492ca3a7a7df146f76624b08890e05ec3d",
+          "at": "2026-04-28T16:46:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3487bd9db5a5e23a0eca83c8fa5d3b0797f3e15df18fa3eb56551e129c01b11",
+          "at": "2026-04-28T16:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6ab2ecc2e4ea1d951ef8266751ff961e3dc86d74e6edd0f625484cac4e2eb5d",
+          "at": "2026-04-28T17:06:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GuideEntry` and `GuideMatch` are declared in the domain catalogue with `kind: \"dto\"`, but the type-designer kind-selection convention marks `dto` as forbidden for the domain layer, not a rationale-required exception. This makes the catalogue layer/kind classification semantically invalid even though the entries are deletion declarations.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 9,
+              "category": "architecture violation"
+            },
+            {
+              "message": "`ComplianceContext` is classified as a `value_object`, but the current domain type has behavior methods such as `render()` that compute the injected additionalContext string. The kind-selection convention restricts value objects to validated/read-only values and explicitly excludes behavior-bearing structs, so this catalogue entry misclassifies the domain type.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 39,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:d6ab2ecc2e4ea1d951ef8266751ff961e3dc86d74e6edd0f625484cac4e2eb5d",
+          "at": "2026-04-28T17:09:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GuideEntry` and `GuideMatch` are declared as `kind: \"dto\"` in the domain catalogue, but the current kind-selection convention marks `dto` in the domain layer as forbidden, not merely requiring rationale. The descriptions also say these structs have no serde derives, which conflicts with the convention's DTO rationale as an infrastructure serde-boundary type.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 9,
+              "category": "architecture"
+            },
+            {
+              "message": "`ComplianceContext` is classified as a `value_object`, but the convention restricts value objects to validated values and excludes behavior-bearing structs. This type is a skill compliance result/context with rendering/emptiness behavior and no stated validation invariant, so the catalogue kind conflicts with R3/R5.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 39,
+              "category": "architecture"
+            },
+            {
+              "message": "The `trigger_matches` catalogue entry records `expected_returns` as an empty list, but the deleted function is a predicate and returns `bool`. This makes the delete declaration factually inaccurate for the removed contract.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 145,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:d6ab2ecc2e4ea1d951ef8266751ff961e3dc86d74e6edd0f625484cac4e2eb5d",
+          "at": "2026-04-28T17:12:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GuideEntry` and `GuideMatch` are declared as `kind: \"value_object\"` while their descriptions say they are plain data-carrier structs with no validation invariants. The type-designer convention defines `value_object` as a validated value and forbids using it as a catch-all, so these catalogue entries are semantically misclassified even though they are `action: delete`.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "`ComplianceContext` is declared as a `value_object`, but the same description says it has no validation-on-construction invariant and it exposes `render()`, which computes formatted output rather than merely returning stored values. Under R3, value objects are limited to validated/read-only values and behavior like this should not be classified as `value_object`.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 36,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:00d10cdbf9c08c8f4f1846bf0f2a84c04631e1b65667b10f79792d97ea28d878",
+          "at": "2026-04-28T17:16:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GuideEntry and GuideMatch are now classified as `value_object`, but the catalogue rationale describes them only as plain read-only data carriers with no validation behavior. The project kind convention restricts `value_object` to validated values, while the briefing says the accepted treatment for these deleted guide containers was the explicitly justified DTO classification. As written, the catalogue and generated views mis-state the semantic role of these domain types instead of documenting the approved deviation.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 9,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1b99321d675ae68b41ca2b63cde40600b52ef751c6bb257fb1bf11b3d4cd84db",
+          "at": "2026-04-28T17:20:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ComplianceContext` is declared as `kind: \"value_object\"`, but the type still owns behavior (`is_empty()` and `render()` in the implementation). Under the R3 kind-selection rule, value objects are limited to validated/read-only values and accessors; rendering/computation behavior makes this catalogue declaration semantically wrong, so the type signal can be incorrectly Blue despite a kind mismatch.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 39,
+              "category": "kind_selection"
+            }
+          ],
+          "hash": "rvw1:sha256:b664cca7c8e02215d8e280ea46f38e0b1788f366c3d03e13f71084af5528b257",
+          "at": "2026-04-28T17:24:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ComplianceContext` is approved as `kind: \"value_object\"` while the entry itself says this is an “accepted R3 deviation” and justifies it as a pragmatic fallback. The required kind-selection convention restricts `value_object` to validated values and R5 forbids using it as the fallback when no other kind fits; `render()` is behavior, not a value accessor. This catalogue entry therefore records a kind choice that contradicts the governing design convention and should be changed or escalated rather than approved as-is.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:67968176532caec9a0db55ffb3d2ce6b13059cb64b18b96bad9aa48d53d5f679",
+          "at": "2026-04-28T17:27:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ComplianceContext` is declared as `kind: \"value_object\"` and the description claims its invariant is established at construction, but this catalog entry does not describe a validated constructor or read-only value boundary; the implementation shape is a result/context struct with behavior (`is_empty`/`render`). Under R3, `value_object` is limited to validated values and must not be used as a catch-all for behavior-bearing structs, so this catalogue declaration is semantically inconsistent unless it is reclassified or documented as an explicit accepted deviation.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 35,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:498eb68dd105e152631e0797d578669bd70a8ea0a1a2116bf9fdf8c03e08751f",
+          "at": "2026-04-28T17:31:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcd609aac1c83e9db847600d5815b8ebd8ab35e977e1b90b90679896d4389c66",
+          "at": "2026-04-28T17:33:56Z"
         }
       ]
     }

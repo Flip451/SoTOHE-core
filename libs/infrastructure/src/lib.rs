@@ -6,7 +6,6 @@ pub mod agent_profiles;
 pub mod code_profile_builder;
 pub mod gh_cli;
 pub mod git_cli;
-pub mod guides_codec;
 pub mod impl_plan_codec;
 pub mod review_v2;
 pub mod schema_export;

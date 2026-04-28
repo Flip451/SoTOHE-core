@@ -3,12 +3,12 @@
 
 ## Summary
 
-This track is deletion-only with zero Rust source code changes. Deletion targets span 6 categories: Python scripts, registry SSoT, Makefile tasks, slash command, doc references, and Roadmap ADR back-reference.
-5-task structure: T001 (core scripts + registry deletion) -> T002 (conditional track_resolution evaluation + Makefile changes) -> T003 (doc ref cleanup) -> T004 (Roadmap ADR back-reference via adr-editor) -> T005 (CI gate verification).
+This track is deletion-only. Deletion targets span 7 categories: Python scripts, registry SSoT, Makefile tasks, slash command, doc references, Roadmap ADR back-reference, and orphan Rust external_guides integration code (T006, added after PR review round 2).
+6-task structure: T001 (core scripts + registry deletion) -> T002 (conditional track_resolution evaluation + Makefile changes) -> T003 (doc ref cleanup) -> T004 (Roadmap ADR back-reference via adr-editor) -> T005 (CI gate verification) -> T006 (orphan Rust deletion + CI re-verification).
 The track_resolution.py / track_schema.py full-file-deletion decision in T002 is an impl-time judgment: if all remaining public functions become test-only after external_guides.py removal, delete entirely; otherwise perform function-level deletion only. This follows IN-04 and the ADR D1 hedge.
-T004 is independent of T001-T003 and may be executed after the deletion work is confirmed. T005 must be last.
+T004 is independent of T001-T003 and may be executed after the deletion work is confirmed. T005 is the CI gate check for the initial deletion work (T001-T004). T006 addresses orphan Rust callers surfaced in PR review round 2 and must be sequenced after T005; T006 itself re-verifies CI to satisfy AC-10 and AC-11.
 
-## Tasks (5/5 resolved)
+## Tasks (5/6 resolved)
 
 ### S001 — Core Python Scripts + Registry SSoT Deletion (T001)
 
@@ -50,6 +50,16 @@ T004 is independent of T001-T003 and may be executed after the deletion work is 
 > Run cargo make ci after T001-T004 are complete and verify all gates pass (AC-10).
 > Zero Rust source changes means fmt-check / clippy / nextest / deny / check-layers should pass unchanged.
 > Verify scripts-selftest, verify-*, and all CI gates pass after the deletion and doc changes.
-> This is the final confirmation task before the track is done.
+> This task covers AC-10 for the T001-T004 deletion scope (no Rust source changes at that point).
 
 - [x] **T005**: Run cargo make ci and verify all gates pass (AC-10). Execute after T001-T004 are complete. Since Rust source code is not changed, fmt-check / clippy / nextest / deny / check-layers should pass without difference. Confirm that scripts-selftest no longer references the removed test files (test_atomic_write.py / test_external_guides.py and optionally test_track_resolution.py) and does not produce false positives. Confirm verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass after the doc changes. Confirm full CI green before finalizing. (`b0024c69d8bfc2fc3e7092e805943dcc39a926f0`)
+
+### S006 — Orphan Rust External-Guides Code Deletion (T006)
+
+> IN-10: Delete orphan Rust callers that survived the knowledge/external/guides.json removal. Specifically: load_guides_from_project() in apps/cli/src/commands/hook.rs and its call site; GuideMatch / GuideEntry structs, ComplianceContext.guide_matches field, find_matching_guides() / trigger_matches() functions and guide-related tests in libs/domain/src/skill_compliance; guides: &[GuideEntry] and guide_limit: usize parameters from check_compliance() signature; libs/infrastructure/src/guides_codec.rs entire file; pub mod guides_codec; declaration in libs/infrastructure/src/lib.rs.
+> This task is deletion-only: no new features, logic changes, new type definitions, or new tests are added.
+> After deletion, AC-11 must pass: cargo check + cargo nextest run pass, and none of the target identifiers (GuideMatch / GuideEntry / guide_matches / find_matching_guides / trigger_matches / guides_codec / load_guides_from_project / guide_limit) remain in the affected files; libs/infrastructure/src/guides_codec.rs must not exist.
+> AC-10 is also re-verified in this task: cargo make ci must pass with IN-10 Rust deletions included.
+> Must be sequenced after T005 (CI baseline confirmed before Rust changes). This task was added following PR review round 2 P1 finding.
+
+- [ ] **T006**: Delete orphan Rust external_guides integration code that survived the knowledge/external/guides.json removal (IN-10 / AC-10 / AC-11). Deletion targets: (a) apps/cli/src/commands/hook.rs: remove load_guides_from_project() function and its call site (let guides = load_guides_from_project() + guides argument passed to check_compliance()); (b) libs/domain/src/skill_compliance: remove GuideMatch struct, GuideEntry struct, ComplianceContext.guide_matches field, find_matching_guides() function, trigger_matches() function, and guide-related test cases in tests.rs; (c) libs/domain/src/skill_compliance: remove guides: &[GuideEntry] and guide_limit: usize parameters from check_compliance() signature and all its call sites; (d) delete libs/infrastructure/src/guides_codec.rs in its entirety; (e) libs/infrastructure/src/lib.rs: remove the pub mod guides_codec; declaration. This task is deletion-only with no new features, logic changes, new type definitions, or new tests added. After deletion, verify: cargo check passes, cargo nextest run passes, and none of the identifiers GuideMatch / GuideEntry / guide_matches / find_matching_guides / trigger_matches / guides_codec / load_guides_from_project / guide_limit remain in the affected files (AC-11). Also run cargo make ci to confirm AC-10 holds with IN-10 changes included.

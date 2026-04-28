@@ -1,6 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T15:39:35Z",
-  "declaration_hash": "1447975e2d69e5fb2f3097c1c1953d83b410c4016eca582a74b9cfd44b5ee6e8",
-  "signals": []
+  "generated_at": "2026-04-28T17:34:22Z",
+  "declaration_hash": "fe7f10b67a8ed49d84b0a8482ab8e1369b74a324ae5d8f87dbb789b90fc96a91",
+  "signals": [
+    {
+      "type_name": "GuidesCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "load_guides",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
 }

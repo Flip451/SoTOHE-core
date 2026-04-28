@@ -296,13 +296,8 @@ fn execute_user_prompt_submit(_hook: CliHookName) -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    // Load guides and track context only when /track: is detected
-    let guides = load_guides_from_project();
-    let track_context = load_latest_track_context();
-
     // Run compliance check
-    let ctx =
-        domain::skill_compliance::check_compliance(&prompt, track_context.as_deref(), &guides, 3);
+    let ctx = domain::skill_compliance::check_compliance(&prompt);
 
     if let Some(additional_context) = ctx.render() {
         let output = serde_json::json!({
@@ -315,46 +310,4 @@ fn execute_user_prompt_submit(_hook: CliHookName) -> ExitCode {
     }
 
     ExitCode::SUCCESS
-}
-
-/// Loads guide entries from `knowledge/external/guides.json` relative to
-/// `$CLAUDE_PROJECT_DIR`. Returns empty vec on any failure (advisory hook).
-fn load_guides_from_project() -> Vec<domain::skill_compliance::GuideEntry> {
-    let project_dir = match std::env::var("CLAUDE_PROJECT_DIR") {
-        Ok(dir) => PathBuf::from(dir),
-        Err(_) => return Vec::new(),
-    };
-    let guides_path = project_dir.join("knowledge/external/guides.json");
-    infrastructure::guides_codec::load_guides(&guides_path).unwrap_or_default()
-}
-
-/// Loads context from the current track's spec.md and plan.md.
-/// Resolves the track from the current git branch (`track/<id>`).
-/// Returns `None` if not on a track branch or on any failure (advisory — never block).
-fn load_latest_track_context() -> Option<String> {
-    let project_dir = PathBuf::from(std::env::var("CLAUDE_PROJECT_DIR").ok()?);
-
-    // Resolve current track from git branch name
-    let output = std::process::Command::new("git")
-        .args(["branch", "--show-current"])
-        .current_dir(&project_dir)
-        .output()
-        .ok()?;
-    let branch = String::from_utf8(output.stdout).ok()?;
-    let branch = branch.trim();
-    let track_id = branch.strip_prefix("track/")?;
-
-    let track_dir = project_dir.join("track/items").join(track_id);
-    if !track_dir.is_dir() {
-        return None;
-    }
-
-    let mut parts = Vec::new();
-    for filename in ["spec.md", "plan.md"] {
-        if let Ok(content) = std::fs::read_to_string(track_dir.join(filename)) {
-            parts.push(content);
-        }
-    }
-
-    if parts.is_empty() { None } else { Some(parts.join("\n")) }
 }

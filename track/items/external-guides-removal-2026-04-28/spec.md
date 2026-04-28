@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 30, yellow: 0, red: 0 }
+signals: { blue: 32, yellow: 0, red: 0 }
 ---
 
 # external_guides 撤去と関連 Python helper の連鎖削除
@@ -23,6 +23,7 @@ signals: { blue: 30, yellow: 0, red: 0 }
 - [IN-07] slash command / skill 削除: `.claude/commands/guide/add.md` を削除する (`.claude/skills/` 側に対応定義はなく、追加削除対象なし)。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D1: external_guides 機能の撤去と関連 Python helper の連鎖削除] [tasks: T003]
 - [IN-08] doc 参照の除去: `CLAUDE.md` の `knowledge/external/POLICY.md` / `knowledge/external/guides.json` 参照行、`.claude/rules/09-maintainer-checklist.md` の `scripts/external_guides.py` 参照、および grep で発見される他の全参照箇所を削除する。具体的な発見候補: `LOCAL_DEVELOPMENT.md`、`DEVELOPER_AI_WORKFLOW.md`、`.claude/settings.json`、`.claude/commands/track/catchup.md`。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D1: external_guides 機能の撤去と関連 Python helper の連鎖削除] [tasks: T003]
 - [IN-09] Roadmap ADR の back-reference 追記: `knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md` の Phase 3 セクションに、本 ADR (`2026-04-28-1258-remove-external-guides.md`) によって Phase 3 の方向性が「Rust 化」から「機能撤去」へ転換された旨の back-reference note を追記する (adr-editor 経由で実施)。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D2: Roadmap ADR Phase 3 の supersede] [tasks: T004]
+- [IN-10] D1 の完了として、`knowledge/external/guides.json` 削除後に孤立する Rust 側 external_guides 連携コードを削除する。削除対象: (a) `apps/cli/src/commands/hook.rs` の `load_guides_from_project()` 関数および対応する call site (`let guides = load_guides_from_project()` + `check_compliance()` への guides 引数渡し); (b) `libs/domain/src/skill_compliance` の `GuideMatch` 構造体・`GuideEntry` 構造体・`ComplianceContext.guide_matches` フィールド・`find_matching_guides()` 関数・`trigger_matches()` 関数および関連する guide 系テスト (`libs/domain/src/skill_compliance/tests.rs` の guide 関連ケース); (c) `check_compliance()` シグネチャから `guides: &[GuideEntry]` および `guide_limit: usize` 引数を除去; (d) `libs/infrastructure/src/guides_codec.rs` ファイル全体 (111 行); (e) `libs/infrastructure/src/lib.rs` の `pub mod guides_codec;` 宣言。本変更は既存ロジックの削除のみであり、新機能追加・論理変更・新型定義・新テスト追加は行わない。元々 OS-04 が `.cache/external-guides/` ディレクトリの自動削除を対象として out-of-scope に分類していた点とは別物であり、PR レビューで `guides.json` 削除後も Rust 実行パスが生き続け機能が無音で degraded 状態になることが判明したため in-scope に昇格した。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D1: external_guides 機能の撤去と関連 Python helper の連鎖削除] [tasks: T006]
 
 ### Out of Scope
 - [OS-01] Rust 側 `infrastructure::track::atomic_write_file` および `bin/sotp file write-atomic` CLI は別物であり、本撤去対象外。これらは継続利用される。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D1: external_guides 機能の撤去と関連 Python helper の連鎖削除]
@@ -47,7 +48,8 @@ signals: { blue: 30, yellow: 0, red: 0 }
 - [ ] [AC-07] `.claude/commands/guide/add.md` がファイルシステムに存在しない。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D1: external_guides 機能の撤去と関連 Python helper の連鎖削除] [tasks: T003]
 - [ ] [AC-08] `CLAUDE.md`、`.claude/rules/09-maintainer-checklist.md`、`DEVELOPER_AI_WORKFLOW.md`、`LOCAL_DEVELOPMENT.md`、`.claude/settings.json`、`.claude/commands/track/catchup.md` 等に `knowledge/external/POLICY.md`、`knowledge/external/guides.json`、`scripts/external_guides.py`、`guides-fetch` / `guides-list` 等の削除済み成果物への参照が残存しない。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D1: external_guides 機能の撤去と関連 Python helper の連鎖削除] [tasks: T003]
 - [ ] [AC-09] `knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md` の Phase 3 セクションに、本 ADR (`2026-04-28-1258-remove-external-guides.md`) による方向性転換を示す back-reference note が追記されている。Roadmap ADR の YAML front-matter は変更されていない。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D2: Roadmap ADR Phase 3 の supersede] [tasks: T004]
-- [ ] [AC-10] `cargo make ci` が pass する。Rust ソースコードへの変更はないため fmt-check / clippy / nextest / deny / check-layers はそのまま通過する。`scripts/` 変更に起因する `cargo make scripts-selftest` / `cargo make hooks-selftest` / `sotp verify *` への影響がないことも確認する。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#Positive] [tasks: T005]
+- [ ] [AC-10] `cargo make ci` が pass する。Rust ソースコードへの変更は IN-10 に記載した orphan external_guides 関連コードの削除のみ (新機能追加・論理変更・新型定義・新テスト追加なし)。CI ゲート (fmt-check / clippy / nextest / deny / check-layers) が IN-10 の変更を含んだ状態で同じ条件で通過する。`scripts/` 変更に起因する `cargo make scripts-selftest` / `cargo make hooks-selftest` / `sotp verify *` への影響がないことも確認する。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#Positive] [tasks: T005, T006]
+- [ ] [AC-11] IN-10 で列挙した orphan Rust コードが削除されていること: (1) `cargo check` および `cargo nextest run` が pass する (guide 関連テストの削除を除き全テストが pass する); (2) `libs/domain/src/skill_compliance/mod.rs`・`libs/domain/src/skill_compliance/tests.rs`・`libs/infrastructure/src/lib.rs`・`apps/cli/src/commands/hook.rs` の各ファイルに `GuideMatch`・`GuideEntry`・`guide_matches`・`find_matching_guides`・`trigger_matches`・`guides_codec`・`load_guides_from_project`・`guide_limit` のいずれの識別子も残存しない; (3) `libs/infrastructure/src/guides_codec.rs` がファイルシステムに存在しない。 [adr: knowledge/adr/2026-04-28-1258-remove-external-guides.md#D1: external_guides 機能の撤去と関連 Python helper の連鎖削除] [tasks: T006]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/pre-track-adr-authoring.md#Rules
@@ -58,5 +60,5 @@ signals: { blue: 30, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 30  🟡 0  🔴 0
+🔵 32  🟡 0  🔴 0
 

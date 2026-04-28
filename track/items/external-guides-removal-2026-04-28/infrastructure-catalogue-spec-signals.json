@@ -1,5 +1,14 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1447975e2d69e5fb2f3097c1c1953d83b410c4016eca582a74b9cfd44b5ee6e8",
-  "signals": []
+  "catalogue_declaration_hash": "fe7f10b67a8ed49d84b0a8482ab8e1369b74a324ae5d8f87dbb789b90fc96a91",
+  "signals": [
+    {
+      "type_name": "GuidesCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "load_guides",
+      "signal": "blue"
+    }
+  ]
 }

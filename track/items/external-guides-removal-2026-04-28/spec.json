@@ -115,6 +115,16 @@
             "anchor": "D2: Roadmap ADR Phase 3 の supersede"
           }
         ]
+      },
+      {
+        "id": "IN-10",
+        "text": "D1 の完了として、`knowledge/external/guides.json` 削除後に孤立する Rust 側 external_guides 連携コードを削除する。削除対象: (a) `apps/cli/src/commands/hook.rs` の `load_guides_from_project()` 関数および対応する call site (`let guides = load_guides_from_project()` + `check_compliance()` への guides 引数渡し); (b) `libs/domain/src/skill_compliance` の `GuideMatch` 構造体・`GuideEntry` 構造体・`ComplianceContext.guide_matches` フィールド・`find_matching_guides()` 関数・`trigger_matches()` 関数および関連する guide 系テスト (`libs/domain/src/skill_compliance/tests.rs` の guide 関連ケース); (c) `check_compliance()` シグネチャから `guides: &[GuideEntry]` および `guide_limit: usize` 引数を除去; (d) `libs/infrastructure/src/guides_codec.rs` ファイル全体 (111 行); (e) `libs/infrastructure/src/lib.rs` の `pub mod guides_codec;` 宣言。本変更は既存ロジックの削除のみであり、新機能追加・論理変更・新型定義・新テスト追加は行わない。元々 OS-04 が `.cache/external-guides/` ディレクトリの自動削除を対象として out-of-scope に分類していた点とは別物であり、PR レビューで `guides.json` 削除後も Rust 実行パスが生き続け機能が無音で degraded 状態になることが判明したため in-scope に昇格した。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+            "anchor": "D1: external_guides 機能の撤去と関連 Python helper の連鎖削除"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -317,11 +327,21 @@
     },
     {
       "id": "AC-10",
-      "text": "`cargo make ci` が pass する。Rust ソースコードへの変更はないため fmt-check / clippy / nextest / deny / check-layers はそのまま通過する。`scripts/` 変更に起因する `cargo make scripts-selftest` / `cargo make hooks-selftest` / `sotp verify *` への影響がないことも確認する。",
+      "text": "`cargo make ci` が pass する。Rust ソースコードへの変更は IN-10 に記載した orphan external_guides 関連コードの削除のみ (新機能追加・論理変更・新型定義・新テスト追加なし)。CI ゲート (fmt-check / clippy / nextest / deny / check-layers) が IN-10 の変更を含んだ状態で同じ条件で通過する。`scripts/` 変更に起因する `cargo make scripts-selftest` / `cargo make hooks-selftest` / `sotp verify *` への影響がないことも確認する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
           "anchor": "Positive"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "IN-10 で列挙した orphan Rust コードが削除されていること: (1) `cargo check` および `cargo nextest run` が pass する (guide 関連テストの削除を除き全テストが pass する); (2) `libs/domain/src/skill_compliance/mod.rs`・`libs/domain/src/skill_compliance/tests.rs`・`libs/infrastructure/src/lib.rs`・`apps/cli/src/commands/hook.rs` の各ファイルに `GuideMatch`・`GuideEntry`・`guide_matches`・`find_matching_guides`・`trigger_matches`・`guides_codec`・`load_guides_from_project`・`guide_limit` のいずれの識別子も残存しない; (3) `libs/infrastructure/src/guides_codec.rs` がファイルシステムに存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+          "anchor": "D1: external_guides 機能の撤去と関連 Python helper の連鎖削除"
         }
       ]
     }
@@ -345,7 +365,7 @@
     }
   ],
   "signals": {
-    "blue": 30,
+    "blue": 32,
     "yellow": 0,
     "red": 0
   }

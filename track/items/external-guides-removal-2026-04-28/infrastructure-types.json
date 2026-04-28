@@ -1,4 +1,58 @@
 {
   "schema_version": 2,
-  "type_definitions": []
+  "type_definitions": [
+    {
+      "name": "GuidesCodecError",
+      "description": "Pre-existing infrastructure error type for guides_codec.rs. Removed in T006 as part of guides_codec.rs file deletion (IN-10).",
+      "approved": true,
+      "action": "delete",
+      "kind": "error_type",
+      "expected_variants": [
+        "Io",
+        "Json"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        },
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "f6d3a05e09e370f3fdde6ed006dcdbc5b23ed61096d933f7d2d32e2fc6c88716"
+        }
+      ]
+    },
+    {
+      "name": "load_guides",
+      "description": "Pre-existing free function that loaded external guides from a JSON file. Removed in T006 along with guides_codec.rs file deletion (IN-10).",
+      "approved": true,
+      "action": "delete",
+      "kind": "free_function",
+      "module_path": "infrastructure::guides_codec",
+      "expected_params": [
+        {
+          "name": "path",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Vec"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        },
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "f6d3a05e09e370f3fdde6ed006dcdbc5b23ed61096d933f7d2d32e2fc6c88716"
+        }
+      ]
+    }
+  ]
 }
