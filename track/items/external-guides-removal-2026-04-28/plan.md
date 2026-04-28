@@ -8,7 +8,7 @@ This track is deletion-only with zero Rust source code changes. Deletion targets
 The track_resolution.py / track_schema.py full-file-deletion decision in T002 is an impl-time judgment: if all remaining public functions become test-only after external_guides.py removal, delete entirely; otherwise perform function-level deletion only. This follows IN-04 and the ADR D1 hedge.
 T004 is independent of T001-T003 and may be executed after the deletion work is confirmed. T005 must be last.
 
-## Tasks (2/5 resolved)
+## Tasks (3/5 resolved)
 
 ### S001 — Core Python Scripts + Registry SSoT Deletion (T001)
 
@@ -34,7 +34,7 @@ T004 is independent of T001-T003 and may be executed after the deletion work is 
 > Each file modification is limited to removing reference lines only. File structure and other content are unchanged.
 > Best sequenced after T001 so the implementer can verify which references remain after deletion.
 
-- [~] **T003**: Delete slash command and remove all doc references to deleted artifacts. (1) Delete .claude/commands/guide/add.md (IN-07 / AC-07). (2) Remove the knowledge/external/POLICY.md and knowledge/external/guides.json reference lines from the priority references section of CLAUDE.md (IN-08 / AC-08). (3) Remove the scripts/external_guides.py reference line from the enforcement section of .claude/rules/09-maintainer-checklist.md, and remove the 'external guides' mention from the Python helpers description (IN-08 / AC-08). (4) Remove all references to knowledge/external/guides.json / knowledge/external/POLICY.md / guides-fetch / guides-list etc. from DEVELOPER_AI_WORKFLOW.md (IN-08 / AC-08). (5) Remove the same kinds of references from LOCAL_DEVELOPMENT.md (IN-08 / AC-08). (6) Remove external guides references from .claude/settings.json (IN-08 / AC-08). (7) Remove external guides references from .claude/commands/track/catchup.md (IN-08 / AC-08). (8) Remove external guides references from track/workflow.md including Guiding Principles item 10 and any guides auto-injection description in the /track:plan section (IN-08 / AC-08). Each file modification is a surgical deletion of reference lines only; file structure and other content are not changed.
+- [x] **T003**: Delete slash command and remove all doc references to deleted artifacts. (1) Delete .claude/commands/guide/add.md (IN-07 / AC-07). (2) Remove the knowledge/external/POLICY.md and knowledge/external/guides.json reference lines from the priority references section of CLAUDE.md (IN-08 / AC-08). (3) Remove the scripts/external_guides.py reference line from the enforcement section of .claude/rules/09-maintainer-checklist.md, and remove the 'external guides' mention from the Python helpers description (IN-08 / AC-08). (4) Remove all references to knowledge/external/guides.json / knowledge/external/POLICY.md / guides-fetch / guides-list etc. from DEVELOPER_AI_WORKFLOW.md (IN-08 / AC-08). (5) Remove the same kinds of references from LOCAL_DEVELOPMENT.md (IN-08 / AC-08). (6) Remove external guides references from .claude/settings.json (IN-08 / AC-08). (7) Remove external guides references from .claude/commands/track/catchup.md (IN-08 / AC-08). (8) Remove external guides references from track/workflow.md including Guiding Principles item 10 and any guides auto-injection description in the /track:plan section (IN-08 / AC-08). Each file modification is a surgical deletion of reference lines only; file structure and other content are not changed. (`5dee9b83ed158dd21126e0f51b4ed8f4e5df0db4`)
 
 ### S004 — Roadmap ADR Back-Reference (T004)
 
@@ -43,7 +43,7 @@ T004 is independent of T001-T003 and may be executed after the deletion work is 
 > CN-02: Roadmap ADR YAML front-matter must not be changed; only a note in the body is appended.
 > This task is independent of T001-T003 and can be executed in parallel with them if needed.
 
-- [ ] **T004**: Append a back-reference note to the Roadmap ADR via adr-editor capability. Append a blockquote note to the Phase 3 section of knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md indicating that the direction of Phase 3 was changed from Rust migration to feature removal by decision D1 of 2026-04-28-1258-remove-external-guides.md (IN-09 / AC-09). The Roadmap ADR YAML front-matter must not be changed (CN-01 / CN-02). This task must be delegated to the adr-editor capability to comply with the 1-file-1-writer principle (CN-01).
+- [~] **T004**: Append a back-reference note to the Roadmap ADR via adr-editor capability. Append a blockquote note to the Phase 3 section of knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md indicating that the direction of Phase 3 was changed from Rust migration to feature removal by decision D1 of 2026-04-28-1258-remove-external-guides.md (IN-09 / AC-09). The Roadmap ADR YAML front-matter must not be changed (CN-01 / CN-02). This task must be delegated to the adr-editor capability to comply with the 1-file-1-writer principle (CN-01).
 
 ### S005 — CI Gate Verification (T005)
 

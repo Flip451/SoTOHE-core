@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:14:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:17:02Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -168,6 +186,42 @@
           "findings": [],
           "hash": "rvw1:sha256:1ec1e04835542c7eac5abdd30d05477fa15c91c2dbfebe40c0bbd1d80a2dec6b",
           "at": "2026-04-28T15:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ed7fa0f0004396b45d8cc3b95b309a360a06280b17ef51b075fcccdefc7d68",
+          "at": "2026-04-28T15:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The appended note says the Phase 3 implementation cost has disappeared, but the Phase 3 section immediately above still includes non-external-guides work such as `scripts/convention_docs.py` add/update-index migration and `sotp conventions add/update-index` implementation. The note only explains deleting `external_guides` and its dependency chain, so this overstates the supersede and can mislead readers into thinking all Phase 3 work is gone.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md",
+              "line": 174,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c4ed7fa0f0004396b45d8cc3b95b309a360a06280b17ef51b075fcccdefc7d68",
+          "at": "2026-04-28T15:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:390c6e56199f9260e5a030ea95e3d6dc332614b94a7d8cd5eb225f6c3cf833f1",
+          "at": "2026-04-28T15:33:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:390c6e56199f9260e5a030ea95e3d6dc332614b94a7d8cd5eb225f6c3cf833f1",
+          "at": "2026-04-28T15:34:45Z"
         }
       ]
     },
@@ -357,24 +411,6 @@
           "findings": [],
           "hash": "rvw1:sha256:aeff896d9dc51894dbc0a7d33007c0f9712aedac5b78fe7c99c7f3bc421a0c03",
           "at": "2026-04-28T15:25:46Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
-          "at": "2026-04-28T15:14:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
-          "at": "2026-04-28T15:17:02Z"
         }
       ]
     }
