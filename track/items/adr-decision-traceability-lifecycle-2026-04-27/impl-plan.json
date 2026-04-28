@@ -40,7 +40,7 @@
     {
       "id": "T007",
       "description": "Makefile.toml に verify-adr-signals task を追加し、cargo make ci に組み込む。既存の `verify-plan-artifact-refs` / `verify-plan-progress` タスクと並列実行可能な形で `verify-adr-signals` タスクを追加する (IN-03 / AC-02)。verify-adr-signals タスクは `bin/sotp verify adr-signals` を docker compose run 経由で実行する形式にする (既存 verify-* タスクと同形式)。`cargo make ci` のタスク連鎖に verify-adr-signals を追加し、CI gate の一部として実行されるようにする (AC-08)。track/workflow.md の Quality Gates セクションに verify-adr-signals 行を追加する。前提: T006 (CLI サブコマンド稼働) AND T008 (本 ADR front-matter 付与) AND T009 (既存 ADR grandfathered 一括付与) の完了後に実施すること。T008/T009 完了前に CI gate を追加すると verify-adr-signals が既存 ADR 由来で即時失敗する。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",
@@ -51,7 +51,8 @@
     {
       "id": "T009",
       "description": "本 ADR 採択前に作成された既存 ADR 全件に grandfathered: true を含む minimal front-matter を一括付与する (IN-06 / AC-04)。対象: knowledge/adr/ 配下の全 .md ファイルのうち、2026-04-27-1234 以外のもの (本 ADR 自体は T008 で個別に処理済み)。minimal front-matter の形式: adr_id (ファイル名スラグ) + decisions[] 配列 — 各 decision には AdrDecisionDto の required フィールドをすべて設定する: id (required String — 例: ファイル名スラグ + \"_grandfathered\" 等の識別子、各 ADR につき一意であれば可)、status: accepted (parse_adr_frontmatter の status-string dispatch では 5 typestate variant のいずれかに対応する必要があるため valid 値を設定)、grandfathered: true。その他の Optional フィールド (user_decision_ref / review_finding_ref / candidate_selection / superseded_by / implemented_in) は設定不要。id が欠落すると AdrFrontMatterCodecError::MissingAdrId 相当のエラーまたは deserialization 失敗となり verify adr-signals が失敗するため、必ず設定すること。MD body は変更しない (CN-01)。この変更後に verify adr-signals が既存 ADR 由来の CI block を発生させないことを手動確認する (AC-04)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "61e6259b1192e126488e96ee2b6cadb36730bd71"
     },
     {
       "id": "T010",
