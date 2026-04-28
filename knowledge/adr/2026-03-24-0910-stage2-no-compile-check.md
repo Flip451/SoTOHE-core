@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-24-0910-stage2-no-compile-check
+decisions:
+  - id: 2026-03-24-0910-stage2-no-compile-check_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Stage 2 信号機にコンパイル通過を条件に入れない
 
 ## Status

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0030-status-override-auto-clear
+decisions:
+  - id: 2026-03-11-0030-status-override-auto-clear_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # StatusOverride の自動クリア
 
 ## Status

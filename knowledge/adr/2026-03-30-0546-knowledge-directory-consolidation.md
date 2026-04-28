@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-30-0546-knowledge-directory-consolidation
+decisions:
+  - id: 2026-03-30-0546-knowledge-directory-consolidation_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # knowledge/ ディレクトリへのドキュメント集約
 
 ## Status

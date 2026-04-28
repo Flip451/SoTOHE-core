@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0070-conch-parser-selection
+decisions:
+  - id: 2026-03-11-0070-conch-parser-selection_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # conch-parser for shell AST (vendored, patched)
 
 ## Status

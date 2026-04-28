@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-25-0000-diff-scope-in-usecase
+decisions:
+  - id: 2026-03-25-0000-diff-scope-in-usecase_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # DiffScope と scope filtering は usecase 層に配置
 
 ## Status

@@ -45,12 +45,13 @@
     {
       "id": "T008",
       "description": "本トラックの親 ADR (knowledge/adr/2026-04-27-1234-adr-decision-traceability-lifecycle.md) に YAML front-matter を追加する (IN-04 / AC-03)。D1-D4 の全 decision を decisions[] 配列に encode する。各 decision に status フィールドを設定する (status の値は typestate-based dispatch で決まる 5 値 proposed / accepted / implemented / superseded / deprecated のいずれか) と user_decision_ref (ユーザーが承認した会話参照) を設定し、各 decision が 🔵 または 🟡 に評価されるようにする。これにより本 ADR が新フォーマットの最初の適合例になる (AC-03)。ADR の MD body (## Context / ## Decision 以下の narrative) は一切変更しない (CN-01)。前提: T006 完了後 (sotp verify adr-signals が実行可能になった後)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "a6c4ca128aa697145a0a1818dd3ed7357568c97e"
     },
     {
       "id": "T009",
       "description": "本 ADR 採択前に作成された既存 ADR 全件に grandfathered: true を含む minimal front-matter を一括付与する (IN-06 / AC-04)。対象: knowledge/adr/ 配下の全 .md ファイルのうち、2026-04-27-1234 以外のもの (本 ADR 自体は T008 で個別に処理済み)。minimal front-matter の形式: adr_id (ファイル名スラグ) + decisions[] 配列 — 各 decision には AdrDecisionDto の required フィールドをすべて設定する: id (required String — 例: ファイル名スラグ + \"_grandfathered\" 等の識別子、各 ADR につき一意であれば可)、status: accepted (parse_adr_frontmatter の status-string dispatch では 5 typestate variant のいずれかに対応する必要があるため valid 値を設定)、grandfathered: true。その他の Optional フィールド (user_decision_ref / review_finding_ref / candidate_selection / superseded_by / implemented_in) は設定不要。id が欠落すると AdrFrontMatterCodecError::MissingAdrId 相当のエラーまたは deserialization 失敗となり verify adr-signals が失敗するため、必ず設定すること。MD body は変更しない (CN-01)。この変更後に verify adr-signals が既存 ADR 由来の CI block を発生させないことを手動確認する (AC-04)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-09-2235-agent-profiles-redesign
+decisions:
+  - id: 2026-04-09-2235-agent-profiles-redesign_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Agent Profiles Redesign (config relocation + schema cleanup)
 
 ## Status

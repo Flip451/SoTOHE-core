@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-22-1432-branch-create-commit-ordering
+decisions:
+  - id: 2026-04-22-1432-branch-create-commit-ordering_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # sotp track branch create: main 上の activation commit regression 修正
 
 ## Context

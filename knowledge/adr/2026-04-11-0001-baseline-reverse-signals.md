@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-11-0001-baseline-reverse-signals
+decisions:
+  - id: 2026-04-11-0001-baseline-reverse-signals_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Baseline-Aware Reverse Signal Detection (TDDD-02)
 
 ## Status

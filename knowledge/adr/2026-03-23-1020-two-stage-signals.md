@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-23-1020-two-stage-signals
+decisions:
+  - id: 2026-03-23-1020-two-stage-signals_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Two-stage signal architecture
 
 ## Status

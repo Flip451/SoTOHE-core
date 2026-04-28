@@ -1,3 +1,7 @@
+---
+adr_id: adr-readme-index
+decisions: []
+---
 # Architecture Decision Records (ADR)
 
 このディレクトリは設計判断の記録を管理する。

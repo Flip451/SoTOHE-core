@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-04-1456-review-system-v2-redesign
+decisions:
+  - id: 2026-04-04-1456-review-system-v2-redesign_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Review System v2: frozen scope 廃止とスコープ独立型レビュー
 
 ## Status

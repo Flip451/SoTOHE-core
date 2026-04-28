@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-17-0000-reviewer-model-profiles
+decisions:
+  - id: 2026-03-17-0000-reviewer-model-profiles_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Reviewer model_profiles in agent-profiles.json
 
 ## Status

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0010-done-owns-commit-hash
+decisions:
+  - id: 2026-03-11-0010-done-owns-commit-hash_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TaskStatus::Done が Option<CommitHash> を所有する
 
 ## Status

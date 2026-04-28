@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-19-1242-plan-artifact-workflow-restructure
+decisions:
+  - id: 2026-04-19-1242-plan-artifact-workflow-restructure_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # 計画成果物ワークフローの再構築 — SoT Chain に沿ったフェーズ分離
 
 > **状態**: Draft (ADR 化済み、推敲中)

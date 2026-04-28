@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-14-1531-domain-serde-ripout
+decisions:
+  - id: 2026-04-14-1531-domain-serde-ripout_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Domain serde 依存除去 — hexagonal 純粋性回復 + infrastructure 層 TDDD partial dogfood
 
 ## Status

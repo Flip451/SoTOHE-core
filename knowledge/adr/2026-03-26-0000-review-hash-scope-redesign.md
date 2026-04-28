@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-26-0000-review-hash-scope-redesign
+decisions:
+  - id: 2026-03-26-0000-review-hash-scope-redesign_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Review Hash スコープ再設計
 
 ## ステータス

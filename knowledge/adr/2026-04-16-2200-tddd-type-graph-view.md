@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-16-2200-tddd-type-graph-view
+decisions:
+  - id: 2026-04-16-2200-tddd-type-graph-view_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD Type Graph View — `TypeGraph` から mermaid 図をレンダーして型間関係を可視化する
 
 ## Status

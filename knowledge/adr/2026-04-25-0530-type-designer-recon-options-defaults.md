@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-25-0530-type-designer-recon-options-defaults
+decisions:
+  - id: 2026-04-25-0530-type-designer-recon-options-defaults_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # type-designer reconnaissance のレンダリングオプション既定値 — depth=1+2 + edges=all
 
 ## Context

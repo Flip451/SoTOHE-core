@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-23-2120-two-stage-signal-architecture
+decisions:
+  - id: 2026-03-23-2120-two-stage-signal-architecture_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # 2 段階信号機アーキテクチャ
 
 ## Status

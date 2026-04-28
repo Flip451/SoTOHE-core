@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-23-0344-catalogue-spec-signal-activation
+decisions:
+  - id: 2026-04-23-0344-catalogue-spec-signal-activation_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # 型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ②)
 
 ## Context

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-18-1400-tddd-ci-gate-and-signals-separation
+decisions:
+  - id: 2026-04-18-1400-tddd-ci-gate-and-signals-separation_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離
 
 ## Status

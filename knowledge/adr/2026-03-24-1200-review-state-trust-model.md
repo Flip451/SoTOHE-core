@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-24-1200-review-state-trust-model
+decisions:
+  - id: 2026-03-24-1200-review-state-trust-model_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Review state trust model と metadata.json 自己参照問題
 
 ## Status

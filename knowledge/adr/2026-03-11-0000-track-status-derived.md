@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0000-track-status-derived
+decisions:
+  - id: 2026-03-11-0000-track-status-derived_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TrackStatus を tasks から導出し、保存しない
 
 ## Status

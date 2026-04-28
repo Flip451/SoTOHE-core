@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0020-task-transition-enum
+decisions:
+  - id: 2026-03-11-0020-task-transition-enum_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TaskTransition を明示的 enum コマンドに
 
 ## Status

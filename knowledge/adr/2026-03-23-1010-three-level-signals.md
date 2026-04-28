@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-23-1010-three-level-signals
+decisions:
+  - id: 2026-03-23-1010-three-level-signals_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TSUMIKI-01/SPEC-05: 3-level signals with SignalBasis
 
 ## Status

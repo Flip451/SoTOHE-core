@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-15-1636-tddd-05-secondary-adapter
+decisions:
+  - id: 2026-04-15-1636-tddd-05-secondary-adapter_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD-05: Secondary Adapter variant の追加 — infrastructure 層における hexagonal port 実装の検証
 
 ## Status

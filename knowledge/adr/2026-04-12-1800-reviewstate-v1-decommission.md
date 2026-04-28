@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-12-1800-reviewstate-v1-decommission
+decisions:
+  - id: 2026-04-12-1800-reviewstate-v1-decommission_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Review System V1 完全撤去 — metadata.json review field + V1 review.json codec + escalation + index_tree_hash_normalizing
 
 ## Status

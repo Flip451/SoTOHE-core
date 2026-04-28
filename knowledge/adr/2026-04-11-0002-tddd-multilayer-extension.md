@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-11-0002-tddd-multilayer-extension
+decisions:
+  - id: 2026-04-11-0002-tddd-multilayer-extension_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD Multilayer Extension — 型カタログの多層化とシグネチャ検証 (TDDD-01)
 
 ## Status

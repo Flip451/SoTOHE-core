@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-15-1012-catalogue-active-guard-fix
+decisions:
+  - id: 2026-04-15-1012-catalogue-active-guard-fix_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Catalogue rendering pipeline: active-track guard + source-file-name fix + multi-layer sync
 
 ## Status

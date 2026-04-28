@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-07-0045-domain-types-separation
+decisions:
+  - id: 2026-04-07-0045-domain-types-separation_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # domain-types.json: Typed Domain Type Registry Separated from spec.json
 
 ## Status

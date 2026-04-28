@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap
+decisions:
+  - id: 2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # scripts/ Python ヘルパーの段階的 Rust 移行ロードマップ
 
 ## Status

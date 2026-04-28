@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-29-0947-review-json-per-group-review-state
+decisions:
+  - id: 2026-03-29-0947-review-json-per-group-review-state_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # review.json 分離 + グループ独立レビュー状態
 
 ## Status
