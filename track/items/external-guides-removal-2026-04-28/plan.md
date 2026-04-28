@@ -8,7 +8,7 @@ This track is deletion-only with zero Rust source code changes. Deletion targets
 The track_resolution.py / track_schema.py full-file-deletion decision in T002 is an impl-time judgment: if all remaining public functions become test-only after external_guides.py removal, delete entirely; otherwise perform function-level deletion only. This follows IN-04 and the ADR D1 hedge.
 T004 is independent of T001-T003 and may be executed after the deletion work is confirmed. T005 must be last.
 
-## Tasks (4/5 resolved)
+## Tasks (5/5 resolved)
 
 ### S001 — Core Python Scripts + Registry SSoT Deletion (T001)
 
@@ -52,4 +52,4 @@ T004 is independent of T001-T003 and may be executed after the deletion work is 
 > Verify scripts-selftest, verify-*, and all CI gates pass after the deletion and doc changes.
 > This is the final confirmation task before the track is done.
 
-- [~] **T005**: Run cargo make ci and verify all gates pass (AC-10). Execute after T001-T004 are complete. Since Rust source code is not changed, fmt-check / clippy / nextest / deny / check-layers should pass without difference. Confirm that scripts-selftest no longer references the removed test files (test_atomic_write.py / test_external_guides.py and optionally test_track_resolution.py) and does not produce false positives. Confirm verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass after the doc changes. Confirm full CI green before finalizing.
+- [x] **T005**: Run cargo make ci and verify all gates pass (AC-10). Execute after T001-T004 are complete. Since Rust source code is not changed, fmt-check / clippy / nextest / deny / check-layers should pass without difference. Confirm that scripts-selftest no longer references the removed test files (test_atomic_write.py / test_external_guides.py and optionally test_track_resolution.py) and does not produce false positives. Confirm verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass after the doc changes. Confirm full CI green before finalizing. (`b0024c69d8bfc2fc3e7092e805943dcc39a926f0`)

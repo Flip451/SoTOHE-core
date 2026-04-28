@@ -218,24 +218,20 @@
           "findings": [],
           "hash": "rvw1:sha256:01daea07df0518aea3a7491390246832b89f1702ecfaa539d09b2787dbdafc3f",
           "at": "2026-04-28T15:38:59Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
-          "at": "2026-04-28T15:14:45Z"
+          "hash": "rvw1:sha256:c63ba34c5365cad4f6d39c800089c772613faaa0df64325d9695b38994074415",
+          "at": "2026-04-28T15:41:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
-          "at": "2026-04-28T15:17:02Z"
+          "hash": "rvw1:sha256:c63ba34c5365cad4f6d39c800089c772613faaa0df64325d9695b38994074415",
+          "at": "2026-04-28T15:41:39Z"
         }
       ]
     },
@@ -254,6 +250,24 @@
           "findings": [],
           "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
           "at": "2026-04-28T15:16:48Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:14:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:17:02Z"
         }
       ]
     },

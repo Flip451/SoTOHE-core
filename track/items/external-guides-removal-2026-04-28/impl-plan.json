@@ -28,7 +28,8 @@
     {
       "id": "T005",
       "description": "Run cargo make ci and verify all gates pass (AC-10). Execute after T001-T004 are complete. Since Rust source code is not changed, fmt-check / clippy / nextest / deny / check-layers should pass without difference. Confirm that scripts-selftest no longer references the removed test files (test_atomic_write.py / test_external_guides.py and optionally test_track_resolution.py) and does not produce false positives. Confirm verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass after the doc changes. Confirm full CI green before finalizing.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "b0024c69d8bfc2fc3e7092e805943dcc39a926f0"
     }
   ],
   "plan": {
