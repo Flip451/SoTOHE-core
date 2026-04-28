@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T06:06:16Z",
-  "declaration_hash": "eb9d6ad985f4d5401b516fd44940c62d09b48e5a274925ae52725e86bdb061c5",
+  "generated_at": "2026-04-28T07:58:00Z",
+  "declaration_hash": "fbbd12408aad638c189f57bcd11c65043dd8dc0603d3c15e146bb383feb34855",
   "signals": [
     {
       "type_name": "FsAdrFileAdapter",
@@ -12,29 +12,19 @@
     {
       "type_name": "parse_adr_frontmatter",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "fn parse_adr_frontmatter(content: &str) -> Result<AdrFrontMatter, AdrFrontMatterCodecError>"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AdrFrontMatterCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
-      "type_name": "AdrFrontMatterDto",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
-      "type_name": "AdrDecisionDto",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "YamlParse",
+        "MissingAdrId",
+        "InvalidDecisionField"
+      ]
     }
   ]
 }

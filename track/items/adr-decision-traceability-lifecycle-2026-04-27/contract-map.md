@@ -32,14 +32,11 @@ flowchart LR
         L14_infrastructure_FsAdrFileAdapter[FsAdrFileAdapter]:::secondary_adapter
         L14_infrastructure_parse__adr__frontmatter[parse_adr_frontmatter]:::free_function
         L14_infrastructure_AdrFrontMatterCodecError>AdrFrontMatterCodecError]
-        L14_infrastructure_AdrFrontMatterDto[AdrFrontMatterDto]
-        L14_infrastructure_AdrDecisionDto[AdrDecisionDto]
     end
     L14_infrastructure_FsAdrFileAdapter -->|"list_adr_paths"| L6_domain_AdrFilePortError
     L14_infrastructure_FsAdrFileAdapter -->|"read_adr_frontmatter"| L6_domain_AdrFilePortError
     L14_infrastructure_FsAdrFileAdapter -->|"read_adr_frontmatter"| L6_domain_AdrFrontMatter
     L14_infrastructure_FsAdrFileAdapter -.impl.-> L6_domain_AdrFilePort
-    L14_infrastructure_parse__adr__frontmatter -->|"returns"| L14_infrastructure_AdrFrontMatterCodecError
     L14_infrastructure_parse__adr__frontmatter -->|"returns"| L6_domain_AdrFrontMatter
     L6_domain_AdrFilePort -->|"list_adr_paths"| L6_domain_AdrFilePortError
     L6_domain_AdrFilePort -->|"read_adr_frontmatter"| L6_domain_AdrFilePortError

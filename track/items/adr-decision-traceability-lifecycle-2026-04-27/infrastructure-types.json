@@ -68,6 +68,7 @@
       "description": "Infrastructure free function that parses the raw content of an ADR Markdown file into a domain AdrFrontMatter value object. Uses the existing parse_yaml_frontmatter utility (infrastructure::verify::frontmatter module) to extract the YAML block, then uses serde_yaml to deserialize into AdrFrontMatterDto. For each AdrDecisionDto, dispatches on status: String to construct the correct domain typestate struct and wraps it in the matching AdrDecisionEntry variant (ProposedDecision | AcceptedDecision | ImplementedDecision | SupersededDecision | DeprecatedDecision). State-specific fields (implemented_in into ImplementedDecision, superseded_by into SupersededDecision) are passed at construction; AdrDecisionCommon is built from shared grounds fields. Status strings that do not match a known variant surface as AdrFrontMatterCodecError::InvalidDecisionField. Enforces explicit-key-presence detection via a serde_yaml::Value intermediate pass before typed DTO deserialization: (a) forbidden-when-key-present — 'implemented_in' key present on any status other than 'implemented' → InvalidDecisionField; 'superseded_by' key present on any status other than 'superseded' → InvalidDecisionField. (b) required-when-value — status 'implemented' requires implemented_in: Some(_), status 'superseded' requires superseded_by: Some(_). serde(deny_unknown_fields) on AdrDecisionDto rejects unknown schema fields. serde derives live in infrastructure, not domain (CN-05). free_function kind: the parsing logic is stateless (no struct state is threaded through; the function takes a string and returns a Result). Precedent: parse_yaml_frontmatter in the same infrastructure::verify::frontmatter module is also a stateless free function. A zero-field codec struct would add no value over a free function here.",
       "approved": true,
       "kind": "free_function",
+      "module_path": "infrastructure::adr_decision::parse",
       "expected_params": [
         {
           "name": "content",
@@ -75,7 +76,7 @@
         }
       ],
       "expected_returns": [
-        "Result<AdrFrontMatter, AdrFrontMatterCodecError>"
+        "AdrFrontMatter"
       ],
       "expected_is_async": false,
       "spec_refs": [
@@ -104,6 +105,10 @@
         {
           "kind": "user_directive",
           "summary": "Redesigned from value_object AdrFrontMatterCodec (zero-field struct) to free_function parse_adr_frontmatter. The existing codebase precedent is parse_yaml_frontmatter in infrastructure::verify::frontmatter — a stateless free function, not a struct. A zero-field parsing struct has no state to protect and stretches value_object semantics (validated value container). free_function kind accurately exposes expected_params / expected_returns in the contract-map. FsAdrFileAdapter no longer holds a codec field — it calls parse_adr_frontmatter directly."
+        },
+        {
+          "kind": "user_directive",
+          "summary": "module_path set to 'infrastructure::adr_decision::parse' because the function is declared in libs/infrastructure/src/adr_decision/parse.rs. The TypeGraph indexes functions by (short_name, module_path) tuple; the baseline key is 'infrastructure::adr_decision::parse::parse_adr_frontmatter'. Without module_path the signal evaluator calls get_function('parse_adr_frontmatter', None) which misses the entry. expected_returns is ['AdrFrontMatter'] (not ['Result<AdrFrontMatter, AdrFrontMatterCodecError>') because collect_type_names() in schema_export.rs unwraps Result<T,E> to extract only T (the Ok type). The signal evaluator's function_signature_matches() compares FunctionNode::returns() (which stores ['AdrFrontMatter']) directly against expected_returns. Storing the full Result<T,E> string as expected_returns would never match."
         }
       ]
     },
@@ -132,96 +137,6 @@
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
           "anchor": "AC-07",
           "hash": "59f56f89288c7676056131c979e5ad282ea081bc27b1b962ab317d7912d68bef"
-        }
-      ]
-    },
-    {
-      "name": "AdrFrontMatterDto",
-      "description": "Serde-derived DTO mirroring the YAML front-matter schema (adr_id + decisions[] array). Used as the intermediate deserialization target inside parse_adr_frontmatter before converting to domain AdrFrontMatter value object. serde(deny_unknown_fields) to fail on schema drift. Infrastructure-only — never exported to domain or usecase layers.",
-      "approved": true,
-      "kind": "dto",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "adr_id",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "decisions",
-          "ty": "Vec<AdrDecisionDto>"
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
-          "anchor": "IN-01",
-          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
-        },
-        {
-          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
-          "anchor": "CN-05",
-          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
-        }
-      ]
-    },
-    {
-      "name": "AdrDecisionDto",
-      "description": "Serde-derived DTO for a single element of the decisions[] array. Covers all schema fields from D3: id (required), user_decision_ref (Option), review_finding_ref (Option), candidate_selection (Option), status (required String — validated and dispatched to AdrDecisionEntry variant by parse_adr_frontmatter), superseded_by (Option<String>, required when status is 'superseded'), implemented_in (Option<String>, required when status is 'implemented'), grandfathered (Option<bool>, defaults to false). Note: serde Option<String> cannot distinguish 'key: null' from 'key absent'; parse_adr_frontmatter performs an explicit-key-presence check on the raw serde_yaml::Value before deserializing this DTO, so that 'implemented_in: null' on a non-'implemented' status is caught as InvalidDecisionField before reaching this struct. Unknown status values surface as AdrFrontMatterCodecError::InvalidDecisionField; misplaced state-specific fields (implemented_in key present on non-'implemented' status, superseded_by key present on non-'superseded' status) also surface as InvalidDecisionField via the key-presence pre-check to uphold the typestate invariant. Infrastructure-only — never exported to domain or usecase layers.",
-      "approved": true,
-      "kind": "dto",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "id",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "user_decision_ref",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "review_finding_ref",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "candidate_selection",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "status",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "superseded_by",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "implemented_in",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "grandfathered",
-          "ty": "Option<bool>"
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
-          "anchor": "IN-01",
-          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
-        },
-        {
-          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
-          "anchor": "CN-05",
-          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
         }
       ]
     }

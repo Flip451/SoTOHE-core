@@ -4,14 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrFrontMatterCodecError | error_type | — | YamlParse, MissingAdrId, InvalidDecisionField | 🟡 | 🔵 |
-
-## DTOs
-
-| Name | Kind | Action | Details | Signal | Cat-Spec |
-|------|------|--------|---------|--------|----------|
-| AdrFrontMatterDto | dto | — | — | 🟡 | 🔵 |
-| AdrDecisionDto | dto | — | — | 🟡 | 🔵 |
+| AdrFrontMatterCodecError | error_type | — | YamlParse, MissingAdrId, InvalidDecisionField | 🔵 | 🔵 |
 
 ## Secondary Adapters
 
@@ -23,5 +16,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| parse_adr_frontmatter | free_function | — | — | 🟡 | 🟡 |
+| parse_adr_frontmatter | free_function | — | — | 🔵 | 🟡 |
 
