@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "Append a back-reference note to the Roadmap ADR via adr-editor capability. Append a blockquote note to the Phase 3 section of knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md indicating that the direction of Phase 3 was changed from Rust migration to feature removal by decision D1 of 2026-04-28-1258-remove-external-guides.md (IN-09 / AC-09). The Roadmap ADR YAML front-matter must not be changed (CN-01 / CN-02). This task must be delegated to the adr-editor capability to comply with the 1-file-1-writer principle (CN-01).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "260b956f22dbf498ac56618c46816946e51db40a"
     },
     {
       "id": "T005",
       "description": "Run cargo make ci and verify all gates pass (AC-10). Execute after T001-T004 are complete. Since Rust source code is not changed, fmt-check / clippy / nextest / deny / check-layers should pass without difference. Confirm that scripts-selftest no longer references the removed test files (test_atomic_write.py / test_external_guides.py and optionally test_track_resolution.py) and does not produce false positives. Confirm verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass after the doc changes. Confirm full CI green before finalizing.",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {

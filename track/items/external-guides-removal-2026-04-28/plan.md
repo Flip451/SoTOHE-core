@@ -8,7 +8,7 @@ This track is deletion-only with zero Rust source code changes. Deletion targets
 The track_resolution.py / track_schema.py full-file-deletion decision in T002 is an impl-time judgment: if all remaining public functions become test-only after external_guides.py removal, delete entirely; otherwise perform function-level deletion only. This follows IN-04 and the ADR D1 hedge.
 T004 is independent of T001-T003 and may be executed after the deletion work is confirmed. T005 must be last.
 
-## Tasks (3/5 resolved)
+## Tasks (4/5 resolved)
 
 ### S001 — Core Python Scripts + Registry SSoT Deletion (T001)
 
@@ -43,7 +43,7 @@ T004 is independent of T001-T003 and may be executed after the deletion work is 
 > CN-02: Roadmap ADR YAML front-matter must not be changed; only a note in the body is appended.
 > This task is independent of T001-T003 and can be executed in parallel with them if needed.
 
-- [~] **T004**: Append a back-reference note to the Roadmap ADR via adr-editor capability. Append a blockquote note to the Phase 3 section of knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md indicating that the direction of Phase 3 was changed from Rust migration to feature removal by decision D1 of 2026-04-28-1258-remove-external-guides.md (IN-09 / AC-09). The Roadmap ADR YAML front-matter must not be changed (CN-01 / CN-02). This task must be delegated to the adr-editor capability to comply with the 1-file-1-writer principle (CN-01).
+- [x] **T004**: Append a back-reference note to the Roadmap ADR via adr-editor capability. Append a blockquote note to the Phase 3 section of knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md indicating that the direction of Phase 3 was changed from Rust migration to feature removal by decision D1 of 2026-04-28-1258-remove-external-guides.md (IN-09 / AC-09). The Roadmap ADR YAML front-matter must not be changed (CN-01 / CN-02). This task must be delegated to the adr-editor capability to comply with the 1-file-1-writer principle (CN-01). (`260b956f22dbf498ac56618c46816946e51db40a`)
 
 ### S005 — CI Gate Verification (T005)
 
@@ -52,4 +52,4 @@ T004 is independent of T001-T003 and may be executed after the deletion work is 
 > Verify scripts-selftest, verify-*, and all CI gates pass after the deletion and doc changes.
 > This is the final confirmation task before the track is done.
 
-- [ ] **T005**: Run cargo make ci and verify all gates pass (AC-10). Execute after T001-T004 are complete. Since Rust source code is not changed, fmt-check / clippy / nextest / deny / check-layers should pass without difference. Confirm that scripts-selftest no longer references the removed test files (test_atomic_write.py / test_external_guides.py and optionally test_track_resolution.py) and does not produce false positives. Confirm verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass after the doc changes. Confirm full CI green before finalizing.
+- [~] **T005**: Run cargo make ci and verify all gates pass (AC-10). Execute after T001-T004 are complete. Since Rust source code is not changed, fmt-check / clippy / nextest / deny / check-layers should pass without difference. Confirm that scripts-selftest no longer references the removed test files (test_atomic_write.py / test_external_guides.py and optionally test_track_resolution.py) and does not produce false positives. Confirm verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass after the doc changes. Confirm full CI green before finalizing.
