@@ -632,6 +632,111 @@
           "findings": [],
           "hash": "rvw1:sha256:0706a64fa7b57b6bbecea2fb43c59f3039ff272ebb4631898b9139f6c167ba1c",
           "at": "2026-04-28T22:45:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T22:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The transition delta removes the `commit_hash` field from every task entry instead of preserving it as `null`. This contradicts the plan-artifacts contract for this round: T001 should only move to `in_progress` while keeping `commit_hash: null`, and T002-T008 task metadata should remain unchanged.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T22:57:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:00:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T001 transition removed the `commit_hash` field from every task entry instead of preserving it as `null`. This contradicts the transition contract for this round, which says only T001 status should change and its commit hash should remain unset while T002-T008 metadata stays unchanged; it also drops the task/hash state that the workflow uses for approval tracking.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:01:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T001 transition should only change the task state while leaving unresolved task commit metadata as `commit_hash: null`; instead `commit_hash` is absent from T001 and the same null field was dropped from T002-T008. That contradicts the transition contract that non-T001 task entries remain unchanged and leaves the plan artifact without the expected pre-commit marker for unresolved tasks.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:03:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:10:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:11:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1219afba10fe727ba80572ae3368759e4b91755d9d2b6fbdd3151479f165fb98",
+          "at": "2026-04-28T23:13:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1219afba10fe727ba80572ae3368759e4b91755d9d2b6fbdd3151479f165fb98",
+          "at": "2026-04-28T23:15:33Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:58:50Z"
         }
       ]
     }

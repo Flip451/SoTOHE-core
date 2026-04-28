@@ -85,6 +85,20 @@ pub trait CommitHashReader: Send + Sync {
     fn read(&self) -> Result<Option<CommitHash>, CommitHashError>;
 }
 
+/// Secondary port for querying whether `review.json` exists on disk.
+///
+/// Abstracts the filesystem existence check from the usecase layer.
+/// Persistence port — defined in domain layer (CN-04 hexagonal purity).
+pub trait ReviewExistsPort: Send + Sync {
+    /// Returns whether `review.json` is present and accessible for this track.
+    ///
+    /// # Errors
+    /// - `Ok(true)` — file exists and is accessible
+    /// - `Ok(false)` — file is absent (not found)
+    /// - `Err(ReviewReaderError)` — other I/O error (e.g. permission denied)
+    fn review_json_exists(&self) -> Result<bool, ReviewReaderError>;
+}
+
 /// Write port for `.commit_hash` file.
 ///
 /// Persistence port — defined in domain layer.

@@ -1,25 +1,40 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T22:46:43Z",
+  "generated_at": "2026-04-28T23:16:01Z",
   "declaration_hash": "9fe1ee89e44a0876aede32f2570fb36d9afc327823a75e5620d2a2f1b8958b92",
   "signals": [
     {
       "type_name": "ReviewApprovalVerdict",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Approved",
+        "ApprovedWithBypass",
+        "Blocked"
+      ]
     },
     {
       "type_name": "ScopeRound",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "round_type: RoundType",
+        "verdict: Verdict",
+        "findings: Vec<ReviewerFinding>",
+        "hash: ReviewHashValue",
+        "at: String"
+      ]
     },
     {
       "type_name": "ReviewExistsPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn review_json_exists(&self) -> Result<bool, ReviewReaderError>"
+      ]
     }
   ]
 }

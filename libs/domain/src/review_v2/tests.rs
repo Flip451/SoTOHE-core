@@ -647,6 +647,96 @@ fn test_briefing_file_for_scope_always_none_for_other() {
     assert!(config.briefing_file_for_scope(&ScopeName::Other).is_none());
 }
 
+// ── ScopeRound ────────────────────────────────────────────────────────
+
+#[test]
+fn test_scope_round_construction_with_all_fields_succeeds() {
+    let hash_value = ReviewHashValue::new("rvw1:sha256:deadbeef01").unwrap();
+    let round = ScopeRound {
+        round_type: RoundType::Final,
+        verdict: Verdict::ZeroFindings,
+        findings: vec![],
+        hash: hash_value.clone(),
+        at: "2026-04-28T12:00:00Z".to_owned(),
+    };
+    assert!(matches!(round.round_type, RoundType::Final));
+    assert!(matches!(round.verdict, Verdict::ZeroFindings));
+    assert!(round.findings.is_empty());
+    assert_eq!(round.hash.as_str(), "rvw1:sha256:deadbeef01");
+    assert_eq!(round.at, "2026-04-28T12:00:00Z");
+}
+
+#[test]
+fn test_scope_round_construction_with_findings_remain() {
+    let hash_value = ReviewHashValue::new("rvw1:sha256:cafebabe99").unwrap();
+    let finding = ReviewerFinding::new("style issue", None, None, None, None).unwrap();
+    let round = ScopeRound {
+        round_type: RoundType::Fast,
+        verdict: Verdict::findings_remain(vec![finding.clone()]).unwrap(),
+        findings: vec![finding],
+        hash: hash_value,
+        at: "2026-04-28T15:30:00Z".to_owned(),
+    };
+    assert!(matches!(round.round_type, RoundType::Fast));
+    assert!(matches!(round.verdict, Verdict::FindingsRemain(_)));
+    assert_eq!(round.findings.len(), 1);
+}
+
+// ── ReviewApprovalVerdict ─────────────────────────────────────────────
+
+#[test]
+fn test_review_approval_verdict_approved_construction() {
+    let verdict = ReviewApprovalVerdict::Approved;
+    assert!(matches!(verdict, ReviewApprovalVerdict::Approved));
+}
+
+#[test]
+fn test_review_approval_verdict_approved_with_bypass_construction() {
+    let verdict = ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 3 };
+    match verdict {
+        ReviewApprovalVerdict::ApprovedWithBypass { not_started_count } => {
+            assert_eq!(not_started_count, 3);
+        }
+        _ => panic!("expected ApprovedWithBypass"),
+    }
+}
+
+#[test]
+fn test_review_approval_verdict_blocked_construction_with_required_scopes() {
+    let scope_a = ScopeName::Main(MainScopeName::new("domain").unwrap());
+    let scope_b = ScopeName::Main(MainScopeName::new("infrastructure").unwrap());
+    let verdict =
+        ReviewApprovalVerdict::Blocked { required_scopes: vec![scope_a.clone(), scope_b.clone()] };
+    match verdict {
+        ReviewApprovalVerdict::Blocked { required_scopes } => {
+            assert_eq!(required_scopes.len(), 2);
+            assert!(required_scopes.contains(&scope_a));
+            assert!(required_scopes.contains(&scope_b));
+        }
+        _ => panic!("expected Blocked"),
+    }
+}
+
+#[test]
+fn test_review_approval_verdict_blocked_with_single_scope() {
+    let scope = ScopeName::Other;
+    let verdict = ReviewApprovalVerdict::Blocked { required_scopes: vec![scope.clone()] };
+    match verdict {
+        ReviewApprovalVerdict::Blocked { required_scopes } => {
+            assert_eq!(required_scopes.len(), 1);
+            assert_eq!(required_scopes[0], scope);
+        }
+        _ => panic!("expected Blocked"),
+    }
+}
+
+#[test]
+fn test_review_approval_verdict_approved_with_bypass_zero_count() {
+    // Edge case: bypass with zero not_started_count is structurally valid
+    let verdict = ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 0 };
+    assert!(matches!(verdict, ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 0 }));
+}
+
 // ── group pattern <track-id> expansion (T001 regression) ──────────────
 
 #[test]

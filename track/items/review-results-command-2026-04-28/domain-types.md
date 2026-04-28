@@ -4,17 +4,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ReviewApprovalVerdict | enum | — | Approved, ApprovedWithBypass, Blocked | 🟡 | 🔵 |
+| ReviewApprovalVerdict | enum | — | Approved, ApprovedWithBypass, Blocked | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ScopeRound | value_object | — | — | 🟡 | 🔵 |
+| ScopeRound | value_object | — | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ReviewExistsPort | secondary_port | — | fn review_json_exists(&self) -> Result<bool, ReviewReaderError> | 🟡 | 🔵 |
+| ReviewExistsPort | secondary_port | — | fn review_json_exists(&self) -> Result<bool, ReviewReaderError> | 🔵 | 🔵 |
 
