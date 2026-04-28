@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "dfa408e1499c628b015bcc5aa22562dbe86b4ea14b769790d8eca106f7dd82ba",
+  "catalogue_declaration_hash": "3fff26f6df8752cedc568bc07d5410ba99ac3fd35403d570a04144e1bd8ba52b",
   "signals": [
     {
       "type_name": "VerifyAdrSignals",

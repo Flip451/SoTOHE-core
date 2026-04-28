@@ -1,6 +1,118 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:03:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AcceptedDecision::implement` accepts any `String` and returns `ImplementedDecision` directly, so callers can create an implemented typestate with `implemented_in == \"\"`. That violates the stated invariant that implemented decisions must carry the commit/reference where they were actualized; validate this field in all `ImplementedDecision` creation paths or use a validated value type/`Result`.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 75,
+              "category": "validation"
+            },
+            {
+              "message": "`AcceptedDecision::supersede` accepts any `String` and returns `SupersededDecision` directly, so callers can create a superseded typestate with an empty `superseded_by` reference. Since `SupersededDecision::new` has the same issue, the terminal state can exist without the required ADR anchor; validate this field in all supersession creation paths or use a validated value type/`Result`.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 84,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AcceptedDecision::implement` accepts an arbitrary `String` and constructs `ImplementedDecision` directly, and `ImplementedDecision::new` has the same shape. This allows `implemented_in == \"\"`, so the domain can represent an implemented decision with no commit/reference even though the catalogue describes `implemented_in` as the required actualization reference and says the typestate should make that invalid state impossible. Validate the value in every creation path or use a validated reference type.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 75,
+              "category": "logic"
+            },
+            {
+              "message": "`AcceptedDecision::supersede` accepts an arbitrary `String` and constructs `SupersededDecision` directly; `ImplementedDecision::supersede` and `SupersededDecision::new` do the same. This allows `superseded_by == \"\"`, leaving a terminal superseded decision without the required ADR anchor/back-reference, contrary to the typestate invariant. Validate the value in every creation path or use a validated reference type.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 84,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:10:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
+          "at": "2026-04-28T03:16:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplementedDecision` validates `implemented_in` in constructors/transitions, but the field is public, so callers can directly construct or later mutate an `ImplementedDecision` with an empty `implemented_in`. That makes the invalid state the constructor is trying to reject representable outside the module.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 131,
+              "category": null
+            },
+            {
+              "message": "`SupersededDecision` validates `superseded_by` in constructors/transitions, but the field is public, so callers can directly construct or later mutate a `SupersededDecision` with an empty `superseded_by`. That bypasses the domain invariant for this terminal state.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 191,
+              "category": null
+            },
+            {
+              "message": "This intra-doc link targets `crate::adr_decision::AdrSignalEvaluator`, which is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/grounds.rs",
+              "line": 5,
+              "category": null
+            },
+            {
+              "message": "This intra-doc link targets `crate::adr_decision::AdrFrontMatter::decisions`, but `AdrFrontMatter` is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/entry.rs",
+              "line": 8,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
+          "at": "2026-04-28T03:18:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
+          "at": "2026-04-28T03:25:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
+          "at": "2026-04-28T03:27:42Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -127,6 +239,218 @@
           "findings": [],
           "hash": "rvw1:sha256:5f7f2e7783d0be4b592c6822dd320d17e29974ac43ad0dac5a32d249d8126fbb",
           "at": "2026-04-28T01:13:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R1 makes `use_case` usecase-only, but the existing agent guidance still treats a `pure computation struct, no trait` as `kind: use_case` and even keeps `AdrFrontMatterCodec` as `kind: use_case` in `infrastructure-types.json` (`.claude/agents/type-designer.md:201,358-361`). Until those examples are updated, the new rule conflicts with the agent's own cookbook/decision tree and gives contradictory instructions for the same shape.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 40,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a837c96e2b9498c88dbff592c1a1e751dcbca50955ad3d3331db2bf0e53f8aaa",
+          "at": "2026-04-28T04:31:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Compliance section makes `use_case` usecase-only and pushes stateless behavior to `free_function`, but this file still tells readers to choose `use_case` for a \"pure computation struct\" and shows `AdrFrontMatterCodec` as `kind: use_case` in `infrastructure-types.json`. That leaves the agent with contradictory authoritative guidance on kind selection.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 201,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a837c96e2b9498c88dbff592c1a1e751dcbca50955ad3d3331db2bf0e53f8aaa",
+          "at": "2026-04-28T04:33:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`secondary_port` is marked domain-only here, but the repository already uses `secondary_port` in `usecase` (for example `TrackBlobReader`, `Reviewer`, `DiffGetter`, and `ReviewHasher` in `track/items/tddd-02-usecase-wiring-2026-04-14/usecase-types.json`). That makes the constraint infeasible and would reject valid usecase-layer ports.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 27,
+              "category": "architecture"
+            },
+            {
+              "message": "This matrix repeats the same infeasible rule: `secondary_port` cannot be domain-only because existing usecase taxonomy and `usecase-types.json` already place several `secondary_port` entries in `usecase`. As written, the convention would contradict established catalogue shape and break valid drafting.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 38,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:46d5b9d2e291e84553749e9c8a1cdea5af22ed51103674ab1c7ee5778e93515f",
+          "at": "2026-04-28T04:35:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33e7454081c5421fc056d0caf103070335bf0cafcc322ef54458af1dd5f2ad37",
+          "at": "2026-04-28T04:37:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Kind Field Schemas` table treats `use_case`, `interactor`, `dto`, `command`, `query`, `factory`, and `secondary_adapter` as fieldless existence checks, but the actual `TypeDefinitionKind` schema requires `expected_members` for all struct-based kinds and `declares_application_service` for `Interactor`. As written, this convention will steer the type-designer toward schema-invalid catalogue entries.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 41,
+              "category": "architecture"
+            },
+            {
+              "message": "The compliance section tells the agent to author only `expected_methods` / `expected_variants` / `transitions_to` / `implements`, but omits `expected_members` and `declares_application_service`. Those fields are required for use case, interactor, and the other struct-based kinds, so following this instruction will produce invalid catalogue drafts.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 42,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:33e7454081c5421fc056d0caf103070335bf0cafcc322ef54458af1dd5f2ad37",
+          "at": "2026-04-28T04:40:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This convention now references `.claude/agents/type-designer.md` in its scope/enforcement/related-docs sections, which creates the reverse documentation dependency the harness policy asks to avoid; keep the dependency one-way from the agent to the convention.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 19,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:33e7454081c5421fc056d0caf103070335bf0cafcc322ef54458af1dd5f2ad37",
+          "at": "2026-04-28T04:41:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cbc14d9ee32bb422584a37dae29799a610dbdd24262b1a8c708be802a8a6f47",
+          "at": "2026-04-28T04:45:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cbc14d9ee32bb422584a37dae29799a610dbdd24262b1a8c708be802a8a6f47",
+          "at": "2026-04-28T04:46:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This convention now points back at `.claude/agents/type-designer.md` by treating the agent's own decision tree as a normative input (`type-designer agent の kind selection decision tree`). That creates a convention→agent dependency cycle with the new agent→convention reference, which violates the one-way dependency requirement in the briefing.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 110,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:4cbc14d9ee32bb422584a37dae29799a610dbdd24262b1a8c708be802a8a6f47",
+          "at": "2026-04-28T04:48:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The \"Kind Field Schemas\" table is not a faithful summary of `TypeDefinitionKind`: `ValueObject`, `UseCase`, `Dto`, `Command`, `Query`, `Factory`, and `SecondaryAdapter` all require `expected_members` in `libs/domain/src/tddd/catalogue.rs`, and `Interactor` also requires `declares_application_service`, but this table shows `—` or only `implements`. As written, the convention is internally inconsistent and can lead the agent to emit catalogue entries that fail validation.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 32,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bc008535dac22b6aa5d58730d476b6abafccf67969bac308b546a27d273c6659",
+          "at": "2026-04-28T04:51:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Kind Field Schemas` table is incomplete and conflicts with `TypeDefinitionKind` in `libs/domain/src/tddd/catalogue.rs`: `value_object`, `use_case`, `interactor`, `dto`, `command`, `query`, and `factory` all require `expected_members`, and `interactor` also requires `declares_application_service`. As written, the agent would be instructed to omit required catalogue fields and emit invalid JSON.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 145,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:a0b07e386cda8803a243748ec784911ab3d9137e829bb186577540b8c14c1c81",
+          "at": "2026-04-28T04:54:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
+          "at": "2026-04-28T04:57:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
+          "at": "2026-04-28T04:59:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
+          "at": "2026-04-28T05:01:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R1 still allows `secondary_port` entries in `usecase`, but this harness-policy round was supposed to make `secondary_port` domain-only. The guard therefore still accepts the exact misplacement it is meant to block, and the same allowance is repeated in `.claude/agents/type-designer.md:27`.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 40,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
+          "at": "2026-04-28T05:04:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
+          "at": "2026-04-28T05:06:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
+          "at": "2026-04-28T05:10:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
+          "at": "2026-04-28T05:14:15Z"
         }
       ]
     },
@@ -1162,6 +1486,142 @@
           "findings": [],
           "hash": "rvw1:sha256:40f845442457277bc32c990ce483af11c508667ac6c3b15290e8b440cc93ec08",
           "at": "2026-04-28T02:53:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff40cf5b85edc9e0d43986fec58d9e4ab1d468232df0b4340b4e3c9f61a9a341",
+          "at": "2026-04-28T03:02:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff40cf5b85edc9e0d43986fec58d9e4ab1d468232df0b4340b4e3c9f61a9a341",
+          "at": "2026-04-28T03:03:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c59c5cd2f16289aee2a99f083fe471af11f42b34876bdc9e38099e263b17a446",
+          "at": "2026-04-28T03:34:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c59c5cd2f16289aee2a99f083fe471af11f42b34876bdc9e38099e263b17a446",
+          "at": "2026-04-28T03:37:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This catalogue still refers to the removed `AdrSignalEvaluator` and `AdrFrontMatterCodec` symbols in the prose, even though the redesign now models `evaluate_adr_decision` and `parse_adr_frontmatter`. That leaves the domain catalogue self-contradictory with the updated plan artifacts. The same stale reference also appears earlier in the file in the `AdrDecisionCommon` description.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 310,
+              "category": "broken reference"
+            },
+            {
+              "message": "`VerifyAdrSignalsError` still says `SignalEval is not a variant: AdrSignalEvaluator::evaluate...`, but the surrounding usecase plan now calls `evaluate_adr_decision`. This is a stale cross-file reference to a deleted type/function and makes the error taxonomy inconsistent with the new orchestration design.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 110,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:3ea21d4bfd5c6579ae4d371479e7ff8bc47bd79c22540bf38aaf809ce9f35b28",
+          "at": "2026-04-28T04:31:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file still describes `AdrFrontMatter` / `AdrDecisionEntry` in terms of the removed `AdrFrontMatterCodec` and `AdrSignalEvaluator` symbols. The current catalogue redesign models those responsibilities as `parse_adr_frontmatter` and `evaluate_adr_decision`, so the domain catalogue is internally inconsistent with the updated architecture.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "`parse_adr_frontmatter` is catalogued as taking `str` by value. That is not a valid Rust parameter type for a callable function; this needs to be `&str` or `String`, otherwise the described API cannot be implemented as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
+              "line": 74,
+              "category": "factual error"
+            },
+            {
+              "message": "`VerifyAdrSignalsError` still says `AdrSignalEvaluator::evaluate` is the infallible evaluator, but the redesign renamed that computation to the free function `evaluate_adr_decision`. This stale symbol name makes the usecase catalogue drift from the rest of the plan artifacts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 110,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3ea21d4bfd5c6579ae4d371479e7ff8bc47bd79c22540bf38aaf809ce9f35b28",
+          "at": "2026-04-28T04:34:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ecaba5539c6a6c35464cd4c8bee6fcae048eaa10c928c0697ef952df1f8dfba",
+          "at": "2026-04-28T04:36:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ecaba5539c6a6c35464cd4c8bee6fcae048eaa10c928c0697ef952df1f8dfba",
+          "at": "2026-04-28T04:37:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrDecisionCommon` still describes its grounds fields as being used by `AdrSignalEvaluator`, but the catalogue has already replaced that type with the `evaluate_adr_decision` free function. This leaves a stale, removed type name in the domain model description.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "line": 46,
+              "category": "factual error"
+            },
+            {
+              "message": "`VerifyAdrSignalsCommand` says the ADR directory is resolved from the workspace root by the infrastructure adapter, but the rest of this plan treats `FsAdrFileAdapter` as a path-injected adapter with an explicit `adr_dir: PathBuf` constructed by the CLI/composition root. That responsibility split is inconsistent and misstates where path resolution happens.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9ecaba5539c6a6c35464cd4c8bee6fcae048eaa10c928c0697ef952df1f8dfba",
+          "at": "2026-04-28T04:57:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:486cfd99ecc4318edd59c1d6140d935b04402d21b1ed1733301e56d550d579c2",
+          "at": "2026-04-28T04:59:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:144e737783cddfcdba87eb664824b1e619fd4d8dcec32a17e2f66ec2aefbd164",
+          "at": "2026-04-28T05:01:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:144e737783cddfcdba87eb664824b1e619fd4d8dcec32a17e2f66ec2aefbd164",
+          "at": "2026-04-28T05:06:52Z"
         }
       ]
     }

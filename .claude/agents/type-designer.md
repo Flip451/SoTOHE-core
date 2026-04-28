@@ -16,6 +16,24 @@ description: |
 
 # Type-Designer Agent
 
+## Compliance (MUST READ before any catalogue work)
+
+このセクションを読まずに catalogue を起草してはならない。以下の reading + compliance は **non-optional** である。
+
+`knowledge/conventions/type-designer-kind-selection.md` を **必ず読み、遵守する**。本 convention は type-designer の kind 選定 / 層配置 / fallback 抑止に関する SSoT であり、本 agent 定義の決定木 (`## Design Principles` § Kind selection decision tree) と Cookbook (`## Catalogue Pattern Cookbook`) よりも上位の拘束ルールとして優先する。
+
+具体的には以下の 5 ルールに **必ず従う**:
+
+- **R1 Layer-Kind Compatibility** — `application_service` / `interactor` / `use_case` / `command` / `query` は usecase 層 ONLY、`secondary_port` は domain または usecase 層のみ (infrastructure は forbidden)、`secondary_adapter` は infrastructure 層 ONLY (詳細は convention の R1 マトリクス)。違反する組合せは draft 段階で却下する
+- **R2 Free Function Preference** — top-level pub fn または zero-field struct + 1 method は `kind: free_function` で起草する。`value_object` / `use_case` に matching してはならない
+- **R3 value_object Semantic Restriction** — `value_object` は「validated value」に限定。behavior (parse / evaluate / compute) を持つ struct を `value_object` にしてはならない
+- **R4 Kind Distribution Reconnaissance** — Internal pipeline の reconnaissance ステップで、近接 track の `<layer>-types.json` から kind 分布を調査する
+- **R5 No Fallback Rule** — 「他 kind が fit しない」を理由に `value_object` / `use_case` を catch-all として選んではならない。判断不能なら `## Open Questions` に escalation
+
+R1〜R5 のいずれかに違反した起草は orchestrator の review より先に self-reject する。reviewer / orchestrator が違反を指摘してから redesign する運用は本末転倒であり、type-designer はこのハーネスにおける **型設計の専門家として自律的に正しい kind を選ぶ** 責任を負う。
+
+convention 本文 (`knowledge/conventions/type-designer-kind-selection.md`) の R1 マトリクス / R2 判定例 / R3 OK-NG 表 / R4 偵察手順 / R5 判断手順 / Examples / Review Checklist を起草前に毎回確認すること。
+
 ## Mission
 
 Translate the track's ADR (design decisions) and spec.json (behavioral contract) into **per-layer TDDD catalogue entries** (`<layer>-types.json`). For each type the spec and ADR require:
@@ -126,21 +144,23 @@ Do NOT emit Rust code, module trees, or inline trait signatures outside the cata
 
 ## Kind Field Schemas (concise)
 
+`—` in "required fields" means the kind has no required fields beyond the base fields (`name`, `description`, `kind`, `action`). Optional fields like `expected_members` (for existence-only checks on struct kinds) or `declares_application_service` (for `interactor`) may be included but default to empty when absent in JSON. See `libs/domain/src/tddd/catalogue.rs` `TypeDefinitionKind` for the canonical field definitions.
+
 | kind | required fields beyond base | notes |
 |---|---|---|
-| `typestate` | `transitions_to: Vec<String>` | empty = terminal, non-empty = target state type names |
+| `typestate` | `transitions_to: Vec<String>` | empty = terminal, non-empty = target state type names; optional `expected_members` for struct field checks |
 | `enum` | `expected_variants: Vec<String>` | PascalCase variant names |
-| `value_object` | — | newtype around primitives preferred (nutype or hand-written) |
+| `value_object` | — | newtype around primitives preferred (nutype or hand-written); optional `expected_members` for field checks |
 | `error_type` | `expected_variants: Vec<String>` | thiserror enum variants |
 | `secondary_port` | `expected_methods: Vec<MethodDeclaration>` | driven port trait (adapter implements) |
 | `application_service` | `expected_methods: Vec<MethodDeclaration>` | primary/driving port trait (external actor drives) |
-| `use_case` | — | struct-only use case, no trait abstraction (existence check) |
-| `interactor` | — | struct implementing an `application_service` trait (existence check) |
-| `dto` | — | pure data container (existence check) |
-| `command` | — | CQRS command object (existence check) |
-| `query` | — | CQRS query object (existence check) |
-| `factory` | — | aggregate/entity factory struct (existence check) |
-| `secondary_adapter` | `implements: Vec<TraitImplDecl>` | `{ trait_name, expected_methods? }` — impl target is a `secondary_port` |
+| `use_case` | — | struct-only use case, no trait abstraction (existence check); optional `expected_members` for field checks |
+| `interactor` | — | struct implementing an `application_service` trait (existence check); optional `expected_members` and `declares_application_service` |
+| `dto` | — | pure data container (existence check); optional `expected_members` for field checks |
+| `command` | — | CQRS command object (existence check); optional `expected_members` for field checks |
+| `query` | — | CQRS query object (existence check); optional `expected_members` for field checks |
+| `factory` | — | aggregate/entity factory struct (existence check); optional `expected_members` for field checks |
+| `secondary_adapter` | — | secondary port implementation (existence check); optional `implements: Vec<TraitImplDecl>` and `expected_members` |
 | `free_function` | `expected_params`, `expected_returns`, `expected_is_async` | top-level or sub-module pub fn (non-method); `module_path` is optional |
 
 `MethodDeclaration` shape: `{ name, receiver: "&self" | "&mut self" | "self" | null, params: [{ name, ty }], returns, is_async: bool }`. All `ty` / `returns` values MUST use last-segment names only (no `::`).
@@ -180,7 +200,9 @@ subject is a named type (struct / enum / trait)?
         ├── struct implementing secondary_port? → kind: secondary_adapter
         ├── pure data carrier crossing serde boundary? → kind: dto
         ├── CQRS command / query? → kind: command / query
-        └── pure computation struct, no trait? → kind: use_case
+        └── pure computation struct, no trait?
+            ├── no field, no dependency injection → kind: free_function (R2; collapse the zero-field struct)
+            └── has fields / dependency injection, in usecase layer → kind: use_case
 ```
 
 ### Other principles
@@ -337,10 +359,12 @@ Use this when the typestate is loaded from external storage. Domain stays serde-
       ]
     },
     {
-      "name": "AdrFrontMatterCodec",
-      "description": "Dispatches on status: String to typestate variant constructor; unknown values surface as AdrFrontMatterCodecError::InvalidDecisionField.",
-      "kind": "use_case",
-      "expected_members": []
+      "name": "parse_adr_front_matter",
+      "description": "Parses AdrDecisionDto into the appropriate typestate variant; unknown status surfaces as AdrFrontMatterCodecError::InvalidDecisionField.",
+      "kind": "free_function",
+      "expected_params": [{ "name": "dto", "ty": "AdrDecisionDto" }],
+      "expected_returns": ["Result<AdrDecisionEntry, AdrFrontMatterCodecError>"],
+      "expected_is_async": false
     },
     {
       "name": "AdrFrontMatterCodecError",

@@ -29,6 +29,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| AdrDecisionCommonError | error_type | — | EmptyId, EmptyImplementedIn, EmptySupersededBy | 🟡 | 🔵 |
 | AdrFilePortError | error_type | — | ListPaths, ReadFile | 🟡 | 🔵 |
 
 ## Secondary Ports
@@ -37,9 +38,9 @@
 |------|------|--------|---------|--------|----------|
 | AdrFilePort | secondary_port | — | fn list_adr_paths(&self) -> Result<Vec<PathBuf>, AdrFilePortError>, fn read_adr_frontmatter(&self, path: PathBuf) -> Result<AdrFrontMatter, AdrFilePortError> | 🟡 | 🟡 |
 
-## Use Cases
+## Free Functions
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrSignalEvaluator | use_case | — | — | 🟡 | 🔵 |
+| evaluate_adr_decision | free_function | — | — | 🟡 | 🟡 |
 

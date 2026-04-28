@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T02:54:13Z",
-  "declaration_hash": "e8e94a617a4d4441487da3a5f013a0e10c5e7260769f70faeefdd63103e15138",
+  "generated_at": "2026-04-28T05:16:39Z",
+  "declaration_hash": "eb9d6ad985f4d5401b516fd44940c62d09b48e5a274925ae52725e86bdb061c5",
   "signals": [
     {
       "type_name": "FsAdrFileAdapter",
@@ -10,10 +10,13 @@
       "found_type": false
     },
     {
-      "type_name": "AdrFrontMatterCodec",
-      "kind_tag": "use_case",
+      "type_name": "parse_adr_frontmatter",
+      "kind_tag": "free_function",
       "signal": "yellow",
-      "found_type": false
+      "found_type": false,
+      "missing_items": [
+        "fn parse_adr_frontmatter(content: &str) -> Result<AdrFrontMatter, AdrFrontMatterCodecError>"
+      ]
     },
     {
       "type_name": "AdrFrontMatterCodecError",
@@ -30,12 +33,6 @@
     {
       "type_name": "AdrDecisionDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
-      "type_name": "AdrSignalsVerifyAdapter",
-      "kind_tag": "use_case",
       "signal": "yellow",
       "found_type": false
     }

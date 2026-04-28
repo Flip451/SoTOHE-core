@@ -6,13 +6,6 @@
 |------|------|--------|---------|--------|----------|
 | AdrFrontMatterCodecError | error_type | — | YamlParse, MissingAdrId, InvalidDecisionField | 🟡 | 🔵 |
 
-## Use Cases
-
-| Name | Kind | Action | Details | Signal | Cat-Spec |
-|------|------|--------|---------|--------|----------|
-| AdrFrontMatterCodec | use_case | — | — | 🟡 | 🔵 |
-| AdrSignalsVerifyAdapter | use_case | — | — | 🟡 | 🔵 |
-
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
@@ -24,5 +17,11 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsAdrFileAdapter | secondary_adapter | — | impl AdrFilePort | 🟡 | 🔵 |
+| FsAdrFileAdapter | secondary_adapter | — | impl AdrFilePort | 🟡 | 🟡 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| parse_adr_frontmatter | free_function | — | — | 🟡 | 🟡 |
 

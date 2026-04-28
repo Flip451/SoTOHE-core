@@ -50,7 +50,7 @@
     },
     {
       "name": "VerifyAdrSignalsCommand",
-      "description": "CQRS command object carrying the invocation options for verify-adr-signals. Currently has no mandatory fields (the ADR directory is resolved from the workspace root by the infrastructure adapter). Kept as a distinct command type for future extensibility (e.g. an --adr-dir override flag). The unit struct signals intent and makes future evolution non-breaking.",
+      "description": "CQRS command object carrying the invocation options for verify-adr-signals. Currently has no mandatory fields (the ADR directory path is injected into FsAdrFileAdapter by the CLI composition root at construction time). Kept as a distinct command type for future extensibility (e.g. an --adr-dir override flag). The unit struct signals intent and makes future evolution non-breaking.",
       "approved": true,
       "kind": "command",
       "expected_members": [],
@@ -69,7 +69,7 @@
     },
     {
       "name": "VerifyAdrSignalsInteractor",
-      "description": "Struct implementing the VerifyAdrSignals application service trait. Orchestrates: (1) AdrFilePort::list_adr_paths, (2) AdrFilePort::read_adr_frontmatter per file, (3) AdrSignalEvaluator::evaluate per AdrDecisionEntry variant in AdrFrontMatter::decisions (evaluate pattern-matches on the enum variant and extracts the embedded AdrDecisionCommon grounds fields), (4) accumulate into AdrVerifyReport. evaluate is infallible; all AdrDecisionEntry values reaching the interactor are well-formed (codec validates at construction). Follows the existing Interactor naming suffix convention. Holds an AdrFilePort implementation injected at construction.",
+      "description": "Struct implementing the VerifyAdrSignals application service trait. Orchestrates: (1) AdrFilePort::list_adr_paths, (2) AdrFilePort::read_adr_frontmatter per file, (3) domain::adr_decision::evaluate_adr_decision per AdrDecisionEntry in AdrFrontMatter::decisions (pure domain free function — pattern-matches the entry and extracts AdrDecisionCommon grounds fields, returning DecisionGrounds), (4) accumulate into AdrVerifyReport. evaluate_adr_decision is infallible; all AdrDecisionEntry values reaching the interactor are well-formed (codec validates at construction). Follows the existing Interactor naming suffix convention. Holds an AdrFilePort implementation injected at construction.",
       "approved": true,
       "kind": "interactor",
       "expected_members": [
@@ -107,7 +107,7 @@
     },
     {
       "name": "VerifyAdrSignalsError",
-      "description": "Error type aggregating all failure modes of the verify-adr-signals use case. AdrFileListing wraps AdrFilePort::list_adr_paths errors (AdrFilePortError::ListPaths); AdrFileRead wraps AdrFilePort::read_adr_frontmatter errors (AdrFilePortError::ReadFile, which subsumes I/O and YAML parse failures absorbed inside the adapter). SignalEval is not a variant: AdrSignalEvaluator::evaluate is infallible (returns DecisionGrounds directly) so there is no error path from the evaluator into the usecase. FrontMatterDecode is not a variant: YAML parsing is fully encapsulated in the infrastructure adapter and surfaces only as AdrFilePortError::ReadFile. Follows existing Error naming pattern (VerifyCatalogueSpecRefsError etc).",
+      "description": "Error type aggregating all failure modes of the verify-adr-signals use case. AdrFileListing wraps AdrFilePort::list_adr_paths errors (AdrFilePortError::ListPaths); AdrFileRead wraps AdrFilePort::read_adr_frontmatter errors (AdrFilePortError::ReadFile, which subsumes I/O and YAML parse failures absorbed inside the adapter). SignalEval is not a variant: evaluate_adr_decision is infallible (returns DecisionGrounds directly) so there is no error path from the evaluator into the usecase. FrontMatterDecode is not a variant: YAML parsing is fully encapsulated in the infrastructure adapter and surfaces only as AdrFilePortError::ReadFile. Follows existing Error naming pattern (VerifyCatalogueSpecRefsError etc).",
       "approved": true,
       "kind": "error_type",
       "expected_variants": [

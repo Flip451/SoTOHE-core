@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T02:54:12Z",
-  "declaration_hash": "64e234fc62e8aade8180f0fcc2963d16a2218d842e11d68c192d066fadbfb321",
+  "generated_at": "2026-04-28T05:16:37Z",
+  "declaration_hash": "83d5442e6715c703280508b8167890fad94086987b8c415373928f97c278a666",
   "signals": [
     {
       "type_name": "AdrFrontMatter",
@@ -12,6 +12,12 @@
     {
       "type_name": "AdrDecisionCommon",
       "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrDecisionCommonError",
+      "kind_tag": "error_type",
       "signal": "yellow",
       "found_type": false
     },
@@ -58,10 +64,13 @@
       "found_type": false
     },
     {
-      "type_name": "AdrSignalEvaluator",
-      "kind_tag": "use_case",
+      "type_name": "evaluate_adr_decision",
+      "kind_tag": "free_function",
       "signal": "yellow",
-      "found_type": false
+      "found_type": false,
+      "missing_items": [
+        "fn evaluate_adr_decision(entry: AdrDecisionEntry) -> DecisionGrounds"
+      ]
     },
     {
       "type_name": "AdrVerifyReport",

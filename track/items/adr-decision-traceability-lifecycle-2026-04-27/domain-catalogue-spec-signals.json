@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "64e234fc62e8aade8180f0fcc2963d16a2218d842e11d68c192d066fadbfb321",
+  "catalogue_declaration_hash": "83d5442e6715c703280508b8167890fad94086987b8c415373928f97c278a666",
   "signals": [
     {
       "type_name": "AdrFrontMatter",
@@ -9,6 +9,10 @@
     {
       "type_name": "AdrDecisionCommon",
       "signal": "yellow"
+    },
+    {
+      "type_name": "AdrDecisionCommonError",
+      "signal": "blue"
     },
     {
       "type_name": "ProposedDecision",
@@ -39,8 +43,8 @@
       "signal": "blue"
     },
     {
-      "type_name": "AdrSignalEvaluator",
-      "signal": "blue"
+      "type_name": "evaluate_adr_decision",
+      "signal": "yellow"
     },
     {
       "type_name": "AdrVerifyReport",
