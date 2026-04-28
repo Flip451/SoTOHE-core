@@ -11,7 +11,7 @@ T006 (status deletion) depends on T005; deleting status before results is in pla
 T007 (doc cleanup) depends on T006; searching for status references after the CLI deletion ensures no false survivors.
 T008 (CI gate) is the final verification task and depends on all prior tasks.
 
-## Tasks (0/8 resolved)
+## Tasks (1/8 resolved)
 
 ### S001 — Domain Layer: ReviewApprovalVerdict + ReviewExistsPort (T001)
 
@@ -20,7 +20,7 @@ T008 (CI gate) is the final verification task and depends on all prior tasks.
 > ReviewExistsPort is the secondary port that abstracts filesystem existence check from usecase layer (hexagonal boundary enforcement — usecase must not call std::fs). The port returns Result<bool, ReviewReaderError> to propagate I/O errors rather than treating them as absent.
 > Zero infrastructure or CLI code changes in this task.
 
-- [~] **T001**: Introduce ReviewApprovalVerdict enum in the domain layer and ReviewExistsPort secondary port trait. (1) Add ReviewApprovalVerdict enum to libs/domain/src/review_v2/types.rs with three variants: Approved, ApprovedWithBypass { not_started_count: usize }, and Blocked { required_scopes: Vec<ScopeName> }. Enum-first design per 04-coding-principles.md: Approved and ApprovedWithBypass are structurally distinct (no serde in domain). (2) Add ReviewExistsPort trait to libs/domain/src/review_v2/ports.rs with a single method review_json_exists(&self) -> Result<bool, ReviewReaderError>: Ok(true) when the file exists, Ok(false) when absent (NotFound), Err(...) on other I/O errors. (3) Re-export both from libs/domain/src/review_v2/mod.rs. (4) Add unit tests in libs/domain/src/review_v2/tests.rs for ReviewApprovalVerdict variant construction. Catalogue refs: domain-types.json#ReviewApprovalVerdict, domain-types.json#ReviewExistsPort. Spec refs: IN-05, IN-07, AC-09, AC-12.
+- [x] **T001**: Introduce ReviewApprovalVerdict enum in the domain layer and ReviewExistsPort secondary port trait. (1) Add ReviewApprovalVerdict enum to libs/domain/src/review_v2/types.rs with three variants: Approved, ApprovedWithBypass { not_started_count: usize }, and Blocked { required_scopes: Vec<ScopeName> }. Enum-first design per 04-coding-principles.md: Approved and ApprovedWithBypass are structurally distinct (no serde in domain). (2) Add ReviewExistsPort trait to libs/domain/src/review_v2/ports.rs with a single method review_json_exists(&self) -> Result<bool, ReviewReaderError>: Ok(true) when the file exists, Ok(false) when absent (NotFound), Err(...) on other I/O errors. (3) Re-export both from libs/domain/src/review_v2/mod.rs. (4) Add unit tests in libs/domain/src/review_v2/tests.rs for ReviewApprovalVerdict variant construction. Catalogue refs: domain-types.json#ReviewApprovalVerdict, domain-types.json#ReviewExistsPort. Spec refs: IN-05, IN-07, AC-09, AC-12. (`4978f08ec2993651589c7022b30367982ab26fc6`)
 
 ### S002 — Infrastructure Layer: FsReviewStore implements ReviewExistsPort (T002)
 
@@ -28,7 +28,7 @@ T008 (CI gate) is the final verification task and depends on all prior tasks.
 > Returns Result<bool, ReviewReaderError>: Ok(true) = exists, Ok(false) = not found, Err = unexpected I/O error. Distinguishes genuine absence from permission errors.
 > check-layers gate must pass: ReviewExistsPort is consumed by usecase via composition root, not by usecase calling infra directly.
 
-- [ ] **T002**: Implement ReviewExistsPort on FsReviewStore in the infrastructure layer. Depends on: T001. (1) Add impl ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs. The review_json_exists method uses std::fs::metadata(&self.path): if Ok(_) returns Ok(true); if Err with ErrorKind::NotFound returns Ok(false); otherwise returns Err(ReviewReaderError::...). This distinguishes genuine absence from I/O errors such as permission denied. (2) Add ReviewExistsPort to the imports. (3) Add unit/integration tests covering: file exists -> Ok(true), file absent -> Ok(false), unexpected I/O error (mocked or simulated) -> Err. (4) Confirm cargo make check-layers passes (no hexagonal violation). Catalogue refs: infrastructure-types.json#FsReviewStore. Spec refs: IN-07, AC-12, CN-04.
+- [~] **T002**: Implement ReviewExistsPort on FsReviewStore in the infrastructure layer. Depends on: T001. (1) Add impl ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs. The review_json_exists method uses std::fs::metadata(&self.path): if Ok(_) returns Ok(true); if Err with ErrorKind::NotFound returns Ok(false); otherwise returns Err(ReviewReaderError::...). This distinguishes genuine absence from I/O errors such as permission denied. (2) Add ReviewExistsPort to the imports. (3) Add unit/integration tests covering: file exists -> Ok(true), file absent -> Ok(false), unexpected I/O error (mocked or simulated) -> Err. (4) Confirm cargo make check-layers passes (no hexagonal violation). Catalogue refs: infrastructure-types.json#FsReviewStore. Spec refs: IN-07, AC-12, CN-04.
 
 ### S003 — Usecase Layer: ReviewCycle::evaluate_approval (T003)
 

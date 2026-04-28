@@ -4,8 +4,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use domain::review_v2::{
-    FastVerdict, MainScopeName, ReviewHash, ReviewReader, ReviewReaderError, ReviewWriter,
-    ReviewWriterError, ReviewerFinding, ScopeName, Verdict,
+    FastVerdict, MainScopeName, ReviewExistsPort, ReviewHash, ReviewReader, ReviewReaderError,
+    ReviewWriter, ReviewWriterError, ReviewerFinding, ScopeName, Verdict,
 };
 
 use super::{
@@ -259,6 +259,24 @@ impl ReviewWriter for FsReviewStore {
         // Create fresh review.json (does NOT clear .commit_hash per ADR)
         write_atomic(&self.path, &ReviewJsonV2::empty())
             .map_err(PersistenceError::into_writer_error)
+    }
+}
+
+impl ReviewExistsPort for FsReviewStore {
+    /// Returns whether the review.json file exists on disk.
+    ///
+    /// # Errors
+    /// Returns `Ok(false)` on `NotFound`, `Err(ReviewReaderError::Io)` on other I/O errors
+    /// (e.g. `PermissionDenied`).
+    fn review_json_exists(&self) -> Result<bool, ReviewReaderError> {
+        match std::fs::metadata(&self.path) {
+            Ok(_) => Ok(true),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
+            Err(e) => Err(ReviewReaderError::Io {
+                path: self.path.display().to_string(),
+                detail: format!("metadata: {e}"),
+            }),
+        }
     }
 }
 

@@ -3,8 +3,8 @@
 #![allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 
 use domain::review_v2::{
-    FastVerdict, MainScopeName, ReviewHash, ReviewReader, ReviewWriter, ReviewerFinding, ScopeName,
-    Verdict,
+    FastVerdict, MainScopeName, ReviewExistsPort, ReviewHash, ReviewReader, ReviewWriter,
+    ReviewerFinding, ScopeName, Verdict,
 };
 
 use super::review_store::FsReviewStore;
@@ -283,6 +283,61 @@ fn test_read_treats_missing_schema_version_as_empty() {
     // Read path should treat as empty (fail-closed), not error
     let map = store.read_latest_finals().unwrap();
     assert!(map.is_empty());
+}
+
+// ── ReviewExistsPort ────────────────────────────────────────────
+
+#[test]
+fn test_review_json_exists_returns_false_when_file_absent() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = make_store(dir.path());
+    // No review.json created — must return Ok(false)
+    let result = store.review_json_exists().unwrap();
+    assert!(!result);
+}
+
+#[test]
+fn test_review_json_exists_returns_true_after_init() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = make_store(dir.path());
+    store.init().unwrap();
+    let result = store.review_json_exists().unwrap();
+    assert!(result);
+}
+
+#[test]
+fn test_review_json_exists_returns_true_when_file_present() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("review.json");
+    std::fs::write(&path, r#"{"schema_version":2,"scopes":{}}"#).unwrap();
+    let store = make_store(dir.path());
+    let result = store.review_json_exists().unwrap();
+    assert!(result);
+}
+
+#[cfg(unix)]
+#[test]
+fn test_review_json_exists_returns_err_on_permission_denied() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let dir = tempfile::tempdir().unwrap();
+
+    // Create a sub-directory where review.json would live, then remove all permissions.
+    let locked_dir = dir.path().join("locked");
+    std::fs::create_dir(&locked_dir).unwrap();
+    // Place review.json inside the locked dir so that metadata() on the file fails.
+    let path = locked_dir.join("review.json");
+    std::fs::write(&path, r#"{"schema_version":2,"scopes":{}}"#).unwrap();
+    // Remove read+execute from the parent dir → metadata() on the file returns PermissionDenied.
+    std::fs::set_permissions(&locked_dir, std::fs::Permissions::from_mode(0o000)).unwrap();
+
+    let store = FsReviewStore::new(path, dir.path().to_path_buf());
+    let result = store.review_json_exists();
+
+    // Restore permissions so tempdir cleanup can succeed.
+    std::fs::set_permissions(&locked_dir, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+    assert!(result.is_err(), "expected Err on PermissionDenied, got {result:?}");
 }
 
 // ── empty file handling ─────────────────────────────────────────

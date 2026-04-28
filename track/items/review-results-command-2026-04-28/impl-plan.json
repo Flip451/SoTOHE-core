@@ -4,12 +4,13 @@
     {
       "id": "T001",
       "description": "Introduce ReviewApprovalVerdict enum in the domain layer and ReviewExistsPort secondary port trait. (1) Add ReviewApprovalVerdict enum to libs/domain/src/review_v2/types.rs with three variants: Approved, ApprovedWithBypass { not_started_count: usize }, and Blocked { required_scopes: Vec<ScopeName> }. Enum-first design per 04-coding-principles.md: Approved and ApprovedWithBypass are structurally distinct (no serde in domain). (2) Add ReviewExistsPort trait to libs/domain/src/review_v2/ports.rs with a single method review_json_exists(&self) -> Result<bool, ReviewReaderError>: Ok(true) when the file exists, Ok(false) when absent (NotFound), Err(...) on other I/O errors. (3) Re-export both from libs/domain/src/review_v2/mod.rs. (4) Add unit tests in libs/domain/src/review_v2/tests.rs for ReviewApprovalVerdict variant construction. Catalogue refs: domain-types.json#ReviewApprovalVerdict, domain-types.json#ReviewExistsPort. Spec refs: IN-05, IN-07, AC-09, AC-12.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "4978f08ec2993651589c7022b30367982ab26fc6"
     },
     {
       "id": "T002",
       "description": "Implement ReviewExistsPort on FsReviewStore in the infrastructure layer. Depends on: T001. (1) Add impl ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs. The review_json_exists method uses std::fs::metadata(&self.path): if Ok(_) returns Ok(true); if Err with ErrorKind::NotFound returns Ok(false); otherwise returns Err(ReviewReaderError::...). This distinguishes genuine absence from I/O errors such as permission denied. (2) Add ReviewExistsPort to the imports. (3) Add unit/integration tests covering: file exists -> Ok(true), file absent -> Ok(false), unexpected I/O error (mocked or simulated) -> Err. (4) Confirm cargo make check-layers passes (no hexagonal violation). Catalogue refs: infrastructure-types.json#FsReviewStore. Spec refs: IN-07, AC-12, CN-04.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",
