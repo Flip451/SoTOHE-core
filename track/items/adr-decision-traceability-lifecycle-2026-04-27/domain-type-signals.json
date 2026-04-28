@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T05:16:37Z",
+  "generated_at": "2026-04-28T05:41:33Z",
   "declaration_hash": "83d5442e6715c703280508b8167890fad94086987b8c415373928f97c278a666",
   "signals": [
     {
@@ -13,55 +13,108 @@
       "type_name": "AdrDecisionCommon",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "candidate_selection: Option<String>",
+        "grandfathered: bool",
+        "id: String",
+        "review_finding_ref: Option<String>",
+        "user_decision_ref: Option<String>"
+      ]
     },
     {
       "type_name": "AdrDecisionCommonError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyId",
+        "EmptyImplementedIn",
+        "EmptySupersededBy"
+      ]
     },
     {
       "type_name": "ProposedDecision",
       "kind_tag": "typestate",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AcceptedDecision",
+        "DeprecatedDecision",
+        "common: AdrDecisionCommon"
+      ]
     },
     {
       "type_name": "AcceptedDecision",
       "kind_tag": "typestate",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplementedDecision",
+        "SupersededDecision",
+        "DeprecatedDecision",
+        "common: AdrDecisionCommon"
+      ]
     },
     {
       "type_name": "ImplementedDecision",
       "kind_tag": "typestate",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "found_items": [
+        "SupersededDecision",
+        "DeprecatedDecision",
+        "common: AdrDecisionCommon"
+      ],
+      "missing_items": [
+        "implemented_in: String"
+      ]
     },
     {
       "type_name": "SupersededDecision",
       "kind_tag": "typestate",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "found_items": [
+        "common: AdrDecisionCommon"
+      ],
+      "missing_items": [
+        "superseded_by: String"
+      ]
     },
     {
       "type_name": "DeprecatedDecision",
       "kind_tag": "typestate",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "common: AdrDecisionCommon"
+      ]
     },
     {
       "type_name": "AdrDecisionEntry",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AcceptedDecision",
+        "DeprecatedDecision",
+        "ImplementedDecision",
+        "ProposedDecision",
+        "SupersededDecision"
+      ]
     },
     {
       "type_name": "DecisionGrounds",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Grandfathered",
+        "NoGrounds",
+        "ReviewFindingRef",
+        "UserDecisionRef"
+      ]
     },
     {
       "type_name": "evaluate_adr_decision",

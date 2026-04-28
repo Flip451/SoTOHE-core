@@ -4,18 +4,18 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ProposedDecision | typestate | — | → AcceptedDecision, → DeprecatedDecision | 🟡 | 🟡 |
-| AcceptedDecision | typestate | — | → ImplementedDecision, → SupersededDecision, → DeprecatedDecision | 🟡 | 🟡 |
+| ProposedDecision | typestate | — | → AcceptedDecision, → DeprecatedDecision | 🔵 | 🟡 |
+| AcceptedDecision | typestate | — | → ImplementedDecision, → SupersededDecision, → DeprecatedDecision | 🔵 | 🟡 |
 | ImplementedDecision | typestate | — | → SupersededDecision, → DeprecatedDecision | 🟡 | 🟡 |
 | SupersededDecision | typestate | — | ∅ (terminal) | 🟡 | 🟡 |
-| DeprecatedDecision | typestate | — | ∅ (terminal) | 🟡 | 🟡 |
+| DeprecatedDecision | typestate | — | ∅ (terminal) | 🔵 | 🟡 |
 
 ## Enums
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrDecisionEntry | enum | modify | ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision | 🟡 | 🟡 |
-| DecisionGrounds | enum | — | UserDecisionRef, ReviewFindingRef, Grandfathered, NoGrounds | 🟡 | 🔵 |
+| AdrDecisionEntry | enum | modify | ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision | 🔵 | 🟡 |
+| DecisionGrounds | enum | — | UserDecisionRef, ReviewFindingRef, Grandfathered, NoGrounds | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -29,7 +29,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrDecisionCommonError | error_type | — | EmptyId, EmptyImplementedIn, EmptySupersededBy | 🟡 | 🔵 |
+| AdrDecisionCommonError | error_type | — | EmptyId, EmptyImplementedIn, EmptySupersededBy | 🔵 | 🔵 |
 | AdrFilePortError | error_type | — | ListPaths, ReadFile | 🟡 | 🔵 |
 
 ## Secondary Ports
