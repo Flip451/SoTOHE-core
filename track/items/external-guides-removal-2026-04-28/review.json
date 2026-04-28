@@ -1,6 +1,104 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:31:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`'s package-import smoke test: the subprocess still imports `scripts.external_guides`, so this test will start failing with `ModuleNotFoundError` unless T002 removes or rewrites it.",
+              "severity": "P1",
+              "file": "scripts/test_track_resolution.py",
+              "line": 47,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:33:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`, which still spawns `import scripts.track_resolution, scripts.external_guides` in its package-style import smoke test. That subprocess will now fail with `ImportError`, so this deletion leaves a remaining `scripts/` test broken.",
+              "severity": "P1",
+              "file": "scripts/test_track_resolution.py",
+              "line": 47,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:35:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `knowledge/external/guides.json` strands the Rust `UserPromptSubmit` hook in `apps/cli/src/commands/hook.rs:320-328`, which still loads that path through `guides_codec` and silently falls back to an empty guide set on any load failure. That is a live caller outside the T002/T003 deferrals, so the deletion set is incomplete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 320,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:38:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:39:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:40:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:42:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:48:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
+          "at": "2026-04-28T15:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
+          "at": "2026-04-28T15:02:54Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -126,6 +224,34 @@
           "findings": [],
           "hash": "rvw1:sha256:0d5b4e37e41b82e5b2da995dba873eaa435a9318015136e9ffabdc5e690966fc",
           "at": "2026-04-28T14:16:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6784949d25f534e2ce16003e1b789d4d7051f1fadc42f7d0093a35d2d93a2fd9",
+          "at": "2026-04-28T14:30:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6784949d25f534e2ce16003e1b789d4d7051f1fadc42f7d0093a35d2d93a2fd9",
+          "at": "2026-04-28T14:31:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2922c216e795eb7d4ccb6b29f91a08f89ce8d33e95c19ea1c397bcb87ed6db6",
+          "at": "2026-04-28T14:59:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2922c216e795eb7d4ccb6b29f91a08f89ce8d33e95c19ea1c397bcb87ed6db6",
+          "at": "2026-04-28T15:00:39Z"
         }
       ]
     }

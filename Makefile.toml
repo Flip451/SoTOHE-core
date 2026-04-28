@@ -24,36 +24,6 @@ description = "Show available tasks with category labels: [wrapper] [fast] [gate
 command = "cargo"
 args = ["make", "--list-all-steps"]
 
-[tasks.guides-list]
-description = "[wrapper] List external long-form guide registry entries"
-command = "python3"
-args = ["scripts/external_guides.py", "list"]
-
-[tasks.guides-fetch]
-description = "[wrapper] Fetch external long-form guides into local cache (not git-managed)"
-command = "python3"
-args = ["scripts/external_guides.py", "fetch", "${@}"]
-
-[tasks.guides-usage]
-description = "[wrapper] Show minimal-context usage policy for external guides"
-command = "python3"
-args = ["scripts/external_guides.py", "usage"]
-
-[tasks.guides-setup]
-description = "[wrapper] Show the recommended setup flow for external long-form guides"
-command = "python3"
-args = ["scripts/external_guides.py", "setup"]
-
-[tasks.guides-clean]
-description = "[wrapper] Remove cached external guide files (all or by id)"
-command = "python3"
-args = ["scripts/external_guides.py", "clean", "${@}"]
-
-[tasks.guides-add]
-description = "[wrapper] Add an external long-form guide entry"
-command = "python3"
-args = ["scripts/external_guides.py", "add", "${@}"]
-
 [tasks.conventions-add]
 description = "[wrapper] Add a project convention document and update index"
 command = "python3"
@@ -94,18 +64,6 @@ description = "[wrapper] Verify architecture rules sync with Cargo.toml and deny
 command = "python3"
 args = ["scripts/architecture_rules.py", "verify-sync"]
 
-[tasks.guides-selftest-local]
-private = true
-description = "[internal] Run self-tests for the external guides helper"
-command = "pytest"
-args = ["-q", "-o", "cache_dir=.cache/pytest", "scripts/test_external_guides.py"]
-
-[tasks.guides-selftest]
-description = "[wrapper] Run self-tests for the external guides helper (docker compose)"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "guides-selftest-local"]
-
 [tasks.scripts-selftest-local]
 private = true
 description = "[internal] Run verify and helper script regression tests"
@@ -115,11 +73,8 @@ args = [
   "-o",
   "cache_dir=.cache/pytest",
   "scripts/test_architecture_rules.py",
-  "scripts/test_atomic_write.py",
   "scripts/test_convention_docs.py",
-  "scripts/test_external_guides.py",
   "scripts/test_make_wrappers.py",
-  "scripts/test_track_resolution.py",
 ]
 
 [tasks.scripts-selftest]
