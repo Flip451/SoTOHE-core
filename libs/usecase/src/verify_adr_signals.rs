@@ -102,6 +102,7 @@ impl VerifyAdrSignals for VerifyAdrSignalsInteractor {
         let mut blue_count = 0usize;
         let mut yellow_count = 0usize;
         let mut red_count = 0usize;
+        let mut grandfathered_count = 0usize;
 
         for path in paths {
             let front_matter = self
@@ -114,19 +115,28 @@ impl VerifyAdrSignals for VerifyAdrSignalsInteractor {
                     &mut blue_count,
                     &mut yellow_count,
                     &mut red_count,
+                    &mut grandfathered_count,
                 );
             }
         }
 
-        Ok(AdrVerifyReport::new(blue_count, yellow_count, red_count))
+        Ok(AdrVerifyReport::new(blue_count, yellow_count, red_count, grandfathered_count))
     }
 }
 
-fn tally(grounds: DecisionGrounds, blue: &mut usize, yellow: &mut usize, red: &mut usize) {
+fn tally(
+    grounds: DecisionGrounds,
+    blue: &mut usize,
+    yellow: &mut usize,
+    red: &mut usize,
+    grandfathered: &mut usize,
+) {
     match grounds {
-        // Grandfathered decisions are exempt from CI gating per D4 — counted as blue
-        // alongside UserDecisionRef so that `red_count == 0` reflects the merge gate.
-        DecisionGrounds::Grandfathered | DecisionGrounds::UserDecisionRef => *blue += 1,
+        // `knowledge/conventions/adr.md` §grandfathered (D4) excludes these
+        // entries from signal evaluation. Counted in their own band — not
+        // 🔵 — so back-fill debt remains observable for operators.
+        DecisionGrounds::Grandfathered => *grandfathered += 1,
+        DecisionGrounds::UserDecisionRef => *blue += 1,
         DecisionGrounds::ReviewFindingRef => *yellow += 1,
         DecisionGrounds::NoGrounds => *red += 1,
     }
@@ -207,6 +217,7 @@ mod tests {
         assert_eq!(report.blue_count(), 2);
         assert_eq!(report.yellow_count(), 0);
         assert_eq!(report.red_count(), 0);
+        assert_eq!(report.grandfathered_count(), 0);
     }
 
     #[test]
@@ -226,6 +237,7 @@ mod tests {
         assert_eq!(report.blue_count(), 1);
         assert_eq!(report.yellow_count(), 0);
         assert_eq!(report.red_count(), 1);
+        assert_eq!(report.grandfathered_count(), 0);
     }
 
     #[test]
@@ -242,6 +254,7 @@ mod tests {
         assert_eq!(report.blue_count(), 0);
         assert_eq!(report.yellow_count(), 1);
         assert_eq!(report.red_count(), 0);
+        assert_eq!(report.grandfathered_count(), 0);
     }
 
     #[test]
@@ -261,6 +274,7 @@ mod tests {
         assert_eq!(report.blue_count(), 1);
         assert_eq!(report.yellow_count(), 1);
         assert_eq!(report.red_count(), 1);
+        assert_eq!(report.grandfathered_count(), 0);
     }
 
     #[test]
@@ -271,6 +285,7 @@ mod tests {
         assert_eq!(report.blue_count(), 0);
         assert_eq!(report.yellow_count(), 0);
         assert_eq!(report.red_count(), 0);
+        assert_eq!(report.grandfathered_count(), 0);
     }
 
     #[test]
@@ -298,7 +313,7 @@ mod tests {
     }
 
     #[test]
-    fn test_verify_grandfathered_counts_as_blue() {
+    fn test_verify_grandfathered_counts_separately_from_blue() {
         let entry = AdrDecisionEntry::ProposedDecision(ProposedDecision::new(
             AdrDecisionCommon::new("D1", None, None, None, true).unwrap(),
         ));
@@ -308,8 +323,9 @@ mod tests {
         });
         let interactor = VerifyAdrSignalsInteractor::new(port);
         let report = interactor.verify(VerifyAdrSignalsCommand).unwrap();
-        assert_eq!(report.blue_count(), 1);
+        assert_eq!(report.blue_count(), 0);
         assert_eq!(report.yellow_count(), 0);
         assert_eq!(report.red_count(), 0);
+        assert_eq!(report.grandfathered_count(), 1);
     }
 }

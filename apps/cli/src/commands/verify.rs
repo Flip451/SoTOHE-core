@@ -969,10 +969,11 @@ fn execute_verify_adr_signals(project_root: &std::path::Path) -> VerifyOutcome {
     };
 
     let summary = format!(
-        "ADR signal counts: blue={} yellow={} red={}",
+        "ADR signal counts: blue={} yellow={} red={} grandfathered={}",
         report.blue_count(),
         report.yellow_count(),
         report.red_count(),
+        report.grandfathered_count(),
     );
 
     if report.red_count() >= 1 {
