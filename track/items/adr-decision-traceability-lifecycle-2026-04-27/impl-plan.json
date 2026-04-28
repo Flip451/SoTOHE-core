@@ -64,12 +64,13 @@
     {
       "id": "T011",
       "description": "knowledge/conventions/adr.md を更新し、YAML front-matter フォーマット (adr_id / decisions[] の全フィールド) を convention として記述する (IN-01 / AC-06)。追加内容: (1) front-matter schema の全フィールド定義と意味 (D3 の内容に準拠) — status は proposed / accepted / implemented / superseded / deprecated の 5 値のみ有効であり、これらは parse_adr_frontmatter の typestate-based status dispatch によって domain 型 (ProposedDecision / AcceptedDecision / ImplementedDecision / SupersededDecision / DeprecatedDecision) に変換されることを明示する (IN-01 / AC-06)、(2) decisions[].status の axis 説明 — ファイル全体の承認状態 (pre-track-adr-authoring.md が禁止する ## Status 見出し) とは別の decision 粒度 lifecycle であることを明示する (CN-02 / AC-06)、(3) grandfathered: true の用途と使用条件 (CN-03) — grandfathered な decision は verify-adr-signals の CI block 対象から除外される、(4) fail-closed 振る舞いの説明 — front-matter のない ADR を新規 ADR と見なして non-zero exit になることと、その回避方法 (grandfathered 付与) を記述する (CN-04 / AC-07)、(5) workflow-ceremony-minimization.md の「人工的な状態フィールドを作らない」原則と decision 個別 status の非衝突性の説明 — decision 個別 status は機械検証可能 (verify-adr-signals が typestate-based dispatch を通じて evaluate できる) であり形骸化するファイルレベルサマリとは異なることを説明する (CN-06)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "c6a1675076ba8f67ff42283cd981b9eed60d11e8"
     },
     {
       "id": "T012",
       "description": "end-to-end CI gate を確認する。T007-T011 完了後に cargo make ci を実行し、全 gate (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* + verify-adr-signals) が pass することを確認する (AC-08)。verify-adr-signals: 本 ADR (T008) が 🔵 または 🟡 で評価され、既存 ADR (T009) が grandfathered によりスキップされて exit 0 になることを確認する (AC-02)。もし追加の failing test / clippy warning が発生した場合は同タスク内で修正する。",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {
