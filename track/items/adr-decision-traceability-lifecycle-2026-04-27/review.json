@@ -1,169 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
-          "at": "2026-04-28T03:03:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AcceptedDecision::implement` accepts any `String` and returns `ImplementedDecision` directly, so callers can create an implemented typestate with `implemented_in == \"\"`. That violates the stated invariant that implemented decisions must carry the commit/reference where they were actualized; validate this field in all `ImplementedDecision` creation paths or use a validated value type/`Result`.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 75,
-              "category": "validation"
-            },
-            {
-              "message": "`AcceptedDecision::supersede` accepts any `String` and returns `SupersededDecision` directly, so callers can create a superseded typestate with an empty `superseded_by` reference. Since `SupersededDecision::new` has the same issue, the terminal state can exist without the required ADR anchor; validate this field in all supersession creation paths or use a validated value type/`Result`.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 84,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
-          "at": "2026-04-28T03:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AcceptedDecision::implement` accepts an arbitrary `String` and constructs `ImplementedDecision` directly, and `ImplementedDecision::new` has the same shape. This allows `implemented_in == \"\"`, so the domain can represent an implemented decision with no commit/reference even though the catalogue describes `implemented_in` as the required actualization reference and says the typestate should make that invalid state impossible. Validate the value in every creation path or use a validated reference type.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 75,
-              "category": "logic"
-            },
-            {
-              "message": "`AcceptedDecision::supersede` accepts an arbitrary `String` and constructs `SupersededDecision` directly; `ImplementedDecision::supersede` and `SupersededDecision::new` do the same. This allows `superseded_by == \"\"`, leaving a terminal superseded decision without the required ADR anchor/back-reference, contrary to the typestate invariant. Validate the value in every creation path or use a validated reference type.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 84,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
-          "at": "2026-04-28T03:10:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
-          "at": "2026-04-28T03:16:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ImplementedDecision` validates `implemented_in` in constructors/transitions, but the field is public, so callers can directly construct or later mutate an `ImplementedDecision` with an empty `implemented_in`. That makes the invalid state the constructor is trying to reject representable outside the module.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 131,
-              "category": null
-            },
-            {
-              "message": "`SupersededDecision` validates `superseded_by` in constructors/transitions, but the field is public, so callers can directly construct or later mutate a `SupersededDecision` with an empty `superseded_by`. That bypasses the domain invariant for this terminal state.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/state.rs",
-              "line": 191,
-              "category": null
-            },
-            {
-              "message": "This intra-doc link targets `crate::adr_decision::AdrSignalEvaluator`, which is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/grounds.rs",
-              "line": 5,
-              "category": null
-            },
-            {
-              "message": "This intra-doc link targets `crate::adr_decision::AdrFrontMatter::decisions`, but `AdrFrontMatter` is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/entry.rs",
-              "line": 8,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
-          "at": "2026-04-28T03:18:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
-          "at": "2026-04-28T03:25:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
-          "at": "2026-04-28T03:27:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AdrFrontMatter::new` accepts any `adr_id`, including the empty string, so callers can construct a front-matter value that violates the required `adr_id` invariant. The domain layer already treats missing `adr_id` as invalid at the parse boundary, so this public infallible constructor leaves an illegal state representable in domain code.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/front_matter.rs",
-              "line": 21,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:93616d74c3f0b2da22df0dae4eee4fb814ffc7cc3fc4902f7ad545bd8ef175b1",
-          "at": "2026-04-28T05:49:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AdrFrontMatter::new lets callers construct a front-matter object with an empty `adr_id`, so the domain still admits an illegal state instead of enforcing the required identifier invariant at construction time.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/front_matter.rs",
-              "line": 21,
-              "category": "invariant"
-            },
-            {
-              "message": "The evaluator test module only covers five single-branch cases plus two precedence checks; it does not exercise the full 5 typestate × 4 grounds matrix requested in the briefing, leaving several `evaluate_adr_decision` paths unverified.",
-              "severity": "P1",
-              "file": "libs/domain/src/adr_decision/evaluator.rs",
-              "line": 74,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:93616d74c3f0b2da22df0dae4eee4fb814ffc7cc3fc4902f7ad545bd8ef175b1",
-          "at": "2026-04-28T05:51:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cac21624a0cf4d3159fa54a5faee3a193431b1ab64f9c22b17410d68c83a14e",
-          "at": "2026-04-28T05:54:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cac21624a0cf4d3159fa54a5faee3a193431b1ab64f9c22b17410d68c83a14e",
-          "at": "2026-04-28T05:55:59Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -502,177 +339,72 @@
           "findings": [],
           "hash": "rvw1:sha256:81310341e6f53381c5ae10d4daa8939bbc7066cab175d507a48687963dddd2e4",
           "at": "2026-04-28T05:14:15Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
-          "at": "2026-04-28T09:26:42Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
-          "at": "2026-04-28T09:28:01Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
-          "at": "2026-04-28T08:51:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
-          "at": "2026-04-28T08:54:42Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "An opening `---` without a matching closing delimiter is collapsed into `None` by `parse_yaml_frontmatter`, so this returns `MissingAdrId` instead of a parse error. That misclassifies malformed front-matter as an absent ADR id.",
+              "message": "The grounds rule requires `user_decision_ref` / `review_finding_ref` to be non-empty strings, but the actual domain code only checks that the option is present. `Some(\"\")` would still classify as Blue/Yellow and pass `verify-adr-signals`, so this instruction misstates the implemented contract.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/adr_decision/parse.rs",
-              "line": 45,
-              "category": "error-handling"
+              "file": ".claude/agents/adr-editor.md",
+              "line": 100,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:970098615d83355c0aa5e829a633ad5d7b09303de37afd91494c029eebe69fdb",
+          "at": "2026-04-28T09:34:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The grounds rule requires `user_decision_ref` / `review_finding_ref` to be non-empty strings, but the implemented classifier only checks whether the option is present. A YAML value like `user_decision_ref: \"\"` still evaluates as Blue/Yellow and passes `verify-adr-signals`, so this instruction overstates the enforced validation.",
+              "severity": "P1",
+              "file": ".claude/agents/adr-editor.md",
+              "line": 98,
+              "category": "correctness"
             },
             {
-              "message": "`AdrFrontMatterDto` and `AdrDecisionDto` are re-exported from the public `adr_decision` module, which makes the serde DTOs part of the crate's external API instead of keeping them internal to the codec boundary.",
+              "message": "`implemented_in` is described as \"the implementing commit hash\", but the domain/state layer accepts any non-empty reference string and the parser only enforces presence. This wording would incorrectly reject valid `implemented` decisions that point to a non-hash reference.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/adr_decision/mod.rs",
-              "line": 19,
-              "category": "architecture"
+              "file": ".claude/agents/adr-editor.md",
+              "line": 93,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:4916247371cec0099dc584da7a9d3301852f4302f4e48f55de0453f77f16885a",
-          "at": "2026-04-28T06:38:56Z"
+          "hash": "rvw1:sha256:970098615d83355c0aa5e829a633ad5d7b09303de37afd91494c029eebe69fdb",
+          "at": "2026-04-28T09:36:01Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The `adr_decision` module makes the serde DTOs part of the public API (`pub mod dto;` plus `pub use dto::{AdrDecisionDto, AdrFrontMatterDto};`), so infrastructure-only codec types can cross the layer boundary. That contradicts the briefing's CN-05 intent that only the validated `AdrFrontMatter` aggregate should be exposed outside the codec boundary.",
+              "message": "This overstates the codec contract: `decisions` is not required at parse time, and the front-matter is not always two keys. `parse_adr_frontmatter` accepts `adr_id`-only input because `AdrFrontMatterDto.decisions` is `#[serde(default)]`, and the test suite explicitly covers omitted `decisions` as valid.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/adr_decision/mod.rs",
-              "line": 15,
-              "category": "architecture"
+              "file": ".claude/agents/adr-editor.md",
+              "line": 83,
+              "category": "factual"
             }
           ],
-          "hash": "rvw1:sha256:4916247371cec0099dc584da7a9d3301852f4302f4e48f55de0453f77f16885a",
-          "at": "2026-04-28T06:41:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr_id` is required in the DTO, so a front-matter block that omits it fails inside `serde_yaml::from_str` as `YamlParse` instead of reaching `AdrFrontMatter::new` and producing `MissingAdrId` as the plan requires. That makes an absent ADR id indistinguishable from a generic YAML/schema error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/adr_decision/dto.rs",
-              "line": 18,
-              "category": "error-handling"
-            },
-            {
-              "message": "An opening `---` without a matching closing delimiter is collapsed to `MissingAdrId` by `parse_yaml_frontmatter`, so malformed front-matter is reported as an absent ADR id rather than a parse failure. That conflates a syntax error with a missing block.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/adr_decision/parse.rs",
-              "line": 45,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:45c72da97eba57322fa6c5b0c9f4186313d2803877708f28ee1ce6c65334114a",
-          "at": "2026-04-28T06:43:34Z"
+          "hash": "rvw1:sha256:459a7a8ef86e33f5256dcc5b895ae350b3839d3ae5ab589a4dcc121973c8c029",
+          "at": "2026-04-28T09:38:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:45c72da97eba57322fa6c5b0c9f4186313d2803877708f28ee1ce6c65334114a",
-          "at": "2026-04-28T06:46:13Z"
+          "hash": "rvw1:sha256:c680bfd82d2eb5a4a9217116541f65156e45a5c758e890611c707bdfbbd457b4",
+          "at": "2026-04-28T09:39:50Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:45c72da97eba57322fa6c5b0c9f4186313d2803877708f28ee1ce6c65334114a",
-          "at": "2026-04-28T06:53:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8808f45b130570e200fe77a2beb9e3176dd5965e87421f435ba24ee93491f0f",
-          "at": "2026-04-28T07:54:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8808f45b130570e200fe77a2beb9e3176dd5965e87421f435ba24ee93491f0f",
-          "at": "2026-04-28T07:57:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b65d7aed06dbf88bd0cb021cc8be268316e8c8f764b01100caa11fea8d3b2630",
-          "at": "2026-04-28T08:03:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`list_adr_paths` uses `Path::is_file()` to filter entries. That API returns `false` when metadata lookup fails, so a permission/race metadata error for an ADR directory entry is silently skipped instead of being propagated as `AdrFilePortError::ListPaths`, violating the adapter's I/O error handling contract.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/adr_decision/adapter.rs",
-              "line": 47,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:b65d7aed06dbf88bd0cb021cc8be268316e8c8f764b01100caa11fea8d3b2630",
-          "at": "2026-04-28T08:05:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Path::is_file()` returns `false` when metadata cannot be read, so `list_adr_paths` silently skips entries with metadata/stat errors instead of propagating them as `AdrFilePortError::ListPaths`. That violates the adapter guarantee that listing I/O failures are reported through `Result`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/adr_decision/adapter.rs",
-              "line": 47,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:b65d7aed06dbf88bd0cb021cc8be268316e8c8f764b01100caa11fea8d3b2630",
-          "at": "2026-04-28T08:07:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ea5da7a4c9e2df543c274ad3ab1274d73019dd142b8f2e89906c8632812694aa",
-          "at": "2026-04-28T08:09:01Z"
+          "hash": "rvw1:sha256:c680bfd82d2eb5a4a9217116541f65156e45a5c758e890611c707bdfbbd457b4",
+          "at": "2026-04-28T09:41:31Z"
         }
       ]
     },
@@ -2065,6 +1797,155 @@
           "findings": [],
           "hash": "rvw1:sha256:cee5a2b4c98bfb7e7e39dd74958181e066c6e0ec17c740088f8ca29c5f2d3e17",
           "at": "2026-04-28T09:27:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88d8a6d56ee9d2701415943c932e06ccdf7e139b8842bdf0713908d2a52f4e4b",
+          "at": "2026-04-28T09:32:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88d8a6d56ee9d2701415943c932e06ccdf7e139b8842bdf0713908d2a52f4e4b",
+          "at": "2026-04-28T09:34:02Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An opening `---` without a matching closing delimiter is collapsed into `None` by `parse_yaml_frontmatter`, so this returns `MissingAdrId` instead of a parse error. That misclassifies malformed front-matter as an absent ADR id.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_decision/parse.rs",
+              "line": 45,
+              "category": "error-handling"
+            },
+            {
+              "message": "`AdrFrontMatterDto` and `AdrDecisionDto` are re-exported from the public `adr_decision` module, which makes the serde DTOs part of the crate's external API instead of keeping them internal to the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_decision/mod.rs",
+              "line": 19,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:4916247371cec0099dc584da7a9d3301852f4302f4e48f55de0453f77f16885a",
+          "at": "2026-04-28T06:38:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `adr_decision` module makes the serde DTOs part of the public API (`pub mod dto;` plus `pub use dto::{AdrDecisionDto, AdrFrontMatterDto};`), so infrastructure-only codec types can cross the layer boundary. That contradicts the briefing's CN-05 intent that only the validated `AdrFrontMatter` aggregate should be exposed outside the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_decision/mod.rs",
+              "line": 15,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:4916247371cec0099dc584da7a9d3301852f4302f4e48f55de0453f77f16885a",
+          "at": "2026-04-28T06:41:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr_id` is required in the DTO, so a front-matter block that omits it fails inside `serde_yaml::from_str` as `YamlParse` instead of reaching `AdrFrontMatter::new` and producing `MissingAdrId` as the plan requires. That makes an absent ADR id indistinguishable from a generic YAML/schema error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_decision/dto.rs",
+              "line": 18,
+              "category": "error-handling"
+            },
+            {
+              "message": "An opening `---` without a matching closing delimiter is collapsed to `MissingAdrId` by `parse_yaml_frontmatter`, so malformed front-matter is reported as an absent ADR id rather than a parse failure. That conflates a syntax error with a missing block.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_decision/parse.rs",
+              "line": 45,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:45c72da97eba57322fa6c5b0c9f4186313d2803877708f28ee1ce6c65334114a",
+          "at": "2026-04-28T06:43:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45c72da97eba57322fa6c5b0c9f4186313d2803877708f28ee1ce6c65334114a",
+          "at": "2026-04-28T06:46:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45c72da97eba57322fa6c5b0c9f4186313d2803877708f28ee1ce6c65334114a",
+          "at": "2026-04-28T06:53:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8808f45b130570e200fe77a2beb9e3176dd5965e87421f435ba24ee93491f0f",
+          "at": "2026-04-28T07:54:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8808f45b130570e200fe77a2beb9e3176dd5965e87421f435ba24ee93491f0f",
+          "at": "2026-04-28T07:57:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b65d7aed06dbf88bd0cb021cc8be268316e8c8f764b01100caa11fea8d3b2630",
+          "at": "2026-04-28T08:03:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`list_adr_paths` uses `Path::is_file()` to filter entries. That API returns `false` when metadata lookup fails, so a permission/race metadata error for an ADR directory entry is silently skipped instead of being propagated as `AdrFilePortError::ListPaths`, violating the adapter's I/O error handling contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_decision/adapter.rs",
+              "line": 47,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b65d7aed06dbf88bd0cb021cc8be268316e8c8f764b01100caa11fea8d3b2630",
+          "at": "2026-04-28T08:05:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Path::is_file()` returns `false` when metadata cannot be read, so `list_adr_paths` silently skips entries with metadata/stat errors instead of propagating them as `AdrFilePortError::ListPaths`. That violates the adapter guarantee that listing I/O failures are reported through `Result`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_decision/adapter.rs",
+              "line": 47,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b65d7aed06dbf88bd0cb021cc8be268316e8c8f764b01100caa11fea8d3b2630",
+          "at": "2026-04-28T08:07:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea5da7a4c9e2df543c274ad3ab1274d73019dd142b8f2e89906c8632812694aa",
+          "at": "2026-04-28T08:09:01Z"
         }
       ]
     },
@@ -2083,6 +1964,205 @@
           "findings": [],
           "hash": "rvw1:sha256:6562bb386055fab22b14505270e74b02d80961743a02e989220c3aa2714b9f08",
           "at": "2026-04-28T08:20:22Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
+          "at": "2026-04-28T09:26:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
+          "at": "2026-04-28T09:28:01Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
+          "at": "2026-04-28T08:51:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
+          "at": "2026-04-28T08:54:42Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:03:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AcceptedDecision::implement` accepts any `String` and returns `ImplementedDecision` directly, so callers can create an implemented typestate with `implemented_in == \"\"`. That violates the stated invariant that implemented decisions must carry the commit/reference where they were actualized; validate this field in all `ImplementedDecision` creation paths or use a validated value type/`Result`.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 75,
+              "category": "validation"
+            },
+            {
+              "message": "`AcceptedDecision::supersede` accepts any `String` and returns `SupersededDecision` directly, so callers can create a superseded typestate with an empty `superseded_by` reference. Since `SupersededDecision::new` has the same issue, the terminal state can exist without the required ADR anchor; validate this field in all supersession creation paths or use a validated value type/`Result`.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 84,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AcceptedDecision::implement` accepts an arbitrary `String` and constructs `ImplementedDecision` directly, and `ImplementedDecision::new` has the same shape. This allows `implemented_in == \"\"`, so the domain can represent an implemented decision with no commit/reference even though the catalogue describes `implemented_in` as the required actualization reference and says the typestate should make that invalid state impossible. Validate the value in every creation path or use a validated reference type.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 75,
+              "category": "logic"
+            },
+            {
+              "message": "`AcceptedDecision::supersede` accepts an arbitrary `String` and constructs `SupersededDecision` directly; `ImplementedDecision::supersede` and `SupersededDecision::new` do the same. This allows `superseded_by == \"\"`, leaving a terminal superseded decision without the required ADR anchor/back-reference, contrary to the typestate invariant. Validate the value in every creation path or use a validated reference type.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 84,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:f0f4d1ab0f3356e98480b80a360cf957a3ec79b0c6e08ebe37df5aa7881f0c8a",
+          "at": "2026-04-28T03:10:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
+          "at": "2026-04-28T03:16:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplementedDecision` validates `implemented_in` in constructors/transitions, but the field is public, so callers can directly construct or later mutate an `ImplementedDecision` with an empty `implemented_in`. That makes the invalid state the constructor is trying to reject representable outside the module.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 131,
+              "category": null
+            },
+            {
+              "message": "`SupersededDecision` validates `superseded_by` in constructors/transitions, but the field is public, so callers can directly construct or later mutate a `SupersededDecision` with an empty `superseded_by`. That bypasses the domain invariant for this terminal state.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/state.rs",
+              "line": 191,
+              "category": null
+            },
+            {
+              "message": "This intra-doc link targets `crate::adr_decision::AdrSignalEvaluator`, which is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/grounds.rs",
+              "line": 5,
+              "category": null
+            },
+            {
+              "message": "This intra-doc link targets `crate::adr_decision::AdrFrontMatter::decisions`, but `AdrFrontMatter` is not defined in this T001 implementation. With workspace warnings denied, rustdoc will treat the unresolved link as a build failure; keep it plain text until T002 adds the type or add the type in this change.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/entry.rs",
+              "line": 8,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:392e14dc508feba3009792d0ddbc25fe013ba3a19a447d2ac28dfeced2f953b1",
+          "at": "2026-04-28T03:18:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
+          "at": "2026-04-28T03:25:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93231f71e3dd2244bc3fda57fed63ffe8f241bfbc9898b16cad45887b3912642",
+          "at": "2026-04-28T03:27:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFrontMatter::new` accepts any `adr_id`, including the empty string, so callers can construct a front-matter value that violates the required `adr_id` invariant. The domain layer already treats missing `adr_id` as invalid at the parse boundary, so this public infallible constructor leaves an illegal state representable in domain code.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/front_matter.rs",
+              "line": 21,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:93616d74c3f0b2da22df0dae4eee4fb814ffc7cc3fc4902f7ad545bd8ef175b1",
+          "at": "2026-04-28T05:49:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AdrFrontMatter::new lets callers construct a front-matter object with an empty `adr_id`, so the domain still admits an illegal state instead of enforcing the required identifier invariant at construction time.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/front_matter.rs",
+              "line": 21,
+              "category": "invariant"
+            },
+            {
+              "message": "The evaluator test module only covers five single-branch cases plus two precedence checks; it does not exercise the full 5 typestate × 4 grounds matrix requested in the briefing, leaving several `evaluate_adr_decision` paths unverified.",
+              "severity": "P1",
+              "file": "libs/domain/src/adr_decision/evaluator.rs",
+              "line": 74,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:93616d74c3f0b2da22df0dae4eee4fb814ffc7cc3fc4902f7ad545bd8ef175b1",
+          "at": "2026-04-28T05:51:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cac21624a0cf4d3159fa54a5faee3a193431b1ab64f9c22b17410d68c83a14e",
+          "at": "2026-04-28T05:54:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cac21624a0cf4d3159fa54a5faee3a193431b1ab64f9c22b17410d68c83a14e",
+          "at": "2026-04-28T05:55:59Z"
         }
       ]
     }

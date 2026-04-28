@@ -40,7 +40,8 @@
     {
       "id": "T007",
       "description": "Makefile.toml に verify-adr-signals task を追加し、cargo make ci に組み込む。既存の `verify-plan-artifact-refs` / `verify-plan-progress` タスクと並列実行可能な形で `verify-adr-signals` タスクを追加する (IN-03 / AC-02)。verify-adr-signals タスクは `bin/sotp verify adr-signals` を docker compose run 経由で実行する形式にする (既存 verify-* タスクと同形式)。`cargo make ci` のタスク連鎖に verify-adr-signals を追加し、CI gate の一部として実行されるようにする (AC-08)。track/workflow.md の Quality Gates セクションに verify-adr-signals 行を追加する。前提: T006 (CLI サブコマンド稼働) AND T008 (本 ADR front-matter 付与) AND T009 (既存 ADR grandfathered 一括付与) の完了後に実施すること。T008/T009 完了前に CI gate を追加すると verify-adr-signals が既存 ADR 由来で即時失敗する。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0f6a9ad9d243409bf57764d9f4a4d437e6e0a761"
     },
     {
       "id": "T008",
@@ -57,7 +58,7 @@
     {
       "id": "T010",
       "description": ".claude/agents/adr-editor.md を更新し、adr-editor が ADR を新規作成・更新する際の front-matter 記述義務を rules に追加する (IN-05 / AC-05)。追加内容: (1) 新規 ADR 作成時は YAML front-matter (adr_id + decisions[] の全フィールド: id / user_decision_ref / review_finding_ref / optional candidate_selection / status / optional superseded_by / optional implemented_in / grandfathered) を付与すること — IN-01 / D3 が定義する全フィールドを網羅する、(2) status は typestate-based lifecycle を反映した 5 値 (proposed / accepted / implemented / superseded / deprecated) のいずれかを設定すること — これらの値が parse_adr_frontmatter の status-string dispatch によって ProposedDecision / AcceptedDecision / ImplementedDecision / SupersededDecision / DeprecatedDecision の各 typestate に変換されることを明記する、(3) user_decision_ref または review_finding_ref のいずれかを必ず設定すること (grandfathered: true の場合は exemption)、(4) front-matter は MD body より前に配置すること。更新対象は .claude/agents/adr-editor.md のみとし、他の convention / command ファイルへの波及修正は行わない (OS-05)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T011",
