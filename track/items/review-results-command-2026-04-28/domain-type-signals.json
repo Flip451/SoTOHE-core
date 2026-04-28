@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-28T22:46:43Z",
+  "declaration_hash": "9fe1ee89e44a0876aede32f2570fb36d9afc327823a75e5620d2a2f1b8958b92",
+  "signals": [
+    {
+      "type_name": "ReviewApprovalVerdict",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ScopeRound",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewExistsPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

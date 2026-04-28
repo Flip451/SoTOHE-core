@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsReviewStore",
+      "description": "Filesystem-based adapter implementing ReviewReader and ReviewWriter for review.json v2. Extended by this track to also implement ReviewExistsPort: the review_json_exists method returns Result<bool, ReviewReaderError> — Ok(true) when the file exists and is accessible, Ok(false) when absent (not found), Err(ReviewReaderError) on unexpected I/O failures such as permission denied. Implementation uses std::fs::metadata() and maps ErrorKind::NotFound to Ok(false), other errors to Err(...). Pre-existing type — action modify to add ReviewExistsPort implementation.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ReviewExistsPort",
+          "expected_methods": [
+            {
+              "name": "review_json_exists",
+              "receiver": "&self",
+              "params": [],
+              "returns": "Result<bool, ReviewReaderError>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "IN-07",
+          "hash": "49b61b68b76b56aa2b7e26d343ad54e13c2091d1ba752c05661bb84045954a5c"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-12",
+          "hash": "975ddfa91b6cfc121bb48c878e72c3c84568406e9aa0cedd5eb7526ea18730c9"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "CN-04",
+          "hash": "26c61b6deabea71b3559f9c4d1d63ff0ede713dbf75966ac4d60830158bfbdb6"
+        }
+      ]
+    }
+  ]
+}

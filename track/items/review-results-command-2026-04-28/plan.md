@@ -1,4 +1,82 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # `sotp review results` で review.json 直読みを置き換える
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Summary
+
+8-task structure following the hexagonal layer order: domain types first (T001) -> infrastructure port impl (T002) -> usecase lift (T003) -> CLI check-approved refactor (T004) -> CLI results command (T005) -> CLI status deletion (T006) -> doc/ref cleanup (T007) -> CI gate verification (T008).
+T001-T003 form the hexagonal foundation: domain enum + port trait, infrastructure adapter, usecase method. These three tasks establish the type-safe review approval verdict without touching any CLI code.
+T004 (check-approved refactor) depends on T001-T003 completing; it removes the inline CLI-layer approval logic and delegates to the new usecase method. Observable CLI surface is preserved (AC-10).
+T005 (results command) depends on T001-T004; it is the largest task and introduces the new results.rs subcommand. All modes (including --limit 0) call read_all_rounds to obtain ScopeRound history so that the state line can include the latest-round type/verdict/timestamp suffix per IN-02; --limit 0 omits findings/history expansion but still shows the latest-round suffix. --limit N adds findings expansion and history filtered by --round-type. ReviewReader may need a read_all_rounds method — if so, it is added as part of T005 with domain port extension + infrastructure implementation included in the same commit to keep the binary gate green.
+T006 (status deletion) depends on T005; deleting status before results is in place would break CI. Pure deletion commit.
+T007 (doc cleanup) depends on T006; searching for status references after the CLI deletion ensures no false survivors.
+T008 (CI gate) is the final verification task and depends on all prior tasks.
+
+## Tasks (0/8 resolved)
+
+### S001 — Domain Layer: ReviewApprovalVerdict + ReviewExistsPort (T001)
+
+> IN-05 + IN-07: introduce ReviewApprovalVerdict enum and ReviewExistsPort trait in libs/domain/src/review_v2/.
+> Enum-first design per 04-coding-principles.md: three variants (Approved / ApprovedWithBypass / Blocked) structurally eliminate the boolean-flag + required-scope anti-pattern used in current run_check_approved.
+> ReviewExistsPort is the secondary port that abstracts filesystem existence check from usecase layer (hexagonal boundary enforcement — usecase must not call std::fs). The port returns Result<bool, ReviewReaderError> to propagate I/O errors rather than treating them as absent.
+> Zero infrastructure or CLI code changes in this task.
+
+- [ ] **T001**: Introduce ReviewApprovalVerdict enum in the domain layer and ReviewExistsPort secondary port trait. (1) Add ReviewApprovalVerdict enum to libs/domain/src/review_v2/types.rs with three variants: Approved, ApprovedWithBypass { not_started_count: usize }, and Blocked { required_scopes: Vec<ScopeName> }. Enum-first design per 04-coding-principles.md: Approved and ApprovedWithBypass are structurally distinct (no serde in domain). (2) Add ReviewExistsPort trait to libs/domain/src/review_v2/ports.rs with a single method review_json_exists(&self) -> Result<bool, ReviewReaderError>: Ok(true) when the file exists, Ok(false) when absent (NotFound), Err(...) on other I/O errors. (3) Re-export both from libs/domain/src/review_v2/mod.rs. (4) Add unit tests in libs/domain/src/review_v2/tests.rs for ReviewApprovalVerdict variant construction. Catalogue refs: domain-types.json#ReviewApprovalVerdict, domain-types.json#ReviewExistsPort. Spec refs: IN-05, IN-07, AC-09, AC-12.
+
+### S002 — Infrastructure Layer: FsReviewStore implements ReviewExistsPort (T002)
+
+> IN-07 / AC-12: implement ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs.
+> Returns Result<bool, ReviewReaderError>: Ok(true) = exists, Ok(false) = not found, Err = unexpected I/O error. Distinguishes genuine absence from permission errors.
+> check-layers gate must pass: ReviewExistsPort is consumed by usecase via composition root, not by usecase calling infra directly.
+
+- [ ] **T002**: Implement ReviewExistsPort on FsReviewStore in the infrastructure layer. Depends on: T001. (1) Add impl ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs. The review_json_exists method uses std::fs::metadata(&self.path): if Ok(_) returns Ok(true); if Err with ErrorKind::NotFound returns Ok(false); otherwise returns Err(ReviewReaderError::...). This distinguishes genuine absence from I/O errors such as permission denied. (2) Add ReviewExistsPort to the imports. (3) Add unit/integration tests covering: file exists -> Ok(true), file absent -> Ok(false), unexpected I/O error (mocked or simulated) -> Err. (4) Confirm cargo make check-layers passes (no hexagonal violation). Catalogue refs: infrastructure-types.json#FsReviewStore. Spec refs: IN-07, AC-12, CN-04.
+
+### S003 — Usecase Layer: ReviewCycle::evaluate_approval (T003)
+
+> IN-05 / AC-09 / AC-11: add evaluate_approval(reader, review_json_exists) -> Result<ReviewApprovalVerdict, ReviewCycleError> to ReviewCycle.
+> Lifts all approval/bypass judgment from CLI layer; CLI check-approved and CLI results hint both consume this single usecase method.
+> review_json_exists bool is resolved by the CLI composition root via ReviewExistsPort before calling evaluate_approval, keeping usecase free of filesystem I/O (CN-04).
+
+- [ ] **T003**: Add evaluate_approval method to ReviewCycle in the usecase layer. Depends on: T001. (1) Add evaluate_approval(reader: &impl ReviewReader, review_json_exists: bool) -> Result<ReviewApprovalVerdict, ReviewCycleError> to ReviewCycle in libs/usecase/src/review_v2/cycle.rs. Implementation: call get_review_states(reader) to get current scope states; collect Required(*) scopes; classify into: Approved (required.is_empty()), ApprovedWithBypass { not_started_count } (all Required scopes are Required(NotStarted) AND !review_json_exists; not_started_count = required.len()), or Blocked { required_scopes } (otherwise). (2) Import ReviewApprovalVerdict from domain. (3) Add unit tests in libs/usecase/src/review_v2/tests.rs covering: all NotRequired -> Approved (regardless of review_json_exists), all Required(NotStarted) + review_json_exists=false -> ApprovedWithBypass{N}, all Required(NotStarted) + review_json_exists=true -> Blocked, some Required(FindingsRemain) -> Blocked. Use mockall for ReviewReader. Catalogue refs: usecase-types.json#ReviewCycle. Spec refs: IN-05, AC-09, AC-11, CN-04.
+
+### S004 — CLI: run_check_approved Refactor to Usecase Delegation (T004)
+
+> IN-05 / AC-10: slim run_check_approved down to usecase delegation. Preserve observable behavior: exit 0 on Approved / ApprovedWithBypass, exit 1 on Blocked, [OK] / [WARN] / [BLOCKED] eprintln format unchanged.
+> Removes the inline domain logic from the CLI layer (L225 required.is_empty(), L244-247 bypass check, L237-243 review_json path resolution).
+> This task must be completed before T005 so that results hint logic can reuse the same usecase path.
+
+- [ ] **T004**: Slim down CLI run_check_approved to delegate to the usecase evaluate_approval method. Depends on: T001, T002, T003. (1) Refactor run_check_approved in apps/cli/src/commands/review/mod.rs to: call comp.review_store.review_json_exists() -> Result<bool, ReviewReaderError> and propagate Err as a CLI error (AppError or anyhow), call comp.cycle.evaluate_approval(&comp.review_store, review_json_exists_bool), and map ReviewApprovalVerdict variants to the existing exit code + eprintln behavior: Approved -> eprintln [OK] + ExitCode::SUCCESS, ApprovedWithBypass { not_started_count } -> eprintln [WARN] + ExitCode::SUCCESS, Blocked { required_scopes } -> eprintln [BLOCKED] + ExitCode::FAILURE. (2) Remove the inline approval/bypass judgment logic from run_check_approved. (3) Adjust compose_v2::ReviewV2Composition to expose review_store so the CLI can call review_json_exists. (4) Update tests to cover the refactored path. Observable CLI surface (exit 0 / exit 1 / eprintln format) must remain unchanged (AC-10). Spec refs: IN-05, AC-09, AC-10, AC-11, CN-04, CN-07.
+
+### S005 — CLI: sotp review results New Subcommand (T005)
+
+> IN-01 / IN-02 / IN-03 / IN-04 / AC-01 to AC-06 / AC-13 / AC-14: largest task, implements the new results subcommand.
+> ResultsArgs with --track-id, --items-dir, --scope/--all, --limit (0 | N | all), --round-type (fast | final | any), --no-hint.
+> Text-only output (CN-01): state summary (IN-02: header + diff base + scope lines with latest-round suffix + summary) always emitted; findings/history expanded when --limit > 0.
+> Scope universe from scope_config.all_scope_names() always fully listed in --all mode (CN-02); --scope filter limits to one scope (AC-14).
+> Reads round data upfront (read_all_rounds or equivalent) so the state line can include latest round type/verdict/timestamp for scopes with review history.
+> Commit hint fires only when evaluate_approval returns Approved AND review_json_exists() returns Ok(true); ApprovedWithBypass -> no hint; Approved + Ok(false) -> no hint; Err -> propagate as CLI error (CN-03 / AC-05 / AC-06).
+> If ReviewReader needs read_all_rounds for history expansion, add the method in the same commit to keep CI green.
+
+- [ ] **T005**: Implement sotp review results CLI subcommand (ResultsArgs + run_results). Depends on: T001, T002, T003, T004. Round-history payload: if ReviewReader does not yet expose a read_all_rounds method, add it in this same commit as fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError> where ScopeRound is a new plain struct { round_type: RoundType, verdict: Verdict, findings: Vec<ReviewerFinding>, hash: ReviewHashValue, at: String } introduced in libs/domain/src/review_v2/types.rs alongside ReviewApprovalVerdict; RoundType, Verdict, ReviewerFinding, and ReviewHashValue are existing domain types already defined in that module. Infrastructure impl (FsReviewStore) reads the stored rounds from review.json and deserializes into ScopeRound records. (1) Add ResultsArgs struct to apps/cli/src/commands/review/mod.rs with flags: --track-id (String), --items-dir (PathBuf, default track/items), --scope (Option<String>), --all (bool, default), --limit (ResultsLimit: 0 | N | all), --round-type (RoundTypeFilter: fast | final | any, default any), --no-hint (bool). (2) Add ReviewCommand::Results(ResultsArgs) variant and wire execute() dispatch. (3) Create apps/cli/src/commands/review/results.rs containing run_results(args) logic: build_review_v2 composition, call read_all_rounds for each scope to obtain ScopeRound history, call get_review_states for scope states, call evaluate_approval for hint verdict, render per IN-02: header line, diff base line, blank line, scope state lines (one per scope in scope_config.all_scope_names() sorted order; for scopes with stored rounds append latest ScopeRound.round_type/verdict/at suffix per IN-02), blank line, Summary line, optional hint line. When --limit > 0: filter ScopeRound records by --round-type (fast | final | any; default any includes all), then take the most recent up to --limit; expand the latest-round findings (ScopeRound.findings) below the state line, and render remaining history records below that as past-round lines (AC-13). (4) Implement --scope filter (single scope display, AC-14) and --all (default full display, CN-02). (5) Write tests for results rendering: state-summary-only mode (--limit 0 including latest round suffix), findings expansion (--limit N), --round-type fast/final/any filtering of history (AC-13), hint emission/suppression, scope filter. (6) Confirm CN-01 (text-only), CN-02 (full scope universe in --all mode), and CN-06 (--limit 0 = state summary only). Spec refs: IN-01, IN-02, IN-03, IN-04, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-13, AC-14, CN-01, CN-02, CN-03, CN-06.
+
+### S006 — CLI: sotp review status Deletion (T006)
+
+> IN-06 / AC-07 / CN-05: pure deletion commit removing ReviewCommand::Status, StatusArgs, execute_status, run_status.
+> No backward-compat alias per no-backward-compat convention.
+> Sequenced after T005 so the replacement command is in place before the old one is removed.
+
+- [ ] **T006**: Delete sotp review status CLI subcommand (no backward-compat alias). Depends on: T005. (1) Remove ReviewCommand::Status(StatusArgs) variant from apps/cli/src/commands/review/mod.rs. (2) Remove StatusArgs struct. (3) Remove execute_status() and run_status() functions. (4) Remove the Status arm from execute() match dispatch. (5) Update apps/cli/src/commands/review/tests.rs to remove any Status-specific test cases. (6) Confirm sotp review status is now an unknown-command error (clap error exit). Must not add any alias for backward-compat (CN-05 / no-backward-compat convention). Spec refs: IN-06, AC-07, CN-05.
+
+### S007 — Docs and Config: review status -> review results Reference Updates (T007)
+
+> IN-06 / AC-08 / CN-05: documentation-only commit updating all sotp review status references in .claude/, knowledge/, track/workflow.md, Makefile.toml.
+> No code changes. Sequenced after T006 so the CLI deletion is confirmed before searching for reference survivors.
+
+- [ ] **T007**: Update all review status references to review results across doc and config files. Depends on: T006. (1) Search for all occurrences of sotp review status and review-status in: .claude/ (all .md and .json files), knowledge/ (all .md files), track/workflow.md, Makefile.toml. (2) Replace each occurrence with sotp review results (or review-results as appropriate). (3) Verify no dead references remain (AC-08). Files expected to contain references include: .claude/agents/review-fix-lead.md, .claude/commands/track/*.md, knowledge/conventions/review-protocol.md, track/workflow.md, Makefile.toml sotp review status wrapper (if any). This is a documentation-only commit with no code changes. Spec refs: IN-06, AC-08, CN-05.
+
+### S008 — CI Gate Verification (T008)
+
+> AC-15: run cargo make ci after T001-T007 and verify all gates pass.
+> Confirms fmt-check / clippy / nextest / deny / check-layers / verify-* all green.
+> Final smoke-test: sotp review results --track-id <id> produces state summary; sotp review status returns clap error.
+
+- [ ] **T008**: Run cargo make ci and verify all gates pass. Depends on: T001, T002, T003, T004, T005, T006, T007. Execute after T001-T007 are complete. Verify: fmt-check + clippy + nextest + deny + check-layers all pass, verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass. Confirm sotp review results --track-id <id> and sotp review check-approved --track-id <id> produce the expected output and exit codes. Confirm sotp review status produces a clap unknown-command error. CI green is required before finalizing. Spec refs: AC-15.

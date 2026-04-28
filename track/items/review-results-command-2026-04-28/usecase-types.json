@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ReviewCycle",
+      "description": "Usecase orchestrator for the review cycle. Extended by this track with a new impl method evaluate_approval on the ReviewCycle struct. The catalogue kind 'use_case' only supports expected_members (struct fields); expected_methods is not part of this kind's schema. Because evaluate_approval is an impl method added to an existing struct (not a new struct field), expected_members remains [] — there are no new struct fields. The modification tracked here is a new method in the impl block, documented below. Method signature: evaluate_approval(&self, reader: &impl ReviewReader, review_json_exists: bool) -> Result<ReviewApprovalVerdict, ReviewCycleError>. It internally calls get_review_states to obtain the current scope states, then classifies into: Approved (required.is_empty() — all scopes are NotRequired(*), no scope requires review); ApprovedWithBypass { not_started_count } (all Required scopes are Required(NotStarted) AND !review_json_exists — PR-based bypass, carrying count of Required(NotStarted) scopes); Blocked { required_scopes } (one or more Required scopes remain and bypass condition does not apply). The review_json_exists bool is used only for the bypass check (Approved does not need it). The results command separately checks review.json existence to determine whether to emit the commit hint for the Approved case. Both sotp review check-approved and sotp review results consume the same usecase return value, eliminating the drift between hint and gate (AC-11). Pre-existing type — action modify to add evaluate_approval impl method.",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "f2395faf9ed177a9d8480a5274e4ff61a9c1fa5282306b1feadb69aa550fc4be"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-09",
+          "hash": "8976a6fa63d4eb913c47b70146e03603e86362b24f31ae6e9a8fea0a9833ba84"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "839c54fc4b885e504fd33ab0ea4a8183ab158557fc141c41e5352cfe9ec3383c"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "CN-04",
+          "hash": "26c61b6deabea71b3559f9c4d1d63ff0ede713dbf75966ac4d60830158bfbdb6"
+        }
+      ]
+    },
+    {
+      "name": "ReviewCycleError",
+      "description": "Error enum for ReviewCycle operations. Referenced here to document the error type used by the new evaluate_approval method, which propagates ReviewCycleError::Reader on ReviewReader port failure. Pre-existing type — reference only.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "UnknownScope",
+        "FileChangedDuringReview",
+        "Diff",
+        "Hash",
+        "Reviewer",
+        "Reader"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "f2395faf9ed177a9d8480a5274e4ff61a9c1fa5282306b1feadb69aa550fc4be"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-09",
+          "hash": "8976a6fa63d4eb913c47b70146e03603e86362b24f31ae6e9a8fea0a9833ba84"
+        }
+      ]
+    }
+  ]
+}

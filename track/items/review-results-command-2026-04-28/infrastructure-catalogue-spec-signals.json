@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6d7097c4e254d865f41d445420ac72c05c8a4a97f1da5b6ab0cf11d21c9c8d37",
+  "signals": [
+    {
+      "type_name": "FsReviewStore",
+      "signal": "blue"
+    }
+  ]
+}

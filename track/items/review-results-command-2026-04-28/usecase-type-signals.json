@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-28T22:46:44Z",
+  "declaration_hash": "0779bff9ae163cea3cdf4f551b789a4848f43406aa0e84c2046fb1e9c01b9f8c",
+  "signals": [
+    {
+      "type_name": "ReviewCycle",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCycleError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "UnknownScope",
+        "FileChangedDuringReview",
+        "Diff",
+        "Hash",
+        "Reviewer",
+        "Reader"
+      ]
+    }
+  ]
+}
