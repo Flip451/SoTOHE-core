@@ -34,8 +34,8 @@
     {
       "id": "T006",
       "description": "Delete orphan Rust external_guides integration code that survived the knowledge/external/guides.json removal (IN-10 / AC-10 / AC-11). Deletion targets: (a) apps/cli/src/commands/hook.rs: remove load_guides_from_project() function and its call site (let guides = load_guides_from_project() + guides argument passed to check_compliance()); (b) libs/domain/src/skill_compliance: remove GuideMatch struct, GuideEntry struct, ComplianceContext.guide_matches field, find_matching_guides() function, trigger_matches() function, and guide-related test cases in tests.rs; (c) libs/domain/src/skill_compliance: remove guides: &[GuideEntry] and guide_limit: usize parameters from check_compliance() signature and all its call sites; (d) delete libs/infrastructure/src/guides_codec.rs in its entirety; (e) libs/infrastructure/src/lib.rs: remove the pub mod guides_codec; declaration. This task is deletion-only with no new features, logic changes, new type definitions, or new tests added. After deletion, verify: cargo check passes, cargo nextest run passes, and none of the identifiers GuideMatch / GuideEntry / guide_matches / find_matching_guides / trigger_matches / guides_codec / load_guides_from_project / guide_limit remain in the affected files (AC-11). Also run cargo make ci to confirm AC-10 holds with IN-10 changes included.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "8fe7460e5c407aee49a241a61f6ffced9e8869c2"
     }
   ],
   "plan": {
