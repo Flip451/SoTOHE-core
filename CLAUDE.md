@@ -21,8 +21,6 @@ Priority references:
 - `knowledge/conventions/pre-track-adr-authoring.md`  # ADR authored before /track:plan runs
 - `knowledge/conventions/workflow-ceremony-minimization.md`  # post-hoc review + approved-state removal
 - `architecture-rules.json`
-- `knowledge/external/POLICY.md`
-- `knowledge/external/guides.json`
 
 Operating notes:
 

@@ -10,24 +10,6 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
-GUIDES_STUB = textwrap.dedent(
-    """\
-    import json
-    import sys
-
-    print(
-        json.dumps(
-            {
-                "script": "external_guides.py",
-                "argv": sys.argv[1:],
-                "python": sys.executable,
-            }
-        )
-    )
-    """
-)
-
-
 CONVENTIONS_STUB = textwrap.dedent(
     """\
     import json
@@ -110,7 +92,6 @@ class MakeWrappersTest(unittest.TestCase):
             root / "Makefile.toml",
             (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8"),
         )
-        self.write_text(root / "scripts" / "external_guides.py", GUIDES_STUB)
         self.write_text(root / "scripts" / "convention_docs.py", CONVENTIONS_STUB)
         self.write_text(root / "scripts" / "architecture_rules.py", ARCH_RULES_STUB)
         self.write_text(
@@ -120,7 +101,6 @@ class MakeWrappersTest(unittest.TestCase):
             "test_architecture_rules.py",
             "test_verify_scripts.py",
             "test_convention_docs.py",
-            "test_external_guides.py",
             "test_make_wrappers.py",
         ):
             self.write_text(root / "scripts" / test_name, PASSING_TEST)
@@ -431,51 +411,6 @@ class MakeWrappersTest(unittest.TestCase):
         self.assertIn('bin/sotp make track-set-commit-hash', task_body)
         self.assertIn('"$@"', task_body)
 
-    def test_guides_wrappers_smoke(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            self.make_fixture(root)
-
-            cases = (
-                ("guides-list", (), ["list"]),
-                ("guides-fetch", ("demo-guide",), ["fetch", "demo-guide"]),
-                ("guides-usage", (), ["usage"]),
-                ("guides-setup", (), ["setup"]),
-                (
-                    "guides-add",
-                    (
-                        "--",
-                        "--id",
-                        "demo-guide",
-                        "--title",
-                        "Demo Guide",
-                        "--source-url",
-                        "https://example.com/demo.md",
-                        "--license",
-                        "MIT",
-                    ),
-                    [
-                        "add",
-                        "--",
-                        "--id",
-                        "demo-guide",
-                        "--title",
-                        "Demo Guide",
-                        "--source-url",
-                        "https://example.com/demo.md",
-                        "--license",
-                        "MIT",
-                    ],
-                ),
-            )
-            for task, args, expected in cases:
-                result = self.run_make(root, task, *args)
-                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                payload = self.parse_json_line(result.stdout)
-                self.assertEqual(payload["script"], "external_guides.py")
-                self.assertEqual(payload["argv"], expected)
-                self.assertIn("python", str(payload["python"]))
-
     def test_conventions_wrappers_smoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -526,7 +461,6 @@ class MakeWrappersTest(unittest.TestCase):
             # make_fixture replaces every referenced selftest target with PASSING_TEST,
             # so this smoke test validates wrapper wiring without executing production tests.
             for task in (
-                "guides-selftest-local",
                 "scripts-selftest-local",
             ):
                 result = self.run_make(root, task, allow_private=True)
@@ -644,20 +578,6 @@ class MakeWrappersTest(unittest.TestCase):
             self.make_docker_stub(root)
 
             cases = (
-                (
-                    "guides-selftest",
-                    (),
-                    [
-                        "compose",
-                        "run",
-                        "--rm",
-                        "tools",
-                        "cargo",
-                        "make",
-                        "--allow-private",
-                        "guides-selftest-local",
-                    ],
-                ),
                 (
                     "scripts-selftest",
                     (),

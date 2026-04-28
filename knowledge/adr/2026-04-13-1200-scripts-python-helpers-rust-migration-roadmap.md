@@ -168,6 +168,12 @@ planning 段階で見落としていた重要な事実:
 
 **リスク**: 高。HTTP fetch 実装には依存追加とテスト整備が必要で、作業量が大きい。
 
+> **2026-04-28 追記**: `knowledge/adr/2026-04-28-1258-remove-external-guides.md` D1 / D2 により、
+> フェーズ 3 の方向性が「Rust 化」から「機能撤去」へ転換された。
+> `external_guides` およびその依存連鎖 (`atomic_write.py`, `track_resolution.py::latest_legacy_track_dir` 等) は
+> Rust 移植ではなく削除で対処される。これにより `external_guides` 関連の Rust 移植コスト (HTTP client 実装・`sotp guides` サブコマンド実装等) は消失している。
+> `convention_docs.py` (`add` / `update-index`) の移行は引き続きフェーズ 3 の残作業として存在する。
+
 ### フェーズ 1 の先行実施理由
 
 フェーズ 1 のみでも保守対象を 10 ファイル削減でき、かつ本番パスに影響しない。移行作業の中では「最も安全で効果が大きい部分」であり、先行して実施することで後続フェーズの実装時に track_branch_guard / markdown / registry / state_machine 系の二重実装を気にしなくてよくなる。

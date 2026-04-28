@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-28T17:34:20Z",
+  "declaration_hash": "a31527392c4ee6c4ad951a641dc43e6260758cd3ea54e7a77f1d9c8538129e64",
+  "signals": [
+    {
+      "type_name": "GuideEntry",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "GuideMatch",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ComplianceContext",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "skill_match: Option<SkillMatch>"
+      ]
+    },
+    {
+      "type_name": "check_compliance",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "find_matching_guides",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "trigger_matches",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

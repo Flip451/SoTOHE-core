@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "GuideEntry",
+      "description": "Pre-existing domain struct representing an external guide entry. Removed as part of orphan external_guides code deletion (IN-10). Classified as dto (explicitly accepted R1 deviation for action:delete): plain data container with no validation invariants (R3: not a validated value) and no serde derives. value_object is inapplicable (no validation invariant to establish). The R1 violation (dto forbidden in domain) is accepted because this is an action:delete entry documenting a pre-existing type that no longer exists in code.",
+      "approved": true,
+      "action": "delete",
+      "kind": "dto",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        }
+      ]
+    },
+    {
+      "name": "GuideMatch",
+      "description": "Pre-existing domain struct representing a matched guide entry. Removed as part of orphan external_guides code deletion (IN-10). Classified as dto (explicitly accepted R1 deviation for action:delete): plain data container with no validation invariants (R3: not a validated value) and no serde derives. value_object is inapplicable (no validation invariant to establish). The R1 violation (dto forbidden in domain) is accepted because this is an action:delete entry documenting a pre-existing type that no longer exists in code.",
+      "approved": true,
+      "action": "delete",
+      "kind": "dto",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        }
+      ]
+    },
+    {
+      "name": "ComplianceContext",
+      "description": "Skill compliance result struct. Modified in T006: field guide_matches removed; only skill_match remains. Classified as value_object (explicit accepted deviation per briefing Known Accepted Deviations): is_empty() is a pure accessor; render() derives display output from the contained value. No other valid domain kind applies (free_function requires stateless top-level fn; struct holds state). value_object is the only viable classification.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "skill_match",
+          "ty": "Option<SkillMatch>"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        },
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "f6d3a05e09e370f3fdde6ed006dcdbc5b23ed61096d933f7d2d32e2fc6c88716"
+        }
+      ]
+    },
+    {
+      "name": "check_compliance",
+      "description": "Performs a skill compliance check. Signature simplified in T006: removed guides and guide_limit parameters; now takes only prompt.",
+      "approved": true,
+      "action": "modify",
+      "kind": "free_function",
+      "module_path": "domain::skill_compliance",
+      "expected_params": [
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "ComplianceContext"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        },
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "f6d3a05e09e370f3fdde6ed006dcdbc5b23ed61096d933f7d2d32e2fc6c88716"
+        }
+      ]
+    },
+    {
+      "name": "find_matching_guides",
+      "description": "Pre-existing free function that matched guides against a prompt. Removed in T006.",
+      "approved": true,
+      "action": "delete",
+      "kind": "free_function",
+      "module_path": "domain::skill_compliance",
+      "expected_params": [
+        {
+          "name": "prompt",
+          "ty": "&str"
+        },
+        {
+          "name": "guides",
+          "ty": "&[GuideEntry]"
+        },
+        {
+          "name": "limit",
+          "ty": "usize"
+        }
+      ],
+      "expected_returns": [
+        "Vec"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        },
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "f6d3a05e09e370f3fdde6ed006dcdbc5b23ed61096d933f7d2d32e2fc6c88716"
+        }
+      ]
+    },
+    {
+      "name": "trigger_matches",
+      "description": "Pre-existing free function that checked trigger keyword matching. Removed in T006.",
+      "approved": true,
+      "action": "delete",
+      "kind": "free_function",
+      "module_path": "domain::skill_compliance",
+      "expected_params": [
+        {
+          "name": "text",
+          "ty": "&str"
+        },
+        {
+          "name": "trigger",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "bool"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "IN-10",
+          "hash": "989336e68c7ba437d1d44146954fdb094d32cb416499663cf83d1101164797f5"
+        },
+        {
+          "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "f6d3a05e09e370f3fdde6ed006dcdbc5b23ed61096d933f7d2d32e2fc6c88716"
+        }
+      ]
+    }
+  ]
+}

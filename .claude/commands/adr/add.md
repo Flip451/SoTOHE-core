@@ -42,7 +42,7 @@ All AskUserQuestion prompts are asked in Japanese and the user's free-form answe
    - Options: "Positive / Negative / Neutral を自由記述" / "Positive のみ (Negative は skip)" / "section を skip"
 6. **Reassess When (再評価条件)** — list triggers (conditions) under which the decision should be reconsidered.
    - Options: "自由記述で列挙" / "skip (general default を挿入: 採用プロジェクトのフィードバック / 新しい技術要件の出現 など)"
-7. **Related (任意)** — references to related ADRs / conventions / external guides. Directory references are fine; the template must not hard-code specific ADR filenames.
+7. **Related (任意)** — references to related ADRs / conventions. Directory references are fine; the template must not hard-code specific ADR filenames.
    - Options: "path を自由記述で列挙" / "skip"
 
 ### Focused / Quick modes

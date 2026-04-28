@@ -34,8 +34,6 @@ Read these first before planning or implementation:
 - `track/items/<id>/observations.md` (optional — manual observation log)
 - `knowledge/DESIGN.md`
 - `.claude/rules/`
-- `knowledge/external/POLICY.md`
-- `knowledge/external/guides.json`
 - `architecture-rules.json`
 
 Operational split:
@@ -44,8 +42,6 @@ Operational split:
 - `CLAUDE.md`: maintainer/reference guide
 - `track/workflow.md`: day-to-day workflow rules
 - `knowledge/conventions/`: project-specific engineering rules and implementation policies
-- `knowledge/external/guides.json`: registry for long-form external guides cached outside git
-- `knowledge/external/POLICY.md`: operating policy for external long-form guides
 - `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
 - `.harness/config/agent-profiles.json`: capability-to-provider mapping source of truth
 

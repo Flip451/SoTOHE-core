@@ -68,7 +68,6 @@ Opus is chosen because behavioral-contract mistakes (missing acceptance criteria
   - Related conventions under `knowledge/conventions/`
   - Any explicit constraints carried over from the ADR
   - Prior `spec.json` excerpt when updating an existing track
-- External guide summaries auto-injected via `knowledge/external/guides.json` `trigger_keywords` matching
 
 ### Internal pipeline (all executed by this agent)
 

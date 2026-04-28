@@ -18,7 +18,6 @@ Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the
 - Read the current track's `spec.md`, `plan.md`, and `metadata.json`.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy tracks without `spec.json`).
 - For exact type signatures, trait definitions, module trees, and Mermaid diagrams, use `## Canonical Blocks` in `plan.md` and `knowledge/DESIGN.md` as the source of truth when reviewing implementation correctness.
-- Use any auto-injected external guide summaries from `knowledge/external/guides.json` before opening cached raw guide documents.
 - If the selected track is branchless planning-only (`status=planned`, `branch=null`), limit review scope to planning artifacts only. Allowed diff is:
   - `track/items/<id>/`
   - `track/registry.md`

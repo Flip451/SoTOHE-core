@@ -1,0 +1,817 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:14:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:17:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a9aacd12d3c75e051249a12fc69c58de3484a6f4c3e8ed0ad0234c22b9180ef",
+          "at": "2026-04-28T15:57:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/**` is still described as containing an `external policy`, but the external guide policy/registry directory has been removed in this change. This leaves an active onboarding instruction pointing users at a deleted policy area, which is the same stale-reference class this cleanup is meant to eliminate.",
+              "severity": "P1",
+              "file": "START_HERE_HUMAN.md",
+              "line": 40,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:5a9aacd12d3c75e051249a12fc69c58de3484a6f4c3e8ed0ad0234c22b9180ef",
+          "at": "2026-04-28T15:59:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca233c3c0b642bc21037bc09887a27c0dc08fac125a352f297ad99e409128bfa",
+          "at": "2026-04-28T16:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca233c3c0b642bc21037bc09887a27c0dc08fac125a352f297ad99e409128bfa",
+          "at": "2026-04-28T16:01:21Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:31:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`'s package-import smoke test: the subprocess still imports `scripts.external_guides`, so this test will start failing with `ModuleNotFoundError` unless T002 removes or rewrites it.",
+              "severity": "P1",
+              "file": "scripts/test_track_resolution.py",
+              "line": 47,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:33:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`, which still spawns `import scripts.track_resolution, scripts.external_guides` in its package-style import smoke test. That subprocess will now fail with `ImportError`, so this deletion leaves a remaining `scripts/` test broken.",
+              "severity": "P1",
+              "file": "scripts/test_track_resolution.py",
+              "line": 47,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:35:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `knowledge/external/guides.json` strands the Rust `UserPromptSubmit` hook in `apps/cli/src/commands/hook.rs:320-328`, which still loads that path through `guides_codec` and silently falls back to an empty guide set on any load failure. That is a live caller outside the T002/T003 deferrals, so the deletion set is incomplete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 320,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:38:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:39:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:40:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:42:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:48:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
+          "at": "2026-04-28T15:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
+          "at": "2026-04-28T15:02:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4beb06ba3bd36cba4a1070f1defa87989ade99dd60af3351131531b127f2783e",
+          "at": "2026-04-28T15:15:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stale external-guides instruction remains: the task workflow still tells users to use `外部ガイド要約` during debugging, but this round is removing the external guide auto-injection/reference path. This leaves a contradictory reference to the deleted feature in the `other` docs scope.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 49,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:4beb06ba3bd36cba4a1070f1defa87989ade99dd60af3351131531b127f2783e",
+          "at": "2026-04-28T15:16:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the `/track:*` auto-injection note is inconsistent with the current runtime path: `apps/cli/src/commands/hook.rs` still loads `knowledge/external/guides.json` for prompts containing `/track:`, and `libs/domain/src/skill_compliance/mod.rs` still matches `trigger_keywords` and renders the matched guide summaries into `additionalContext`. This doc change would misstate the workflow behavior.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 65,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
+          "at": "2026-04-28T15:20:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
+          "at": "2026-04-28T15:22:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` still states that the current track resolution implementation lives in `scripts/track_resolution.py::resolve_track_dir()`, but `scripts/track_resolution.py` is no longer present after the T002 cleanup. This leaves a broken reference in the top-level workflow doc; the reference should be removed or updated to the Rust implementation.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 219,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
+          "at": "2026-04-28T15:23:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeff896d9dc51894dbc0a7d33007c0f9712aedac5b78fe7c99c7f3bc421a0c03",
+          "at": "2026-04-28T15:25:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeff896d9dc51894dbc0a7d33007c0f9712aedac5b78fe7c99c7f3bc421a0c03",
+          "at": "2026-04-28T15:25:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e25e1cb75564be0c4a1ad140b5c54ca43808e2b811a32c5e404aad3c23c93eef",
+          "at": "2026-04-28T15:56:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e25e1cb75564be0c4a1ad140b5c54ca43808e2b811a32c5e404aad3c23c93eef",
+          "at": "2026-04-28T15:57:24Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:015bb237aa091fc6537ff85b37d1b8734b35f0cd0c06886e42822cee2f7fc928",
+          "at": "2026-04-28T16:34:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:015bb237aa091fc6537ff85b37d1b8734b35f0cd0c06886e42822cee2f7fc928",
+          "at": "2026-04-28T16:35:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:015bb237aa091fc6537ff85b37d1b8734b35f0cd0c06886e42822cee2f7fc928",
+          "at": "2026-04-28T16:39:40Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e35825893d072d9259892c8bb6876ca8896d7f80f8ad563d4755e1c669607d3",
+          "at": "2026-04-28T16:34:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e35825893d072d9259892c8bb6876ca8896d7f80f8ad563d4755e1c669607d3",
+          "at": "2026-04-28T16:35:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e35825893d072d9259892c8bb6876ca8896d7f80f8ad563d4755e1c669607d3",
+          "at": "2026-04-28T16:39:15Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
+          "at": "2026-04-28T15:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
+          "at": "2026-04-28T15:16:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30cc40abcacc8db41dc5ed4b4232d47753ea3313354a6ed04d93401179d64550",
+          "at": "2026-04-28T16:34:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30cc40abcacc8db41dc5ed4b4232d47753ea3313354a6ed04d93401179d64550",
+          "at": "2026-04-28T16:36:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30cc40abcacc8db41dc5ed4b4232d47753ea3313354a6ed04d93401179d64550",
+          "at": "2026-04-28T16:39:12Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says `external_guides.py` is the only current Python caller of `atomic_write.py`, but the roadmap ADR still treats `track_registry.py` as another caller. As written, this makes the deletion chain incomplete: removing `atomic_write.py` here would strand an existing caller unless Phase 1 is part of the same change set.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 25,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2 asks for semantic edits to the already-merged roadmap ADR (body note plus decision metadata changes). That conflicts with `knowledge/conventions/pre-track-adr-authoring.md`, which only allows post-merge ADR edits for typos, broken cross-references, or adding a back-reference. The supersede should be expressed without rewriting the merged ADR's decision state.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 63,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8224d9b19c6f68abee9c3f7448e4acede62125ce556f30c7743ecf9b7e6ffb6a",
+          "at": "2026-04-28T13:17:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 asks for a semantic rewrite of the post-merge roadmap ADR: it changes the Phase 3 decision's front-matter `status` to `superseded` and adds `superseded_by`. The pre-track ADR convention only allows post-merge edits for typos, broken cross-references, or adding a newer-ADR back-reference, so this supersession procedure is not executable as written. It needs to be represented as a new ADR/back-reference rather than a semantic edit to the merged roadmap ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 64,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8224d9b19c6f68abee9c3f7448e4acede62125ce556f30c7743ecf9b7e6ffb6a",
+          "at": "2026-04-28T13:19:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Context line 20 calls `guide:add` a skill, but D1 line 49 identifies the same entry point as the `/guide:add` slash command and explicitly says there is no `.claude/skills/` counterpart. That is an internal semantic mismatch about the deletion target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 20,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09f9fd4b96fcdf2f68082aa7f1ecf3661ec34cbf7023957491f611b5fc280ce0",
+          "at": "2026-04-28T13:27:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09f9fd4b96fcdf2f68082aa7f1ecf3661ec34cbf7023957491f611b5fc280ce0",
+          "at": "2026-04-28T13:31:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Context lists the remaining interactive registration path as being called from a `guide:add` skill, but D1 later identifies the concrete artifact as `.claude/commands/guide/add.md` and explicitly says there is no corresponding `.claude/skills/` definition. Since this plan is deciding which artifact to remove, the command-vs-skill contradiction should be resolved in the ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 20,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2 says the Roadmap ADR handling follows the post-merge editing rules in `pre-track-adr-authoring.md`, but that convention does not define the immutable post-merge rule being relied on and instead permits direct rewrites of existing ADRs. The three allowed post-merge edit cases are in `knowledge/conventions/adr.md`, so this compliance reference points at the wrong source of authority.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 67,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:09f9fd4b96fcdf2f68082aa7f1ecf3661ec34cbf7023957491f611b5fc280ce0",
+          "at": "2026-04-28T13:35:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR says the remaining external_guides uses are only the cargo-make wrappers, `/guide:add`, and the registry, but the current Rust UserPromptSubmit hook still loads `knowledge/external/guides.json` and injects matching guide summaries for `/track:` prompts via `guides_codec` / `skill_compliance`. As written, D1 plans to delete the registry and Python helper without accounting for that active Rust-side AI-session path, so the removal plan is semantically incomplete and would leave the hook behavior silently degraded or partially orphaned.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "line": 17,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:4709b8d978d6369a16e81f76a95d2a73c61f86f668b4d9394186a46fc48d1bbb",
+          "at": "2026-04-28T13:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4709b8d978d6369a16e81f76a95d2a73c61f86f668b4d9394186a46fc48d1bbb",
+          "at": "2026-04-28T13:43:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d5b4e37e41b82e5b2da995dba873eaa435a9318015136e9ffabdc5e690966fc",
+          "at": "2026-04-28T14:07:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d5b4e37e41b82e5b2da995dba873eaa435a9318015136e9ffabdc5e690966fc",
+          "at": "2026-04-28T14:10:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d5b4e37e41b82e5b2da995dba873eaa435a9318015136e9ffabdc5e690966fc",
+          "at": "2026-04-28T14:16:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6784949d25f534e2ce16003e1b789d4d7051f1fadc42f7d0093a35d2d93a2fd9",
+          "at": "2026-04-28T14:30:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6784949d25f534e2ce16003e1b789d4d7051f1fadc42f7d0093a35d2d93a2fd9",
+          "at": "2026-04-28T14:31:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2922c216e795eb7d4ccb6b29f91a08f89ce8d33e95c19ea1c397bcb87ed6db6",
+          "at": "2026-04-28T14:59:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2922c216e795eb7d4ccb6b29f91a08f89ce8d33e95c19ea1c397bcb87ed6db6",
+          "at": "2026-04-28T15:00:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec1e04835542c7eac5abdd30d05477fa15c91c2dbfebe40c0bbd1d80a2dec6b",
+          "at": "2026-04-28T15:14:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec1e04835542c7eac5abdd30d05477fa15c91c2dbfebe40c0bbd1d80a2dec6b",
+          "at": "2026-04-28T15:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ed7fa0f0004396b45d8cc3b95b309a360a06280b17ef51b075fcccdefc7d68",
+          "at": "2026-04-28T15:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The appended note says the Phase 3 implementation cost has disappeared, but the Phase 3 section immediately above still includes non-external-guides work such as `scripts/convention_docs.py` add/update-index migration and `sotp conventions add/update-index` implementation. The note only explains deleting `external_guides` and its dependency chain, so this overstates the supersede and can mislead readers into thinking all Phase 3 work is gone.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md",
+              "line": 174,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c4ed7fa0f0004396b45d8cc3b95b309a360a06280b17ef51b075fcccdefc7d68",
+          "at": "2026-04-28T15:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:390c6e56199f9260e5a030ea95e3d6dc332614b94a7d8cd5eb225f6c3cf833f1",
+          "at": "2026-04-28T15:33:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:390c6e56199f9260e5a030ea95e3d6dc332614b94a7d8cd5eb225f6c3cf833f1",
+          "at": "2026-04-28T15:34:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01daea07df0518aea3a7491390246832b89f1702ecfaa539d09b2787dbdafc3f",
+          "at": "2026-04-28T15:38:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01daea07df0518aea3a7491390246832b89f1702ecfaa539d09b2787dbdafc3f",
+          "at": "2026-04-28T15:38:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c63ba34c5365cad4f6d39c800089c772613faaa0df64325d9695b38994074415",
+          "at": "2026-04-28T15:41:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c63ba34c5365cad4f6d39c800089c772613faaa0df64325d9695b38994074415",
+          "at": "2026-04-28T15:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The top-level summary still says the track is \"deletion-only with zero Rust source code changes\" and that deletion targets span \"6 categories\", but T006 now explicitly deletes Rust code and introduces a seventh category. That makes the summary inconsistent with the rest of the plan. The same stale wording also appears in `impl-plan.json`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/external-guides-removal-2026-04-28/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d96647f154ccc69c93f8a0e8dc6d00d8a6da0cc1e8372ecd5e7e26008eff617",
+          "at": "2026-04-28T16:35:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The top-level summary still says the track is \"deletion-only with zero Rust source code changes\" and that deletion targets span 6 categories, but T006/S006 add a Rust deletion category (external_guides integration code). The overview is now inconsistent with the actual scope and should be updated.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d96647f154ccc69c93f8a0e8dc6d00d8a6da0cc1e8372ecd5e7e26008eff617",
+          "at": "2026-04-28T16:36:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2984c2bec02a770716f8803c03796f8344032a5678dbfd410ee23010a245cf3f",
+          "at": "2026-04-28T16:37:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 says it verifies that all IN-10 orphan Rust code is removed, but its identifier grep list omits `guide_limit`, even though IN-10(c) explicitly requires removing the `guide_limit: usize` parameter from `check_compliance()`. As written, a leftover `guide_limit` parameter could satisfy AC-11's grep checks, so the acceptance criterion is not semantically aligned with the in-scope deletion target.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+              "line": 340,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2984c2bec02a770716f8803c03796f8344032a5678dbfd410ee23010a245cf3f",
+          "at": "2026-04-28T16:40:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 says it verifies deletion of the orphan Rust code listed in IN-10, but its identifier grep omits `guide_limit`, even though IN-10/T006 explicitly require removing the `guide_limit: usize` parameter from `check_compliance()`. A leftover `guide_limit` parameter could satisfy the stated AC-11 machine check, so the plan does not enforce one of its own deletion targets.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/spec.json",
+              "line": 340,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2984c2bec02a770716f8803c03796f8344032a5678dbfd410ee23010a245cf3f",
+          "at": "2026-04-28T16:43:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006/S006 restates AC-11's identifier-grep requirement but omits `guide_limit` from the list, while `spec.json` AC-11 explicitly requires `guide_limit` to be absent and IN-10 includes removing the `guide_limit: usize` parameter. An implementer following this plan could run the listed grep set and believe AC-11 is satisfied while leaving `guide_limit` behind. Add `guide_limit` to the T006/S006 verification list and regenerate `plan.md`.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/impl-plan.json",
+              "line": 119,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8e10eafc58a79018cce2f945b55907492ca3a7a7df146f76624b08890e05ec3d",
+          "at": "2026-04-28T16:46:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3487bd9db5a5e23a0eca83c8fa5d3b0797f3e15df18fa3eb56551e129c01b11",
+          "at": "2026-04-28T16:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6ab2ecc2e4ea1d951ef8266751ff961e3dc86d74e6edd0f625484cac4e2eb5d",
+          "at": "2026-04-28T17:06:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GuideEntry` and `GuideMatch` are declared in the domain catalogue with `kind: \"dto\"`, but the type-designer kind-selection convention marks `dto` as forbidden for the domain layer, not a rationale-required exception. This makes the catalogue layer/kind classification semantically invalid even though the entries are deletion declarations.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 9,
+              "category": "architecture violation"
+            },
+            {
+              "message": "`ComplianceContext` is classified as a `value_object`, but the current domain type has behavior methods such as `render()` that compute the injected additionalContext string. The kind-selection convention restricts value objects to validated/read-only values and explicitly excludes behavior-bearing structs, so this catalogue entry misclassifies the domain type.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 39,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:d6ab2ecc2e4ea1d951ef8266751ff961e3dc86d74e6edd0f625484cac4e2eb5d",
+          "at": "2026-04-28T17:09:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GuideEntry` and `GuideMatch` are declared as `kind: \"dto\"` in the domain catalogue, but the current kind-selection convention marks `dto` in the domain layer as forbidden, not merely requiring rationale. The descriptions also say these structs have no serde derives, which conflicts with the convention's DTO rationale as an infrastructure serde-boundary type.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 9,
+              "category": "architecture"
+            },
+            {
+              "message": "`ComplianceContext` is classified as a `value_object`, but the convention restricts value objects to validated values and excludes behavior-bearing structs. This type is a skill compliance result/context with rendering/emptiness behavior and no stated validation invariant, so the catalogue kind conflicts with R3/R5.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 39,
+              "category": "architecture"
+            },
+            {
+              "message": "The `trigger_matches` catalogue entry records `expected_returns` as an empty list, but the deleted function is a predicate and returns `bool`. This makes the delete declaration factually inaccurate for the removed contract.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 145,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:d6ab2ecc2e4ea1d951ef8266751ff961e3dc86d74e6edd0f625484cac4e2eb5d",
+          "at": "2026-04-28T17:12:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GuideEntry` and `GuideMatch` are declared as `kind: \"value_object\"` while their descriptions say they are plain data-carrier structs with no validation invariants. The type-designer convention defines `value_object` as a validated value and forbids using it as a catch-all, so these catalogue entries are semantically misclassified even though they are `action: delete`.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "`ComplianceContext` is declared as a `value_object`, but the same description says it has no validation-on-construction invariant and it exposes `render()`, which computes formatted output rather than merely returning stored values. Under R3, value objects are limited to validated/read-only values and behavior like this should not be classified as `value_object`.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 36,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:00d10cdbf9c08c8f4f1846bf0f2a84c04631e1b65667b10f79792d97ea28d878",
+          "at": "2026-04-28T17:16:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GuideEntry and GuideMatch are now classified as `value_object`, but the catalogue rationale describes them only as plain read-only data carriers with no validation behavior. The project kind convention restricts `value_object` to validated values, while the briefing says the accepted treatment for these deleted guide containers was the explicitly justified DTO classification. As written, the catalogue and generated views mis-state the semantic role of these domain types instead of documenting the approved deviation.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 9,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1b99321d675ae68b41ca2b63cde40600b52ef751c6bb257fb1bf11b3d4cd84db",
+          "at": "2026-04-28T17:20:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ComplianceContext` is declared as `kind: \"value_object\"`, but the type still owns behavior (`is_empty()` and `render()` in the implementation). Under the R3 kind-selection rule, value objects are limited to validated/read-only values and accessors; rendering/computation behavior makes this catalogue declaration semantically wrong, so the type signal can be incorrectly Blue despite a kind mismatch.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 39,
+              "category": "kind_selection"
+            }
+          ],
+          "hash": "rvw1:sha256:b664cca7c8e02215d8e280ea46f38e0b1788f366c3d03e13f71084af5528b257",
+          "at": "2026-04-28T17:24:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ComplianceContext` is approved as `kind: \"value_object\"` while the entry itself says this is an “accepted R3 deviation” and justifies it as a pragmatic fallback. The required kind-selection convention restricts `value_object` to validated values and R5 forbids using it as the fallback when no other kind fits; `render()` is behavior, not a value accessor. This catalogue entry therefore records a kind choice that contradicts the governing design convention and should be changed or escalated rather than approved as-is.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:67968176532caec9a0db55ffb3d2ce6b13059cb64b18b96bad9aa48d53d5f679",
+          "at": "2026-04-28T17:27:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ComplianceContext` is declared as `kind: \"value_object\"` and the description claims its invariant is established at construction, but this catalog entry does not describe a validated constructor or read-only value boundary; the implementation shape is a result/context struct with behavior (`is_empty`/`render`). Under R3, `value_object` is limited to validated values and must not be used as a catch-all for behavior-bearing structs, so this catalogue declaration is semantically inconsistent unless it is reclassified or documented as an explicit accepted deviation.",
+              "severity": "P1",
+              "file": "track/items/external-guides-removal-2026-04-28/domain-types.json",
+              "line": 35,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:498eb68dd105e152631e0797d578669bd70a8ea0a1a2116bf9fdf8c03e08751f",
+          "at": "2026-04-28T17:31:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcd609aac1c83e9db847600d5815b8ebd8ab35e977e1b90b90679896d4389c66",
+          "at": "2026-04-28T17:33:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d3ddf217d9b71def97f57e05a75a254e2f19bcce18647239609a044b01fcaac",
+          "at": "2026-04-28T17:37:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d3ddf217d9b71def97f57e05a75a254e2f19bcce18647239609a044b01fcaac",
+          "at": "2026-04-28T17:38:29Z"
+        }
+      ]
+    }
+  }
+}

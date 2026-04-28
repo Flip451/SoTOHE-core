@@ -2,7 +2,6 @@
 //!
 //! Detects `/track:*` slash commands in user prompts and generates
 //! SKILL.md phase requirement reminders as `additionalContext`.
-//! Also matches external guide triggers against the prompt.
 
 /// A detected `/track:*` command with its skill phase requirements.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -13,95 +12,32 @@ pub struct SkillMatch {
     pub reminders: Vec<String>,
 }
 
-/// Result of external guide matching.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GuideMatch {
-    /// Guide ID.
-    pub id: String,
-    /// The trigger keyword that matched.
-    pub trigger: String,
-    /// Guide summary lines.
-    pub summary: Vec<String>,
-    /// Project usage notes.
-    pub project_usage: Vec<String>,
-    /// Cache path for the raw guide file.
-    pub cache_path: String,
-}
-
-/// External guide entry (domain representation — no serde here).
-#[derive(Debug, Clone)]
-pub struct GuideEntry {
-    /// Unique guide identifier.
-    pub id: String,
-    /// Trigger keywords for matching.
-    pub trigger_keywords: Vec<String>,
-    /// Summary lines.
-    pub summary: Vec<String>,
-    /// Project usage notes.
-    pub project_usage: Vec<String>,
-    /// Cache path.
-    pub cache_path: String,
-}
-
 /// Result of a skill compliance check.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ComplianceContext {
     /// Matched skill command (if any).
     pub skill_match: Option<SkillMatch>,
-    /// Matched external guides.
-    pub guide_matches: Vec<GuideMatch>,
 }
 
 impl ComplianceContext {
     /// Returns `true` if no context was generated (nothing to inject).
     #[must_use]
     pub fn is_empty(&self) -> bool {
-        self.skill_match.is_none() && self.guide_matches.is_empty()
+        self.skill_match.is_none()
     }
 
     /// Renders the compliance context as `additionalContext` string.
     #[must_use]
     pub fn render(&self) -> Option<String> {
-        if self.is_empty() {
-            return None;
+        let skill = self.skill_match.as_ref()?;
+        let mut lines = vec![format!(
+            "[Skill Compliance] Detected `{}` — follow the SKILL.md workflow phases:",
+            skill.command,
+        )];
+        for reminder in &skill.reminders {
+            lines.push(format!("- {reminder}"));
         }
-
-        let mut parts = Vec::new();
-
-        if let Some(skill) = &self.skill_match {
-            let mut lines = vec![format!(
-                "[Skill Compliance] Detected `{}` — follow the SKILL.md workflow phases:",
-                skill.command,
-            )];
-            for reminder in &skill.reminders {
-                lines.push(format!("- {reminder}"));
-            }
-            parts.push(lines.join("\n"));
-        }
-
-        if !self.guide_matches.is_empty() {
-            let mut lines = vec!["[External Guide Context] Relevant guide summaries:".to_owned()];
-            for guide in &self.guide_matches {
-                let summary = if guide.summary.is_empty() {
-                    "Summary not recorded.".to_owned()
-                } else {
-                    guide.summary.join(" ")
-                };
-                let usage = if guide.project_usage.is_empty() {
-                    "Project usage not recorded.".to_owned()
-                } else {
-                    guide.project_usage.join(" ")
-                };
-                lines.push(format!("- {} (trigger: {}): {}", guide.id, guide.trigger, summary));
-                lines.push(format!("  project usage: {usage}"));
-                if !guide.cache_path.is_empty() {
-                    lines.push(format!("  cache path: {}", guide.cache_path));
-                }
-            }
-            parts.push(lines.join("\n"));
-        }
-
-        Some(parts.join("\n\n"))
+        Some(lines.join("\n"))
     }
 }
 
@@ -227,103 +163,11 @@ pub fn detect_skill_command(prompt: &str) -> Option<SkillMatch> {
     })
 }
 
-// ---------------------------------------------------------------------------
-// External guide matching
-// ---------------------------------------------------------------------------
-
-/// Whether a trigger keyword matches in the given text.
-///
-/// Both text and trigger are lowercased internally.
-/// Word-boundary aware for triggers containing alphanumeric characters.
+/// Performs a skill compliance check: detect a `/track:*` command in the prompt.
 #[must_use]
-pub fn trigger_matches(text: &str, trigger: &str) -> bool {
-    let text_lower = text.to_lowercase();
-    let trigger_lower = trigger.to_lowercase();
-    if trigger_lower.chars().any(|c| c.is_ascii_alphanumeric()) {
-        // Word-boundary aware match — scan all occurrences
-        let mut start = 0;
-        while let Some(rel) = text_lower[start..].find(&trigger_lower) {
-            let pos = start + rel;
-            let before_ok = pos == 0
-                || text_lower
-                    .as_bytes()
-                    .get(pos - 1)
-                    .is_none_or(|&b| !b.is_ascii_alphanumeric() && b != b'_');
-            let after_pos = pos + trigger_lower.len();
-            let after_ok = after_pos >= text_lower.len()
-                || text_lower
-                    .as_bytes()
-                    .get(after_pos)
-                    .is_none_or(|&b| !b.is_ascii_alphanumeric() && b != b'_');
-            if before_ok && after_ok {
-                return true;
-            }
-            // Advance past the current match start on a valid char boundary.
-            start = pos + 1;
-            while start < text_lower.len() && !text_lower.is_char_boundary(start) {
-                start += 1;
-            }
-        }
-        false
-    } else {
-        text_lower.contains(&trigger_lower)
-    }
-}
-
-/// Matches guide entries against the prompt text.
-///
-/// Returns up to `limit` matches, each with the guide and the trigger that matched.
-#[must_use]
-pub fn find_matching_guides(prompt: &str, guides: &[GuideEntry], limit: usize) -> Vec<GuideMatch> {
-    let prompt_lower = prompt.to_lowercase();
-    let mut matches = Vec::new();
-
-    for guide in guides {
-        if matches.len() >= limit {
-            break;
-        }
-        for trigger in &guide.trigger_keywords {
-            if trigger_matches(&prompt_lower, trigger) {
-                matches.push(GuideMatch {
-                    id: guide.id.clone(),
-                    trigger: trigger.clone(),
-                    summary: guide.summary.clone(),
-                    project_usage: guide.project_usage.clone(),
-                    cache_path: guide.cache_path.clone(),
-                });
-                break;
-            }
-        }
-    }
-
-    matches
-}
-
-/// Performs a full skill compliance check: detect command + match guides.
-///
-/// `track_context` is optional additional text (e.g. from spec.md/plan.md of the
-/// active track) that is concatenated with the prompt for guide trigger matching.
-/// This mirrors the Python `find_relevant_guides_for_track_workflow()` behavior.
-#[must_use]
-pub fn check_compliance(
-    prompt: &str,
-    track_context: Option<&str>,
-    guides: &[GuideEntry],
-    guide_limit: usize,
-) -> ComplianceContext {
+pub fn check_compliance(prompt: &str) -> ComplianceContext {
     let skill_match = detect_skill_command(prompt);
-    // Match guides when any /track: command is detected (not just SKILL_COMMANDS).
-    let has_track_command = prompt.to_lowercase().contains("/track:");
-    let guide_matches = if has_track_command {
-        let combined = match track_context {
-            Some(ctx) if !ctx.is_empty() => format!("{prompt}\n{ctx}"),
-            _ => prompt.to_owned(),
-        };
-        find_matching_guides(&combined, guides, guide_limit)
-    } else {
-        Vec::new()
-    };
-    ComplianceContext { skill_match, guide_matches }
+    ComplianceContext { skill_match }
 }
 
 #[cfg(test)]
