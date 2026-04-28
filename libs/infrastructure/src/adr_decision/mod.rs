@@ -13,10 +13,14 @@
 //! - [`error`] — [`AdrFrontMatterCodecError`] variants raised by the codec.
 //! - [`parse`] — [`parse_adr_frontmatter`] free function that turns raw
 //!   markdown content into the domain [`domain::AdrFrontMatter`] value object.
+//! - [`adapter`] — [`FsAdrFileAdapter`] concrete implementation of the
+//!   domain [`domain::AdrFilePort`] secondary port.
 
+pub mod adapter;
 mod dto;
 pub mod error;
 pub mod parse;
 
+pub use adapter::FsAdrFileAdapter;
 pub use error::AdrFrontMatterCodecError;
 pub use parse::parse_adr_frontmatter;
