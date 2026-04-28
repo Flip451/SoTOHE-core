@@ -51,10 +51,31 @@ pub fn parse_adr_frontmatter(content: &str) -> Result<AdrFrontMatter, AdrFrontMa
     let dto: AdrFrontMatterDto = serde_yaml::from_str(yaml_text)?;
     let AdrFrontMatterDto { adr_id, decisions } = dto;
 
+    check_decision_ids_unique(&decisions)?;
+
     let entries =
         decisions.into_iter().map(decision_dto_to_entry).collect::<Result<Vec<_>, _>>()?;
 
     AdrFrontMatter::new(adr_id, entries).map_err(|_| AdrFrontMatterCodecError::MissingAdrId)
+}
+
+/// Reject duplicate decision IDs within a single ADR.
+///
+/// `knowledge/conventions/adr.md` constrains `decisions[].id` to be unique
+/// within one ADR; without this check, references such as
+/// `superseded_by: <adr>.md#D1` are ambiguous and lifecycle traceability
+/// breaks while `verify adr-signals` still passes.
+fn check_decision_ids_unique(decisions: &[AdrDecisionDto]) -> Result<(), AdrFrontMatterCodecError> {
+    let mut seen = std::collections::HashSet::with_capacity(decisions.len());
+    for decision in decisions {
+        if !seen.insert(decision.id.as_str()) {
+            return Err(AdrFrontMatterCodecError::InvalidDecisionField(format!(
+                "duplicate decision id: '{}'",
+                decision.id
+            )));
+        }
+    }
+    Ok(())
 }
 
 /// First-pass key-presence check: forbid typestate-specific keys on the
@@ -485,5 +506,27 @@ decisions: []"#,
         let fm = parse_adr_frontmatter(&content).unwrap();
         assert_eq!(fm.adr_id(), "foo");
         assert!(fm.decisions().is_empty());
+    }
+
+    #[test]
+    fn test_parse_adr_frontmatter_duplicate_decision_ids_returns_invalid_decision_field() {
+        let content = wrap(
+            r#"adr_id: foo
+decisions:
+  - id: D1
+    status: proposed
+    user_decision_ref: chat:2026-04-25
+  - id: D1
+    status: accepted
+    user_decision_ref: chat:2026-04-25"#,
+        );
+        let err = parse_adr_frontmatter(&content).unwrap_err();
+        match err {
+            AdrFrontMatterCodecError::InvalidDecisionField(msg) => {
+                assert!(msg.contains("duplicate decision id"), "got: {msg}");
+                assert!(msg.contains("D1"), "got: {msg}");
+            }
+            other => panic!("expected InvalidDecisionField, got {other:?}"),
+        }
     }
 }

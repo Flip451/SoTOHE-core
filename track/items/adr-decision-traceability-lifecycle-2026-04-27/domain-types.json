@@ -3,21 +3,10 @@
   "type_definitions": [
     {
       "name": "AdrFrontMatter",
-      "description": "Parsed representation of a single ADR file's YAML front-matter block. Wraps the deserialized adr_id + decisions[] payload as a domain value object. Construction from raw YAML text delegates to the infrastructure parse_adr_frontmatter free function; domain holds only the validated form. serde-free in domain — deserialization lives in the infrastructure adapter per CN-05 hexagonal rule.",
+      "description": "Parsed representation of a single ADR file's YAML front-matter block. Wraps the deserialized adr_id + decisions[] payload as a domain value object. Construction from raw YAML text delegates to the infrastructure parse_adr_frontmatter free function; domain holds only the validated form. serde-free in domain — deserialization lives in the infrastructure adapter per CN-05 hexagonal rule. Both adr_id and decisions are private fields accessed only via accessors (adr_id(), decisions(), into_decisions()); the schema_export captures only public fields so expected_members is intentionally empty — the type's existence and kind (struct) are verified by the evaluator.",
       "approved": true,
       "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "adr_id",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "decisions",
-          "ty": "Vec<AdrDecisionEntry>"
-        }
-      ],
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
@@ -64,36 +53,10 @@
     },
     {
       "name": "AdrDecisionCommon",
-      "description": "Common fields shared by every AdrDecisionEntry variant regardless of lifecycle state: the decision id (e.g. 'D1'), optional user_decision_ref and review_finding_ref (grounds trace fields evaluated by evaluate_adr_decision), optional candidate_selection (encodes candidate A/B/C selection per D3), and the grandfathered flag (exempts from signal verification per D4). Extracted as a separate value object so each typestate embeds it rather than repeating fields. No serde in domain.",
+      "description": "Common fields shared by every AdrDecisionEntry variant regardless of lifecycle state: the decision id (e.g. 'D1'), optional user_decision_ref and review_finding_ref (grounds trace fields evaluated by evaluate_adr_decision), optional candidate_selection (encodes candidate A/B/C selection per D3), and the grandfathered flag (exempts from signal verification per D4). Extracted as a separate value object so each typestate embeds it rather than repeating fields. No serde in domain. All fields are private (accessed via id(), user_decision_ref(), review_finding_ref(), candidate_selection(), grandfathered() accessors); the schema_export captures only public fields so expected_members is intentionally empty — the type's existence and kind (struct) are verified by the evaluator.",
       "approved": true,
       "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "id",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "user_decision_ref",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "review_finding_ref",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "candidate_selection",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "grandfathered",
-          "ty": "bool"
-        }
-      ],
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
@@ -109,12 +72,6 @@
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
           "anchor": "CN-05",
           "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Embedded into each lifecycle typestate (ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision) as the shared grounds payload, so each typestate struct carries only its relevant fields plus the shared common block."
         }
       ]
     },
@@ -148,7 +105,7 @@
     },
     {
       "name": "ProposedDecision",
-      "description": "Typestate for a decision that is newly drafted and awaiting review. Carries only AdrDecisionCommon (id, user_decision_ref, review_finding_ref, candidate_selection, grandfathered). No state-specific payload beyond the common fields — the proposal is open, no implementation or supersession reference exists yet. Outgoing transitions: to AcceptedDecision (review-complete) or DeprecatedDecision (withdrawn before acceptance). No serde in domain.",
+      "description": "Typestate for a decision that is newly drafted and awaiting review. Carries AdrDecisionCommon (id, user_decision_ref, review_finding_ref, candidate_selection, grandfathered) as a public field. No state-specific payload beyond the common fields — the proposal is open, no implementation or supersession reference exists yet. Outgoing transitions: to AcceptedDecision (review-complete) or DeprecatedDecision (withdrawn before acceptance). No serde in domain. Replaces the Proposed variant of the old flat AdrDecisionEntry enum: per 04-coding-principles.md typestate rule, state transitions exist in the lifecycle (proposed -> accepted -> implemented), so typestate is preferred over enum, and each state is its own type carrying only the fields valid in that state.",
       "approved": true,
       "kind": "typestate",
       "transitions_to": [
@@ -173,17 +130,11 @@
           "anchor": "GO-03",
           "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Replaces the Proposed variant of the old flat AdrDecisionEntry enum. Per 04-coding-principles.md typestate rule: state transitions exist in the lifecycle (proposed -> accepted -> implemented), so typestate is preferred over enum. Each state is its own type carrying only the fields valid in that state."
-        }
       ]
     },
     {
       "name": "AcceptedDecision",
-      "description": "Typestate for a decision that has completed review and is ready for implementation. Carries only AdrDecisionCommon. No state-specific payload — acceptance means the decision is ratified but implementation has not started yet. Outgoing transitions: to ImplementedDecision (implementation complete), SupersededDecision (replaced by a later decision before implementation), or DeprecatedDecision (withdrawn after acceptance). No serde in domain.",
+      "description": "Typestate for a decision that has completed review and is ready for implementation. Carries AdrDecisionCommon as a public field. No state-specific payload — acceptance means the decision is ratified but implementation has not started yet. Outgoing transitions: to ImplementedDecision (implementation complete), SupersededDecision (replaced by a later decision before implementation), or DeprecatedDecision (withdrawn after acceptance). No serde in domain. Replaces the Accepted variant of the old flat AdrDecisionEntry enum; AcceptedDecision has no extra payload versus ProposedDecision but is a distinct typestate because it unlocks the ImplementedDecision transition that Proposed cannot reach.",
       "approved": true,
       "kind": "typestate",
       "transitions_to": [
@@ -209,17 +160,11 @@
           "anchor": "GO-03",
           "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Replaces the Accepted variant of the old flat AdrDecisionEntry enum. AcceptedDecision has no extra payload versus ProposedDecision but is a distinct typestate because it unlocks the ImplementedDecision transition that Proposed cannot reach."
-        }
       ]
     },
     {
       "name": "ImplementedDecision",
-      "description": "Typestate for a decision that has been fully implemented. Carries AdrDecisionCommon plus implemented_in: String — the commit hash or reference where the decision was actualized. The implemented_in field is structurally present only in this state; it cannot appear in ProposedDecision or AcceptedDecision, eliminating the Option<implemented_in> field that would otherwise pollute those states. Outgoing transitions: to SupersededDecision (implementation is later replaced) or DeprecatedDecision (implementation is retired). No serde in domain.",
+      "description": "Typestate for a decision that has been fully implemented. Carries AdrDecisionCommon as a public field plus a private implemented_in: String field — the commit hash or reference where the decision was actualized. The implemented_in field is structurally present only in this state (eliminating any Option<implemented_in> in other states), but it is private and accessible only via the implemented_in() accessor; therefore it cannot be verified by the schema_export-based evaluator and is excluded from expected_members. Outgoing transitions: to SupersededDecision (implementation is later replaced) or DeprecatedDecision (implementation is retired). No serde in domain.",
       "approved": true,
       "kind": "typestate",
       "transitions_to": [
@@ -231,11 +176,6 @@
           "kind": "field",
           "name": "common",
           "ty": "AdrDecisionCommon"
-        },
-        {
-          "kind": "field",
-          "name": "implemented_in",
-          "ty": "String"
         }
       ],
       "spec_refs": [
@@ -248,18 +188,12 @@
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
           "anchor": "GO-03",
           "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Replaces the Implemented variant of the old flat AdrDecisionEntry enum. implemented_in is now a required String (not Option) because it cannot be None in this state — the typestate makes the invalid state (Implemented with no commit ref) structurally impossible."
         }
       ]
     },
     {
       "name": "SupersededDecision",
-      "description": "Typestate for a decision that has been replaced by a later decision in a subsequent ADR. Carries AdrDecisionCommon plus superseded_by: String — the ADR anchor reference (e.g. '2026-04-28-0001-some-adr.md#D2') identifying the superseding decision. Terminal state: no outgoing transitions. The superseded_by field is structurally present only in this state, making it impossible for other lifecycle states to carry a supersession reference. No serde in domain.",
+      "description": "Typestate for a decision that has been replaced by a later decision in a subsequent ADR. Carries AdrDecisionCommon as a public field plus a private superseded_by: String field — the ADR anchor reference (e.g. '2026-04-28-0001-some-adr.md#D2') identifying the superseding decision. The superseded_by field is structurally present only in this state (eliminating Option<superseded_by> in other states), but it is private and accessible only via the superseded_by() accessor; therefore it cannot be verified by the schema_export-based evaluator and is excluded from expected_members. Terminal state: no outgoing transitions. No serde in domain.",
       "approved": true,
       "kind": "typestate",
       "transitions_to": [],
@@ -268,11 +202,6 @@
           "kind": "field",
           "name": "common",
           "ty": "AdrDecisionCommon"
-        },
-        {
-          "kind": "field",
-          "name": "superseded_by",
-          "ty": "String"
         }
       ],
       "spec_refs": [
@@ -285,18 +214,12 @@
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
           "anchor": "GO-03",
           "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Replaces the Superseded variant of the old flat AdrDecisionEntry enum. superseded_by is now a required String (not Option) because it cannot be None in this state — the typestate makes the invalid state (Superseded with no back-reference) structurally impossible. Terminal: no further transitions."
         }
       ]
     },
     {
       "name": "DeprecatedDecision",
-      "description": "Typestate for a decision that has been retired without replacement. Carries only AdrDecisionCommon. No state-specific payload — deprecation is a retirement marker with no forward reference. Terminal state: no outgoing transitions. This state differs from SupersededDecision in that deprecation signals voluntary retirement rather than replacement; the distinction is valuable for lifecycle reporting (OS-02 notes advanced queries are out-of-scope but the structural distinction is established here). No serde in domain.",
+      "description": "Typestate for a decision that has been retired without replacement. Carries only AdrDecisionCommon as a public field. No state-specific payload — deprecation is a retirement marker with no forward reference. Terminal state: no outgoing transitions. This state differs from SupersededDecision in that deprecation signals voluntary retirement rather than replacement; the distinction is valuable for lifecycle reporting. No serde in domain. Replaces the Deprecated variant of the old flat AdrDecisionEntry enum. Structurally distinguishable from SupersededDecision at the type level — a Deprecated entry has no superseded_by reference, making it impossible to confuse the two end states.",
       "approved": true,
       "kind": "typestate",
       "transitions_to": [],
@@ -318,17 +241,11 @@
           "anchor": "GO-03",
           "hash": "38b65b565f10b3d1864e5ad0a3d7b76e25a93b248c6d1d4d16d241ee747a8bfa"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Replaces the Deprecated variant of the old flat AdrDecisionEntry enum. Terminal with no extra payload. Structurally distinguishable from SupersededDecision at the type level — a Deprecated entry has no superseded_by reference, making it impossible to confuse the two end states."
-        }
       ]
     },
     {
       "name": "AdrDecisionEntry",
-      "description": "Enum wrapper providing the heterogeneous-collection boundary for Vec<AdrDecisionEntry> in AdrFrontMatter::decisions. Each variant holds one of the five lifecycle typestate types (ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision), allowing the Vec to hold decisions at any lifecycle state while each typestate node remains a distinct catalogue entry that the contract-map renderer can draw as individual nodes. evaluate_adr_decision pattern-matches on this enum to extract the embedded AdrDecisionCommon grounds fields from whichever typestate variant is present. parse_adr_frontmatter dispatches on the YAML status string to construct the correct variant. No serde in domain — serde lives in the infrastructure DTO layer per CN-05.",
+      "description": "Enum wrapper providing the heterogeneous-collection boundary for Vec<AdrDecisionEntry> in AdrFrontMatter::decisions. Each variant holds one of the five lifecycle typestate types (ProposedDecision, AcceptedDecision, ImplementedDecision, SupersededDecision, DeprecatedDecision), allowing the Vec to hold decisions at any lifecycle state while each typestate node remains a distinct catalogue entry. evaluate_adr_decision pattern-matches on this enum to extract the embedded AdrDecisionCommon grounds fields from whichever typestate variant is present. parse_adr_frontmatter dispatches on the YAML status string to construct the correct variant. No serde in domain — serde lives in the infrastructure DTO layer per CN-05. Restructured from an enum with five flat string-named variants to an enum whose variants carry typestate types: the typestate types are the individual catalogue nodes; this enum is the heterogeneous-collection boundary only (04-coding-principles.md persistence-from-serde pattern).",
       "approved": true,
       "action": "modify",
       "kind": "enum",
@@ -359,12 +276,6 @@
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
           "anchor": "CN-05",
           "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Restructured from an enum with five flat string-named variants (Proposed/Accepted/Implemented/Superseded/Deprecated) to an enum whose variants carry typestate types (ProposedDecision/AcceptedDecision/ImplementedDecision/SupersededDecision/DeprecatedDecision). The typestate types are the individual catalogue nodes; this enum is the heterogeneous-collection boundary only (04-coding-principles.md persistence-from-serde pattern: typestate per state + state-erasing enum at heterogeneous boundary). expected_variants list the typestate type names so the contract-map renderer draws AdrDecisionEntry -> ProposedDecision edges etc."
         }
       ]
     },
@@ -404,7 +315,7 @@
     },
     {
       "name": "evaluate_adr_decision",
-      "description": "Pure domain free function that classifies a single AdrDecisionEntry into a DecisionGrounds signal. spec IN-07 calls this a '純粋関数' (pure function) — stateless, no I/O, no struct wrapper needed. Pattern-matches on the AdrDecisionEntry variant and extracts the embedded AdrDecisionCommon grounds fields (user_decision_ref, review_finding_ref, grandfathered) from whichever typestate is present. All five typestate variants carry AdrDecisionCommon, so evaluation is uniform across lifecycle states. Infallible: all AdrDecisionEntry values reaching this function are well-formed (codec validates at the infrastructure boundary). Located in the adr_decision::evaluator submodule so the usecase interactor can call it without depending on infrastructure (CN-05). free_function kind: the spec explicitly names a pure function; there is no state to encapsulate in a struct, and a zero-field struct with a method is semantically identical to a free function but obscures the statelessness.",
+      "description": "Pure domain free function that classifies a single AdrDecisionEntry into a DecisionGrounds signal. spec IN-07 calls this a pure function — stateless, no I/O, no struct wrapper needed. Pattern-matches on the AdrDecisionEntry variant and extracts the embedded AdrDecisionCommon grounds fields (user_decision_ref, review_finding_ref, grandfathered) from whichever typestate is present. All five typestate variants carry AdrDecisionCommon, so evaluation is uniform across lifecycle states. Infallible: all AdrDecisionEntry values reaching this function are well-formed (codec validates at the infrastructure boundary). Located in the adr_decision::evaluator submodule so the usecase interactor can call it without depending on infrastructure (CN-05). Redesigned from value_object AdrSignalEvaluator to free_function: the spec (IN-07) calls this a pure function; a zero-field struct with one method is semantically indistinguishable from a free function but hides the statelessness. FreeFunction kind accurately declares the spec intent and makes expected_params / expected_returns visible in the contract-map.",
       "approved": true,
       "kind": "free_function",
       "module_path": "domain::adr_decision::evaluator",
@@ -439,36 +350,14 @@
           "anchor": "AC-01",
           "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Redesigned from value_object AdrSignalEvaluator to free_function evaluate_adr_decision. The spec (IN-07) calls this a pure function. A zero-field struct with one method is semantically indistinguishable from a free function but hides the statelessness from the catalogue. FreeFunction kind accurately declares the spec intent and makes expected_params / expected_returns visible in the contract-map. The struct form was never implemented (T002 is pending), so this is a spec-level correction, not a code migration."
-        }
       ]
     },
     {
       "name": "AdrVerifyReport",
-      "description": "Aggregate result of evaluating all decisions across all ADR files in a single verify-adr-signals run. Contains a summary count of blue/yellow/red decisions across all evaluated files. Returned by VerifyAdrSignalsInteractor and consumed by the CLI layer for exit-code determination. The red_count drives non-zero exit per AC-01.",
+      "description": "Aggregate result of evaluating all decisions across all ADR files in a single verify-adr-signals run. Contains a summary count of blue/yellow/red decisions across all evaluated files. Returned by VerifyAdrSignalsInteractor and consumed by the CLI layer for exit-code determination. The red_count drives non-zero exit per AC-01. All three count fields (blue_count, yellow_count, red_count: usize) are private and accessed via accessors; the schema_export captures only public fields so expected_members is intentionally empty — the type's existence and kind (struct) are verified by the evaluator.",
       "approved": true,
       "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "blue_count",
-          "ty": "usize"
-        },
-        {
-          "kind": "field",
-          "name": "yellow_count",
-          "ty": "usize"
-        },
-        {
-          "kind": "field",
-          "name": "red_count",
-          "ty": "usize"
-        }
-      ],
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
@@ -516,7 +405,7 @@
     },
     {
       "name": "AdrFilePort",
-      "description": "Secondary port (driven by infrastructure) for ADR file enumeration and front-matter parsing. Abstracts filesystem access AND YAML decoding from the usecase layer per CN-05 hexagonal rule. The interactor depends on this trait; FsAdrFileAdapter in infrastructure implements it. list_adr_paths returns Vec<PathBuf> of discovered ADR file paths; read_adr_frontmatter takes a path and returns Result<AdrFrontMatter, AdrFilePortError> — IO and parse errors propagate as errors so the adapter satisfies no-panic and the interactor can surface failures via VerifyAdrSignalsError.",
+      "description": "Secondary port (driven by infrastructure) for ADR file enumeration and front-matter parsing. Abstracts filesystem access AND YAML decoding from the usecase layer per CN-05 hexagonal rule. The interactor depends on this trait; FsAdrFileAdapter in infrastructure implements it. list_adr_paths returns Vec<PathBuf> of discovered ADR file paths; read_adr_frontmatter takes a path and returns Result<AdrFrontMatter, AdrFilePortError> — IO and parse errors propagate as errors so the adapter satisfies no-panic and the interactor can surface failures via VerifyAdrSignalsError. The read_adr_frontmatter parameter uses PathBuf (owned concrete type) rather than &Path to avoid lifetime parameters when using Arc<dyn AdrFilePort> — an owned path eliminates the need for lifetime annotations on the trait, keeping the port signature simple (CN-05).",
       "approved": true,
       "kind": "secondary_port",
       "expected_methods": [
@@ -555,12 +444,6 @@
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
           "anchor": "AC-01",
           "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "read_adr_frontmatter parameter changed from '&Path' to 'PathBuf' to satisfy the constraint that domain port method signatures reference only domain types with no unsized owned Path. PathBuf is an owned concrete type safe in trait object method signatures."
         }
       ]
     }

@@ -16,7 +16,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| VerifyAdrSignalsInteractor | interactor | — | — | 🟡 | 🔵 |
+| VerifyAdrSignalsInteractor | interactor | — | — | 🔵 | 🔵 |
 
 ## Commands
 

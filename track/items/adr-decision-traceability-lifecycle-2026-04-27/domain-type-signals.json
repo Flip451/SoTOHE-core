@@ -1,17 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-28T10:02:39Z",
-  "declaration_hash": "b3b99409f65fdcfc73ca12414bf432209ad5409fe76bd2b8ec7d65aa2048cbd3",
+  "generated_at": "2026-04-28T11:22:14Z",
+  "declaration_hash": "fce62f2b8fd11b356fd2fec03ec337377911fcbd8635b97fb5b355e76fd3ca12",
   "signals": [
     {
       "type_name": "AdrFrontMatter",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "adr_id: String",
-        "decisions: Vec<AdrDecisionEntry>"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AdrFrontMatterError",
@@ -25,15 +21,8 @@
     {
       "type_name": "AdrDecisionCommon",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "candidate_selection: Option<String>",
-        "grandfathered: bool",
-        "id: String",
-        "review_finding_ref: Option<String>",
-        "user_decision_ref: Option<String>"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AdrDecisionCommonError",
@@ -72,27 +61,21 @@
     {
       "type_name": "ImplementedDecision",
       "kind_tag": "typestate",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "SupersededDecision",
         "DeprecatedDecision",
         "common: AdrDecisionCommon"
-      ],
-      "missing_items": [
-        "implemented_in: String"
       ]
     },
     {
       "type_name": "SupersededDecision",
       "kind_tag": "typestate",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "common: AdrDecisionCommon"
-      ],
-      "missing_items": [
-        "superseded_by: String"
       ]
     },
     {
@@ -138,13 +121,8 @@
     {
       "type_name": "AdrVerifyReport",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "blue_count: usize",
-        "red_count: usize",
-        "yellow_count: usize"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AdrFilePortError",

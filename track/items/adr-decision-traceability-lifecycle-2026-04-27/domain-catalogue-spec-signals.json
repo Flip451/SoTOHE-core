@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b3b99409f65fdcfc73ca12414bf432209ad5409fe76bd2b8ec7d65aa2048cbd3",
+  "catalogue_declaration_hash": "fce62f2b8fd11b356fd2fec03ec337377911fcbd8635b97fb5b355e76fd3ca12",
   "signals": [
     {
       "type_name": "AdrFrontMatter",
@@ -12,7 +12,7 @@
     },
     {
       "type_name": "AdrDecisionCommon",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "AdrDecisionCommonError",
@@ -20,27 +20,27 @@
     },
     {
       "type_name": "ProposedDecision",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "AcceptedDecision",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "ImplementedDecision",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "SupersededDecision",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "DeprecatedDecision",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "AdrDecisionEntry",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "DecisionGrounds",
@@ -48,7 +48,7 @@
     },
     {
       "type_name": "evaluate_adr_decision",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "AdrVerifyReport",
@@ -60,7 +60,7 @@
     },
     {
       "type_name": "AdrFilePort",
-      "signal": "yellow"
+      "signal": "blue"
     }
   ]
 }

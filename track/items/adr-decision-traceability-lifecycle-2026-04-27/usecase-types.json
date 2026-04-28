@@ -69,16 +69,10 @@
     },
     {
       "name": "VerifyAdrSignalsInteractor",
-      "description": "Struct implementing the VerifyAdrSignals application service trait. Orchestrates: (1) AdrFilePort::list_adr_paths, (2) AdrFilePort::read_adr_frontmatter per file, (3) domain::adr_decision::evaluate_adr_decision per AdrDecisionEntry in AdrFrontMatter::decisions (pure domain free function — pattern-matches the entry and extracts AdrDecisionCommon grounds fields, returning DecisionGrounds), (4) accumulate into AdrVerifyReport. evaluate_adr_decision is infallible; all AdrDecisionEntry values reaching the interactor are well-formed (codec validates at construction). Follows the existing Interactor naming suffix convention. Holds an AdrFilePort implementation injected at construction.",
+      "description": "Struct implementing the VerifyAdrSignals application service trait. Orchestrates: (1) AdrFilePort::list_adr_paths, (2) AdrFilePort::read_adr_frontmatter per file, (3) domain::adr_decision::evaluate_adr_decision per AdrDecisionEntry in AdrFrontMatter::decisions (pure domain free function — pattern-matches the entry and extracts AdrDecisionCommon grounds fields, returning DecisionGrounds), (4) accumulate into AdrVerifyReport. evaluate_adr_decision is infallible; all AdrDecisionEntry values reaching the interactor are well-formed (codec validates at construction). Follows the existing Interactor naming suffix convention. Holds a private AdrFilePort implementation injected at construction; the port field is private (accessed via new()) so it is excluded from expected_members — only the impl VerifyAdrSignals relationship is verified by the evaluator.",
       "approved": true,
       "kind": "interactor",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "port",
-          "ty": "Arc<dyn AdrFilePort>"
-        }
-      ],
+      "expected_members": [],
       "declares_application_service": [
         "VerifyAdrSignals"
       ],

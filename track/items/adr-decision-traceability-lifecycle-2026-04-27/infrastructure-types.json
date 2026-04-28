@@ -3,7 +3,7 @@
   "type_definitions": [
     {
       "name": "FsAdrFileAdapter",
-      "description": "Filesystem adapter implementing the AdrFilePort secondary port. Walks knowledge/adr/*.md on the real filesystem; reads file contents and calls parse_adr_frontmatter to YAML-parse the string into domain AdrFrontMatter objects. Encapsulates both I/O and parsing so the usecase layer receives domain objects directly (CN-05). Follows the existing Fs-prefix adapter naming convention (FsTrackStore, FsCatalogueLoader, FsCatalogueSpecSignalsStore). Holds only the ADR directory path — parsing is delegated to the parse_adr_frontmatter free function (no codec struct field needed). The CLI match arm for verify adr-signals constructs FsAdrFileAdapter + VerifyAdrSignalsInteractor directly in verify.rs following the established pattern (no interposing composition struct), consistent with all other verify subcommands (TechStack, LatestTrack, ArchDocs, etc.).",
+      "description": "Filesystem adapter implementing the AdrFilePort secondary port. Walks knowledge/adr/*.md on the real filesystem; reads file contents and calls parse_adr_frontmatter to YAML-parse the string into domain AdrFrontMatter objects. Encapsulates both I/O and parsing so the usecase layer receives domain objects directly (CN-05). Follows the existing Fs-prefix adapter naming convention (FsTrackStore, FsCatalogueLoader, FsCatalogueSpecSignalsStore). Holds a private adr_dir: PathBuf field — the ADR directory path is private and accessed only via new(PathBuf) at construction; the schema_export captures only public fields so expected_members is intentionally empty. The CLI match arm for verify adr-signals constructs FsAdrFileAdapter + VerifyAdrSignalsInteractor directly in verify.rs following the established pattern (no interposing composition struct), consistent with all other verify subcommands.",
       "approved": true,
       "kind": "secondary_adapter",
       "implements": [
@@ -32,13 +32,7 @@
           ]
         }
       ],
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "adr_dir",
-          "ty": "PathBuf"
-        }
-      ],
+      "expected_members": [],
       "spec_refs": [
         {
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
@@ -55,17 +49,11 @@
           "anchor": "AC-01",
           "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "CLI composition pattern clarified: verify.rs match arm constructs FsAdrFileAdapter + VerifyAdrSignalsInteractor directly, with no interposing AdrSignalsVerifyAdapter struct. The previously drafted AdrSignalsVerifyAdapter entry had no precedent in the verify module family and has been removed from this catalogue. This note is embedded in FsAdrFileAdapter so the impl-plan reviewer is aware of the wiring pattern."
-        }
       ]
     },
     {
       "name": "parse_adr_frontmatter",
-      "description": "Infrastructure free function that parses the raw content of an ADR Markdown file into a domain AdrFrontMatter value object. Uses the existing parse_yaml_frontmatter utility (infrastructure::verify::frontmatter module) to extract the YAML block, then uses serde_yaml to deserialize into AdrFrontMatterDto. For each AdrDecisionDto, dispatches on status: String to construct the correct domain typestate struct and wraps it in the matching AdrDecisionEntry variant (ProposedDecision | AcceptedDecision | ImplementedDecision | SupersededDecision | DeprecatedDecision). State-specific fields (implemented_in into ImplementedDecision, superseded_by into SupersededDecision) are passed at construction; AdrDecisionCommon is built from shared grounds fields. Status strings that do not match a known variant surface as AdrFrontMatterCodecError::InvalidDecisionField. Enforces explicit-key-presence detection via a serde_yaml::Value intermediate pass before typed DTO deserialization: (a) forbidden-when-key-present — 'implemented_in' key present on any status other than 'implemented' → InvalidDecisionField; 'superseded_by' key present on any status other than 'superseded' → InvalidDecisionField. (b) required-when-value — status 'implemented' requires implemented_in: Some(_), status 'superseded' requires superseded_by: Some(_). serde(deny_unknown_fields) on AdrDecisionDto rejects unknown schema fields. serde derives live in infrastructure, not domain (CN-05). free_function kind: the parsing logic is stateless (no struct state is threaded through; the function takes a string and returns a Result). Precedent: parse_yaml_frontmatter in the same infrastructure::verify::frontmatter module is also a stateless free function. A zero-field codec struct would add no value over a free function here.",
+      "description": "Infrastructure free function that parses the raw content of an ADR Markdown file into a domain AdrFrontMatter value object. Uses the existing parse_yaml_frontmatter utility (infrastructure::verify::frontmatter module) to extract the YAML block, then uses serde_yaml to deserialize into AdrFrontMatterDto. For each AdrDecisionDto, dispatches on status: String to construct the correct domain typestate struct and wraps it in the matching AdrDecisionEntry variant. State-specific fields (implemented_in into ImplementedDecision, superseded_by into SupersededDecision) are passed at construction; AdrDecisionCommon is built from shared grounds fields. Status strings that do not match a known variant surface as AdrFrontMatterCodecError::InvalidDecisionField. Enforces explicit-key-presence detection via a serde_yaml::Value intermediate pass. serde derives live in infrastructure, not domain (CN-05). Stateless free function — the parsing logic takes a string and returns a Result; no struct state is threaded through. Precedent: parse_yaml_frontmatter in the same infrastructure::verify::frontmatter module is also a stateless free function. module_path is infrastructure::adr_decision::parse; expected_returns is ['AdrFrontMatter'] (not ['Result<AdrFrontMatter, AdrFrontMatterCodecError>'] because collect_type_names() in schema_export.rs unwraps Result<T,E> to extract only T).",
       "approved": true,
       "kind": "free_function",
       "module_path": "infrastructure::adr_decision::parse",
@@ -99,16 +87,6 @@
           "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
           "anchor": "AC-03",
           "hash": "b9b42512b3895fe05b4791da3d2aa24fdf6ab07c5207e29435ac02a86ccb1c96"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Redesigned from value_object AdrFrontMatterCodec (zero-field struct) to free_function parse_adr_frontmatter. The existing codebase precedent is parse_yaml_frontmatter in infrastructure::verify::frontmatter — a stateless free function, not a struct. A zero-field parsing struct has no state to protect and stretches value_object semantics (validated value container). free_function kind accurately exposes expected_params / expected_returns in the contract-map. FsAdrFileAdapter no longer holds a codec field — it calls parse_adr_frontmatter directly."
-        },
-        {
-          "kind": "user_directive",
-          "summary": "module_path set to 'infrastructure::adr_decision::parse' because the function is declared in libs/infrastructure/src/adr_decision/parse.rs. The TypeGraph indexes functions by (short_name, module_path) tuple; the baseline key is 'infrastructure::adr_decision::parse::parse_adr_frontmatter'. Without module_path the signal evaluator calls get_function('parse_adr_frontmatter', None) which misses the entry. expected_returns is ['AdrFrontMatter'] (not ['Result<AdrFrontMatter, AdrFrontMatterCodecError>') because collect_type_names() in schema_export.rs unwraps Result<T,E> to extract only T (the Ok type). The signal evaluator's function_signature_matches() compares FunctionNode::returns() (which stores ['AdrFrontMatter']) directly against expected_returns. Storing the full Result<T,E> string as expected_returns would never match."
         }
       ]
     },

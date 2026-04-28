@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "fbbd12408aad638c189f57bcd11c65043dd8dc0603d3c15e146bb383feb34855",
+  "catalogue_declaration_hash": "098214f32b56efdd1a8f938785f6f901b8724edb1175b01118da6cb2e4be3695",
   "signals": [
     {
       "type_name": "FsAdrFileAdapter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "parse_adr_frontmatter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "AdrFrontMatterCodecError",
