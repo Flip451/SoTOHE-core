@@ -565,6 +565,12 @@ case "$BRANCH" in
 esac
 ''']
 
+[tasks.verify-adr-signals-local]
+private = true
+description = "[internal] Verify ADR decision signal grounds across knowledge/adr/ (red_count >= 1 → exit 1) per ADR 2026-04-27-1234 §D1 / AC-01"
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "verify", "adr-signals"]
+
 [tasks.verify-spec-states-current-local]
 private = true
 description = "[internal] Verify current track's spec.json signals in CI interim mode. Yellow surfaces as Finding::warning; only red blocks. Strict enforcement happens at sotp pr wait-and-merge."
@@ -644,7 +650,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -652,7 +658,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -806,6 +812,12 @@ description = "[gate] Verify plan artifact refs + task-coverage integrity (docke
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-plan-artifact-refs-local"]
+
+[tasks.verify-adr-signals]
+description = "[gate] Verify ADR decision signal grounds across knowledge/adr/ (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-adr-signals-local"]
 
 [tasks.ci-rust]
 description = "[gate] Run Rust-only CI checks (docker compose) — inner loop for app developers"

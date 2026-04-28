@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-14-0625-finding-taxonomy-cleanup
+decisions:
+  - id: 2026-04-14-0625-finding-taxonomy-cleanup_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Finding 型 Taxonomy クリーンアップ — 同名衝突の解消と hexagonal 分離の維持
 
 ## Status

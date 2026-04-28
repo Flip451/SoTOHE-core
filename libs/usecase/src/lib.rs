@@ -15,6 +15,7 @@ pub mod task_completion;
 pub mod track_activation;
 pub mod track_phase;
 pub mod track_resolution;
+pub mod verify_adr_signals;
 pub mod worktree_guard;
 
 use std::sync::Arc;

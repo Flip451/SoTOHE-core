@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-23-2130-spec-code-consistency-deferred
+decisions:
+  - id: 2026-03-23-2130-spec-code-consistency-deferred_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # spec ↔ code 整合性チェックは Phase 3 に送る
 
 ## Status

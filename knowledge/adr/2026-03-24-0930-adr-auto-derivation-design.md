@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-24-0930-adr-auto-derivation-design
+decisions:
+  - id: 2026-03-24-0930-adr-auto-derivation-design_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # ADR 自動導出: SSoT ファイルから判断候補を検出する設計
 
 ## Status

@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "VerifyAdrSignals",
+      "description": "Primary port (application service) trait for the verify-adr-signals use case. Driven by the CLI layer from outside. The VerifyAdrSignalsInteractor struct implements this trait. Follows the naming convention established by VerifyCatalogueSpecRefs and RefreshCatalogueSpecSignals in existing usecase clusters.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "verify",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "command",
+              "ty": "VerifyAdrSignalsCommand"
+            }
+          ],
+          "returns": "Result<AdrVerifyReport, VerifyAdrSignalsError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-03",
+          "hash": "de9902961a8189d8d1c095f442b6fe0befda6f08bf0cc35596281cd5331bab4b"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "GO-02",
+          "hash": "948d255f2c35e278d1381aaa09f56fef44fe0fa183fbfcf1ac64dc468e4beeda"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-02",
+          "hash": "2881ca598d2cd0177afebb0365e61dc5caffefde6af8d315f8afa805ded5e828"
+        }
+      ]
+    },
+    {
+      "name": "VerifyAdrSignalsCommand",
+      "description": "CQRS command object carrying the invocation options for verify-adr-signals. Currently has no mandatory fields (the ADR directory path is injected into FsAdrFileAdapter by the CLI composition root at construction time). Kept as a distinct command type for future extensibility (e.g. an --adr-dir override flag). The unit struct signals intent and makes future evolution non-breaking.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    },
+    {
+      "name": "VerifyAdrSignalsInteractor",
+      "description": "Struct implementing the VerifyAdrSignals application service trait. Orchestrates: (1) AdrFilePort::list_adr_paths, (2) AdrFilePort::read_adr_frontmatter per file, (3) domain::adr_decision::evaluate_adr_decision per AdrDecisionEntry in AdrFrontMatter::decisions (pure domain free function — pattern-matches the entry and extracts AdrDecisionCommon grounds fields, returning DecisionGrounds), (4) accumulate into AdrVerifyReport. evaluate_adr_decision is infallible; all AdrDecisionEntry values reaching the interactor are well-formed (codec validates at construction). Follows the existing Interactor naming suffix convention. Holds a private AdrFilePort implementation injected at construction; the port field is private (accessed via new()) so it is excluded from expected_members — only the impl VerifyAdrSignals relationship is verified by the evaluator.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "VerifyAdrSignals"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-07",
+          "hash": "7d227c235c9c4fe09b4abf157b7f2988bf07107a487e2ec8361720228f62cd17"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    },
+    {
+      "name": "VerifyAdrSignalsError",
+      "description": "Error type aggregating all failure modes of the verify-adr-signals use case. AdrFileListing wraps AdrFilePort::list_adr_paths errors (AdrFilePortError::ListPaths); AdrFileRead wraps AdrFilePort::read_adr_frontmatter errors (AdrFilePortError::ReadFile, which subsumes I/O and YAML parse failures absorbed inside the adapter). SignalEval is not a variant: evaluate_adr_decision is infallible (returns DecisionGrounds directly) so there is no error path from the evaluator into the usecase. FrontMatterDecode is not a variant: YAML parsing is fully encapsulated in the infrastructure adapter and surfaces only as AdrFilePortError::ReadFile. Follows existing Error naming pattern (VerifyCatalogueSpecRefsError etc).",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "AdrFileListing",
+        "AdrFileRead"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    }
+  ]
+}

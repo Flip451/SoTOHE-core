@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0060-shell-guard-in-domain
+decisions:
+  - id: 2026-03-11-0060-shell-guard-in-domain_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Shell guard を domain 層に配置 (no trait)
 
 ## Status

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-09-2047-planning-review-phase-separation
+decisions:
+  - id: 2026-04-09-2047-planning-review-phase-separation_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Planning Review Phase Separation (RV2-16)
 
 ## Status

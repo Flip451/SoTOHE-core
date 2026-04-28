@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-25-0353-type-designer-reconnaissance-step
+decisions:
+  - id: 2026-04-25-0353-type-designer-reconnaissance-step_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # type-designer Phase 2 reconnaissance step — 設計開始前に baseline + type-graph で既存型インベントリを把握する
 
 ## Context

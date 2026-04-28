@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-27-0554-doc-reorganization
+decisions:
+  - id: 2026-04-27-0554-doc-reorganization_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # 運用ドキュメント断捨離方針 — SoT 一本化と narrative 重複の解消
 
 ## Context

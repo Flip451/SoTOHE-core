@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-23-2110-sotp-extraction-deferred
+decisions:
+  - id: 2026-03-23-2110-sotp-extraction-deferred_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # sotp CLI 外部ツール化は Moat 後に再評価
 
 ## Status

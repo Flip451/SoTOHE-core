@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-24-1210-planning-only-bypass-scope
+decisions:
+  - id: 2026-03-24-1210-planning-only-bypass-scope_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Planning-only bypass は NotStarted+empty のみ許可
 
 ## Status

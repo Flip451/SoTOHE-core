@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-08-0045-spec-code-consistency-check-design
+decisions:
+  - id: 2026-04-08-0045-spec-code-consistency-check-design_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # 3-12 spec ↔ code 整合性チェック — TypeGraph + 既知課題の解決
 
 ## Status

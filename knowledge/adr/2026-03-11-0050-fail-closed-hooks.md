@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0050-fail-closed-hooks
+decisions:
+  - id: 2026-03-11-0050-fail-closed-hooks_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Fail-closed フック エラーハンドリング
 
 ## Status

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-25-2125-review-json-separation-of-concerns
+decisions:
+  - id: 2026-03-25-2125-review-json-separation-of-concerns_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # FsTrackStore + review.json: 関心事の分離
 
 ## ステータス

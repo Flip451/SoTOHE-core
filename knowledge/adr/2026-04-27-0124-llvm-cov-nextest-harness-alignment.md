@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-27-0124-llvm-cov-nextest-harness-alignment
+decisions:
+  - id: 2026-04-27-0124-llvm-cov-nextest-harness-alignment_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # `cargo make llvm-cov` を nextest 経路に統一する
 
 ## Context

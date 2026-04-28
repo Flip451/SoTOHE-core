@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0080-guard-policy-ban-patterns
+decisions:
+  - id: 2026-03-11-0080-guard-policy-ban-patterns_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Guard policy: ban edge-case-producing patterns
 
 ## Status

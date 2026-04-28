@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-18-1354-review-scope-prompt-injection
+decisions:
+  - id: 2026-04-18-1354-review-scope-prompt-injection_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設
 
 ## Status

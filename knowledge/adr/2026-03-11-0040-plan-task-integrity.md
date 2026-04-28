@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-11-0040-plan-task-integrity
+decisions:
+  - id: 2026-03-11-0040-plan-task-integrity_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Plan-task 参照整合性を構築時に検証
 
 ## Status

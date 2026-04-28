@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-26-0010-tamper-proof-review-verdict
+decisions:
+  - id: 2026-03-26-0010-tamper-proof-review-verdict_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # レビュー verdict 改ざん防止設計
 
 ## ステータス

@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-28T11:53:52Z",
+  "declaration_hash": "098214f32b56efdd1a8f938785f6f901b8724edb1175b01118da6cb2e4be3695",
+  "signals": [
+    {
+      "type_name": "FsAdrFileAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn list_adr_paths(&self) -> Result<Vec<PathBuf>, AdrFilePortError>",
+        "fn read_adr_frontmatter(&self, path: PathBuf) -> Result<AdrFrontMatter, AdrFilePortError>"
+      ]
+    },
+    {
+      "type_name": "parse_adr_frontmatter",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrFrontMatterCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "YamlParse",
+        "MissingAdrId",
+        "InvalidDecisionField"
+      ]
+    }
+  ]
+}

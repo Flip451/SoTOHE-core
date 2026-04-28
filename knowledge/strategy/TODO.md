@@ -488,6 +488,12 @@
   - **由来**: `type-designer-tuning-2026-04-25` で auto-cleanup 仕様の orchestrator 独断密輸が user 指摘で発覚 (WF-67 と同根、user による補完案として浮上)。フォーマット選定 (MD + YAML front-matter) + decision-level status 拡張も同セッション中に user 採用
   - 詳細は memory `feedback_adr_signal_traceability.md`
 
+- [ ] **WF-82** (MEDIUM): type-designer agent pipeline の rendered view 漏れと verify-view-freshness gate の未検知を同時に修復する — `.claude/agents/type-designer.md` の Internal pipeline は `bin/sotp track type-signals` を呼ぶが、`bin/sotp track catalogue-spec-signals` と `bin/sotp make track-sync-views` (= `<layer>-types.md` 再 render) を呼ばない。`<layer>-types.md` は catalogue JSON が変わっても agent 出力時点で stale のまま残るが、`verify-view-freshness` gate も "All checks passed" を返すため CI で検出できない (gate 側の漏れ)。結果として orchestrator が後追いで `cargo make track-sync-views` を主動実行しないと view が SoT JSON とドリフトしたまま commit される構造リスク。
+  - **修復対象**: (1) `.claude/agents/type-designer.md` Internal pipeline に `bin/sotp track catalogue-spec-signals` + `bin/sotp make track-sync-views` 呼び出しを追加 (既存 `project_type_designer_render_followup.md` 提案)。(2) `verify-view-freshness` の対象に `<layer>-types.md` ↔ `<layer>-types.json` (および `<layer>-catalogue-spec-signals.json` 反映分) のドリフト検出を追加し、stale な場合は ERROR で block。(3) `.claude/commands/track/type-design.md:7` の `<layer>-type-signals.md` 言及削除 (`<layer>-types.md` テーブルに Signal 列が既にあり、独立した signal md は不要 / 既存 follow-up memo より)。
+  - **追加日**: 2026-04-28
+  - **由来**: `adr-decision-traceability-lifecycle-2026-04-27` track 実装後 catalogue normalization で type-designer agent に委譲した際、catalogue JSON は更新されたが `<layer>-types.md` 3 ファイルが stale のまま残った。`verify-view-freshness` も pass を返したため気付きにくく、user 指摘で発覚 (2026-04-28 セッション)。既知の `project_type_designer_render_followup.md` (起点 2026-04-27) に gate 側漏れの観測を加えた拡張版
+  - 詳細は memory `project_type_designer_render_followup.md`
+
 ---
 
 ## H. 戦略的提案

@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 //! Domain layer for the SoTOHE-core track state machine.
 
+pub mod adr_decision;
 pub mod auto_phase;
 mod decision;
 mod error;
@@ -24,6 +25,12 @@ mod track;
 pub mod track_phase;
 pub mod verify;
 
+pub use adr_decision::{
+    AcceptedDecision, AdrDecisionCommon, AdrDecisionCommonError, AdrDecisionEntry, AdrFilePort,
+    AdrFilePortError, AdrFrontMatter, AdrFrontMatterError, AdrVerifyReport, DecisionGrounds,
+    DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
+    evaluate_adr_decision,
+};
 pub use decision::Decision;
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-08-1200-remove-agent-router-hook
+decisions:
+  - id: 2026-04-08-1200-remove-agent-router-hook_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # agent-router フックを skill 遵守フックに置換
 
 ## Status

@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-17-1528-tddd-contract-map
+decisions:
+  - id: 2026-04-17-1528-tddd-contract-map_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD Contract Map — 全層カタログを入力とする統合 mermaid view
 
 ## Status

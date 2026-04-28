@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-25-0010-path-normalization-exact-match
+decisions:
+  - id: 2026-03-25-0010-path-normalization-exact-match_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # パス正規化: exact match + fail-closed for unknown paths
 
 ## Status

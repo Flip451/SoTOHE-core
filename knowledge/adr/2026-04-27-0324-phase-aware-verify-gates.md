@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-27-0324-phase-aware-verify-gates
+decisions:
+  - id: 2026-04-27-0324-phase-aware-verify-gates_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # verify チェーンを file 存在ベースの phase 責務分離に揃える
 
 ## Context

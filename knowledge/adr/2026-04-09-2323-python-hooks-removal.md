@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-09-2323-python-hooks-removal
+decisions:
+  - id: 2026-04-09-2323-python-hooks-removal_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Python Hooks Removal (RV2-17)
 
 ## Status

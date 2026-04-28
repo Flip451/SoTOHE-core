@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-24-0900-coverage-not-a-signal
+decisions:
+  - id: 2026-03-24-0900-coverage-not-a-signal_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Coverage は信号機ではなく CI ゲートとする
 
 ## Status

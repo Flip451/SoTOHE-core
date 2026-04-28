@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-28T11:53:51Z",
+  "declaration_hash": "fce62f2b8fd11b356fd2fec03ec337377911fcbd8635b97fb5b355e76fd3ca12",
+  "signals": [
+    {
+      "type_name": "AdrFrontMatter",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrFrontMatterError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyAdrId"
+      ]
+    },
+    {
+      "type_name": "AdrDecisionCommon",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrDecisionCommonError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyId",
+        "EmptyImplementedIn",
+        "EmptySupersededBy"
+      ]
+    },
+    {
+      "type_name": "ProposedDecision",
+      "kind_tag": "typestate",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AcceptedDecision",
+        "DeprecatedDecision",
+        "common: AdrDecisionCommon"
+      ]
+    },
+    {
+      "type_name": "AcceptedDecision",
+      "kind_tag": "typestate",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplementedDecision",
+        "SupersededDecision",
+        "DeprecatedDecision",
+        "common: AdrDecisionCommon"
+      ]
+    },
+    {
+      "type_name": "ImplementedDecision",
+      "kind_tag": "typestate",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SupersededDecision",
+        "DeprecatedDecision",
+        "common: AdrDecisionCommon"
+      ]
+    },
+    {
+      "type_name": "SupersededDecision",
+      "kind_tag": "typestate",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "common: AdrDecisionCommon"
+      ]
+    },
+    {
+      "type_name": "DeprecatedDecision",
+      "kind_tag": "typestate",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "common: AdrDecisionCommon"
+      ]
+    },
+    {
+      "type_name": "AdrDecisionEntry",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AcceptedDecision",
+        "DeprecatedDecision",
+        "ImplementedDecision",
+        "ProposedDecision",
+        "SupersededDecision"
+      ]
+    },
+    {
+      "type_name": "DecisionGrounds",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Grandfathered",
+        "NoGrounds",
+        "ReviewFindingRef",
+        "UserDecisionRef"
+      ]
+    },
+    {
+      "type_name": "evaluate_adr_decision",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrVerifyReport",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrFilePortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ListPaths",
+        "ReadFile"
+      ]
+    },
+    {
+      "type_name": "AdrFilePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn list_adr_paths(&self) -> Result<Vec<PathBuf>, AdrFilePortError>",
+        "fn read_adr_frontmatter(&self, path: PathBuf) -> Result<AdrFrontMatter, AdrFilePortError>"
+      ]
+    }
+  ]
+}

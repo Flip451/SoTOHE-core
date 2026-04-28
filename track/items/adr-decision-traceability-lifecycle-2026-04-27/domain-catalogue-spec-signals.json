@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "fce62f2b8fd11b356fd2fec03ec337377911fcbd8635b97fb5b355e76fd3ca12",
+  "signals": [
+    {
+      "type_name": "AdrFrontMatter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrFrontMatterError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrDecisionCommon",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrDecisionCommonError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ProposedDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AcceptedDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ImplementedDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SupersededDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DeprecatedDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrDecisionEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DecisionGrounds",
+      "signal": "blue"
+    },
+    {
+      "type_name": "evaluate_adr_decision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrVerifyReport",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrFilePortError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrFilePort",
+      "signal": "blue"
+    }
+  ]
+}

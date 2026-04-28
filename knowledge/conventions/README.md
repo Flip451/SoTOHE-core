@@ -71,6 +71,7 @@
 - `shell-parsing.md`: Shell Parsing Convention
 - `source-attribution.md`: Source Attribution Convention
 - `task-completion-flow.md`: Task Completion Flow
+- `type-designer-kind-selection.md`: Type-Designer Kind Selection Convention
 - `typed-deserialization.md`: Typed Deserialization Convention
 - `workflow-ceremony-minimization.md`: Workflow Ceremony Minimization Convention
 <!-- convention-docs:end -->

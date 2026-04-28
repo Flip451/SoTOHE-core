@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
+pub mod adr_decision;
 pub mod agent_profiles;
 pub mod code_profile_builder;
 pub mod gh_cli;

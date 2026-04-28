@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-11-0003-type-action-declarations
+decisions:
+  - id: 2026-04-11-0003-type-action-declarations_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # 型アクション宣言 — add / modify / delete の意図表明 (TDDD-03)
 
 ## Status

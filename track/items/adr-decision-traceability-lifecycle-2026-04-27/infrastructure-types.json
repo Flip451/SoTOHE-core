@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsAdrFileAdapter",
+      "description": "Filesystem adapter implementing the AdrFilePort secondary port. Walks knowledge/adr/*.md on the real filesystem; reads file contents and calls parse_adr_frontmatter to YAML-parse the string into domain AdrFrontMatter objects. Encapsulates both I/O and parsing so the usecase layer receives domain objects directly (CN-05). Follows the existing Fs-prefix adapter naming convention (FsTrackStore, FsCatalogueLoader, FsCatalogueSpecSignalsStore). Holds a private adr_dir: PathBuf field — the ADR directory path is private and accessed only via new(PathBuf) at construction; the schema_export captures only public fields so expected_members is intentionally empty. The CLI match arm for verify adr-signals constructs FsAdrFileAdapter + VerifyAdrSignalsInteractor directly in verify.rs following the established pattern (no interposing composition struct), consistent with all other verify subcommands.",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "AdrFilePort",
+          "expected_methods": [
+            {
+              "name": "list_adr_paths",
+              "receiver": "&self",
+              "params": [],
+              "returns": "Result<Vec<PathBuf>, AdrFilePortError>",
+              "is_async": false
+            },
+            {
+              "name": "read_adr_frontmatter",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "path",
+                  "ty": "PathBuf"
+                }
+              ],
+              "returns": "Result<AdrFrontMatter, AdrFilePortError>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "expected_members": [],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-01",
+          "hash": "db51ef7f9d8b714d281494855c4e8d9a0a01072ebc2472ab014ce8612cac1cf7"
+        }
+      ]
+    },
+    {
+      "name": "parse_adr_frontmatter",
+      "description": "Infrastructure free function that parses the raw content of an ADR Markdown file into a domain AdrFrontMatter value object. Uses the existing parse_yaml_frontmatter utility (infrastructure::verify::frontmatter module) to extract the YAML block, then uses serde_yaml to deserialize into AdrFrontMatterDto. For each AdrDecisionDto, dispatches on status: String to construct the correct domain typestate struct and wraps it in the matching AdrDecisionEntry variant. State-specific fields (implemented_in into ImplementedDecision, superseded_by into SupersededDecision) are passed at construction; AdrDecisionCommon is built from shared grounds fields. Status strings that do not match a known variant surface as AdrFrontMatterCodecError::InvalidDecisionField. Enforces explicit-key-presence detection via a serde_yaml::Value intermediate pass. serde derives live in infrastructure, not domain (CN-05). Stateless free function — the parsing logic takes a string and returns a Result; no struct state is threaded through. Precedent: parse_yaml_frontmatter in the same infrastructure::verify::frontmatter module is also a stateless free function. module_path is infrastructure::adr_decision::parse; expected_returns is ['AdrFrontMatter'] (not ['Result<AdrFrontMatter, AdrFrontMatterCodecError>'] because collect_type_names() in schema_export.rs unwraps Result<T,E> to extract only T).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::adr_decision::parse",
+      "expected_params": [
+        {
+          "name": "content",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "AdrFrontMatter"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "CN-05",
+          "hash": "2fdcf2d94dae68d7c850cbc78732aa894f3172edd760c014a6b38692d9ffcd90"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-03",
+          "hash": "b9b42512b3895fe05b4791da3d2aa24fdf6ab07c5207e29435ac02a86ccb1c96"
+        }
+      ]
+    },
+    {
+      "name": "AdrFrontMatterCodecError",
+      "description": "Error type for YAML front-matter parse failures within parse_adr_frontmatter. YamlParse wraps serde_yaml errors; MissingAdrId covers missing required adr_id field; InvalidDecisionField covers per-decision field validation failures (unknown status string, forbidden-when-key-present violations, required-when-value violations). Infrastructure-layer concern — does not propagate serde types into domain.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "YamlParse",
+        "MissingAdrId",
+        "InvalidDecisionField"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-01",
+          "hash": "bcf6c81ddae7b38b2ef0c07e1fca5d6764754d3af54023c028d3ce324f736718"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "IN-02",
+          "hash": "532b08c25c5ac5c8c3cb04a8fe564d992ee5c18fafe0bd1bd1c082ce5b01f774"
+        },
+        {
+          "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/spec.json",
+          "anchor": "AC-07",
+          "hash": "59f56f89288c7676056131c979e5ad282ea081bc27b1b962ab317d7912d68bef"
+        }
+      ]
+    }
+  ]
+}

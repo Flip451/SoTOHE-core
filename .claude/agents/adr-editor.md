@@ -70,6 +70,47 @@ Opus is chosen because ADR decisions have long-lasting cross-track implications;
 - **Minimal change**: fix only the sections that caused the 🔴 signal. Do not restructure unrelated sections.
 - **Language**: ADR body is in Japanese. Section headers (`## Context`, `## Decision`, etc.) and code identifiers remain in English.
 
+## Front-matter authoring rules
+
+ADR files use a leading YAML front-matter block to encode machine-checkable decision metadata (per ADR `2026-04-27-1234-adr-decision-traceability-lifecycle.md` D1-D3). When this agent writes or modifies an ADR's front-matter, the following rules apply.
+
+### Placement
+
+The front-matter MUST be the very first content in the file — a `---`-delimited block at the top, before the `# <Title>` heading and any other markdown. No blank lines are allowed before the leading `---` (the parser treats the whole file as bodyless when `---` is not at offset 0).
+
+### Schema
+
+The front-matter recognises exactly two top-level keys (`deny_unknown_fields` rejects any others):
+
+- `adr_id` (required, non-empty string): the slug identifier — typically the file name without the `.md` extension (e.g. `2026-04-27-1234-adr-decision-traceability-lifecycle`).
+- `decisions[]` (optional list, defaults to empty when omitted; may be empty for non-ADR README pages but otherwise carries one entry per `### D<n>` decision in the body):
+  - `id` (required, non-empty string): a per-decision identifier such as `D1`, `D2`, …, or — for grandfathered legacy ADRs — `<file-stem>_grandfathered`.
+  - `user_decision_ref` (optional string): a reference to where the user explicitly approved the decision (chat segment ref, approval marker, etc.). Sets the signal to 🔵 Blue (highest priority — wins over `review_finding_ref` if both are set).
+  - `review_finding_ref` (optional string): a reference to a review-process finding that surfaced the decision. Sets the signal to 🟡 Yellow when no `user_decision_ref` is set.
+  - `candidate_selection` (optional string): when the decision selects from multiple candidates evaluated in `## Rejected Alternatives`, encode the choice (e.g. `"from:[A,B,C,D,E] chose:A"`).
+  - `status` (required string): one of `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`. These five values dispatch through `parse_adr_frontmatter` (T003) to the corresponding domain typestate variants `ProposedDecision` / `AcceptedDecision` / `ImplementedDecision` / `SupersededDecision` / `DeprecatedDecision`. Any other value is rejected at parse time.
+  - `superseded_by` (optional string, **required when** `status: superseded`): a reference to the superseding decision (`<adr-slug>.md#<id>` form). Forbidden on any other status (the parser raises `InvalidDecisionField` even if the value is `null`).
+  - `implemented_in` (optional string, **required when** `status: implemented`): a non-empty commit hash or reference identifying where the decision was actualized (e.g. `"abc1234"` or `"track/my-feature@0c0f24c"`). Forbidden on any other status (same key-presence rule as `superseded_by`).
+  - `grandfathered` (optional boolean): when `true`, exempts the decision from the `verify-adr-signals` Red/Yellow signal check (D4 grandfathered exemption). Use only for ADRs predating the front-matter format whose grounds cannot reasonably be reconstructed.
+
+### Grounds requirement
+
+Every `decisions[]` entry MUST satisfy at least one of the following:
+
+1. `user_decision_ref` is set to any non-null value (Blue — the classifier uses presence, not emptiness), or
+2. `review_finding_ref` is set to any non-null value (Yellow — same presence check), or
+3. `grandfathered: true` is set (exempt from the signal check).
+
+A decision with none of the three is evaluated as 🔴 Red and blocks the `cargo make verify-adr-signals` CI gate. Do not write a Red-grounded decision unless the briefing explicitly authorises it.
+
+### Body preservation (CN-01)
+
+When adding front-matter to an ADR that previously had none (back-fill case), the markdown body MUST remain byte-for-byte unchanged. Only the leading `---\n…\n---\n` block is added; no whitespace in the body, no heading shifts, no rewording.
+
+### When new decisions are added to an existing ADR
+
+If an edit creates a new `### D<n>` decision in the body, a corresponding `decisions[]` entry must be added to the front-matter in the same edit. The reverse holds too: a front-matter `decisions[]` entry without a matching body section is a contradiction the reviewer should flag.
+
 ## Output
 
 After editing:

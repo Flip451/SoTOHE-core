@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-08-1800-reverse-signal-integration
+decisions:
+  - id: 2026-04-08-1800-reverse-signal-integration_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD: 逆方向チェック信号機統合 + designer capability
 
 ## Status

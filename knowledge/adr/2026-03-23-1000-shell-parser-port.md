@@ -1,3 +1,10 @@
+---
+adr_id: 2026-03-23-1000-shell-parser-port
+decisions:
+  - id: 2026-03-23-1000-shell-parser-port_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # INF-20: ShellParser port + ConchShellParser adapter
 
 ## Status

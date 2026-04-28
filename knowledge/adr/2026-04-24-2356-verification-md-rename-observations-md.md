@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-24-2356-verification-md-rename-observations-md
+decisions:
+  - id: 2026-04-24-2356-verification-md-rename-observations-md_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # verification.md を observations.md に改名 — 役割を手動観測ログに限定
 
 ## Context

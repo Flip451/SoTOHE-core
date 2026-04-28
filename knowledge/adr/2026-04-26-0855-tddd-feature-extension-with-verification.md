@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-26-0855-tddd-feature-extension-with-verification
+decisions:
+  - id: 2026-04-26-0855-tddd-feature-extension-with-verification_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD カタログ機能拡張と照合可能性の不変条件
 
 ## Context

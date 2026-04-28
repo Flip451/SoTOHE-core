@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-13-1813-tddd-taxonomy-expansion
+decisions:
+  - id: 2026-04-13-1813-tddd-taxonomy-expansion_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # TDDD 型カタログ Taxonomy 拡張 — アプリケーション層パターンの幅を広げる
 
 ## Status

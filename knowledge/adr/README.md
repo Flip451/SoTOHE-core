@@ -1,3 +1,7 @@
+---
+adr_id: adr-readme-index
+decisions: []
+---
 # Architecture Decision Records (ADR)
 
 このディレクトリは設計判断の記録を管理する。
@@ -106,6 +110,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | ADR | Status | Date |
 |-----|--------|------|
 | [ADR 自動導出: SSoT → ADR 候補検出の設計](2026-03-24-0930-adr-auto-derivation-design.md) | Accepted (設計のみ) | 2026-03-24 |
+| [ADR decision の根拠 trace 信号機評価 + 個別 lifecycle 管理](2026-04-27-1234-adr-decision-traceability-lifecycle.md) | — | 2026-04-27 |
 
 ### ドキュメント運用
 

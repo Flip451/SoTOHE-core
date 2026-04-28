@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-12-1200-strict-spec-signal-gate-v2
+decisions:
+  - id: 2026-04-12-1200-strict-spec-signal-gate-v2_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Strict Spec Signal Gate v2 — Yellow がマージをブロックする (fail-closed)
 
 ## Status

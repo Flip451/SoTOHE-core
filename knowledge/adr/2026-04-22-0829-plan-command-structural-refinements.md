@@ -1,3 +1,10 @@
+---
+adr_id: 2026-04-22-0829-plan-command-structural-refinements
+decisions:
+  - id: 2026-04-22-0829-plan-command-structural-refinements_grandfathered
+    status: accepted
+    grandfathered: true
+---
 # Phase command 共通構造 + subagent 内部 pipeline 決定
 
 ## Context
