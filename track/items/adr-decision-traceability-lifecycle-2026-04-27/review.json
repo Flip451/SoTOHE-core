@@ -1,46 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
-          "at": "2026-04-28T09:26:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
-          "at": "2026-04-28T09:28:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The entry says stale `<layer>-types.md` can be committed unless the orchestrator manually runs `cargo make track-sync-views`, but the commit path already refreshes and stages rendered views in pre-commit (`apps/cli/src/commands/make.rs:681-703`). So the stated commit-risk is not factual; this is a working-tree freshness gap, not a committed-state drift risk.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 491,
-              "category": "internal_consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:e6041245bb898543cc3e249ef1353ba1026985e75021b4e903e615be3c7c7ba9",
-          "at": "2026-04-28T11:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e6041245bb898543cc3e249ef1353ba1026985e75021b4e903e615be3c7c7ba9",
-          "at": "2026-04-28T11:08:07Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -1580,6 +1540,20 @@
           "findings": [],
           "hash": "rvw1:sha256:88e7fe06f8209bbc7e1d52f9f5e4aae8230b184082073060b254384938324064",
           "at": "2026-04-28T11:51:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f71a1f5028a5b8677602a170ade8b662dfc4164430d9ce9cb5a26b0d78a5c85",
+          "at": "2026-04-28T11:55:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f71a1f5028a5b8677602a170ade8b662dfc4164430d9ce9cb5a26b0d78a5c85",
+          "at": "2026-04-28T11:55:59Z"
         }
       ]
     },
@@ -1612,6 +1586,38 @@
           "findings": [],
           "hash": "rvw1:sha256:1698532195911e59f1ce2aab0f46a2c4fdaf3f980ad6ab5724092249f6b80787",
           "at": "2026-04-28T11:50:41Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
+          "at": "2026-04-28T08:51:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
+          "at": "2026-04-28T08:54:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70edb6afaf1bf7ebdb73c84b93e36d885f620caccc1e9847a0c63020077fc304",
+          "at": "2026-04-28T11:50:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70edb6afaf1bf7ebdb73c84b93e36d885f620caccc1e9847a0c63020077fc304",
+          "at": "2026-04-28T11:53:06Z"
         }
       ]
     },
@@ -1789,38 +1795,6 @@
           "findings": [],
           "hash": "rvw1:sha256:5f16d38ce5c75340d30bcba5327822d237463528810b876fdc99a28c4fce5ffe",
           "at": "2026-04-28T11:50:40Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
-          "at": "2026-04-28T08:51:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3911a22532a536bdb43d6745b21789bed1275becff1d023a41a231a275bbbb31",
-          "at": "2026-04-28T08:54:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70edb6afaf1bf7ebdb73c84b93e36d885f620caccc1e9847a0c63020077fc304",
-          "at": "2026-04-28T11:50:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70edb6afaf1bf7ebdb73c84b93e36d885f620caccc1e9847a0c63020077fc304",
-          "at": "2026-04-28T11:53:06Z"
         }
       ]
     },
@@ -2443,6 +2417,46 @@
           "findings": [],
           "hash": "rvw1:sha256:fbbfdf2c338465b2971966c9501ffc46d3ea890593241818df447e138f0a736c",
           "at": "2026-04-28T10:23:57Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
+          "at": "2026-04-28T09:26:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89c48de6d46928741db891859b5b3c32bcafb678ab27787db6f098bef78788da",
+          "at": "2026-04-28T09:28:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The entry says stale `<layer>-types.md` can be committed unless the orchestrator manually runs `cargo make track-sync-views`, but the commit path already refreshes and stages rendered views in pre-commit (`apps/cli/src/commands/make.rs:681-703`). So the stated commit-risk is not factual; this is a working-tree freshness gap, not a committed-state drift risk.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 491,
+              "category": "internal_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e6041245bb898543cc3e249ef1353ba1026985e75021b4e903e615be3c7c7ba9",
+          "at": "2026-04-28T11:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6041245bb898543cc3e249ef1353ba1026985e75021b4e903e615be3c7c7ba9",
+          "at": "2026-04-28T11:08:07Z"
         }
       ]
     }

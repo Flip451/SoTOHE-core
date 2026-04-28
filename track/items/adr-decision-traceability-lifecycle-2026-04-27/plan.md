@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # ADR decision の根拠 trace 信号機評価 + 個別 lifecycle 管理
 
-## Tasks (11/12 resolved)
+## Tasks (12/12 resolved)
 
 ### S1 — Domain Layer — Typestate Cluster + Enum Wrapper + Grounds Types (T001)
 
@@ -84,4 +84,4 @@
 > verify-adr-signals が本 ADR (AC-02 / AC-03) と既存 ADR (AC-04) で正しく評価されることを確認する。
 > 失敗した gate があれば同タスク内で修正する。
 
-- [~] **T012**: end-to-end CI gate を確認する。T007-T011 完了後に cargo make ci を実行し、全 gate (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* + verify-adr-signals) が pass することを確認する (AC-08)。verify-adr-signals: 本 ADR (T008) が 🔵 または 🟡 で評価され、既存 ADR (T009) が grandfathered によりスキップされて exit 0 になることを確認する (AC-02)。もし追加の failing test / clippy warning が発生した場合は同タスク内で修正する。
+- [x] **T012**: end-to-end CI gate を確認する。T007-T011 完了後に cargo make ci を実行し、全 gate (fmt-check + clippy + nextest + test-doc + deny + check-layers + verify-* + verify-adr-signals) が pass することを確認する (AC-08)。verify-adr-signals: 本 ADR (T008) が 🔵 または 🟡 で評価され、既存 ADR (T009) が grandfathered によりスキップされて exit 0 になることを確認する (AC-02)。もし追加の failing test / clippy warning が発生した場合は同タスク内で修正する。 (`4dc3aeceebb5ded6725fca7a4701119291d7aee0`)
