@@ -79,6 +79,12 @@ pub enum VerifyCommand {
     /// → warning. ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
     /// §D4.1.
     CatalogueSpecSignals(CatalogueSpecSignalsArgs),
+
+    /// Verify ADR decision signal grounds across `knowledge/adr/`
+    /// (SoT Chain ADR-internal binary gate): `red_count >= 1` → exit 1
+    /// with a stderr summary; `red_count == 0` → exit 0. ADR
+    /// `2026-04-27-1234-adr-decision-traceability-lifecycle.md` §D1 / AC-01.
+    AdrSignals(VerifyArgs),
 }
 
 /// Arguments for `catalogue-spec-signals` verify subcommand.
@@ -149,6 +155,7 @@ pub struct VerifyArgs {
     project_root: PathBuf,
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn execute(cmd: VerifyCommand) -> ExitCode {
     let (label, outcome) = match cmd {
         VerifyCommand::TechStack(args) => (
@@ -254,6 +261,9 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         }
         VerifyCommand::CatalogueSpecSignals(args) => {
             ("verify catalogue-spec signals", execute_catalogue_spec_signals_check(args))
+        }
+        VerifyCommand::AdrSignals(args) => {
+            ("verify adr signals", execute_verify_adr_signals(&args.project_root))
         }
     };
 
@@ -921,6 +931,60 @@ fn execute_catalogue_spec_signals(
         }
     }
     outcome
+}
+
+/// Execute the `verify adr-signals` subcommand.
+///
+/// Composes [`infrastructure::adr_decision::FsAdrFileAdapter`] with
+/// [`usecase::verify_adr_signals::VerifyAdrSignalsInteractor`] at the
+/// composition root, runs the verification, and translates the resulting
+/// [`domain::AdrVerifyReport`] into a [`VerifyOutcome`]:
+///
+/// - `red_count >= 1` → error finding (drives exit 1) plus a stderr summary
+///   per AC-01 (`stderr にエラーメッセージ (red_count 含む集計)`).
+/// - `yellow_count >= 1` (no red) → warning finding (still exit 0).
+/// - all blue (or empty directory) → info finding (exit 0).
+fn execute_verify_adr_signals(project_root: &std::path::Path) -> VerifyOutcome {
+    use std::sync::Arc;
+
+    use domain::AdrFilePort;
+    use domain::verify::{Severity, VerifyFinding};
+    use infrastructure::adr_decision::FsAdrFileAdapter;
+    use usecase::verify_adr_signals::{
+        VerifyAdrSignals, VerifyAdrSignalsCommand, VerifyAdrSignalsInteractor,
+    };
+
+    let adr_dir = project_root.join("knowledge/adr");
+    let adapter = FsAdrFileAdapter::new(adr_dir);
+    let port: Arc<dyn AdrFilePort> = Arc::new(adapter);
+    let interactor = VerifyAdrSignalsInteractor::new(port);
+
+    let report = match interactor.verify(VerifyAdrSignalsCommand) {
+        Ok(r) => r,
+        Err(e) => {
+            let msg = format!("verify-adr-signals failed: {e}");
+            eprintln!("{msg}");
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(msg)]);
+        }
+    };
+
+    let summary = format!(
+        "ADR signal counts: blue={} yellow={} red={}",
+        report.blue_count(),
+        report.yellow_count(),
+        report.red_count(),
+    );
+
+    if report.red_count() >= 1 {
+        eprintln!("[verify-adr-signals] {summary} (red_count >= 1 → CI block)");
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(summary)]);
+    }
+
+    if report.yellow_count() >= 1 {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(summary)]);
+    }
+
+    VerifyOutcome::from_findings(vec![VerifyFinding::new(Severity::Info, summary)])
 }
 
 /// Combine architecture_rules + doc_patterns + convention_docs checks.
@@ -1901,6 +1965,71 @@ mod tests {
         assert!(
             outcome.has_errors(),
             "missing architecture-rules.json must produce an error finding: {outcome:?}"
+        );
+    }
+
+    // ── verify adr-signals (T006 / AC-01) ──────────────────────────────────
+
+    /// Set up a project root with the given ADR fixture files written under
+    /// `<root>/knowledge/adr/`. Each fixture is `(filename, content)`.
+    fn setup_adr_project(root: &std::path::Path, fixtures: &[(&str, &str)]) {
+        let adr_dir = root.join("knowledge/adr");
+        std::fs::create_dir_all(&adr_dir).unwrap();
+        for (name, body) in fixtures {
+            std::fs::write(adr_dir.join(name), body).unwrap();
+        }
+    }
+
+    fn fixture_blue_proposed() -> &'static str {
+        "---\nadr_id: 2026-01-01-blue\ndecisions:\n  - id: D1\n    status: proposed\n    user_decision_ref: chat:test-blue\n---\n# body\n"
+    }
+
+    fn fixture_red_proposed() -> &'static str {
+        "---\nadr_id: 2026-01-99-red\ndecisions:\n  - id: D1\n    status: proposed\n---\n# body\n"
+    }
+
+    #[test]
+    fn test_adr_signals_with_only_blue_decisions_passes() {
+        let tmp = TempDir::new().unwrap();
+        setup_adr_project(tmp.path(), &[("blue.md", fixture_blue_proposed())]);
+
+        let outcome = execute_verify_adr_signals(tmp.path());
+        assert!(
+            !outcome.has_errors(),
+            "all-Blue project must not produce an error finding: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_adr_signals_with_red_decision_yields_error_finding() {
+        let tmp = TempDir::new().unwrap();
+        setup_adr_project(
+            tmp.path(),
+            &[("blue.md", fixture_blue_proposed()), ("red.md", fixture_red_proposed())],
+        );
+
+        let outcome = execute_verify_adr_signals(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "project with a Red decision must produce an error finding (drives exit 1 per AC-01): {:?}",
+            outcome.findings()
+        );
+        let msg = outcome.findings()[0].message();
+        assert!(
+            msg.contains("red=1"),
+            "error finding must include the red count summary, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn test_adr_signals_propagates_listing_error_when_dir_missing() {
+        let tmp = TempDir::new().unwrap();
+        // Do not create knowledge/adr/ — list_adr_paths must fail.
+        let outcome = execute_verify_adr_signals(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "missing knowledge/adr/ must produce an error finding (port listing failure)"
         );
     }
 }
