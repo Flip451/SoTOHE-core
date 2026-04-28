@@ -1,6 +1,263 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:14:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
+          "at": "2026-04-28T15:17:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a9aacd12d3c75e051249a12fc69c58de3484a6f4c3e8ed0ad0234c22b9180ef",
+          "at": "2026-04-28T15:57:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/**` is still described as containing an `external policy`, but the external guide policy/registry directory has been removed in this change. This leaves an active onboarding instruction pointing users at a deleted policy area, which is the same stale-reference class this cleanup is meant to eliminate.",
+              "severity": "P1",
+              "file": "START_HERE_HUMAN.md",
+              "line": 40,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:5a9aacd12d3c75e051249a12fc69c58de3484a6f4c3e8ed0ad0234c22b9180ef",
+          "at": "2026-04-28T15:59:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca233c3c0b642bc21037bc09887a27c0dc08fac125a352f297ad99e409128bfa",
+          "at": "2026-04-28T16:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca233c3c0b642bc21037bc09887a27c0dc08fac125a352f297ad99e409128bfa",
+          "at": "2026-04-28T16:01:21Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:31:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`'s package-import smoke test: the subprocess still imports `scripts.external_guides`, so this test will start failing with `ModuleNotFoundError` unless T002 removes or rewrites it.",
+              "severity": "P1",
+              "file": "scripts/test_track_resolution.py",
+              "line": 47,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:33:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`, which still spawns `import scripts.track_resolution, scripts.external_guides` in its package-style import smoke test. That subprocess will now fail with `ImportError`, so this deletion leaves a remaining `scripts/` test broken.",
+              "severity": "P1",
+              "file": "scripts/test_track_resolution.py",
+              "line": 47,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:35:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `knowledge/external/guides.json` strands the Rust `UserPromptSubmit` hook in `apps/cli/src/commands/hook.rs:320-328`, which still loads that path through `guides_codec` and silently falls back to an empty guide set on any load failure. That is a live caller outside the T002/T003 deferrals, so the deletion set is incomplete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/hook.rs",
+              "line": 320,
+              "category": "stranded-caller"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:38:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:39:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:40:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:42:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
+          "at": "2026-04-28T14:48:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
+          "at": "2026-04-28T15:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
+          "at": "2026-04-28T15:02:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4beb06ba3bd36cba4a1070f1defa87989ade99dd60af3351131531b127f2783e",
+          "at": "2026-04-28T15:15:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stale external-guides instruction remains: the task workflow still tells users to use `外部ガイド要約` during debugging, but this round is removing the external guide auto-injection/reference path. This leaves a contradictory reference to the deleted feature in the `other` docs scope.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 49,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:4beb06ba3bd36cba4a1070f1defa87989ade99dd60af3351131531b127f2783e",
+          "at": "2026-04-28T15:16:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the `/track:*` auto-injection note is inconsistent with the current runtime path: `apps/cli/src/commands/hook.rs` still loads `knowledge/external/guides.json` for prompts containing `/track:`, and `libs/domain/src/skill_compliance/mod.rs` still matches `trigger_keywords` and renders the matched guide summaries into `additionalContext`. This doc change would misstate the workflow behavior.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 65,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
+          "at": "2026-04-28T15:20:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
+          "at": "2026-04-28T15:22:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/workflow.md` still states that the current track resolution implementation lives in `scripts/track_resolution.py::resolve_track_dir()`, but `scripts/track_resolution.py` is no longer present after the T002 cleanup. This leaves a broken reference in the top-level workflow doc; the reference should be removed or updated to the Rust implementation.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 219,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
+          "at": "2026-04-28T15:23:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeff896d9dc51894dbc0a7d33007c0f9712aedac5b78fe7c99c7f3bc421a0c03",
+          "at": "2026-04-28T15:25:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeff896d9dc51894dbc0a7d33007c0f9712aedac5b78fe7c99c7f3bc421a0c03",
+          "at": "2026-04-28T15:25:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e25e1cb75564be0c4a1ad140b5c54ca43808e2b811a32c5e404aad3c23c93eef",
+          "at": "2026-04-28T15:56:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e25e1cb75564be0c4a1ad140b5c54ca43808e2b811a32c5e404aad3c23c93eef",
+          "at": "2026-04-28T15:57:24Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
+          "at": "2026-04-28T15:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
+          "at": "2026-04-28T15:16:48Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -232,213 +489,6 @@
           "findings": [],
           "hash": "rvw1:sha256:c63ba34c5365cad4f6d39c800089c772613faaa0df64325d9695b38994074415",
           "at": "2026-04-28T15:41:39Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
-          "at": "2026-04-28T15:14:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9704c946f258b223481f12ac320fd324d56e95c198adef4d269753fd1686f82",
-          "at": "2026-04-28T15:16:48Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
-          "at": "2026-04-28T15:14:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39f66ea235d46e8dbd9dc520e8a81c8fe5854d7cf7f29e7b043c4722a3fb7f7f",
-          "at": "2026-04-28T15:17:02Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:31:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`'s package-import smoke test: the subprocess still imports `scripts.external_guides`, so this test will start failing with `ModuleNotFoundError` unless T002 removes or rewrites it.",
-              "severity": "P1",
-              "file": "scripts/test_track_resolution.py",
-              "line": 47,
-              "category": "stranded-caller"
-            }
-          ],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:33:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `scripts/external_guides.py` strands `scripts/test_track_resolution.py`, which still spawns `import scripts.track_resolution, scripts.external_guides` in its package-style import smoke test. That subprocess will now fail with `ImportError`, so this deletion leaves a remaining `scripts/` test broken.",
-              "severity": "P1",
-              "file": "scripts/test_track_resolution.py",
-              "line": 47,
-              "category": "stranded-caller"
-            }
-          ],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:35:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `knowledge/external/guides.json` strands the Rust `UserPromptSubmit` hook in `apps/cli/src/commands/hook.rs:320-328`, which still loads that path through `guides_codec` and silently falls back to an empty guide set on any load failure. That is a live caller outside the T002/T003 deferrals, so the deletion set is incomplete.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/hook.rs",
-              "line": 320,
-              "category": "stranded-caller"
-            }
-          ],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:38:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:39:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:40:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:42:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4eb705f4ea7f91dd9d1cc7b786c2fd66c7326d186331cf744a404caa947894fc",
-          "at": "2026-04-28T14:48:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
-          "at": "2026-04-28T15:00:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ed6a8abd992534e87ca328325f206467f6d8ec3538278793678d10afc73c2ad",
-          "at": "2026-04-28T15:02:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4beb06ba3bd36cba4a1070f1defa87989ade99dd60af3351131531b127f2783e",
-          "at": "2026-04-28T15:15:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Stale external-guides instruction remains: the task workflow still tells users to use `外部ガイド要約` during debugging, but this round is removing the external guide auto-injection/reference path. This leaves a contradictory reference to the deleted feature in the `other` docs scope.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 49,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:4beb06ba3bd36cba4a1070f1defa87989ade99dd60af3351131531b127f2783e",
-          "at": "2026-04-28T15:16:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing the `/track:*` auto-injection note is inconsistent with the current runtime path: `apps/cli/src/commands/hook.rs` still loads `knowledge/external/guides.json` for prompts containing `/track:`, and `libs/domain/src/skill_compliance/mod.rs` still matches `trigger_keywords` and renders the matched guide summaries into `additionalContext`. This doc change would misstate the workflow behavior.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 65,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
-          "at": "2026-04-28T15:20:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
-          "at": "2026-04-28T15:22:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/workflow.md` still states that the current track resolution implementation lives in `scripts/track_resolution.py::resolve_track_dir()`, but `scripts/track_resolution.py` is no longer present after the T002 cleanup. This leaves a broken reference in the top-level workflow doc; the reference should be removed or updated to the Rust implementation.",
-              "severity": "P1",
-              "file": "track/workflow.md",
-              "line": 219,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:91ac99059a5ba5b7e61c15075e8fa6597123ea37935bcfcd19be85efafe654d1",
-          "at": "2026-04-28T15:23:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aeff896d9dc51894dbc0a7d33007c0f9712aedac5b78fe7c99c7f3bc421a0c03",
-          "at": "2026-04-28T15:25:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aeff896d9dc51894dbc0a7d33007c0f9712aedac5b78fe7c99c7f3bc421a0c03",
-          "at": "2026-04-28T15:25:46Z"
         }
       ]
     }

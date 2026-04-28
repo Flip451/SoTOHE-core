@@ -177,7 +177,7 @@ def build_template(title: str, summary: str | None) -> str:
         "## Review Checklist\n\n"
         "- `TODO:` レビュー時に確認する観点を書く\n\n"
         "## Related Documents\n\n"
-        "- `TODO:` 関連する spec / plan / external guide / rule を書く\n"
+        "- `TODO:` 関連する spec / plan / rule を書く\n"
     )
 
 
