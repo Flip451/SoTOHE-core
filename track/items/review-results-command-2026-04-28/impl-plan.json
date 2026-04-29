@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "Implement ReviewExistsPort on FsReviewStore in the infrastructure layer. Depends on: T001. (1) Add impl ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs. The review_json_exists method uses std::fs::metadata(&self.path): if Ok(_) returns Ok(true); if Err with ErrorKind::NotFound returns Ok(false); otherwise returns Err(ReviewReaderError::...). This distinguishes genuine absence from I/O errors such as permission denied. (2) Add ReviewExistsPort to the imports. (3) Add unit/integration tests covering: file exists -> Ok(true), file absent -> Ok(false), unexpected I/O error (mocked or simulated) -> Err. (4) Confirm cargo make check-layers passes (no hexagonal violation). Catalogue refs: infrastructure-types.json#FsReviewStore. Spec refs: IN-07, AC-12, CN-04.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "84ac3829501212134e8502fe7decfae24c4263aa"
     },
     {
       "id": "T003",
       "description": "Add evaluate_approval method to ReviewCycle in the usecase layer. Depends on: T001. (1) Add evaluate_approval(reader: &impl ReviewReader, review_json_exists: bool) -> Result<ReviewApprovalVerdict, ReviewCycleError> to ReviewCycle in libs/usecase/src/review_v2/cycle.rs. Implementation: call get_review_states(reader) to get current scope states; collect Required(*) scopes; classify into: Approved (required.is_empty()), ApprovedWithBypass { not_started_count } (all Required scopes are Required(NotStarted) AND !review_json_exists; not_started_count = required.len()), or Blocked { required_scopes } (otherwise). (2) Import ReviewApprovalVerdict from domain. (3) Add unit tests in libs/usecase/src/review_v2/tests.rs covering: all NotRequired -> Approved (regardless of review_json_exists), all Required(NotStarted) + review_json_exists=false -> ApprovedWithBypass{N}, all Required(NotStarted) + review_json_exists=true -> Blocked, some Required(FindingsRemain) -> Blocked. Use mockall for ReviewReader. Catalogue refs: usecase-types.json#ReviewCycle. Spec refs: IN-05, AC-09, AC-11, CN-04.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",

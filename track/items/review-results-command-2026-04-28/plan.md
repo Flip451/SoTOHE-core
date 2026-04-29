@@ -11,7 +11,7 @@ T006 (status deletion) depends on T005; deleting status before results is in pla
 T007 (doc cleanup) depends on T006; searching for status references after the CLI deletion ensures no false survivors.
 T008 (CI gate) is the final verification task and depends on all prior tasks.
 
-## Tasks (1/8 resolved)
+## Tasks (2/8 resolved)
 
 ### S001 — Domain Layer: ReviewApprovalVerdict + ReviewExistsPort (T001)
 
@@ -28,7 +28,7 @@ T008 (CI gate) is the final verification task and depends on all prior tasks.
 > Returns Result<bool, ReviewReaderError>: Ok(true) = exists, Ok(false) = not found, Err = unexpected I/O error. Distinguishes genuine absence from permission errors.
 > check-layers gate must pass: ReviewExistsPort is consumed by usecase via composition root, not by usecase calling infra directly.
 
-- [~] **T002**: Implement ReviewExistsPort on FsReviewStore in the infrastructure layer. Depends on: T001. (1) Add impl ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs. The review_json_exists method uses std::fs::metadata(&self.path): if Ok(_) returns Ok(true); if Err with ErrorKind::NotFound returns Ok(false); otherwise returns Err(ReviewReaderError::...). This distinguishes genuine absence from I/O errors such as permission denied. (2) Add ReviewExistsPort to the imports. (3) Add unit/integration tests covering: file exists -> Ok(true), file absent -> Ok(false), unexpected I/O error (mocked or simulated) -> Err. (4) Confirm cargo make check-layers passes (no hexagonal violation). Catalogue refs: infrastructure-types.json#FsReviewStore. Spec refs: IN-07, AC-12, CN-04.
+- [x] **T002**: Implement ReviewExistsPort on FsReviewStore in the infrastructure layer. Depends on: T001. (1) Add impl ReviewExistsPort for FsReviewStore in libs/infrastructure/src/review_v2/persistence/review_store.rs. The review_json_exists method uses std::fs::metadata(&self.path): if Ok(_) returns Ok(true); if Err with ErrorKind::NotFound returns Ok(false); otherwise returns Err(ReviewReaderError::...). This distinguishes genuine absence from I/O errors such as permission denied. (2) Add ReviewExistsPort to the imports. (3) Add unit/integration tests covering: file exists -> Ok(true), file absent -> Ok(false), unexpected I/O error (mocked or simulated) -> Err. (4) Confirm cargo make check-layers passes (no hexagonal violation). Catalogue refs: infrastructure-types.json#FsReviewStore. Spec refs: IN-07, AC-12, CN-04. (`84ac3829501212134e8502fe7decfae24c4263aa`)
 
 ### S003 — Usecase Layer: ReviewCycle::evaluate_approval (T003)
 
@@ -36,7 +36,7 @@ T008 (CI gate) is the final verification task and depends on all prior tasks.
 > Lifts all approval/bypass judgment from CLI layer; CLI check-approved and CLI results hint both consume this single usecase method.
 > review_json_exists bool is resolved by the CLI composition root via ReviewExistsPort before calling evaluate_approval, keeping usecase free of filesystem I/O (CN-04).
 
-- [ ] **T003**: Add evaluate_approval method to ReviewCycle in the usecase layer. Depends on: T001. (1) Add evaluate_approval(reader: &impl ReviewReader, review_json_exists: bool) -> Result<ReviewApprovalVerdict, ReviewCycleError> to ReviewCycle in libs/usecase/src/review_v2/cycle.rs. Implementation: call get_review_states(reader) to get current scope states; collect Required(*) scopes; classify into: Approved (required.is_empty()), ApprovedWithBypass { not_started_count } (all Required scopes are Required(NotStarted) AND !review_json_exists; not_started_count = required.len()), or Blocked { required_scopes } (otherwise). (2) Import ReviewApprovalVerdict from domain. (3) Add unit tests in libs/usecase/src/review_v2/tests.rs covering: all NotRequired -> Approved (regardless of review_json_exists), all Required(NotStarted) + review_json_exists=false -> ApprovedWithBypass{N}, all Required(NotStarted) + review_json_exists=true -> Blocked, some Required(FindingsRemain) -> Blocked. Use mockall for ReviewReader. Catalogue refs: usecase-types.json#ReviewCycle. Spec refs: IN-05, AC-09, AC-11, CN-04.
+- [~] **T003**: Add evaluate_approval method to ReviewCycle in the usecase layer. Depends on: T001. (1) Add evaluate_approval(reader: &impl ReviewReader, review_json_exists: bool) -> Result<ReviewApprovalVerdict, ReviewCycleError> to ReviewCycle in libs/usecase/src/review_v2/cycle.rs. Implementation: call get_review_states(reader) to get current scope states; collect Required(*) scopes; classify into: Approved (required.is_empty()), ApprovedWithBypass { not_started_count } (all Required scopes are Required(NotStarted) AND !review_json_exists; not_started_count = required.len()), or Blocked { required_scopes } (otherwise). (2) Import ReviewApprovalVerdict from domain. (3) Add unit tests in libs/usecase/src/review_v2/tests.rs covering: all NotRequired -> Approved (regardless of review_json_exists), all Required(NotStarted) + review_json_exists=false -> ApprovedWithBypass{N}, all Required(NotStarted) + review_json_exists=true -> Blocked, some Required(FindingsRemain) -> Blocked. Use mockall for ReviewReader. Catalogue refs: usecase-types.json#ReviewCycle. Spec refs: IN-05, AC-09, AC-11, CN-04.
 
 ### S004 — CLI: run_check_approved Refactor to Usecase Delegation (T004)
 
