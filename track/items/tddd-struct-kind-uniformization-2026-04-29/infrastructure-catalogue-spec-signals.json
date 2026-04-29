@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3cf7b4864b8569dd8d810084050252a4c46659de47bf2db480d547eff50bf505",
+  "signals": [
+    {
+      "type_name": "TypeDefinitionKindDto",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "signal": "blue"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "7aa1748cff6c30ffc8d275c2887812c70fbb3f81bda236081e06fb7976b62f6c",
+  "signals": [
+    {
+      "type_name": "TypeDefinitionKind",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinterRule",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinterRuleError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLintViolation",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinterError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinter",
+      "signal": "blue"
+    }
+  ]
+}

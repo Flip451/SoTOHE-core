@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TypeDefinitionKind",
+      "description": "M1+S1: Pre-existing domain enum. M1 adds expected_methods: Vec<MethodDeclaration> to all 9 struct-based variants (Typestate, ValueObject, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter). S1 adds new DomainService variant with both expected_members and expected_methods. After this track the enum has 15 variants total (was 14). TypeGraph/baseline schema is unchanged per CN-07 because TypeNode::members and TypeNode::methods already exist.",
+      "approved": true,
+      "action": "modify",
+      "kind": "enum",
+      "expected_variants": [
+        "Typestate",
+        "Enum",
+        "ValueObject",
+        "ErrorType",
+        "SecondaryPort",
+        "ApplicationService",
+        "UseCase",
+        "Interactor",
+        "Dto",
+        "Command",
+        "Query",
+        "Factory",
+        "SecondaryAdapter",
+        "FreeFunction",
+        "DomainService"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-01",
+          "hash": "53a017ee8d8c67904faf9a8748bb9b2f54c434d9eeec64cf43fd2a5bee08de3a"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-02",
+          "hash": "e30c00a7e21566c167588cd3b0809e1b4480df07e892ced39f9946041462f47a"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-07",
+          "hash": "6a4344c6a283c5667fc24a32d1ed3e328114e3c9b300f32f81c971bb9d5a0a46"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "919443244e9f6762bd99aa3f449162983c1c989a7cedca9a94ae3f3df19b6a46"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLinterRuleKind",
+      "description": "S3: New domain enum — discriminator for the 3 primitive linter rule kinds. FieldEmpty enforces that a specified field on a specified kind is an empty collection. FieldNonEmpty enforces that a specified field is non-empty. KindLayerConstraint enforces that a kind is only declared in permitted layers. Used as the tag in CatalogueLinterRule and reported in CatalogueLintViolation.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "FieldEmpty",
+        "FieldNonEmpty",
+        "KindLayerConstraint"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLinterRule",
+      "description": "S3: New domain value object — a single linter rule primitive. Carries rule_kind (CatalogueLinterRuleKind), the target kind tag string (e.g. 'value_object'), the target field name (e.g. 'expected_methods'), and optionally a set of permitted layer ids (for KindLayerConstraint). Constructed via a validating constructor that rejects empty target_kind strings, empty field names on FieldEmpty/FieldNonEmpty rules, and empty permitted_layers on KindLayerConstraint rules. No serde in domain layer.",
+      "approved": true,
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "rule_kind",
+          "ty": "CatalogueLinterRuleKind"
+        },
+        {
+          "kind": "field",
+          "name": "target_kind",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "target_field",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "permitted_layers",
+          "ty": "Vec<String>"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "CN-06",
+          "hash": "c7ca56391d351897b23d571e0eef32363f245e45cb06fcc640f18d3e8de0dd6d"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLinterRuleError",
+      "description": "S3: New domain error type — validation error for CatalogueLinterRule construction. EmptyTargetKind rejects blank kind tag strings. EmptyTargetField rejects blank field name strings on FieldEmpty/FieldNonEmpty rules. EmptyPermittedLayers rejects KindLayerConstraint rules with no permitted layers (would forbid all placements).",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "EmptyTargetKind",
+        "EmptyTargetField",
+        "EmptyPermittedLayers"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLintViolation",
+      "description": "S3: New domain value object — a single lint violation produced when a CatalogueLinterRule fires against a TypeCatalogueEntry. Carries the rule kind, the entry name, and a human-readable message. Output element of the linter evaluation. All fields are private, accessed via accessors.",
+      "approved": true,
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "rule_kind",
+          "ty": "CatalogueLinterRuleKind"
+        },
+        {
+          "kind": "field",
+          "name": "entry_name",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "message",
+          "ty": "String"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLinterError",
+      "description": "S3: New domain error type — covers linter execution errors (distinct from CatalogueLintViolation which is findings output). InvalidRuleConfig: a rule could not be applied because its configuration is internally inconsistent at evaluation time. Used as the Err arm of the CatalogueLinter port's run method.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidRuleConfig"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLinter",
+      "description": "S3: New domain secondary port (driven port) — the interface that a catalogue linter adapter must implement. The run method evaluates a slice of CatalogueLinterRule instances against a TypeCatalogueDocument and returns a Vec<CatalogueLintViolation> on success. The layer_id parameter provides the layer context needed for KindLayerConstraint rules (the catalogue document itself does not carry layer identity; it is injected by the caller). The CLI subcommand (bin/sotp track lint or similar) drives this port through an interactor in the usecase layer.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "rules",
+              "ty": "&[CatalogueLinterRule]"
+            },
+            {
+              "name": "catalogue",
+              "ty": "&TypeCatalogueDocument"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        }
+      ]
+    }
+  ]
+}

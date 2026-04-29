@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "69076e92e39fc1869c2f637969f1763d0219d872594ef3c7d89ab657ac050ae4",
+  "signals": [
+    {
+      "type_name": "RenderContractMapInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunCatalogueLintCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunCatalogueLintError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "signal": "blue"
+    }
+  ]
+}

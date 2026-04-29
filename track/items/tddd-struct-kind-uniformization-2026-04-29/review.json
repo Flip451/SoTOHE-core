@@ -1,113 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 1 offers \"continue on the current branch\" when the starting branch is not `main`, but Step 2 still unconditionally creates `track/<id>` from `main`. That leaves no actual execution path for the suggested non-main continuation option, so the command can send the user into an impossible choice.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
-              "line": 19,
-              "category": "logic"
-            },
-            {
-              "message": "The non-empty `git status` handling is internally inconsistent for the intended baseline-file case: it first says every listed item needs user handling, then says `knowledge/` baseline files need no action and can just be carried to Step 3, while still requiring the user to resolve the non-empty state before proceeding. As written, the common baseline case can still block the bootstrap flow without a clear resolution rule.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
-              "line": 20,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:091f7499e58730859aaaeedf2d13c9ff163cf9cbf65c9f9a7823f80221836104",
-          "at": "2026-04-29T10:32:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review` reads the current track's `metadata.json` before it can proceed. At that point step 4 has not created `track/items/<track-id>/metadata.json` yet, so the documented 'typical' flow is not actually executable in this order.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 28,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
-          "at": "2026-04-29T10:38:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review`’s own context-gathering step requires the track’s `metadata.json` to already exist. Because `metadata.json` is only created in step 4, the documented first-commit path is not executable in the order shown.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 28,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
-          "at": "2026-04-29T10:40:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The step sequence no longer matches the harness-policy intent: step 3 is now `metadata.json` creation, step 4 is verification, and the `/track:review` → `/track:commit` guidance is pushed to step 5. That makes the renumbered workflow inconsistent with the requested 1-5 ordering and leaves the earlier `step 5 below` reference pointing at a different kind of action than the briefing intended.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 28,
-              "category": "documentation"
-            },
-            {
-              "message": "Step 5 says that having `metadata.json` 'satisfies `/track:review`'s prerequisite of reading `metadata.json` / `plan.md` / `spec.md`', but this init flow only creates `metadata.json`. `plan.md` and `spec.md` are not produced here, so the command is asserting prerequisite satisfaction that it does not actually establish.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 38,
-              "category": "documentation"
-            }
-          ],
-          "hash": "rvw1:sha256:42e7024e447f0d4aaf92cebeb02e7ed2e380f5d9ce60de31ca2cb7f30398dfe9",
-          "at": "2026-04-29T10:44:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
-          "at": "2026-04-29T10:49:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 5 sends the user directly from metadata verification to `/track:review` and says `plan.md` is auto-rendered, but steps 1-4 never run `cargo make track-sync-views`. A freshly initialized track can therefore reach the first-review flow with only `metadata.json` present, while the review command expects `plan.md`/track context before invoking the reviewer. Add an explicit `track-sync-views` step before the `/track:review` guidance, or make the guidance point to a command path that performs the sync first.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 38,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
-          "at": "2026-04-29T10:53:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b628f2e6bf0a880f1373c89415b0dcb391ab395047189287319ed14bd3e5d19",
-          "at": "2026-04-29T11:00:58Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -256,6 +149,289 @@
           "findings": [],
           "hash": "rvw1:sha256:df4b244ff51ad046a66b1485d370ec8f43eceabf5633748b494efac19668c724",
           "at": "2026-04-29T11:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Line 22 combines `#[serde(default)]` with “JSON の後方互換は持たない”. A defaulted field will still deserialize pre-change JSON that omits `expected_methods`, so the plan is asking for backward compatibility and forbidding it at the same time. Pick one behavior and align the codec task with it.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 22,
+              "category": "contradiction"
+            },
+            {
+              "message": "Lines 48-57 require `KindLayerConstraint` / `InvalidLayer`, but no task passes layer context into `CatalogueLinter::run` or provides another layer registry source. The adapter only sees `&TypeCatalogueDocument`, and the interactor only injects `CatalogueLoader` + `CatalogueLinter`, so this primitive cannot be evaluated as written. Add an explicit layer context to the port or move the check into the loader/interactor before this can be implemented.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:3396fec5a3361aac93ff781613c9614e26dbc060568e181ace39c41eeb27dc83",
+          "at": "2026-04-29T11:41:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Line 22 mixes `#[serde(default)]` with a no-backward-compat requirement. A defaulted field will still accept pre-change JSON missing `expected_methods`, so the codec requirement contradicts itself.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 22,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005/T006 define `KindLayerConstraint`, but the port only receives `&TypeCatalogueDocument` and the interactor never passes any layer registry or layer context into `run`. As written, this primitive has no source of truth for permitted-layer checks.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The `CatalogueLinterRule` description claims the validating constructor rejects unknown kind tags, but T004 only models empty-string/layer validation and the error shape has no way to represent an unknown target kind. That validation promise is not supported by the plan.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
+              "line": 75,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3396fec5a3361aac93ff781613c9614e26dbc060568e181ace39c41eeb27dc83",
+          "at": "2026-04-29T11:43:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 defines `CatalogueLinter::run` without `layer_id`, but the rest of the plan models the same port with `layer_id: &str` and T005/T006 are written against that 3-argument signature. As written, the plan gives two incompatible interfaces for `CatalogueLinter`, so the adapter and interactor tasks cannot be implemented consistently until T004 is aligned.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f1ff94b8406ed5ac8bc22524cb4fb33d978b4e00495455fdb0191ff6e45a193",
+          "at": "2026-04-29T11:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` is missing the required `DO NOT EDIT DIRECTLY` generated-file marker, which contradicts CN-08 and the same convention preserved in the other rendered markdown artifacts.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/contract-map.md",
+              "line": 1,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:7afcb7984bc98198f509000c196fe7a3e1dad78b82cea0dcdf91df8e9e1b0939",
+          "at": "2026-04-29T11:50:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
+          "at": "2026-04-29T11:53:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The InMemoryCatalogueLinter entry says rule opt-out via `disabled_rules` is supported, and T005 requires the adapter to hold `disabled_rules: Vec<String>` so disabled rules suppress violations, but the catalogue contract declares `expected_members: []`. An implementer following this artifact can build a stateless adapter and miss the CN-06 opt-out requirement.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/infrastructure-types.json",
+              "line": 102,
+              "category": "contradiction"
+            },
+            {
+              "message": "The usecase interactor description injects `FsCatalogueLoader`, a concrete infrastructure adapter, even though the same entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and T007 says the CLI composition root wires `FsCatalogueLoader`. This contradicts the intended trait boundary and can lead the usecase layer to depend on infrastructure.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 114,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
+          "at": "2026-04-29T11:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "RunCatalogueLintInteractor is described as injecting the concrete `FsCatalogueLoader`, while the same catalogue entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and the implementation plan places `FsCatalogueLoader` wiring in the CLI composition root. This contradicts the trait boundary for the usecase layer and can lead implementation toward an infrastructure dependency.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 114,
+              "category": "contradiction"
+            },
+            {
+              "message": "InMemoryCatalogueLinter is required to support rule opt-out via `disabled_rules`, and T005 says the adapter holds `disabled_rules: Vec<String>`, but the catalogue contract declares `expected_members: []`. An implementer following this artifact can build a stateless adapter and miss the CN-06 opt-out requirement.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/infrastructure-types.json",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
+          "at": "2026-04-29T12:00:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "RunCatalogueLintInteractor is described as injecting the concrete `FsCatalogueLoader`, while the same catalogue entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and the implementation plan places `FsCatalogueLoader` wiring in the CLI composition root. This contradicts the trait boundary for the usecase layer and can lead implementation toward an infrastructure dependency.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 114,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:182cb2ffb65b096dbfdfbdee07015353aff8fcd0742ec3f4389077f35cfe1fa3",
+          "at": "2026-04-29T12:06:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "M1/CN-01 requires every struct-based kind to carry `expected_methods`, and T002 explicitly makes the new codec reject missing `expected_methods` by omitting `#[serde(default)]`. However the newly authored catalogue entries still use the pre-M1 shape; for example `CatalogueLinterRule` is a `value_object` with `expected_members` only. The same omission appears on `CatalogueLintViolation`, `RunCatalogueLintCommand`, `RunCatalogueLintInteractor`, and `InMemoryCatalogueLinter`. After T002, these artifacts become invalid unless the plan updates them to include empty/top-level `expected_methods`.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
+              "line": 74,
+              "category": "contradiction"
+            },
+            {
+              "message": "T006 describes the usecase interactor as depending only on domain ports (`Arc<dyn CatalogueLoader>` and `Arc<dyn CatalogueLinter>`) and using mocks in tests, but the same task declares T005, the infrastructure adapter, as a prerequisite. That contradicts the port-based layer boundary and the intended composition-root split where T007 wires concrete adapters; T006 should be unblocked after T004, while T007 should depend on both T005 and T006.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:daffca1a189f1681e9e01fb52c2a0baa11eb92f5bce3422fa5efc238d07f91ad",
+          "at": "2026-04-29T12:12:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f61c5ffa35e6d1373c7f3a8c766e4c57a60a3dacf9f49d3e8056f63316b17814",
+          "at": "2026-04-29T12:17:12Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 offers \"continue on the current branch\" when the starting branch is not `main`, but Step 2 still unconditionally creates `track/<id>` from `main`. That leaves no actual execution path for the suggested non-main continuation option, so the command can send the user into an impossible choice.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "line": 19,
+              "category": "logic"
+            },
+            {
+              "message": "The non-empty `git status` handling is internally inconsistent for the intended baseline-file case: it first says every listed item needs user handling, then says `knowledge/` baseline files need no action and can just be carried to Step 3, while still requiring the user to resolve the non-empty state before proceeding. As written, the common baseline case can still block the bootstrap flow without a clear resolution rule.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "line": 20,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:091f7499e58730859aaaeedf2d13c9ff163cf9cbf65c9f9a7823f80221836104",
+          "at": "2026-04-29T10:32:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review` reads the current track's `metadata.json` before it can proceed. At that point step 4 has not created `track/items/<track-id>/metadata.json` yet, so the documented 'typical' flow is not actually executable in this order.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
+          "at": "2026-04-29T10:38:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review`’s own context-gathering step requires the track’s `metadata.json` to already exist. Because `metadata.json` is only created in step 4, the documented first-commit path is not executable in the order shown.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
+          "at": "2026-04-29T10:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The step sequence no longer matches the harness-policy intent: step 3 is now `metadata.json` creation, step 4 is verification, and the `/track:review` → `/track:commit` guidance is pushed to step 5. That makes the renumbered workflow inconsistent with the requested 1-5 ordering and leaves the earlier `step 5 below` reference pointing at a different kind of action than the briefing intended.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "documentation"
+            },
+            {
+              "message": "Step 5 says that having `metadata.json` 'satisfies `/track:review`'s prerequisite of reading `metadata.json` / `plan.md` / `spec.md`', but this init flow only creates `metadata.json`. `plan.md` and `spec.md` are not produced here, so the command is asserting prerequisite satisfaction that it does not actually establish.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 38,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:42e7024e447f0d4aaf92cebeb02e7ed2e380f5d9ce60de31ca2cb7f30398dfe9",
+          "at": "2026-04-29T10:44:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
+          "at": "2026-04-29T10:49:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 sends the user directly from metadata verification to `/track:review` and says `plan.md` is auto-rendered, but steps 1-4 never run `cargo make track-sync-views`. A freshly initialized track can therefore reach the first-review flow with only `metadata.json` present, while the review command expects `plan.md`/track context before invoking the reviewer. Add an explicit `track-sync-views` step before the `/track:review` guidance, or make the guidance point to a command path that performs the sync first.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 38,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
+          "at": "2026-04-29T10:53:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b628f2e6bf0a880f1373c89415b0dcb391ab395047189287319ed14bd3e5d19",
+          "at": "2026-04-29T11:00:58Z"
         }
       ]
     }

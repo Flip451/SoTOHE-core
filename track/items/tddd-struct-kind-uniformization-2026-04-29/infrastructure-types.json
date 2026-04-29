@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TypeDefinitionKindDto",
+      "description": "M1+S1: Pre-existing infrastructure serde codec enum for TypeDefinitionKind. M1 adds expected_methods: Vec<MethodDto> field to the 9 struct-based variants (Typestate, ValueObject, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter). The codec's Phase 1.5 validation guard (FORBIDDEN_FIELDS_STRUCT_KINDS) must be updated to remove expected_methods from the forbidden list for struct kinds. S1 adds a new DomainService variant with expected_members and expected_methods. Per CN-02 the codec is new-schema-only; no backward-compat path for pre-M1 catalogue files.",
+      "approved": true,
+      "action": "modify",
+      "kind": "enum",
+      "expected_variants": [
+        "Typestate",
+        "Enum",
+        "ValueObject",
+        "ErrorType",
+        "SecondaryPort",
+        "ApplicationService",
+        "UseCase",
+        "Interactor",
+        "Dto",
+        "Command",
+        "Query",
+        "Factory",
+        "SecondaryAdapter",
+        "FreeFunction",
+        "DomainService"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-01",
+          "hash": "53a017ee8d8c67904faf9a8748bb9b2f54c434d9eeec64cf43fd2a5bee08de3a"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "3f6b091327c1f09a32f200a37c7f1ecbc1a457782ae3bbe75fb954a187029363"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-03",
+          "hash": "5ec8c9e04aa83f55dec0ebf011c69bf7ea4c7341d6198d144516b75aa44e4052"
+        }
+      ]
+    },
+    {
+      "name": "TypeCatalogueCodecError",
+      "description": "M1+S1: Pre-existing infrastructure error type for the catalogue codec. No new variants are required by M1/S1 themselves (schema version stays at 2), but the Phase 1.5 validation guard is updated. The UnsupportedSchemaVersion, InvalidEntry, Json, and Validation variants remain unchanged. Referenced here to mark that the codec error type is a stable target during M1/S1 implementation.",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "Json",
+        "Validation",
+        "UnsupportedSchemaVersion",
+        "InvalidEntry"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "3f6b091327c1f09a32f200a37c7f1ecbc1a457782ae3bbe75fb954a187029363"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-03",
+          "hash": "5ec8c9e04aa83f55dec0ebf011c69bf7ea4c7341d6198d144516b75aa44e4052"
+        }
+      ]
+    },
+    {
+      "name": "InMemoryCatalogueLinter",
+      "description": "S3: New infrastructure secondary adapter that implements the CatalogueLinter port. Evaluates CatalogueLinterRule primitives against a TypeCatalogueDocument in memory without any I/O. Supports all 3 primitive rule kinds: FieldEmpty (checks that a field is an empty Vec on matching kind entries), FieldNonEmpty (checks that a field is non-empty), and KindLayerConstraint (checks that an entry's layer matches the permitted set using the layer_id parameter injected by the caller). Rule opt-out via disabled_rules is supported per CN-06.",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "CatalogueLinter",
+          "expected_methods": [
+            {
+              "name": "run",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "rules",
+                  "ty": "&[CatalogueLinterRule]"
+                },
+                {
+                  "name": "catalogue",
+                  "ty": "&TypeCatalogueDocument"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "&str"
+                }
+              ],
+              "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "disabled_rules",
+          "ty": "Vec<String>"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "CN-06",
+          "hash": "c7ca56391d351897b23d571e0eef32363f245e45cb06fcc640f18d3e8de0dd6d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        }
+      ]
+    }
+  ]
+}

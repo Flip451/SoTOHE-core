@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-29T12:20:03Z",
+  "declaration_hash": "7aa1748cff6c30ffc8d275c2887812c70fbb3f81bda236081e06fb7976b62f6c",
+  "signals": [
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ApplicationService",
+        "Command",
+        "Dto",
+        "Enum",
+        "ErrorType",
+        "Factory",
+        "FreeFunction",
+        "Interactor",
+        "Query",
+        "SecondaryAdapter",
+        "SecondaryPort",
+        "Typestate",
+        "UseCase",
+        "ValueObject"
+      ],
+      "missing_items": [
+        "DomainService"
+      ]
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLinterRule",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLinterRuleError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLintViolation",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLinterError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLinter",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

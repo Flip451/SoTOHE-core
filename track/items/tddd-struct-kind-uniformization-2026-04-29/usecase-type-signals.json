@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-29T12:20:04Z",
+  "declaration_hash": "69076e92e39fc1869c2f637969f1763d0219d872594ef3c7d89ab657ac050ae4",
+  "signals": [
+    {
+      "type_name": "RenderContractMapInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RenderContractMap"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunCatalogueLintError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}
