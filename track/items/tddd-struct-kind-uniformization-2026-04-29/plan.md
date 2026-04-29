@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD struct kind 均質化と type catalogue linter framework の導入
 
-## Tasks (6/9 resolved)
+## Tasks (7/9 resolved)
 
 ### S1 — Domain Layer — M1+S1: TypeDefinitionKind Uniformization + DomainService Variant (T001)
 
@@ -62,7 +62,7 @@
 > CLI は --track-id と --layer-id を受け取り violations を stdout に出力する。violations > 0 なら exit 1。
 > config schema / rule DSL の詳細設計は OS-02 のスコープ外 — デモ実装として hardcoded rules で動作確認する。
 
-- [~] **T007**: CLI の `bin/sotp track lint` サブコマンドを実装し、`RunCatalogueLint` use case を呼び出せるようにする (IN-05 / AC-05)。既存の `sotp track contract-map` / `sotp track type-signals` などのサブコマンドと同じ構成パターンに従い、CLI layer (`apps/cli/src/`) の track サブコマンド群に `lint` subcommand を追加する。CLI layer は TDDD-disabled (`architecture-rules.json` の `tddd.enabled: false`) のため catalogue は持たない。CLI は `RunCatalogueLintInteractor` + `InMemoryCatalogueLinter` + `FsCatalogueLoader` (既存 adapter) を composition root で wire する。linter framework の詳細な config schema / rule DSL (OS-02 に相当) はこのタスクのスコープ外 — 今タスクでは最低限 hardcoded な primitive rules (value_object の expected_methods 空強制 + domain_service の kind-layer constraint) を直接コード内で定義した形でテスト可能なデモ実装として接続する。`--track-id` と `--layer-id` をフラグとして受け取り、violations を stdout に出力し、violations > 0 の場合は exit 1 で終了する (AC-05)。integration test: `FsCatalogueLoader` のテスト用 fixture catalogue (この track の domain-types.json など) を対象に `RunCatalogueLint` を呼び出し violation が期待通り返ること。前提: T005 完了 (InMemoryCatalogueLinter) + T006 完了 (usecase interactor)。
+- [x] **T007**: CLI の `bin/sotp track lint` サブコマンドを実装し、`RunCatalogueLint` use case を呼び出せるようにする (IN-05 / AC-05)。既存の `sotp track contract-map` / `sotp track type-signals` などのサブコマンドと同じ構成パターンに従い、CLI layer (`apps/cli/src/`) の track サブコマンド群に `lint` subcommand を追加する。CLI layer は TDDD-disabled (`architecture-rules.json` の `tddd.enabled: false`) のため catalogue は持たない。CLI は `RunCatalogueLintInteractor` + `InMemoryCatalogueLinter` + `FsCatalogueLoader` (既存 adapter) を composition root で wire する。linter framework の詳細な config schema / rule DSL (OS-02 に相当) はこのタスクのスコープ外 — 今タスクでは最低限 hardcoded な primitive rules (value_object の expected_methods 空強制 + domain_service の kind-layer constraint) を直接コード内で定義した形でテスト可能なデモ実装として接続する。`--track-id` と `--layer-id` をフラグとして受け取り、violations を stdout に出力し、violations > 0 の場合は exit 1 で終了する (AC-05)。integration test: `FsCatalogueLoader` のテスト用 fixture catalogue (この track の domain-types.json など) を対象に `RunCatalogueLint` を呼び出し violation が期待通り返ること。前提: T005 完了 (InMemoryCatalogueLinter) + T006 完了 (usecase interactor)。 (`d4f99909342234840bc93db0624d3226be6307de`)
 
 ### S8 — Convention Update — S1+S3: type-designer-kind-selection.md (T008)
 
@@ -72,7 +72,7 @@
 > R5 No Fallback ルールに domain_service を正しい住所として明示 (field + behavior method を持つ domain struct の kind 選択肢)。
 > domain_service の kind 判定基準を追記する (ADR S1 の判定基準に準拠)。
 
-- [ ] **T008**: knowledge/conventions/type-designer-kind-selection.md を S1 + S3 に従い更新する (IN-06 / AC-06)。(1) R1 layer-kind 互換マトリクスに `domain_service` 行を追加する: `domain` ✓ / `usecase` △ (trans-domain な application logic の場合のみ要根拠) / `infrastructure` ✗ (IN-02 / CN-03)。(2) R3 value_object semantic restriction の説明に「M1 以降は `expected_methods` フィールドを schema として持てるが、behavior method を宣言することは S3 linter の field-empty ルールで enforce される」旨の補足を追加する。(3) R5 No Fallback ルール (どの kind も fit しないとき value_object 等に押し込まない) に `domain_service` を選択肢として追加する: field を持ち behavior method を持つ domain struct の正しい住所として `domain_service` を明示する。(4) `domain_service` の kind 判定基準を追記する (ADR S1 の判定基準に準拠): struct + expected_members >= 1 field + expected_methods >= 1 method + 状態遷移なし + application_service / secondary_port 実装なし + domain 層配置 (usecase は要根拠) = domain_service を採用する。行数が目安 400 行を超えないよう既存セクションの冗長な記述を削減して追記する。前提: T001 完了 (DomainService variant が存在することを前提として記述)。
+- [~] **T008**: knowledge/conventions/type-designer-kind-selection.md を S1 + S3 に従い更新する (IN-06 / AC-06)。(1) R1 layer-kind 互換マトリクスに `domain_service` 行を追加する: `domain` ✓ / `usecase` △ (trans-domain な application logic の場合のみ要根拠) / `infrastructure` ✗ (IN-02 / CN-03)。(2) R3 value_object semantic restriction の説明に「M1 以降は `expected_methods` フィールドを schema として持てるが、behavior method を宣言することは S3 linter の field-empty ルールで enforce される」旨の補足を追加する。(3) R5 No Fallback ルール (どの kind も fit しないとき value_object 等に押し込まない) に `domain_service` を選択肢として追加する: field を持ち behavior method を持つ domain struct の正しい住所として `domain_service` を明示する。(4) `domain_service` の kind 判定基準を追記する (ADR S1 の判定基準に準拠): struct + expected_members >= 1 field + expected_methods >= 1 method + 状態遷移なし + application_service / secondary_port 実装なし + domain 層配置 (usecase は要根拠) = domain_service を採用する。行数が目安 400 行を超えないよう既存セクションの冗長な記述を削減して追記する。前提: T001 完了 (DomainService variant が存在することを前提として記述)。
 
 ### S9 — Final CI Gate Verification (T009)
 
