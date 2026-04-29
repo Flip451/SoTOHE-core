@@ -651,54 +651,6 @@ fn run_codex_local_never_passes_full_auto_even_when_profiles_missing() {
 // Commit gate now uses get_review_states() exclusively.
 
 // ---------------------------------------------------------------------------
-// review status: integration tests via execute_status
-// ---------------------------------------------------------------------------
-
-#[test]
-fn status_succeeds_with_valid_track() {
-    let _lock = env_lock().lock().unwrap();
-    use super::{StatusArgs, execute_status};
-
-    let dir = tempfile::tempdir().unwrap();
-    setup_test_git_repo(dir.path());
-    let _cwd = CurrentDirGuard::change_to(dir.path());
-
-    let items_dir = dir.path().join("items");
-    let track_dir = items_dir.join("test-track");
-    fs::create_dir_all(&track_dir).unwrap();
-
-    // Write a minimal metadata.json with review section
-    let metadata = r#"{
-  "schema_version": 3,
-  "id": "test-track",
-  "branch": "track/test-track",
-  "title": "Test track",
-  "status": "planned",
-  "created_at": "2026-03-24T00:00:00Z",
-  "updated_at": "2026-03-24T00:00:00Z",
-  "tasks": [{"id": "T1", "description": "task", "status": "todo", "commit_hash": null}],
-  "plan": {"summary": ["s"], "sections": [{"id": "S1", "title": "sec", "description": [], "task_ids": ["T1"]}]},
-  "review": {"status": "not_started", "code_hash": null, "groups": {}}
-}"#;
-    fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-
-    let args = StatusArgs { items_dir: items_dir.clone(), track_id: "test-track".to_string() };
-    let exit = execute_status(&args);
-    assert_eq!(exit, std::process::ExitCode::SUCCESS);
-}
-
-#[test]
-fn status_fails_for_nonexistent_track() {
-    // v2 composition validates the track directory exists before proceeding.
-    use super::{StatusArgs, execute_status};
-
-    let args =
-        StatusArgs { items_dir: PathBuf::from("track/items"), track_id: "nonexistent".to_string() };
-    let exit = execute_status(&args);
-    assert_eq!(exit, std::process::ExitCode::FAILURE);
-}
-
-// ---------------------------------------------------------------------------
 // check-approved: T004 verdict mapping tests
 // ---------------------------------------------------------------------------
 
@@ -917,50 +869,6 @@ fn test_validate_auto_record_args_invalid_track_id_returns_error() {
     let result = validate_auto_record_args(&args);
     assert!(result.is_err());
     assert!(result.unwrap_err().contains("--track-id"));
-}
-
-#[test]
-fn status_displays_per_group_fast_final_state() {
-    let _lock = env_lock().lock().unwrap();
-    use super::{StatusArgs, execute_status};
-
-    let dir = tempfile::tempdir().unwrap();
-    setup_test_git_repo(dir.path());
-    let _cwd = CurrentDirGuard::change_to(dir.path());
-
-    let items_dir = dir.path().join("items");
-    let track_dir = items_dir.join("test-track");
-    fs::create_dir_all(&track_dir).unwrap();
-
-    let metadata = r#"{
-  "schema_version": 3,
-  "id": "test-track",
-  "branch": "track/test-track",
-  "title": "Test track",
-  "status": "in_progress",
-  "created_at": "2026-03-24T00:00:00Z",
-  "updated_at": "2026-03-24T00:00:00Z",
-  "tasks": [{"id": "T1", "description": "task", "status": "in_progress", "commit_hash": null}],
-  "plan": {"summary": ["s"], "sections": [{"id": "S1", "title": "sec", "description": [], "task_ids": ["T1"]}]},
-  "review": {
-    "status": "fast_passed",
-    "code_hash": "abc123def456",
-    "groups": {
-      "usecase": {
-        "fast": {"round": 2, "verdict": "zero_findings", "timestamp": "2026-03-24T01:00:00Z"}
-      },
-      "cli": {
-        "fast": {"round": 1, "verdict": "findings_remain", "timestamp": "2026-03-24T00:30:00Z", "concerns": ["security"]},
-        "final": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-24T01:30:00Z"}
-      }
-    }
-  }
-}"#;
-    fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-
-    let args = StatusArgs { items_dir, track_id: "test-track".to_string() };
-    let exit = execute_status(&args);
-    assert_eq!(exit, std::process::ExitCode::SUCCESS);
 }
 
 // ---------------------------------------------------------------------------

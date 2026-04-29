@@ -36,13 +36,11 @@ pub enum ReviewCommand {
     CodexLocal(CodexLocalArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),
-    /// Show per-scope review state for a track.
-    Status(StatusArgs),
     /// Show review results: per-scope state summary, optional round history, and a commit hint.
     ///
-    /// Replaces ad-hoc `review.json` reads with a stable read-only API. With `--limit 0`
-    /// (the default) the output is the state summary only, equivalent to the legacy
-    /// `sotp review status` command.
+    /// Read-only canonical API replacing direct `review.json` access. With `--limit 0`
+    /// (the default) the output is the state summary only — the equivalent of the
+    /// removed `sotp review status` subcommand.
     Results(ResultsArgs),
 }
 
@@ -141,17 +139,6 @@ pub(super) fn validate_auto_record_args(
 
 #[derive(Debug, Args)]
 pub struct CheckApprovedArgs {
-    /// Path to the track items directory.
-    #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
-
-    /// Track ID.
-    #[arg(long)]
-    track_id: String,
-}
-
-#[derive(Debug, Args)]
-pub struct StatusArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
     items_dir: PathBuf,
@@ -260,7 +247,6 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
     match cmd {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
-        ReviewCommand::Status(args) => execute_status(&args),
         ReviewCommand::Results(args) => execute_results(&args),
     }
 }
@@ -335,70 +321,4 @@ fn run_check_approved(
     comp.cycle
         .evaluate_approval(&comp.review_store, review_json_exists)
         .map_err(|e| format!("failed to evaluate approval: {e}"))
-}
-
-// ---------------------------------------------------------------------------
-// status: Show per-group Fast/Final review state
-// ---------------------------------------------------------------------------
-
-fn execute_status(args: &StatusArgs) -> ExitCode {
-    match run_status(args) {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(msg) => {
-            eprintln!("{msg}");
-            ExitCode::FAILURE
-        }
-    }
-}
-
-fn run_status(args: &StatusArgs) -> Result<(), String> {
-    use domain::review_v2::{NotRequiredReason, ReviewState};
-
-    let track_id =
-        domain::TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
-    let comp = compose_v2::build_review_v2(&track_id, &args.items_dir)?;
-
-    let states = comp
-        .cycle
-        .get_review_states(&comp.review_store)
-        .map_err(|e| format!("failed to get review states: {e}"))?;
-
-    if states.is_empty() {
-        println!("Review status: no scopes (empty diff)");
-        return Ok(());
-    }
-
-    println!("Review status (v2 scope-based):");
-    println!("Diff base: {}", comp.base);
-
-    let mut sorted: Vec<_> = states.iter().collect();
-    sorted.sort_by_key(|(scope, _)| scope.to_string());
-
-    let mut approved_count = 0;
-    let mut empty_count = 0;
-    let mut required_count = 0;
-    for (scope, state) in &sorted {
-        let indicator = match state {
-            ReviewState::Required(_) => {
-                required_count += 1;
-                "[-]"
-            }
-            ReviewState::NotRequired(NotRequiredReason::Empty) => {
-                empty_count += 1;
-                "[.]"
-            }
-            ReviewState::NotRequired(NotRequiredReason::ZeroFindings) => {
-                approved_count += 1;
-                "[+]"
-            }
-        };
-        println!("  {indicator} {scope}: {state}");
-    }
-
-    println!(
-        "Summary: {approved_count} approved, {empty_count} empty, {required_count} required, {} total",
-        sorted.len()
-    );
-
-    Ok(())
 }

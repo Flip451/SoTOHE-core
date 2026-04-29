@@ -93,82 +93,6 @@
         }
       ]
     },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
-          "at": "2026-04-28T22:57:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
-          "at": "2026-04-28T22:58:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
-          "at": "2026-04-29T00:52:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
-          "at": "2026-04-29T00:53:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This test will not compile: `matches!(round.hash, ReviewHash::Empty)` moves `round.hash` out of `round`, so the next line cannot borrow `round.hash` again. Use a borrow in the match (`matches!(&round.hash, ReviewHash::Empty)`) or check `round.hash.is_empty()` instead.",
-              "severity": "P1",
-              "file": "libs/domain/src/review_v2/tests.rs",
-              "line": 694,
-              "category": "compile_error"
-            }
-          ],
-          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
-          "at": "2026-04-29T01:21:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new empty-hash test moves `round.hash` into `matches!` and then uses `round.hash` again on the next assertion, which will not compile because `ReviewHash` is not `Copy`. Borrow the field in the match or avoid the second use after the move.",
-              "severity": "P1",
-              "file": "libs/domain/src/review_v2/tests.rs",
-              "line": 694,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
-          "at": "2026-04-29T01:22:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
-          "at": "2026-04-29T01:23:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
-          "at": "2026-04-29T01:25:40Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -302,83 +226,20 @@
           "findings": [],
           "hash": "rvw1:sha256:d770c5ddeb5f029f4e95ff1d6bc3e75ec73cc32bb14b94f0d50fa00603453811",
           "at": "2026-04-29T01:25:28Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
-          "at": "2026-04-28T23:45:45Z"
+          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
+          "at": "2026-04-29T01:40:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
-          "at": "2026-04-28T23:47:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_all_rounds` rejects `ReviewHash::Empty` by calling `ReviewHashValue::new(&round.hash)`, but `write_verdict`/`write_fast_verdict` persist empty hashes as `\"\"` and `read_latest_finals` already accepts them. Any existing or future round written with an empty hash will now make `sotp review results` fail instead of round-tripping the stored data.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 221,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
-          "at": "2026-04-29T00:53:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_all_rounds` now rejects rounds whose persisted `hash` is empty, but the writer can still serialize `ReviewHash::Empty` and the existing round-trip path already accepts that case in `read_latest_finals`. As a result, `sotp review results` will fail on valid `review.json` data that contains an empty-hash round instead of reporting the history.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 221,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
-          "at": "2026-04-29T00:55:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_all_rounds` silently skips any persisted round whose `hash` is empty. That loses valid stored history because `write_verdict`/`write_fast_verdict` can serialize `ReviewHash::Empty`, and `read_latest_finals` already accepts that case; as a result, `sotp review results` will omit the round and its latest-round suffix instead of round-tripping the recorded data.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 222,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b58c66c4e7e3bdd89bb1d5107b55aee94298bf4a2554d4d57a74326d55a04804",
-          "at": "2026-04-29T00:58:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
-          "at": "2026-04-29T01:20:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
-          "at": "2026-04-29T01:22:01Z"
+          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
+          "at": "2026-04-29T01:42:08Z"
         }
       ]
     },
@@ -1199,6 +1060,173 @@
           "findings": [],
           "hash": "rvw1:sha256:f0a183307cce2950812e214f67573d785425bae05a56465f4033d4a8f1ce4655",
           "at": "2026-04-29T01:34:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:310f1b6c76a74bdad9b7705fc1f40b7fc29a4fc02f23c195d9d6dab832827c98",
+          "at": "2026-04-29T01:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:310f1b6c76a74bdad9b7705fc1f40b7fc29a4fc02f23c195d9d6dab832827c98",
+          "at": "2026-04-29T01:41:45Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:58:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
+          "at": "2026-04-29T00:52:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
+          "at": "2026-04-29T00:53:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test will not compile: `matches!(round.hash, ReviewHash::Empty)` moves `round.hash` out of `round`, so the next line cannot borrow `round.hash` again. Use a borrow in the match (`matches!(&round.hash, ReviewHash::Empty)`) or check `round.hash.is_empty()` instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/review_v2/tests.rs",
+              "line": 694,
+              "category": "compile_error"
+            }
+          ],
+          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
+          "at": "2026-04-29T01:21:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new empty-hash test moves `round.hash` into `matches!` and then uses `round.hash` again on the next assertion, which will not compile because `ReviewHash` is not `Copy`. Borrow the field in the match or avoid the second use after the move.",
+              "severity": "P1",
+              "file": "libs/domain/src/review_v2/tests.rs",
+              "line": 694,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
+          "at": "2026-04-29T01:22:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
+          "at": "2026-04-29T01:23:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
+          "at": "2026-04-29T01:25:40Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:45:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:47:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` rejects `ReviewHash::Empty` by calling `ReviewHashValue::new(&round.hash)`, but `write_verdict`/`write_fast_verdict` persist empty hashes as `\"\"` and `read_latest_finals` already accepts them. Any existing or future round written with an empty hash will now make `sotp review results` fail instead of round-tripping the stored data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 221,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
+          "at": "2026-04-29T00:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` now rejects rounds whose persisted `hash` is empty, but the writer can still serialize `ReviewHash::Empty` and the existing round-trip path already accepts that case in `read_latest_finals`. As a result, `sotp review results` will fail on valid `review.json` data that contains an empty-hash round instead of reporting the history.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 221,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
+          "at": "2026-04-29T00:55:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` silently skips any persisted round whose `hash` is empty. That loses valid stored history because `write_verdict`/`write_fast_verdict` can serialize `ReviewHash::Empty`, and `read_latest_finals` already accepts that case; as a result, `sotp review results` will omit the round and its latest-round suffix instead of round-tripping the recorded data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b58c66c4e7e3bdd89bb1d5107b55aee94298bf4a2554d4d57a74326d55a04804",
+          "at": "2026-04-29T00:58:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
+          "at": "2026-04-29T01:20:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
+          "at": "2026-04-29T01:22:01Z"
         }
       ]
     }
