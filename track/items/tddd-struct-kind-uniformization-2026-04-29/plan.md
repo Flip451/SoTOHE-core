@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD struct kind 均質化と type catalogue linter framework の導入
 
-## Tasks (7/9 resolved)
+## Tasks (8/9 resolved)
 
 ### S1 — Domain Layer — M1+S1: TypeDefinitionKind Uniformization + DomainService Variant (T001)
 
@@ -72,7 +72,7 @@
 > R5 No Fallback ルールに domain_service を正しい住所として明示 (field + behavior method を持つ domain struct の kind 選択肢)。
 > domain_service の kind 判定基準を追記する (ADR S1 の判定基準に準拠)。
 
-- [~] **T008**: knowledge/conventions/type-designer-kind-selection.md を S1 + S3 に従い更新する (IN-06 / AC-06)。(1) R1 layer-kind 互換マトリクスに `domain_service` 行を追加する: `domain` ✓ / `usecase` △ (trans-domain な application logic の場合のみ要根拠) / `infrastructure` ✗ (IN-02 / CN-03)。(2) R3 value_object semantic restriction の説明に「M1 以降は `expected_methods` フィールドを schema として持てるが、behavior method を宣言することは S3 linter の field-empty ルールで enforce される」旨の補足を追加する。(3) R5 No Fallback ルール (どの kind も fit しないとき value_object 等に押し込まない) に `domain_service` を選択肢として追加する: field を持ち behavior method を持つ domain struct の正しい住所として `domain_service` を明示する。(4) `domain_service` の kind 判定基準を追記する (ADR S1 の判定基準に準拠): struct + expected_members >= 1 field + expected_methods >= 1 method + 状態遷移なし + application_service / secondary_port 実装なし + domain 層配置 (usecase は要根拠) = domain_service を採用する。行数が目安 400 行を超えないよう既存セクションの冗長な記述を削減して追記する。前提: T001 完了 (DomainService variant が存在することを前提として記述)。
+- [x] **T008**: knowledge/conventions/type-designer-kind-selection.md を S1 + S3 に従い更新する (IN-06 / AC-06)。(1) R1 layer-kind 互換マトリクスに `domain_service` 行を追加する: `domain` ✓ / `usecase` △ (trans-domain な application logic の場合のみ要根拠) / `infrastructure` ✗ (IN-02 / CN-03)。(2) R3 value_object semantic restriction の説明に「M1 以降は `expected_methods` フィールドを schema として持てるが、behavior method を宣言することは S3 linter の field-empty ルールで enforce される」旨の補足を追加する。(3) R5 No Fallback ルール (どの kind も fit しないとき value_object 等に押し込まない) に `domain_service` を選択肢として追加する: field を持ち behavior method を持つ domain struct の正しい住所として `domain_service` を明示する。(4) `domain_service` の kind 判定基準を追記する (ADR S1 の判定基準に準拠): struct + expected_members >= 1 field + expected_methods >= 1 method + 状態遷移なし + application_service / secondary_port 実装なし + domain 層配置 (usecase は要根拠) = domain_service を採用する。行数が目安 400 行を超えないよう既存セクションの冗長な記述を削減して追記する。前提: T001 完了 (DomainService variant が存在することを前提として記述)。 (`571d6b8f450cdb3de19b5a19a8a2120bcb842e22`)
 
 ### S9 — Final CI Gate Verification (T009)
 
@@ -80,4 +80,4 @@
 > M1 / S1 / S2 の変更が既存テストを壊していないことを特に確認する。
 > 失敗した gate があれば同タスク内で修正する。
 
-- [ ] **T009**: cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-07)。T001-T008 完了後に実行する。(1) cargo make fmt-check — rustfmt の差分がないことを確認する。(2) cargo make clippy — warnings が 0 であることを確認する (-D warnings)。(3) cargo make test (nextest) — 新規追加した全ユニットテスト + 既存テストがすべて pass することを確認する (AC-07)。(4) cargo make deny — ライセンス・禁止クレートチェックが pass することを確認する。(5) cargo make check-layers — レイヤー依存関係チェック (domain が infrastructure に依存していないこと等) が pass することを確認する。(6) cargo make verify-* — plan-artifact-refs / plan-progress / arch-docs など既存の verify タスクが pass することを確認する。T001-T003 の変更 (TypeDefinitionKind + codec + renderer) が既存テストを壊していないことを特に確認する。失敗した gate があれば同タスク内で修正する。前提: T001-T008 完了。
+- [~] **T009**: cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-07)。T001-T008 完了後に実行する。(1) cargo make fmt-check — rustfmt の差分がないことを確認する。(2) cargo make clippy — warnings が 0 であることを確認する (-D warnings)。(3) cargo make test (nextest) — 新規追加した全ユニットテスト + 既存テストがすべて pass することを確認する (AC-07)。(4) cargo make deny — ライセンス・禁止クレートチェックが pass することを確認する。(5) cargo make check-layers — レイヤー依存関係チェック (domain が infrastructure に依存していないこと等) が pass することを確認する。(6) cargo make verify-* — plan-artifact-refs / plan-progress / arch-docs など既存の verify タスクが pass することを確認する。T001-T003 の変更 (TypeDefinitionKind + codec + renderer) が既存テストを壊していないことを特に確認する。失敗した gate があれば同タスク内で修正する。前提: T001-T008 完了。
