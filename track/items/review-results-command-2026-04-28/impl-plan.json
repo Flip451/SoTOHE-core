@@ -16,12 +16,13 @@
     {
       "id": "T003",
       "description": "Add evaluate_approval method to ReviewCycle in the usecase layer. Depends on: T001. (1) Add evaluate_approval(reader: &impl ReviewReader, review_json_exists: bool) -> Result<ReviewApprovalVerdict, ReviewCycleError> to ReviewCycle in libs/usecase/src/review_v2/cycle.rs. Implementation: call get_review_states(reader) to get current scope states; collect Required(*) scopes; classify into: Approved (required.is_empty()), ApprovedWithBypass { not_started_count } (all Required scopes are Required(NotStarted) AND !review_json_exists; not_started_count = required.len()), or Blocked { required_scopes } (otherwise). (2) Import ReviewApprovalVerdict from domain. (3) Add unit tests in libs/usecase/src/review_v2/tests.rs covering: all NotRequired -> Approved (regardless of review_json_exists), all Required(NotStarted) + review_json_exists=false -> ApprovedWithBypass{N}, all Required(NotStarted) + review_json_exists=true -> Blocked, some Required(FindingsRemain) -> Blocked. Use mockall for ReviewReader. Catalogue refs: usecase-types.json#ReviewCycle. Spec refs: IN-05, AC-09, AC-11, CN-04.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "f7305ad5d60878984f1d28ecc4e4f1ed42bb4a67"
     },
     {
       "id": "T004",
       "description": "Slim down CLI run_check_approved to delegate to the usecase evaluate_approval method. Depends on: T001, T002, T003. (1) Refactor run_check_approved in apps/cli/src/commands/review/mod.rs to: call comp.review_store.review_json_exists() -> Result<bool, ReviewReaderError> and propagate Err as a CLI error (AppError or anyhow), call comp.cycle.evaluate_approval(&comp.review_store, review_json_exists_bool), and map ReviewApprovalVerdict variants to the existing exit code + eprintln behavior: Approved -> eprintln [OK] + ExitCode::SUCCESS, ApprovedWithBypass { not_started_count } -> eprintln [WARN] + ExitCode::SUCCESS, Blocked { required_scopes } -> eprintln [BLOCKED] + ExitCode::FAILURE. (2) Remove the inline approval/bypass judgment logic from run_check_approved. (3) Adjust compose_v2::ReviewV2Composition to expose review_store so the CLI can call review_json_exists. (4) Update tests to cover the refactored path. Observable CLI surface (exit 0 / exit 1 / eprintln format) must remain unchanged (AC-10). Spec refs: IN-05, AC-09, AC-10, AC-11, CN-04, CN-07.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",

@@ -1,21 +1,169 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
-          "at": "2026-04-28T22:57:28Z"
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:45:45Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
-          "at": "2026-04-28T22:58:50Z"
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:47:03Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `[BLOCKED]` branch no longer prints the per-scope reason that the previous CLI emitted (`scope: state`); it now shows only bare scope names. That is a user-visible contract change for a guard command, because operators can no longer tell whether a scope is blocked by `NotStarted`, `FindingsRemain`, or `StaleHash`. The new tests in `tests.rs` only assert exit codes, so this regression is currently unprotected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/mod.rs",
+              "line": 208,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
+          "at": "2026-04-29T00:22:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `check-approved` tests only assert the exit code; they never capture or compare stderr, so the required `[OK]` / `[WARN]` / `[BLOCKED]` surface in AC-10 is untested and a prefix regression would still pass.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 754,
+              "category": "testing"
+            },
+            {
+              "message": "In the blocked-path fixture, `review.json` is written without a matching `review_operational` exclusion, so the file itself becomes an extra required scope (typically `Other`). The test can therefore fail for the wrong reason and does not isolate the intended `domain`-scope bypass-block path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 798,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
+          "at": "2026-04-29T00:25:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Blocked` output no longer preserves the previous stderr format: it drops the per-scope `: {state}` suffix and now prints only scope names. That changes a user-visible CLI contract for `check-approved` even though the exit code and prefix stay the same, so any consumer or snapshot relying on the full blocked message will regress.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 218,
+              "category": "behavioral regression"
+            }
+          ],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:35:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:36:30Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add a regression test for `evaluate_approval`'s error path. The new public API only has success-case coverage, so a future break in `get_review_states` error propagation (diff/hash/reader failures) would go undetected despite the repo policy requiring error-case tests for public APIs.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/tests.rs",
+              "line": 404,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:39ef3531c2dfe734818eed82d3b5d99decb4d5629256128b61ba5b0436e42af8",
+          "at": "2026-04-28T23:55:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `evaluate_approval` public API is only covered by success cases here. There is no test for `ReviewCycleError` propagation from `get_review_states`, and the blocked cases only assert `required_scopes.len()` instead of the actual scope set. A regression that swallows diff/hash/reader failures or returns the wrong blocked scopes would still pass this suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
+              "line": 404,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:39ef3531c2dfe734818eed82d3b5d99decb4d5629256128b61ba5b0436e42af8",
+          "at": "2026-04-28T23:57:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_approval()` is only covered for the diff failure path here. The method also propagates `ReviewHasherError` and `ReviewReaderError` from `get_review_states()`, but there are no tests for those error cases, so regressions in those paths would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
+              "line": 532,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7849ad24131a487bbc62e11eb8cd7aff81b216a9ab01598366e456f40cb05f12",
+          "at": "2026-04-29T00:01:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`required_scopes` is collected from `states.into_iter()` over a `HashMap`, so the blocked-scope list has nondeterministic order. That makes this public verdict unstable between runs and can change downstream CLI output or snapshot tests even when the underlying set of blocked scopes is the same. Stabilize the ordering before returning it.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/cycle.rs",
+              "line": 196,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:37d7e3233d524db949ae66b1900816581c5bb0f0c2c48cc534a7ac96798174ac",
+          "at": "2026-04-29T00:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:432ba302c4e5168ffdfd242437d6618a8594ea222679aa0e1f2586161570adfa",
+          "at": "2026-04-29T00:06:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:432ba302c4e5168ffdfd242437d6618a8594ea222679aa0e1f2586161570adfa",
+          "at": "2026-04-29T00:08:07Z"
         }
       ]
     },
@@ -765,102 +913,38 @@
           "findings": [],
           "hash": "rvw1:sha256:683fe94e98a05e74bbf6568dfd39ead0588495356380bca74ee1bcc7be1ddb86",
           "at": "2026-04-28T23:59:52Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
-          "at": "2026-04-28T23:45:45Z"
+          "hash": "rvw1:sha256:a4612544c24a24f1a4dafcac20ebc864058da438f246ed7ecf06a59784d604b9",
+          "at": "2026-04-29T00:21:04Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
-          "at": "2026-04-28T23:47:03Z"
+          "hash": "rvw1:sha256:a4612544c24a24f1a4dafcac20ebc864058da438f246ed7ecf06a59784d604b9",
+          "at": "2026-04-29T00:21:58Z"
         }
       ]
     },
-    "usecase": {
+    "domain": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Add a regression test for `evaluate_approval`'s error path. The new public API only has success-case coverage, so a future break in `get_review_states` error propagation (diff/hash/reader failures) would go undetected despite the repo policy requiring error-case tests for public APIs.",
-              "severity": "P1",
-              "file": "libs/usecase/src/review_v2/tests.rs",
-              "line": 404,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:39ef3531c2dfe734818eed82d3b5d99decb4d5629256128b61ba5b0436e42af8",
-          "at": "2026-04-28T23:55:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `evaluate_approval` public API is only covered by success cases here. There is no test for `ReviewCycleError` propagation from `get_review_states`, and the blocked cases only assert `required_scopes.len()` instead of the actual scope set. A regression that swallows diff/hash/reader failures or returns the wrong blocked scopes would still pass this suite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
-              "line": 404,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:39ef3531c2dfe734818eed82d3b5d99decb4d5629256128b61ba5b0436e42af8",
-          "at": "2026-04-28T23:57:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_approval()` is only covered for the diff failure path here. The method also propagates `ReviewHasherError` and `ReviewReaderError` from `get_review_states()`, but there are no tests for those error cases, so regressions in those paths would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
-              "line": 532,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7849ad24131a487bbc62e11eb8cd7aff81b216a9ab01598366e456f40cb05f12",
-          "at": "2026-04-29T00:01:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`required_scopes` is collected from `states.into_iter()` over a `HashMap`, so the blocked-scope list has nondeterministic order. That makes this public verdict unstable between runs and can change downstream CLI output or snapshot tests even when the underlying set of blocked scopes is the same. Stabilize the ordering before returning it.",
-              "severity": "P1",
-              "file": "libs/usecase/src/review_v2/cycle.rs",
-              "line": 196,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:37d7e3233d524db949ae66b1900816581c5bb0f0c2c48cc534a7ac96798174ac",
-          "at": "2026-04-29T00:04:38Z"
-        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:432ba302c4e5168ffdfd242437d6618a8594ea222679aa0e1f2586161570adfa",
-          "at": "2026-04-29T00:06:23Z"
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:57:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:432ba302c4e5168ffdfd242437d6618a8594ea222679aa0e1f2586161570adfa",
-          "at": "2026-04-29T00:08:07Z"
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:58:50Z"
         }
       ]
     }

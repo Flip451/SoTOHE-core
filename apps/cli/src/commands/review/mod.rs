@@ -8,7 +8,7 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use clap::{ArgGroup, Args, Subcommand};
-use infrastructure::git_cli::GitRepository;
+use domain::review_v2::ReviewExistsPort;
 #[cfg(test)]
 use usecase::review_workflow::ReviewVerdict;
 
@@ -190,11 +190,49 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
 // check-approved: Verify review.status == approved with current code hash
 // ---------------------------------------------------------------------------
 
+/// Formats an `ReviewApprovalVerdict` into the human-readable message and exit
+/// code for the `check-approved` command.
+///
+/// Extracted as a pure function so that tests can assert on the *exact* message
+/// prefix (`[OK]` / `[WARN]` / `[BLOCKED]`) without having to redirect stderr.
+///
+/// Observable surface (AC-10):
+/// - `Approved`            → `[OK] …`   + `ExitCode::SUCCESS`
+/// - `ApprovedWithBypass`  → `[WARN] …` + `ExitCode::SUCCESS`
+/// - `Blocked`             → `[BLOCKED] …` + `ExitCode::FAILURE`
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn format_approval_verdict(
+    verdict: domain::review_v2::ReviewApprovalVerdict,
+) -> (String, ExitCode) {
+    use domain::review_v2::ReviewApprovalVerdict;
+    match verdict {
+        ReviewApprovalVerdict::Approved => {
+            ("[OK] Review is approved and code hash is current".to_owned(), ExitCode::SUCCESS)
+        }
+        ReviewApprovalVerdict::ApprovedWithBypass { not_started_count } => (
+            format!(
+                "[WARN] No review.json found. Allowing commit for PR-based review ({not_started_count} scope(s))."
+            ),
+            ExitCode::SUCCESS,
+        ),
+        ReviewApprovalVerdict::Blocked { required_scopes } => {
+            let mut display: Vec<_> =
+                required_scopes.iter().map(|scope| format!("  {scope}")).collect();
+            display.sort();
+            (
+                format!("[BLOCKED] Review not approved. Required scopes:\n{}", display.join("\n")),
+                ExitCode::FAILURE,
+            )
+        }
+    }
+}
+
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     match run_check_approved(args) {
-        Ok(()) => {
-            eprintln!("[OK] Review is approved and code hash is current");
-            ExitCode::SUCCESS
+        Ok(verdict) => {
+            let (msg, code) = format_approval_verdict(verdict);
+            eprintln!("{msg}");
+            code
         }
         Err(msg) => {
             eprintln!("{msg}");
@@ -203,59 +241,21 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     }
 }
 
-fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
-    use domain::review_v2::ReviewState;
-
-    // v2: no planning-only bypass. All files are classified into scopes.
-    // Empty scopes are NotRequired(Empty), reviewed scopes are NotRequired(ZeroFindings).
-    // The commit gate simply checks all scopes are NotRequired.
+fn run_check_approved(
+    args: &CheckApprovedArgs,
+) -> Result<domain::review_v2::ReviewApprovalVerdict, String> {
     let track_id = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
 
     let comp = compose_v2::build_review_v2(&track_id, &args.items_dir)?;
 
-    let states = comp
-        .cycle
-        .get_review_states(&comp.review_store)
-        .map_err(|e| format!("failed to get review states: {e}"))?;
+    let review_json_exists = comp
+        .review_store
+        .review_json_exists()
+        .map_err(|e| format!("failed to check review.json existence: {e}"))?;
 
-    // Collect scopes that still require review.
-    let required: Vec<_> =
-        states.iter().filter(|(_, state)| matches!(state, ReviewState::Required(_))).collect();
-
-    if required.is_empty() {
-        return Ok(());
-    }
-
-    // If review.json does not exist AND all required scopes are NotStarted,
-    // allow commit without review. This enables PR-based review workflows
-    // where local review is skipped intentionally.
-    // When review.json exists but is corrupt/unreadable, the store returns
-    // empty state (all NotStarted) as fail-closed — we must NOT bypass in
-    // that case, so we require the file to be absent.
-    // Resolve review.json relative to the git root (same as build_review_v2)
-    // to avoid CWD-dependent path mismatch.
-    let git = infrastructure::git_cli::SystemGitRepo::discover()
-        .map_err(|e| format!("git discover: {e}"))?;
-    let review_json = if args.items_dir.is_absolute() {
-        args.items_dir.join(&args.track_id).join("review.json")
-    } else {
-        git.root().join(&args.items_dir).join(&args.track_id).join("review.json")
-    };
-    let all_not_started = required.iter().all(|(_, state)| {
-        matches!(state, ReviewState::Required(domain::review_v2::RequiredReason::NotStarted))
-    });
-    if all_not_started && !review_json.exists() {
-        eprintln!(
-            "[WARN] No review.json found. Allowing commit for PR-based review ({} scope(s)).",
-            required.len()
-        );
-        return Ok(());
-    }
-
-    let mut display: Vec<_> =
-        required.iter().map(|(scope, state)| format!("  {scope}: {state}")).collect();
-    display.sort();
-    Err(format!("[BLOCKED] Review not approved. Required scopes:\n{}", display.join("\n")))
+    comp.cycle
+        .evaluate_approval(&comp.review_store, review_json_exists)
+        .map_err(|e| format!("failed to evaluate approval: {e}"))
 }
 
 // ---------------------------------------------------------------------------

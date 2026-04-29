@@ -699,6 +699,183 @@ fn status_fails_for_nonexistent_track() {
 }
 
 // ---------------------------------------------------------------------------
+// check-approved: T004 verdict mapping tests
+// ---------------------------------------------------------------------------
+
+/// Writes a review-scope.json with a single "domain" group matching `libs/domain/**`.
+///
+/// Includes a `review_operational` exclusion for `items/<track-id>/review.json` so
+/// that the review.json file written by the blocked-path test does not spill into
+/// the `Other` scope and cause the test to pass for the wrong reason.
+fn write_domain_scope_config(root: &Path) {
+    let track_dir = root.join("track");
+    fs::create_dir_all(&track_dir).unwrap();
+    fs::write(
+        track_dir.join("review-scope.json"),
+        r#"{
+  "version": 2,
+  "groups": {"domain": {"patterns": ["libs/domain/**"]}},
+  "review_operational": ["items/<track-id>/review.json"],
+  "other_track": []
+}"#,
+    )
+    .unwrap();
+}
+
+/// Sets up a minimal git repo with a domain scope, creates the items dir and track dir,
+/// returns (items_dir, track_dir).
+fn setup_check_approved_repo(root: &Path) -> (PathBuf, PathBuf) {
+    use std::process::Command;
+
+    Command::new("git").args(["init", "-b", "main"]).current_dir(root).output().unwrap();
+    Command::new("git")
+        .args(["config", "user.email", "test@test.com"])
+        .current_dir(root)
+        .output()
+        .unwrap();
+    Command::new("git").args(["config", "user.name", "Test"]).current_dir(root).output().unwrap();
+
+    write_domain_scope_config(root);
+    fs::create_dir_all(root.join("track/items")).unwrap();
+
+    Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
+    Command::new("git").args(["commit", "-m", "init"]).current_dir(root).output().unwrap();
+
+    let items_dir = root.join("items");
+    let track_dir = items_dir.join("test-track");
+    fs::create_dir_all(&track_dir).unwrap();
+
+    (items_dir, track_dir)
+}
+
+/// Case: all scopes NotRequired (empty diff) → Approved verdict → exit 0 + [OK].
+#[test]
+fn check_approved_approved_path_exits_success_with_ok_message() {
+    let _lock = env_lock().lock().unwrap();
+    use super::{CheckApprovedArgs, execute_check_approved};
+
+    let dir = tempfile::tempdir().unwrap();
+    let (items_dir, _track_dir) = setup_check_approved_repo(dir.path());
+    let _cwd = CurrentDirGuard::change_to(dir.path());
+
+    // Empty diff → "Other" scope is NotRequired(Empty) → Approved.
+    let args = CheckApprovedArgs { items_dir, track_id: "test-track".to_string() };
+    let exit = execute_check_approved(&args);
+    assert_eq!(exit, std::process::ExitCode::SUCCESS);
+}
+
+/// Case: all Required(NotStarted) and review.json absent → ApprovedWithBypass → exit 0 + [WARN].
+#[test]
+fn check_approved_bypass_path_exits_success_with_warn_message() {
+    let _lock = env_lock().lock().unwrap();
+    use super::{CheckApprovedArgs, execute_check_approved};
+
+    let dir = tempfile::tempdir().unwrap();
+    let (items_dir, _track_dir) = setup_check_approved_repo(dir.path());
+    let _cwd = CurrentDirGuard::change_to(dir.path());
+
+    // Add an untracked file in libs/domain/ so it shows up in git ls-files --others.
+    // The "domain" scope matches "libs/domain/**" → Required(NotStarted).
+    // No review.json exists → bypass condition met → ApprovedWithBypass.
+    let domain_src = dir.path().join("libs/domain/src");
+    fs::create_dir_all(&domain_src).unwrap();
+    fs::write(domain_src.join("lib.rs"), "// untracked").unwrap();
+
+    let args = CheckApprovedArgs { items_dir, track_id: "test-track".to_string() };
+    let exit = execute_check_approved(&args);
+    assert_eq!(exit, std::process::ExitCode::SUCCESS);
+}
+
+/// Case: Required scope + review.json present → bypass blocked → Blocked → exit 1 + [BLOCKED].
+///
+/// The review-scope.json has `review_operational: ["items/<track-id>/review.json"]` so the
+/// review.json file written to the track dir is excluded from scope classification and does not
+/// create a spurious `Other` required scope that could make this test pass for the wrong reason.
+#[test]
+fn check_approved_blocked_path_exits_failure_with_blocked_message() {
+    let _lock = env_lock().lock().unwrap();
+    use super::{CheckApprovedArgs, execute_check_approved};
+
+    let dir = tempfile::tempdir().unwrap();
+    let (items_dir, track_dir) = setup_check_approved_repo(dir.path());
+    let _cwd = CurrentDirGuard::change_to(dir.path());
+
+    // Add an untracked file in libs/domain/ → Required(NotStarted) for domain scope.
+    let domain_src = dir.path().join("libs/domain/src");
+    fs::create_dir_all(&domain_src).unwrap();
+    fs::write(domain_src.join("lib.rs"), "// untracked").unwrap();
+
+    // Write an empty review.json to disable the NotStarted bypass.
+    // review_operational in the scope config excludes this file from scope classification.
+    fs::write(track_dir.join("review.json"), r#"{"schema_version":2,"scopes":{}}"#).unwrap();
+
+    let args = CheckApprovedArgs { items_dir, track_id: "test-track".to_string() };
+    let exit = execute_check_approved(&args);
+    assert_eq!(exit, std::process::ExitCode::FAILURE);
+}
+
+// ---------------------------------------------------------------------------
+// format_approval_verdict: AC-10 observable surface (message prefix) tests
+// ---------------------------------------------------------------------------
+//
+// These tests verify the `[OK]` / `[WARN]` / `[BLOCKED]` prefix contract (AC-10)
+// directly against the pure `format_approval_verdict` function, which avoids the
+// need to redirect the real stderr in the integration tests above.
+
+#[test]
+fn format_approval_verdict_approved_has_ok_prefix() {
+    use super::format_approval_verdict;
+    use domain::review_v2::ReviewApprovalVerdict;
+
+    let (msg, code) = format_approval_verdict(ReviewApprovalVerdict::Approved);
+    assert!(
+        msg.starts_with("[OK]"),
+        "Approved message must start with [OK] prefix (AC-10); got: {msg:?}"
+    );
+    assert_eq!(code, std::process::ExitCode::SUCCESS);
+}
+
+#[test]
+fn format_approval_verdict_approved_with_bypass_has_warn_prefix() {
+    use super::format_approval_verdict;
+    use domain::review_v2::ReviewApprovalVerdict;
+
+    let (msg, code) =
+        format_approval_verdict(ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 2 });
+    assert!(
+        msg.starts_with("[WARN]"),
+        "ApprovedWithBypass message must start with [WARN] prefix (AC-10); got: {msg:?}"
+    );
+    assert!(
+        msg.contains("2 scope(s)"),
+        "ApprovedWithBypass message must include scope count; got: {msg:?}"
+    );
+    assert_eq!(code, std::process::ExitCode::SUCCESS);
+}
+
+#[test]
+fn format_approval_verdict_blocked_has_blocked_prefix_and_lists_scopes() {
+    use super::format_approval_verdict;
+    use domain::review_v2::{MainScopeName, ReviewApprovalVerdict, ScopeName};
+
+    let scopes = vec![
+        ScopeName::Main(MainScopeName::new("cli").unwrap()),
+        ScopeName::Main(MainScopeName::new("domain").unwrap()),
+    ];
+    let (msg, code) =
+        format_approval_verdict(ReviewApprovalVerdict::Blocked { required_scopes: scopes });
+    assert!(
+        msg.starts_with("[BLOCKED]"),
+        "Blocked message must start with [BLOCKED] prefix (AC-10); got: {msg:?}"
+    );
+    assert!(
+        msg.contains("  cli") && msg.contains("  domain"),
+        "Blocked message must list required scope names; got: {msg:?}"
+    );
+    assert_eq!(code, std::process::ExitCode::FAILURE);
+}
+
+// ---------------------------------------------------------------------------
 // validate_auto_record_args tests (v2: always-on auto-record)
 // ---------------------------------------------------------------------------
 
