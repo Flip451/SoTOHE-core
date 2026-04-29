@@ -51,14 +51,23 @@ fn run_results(args: &ResultsArgs) -> Result<String, String> {
     let scope_universe = sorted_scope_universe(&states);
     let displayed_scopes = filter_scopes(&scope_universe, args.scope.as_deref())?;
 
-    let mut rounds_per_scope: HashMap<ScopeName, Vec<ScopeRound>> = HashMap::new();
-    for scope in &displayed_scopes {
-        let rounds = comp
-            .review_store
-            .read_all_rounds(scope)
-            .map_err(|e| format!("failed to read rounds for {scope}: {e}"))?;
-        rounds_per_scope.insert(scope.clone(), rounds);
-    }
+    // Summary mode (`--limit 0`) uses only the state map + approval verdict.
+    // Skip historical round loading so a malformed legacy round cannot
+    // hard-fail the status-equivalent default path.
+    let rounds_per_scope: HashMap<ScopeName, Vec<ScopeRound>> =
+        if matches!(args.limit, ResultsLimit::Zero) {
+            HashMap::new()
+        } else {
+            let mut map = HashMap::new();
+            for scope in &displayed_scopes {
+                let rounds = comp
+                    .review_store
+                    .read_all_rounds(scope)
+                    .map_err(|e| format!("failed to read rounds for {scope}: {e}"))?;
+                map.insert(scope.clone(), rounds);
+            }
+            map
+        };
 
     Ok(render_results(
         &comp.base,

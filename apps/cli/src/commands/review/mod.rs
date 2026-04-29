@@ -188,6 +188,11 @@ impl std::str::FromStr for ResultsLimit {
 }
 
 #[derive(Debug, Args)]
+#[command(group(
+    ArgGroup::new("scope_selector")
+        .args(["scope", "all"])
+        .multiple(false)
+))]
 pub struct ResultsArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
@@ -201,8 +206,8 @@ pub struct ResultsArgs {
     #[arg(long)]
     pub(super) scope: Option<String>,
 
-    /// Show every scope (default).
-    #[arg(long, default_value_t = true)]
+    /// Show every scope (equivalent to omitting `--scope`; mutually exclusive with `--scope`).
+    #[arg(long, default_value_t = false)]
     pub(super) all: bool,
 
     /// `0` (state summary only, default), a positive integer `N`, or `all`.
