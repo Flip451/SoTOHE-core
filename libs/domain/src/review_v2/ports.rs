@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::error::{CommitHashError, ReviewReaderError, ReviewWriterError};
-use super::types::{FastVerdict, ReviewHash, ScopeName, Verdict};
+use super::types::{FastVerdict, ReviewHash, ScopeName, ScopeRound, Verdict};
 use crate::CommitHash;
 
 /// Read-only port for review.json v2 retrieval.
@@ -18,6 +18,19 @@ pub trait ReviewReader: Send + Sync {
     fn read_latest_finals(
         &self,
     ) -> Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError>;
+
+    /// Reads all rounds (fast and final) recorded for a single scope.
+    ///
+    /// Rounds are returned in storage order (oldest first). Callers are
+    /// responsible for any reverse-ordering or filtering they need (e.g. the
+    /// `sotp review results` command shows newest first).
+    ///
+    /// Returns an empty `Vec` if the scope has no rounds or `review.json`
+    /// does not exist.
+    ///
+    /// # Errors
+    /// Returns `ReviewReaderError` on I/O or codec failure.
+    fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError>;
 }
 
 /// Write port for review.json v2 persistence.

@@ -41,7 +41,7 @@
     },
     {
       "name": "ScopeRound",
-      "description": "Plain data struct holding the persisted state of one review round for a single scope. Introduced in T005 to carry the round-history payload that sotp review results reads when rendering state lines with latest-round suffix and expanding findings/history under --limit N. Fields: round_type: RoundType (fast | final), verdict: Verdict (ZeroFindings | FindingsRemain), findings: Vec<ReviewerFinding>, hash: ReviewHashValue, at: String (ISO 8601 timestamp). All four field types (RoundType, Verdict, ReviewerFinding, ReviewHashValue) are pre-existing domain types defined in libs/domain/src/review_v2/types.rs. No serde derives in domain; infrastructure layer handles deserialization from review.json. If ReviewReader does not yet expose read_all_rounds, the method is added in the T005 commit: fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError>.",
+      "description": "Plain data struct holding the persisted state of one review round for a single scope. Introduced in T005 to carry the round-history payload that sotp review results reads when rendering state lines with latest-round suffix and expanding findings/history under --limit N. Fields: round_type: RoundType (fast | final), verdict: Verdict (ZeroFindings | FindingsRemain), findings: Vec<ReviewerFinding>, hash: ReviewHash, at: String (ISO 8601 timestamp). All four field types (RoundType, Verdict, ReviewerFinding, ReviewHash) are pre-existing domain types defined in libs/domain/src/review_v2/types.rs. hash is ReviewHash (Computed(ReviewHashValue) | Empty) rather than the narrower ReviewHashValue so that empty-hash rounds (stored as \"\" in review.json) can be represented without data loss — parallel with how read_latest_finals already handles empty-hash rounds. No serde derives in domain; infrastructure layer handles deserialization from review.json. If ReviewReader does not yet expose read_all_rounds, the method is added in the T005 commit: fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError>.",
       "approved": true,
       "kind": "value_object",
       "expected_members": [
@@ -63,7 +63,7 @@
         {
           "kind": "field",
           "name": "hash",
-          "ty": "ReviewHashValue"
+          "ty": "ReviewHash"
         },
         {
           "kind": "field",

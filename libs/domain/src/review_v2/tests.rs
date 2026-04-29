@@ -651,35 +651,48 @@ fn test_briefing_file_for_scope_always_none_for_other() {
 
 #[test]
 fn test_scope_round_construction_with_all_fields_succeeds() {
-    let hash_value = ReviewHashValue::new("rvw1:sha256:deadbeef01").unwrap();
+    let hash = ReviewHash::computed("rvw1:sha256:deadbeef01").unwrap();
     let round = ScopeRound {
         round_type: RoundType::Final,
         verdict: Verdict::ZeroFindings,
         findings: vec![],
-        hash: hash_value.clone(),
+        hash: hash.clone(),
         at: "2026-04-28T12:00:00Z".to_owned(),
     };
     assert!(matches!(round.round_type, RoundType::Final));
     assert!(matches!(round.verdict, Verdict::ZeroFindings));
     assert!(round.findings.is_empty());
-    assert_eq!(round.hash.as_str(), "rvw1:sha256:deadbeef01");
+    assert_eq!(round.hash.as_str(), Some("rvw1:sha256:deadbeef01"));
     assert_eq!(round.at, "2026-04-28T12:00:00Z");
 }
 
 #[test]
 fn test_scope_round_construction_with_findings_remain() {
-    let hash_value = ReviewHashValue::new("rvw1:sha256:cafebabe99").unwrap();
+    let hash = ReviewHash::computed("rvw1:sha256:cafebabe99").unwrap();
     let finding = ReviewerFinding::new("style issue", None, None, None, None).unwrap();
     let round = ScopeRound {
         round_type: RoundType::Fast,
         verdict: Verdict::findings_remain(vec![finding.clone()]).unwrap(),
         findings: vec![finding],
-        hash: hash_value,
+        hash,
         at: "2026-04-28T15:30:00Z".to_owned(),
     };
     assert!(matches!(round.round_type, RoundType::Fast));
     assert!(matches!(round.verdict, Verdict::FindingsRemain(_)));
     assert_eq!(round.findings.len(), 1);
+}
+
+#[test]
+fn test_scope_round_construction_with_empty_hash_succeeds() {
+    let round = ScopeRound {
+        round_type: RoundType::Final,
+        verdict: Verdict::ZeroFindings,
+        findings: vec![],
+        hash: ReviewHash::Empty,
+        at: "2026-04-28T18:00:00Z".to_owned(),
+    };
+    assert!(round.hash.is_empty());
+    assert_eq!(round.hash.as_str(), None);
 }
 
 // ── ReviewApprovalVerdict ─────────────────────────────────────────────

@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use domain::review_v2::{
     FastVerdict, FilePath, LogInfo, MainScopeName, NotRequiredReason, RequiredReason,
     ReviewApprovalVerdict, ReviewHash, ReviewOutcome, ReviewReader, ReviewReaderError,
-    ReviewScopeConfig, ReviewState, ReviewerFinding, ScopeName, Verdict,
+    ReviewScopeConfig, ReviewState, ReviewerFinding, ScopeName, ScopeRound, Verdict,
 };
 use domain::{CommitHash, TrackId};
 
@@ -105,6 +105,13 @@ impl ReviewReader for FailingReviewReader {
             detail: "simulated I/O failure".to_owned(),
         })
     }
+
+    fn read_all_rounds(&self, _scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError> {
+        Err(ReviewReaderError::Io {
+            path: "review.json".to_owned(),
+            detail: "simulated I/O failure".to_owned(),
+        })
+    }
 }
 
 /// Mock hasher that returns a deterministic hash based on file count.
@@ -178,6 +185,10 @@ impl ReviewReader for MockReviewReader {
         &self,
     ) -> Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError> {
         Ok(self.finals.clone())
+    }
+
+    fn read_all_rounds(&self, _scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError> {
+        Ok(Vec::new())
     }
 }
 

@@ -430,13 +430,17 @@ impl fmt::Display for ReviewState {
 /// Persisted state of one review round for a single scope.
 ///
 /// Carries round metadata read from `review.json` by the results command.
+/// `hash` mirrors `ReviewHash` (Computed | Empty) so that historical rounds
+/// that were stored with an empty hash (e.g. via `write_verdict` on a Skipped
+/// scope) can be represented without data loss, parallel with
+/// `ReviewReader::read_latest_finals`.
 /// No serde derives — domain layer stays persistence-agnostic (CN-04).
 #[derive(Debug, Clone)]
 pub struct ScopeRound {
     pub round_type: RoundType,
     pub verdict: Verdict,
     pub findings: Vec<ReviewerFinding>,
-    pub hash: ReviewHashValue,
+    pub hash: ReviewHash,
     /// ISO 8601 timestamp recorded when the round was written.
     pub at: String,
 }

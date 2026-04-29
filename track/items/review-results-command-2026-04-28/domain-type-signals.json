@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T00:39:27Z",
-  "declaration_hash": "9fe1ee89e44a0876aede32f2570fb36d9afc327823a75e5620d2a2f1b8958b92",
+  "generated_at": "2026-04-29T01:34:52Z",
+  "declaration_hash": "3171c41d1ad000475f9276b47001494ba262c6b005154ec315eda85935aa1c01",
   "signals": [
     {
       "type_name": "ReviewApprovalVerdict",
@@ -23,7 +23,7 @@
         "round_type: RoundType",
         "verdict: Verdict",
         "findings: Vec<ReviewerFinding>",
-        "hash: ReviewHashValue",
+        "hash: ReviewHash",
         "at: String"
       ]
     },

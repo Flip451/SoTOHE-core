@@ -14,10 +14,12 @@ use usecase::review_workflow::ReviewVerdict;
 
 mod codex_local;
 mod compose_v2;
+mod results;
 #[cfg(test)]
 mod tests;
 
 use codex_local::execute_codex_local;
+use results::execute_results;
 
 const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
 
@@ -36,6 +38,12 @@ pub enum ReviewCommand {
     CheckApproved(CheckApprovedArgs),
     /// Show per-scope review state for a track.
     Status(StatusArgs),
+    /// Show review results: per-scope state summary, optional round history, and a commit hint.
+    ///
+    /// Replaces ad-hoc `review.json` reads with a stable read-only API. With `--limit 0`
+    /// (the default) the output is the state summary only, equivalent to the legacy
+    /// `sotp review status` command.
+    Results(ResultsArgs),
 }
 
 /// CLI round type for auto-record.
@@ -153,6 +161,76 @@ pub struct StatusArgs {
     track_id: String,
 }
 
+/// Round-type filter for `sotp review results --round-type ...`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+pub enum RoundTypeFilter {
+    /// Include only fast rounds.
+    Fast,
+    /// Include only final rounds.
+    Final,
+    /// Include all rounds (default).
+    Any,
+}
+
+/// `--limit` value: `0` (state summary only, default) | `N` (a positive integer) | `all`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResultsLimit {
+    /// `--limit 0` — state summary only.
+    Zero,
+    /// `--limit N` (where `N >= 1`) — show up to `N` recent rounds.
+    Count(u32),
+    /// `--limit all` — show every round.
+    All,
+}
+
+impl std::str::FromStr for ResultsLimit {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.eq_ignore_ascii_case("all") {
+            return Ok(Self::All);
+        }
+        match s.parse::<u32>() {
+            Ok(0) => Ok(Self::Zero),
+            Ok(n) => Ok(Self::Count(n)),
+            Err(_) => Err(format!(
+                "invalid --limit value: '{s}' (expected non-negative integer or 'all')"
+            )),
+        }
+    }
+}
+
+#[derive(Debug, Args)]
+pub struct ResultsArgs {
+    /// Path to the track items directory.
+    #[arg(long, default_value = "track/items")]
+    pub(super) items_dir: PathBuf,
+
+    /// Track ID.
+    #[arg(long)]
+    pub(super) track_id: String,
+
+    /// Show only the named scope (mutually exclusive with `--all`).
+    #[arg(long)]
+    pub(super) scope: Option<String>,
+
+    /// Show every scope (default).
+    #[arg(long, default_value_t = true)]
+    pub(super) all: bool,
+
+    /// `0` (state summary only, default), a positive integer `N`, or `all`.
+    #[arg(long, default_value = "0")]
+    pub(super) limit: ResultsLimit,
+
+    /// Round-type filter applied to history rounds.
+    #[arg(long, value_enum, default_value_t = RoundTypeFilter::Any)]
+    pub(super) round_type: RoundTypeFilter,
+
+    /// Suppress the commit hint line.
+    #[arg(long)]
+    pub(super) no_hint: bool,
+}
+
 // These types are only needed by the test shim in codex_local.rs.
 #[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -183,6 +261,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
         ReviewCommand::Status(args) => execute_status(&args),
+        ReviewCommand::Results(args) => execute_results(&args),
     }
 }
 
