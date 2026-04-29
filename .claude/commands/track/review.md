@@ -4,10 +4,8 @@ description: Run review for current track implementation.
 
 Canonical command for review in the track workflow.
 
-Implements the review → fix → review cycle mandated by `CLAUDE.md`:
-> Before committing code changes, run the `reviewer` capability review cycle
-> (review → fix → review → ... → no findings). Do not commit until the reviewer
-> reports zero findings.
+Implements the review → fix → review cycle: do not commit until every required scope
+reaches `final` round `zero_findings` (or the `NotStarted` bypass applies — see Step 6).
 
 Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the review target.
 
@@ -15,271 +13,121 @@ Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the
 
 - Extract the track id from the current git branch (`track/<id>` or `plan/<id>`).
   If the branch matches neither pattern, stop and instruct the user to switch first.
-- Read the current track's `spec.md`, `plan.md`, and `metadata.json`.
-- Read every convention file listed in the `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy tracks without `spec.json`).
-- For exact type signatures, trait definitions, module trees, and Mermaid diagrams, use `## Canonical Blocks` in `plan.md` and `knowledge/DESIGN.md` as the source of truth when reviewing implementation correctness.
-- If the selected track is branchless planning-only (`status=planned`, `branch=null`), limit review scope to planning artifacts only. Allowed diff is:
-  - `track/items/<id>/`
-  - `track/registry.md`
-  - `track/tech-stack.md`
-  - `knowledge/DESIGN.md`
-- If changed files exceed that allowlist, stop and instruct the user to run `/track:activate <track-id>` before code-bearing review.
+- Read the current track's `spec.md`, `plan.md`, `metadata.json`, and every convention listed
+  in `## Related Conventions (Required Reading)` — check both `spec.md` and `plan.md` (legacy
+  tracks may carry this section in `plan.md` instead of `spec.md`).
+- For exact type signatures / module trees / Mermaid diagrams, treat `## Canonical Blocks` in
+  `plan.md` and `knowledge/DESIGN.md` as the source of truth.
 
-## Step 1: Resolve reviewer model
+## Step 1: Resolve reviewer models
 
-- Read `.harness/config/agent-profiles.json`.
-- Look up `capabilities.reviewer.provider` → `{reviewer_provider}` (e.g., `codex`).
-- Look up `capabilities.reviewer.model` → `{model}` (full model).
-- Look up `capabilities.reviewer.fast_model` → `{fast_model}` (iterative rounds; falls back to `model` if absent).
-- Invoke via `cargo make track-local-review` with explicit `--model` flag.
-- **Note**: The `claude` provider path (`claude-heavy` profile) is not yet supported.
+Read `.harness/config/agent-profiles.json` `capabilities.reviewer`:
+- `capabilities.reviewer.provider` — invocation route (Codex CLI is the only supported provider; `claude` is unsupported)
+- `capabilities.reviewer.fast_model` — used for `--round-type fast` (falls back to `capabilities.reviewer.model` if absent)
+- `capabilities.reviewer.model` — used for `--round-type final`
 
-## Step 2: Prepare review briefings (parallel observation split)
-
-Partition changed files into **observation groups** by architecture layer. Each group gets its own
-focused briefing and reviewer invocation. All groups run **in parallel** via Agent Teams.
-
-### 2a. Determine review scope via `track-review-results`
-
-Run `cargo make track-review-results -- --track-id {track-id}` to get the authoritative
-per-scope review state. This command computes diff-based scope hashes and reports which
-groups need review:
+## Step 2: Determine required scopes
 
 ```
 cargo make track-review-results -- --track-id {track-id}
 ```
 
-Output example (default = state-summary only, equivalent to the removed `sotp review status`):
-```
-  [+] cli: approved
-  [-] domain: required (not started)
-  [.] harness-policy: not required (empty)
-  [-] other: required (stale hash)
-  [-] plan-artifacts: required (stale hash)
-  [.] usecase: not required (empty)
-```
+State legend: `[+] approved` (skip) / `[-] required (...)` (run) / `[.] not required (empty)` (skip).
+Scope partitioning, hash computation, and approval state are owned by the CLI — do not
+hand-classify files into groups.
 
-Current named groups (v2 `track/review-scope.json`): `domain`, `usecase`,
-`infrastructure`, `cli`, `plan-artifacts`, `harness-policy`. The implicit
-`other` group collects everything not matched by a named group.
+### track-review-results flag reference
 
-Use this output to determine which groups need reviewer invocation:
-- `required (not started)` — needs review (new changes, no review yet)
-- `required (stale hash)` — needs review (files changed since last review)
-- `required (findings remain)` — needs review (previous round had findings; re-review required)
-- `approved` — already reviewed and up-to-date, skip
-- `not required (empty)` — no changed files in this group, skip
+`cargo make track-review-results -- --help` is the canonical source. Common flags: `--track-id`, `--scope`,
+`--round-type`, `--limit` (0 = state summary only; N > 0 = last N round entries).
 
-**Do NOT manually classify files into groups** — `track-review-results` handles partition,
-hash computation, and approval state tracking. Only invoke reviewers for groups that
-report `required`.
+## Step 3: Build per-scope briefings
 
-#### `track-review-results` flag reference
-
-`sotp review results` (invoked via `cargo make track-review-results -- ...`) supports:
-
-- `--track-id <ID>` (required): track id to inspect
-- `--scope <NAME>` (optional): show only the named scope; mutually exclusive with `--all`
-- `--all` (optional): explicitly show every scope (default behavior when `--scope` is absent;
-  presence is enforced as mutually exclusive with `--scope`)
-- `--limit <N|all>` (default `0`):
-  - `0` — state-summary only (no per-round findings/history; equivalent to the removed
-    `sotp review status` output, and skips loading historical rounds for robustness against
-    malformed legacy data)
-  - `N >= 1` — show the latest round findings inline plus up to `N-1` history entries
-  - `all` — show every recorded round
-- `--round-type <fast|final|any>` (default `any`): filter the displayed history to a
-  single round type. The state-line summary always uses the actual newest round
-  regardless of this filter
-- `--no-hint`: suppress the `hint: review approved — run /track:commit ...` trailing line
-  (use this when piping the output into another command)
-
-Common invocations during the review cycle:
-
-- Per-scope state recap before launching agents:
-  `cargo make track-review-results -- --track-id <id>` (default `--limit 0`)
-- Inspect the latest fast-round findings for a single scope between rounds:
-  `cargo make track-review-results -- --track-id <id> --scope <scope> --limit 1 --round-type fast`
-- Inspect both fast and final history for a scope (e.g., to confirm the fast/full
-  escalation sequence): `cargo make track-review-results -- --track-id <id> --scope <scope> --limit all`
-
-### 2b. Build per-group briefing
-
-For each group reporting `required` in Step 2a, build a briefing file at `tmp/reviewer-runtime/briefing-{group}.md`.
-The per-group scope file list is automatically injected by `cargo make track-local-review` (via `CodexReviewer::build_full_prompt`) — the briefing only needs design intent and review checklist.
-
-**Do NOT hand-author the `## Scope-specific severity policy` section.** If the
-group has a `briefing_file` configured in `track/review-scope.json` (currently
-`plan-artifacts` — `track/review-prompts/plan-artifacts.md`), the CLI composer
-automatically appends a `## Scope-specific severity policy` section pointing
-the reviewer at that file. Duplicating the policy in the per-group briefing is
-not just redundant — it creates drift when the severity policy md is updated
-without touching this template. Responsibility split:
-
-- `track/review-prompts/<scope>.md` owns severity policy wording (edited as a
-  standalone file; versioned with the config)
-- `tmp/reviewer-runtime/briefing-{scope}.md` owns per-round design intent and
-  review checklist (authored here, per-round)
-- `sotp review codex-local` owns the wiring between the two (automatic)
+For each scope reporting `required`, write `tmp/reviewer-runtime/briefing-{scope}.md`:
 
 ```markdown
-# Review Briefing: {track-id} — {group} layer
+# Review Briefing: {track-id} — {scope} layer
 
 ## Design Intent
-{3-5 bullet points from spec.md / plan.md}
+{3-5 bullets from spec.md / plan.md describing what changed and why}
 
 ## Review Checklist
-- Logic errors, edge cases, race conditions
-- No panics in library code (no unwrap/expect outside #[cfg(test)])
-- Proper error propagation (thiserror, #[source], #[from])
-- Architecture layer dependency direction (domain ← usecase ← infrastructure ← cli)
-- Idiomatic Rust (naming, patterns)
-- Enum-first: variant-dependent data must use enum variants, not struct + runtime validation (see .claude/rules/04-coding-principles.md § Enum-first)
-- Typestate: state transitions should use typestate pattern where feasible, not status field + runtime checks (see .claude/rules/04-coding-principles.md § Typestate)
-- Test coverage gaps
-- Security (input validation, error information leakage)
-
-## Architecture Verification Checklist (see knowledge/conventions/impl-delegation-arch-guard.md)
-- ADR/plan で指定された型が正しい層に配置されているか
-- CLI が composition root パターンに従っているか（usecase 呼び出しのみ）
-- usecase ロジックが CLI に漏れていないか
-- NullXxx による usecase bypass がないか（status/check-approved 用途を除く）
+{scope-specific checklist items — keep this list short and observable}
 
 ## Known Accepted Deviations
-{any scope-specific notes, e.g. "lock.rs and hook.rs are intentionally unchanged"}
-
-Report findings as JSON:
-{"verdict":"zero_findings","findings":[]}
-or
-{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}
-Every object field is required by the output schema. When a finding does not have a concrete
-severity, file, or line, use `null` for that field instead of omitting it.
-DO NOT report findings about test code using unwrap/expect — that is allowed.
-DO NOT report findings about unchanged pre-existing code.
+{scope-specific notes for findings that should be dismissed}
 ```
 
-### 2c. Invoke review-fix-lead agents in parallel
+Constraints:
 
-Launch one `review-fix-lead` agent per group reporting `required`, **in parallel** using Agent Teams
-(the Agent tool with `run_in_background: true` and `subagent_type: "review-fix-lead"`).
+- The CLI auto-injects scope file list and severity policy. Do NOT hand-author the
+  `## Scope-specific severity policy` section: scopes with `briefing_file` configured in
+  `track/review-scope.json` (e.g., `plan-artifacts` → `track/review-prompts/plan-artifacts.md`)
+  receive the policy reference automatically via `sotp review codex-local`.
 
-Each `review-fix-lead` agent autonomously handles the full review → fix → re-review loop
-for its scope. This eliminates the intermediate `codex-reviewer` → orchestrator aggregation
-→ `review-fix-lead` handoff. The agent loops until fast-model `zero_findings`, then reports
-`completed` back to the orchestrator.
+## Step 4: Launch review-fix-lead agents (parallel, fast round)
 
-**When the provider has a CLI tool** (e.g., Codex CLI — the default profile):
+For each `required` scope, launch one `review-fix-lead` subagent in parallel
+(`run_in_background: true`, `subagent_type: "review-fix-lead"`).
 
-Use `{fast_model}` for iterative rounds. Auto-record is always on (v2). Verdicts are
-written directly to `review.json` after each Codex run. Parallel per-scope reviews are
-safe: each scope's hash is computed from its own files only.
+Agent prompt minimum content:
 
-To compute per-scope file lists for the agent prompt:
-- **Named groups**: changed files matching the group's glob patterns from `track/review-scope.json`.
-- **`other` group**: full changed file list (`git diff {base}...HEAD --name-only` + staged + unstaged + untracked, where `{base}` = `.commit_hash` or `main`) minus files matched by named-group patterns, `review_operational` patterns, and `other_track` patterns (all from `track/review-scope.json`). Exception: current track artifacts (`track/items/{track-id}/**`) are NOT excluded by `other_track`.
+- Track id, scope name, briefing path
+- `round_type: fast`, `model: {fast_model}`
+- Reviewer invocation: `cargo make track-local-review -- --model {fast_model} --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md`
+- Scope file list (files the agent is allowed to **modify** — this is the agent's modification
+  boundary, distinct from the reviewer's scope which the CLI injects automatically): apply
+  the CLI classifier logic to the changed file list — exclude `review_operational` and
+  `other_track` matches (exception: current-track `track/items/{track-id}/**` files are never
+  excluded by `other_track`), then keep files matching that group's glob patterns (named groups)
+  or all remaining unmatched files (`other` scope).
 
-```
-Agent prompt for each scope:
-  You are a review-fix-lead for the {scope} scope of track {track-id}.
-  Briefing: tmp/reviewer-runtime/briefing-{scope}.md
-  Fast model: {fast_model}
-  Scope files (files this agent is allowed to modify):
-  {per-scope file list computed above}
+The agent's modification boundary comes from the scope file list in its prompt
+(see `.claude/agents/review-fix-lead.md` § Scope Ownership). Note: the CLI injecting the
+scope file list into the reviewer's prompt (Step 3 constraint) is separate from this — the
+orchestrator must independently derive and pass the modification boundary to the agent.
 
-  Run the fix+review loop as defined in .claude/agents/review-fix-lead.md.
-  Use: cargo make track-local-review -- --model {fast_model} --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
+The agent's internal fix loop (review → fix → re-review until `zero_findings`),
+canonical-API verification, and status reporting are owned by `.claude/agents/review-fix-lead.md`.
+The orchestrator does not parse reviewer JSON directly.
 
-  Report your final status: completed / blocked_cross_scope / failed.
-```
+Agent statuses:
 
-Wait for all agents to complete (or timeout).
+- `completed` — fast `zero_findings` confirmed via canonical API → step 5 (final round)
+- `blocked_cross_scope` — fix dependencies in other scopes from the orchestrator, then relaunch
+- `failed` / timeout — relaunch or report to user depending on cause (treat as `findings_remain`)
 
-### 2d. Collect agent statuses
+## Step 5: Escalate to final round (per-scope, immediate)
 
-Each review-fix-lead agent reports one of:
-- `completed` — fast model `zero_findings` achieved
-- `blocked_cross_scope` — fix requires changes in another scope
-- `failed` — timeout, recurring findings, or execution error
+When a scope's fast agent reports `completed`, **immediately** launch a `review-fix-lead`
+subagent for the same scope with `round_type: final`, `model: {model}`. Do not wait for
+other scopes.
 
-**Fail-closed**: if an agent fails or times out, treat as `findings_remain`.
+Agent status handling for the `final` agent:
 
-**Verdict JSON and auto-record** are handled internally by the review-fix-lead agent
-and the `bin/sotp review codex-local` wrapper. The orchestrator does not parse verdict
-JSON directly — it only acts on the agent's status report.
+- `completed` → that scope is review-complete.
+- `blocked_cross_scope` → fix cross-scope dependencies from the orchestrator, then relaunch.
+- `failed` / timeout → relaunch or report to user depending on cause.
 
-### 2e. Orchestrator actions per status
+Each scope's lifecycle is independent — scope hashes are per-group, so modifications in one
+scope do not affect another scope's hash.
 
-- `completed` → immediately launch full model confirmation for that scope (Step 2f)
-- `blocked_cross_scope` → fix cross-scope dependencies in the orchestrator, then relaunch
-- `failed` / timeout → immediately relaunch or report to user depending on cause
+## Step 6: Final validation
 
-### 2f. Full model confirmation (per-scope, immediate)
+1. `cargo make ci` (full CI, not just `ci-rust`) — fix and re-run on failure (does not reset the loop).
+2. `cargo make track-check-approved -- --track-id {track-id}` — exit 0 confirms readiness.
+   Non-zero exit means review is not complete (e.g., stale hash, auto-record failure); diagnose
+   and resolve before declaring readiness.
 
-When a scope's review-fix-lead reports `completed` (fast model `zero_findings`),
-**immediately** launch a full model confirmation for that scope. Do not wait for other scopes.
-
-Launch a `review-fix-lead` agent for that scope with `{model}` (full model) and
-`--round-type final`. If the full model reports `zero_findings`: that scope is done.
-If the full model finds new issues: the orchestrator updates the briefing for that scope
-to include the full-model findings and previously applied fixes, then relaunches
-review-fix-lead for that scope, choosing `{fast_model}` or `{model}` based on its
-assessment of the findings.
-
-A scope's review is complete only when **full model `zero_findings`** is recorded for it.
-Step 3 begins when all scopes have achieved full model `zero_findings`.
-
-### Model escalation strategy
-
-**CRITICAL: fast model の zero_findings はレビュー完了の根拠にならない。**
-レビュー完了は **full model の zero_findings** によってのみ確認される。
-
-Resolve models from `.harness/config/agent-profiles.json` using the `reviewer` capability:
-- `{fast_model}`: `capabilities.reviewer.fast_model`, then `capabilities.reviewer.model`. If neither exists, skip `--model`.
-- `{model}`: `capabilities.reviewer.model`. If not set, skip `--model`.
-
-### Per-scope independence (throughput-first)
-
-Each scope's review lifecycle is fully independent. Scopes do not wait for each other.
-`group_scope_hash` is computed per-group from that group's scope files only, so
-modifications in one scope do not affect another scope's hash.
-
-### Loop guard
-
-- The review-fix-lead agent loops until `zero_findings`, `blocked_cross_scope`,
-  `failed`, or Agent timeout (60 minutes/scope).
-- If the same finding recurs 3 times with no code change addressing it, the agent should
-  return `failed` with the recurring finding details.
-
-> **Note**: v2 escalation (concern tracking, `EscalationActive`) is not yet implemented
-> (RV2-06). The Agent timeout serves as the primary infinite-loop prevention mechanism.
-
-## Step 3: Final validation
-
-After the reviewer reports zero findings:
-1. Run `cargo make ci` (full CI, not just ci-rust) to confirm all checks pass.
-2. If CI fails, fix and re-run (this does not reset the review loop counter).
-3. **Review state guard verification (mandatory)**: Run `cargo make track-check-approved -- --track-id {track-id}`
-   to confirm the review state is `Approved`. This is the authoritative readiness check —
-   do NOT declare "Ready" based solely on reviewer stdout verdicts.
-   - If `check-approved` returns exit code 0: review is complete. Proceed to "Ready".
-   - If `check-approved` returns non-zero: review is NOT complete. Diagnose the cause
-     (stale code hash, auto-record failure) and resolve before declaring readiness.
-
-**NotStarted bypass** (PR-based workflow): When `review.json` does not exist AND all required
-scopes are in `NotStarted` state, `check-approved` treats this as a valid bypass and returns
-exit code 0. This allows commits when only the PR-based review path (`/track:pr-review`) is
-used without a preceding local review. Once any local review round has been recorded (i.e.,
-`review.json` exists or any scope has progressed beyond `NotStarted`), the bypass is no longer
-available and full approval is required.
+NotStarted bypass: when `review.json` does not exist and every required scope is `NotStarted`,
+`check-approved` returns exit 0 to allow PR-based reviews (`/track:pr-review`) without a local
+round. Once any local round is recorded, the bypass is no longer available.
 
 ## Behavior
 
 After execution, summarize:
-1. Total review rounds completed
-2. Reviewer groups used and parallelization (e.g., "3 parallel groups: infrastructure, usecase, cli")
-3. Findings per round (count and severity breakdown, grouped by layer)
-4. Fixes applied (with file references)
-5. Final CI result
-6. Review state guard (`check-approved`) result
-7. Merge/commit readiness (Ready / Not ready with reason)
-8. Recommended next command (`/track:commit <message>`)
+
+1. Required scopes and their `final` round verdicts
+2. Findings fixed (with file references)
+3. CI + `check-approved` result
+4. Commit readiness and the recommended next command (`/track:commit <message>`)

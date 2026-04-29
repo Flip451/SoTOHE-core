@@ -79,7 +79,8 @@ when you need to inspect what the reviewer said previously for your scope:
 `--limit 0` (the default) shows only the per-scope state summary and is the
 right form when you just need to confirm `required (stale hash)` /
 `required (findings remain)` / `approved`. See `.claude/commands/track/review.md`
-§ "track-review-results flag reference" for the complete option list.
+§ "track-review-results flag reference" for common flags; run
+`cargo make track-review-results -- --help` for the complete option list.
 
 1. **Review**: Run `cargo make track-local-review` with the provided briefing, the assigned model, and the assigned `--round-type` (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other).
 2. **Parse verdict**: Read the verdict from command output.
