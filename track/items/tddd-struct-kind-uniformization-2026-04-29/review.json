@@ -1,0 +1,263 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 offers \"continue on the current branch\" when the starting branch is not `main`, but Step 2 still unconditionally creates `track/<id>` from `main`. That leaves no actual execution path for the suggested non-main continuation option, so the command can send the user into an impossible choice.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "line": 19,
+              "category": "logic"
+            },
+            {
+              "message": "The non-empty `git status` handling is internally inconsistent for the intended baseline-file case: it first says every listed item needs user handling, then says `knowledge/` baseline files need no action and can just be carried to Step 3, while still requiring the user to resolve the non-empty state before proceeding. As written, the common baseline case can still block the bootstrap flow without a clear resolution rule.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "line": 20,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:091f7499e58730859aaaeedf2d13c9ff163cf9cbf65c9f9a7823f80221836104",
+          "at": "2026-04-29T10:32:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review` reads the current track's `metadata.json` before it can proceed. At that point step 4 has not created `track/items/<track-id>/metadata.json` yet, so the documented 'typical' flow is not actually executable in this order.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
+          "at": "2026-04-29T10:38:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review`’s own context-gathering step requires the track’s `metadata.json` to already exist. Because `metadata.json` is only created in step 4, the documented first-commit path is not executable in the order shown.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
+          "at": "2026-04-29T10:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The step sequence no longer matches the harness-policy intent: step 3 is now `metadata.json` creation, step 4 is verification, and the `/track:review` → `/track:commit` guidance is pushed to step 5. That makes the renumbered workflow inconsistent with the requested 1-5 ordering and leaves the earlier `step 5 below` reference pointing at a different kind of action than the briefing intended.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "documentation"
+            },
+            {
+              "message": "Step 5 says that having `metadata.json` 'satisfies `/track:review`'s prerequisite of reading `metadata.json` / `plan.md` / `spec.md`', but this init flow only creates `metadata.json`. `plan.md` and `spec.md` are not produced here, so the command is asserting prerequisite satisfaction that it does not actually establish.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 38,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:42e7024e447f0d4aaf92cebeb02e7ed2e380f5d9ce60de31ca2cb7f30398dfe9",
+          "at": "2026-04-29T10:44:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
+          "at": "2026-04-29T10:49:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 sends the user directly from metadata verification to `/track:review` and says `plan.md` is auto-rendered, but steps 1-4 never run `cargo make track-sync-views`. A freshly initialized track can therefore reach the first-review flow with only `metadata.json` present, while the review command expects `plan.md`/track context before invoking the reviewer. Add an explicit `track-sync-views` step before the `/track:review` guidance, or make the guidance point to a command path that performs the sync first.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 38,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
+          "at": "2026-04-29T10:53:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b628f2e6bf0a880f1373c89415b0dcb391ab395047189287319ed14bd3e5d19",
+          "at": "2026-04-29T11:00:58Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 describes `domain_service` as the place for DDD domain services, including stateless aggregate-crossing operations, but the selection rules only admit structs with at least one field and route zero-field cases to `free_function`. As written, the new kind does not actually cover the stateless domain-service case it claims to solve.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 161,
+              "category": "contradiction"
+            },
+            {
+              "message": "S2 says the current `methods_of()` special handling becomes unnecessary, but the replacement still keeps direct arms for `SecondaryPort` and `ApplicationService` and preserves the `SecondaryAdapter` trait-impl path. This is a simplification, not elimination, so the claim is overstated.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 235,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
+          "at": "2026-04-29T10:34:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`field empty enforcement` for `value_object.expected_methods` would make every `value_object` method illegal, including the `new() -> Result<Self, FooError>` constructors this ADR says M1 is meant to enable. If getters/accessors are still allowed, the rule needs to target a narrower notion of behavior than \"all methods\".",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 304,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `SecondaryAdapter` renderer branch still reads only `implements[].expected_methods`, so the new direct `expected_methods` added to `SecondaryAdapter` in M1 would never affect contract-map rendering or validation. That leaves one of the introduced schema fields effectively dead.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 260,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
+          "at": "2026-04-29T10:37:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 describes `domain_service` as a stateless domain service, but the same section makes it a field-bearing kind (`expected_members`) and then requires at least one member in the selection criteria. That leaves the new kind's semantics inconsistent: readers cannot tell whether it is meant for pure stateless services or stateful behavioral structs.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 166,
+              "category": "contradiction"
+            },
+            {
+              "message": "M1 says all nine struct kinds gain `expected_methods`, but the proposed `methods_of()` rewrite still excludes `Typestate` from the uniform match arm. As written, one of the supposedly uniformized struct kinds remains on the old non-method path, so the renderer change does not actually match the decision text.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 246,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
+          "at": "2026-04-29T10:39:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 says `methods_of()` will be made uniform after M1, but the proposed match still special-cases `SecondaryAdapter` via `implements` only. That leaves any methods declared on `SecondaryAdapter.expected_methods` invisible to the contract-map, so the renderer change does not actually match the schema uniformization promised in M1.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 262,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a52f2631e960ee28345856b3681feb80b5a029a7ee99729498d1627c666e9bf3",
+          "at": "2026-04-29T10:43:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR is listed in the README index with status `—`, but the ADR frontmatter marks all decisions as `proposed`; this leaves the index out of sync with the artifact's lifecycle state. Use an explicit lifecycle state here instead of `—`.",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 98,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e2ad73cfc1ced99c7a38faea51585dc5ae68fb5b6527590e861e56dcefe2a0b9",
+          "at": "2026-04-29T10:45:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afd9bb586f77424d94820c2ac74d676c935ca5d5e4cf1b72990bd9a2ce876161",
+          "at": "2026-04-29T10:47:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 says `methods_of()` will use \"uniform 処理 (特例分岐なし)\" and that the existing special branches become unnecessary, but the proposed implementation still gives `SecondaryAdapter` its own branch that merges top-level `expected_methods` with `implements[].expected_methods`. That leaves the design intent ambiguous: either `SecondaryAdapter` is intentionally special and the surrounding text/consequences should stop promising no special case, or the implementation sketch should handle it uniformly like the other struct kinds.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 246,
+              "category": "contradiction"
+            },
+            {
+              "message": "§4 treats the `ComplianceContext`-class behavioral struct not appearing in the graph as a downstream effect of `methods_of()`/schema non-uniformity, but later the ADR states that the current `ComplianceContext` has no catalogue declaration and will be authored in another track. An undeclared type cannot be made visible by renderer/schema uniformization, so the ADR conflates missing catalogue coverage with missing method-edge rendering and overstates what M1/S2 will resolve.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 88,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:afd9bb586f77424d94820c2ac74d676c935ca5d5e4cf1b72990bd9a2ce876161",
+          "at": "2026-04-29T10:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain_service` の配置方針が矛盾しています。S1 では placement table と判定基準で usecase 層配置を「trans-domain な application logic の場合のみ要根拠」として許容している一方、S3 の linter primitive 例では `domain_service` を「domain 層のみ」として enforce するとしています。このままだと実装者が linter を domain-only にすべきか、usecase 条件付き許容にすべきか判断できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 333,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b2240e835241faff78dd4cf16bc52a99fae65a20781276e4593176eddaceed1a",
+          "at": "2026-04-29T11:07:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df4b244ff51ad046a66b1485d370ec8f43eceabf5633748b494efac19668c724",
+          "at": "2026-04-29T11:10:16Z"
+        }
+      ]
+    }
+  }
+}

@@ -95,6 +95,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ②)](2026-04-23-0344-catalogue-spec-signal-activation.md) | — | 2026-04-23 |
 | [type-designer Phase 2 reconnaissance step — 設計開始前に baseline + type-graph で既存型インベントリを把握する](2026-04-25-0353-type-designer-reconnaissance-step.md) | — | 2026-04-25 |
 | [type-designer reconnaissance のレンダリングオプション既定値 — depth=1+2 + edges=all](2026-04-25-0530-type-designer-recon-options-defaults.md) | — | 2026-04-25 |
+| [TDDD struct kind taxonomy の field/method 均質化と type catalogue linter 機構の導入](2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md) | Proposed | 2026-04-28 |
 
 ### トラック・ワークフロー
 
