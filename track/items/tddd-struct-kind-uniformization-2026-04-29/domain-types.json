@@ -97,6 +97,7 @@
           "ty": "Vec<String>"
         }
       ],
+      "expected_methods": [],
       "spec_refs": [
         {
           "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
@@ -155,6 +156,7 @@
           "ty": "String"
         }
       ],
+      "expected_methods": [],
       "spec_refs": [
         {
           "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",

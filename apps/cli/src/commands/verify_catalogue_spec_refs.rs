@@ -525,6 +525,7 @@ mod tests {
                     "description": "dangling anchor",
                     "approved": true,
                     "kind": "value_object",
+                    "expected_methods": [],
                     "spec_refs": [
                         {
                             "file": "track/items/x/spec.json",
@@ -757,6 +758,7 @@ mod tests {
                     "description": "valid anchor, wrong hash",
                     "approved": true,
                     "kind": "value_object",
+                    "expected_methods": [],
                     "spec_refs": [
                         {
                             "file": "track/items/test-track/spec.json",

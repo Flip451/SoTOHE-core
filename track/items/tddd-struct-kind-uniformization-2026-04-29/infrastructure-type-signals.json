@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T13:16:59Z",
-  "declaration_hash": "3cf7b4864b8569dd8d810084050252a4c46659de47bf2db480d547eff50bf505",
+  "generated_at": "2026-04-29T14:04:04Z",
+  "declaration_hash": "5371eb2506532b24162808ab3cf704eb1b530d2ed4ee8103194b4c10bb650cee",
   "signals": [
     {
       "type_name": "TypeDefinitionKindDto",

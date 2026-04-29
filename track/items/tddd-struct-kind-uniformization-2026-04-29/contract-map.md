@@ -5,6 +5,7 @@ flowchart LR
     classDef query fill:#f3e5f5,stroke:#8e24aa
     classDef factory fill:#fff8e1,stroke:#f9a825
     classDef free_function fill:#f1f8e9,stroke:#558b2f
+    classDef domain_service fill:#fce4ec,stroke:#c62828
     subgraph domain [domain]
         L6_domain_TypeDefinitionKind{{TypeDefinitionKind}}
         L6_domain_CatalogueLinterRuleKind{{CatalogueLinterRuleKind}}

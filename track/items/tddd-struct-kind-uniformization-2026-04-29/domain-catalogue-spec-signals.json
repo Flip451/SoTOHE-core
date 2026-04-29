@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7aa1748cff6c30ffc8d275c2887812c70fbb3f81bda236081e06fb7976b62f6c",
+  "catalogue_declaration_hash": "e9f4e6df36a659e5456c10c2a3b88e6e1ab915fa60254560dffd49b84789df46",
   "signals": [
     {
       "type_name": "TypeDefinitionKind",

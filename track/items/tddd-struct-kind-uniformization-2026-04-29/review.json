@@ -1,119 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
-          "at": "2026-04-29T12:56:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DomainService` entries still will not render: `render_type_catalogue` only iterates entries whose `kind_tag()` matches a tag in `SECTIONS`, and this list has no `domain_service` section. The new `render_details` arm is therefore unreachable for `DomainService`, and the existing coverage test also misses it because its sample list omits `TypeDefinitionKind::DomainService`. Any in-memory catalogue containing a domain service will silently drop that row from the generated markdown.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 154,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
-          "at": "2026-04-29T12:58:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
-          "at": "2026-04-29T13:12:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
-          "at": "2026-04-29T13:15:29Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
-          "at": "2026-04-29T12:52:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
-          "at": "2026-04-29T12:53:46Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T12:55:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService nodes are emitted with the `:::domain_service` class, but the renderer header only defines classDefs for secondary_adapter, command, query, factory, and free_function. This leaves the new class reference undefined in generated Mermaid output, unlike every other styled kind; add a `classDef domain_service ...` line and cover it in the shape/class test.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 386,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T12:59:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService nodes are emitted with the `:::domain_service` class, but `render_contract_map` only declares classDefs for `secondary_adapter`, `command`, `query`, `factory`, and `free_function`. This leaves the new Mermaid class reference undefined in generated contract maps; add a `classDef domain_service ...` header entry and cover the DomainService shape/class in the renderer test.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 386,
-              "category": null
-            },
-            {
-              "message": "The SecondaryAdapter variant documentation says renderer `methods_of()` merges direct `expected_methods` with `implements[].expected_methods`, but the current renderer arm only reads `implements` and ignores the new top-level `expected_methods`. Since T003 is explicitly deferred, this comment is currently a factual contradiction and should be reworded as future behavior or the renderer should actually merge both sources.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 456,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T13:01:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5722b6ce4ea4b8b38fd47edc9ffc44f55eec281c14d29fbe0961fdebd0c5a5a6",
-          "at": "2026-04-29T13:03:43Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -466,6 +353,151 @@
           "findings": [],
           "hash": "rvw1:sha256:ed2046263576ab6ed34027f964e2666f7f07a3d8570e088692ae779a2d50f555",
           "at": "2026-04-29T13:11:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinter` is a `secondary_port`, but this artifact adds `expected_methods` to it. The scope policy explicitly says `secondary_port` entries must not gain that field, so this JSON no longer matches the intended plan-artifact schema.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
+              "line": 194,
+              "category": "factual error"
+            },
+            {
+              "message": "`RunCatalogueLint` is an `application_service`, but this artifact adds `expected_methods` to it. The scope policy explicitly excludes `application_service` entries from the new field, so this entry is semantically inconsistent with the intended codec/catalogue shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 87,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:45:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:49:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService placement is described inconsistently: this task text says `domain/usecase ✓`, but the surrounding S1/S8 matrix says `usecase △`. The plan needs one consistent rule for whether usecase placement is fully allowed or only conditional.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:55:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:56:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:59:07Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:47:26Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T12:55:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService nodes are emitted with the `:::domain_service` class, but the renderer header only defines classDefs for secondary_adapter, command, query, factory, and free_function. This leaves the new class reference undefined in generated Mermaid output, unlike every other styled kind; add a `classDef domain_service ...` line and cover it in the shape/class test.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 386,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T12:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService nodes are emitted with the `:::domain_service` class, but `render_contract_map` only declares classDefs for `secondary_adapter`, `command`, `query`, `factory`, and `free_function`. This leaves the new Mermaid class reference undefined in generated contract maps; add a `classDef domain_service ...` header entry and cover the DomainService shape/class in the renderer test.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 386,
+              "category": null
+            },
+            {
+              "message": "The SecondaryAdapter variant documentation says renderer `methods_of()` merges direct `expected_methods` with `implements[].expected_methods`, but the current renderer arm only reads `implements` and ignores the new top-level `expected_methods`. Since T003 is explicitly deferred, this comment is currently a factual contradiction and should be reworded as future behavior or the renderer should actually merge both sources.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 456,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T13:01:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5722b6ce4ea4b8b38fd47edc9ffc44f55eec281c14d29fbe0961fdebd0c5a5a6",
+          "at": "2026-04-29T13:03:43Z"
         }
       ]
     },
@@ -573,24 +605,189 @@
           "findings": [],
           "hash": "rvw1:sha256:9b628f2e6bf0a880f1373c89415b0dcb391ab395047189287319ed14bd3e5d19",
           "at": "2026-04-29T11:00:58Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Broadening `completed` to mean “zero_findings for the assigned round_type” is incompatible with the caller contract in `.claude/commands/track/review.md:199-234`, which still treats `completed` as the fast-round handoff that triggers step 2f full-model confirmation. If a final-round agent reports `completed`, the orchestrator will mis-handle it as another fast completion and re-enter confirmation instead of terminating.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 28,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:f894bdbc377fac533cdaff70f2ff88c3d2f5427afafc3169a110f5ab63e6763f",
+          "at": "2026-04-29T13:46:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2.5 overstates what `--round-type` does. The `track/review.md` docs say the filter only applies to displayed history, while the state-line summary still reflects the newest round regardless of the filter. As written, an agent can still misread the unfiltered summary and treat the wrong round as the completion verdict.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 93,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:f894bdbc377fac533cdaff70f2ff88c3d2f5427afafc3169a110f5ab63e6763f",
+          "at": "2026-04-29T13:47:51Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:54:00Z"
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:49:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`completed` now means “the assigned round_type returned zero_findings,” but the orchestrator flow in `.claude/commands/track/review.md` still treats `completed` as a fast-round-only signal and immediately launches final confirmation. A successful `final` round would therefore re-trigger confirmation instead of terminating the scope, so the escalation loop does not converge.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 28,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:54:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:56:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The agent definition still includes a parenthetical incident reference, `over-long review loops (28-round history)`, despite the harness-policy checklist requiring the body to be rule/step-list only with past incident references removed. This leaves the requested policy cleanup incomplete.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 47,
+              "category": "policy_compliance"
+            }
+          ],
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:58:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2.5 tells the agent to verify an inline entry containing `verdict: zero_findings`, but the referenced `track-review-results --limit 1` output does not emit a `verdict:` field for the displayed round; the current API renders the filtered latest round as `findings: zero_findings` or a findings list, while only history lines contain `<round>@<timestamp> <verdict>`. This makes the mandatory completion check look for a string the canonical API does not print, so an agent can fail to ever report `completed` after a successful review.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 99,
+              "category": "broken-ref"
+            }
+          ],
+          "hash": "rvw1:sha256:e212c85723fa579a364a00d59017746546fff1ec8da6bf9266a769619491c2db",
+          "at": "2026-04-29T13:59:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:55:45Z"
+          "hash": "rvw1:sha256:df63d60cf6dbe69f75571d490a3e529469306a5be48c34d728b0be15da7ca493",
+          "at": "2026-04-29T14:01:44Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
+          "at": "2026-04-29T12:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DomainService` entries still will not render: `render_type_catalogue` only iterates entries whose `kind_tag()` matches a tag in `SECTIONS`, and this list has no `domain_service` section. The new `render_details` arm is therefore unreachable for `DomainService`, and the existing coverage test also misses it because its sample list omits `TypeDefinitionKind::DomainService`. Any in-memory catalogue containing a domain service will silently drop that row from the generated markdown.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 154,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
+          "at": "2026-04-29T12:58:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
+          "at": "2026-04-29T13:12:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
+          "at": "2026-04-29T13:15:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
+          "at": "2026-04-29T13:46:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService is a new struct-based kind, but it is not included in the Phase 1.5 forbidden-field guard. A `domain_service` entry with `expected_methods` plus a stale field such as `implements`, `expected_variants`, or `transitions_to` will pass this pre-validation and serde will silently drop the stale field during flattened enum deserialization, reintroducing the data-loss case this guard is meant to prevent. Add `domain_service` to this guard or add an equivalent DomainService-specific check.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 380,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
+          "at": "2026-04-29T13:49:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:127fcc0b2ec873ccd19ccf463e2712fad566050782c6b78f6e4de67526b80d6c",
+          "at": "2026-04-29T13:53:18Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
+          "at": "2026-04-29T12:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
+          "at": "2026-04-29T12:53:46Z"
         }
       ]
     }

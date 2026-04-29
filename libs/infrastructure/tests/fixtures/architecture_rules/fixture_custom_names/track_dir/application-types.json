@@ -5,7 +5,9 @@
       "name": "AppInteractor",
       "kind": "use_case",
       "description": "application-layer use case",
-      "approved": true
+      "approved": true,
+      "expected_members": [],
+      "expected_methods": []
     }
   ]
 }

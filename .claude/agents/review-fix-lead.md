@@ -8,9 +8,8 @@ description: Own one review scope, autonomously fix findings and re-review until
 
 ## Mission
 
-Own a single review scope (e.g., `domain`, `infrastructure`, `cli`). Autonomously loop:
-review → fix → verify → re-review until the reviewer reports `zero_findings` on fast model.
-Then return control to the orchestrator for full model escalation.
+Own a single review scope (e.g., `domain`, `infrastructure`, `cli`) for the **single round_type** the orchestrator assigns (`fast` or `final`). Autonomously loop:
+review → fix → verify → re-review until the reviewer reports `zero_findings` for that assigned round_type. Then return control to the orchestrator (which decides whether to escalate `fast` → `final`, run another scope, or stop).
 
 ## Contract
 
@@ -18,14 +17,15 @@ Then return control to the orchestrator for full model escalation.
 
 - Track ID and scope name
 - Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`)
-- Fast model name for reviewer invocation
+- Round type (`fast` or `final`) — single value, fixed for the agent's lifetime
+- Reviewer model name for that round
 - Scope file list (files this agent is allowed to modify)
 
 ### Output (structured status in final message)
 
 Report one of the following statuses:
 
-- `completed` — fast model returned `zero_findings`. Ready for full model confirmation.
+- `completed` — the assigned round_type returned `zero_findings` (verified via canonical API per step 2.5).
 - `blocked_cross_scope` — a fix requires modifying files outside this agent's scope.
   Include the list of out-of-scope files needed.
 - `failed` — unrecoverable error (CI failure, reviewer crash, etc.). Include error details.
@@ -44,7 +44,7 @@ If the main briefing contains a `## Scope-specific severity policy` section,
 you MUST read the file listed there using your `Read` tool **before starting
 the review**. That file defines which finding categories to report and which
 to skip for this scope. Applying the wrong severity filter is the primary
-cause of over-long review loops (28-round history).
+cause of over-long review loops.
 
 Do not skip this step even if the briefing path appears to be a known file.
 Always read it fresh — the policy file may have been updated since the last
@@ -72,27 +72,35 @@ canonical read-only API for review state and round history. Useful invocations
 when you need to inspect what the reviewer said previously for your scope:
 
 - Latest fast-round findings only:
-  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit 1 --round-type fast`
+  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type fast --limit 1`
 - Latest final-round findings only:
-  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit 1 --round-type final`
-- Full round history for the scope:
-  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit all`
+  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type final --limit 1`
 
 `--limit 0` (the default) shows only the per-scope state summary and is the
 right form when you just need to confirm `required (stale hash)` /
 `required (findings remain)` / `approved`. See `.claude/commands/track/review.md`
 § "track-review-results flag reference" for the complete option list.
 
-1. **Review**: Run `cargo make track-local-review` with the provided briefing and fast model.
+1. **Review**: Run `cargo make track-local-review` with the provided briefing, the assigned model, and the assigned `--round-type` (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other).
 2. **Parse verdict**: Read the verdict from command output.
-   - `zero_findings` → return `completed`
-   - `findings_remain` → proceed to fix phase
-   - Error → return `failed`
+   - `zero_findings` → proceed to step 2.5 (verify via canonical API).
+   - `findings_remain` → proceed to fix phase.
+   - Error → return `failed`.
+2.5. **Verify via canonical API (mandatory before reporting `completed`)**:
+   ```
+   cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type {round_type} --limit 1
+   ```
+   `--limit 1` prints the most recent round entry for the assigned round_type as a findings
+   block below the state-line. The state-line suffix (`[+] {scope}: approved  {round_type}@{ts} zero_findings`)
+   and the findings block (`findings: zero_findings`) are the two signals for a passing round.
+   - State-line shows `[+]` / `approved` AND findings block shows `findings: zero_findings` → return `completed`.
+   - State-line shows `[-]` / `required` OR findings block lists findings → re-loop into the fix phase (the API is authoritative over parsed stdout).
+   - No matching entry for the assigned round_type (empty output below state-line) → re-loop.
 3. **Fix phase**:
    - Verify each finding's factual claims via `Grep` / `Read` before acting.
-   - To recall the previous round's findings without re-running the reviewer,
-     use `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit 1 --round-type fast`
-     (or `final` for full-model rounds).
+   - To recall previous-round findings without re-running the reviewer,
+     use `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type {round_type} --limit N`
+     (N is a positive integer; `1` returns only the most recent entry — keep N small to avoid context bloat).
    - P3 findings from pre-existing unchanged code: note but do not fix.
    - P0/P1/P2: implement the fix within scope boundaries.
    - If a fix requires out-of-scope files: return `blocked_cross_scope`.

@@ -337,6 +337,7 @@ mod tests {
                     "description": "blue entry — has spec_refs, no informal_grounds",
                     "approved": true,
                     "kind": "value_object",
+                    "expected_methods": [],
                     "spec_refs": [
                         {
                             "file": "track/items/x/spec.json",
@@ -350,6 +351,7 @@ mod tests {
                     "description": "yellow entry — has informal_grounds",
                     "approved": true,
                     "kind": "value_object",
+                    "expected_methods": [],
                     "informal_grounds": [
                         {"kind": "user_directive", "summary": "pending formalization"}
                     ]
@@ -358,7 +360,8 @@ mod tests {
                     "name": "RedType",
                     "description": "red entry — no refs, no grounds",
                     "approved": true,
-                    "kind": "value_object"
+                    "kind": "value_object",
+                    "expected_methods": []
                 }
             ]
         });

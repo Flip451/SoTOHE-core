@@ -5,7 +5,9 @@
       "name": "UsecaseInteractor",
       "kind": "use_case",
       "description": "usecase-layer struct-only use case",
-      "approved": true
+      "approved": true,
+      "expected_members": [],
+      "expected_methods": []
     }
   ]
 }

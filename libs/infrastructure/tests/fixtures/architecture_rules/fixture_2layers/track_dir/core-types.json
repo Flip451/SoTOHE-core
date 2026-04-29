@@ -5,7 +5,9 @@
       "name": "CoreValue",
       "kind": "value_object",
       "description": "core-layer value object",
-      "approved": true
+      "approved": true,
+      "expected_members": [],
+      "expected_methods": []
     }
   ]
 }

@@ -1405,7 +1405,7 @@ mod tests {
         // domain-types.json: one entry with a yellow signal.
         std::fs::write(
             tmp.path().join("domain-types.json"),
-            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true,"expected_methods":[]}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
         write_matching_signal_file(tmp.path(), "domain-types.json", "domain-type-signals.json");
@@ -1430,7 +1430,7 @@ mod tests {
         // domain-types.json: one entry with a yellow signal.
         std::fs::write(
             tmp.path().join("domain-types.json"),
-            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true,"expected_methods":[]}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
         write_matching_signal_file(tmp.path(), "domain-types.json", "domain-type-signals.json");
@@ -1821,7 +1821,8 @@ mod tests {
                     "description": "test fixture",
                     "kind": "value_object",
                     "action": "add",
-                    "approved": true
+                    "approved": true,
+                    "expected_methods": []
                 }
             ]
         });

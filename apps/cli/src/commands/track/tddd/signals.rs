@@ -1373,7 +1373,7 @@ mod tests {
         let domain_types_json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_methods": [] }
   ]
 }"#;
         let (items_dir, track_id) = setup_track(dir.path(), domain_types_json);
