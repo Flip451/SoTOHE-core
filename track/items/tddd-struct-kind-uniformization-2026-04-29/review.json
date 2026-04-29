@@ -1,97 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T12:55:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService nodes are emitted with the `:::domain_service` class, but the renderer header only defines classDefs for secondary_adapter, command, query, factory, and free_function. This leaves the new class reference undefined in generated Mermaid output, unlike every other styled kind; add a `classDef domain_service ...` line and cover it in the shape/class test.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 386,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T12:59:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService nodes are emitted with the `:::domain_service` class, but `render_contract_map` only declares classDefs for `secondary_adapter`, `command`, `query`, `factory`, and `free_function`. This leaves the new Mermaid class reference undefined in generated contract maps; add a `classDef domain_service ...` header entry and cover the DomainService shape/class in the renderer test.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 386,
-              "category": null
-            },
-            {
-              "message": "The SecondaryAdapter variant documentation says renderer `methods_of()` merges direct `expected_methods` with `implements[].expected_methods`, but the current renderer arm only reads `implements` and ignores the new top-level `expected_methods`. Since T003 is explicitly deferred, this comment is currently a factual contradiction and should be reworded as future behavior or the renderer should actually merge both sources.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 456,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T13:01:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5722b6ce4ea4b8b38fd47edc9ffc44f55eec281c14d29fbe0961fdebd0c5a5a6",
-          "at": "2026-04-29T13:03:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
-          "at": "2026-04-29T14:14:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
-          "at": "2026-04-29T14:17:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The task requires `contract_map_render.rs` to stay within `architecture-rules.json` `module_limits.max_lines = 700`, but this patch adds the new tests directly to the same file. The file is now 1797 lines, and the module-size verifier counts full `.rs` files without excluding `#[cfg(test)]`, so the line-limit acceptance criterion remains unsatisfied. Move the tests into a separate test module/file or split the renderer before marking this done.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 1462,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
-          "at": "2026-04-29T14:24:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:41dd994eee15294d2dea2f09c7315eb23d8757691829e936f0a97dfd35cf106b",
-          "at": "2026-04-29T14:36:22Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -597,6 +506,244 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:47:26Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
+          "at": "2026-04-29T12:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DomainService` entries still will not render: `render_type_catalogue` only iterates entries whose `kind_tag()` matches a tag in `SECTIONS`, and this list has no `domain_service` section. The new `render_details` arm is therefore unreachable for `DomainService`, and the existing coverage test also misses it because its sample list omits `TypeDefinitionKind::DomainService`. Any in-memory catalogue containing a domain service will silently drop that row from the generated markdown.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 154,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
+          "at": "2026-04-29T12:58:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
+          "at": "2026-04-29T13:12:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
+          "at": "2026-04-29T13:15:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
+          "at": "2026-04-29T13:46:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService is a new struct-based kind, but it is not included in the Phase 1.5 forbidden-field guard. A `domain_service` entry with `expected_methods` plus a stale field such as `implements`, `expected_variants`, or `transitions_to` will pass this pre-validation and serde will silently drop the stale field during flattened enum deserialization, reintroducing the data-loss case this guard is meant to prevent. Add `domain_service` to this guard or add an equivalent DomainService-specific check.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 380,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
+          "at": "2026-04-29T13:49:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:127fcc0b2ec873ccd19ccf463e2712fad566050782c6b78f6e4de67526b80d6c",
+          "at": "2026-04-29T13:53:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
+          "at": "2026-04-29T15:06:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
+          "at": "2026-04-29T15:08:12Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
+          "at": "2026-04-29T12:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
+          "at": "2026-04-29T12:53:46Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T12:55:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService nodes are emitted with the `:::domain_service` class, but the renderer header only defines classDefs for secondary_adapter, command, query, factory, and free_function. This leaves the new class reference undefined in generated Mermaid output, unlike every other styled kind; add a `classDef domain_service ...` line and cover it in the shape/class test.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 386,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T12:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService nodes are emitted with the `:::domain_service` class, but `render_contract_map` only declares classDefs for `secondary_adapter`, `command`, `query`, `factory`, and `free_function`. This leaves the new Mermaid class reference undefined in generated contract maps; add a `classDef domain_service ...` header entry and cover the DomainService shape/class in the renderer test.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 386,
+              "category": null
+            },
+            {
+              "message": "The SecondaryAdapter variant documentation says renderer `methods_of()` merges direct `expected_methods` with `implements[].expected_methods`, but the current renderer arm only reads `implements` and ignores the new top-level `expected_methods`. Since T003 is explicitly deferred, this comment is currently a factual contradiction and should be reworded as future behavior or the renderer should actually merge both sources.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 456,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T13:01:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5722b6ce4ea4b8b38fd47edc9ffc44f55eec281c14d29fbe0961fdebd0c5a5a6",
+          "at": "2026-04-29T13:03:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
+          "at": "2026-04-29T14:14:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
+          "at": "2026-04-29T14:17:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The task requires `contract_map_render.rs` to stay within `architecture-rules.json` `module_limits.max_lines = 700`, but this patch adds the new tests directly to the same file. The file is now 1797 lines, and the module-size verifier counts full `.rs` files without excluding `#[cfg(test)]`, so the line-limit acceptance criterion remains unsatisfied. Move the tests into a separate test module/file or split the renderer before marking this done.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 1462,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
+          "at": "2026-04-29T14:24:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41dd994eee15294d2dea2f09c7315eb23d8757691829e936f0a97dfd35cf106b",
+          "at": "2026-04-29T14:36:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d9a1ac52e751108e44b780e0dc311c0c9b60fd36e448640e59ed61e8a23349",
+          "at": "2026-04-29T15:57:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d9a1ac52e751108e44b780e0dc311c0c9b60fd36e448640e59ed61e8a23349",
+          "at": "2026-04-29T15:59:06Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -1021,139 +1168,56 @@
           "findings": [],
           "hash": "rvw1:sha256:5cc871b8fe129812dc91423a9d88e1223f2a5a83aff8f6bac1c4682fa77c4770",
           "at": "2026-04-29T14:14:42Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
-          "at": "2026-04-29T12:56:00Z"
+          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
+          "at": "2026-04-29T15:55:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
+          "at": "2026-04-29T15:56:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
+          "at": "2026-04-29T16:00:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
+          "at": "2026-04-29T16:03:24Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`DomainService` entries still will not render: `render_type_catalogue` only iterates entries whose `kind_tag()` matches a tag in `SECTIONS`, and this list has no `domain_service` section. The new `render_details` arm is therefore unreachable for `DomainService`, and the existing coverage test also misses it because its sample list omits `TypeDefinitionKind::DomainService`. Any in-memory catalogue containing a domain service will silently drop that row from the generated markdown.",
+              "message": "T004 is now marked in progress and the plan describes the six linter foundation types as the active deliverable, but the rendered domain type view only refreshes four of them to 🔵 and leaves `CatalogueLinterRule` / `CatalogueLintViolation` at 🟡. That makes the plan artifact internally inconsistent about whether the T004 domain types have been detected, so readers and gates see a partial signal refresh for a single six-type task.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 154,
-              "category": null
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.md",
+              "line": 14,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
-          "at": "2026-04-29T12:58:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
-          "at": "2026-04-29T13:12:25Z"
+          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
+          "at": "2026-04-29T16:05:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
-          "at": "2026-04-29T13:15:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
-          "at": "2026-04-29T13:46:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService is a new struct-based kind, but it is not included in the Phase 1.5 forbidden-field guard. A `domain_service` entry with `expected_methods` plus a stale field such as `implements`, `expected_variants`, or `transitions_to` will pass this pre-validation and serde will silently drop the stale field during flattened enum deserialization, reintroducing the data-loss case this guard is meant to prevent. Add `domain_service` to this guard or add an equivalent DomainService-specific check.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 380,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
-          "at": "2026-04-29T13:49:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:127fcc0b2ec873ccd19ccf463e2712fad566050782c6b78f6e4de67526b80d6c",
-          "at": "2026-04-29T13:53:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
-          "at": "2026-04-29T15:06:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
-          "at": "2026-04-29T15:08:12Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
-          "at": "2026-04-29T12:52:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
-          "at": "2026-04-29T12:53:46Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:54:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:55:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:45:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:47:26Z"
+          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
+          "at": "2026-04-29T16:08:22Z"
         }
       ]
     }

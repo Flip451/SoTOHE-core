@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T15:50:11Z",
+  "generated_at": "2026-04-29T16:08:45Z",
   "declaration_hash": "e9f4e6df36a659e5456c10c2a3b88e6e1ab915fa60254560dffd49b84789df46",
   "signals": [
     {
@@ -29,38 +29,65 @@
     {
       "type_name": "CatalogueLinterRuleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FieldEmpty",
+        "FieldNonEmpty",
+        "KindLayerConstraint"
+      ]
     },
     {
       "type_name": "CatalogueLinterRule",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "permitted_layers: Vec<String>",
+        "rule_kind: CatalogueLinterRuleKind",
+        "target_field: Option<String>",
+        "target_kind: String"
+      ]
     },
     {
       "type_name": "CatalogueLinterRuleError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyTargetKind",
+        "EmptyTargetField",
+        "EmptyPermittedLayers"
+      ]
     },
     {
       "type_name": "CatalogueLintViolation",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "entry_name: String",
+        "message: String",
+        "rule_kind: CatalogueLinterRuleKind"
+      ]
     },
     {
       "type_name": "CatalogueLinterError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidRuleConfig"
+      ]
     },
     {
       "type_name": "CatalogueLinter",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn run(&self, rules: &[CatalogueLinterRule], catalogue: &TypeCatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>"
+      ]
     }
   ]
 }
