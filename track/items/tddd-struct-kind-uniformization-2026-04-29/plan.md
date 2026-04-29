@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD struct kind 均質化と type catalogue linter framework の導入
 
-## Tasks (8/9 resolved)
+## Tasks (9/9 resolved)
 
 ### S1 — Domain Layer — M1+S1: TypeDefinitionKind Uniformization + DomainService Variant (T001)
 
@@ -80,4 +80,4 @@
 > M1 / S1 / S2 の変更が既存テストを壊していないことを特に確認する。
 > 失敗した gate があれば同タスク内で修正する。
 
-- [~] **T009**: cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-07)。T001-T008 完了後に実行する。(1) cargo make fmt-check — rustfmt の差分がないことを確認する。(2) cargo make clippy — warnings が 0 であることを確認する (-D warnings)。(3) cargo make test (nextest) — 新規追加した全ユニットテスト + 既存テストがすべて pass することを確認する (AC-07)。(4) cargo make deny — ライセンス・禁止クレートチェックが pass することを確認する。(5) cargo make check-layers — レイヤー依存関係チェック (domain が infrastructure に依存していないこと等) が pass することを確認する。(6) cargo make verify-* — plan-artifact-refs / plan-progress / arch-docs など既存の verify タスクが pass することを確認する。T001-T003 の変更 (TypeDefinitionKind + codec + renderer) が既存テストを壊していないことを特に確認する。失敗した gate があれば同タスク内で修正する。前提: T001-T008 完了。
+- [x] **T009**: cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-07)。T001-T008 完了後に実行する。(1) cargo make fmt-check — rustfmt の差分がないことを確認する。(2) cargo make clippy — warnings が 0 であることを確認する (-D warnings)。(3) cargo make test (nextest) — 新規追加した全ユニットテスト + 既存テストがすべて pass することを確認する (AC-07)。(4) cargo make deny — ライセンス・禁止クレートチェックが pass することを確認する。(5) cargo make check-layers — レイヤー依存関係チェック (domain が infrastructure に依存していないこと等) が pass することを確認する。(6) cargo make verify-* — plan-artifact-refs / plan-progress / arch-docs など既存の verify タスクが pass することを確認する。T001-T003 の変更 (TypeDefinitionKind + codec + renderer) が既存テストを壊していないことを特に確認する。失敗した gate があれば同タスク内で修正する。前提: T001-T008 完了。 (`935bab43c8e96f885c2051115bb0029e0bdbd4f0`)

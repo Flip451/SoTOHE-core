@@ -113,210 +113,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
-          "at": "2026-04-29T12:52:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
-          "at": "2026-04-29T12:53:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:31:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:34:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:35:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:41:43Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:54:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:55:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:45:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:47:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T16:58:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T17:01:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T17:08:29Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T12:55:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService nodes are emitted with the `:::domain_service` class, but the renderer header only defines classDefs for secondary_adapter, command, query, factory, and free_function. This leaves the new class reference undefined in generated Mermaid output, unlike every other styled kind; add a `classDef domain_service ...` line and cover it in the shape/class test.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 386,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T12:59:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService nodes are emitted with the `:::domain_service` class, but `render_contract_map` only declares classDefs for `secondary_adapter`, `command`, `query`, `factory`, and `free_function`. This leaves the new Mermaid class reference undefined in generated contract maps; add a `classDef domain_service ...` header entry and cover the DomainService shape/class in the renderer test.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 386,
-              "category": null
-            },
-            {
-              "message": "The SecondaryAdapter variant documentation says renderer `methods_of()` merges direct `expected_methods` with `implements[].expected_methods`, but the current renderer arm only reads `implements` and ignores the new top-level `expected_methods`. Since T003 is explicitly deferred, this comment is currently a factual contradiction and should be reworded as future behavior or the renderer should actually merge both sources.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 456,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
-          "at": "2026-04-29T13:01:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5722b6ce4ea4b8b38fd47edc9ffc44f55eec281c14d29fbe0961fdebd0c5a5a6",
-          "at": "2026-04-29T13:03:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
-          "at": "2026-04-29T14:14:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
-          "at": "2026-04-29T14:17:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The task requires `contract_map_render.rs` to stay within `architecture-rules.json` `module_limits.max_lines = 700`, but this patch adds the new tests directly to the same file. The file is now 1797 lines, and the module-size verifier counts full `.rs` files without excluding `#[cfg(test)]`, so the line-limit acceptance criterion remains unsatisfied. Move the tests into a separate test module/file or split the renderer before marking this done.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 1462,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
-          "at": "2026-04-29T14:24:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:41dd994eee15294d2dea2f09c7315eb23d8757691829e936f0a97dfd35cf106b",
-          "at": "2026-04-29T14:36:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d9a1ac52e751108e44b780e0dc311c0c9b60fd36e448640e59ed61e8a23349",
-          "at": "2026-04-29T15:57:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d9a1ac52e751108e44b780e0dc311c0c9b60fd36e448640e59ed61e8a23349",
-          "at": "2026-04-29T15:59:06Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -863,6 +659,164 @@
           "findings": [],
           "hash": "rvw1:sha256:d5bedbd952640a4c6ac2deb4b1c4c7a678c6413aae1e061db7ac44fd9a93e6fa",
           "at": "2026-04-29T17:19:48Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T12:55:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService nodes are emitted with the `:::domain_service` class, but the renderer header only defines classDefs for secondary_adapter, command, query, factory, and free_function. This leaves the new class reference undefined in generated Mermaid output, unlike every other styled kind; add a `classDef domain_service ...` line and cover it in the shape/class test.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 386,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T12:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService nodes are emitted with the `:::domain_service` class, but `render_contract_map` only declares classDefs for `secondary_adapter`, `command`, `query`, `factory`, and `free_function`. This leaves the new Mermaid class reference undefined in generated contract maps; add a `classDef domain_service ...` header entry and cover the DomainService shape/class in the renderer test.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 386,
+              "category": null
+            },
+            {
+              "message": "The SecondaryAdapter variant documentation says renderer `methods_of()` merges direct `expected_methods` with `implements[].expected_methods`, but the current renderer arm only reads `implements` and ignores the new top-level `expected_methods`. Since T003 is explicitly deferred, this comment is currently a factual contradiction and should be reworded as future behavior or the renderer should actually merge both sources.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 456,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6813b36f3778faf5ae85bb5856b314677f1e1c0d73d166a2e26bb008f3da1c36",
+          "at": "2026-04-29T13:01:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5722b6ce4ea4b8b38fd47edc9ffc44f55eec281c14d29fbe0961fdebd0c5a5a6",
+          "at": "2026-04-29T13:03:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
+          "at": "2026-04-29T14:14:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
+          "at": "2026-04-29T14:17:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The task requires `contract_map_render.rs` to stay within `architecture-rules.json` `module_limits.max_lines = 700`, but this patch adds the new tests directly to the same file. The file is now 1797 lines, and the module-size verifier counts full `.rs` files without excluding `#[cfg(test)]`, so the line-limit acceptance criterion remains unsatisfied. Move the tests into a separate test module/file or split the renderer before marking this done.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 1462,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3e48cd665ac5d3aa533d0447beb10512ecd8caa7d25d979d2680615086f228",
+          "at": "2026-04-29T14:24:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41dd994eee15294d2dea2f09c7315eb23d8757691829e936f0a97dfd35cf106b",
+          "at": "2026-04-29T14:36:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d9a1ac52e751108e44b780e0dc311c0c9b60fd36e448640e59ed61e8a23349",
+          "at": "2026-04-29T15:57:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d9a1ac52e751108e44b780e0dc311c0c9b60fd36e448640e59ed61e8a23349",
+          "at": "2026-04-29T15:59:06Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:47:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T16:58:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T17:01:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T17:08:29Z"
         }
       ]
     },
@@ -1460,6 +1414,73 @@
           "findings": [],
           "hash": "rvw1:sha256:272d12ec79ed8534c0cfc9d3b82841aed6d06ae789564521ffb96333d3dd7264",
           "at": "2026-04-29T17:27:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10a0fb9c89cdf819af856e599e0ba7c39fc27e2f919825fdf15af725b2033394",
+          "at": "2026-04-29T17:30:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10a0fb9c89cdf819af856e599e0ba7c39fc27e2f919825fdf15af725b2033394",
+          "at": "2026-04-29T17:31:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10a0fb9c89cdf819af856e599e0ba7c39fc27e2f919825fdf15af725b2033394",
+          "at": "2026-04-29T17:36:38Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
+          "at": "2026-04-29T12:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
+          "at": "2026-04-29T12:53:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:31:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:34:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:35:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:41:43Z"
         }
       ]
     }
