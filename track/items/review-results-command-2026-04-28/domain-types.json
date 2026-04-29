@@ -1,0 +1,235 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ReviewApprovalVerdict",
+      "description": "Domain enum expressing the outcome of the approval/bypass check for the entire track's review cycle. Three variants: Approved (all scopes are NotRequired(*) — no scope requires review; check-approved exits [OK]; hint fires in sotp review results only when Approved AND review.json exists as a separate check by the results command); ApprovedWithBypass { not_started_count: usize } (all Required scopes are Required(NotStarted) AND review.json is absent — PR-based workflow bypass, no local review recorded; check-approved emits [WARN] + SUCCESS; not_started_count carries count of Required(NotStarted) scopes for the WARN message; hint does NOT fire); Blocked { required_scopes: Vec<ScopeName> } (one or more scopes still require review and the bypass condition does not apply; check-approved emits [BLOCKED] + EXIT_FAILURE). Introduced to lift the approval/bypass judgment from CLI layer (apps/cli/src/commands/review/mod.rs run_check_approved) into domain/usecase (IN-05, AC-09). The three-variant enum-first design (per 04-coding-principles.md Enum-first) eliminates the previous boolean-flag + required-scope struct anti-pattern: Approved and ApprovedWithBypass are structurally distinct (Bypass carries not_started_count for WARN messaging), and Blocked carries the required scopes so the CLI can render a human-readable list without re-querying states. No serde derives in domain layer (per CN-04 hexagonal architecture).",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Approved",
+        "ApprovedWithBypass",
+        "Blocked"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "f2395faf9ed177a9d8480a5274e4ff61a9c1fa5282306b1feadb69aa550fc4be"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-09",
+          "hash": "8976a6fa63d4eb913c47b70146e03603e86362b24f31ae6e9a8fea0a9833ba84"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-10",
+          "hash": "8b412ed2977c87a02511b39a136aa556268c56dc6bf25d09bf0712a7bbaf7b01"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-11",
+          "hash": "839c54fc4b885e504fd33ab0ea4a8183ab158557fc141c41e5352cfe9ec3383c"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "CN-04",
+          "hash": "26c61b6deabea71b3559f9c4d1d63ff0ede713dbf75966ac4d60830158bfbdb6"
+        }
+      ]
+    },
+    {
+      "name": "ScopeRound",
+      "description": "Plain data struct holding the persisted state of one review round for a single scope. Introduced in T005 to carry the round-history payload that sotp review results reads when rendering state lines with latest-round suffix and expanding findings/history under --limit N. Fields: round_type: RoundType (fast | final), verdict: Verdict (ZeroFindings | FindingsRemain), findings: Vec<ReviewerFinding>, hash: ReviewHash, at: String (ISO 8601 timestamp). All four field types (RoundType, Verdict, ReviewerFinding, ReviewHash) are pre-existing domain types defined in libs/domain/src/review_v2/types.rs. hash is ReviewHash (Computed(ReviewHashValue) | Empty) rather than the narrower ReviewHashValue so that empty-hash rounds (stored as \"\" in review.json) can be represented without data loss — parallel with how read_latest_finals already handles empty-hash rounds. No serde derives in domain; infrastructure layer handles deserialization from review.json. If ReviewReader does not yet expose read_all_rounds, the method is added in the T005 commit: fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError>.",
+      "approved": true,
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "round_type",
+          "ty": "RoundType"
+        },
+        {
+          "kind": "field",
+          "name": "verdict",
+          "ty": "Verdict"
+        },
+        {
+          "kind": "field",
+          "name": "findings",
+          "ty": "Vec<ReviewerFinding>"
+        },
+        {
+          "kind": "field",
+          "name": "hash",
+          "ty": "ReviewHash"
+        },
+        {
+          "kind": "field",
+          "name": "at",
+          "ty": "String"
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "IN-02",
+          "hash": "1ba76d79220616b3fee6cc67ab5365e5c828a522c5fc5063110040c7f29f4e55"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-02",
+          "hash": "f5b40d28de7a578fef43a0e966c696e5c26d5314d0803f527102132708d981f3"
+        }
+      ]
+    },
+    {
+      "name": "ReviewReader",
+      "description": "Secondary port (driven by infrastructure) for reading review.json v2 data. Pre-existing domain port — declared here as reference to complete the contract-map picture for FsReviewStore's implements edges. Two methods: read_latest_finals returns a HashMap of scope names to the latest final (Verdict, ReviewHash) pair; read_all_rounds (added in this track's T001) returns all rounds for a single scope in storage order (oldest first), returning an empty Vec when the scope has no rounds or review.json does not exist. Both methods return ReviewReaderError on I/O or codec failure.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_latest_finals",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError>",
+          "is_async": false
+        },
+        {
+          "name": "read_all_rounds",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "returns": "Result<Vec<ScopeRound>, ReviewReaderError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "IN-02",
+          "hash": "1ba76d79220616b3fee6cc67ab5365e5c828a522c5fc5063110040c7f29f4e55"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-02",
+          "hash": "f5b40d28de7a578fef43a0e966c696e5c26d5314d0803f527102132708d981f3"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "CN-04",
+          "hash": "26c61b6deabea71b3559f9c4d1d63ff0ede713dbf75966ac4d60830158bfbdb6"
+        }
+      ]
+    },
+    {
+      "name": "ReviewWriter",
+      "description": "Secondary port (driven by infrastructure) for writing to review.json v2. Pre-existing domain port — declared here as reference to complete the contract-map picture for FsReviewStore's implements edges. Four methods: write_verdict appends a final verdict with findings and hash to a scope's round history; write_fast_verdict appends a fast verdict; init creates a new review.json (track initialization); reset archives the existing review.json and creates a new one (review restart, does NOT clear .commit_hash). All methods return ReviewWriterError on I/O or codec failure. Implementations should use fs4::lock_exclusive for concurrent write safety.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "write_verdict",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            },
+            {
+              "name": "verdict",
+              "ty": "&Verdict"
+            },
+            {
+              "name": "hash",
+              "ty": "&ReviewHash"
+            }
+          ],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        },
+        {
+          "name": "write_fast_verdict",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            },
+            {
+              "name": "verdict",
+              "ty": "&FastVerdict"
+            },
+            {
+              "name": "hash",
+              "ty": "&ReviewHash"
+            }
+          ],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        },
+        {
+          "name": "init",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        },
+        {
+          "name": "reset",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "CN-04",
+          "hash": "26c61b6deabea71b3559f9c4d1d63ff0ede713dbf75966ac4d60830158bfbdb6"
+        }
+      ]
+    },
+    {
+      "name": "ReviewExistsPort",
+      "description": "Secondary port (driven by infrastructure) for querying whether review.json is present on disk for a given track. Abstracts the filesystem existence check from the usecase layer so the CLI composition root — not the ReviewCycle usecase — performs the I/O and converts the result to a bool for evaluate_approval. Placed in domain per hexagonal convention (secondary ports that abstract persistence I/O live in domain or usecase). The single method review_json_exists returns Result<bool, ReviewReaderError>: Ok(true) when the file exists and is accessible, Ok(false) when the file is absent (not found), Err(...) when an I/O error prevents determining existence (e.g., permission denied on a parent directory). The CLI composition root calls review_json_exists() and propagates the Err or maps it to a CLI-level error before passing the bool to evaluate_approval; this preserves the evaluate_approval signature (bool parameter) while ensuring I/O failures are not silently treated as absence. FsReviewStore in infrastructure implements this port alongside ReviewReader and ReviewWriter.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "review_json_exists",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<bool, ReviewReaderError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "IN-07",
+          "hash": "49b61b68b76b56aa2b7e26d343ad54e13c2091d1ba752c05661bb84045954a5c"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "AC-12",
+          "hash": "975ddfa91b6cfc121bb48c878e72c3c84568406e9aa0cedd5eb7526ea18730c9"
+        },
+        {
+          "file": "track/items/review-results-command-2026-04-28/spec.json",
+          "anchor": "CN-04",
+          "hash": "26c61b6deabea71b3559f9c4d1d63ff0ede713dbf75966ac4d60830158bfbdb6"
+        }
+      ]
+    }
+  ]
+}

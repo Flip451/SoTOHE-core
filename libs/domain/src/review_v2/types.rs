@@ -425,6 +425,62 @@ impl fmt::Display for ReviewState {
     }
 }
 
+// ── ScopeRound ────────────────────────────────────────────────────────
+
+/// Persisted state of one review round for a single scope.
+///
+/// Carries round metadata read from `review.json` by the results command.
+/// `hash` mirrors `ReviewHash` (Computed | Empty) so that historical rounds
+/// that were stored with an empty hash (e.g. via `write_verdict` on a Skipped
+/// scope) can be represented without data loss, parallel with
+/// `ReviewReader::read_latest_finals`.
+/// No serde derives — domain layer stays persistence-agnostic (CN-04).
+#[derive(Debug, Clone)]
+pub struct ScopeRound {
+    pub round_type: RoundType,
+    pub verdict: Verdict,
+    pub findings: Vec<ReviewerFinding>,
+    pub hash: ReviewHash,
+    /// ISO 8601 timestamp recorded when the round was written.
+    pub at: String,
+}
+
+// ── ReviewApprovalVerdict ─────────────────────────────────────────────
+
+/// Domain verdict expressing the outcome of the approval/bypass check for the
+/// entire track's review cycle.
+///
+/// Enum-first design (per `04-coding-principles.md`): each variant carries
+/// exactly the data it needs, eliminating boolean flags and cross-field
+/// invariants.
+///
+/// No serde derives — domain layer stays persistence-agnostic (CN-04).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ReviewApprovalVerdict {
+    /// All scopes are `NotRequired(*)` — no scope requires review.
+    ///
+    /// `check-approved` exits `[OK]`.
+    Approved,
+
+    /// All `Required` scopes are `Required(NotStarted)` and `review.json` is
+    /// absent — PR-based workflow bypass; no local review has been recorded.
+    ///
+    /// `check-approved` emits `[WARN]` then exits successfully.
+    ApprovedWithBypass {
+        /// Number of `Required(NotStarted)` scopes for the WARN message.
+        not_started_count: usize,
+    },
+
+    /// One or more scopes still require review and the bypass condition does
+    /// not apply.
+    ///
+    /// `check-approved` emits `[BLOCKED]` and exits with failure.
+    Blocked {
+        /// Scopes that still require review; non-empty.
+        required_scopes: Vec<ScopeName>,
+    },
+}
+
 // ── Verdict JSON extraction ───────────────────────────────────────────────────
 
 /// Scans text content for a JSON verdict block. Pure function (no file I/O).

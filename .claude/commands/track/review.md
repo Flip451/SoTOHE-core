@@ -39,19 +39,19 @@ Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the
 Partition changed files into **observation groups** by architecture layer. Each group gets its own
 focused briefing and reviewer invocation. All groups run **in parallel** via Agent Teams.
 
-### 2a. Determine review scope via `track-review-status`
+### 2a. Determine review scope via `track-review-results`
 
-Run `cargo make track-review-status -- --track-id {track-id}` to get the authoritative
+Run `cargo make track-review-results -- --track-id {track-id}` to get the authoritative
 per-scope review state. This command computes diff-based scope hashes and reports which
 groups need review:
 
 ```
-cargo make track-review-status -- --track-id {track-id}
+cargo make track-review-results -- --track-id {track-id}
 ```
 
-Output example:
+Output example (default = state-summary only, equivalent to the removed `sotp review status`):
 ```
-  [✓] cli: approved
+  [+] cli: approved
   [-] domain: required (not started)
   [.] harness-policy: not required (empty)
   [-] other: required (stale hash)
@@ -70,9 +70,38 @@ Use this output to determine which groups need reviewer invocation:
 - `approved` — already reviewed and up-to-date, skip
 - `not required (empty)` — no changed files in this group, skip
 
-**Do NOT manually classify files into groups** — `track-review-status` handles partition,
+**Do NOT manually classify files into groups** — `track-review-results` handles partition,
 hash computation, and approval state tracking. Only invoke reviewers for groups that
 report `required`.
+
+#### `track-review-results` flag reference
+
+`sotp review results` (invoked via `cargo make track-review-results -- ...`) supports:
+
+- `--track-id <ID>` (required): track id to inspect
+- `--scope <NAME>` (optional): show only the named scope; mutually exclusive with `--all`
+- `--all` (optional): explicitly show every scope (default behavior when `--scope` is absent;
+  presence is enforced as mutually exclusive with `--scope`)
+- `--limit <N|all>` (default `0`):
+  - `0` — state-summary only (no per-round findings/history; equivalent to the removed
+    `sotp review status` output, and skips loading historical rounds for robustness against
+    malformed legacy data)
+  - `N >= 1` — show the latest round findings inline plus up to `N-1` history entries
+  - `all` — show every recorded round
+- `--round-type <fast|final|any>` (default `any`): filter the displayed history to a
+  single round type. The state-line summary always uses the actual newest round
+  regardless of this filter
+- `--no-hint`: suppress the `hint: review approved — run /track:commit ...` trailing line
+  (use this when piping the output into another command)
+
+Common invocations during the review cycle:
+
+- Per-scope state recap before launching agents:
+  `cargo make track-review-results -- --track-id <id>` (default `--limit 0`)
+- Inspect the latest fast-round findings for a single scope between rounds:
+  `cargo make track-review-results -- --track-id <id> --scope <scope> --limit 1 --round-type fast`
+- Inspect both fast and final history for a scope (e.g., to confirm the fast/full
+  escalation sequence): `cargo make track-review-results -- --track-id <id> --scope <scope> --limit all`
 
 ### 2b. Build per-group briefing
 

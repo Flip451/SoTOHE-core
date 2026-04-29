@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use domain::CommitHash;
 use domain::review_v2::{
-    FastVerdict, FilePath, NotRequiredReason, RequiredReason, ReviewHash, ReviewOutcome,
-    ReviewReader, ReviewScopeConfig, ReviewState, ReviewTarget, ScopeName, Verdict,
+    FastVerdict, FilePath, NotRequiredReason, RequiredReason, ReviewApprovalVerdict, ReviewHash,
+    ReviewOutcome, ReviewReader, ReviewScopeConfig, ReviewState, ReviewTarget, ScopeName, Verdict,
 };
 
 use super::error::ReviewCycleError;
@@ -170,6 +170,55 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
         }
 
         Ok(states)
+    }
+
+    /// Evaluates whether the review cycle is approved for the current track.
+    ///
+    /// Collects all `Required(*)` scopes via `get_review_states` and classifies:
+    /// - No Required scopes → `Approved`
+    /// - All Required scopes are `Required(NotStarted)` **and** `review_json_exists == false`
+    ///   → `ApprovedWithBypass { not_started_count }`
+    /// - Otherwise → `Blocked { required_scopes }`
+    ///
+    /// The `review_json_exists` flag is provided by the caller (CLI composition root)
+    /// via `FsReviewStore::review_json_exists()`; this method performs no file I/O.
+    ///
+    /// # Errors
+    /// Propagated from `get_review_states` (diff, hash, or reader errors).
+    pub fn evaluate_approval(
+        &self,
+        reader: &impl ReviewReader,
+        review_json_exists: bool,
+    ) -> Result<ReviewApprovalVerdict, ReviewCycleError> {
+        let states = self.get_review_states(reader)?;
+
+        // Collect Required(*) scopes as (ScopeName, RequiredReason) pairs.
+        let required: Vec<(ScopeName, RequiredReason)> = states
+            .into_iter()
+            .filter_map(|(name, state)| match state {
+                ReviewState::Required(reason) => Some((name, reason)),
+                ReviewState::NotRequired(_) => None,
+            })
+            .collect();
+
+        if required.is_empty() {
+            return Ok(ReviewApprovalVerdict::Approved);
+        }
+
+        // Bypass: all Required scopes are NotStarted AND review.json is absent.
+        let all_not_started =
+            required.iter().all(|(_, reason)| matches!(reason, RequiredReason::NotStarted));
+        if all_not_started && !review_json_exists {
+            return Ok(ReviewApprovalVerdict::ApprovedWithBypass {
+                not_started_count: required.len(),
+            });
+        }
+
+        let mut required_scopes: Vec<ScopeName> =
+            required.into_iter().map(|(name, _)| name).collect();
+        // Sort by display representation for deterministic output across HashMap iteration.
+        required_scopes.sort_by_key(|a| a.to_string());
+        Ok(ReviewApprovalVerdict::Blocked { required_scopes })
     }
 
     /// Helper: gets the classified files for a single scope from the current diff.

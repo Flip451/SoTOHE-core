@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 
 use domain::review_v2::{
-    FastVerdict, FilePath, LogInfo, MainScopeName, NotRequiredReason, RequiredReason, ReviewHash,
-    ReviewOutcome, ReviewReader, ReviewReaderError, ReviewScopeConfig, ReviewState,
-    ReviewerFinding, ScopeName, Verdict,
+    FastVerdict, FilePath, LogInfo, MainScopeName, NotRequiredReason, RequiredReason,
+    ReviewApprovalVerdict, ReviewHash, ReviewOutcome, ReviewReader, ReviewReaderError,
+    ReviewScopeConfig, ReviewState, ReviewerFinding, ScopeName, ScopeRound, Verdict,
 };
 use domain::{CommitHash, TrackId};
 
@@ -75,6 +75,45 @@ impl DiffGetter for MockDiffGetter {
     }
 }
 
+struct FailingDiffGetter;
+
+impl DiffGetter for FailingDiffGetter {
+    fn list_diff_files(&self, _base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError> {
+        Err(DiffGetError::Failed("simulated diff failure".to_owned()))
+    }
+}
+
+struct FailingHasher;
+
+impl ReviewHasher for FailingHasher {
+    fn calc(
+        &self,
+        _target: &domain::review_v2::ReviewTarget,
+    ) -> Result<ReviewHash, ReviewHasherError> {
+        Err(ReviewHasherError::Failed("simulated hash failure".to_owned()))
+    }
+}
+
+struct FailingReviewReader;
+
+impl ReviewReader for FailingReviewReader {
+    fn read_latest_finals(
+        &self,
+    ) -> Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError> {
+        Err(ReviewReaderError::Io {
+            path: "review.json".to_owned(),
+            detail: "simulated I/O failure".to_owned(),
+        })
+    }
+
+    fn read_all_rounds(&self, _scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError> {
+        Err(ReviewReaderError::Io {
+            path: "review.json".to_owned(),
+            detail: "simulated I/O failure".to_owned(),
+        })
+    }
+}
+
 /// Mock hasher that returns a deterministic hash based on file count.
 struct MockHasher;
 
@@ -131,6 +170,14 @@ impl MockReviewReader {
         finals.insert(scope, (Verdict::ZeroFindings, hash));
         Self { finals }
     }
+
+    fn with_finals(entries: Vec<(ScopeName, Verdict, ReviewHash)>) -> Self {
+        let mut finals = HashMap::new();
+        for (scope, verdict, hash) in entries {
+            finals.insert(scope, (verdict, hash));
+        }
+        Self { finals }
+    }
 }
 
 impl ReviewReader for MockReviewReader {
@@ -138,6 +185,10 @@ impl ReviewReader for MockReviewReader {
         &self,
     ) -> Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError> {
         Ok(self.finals.clone())
+    }
+
+    fn read_all_rounds(&self, _scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError> {
+        Ok(Vec::new())
     }
 }
 
@@ -391,4 +442,197 @@ fn test_review_other_scope() {
 
     let result = cycle.review(&ScopeName::Other).unwrap();
     assert!(matches!(result, ReviewOutcome::Reviewed { verdict: Verdict::ZeroFindings, .. }));
+}
+
+// ── evaluate_approval() tests ─────────────────────────────────────────
+
+fn two_scope_config() -> ReviewScopeConfig {
+    ReviewScopeConfig::new(
+        &track_id(),
+        vec![
+            ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None),
+            ("usecase".to_owned(), vec!["libs/usecase/**".to_owned()], None),
+        ],
+        vec![],
+        vec![],
+    )
+    .unwrap()
+}
+
+/// Case 1: all scopes NotRequired(*) → Approved (regardless of review_json_exists).
+#[test]
+fn test_evaluate_approval_all_not_required_returns_approved() {
+    // Both scopes have matching ZeroFindings hashes → NotRequired(ZeroFindings)
+    let domain_hash = ReviewHash::computed(format!("rvw1:sha256:{:064x}", 1)).unwrap();
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        MockDiffGetter::new(&["libs/domain/src/lib.rs"]),
+        MockHasher,
+    );
+    let reader = MockReviewReader::with_approved(domain_scope(), domain_hash);
+
+    let verdict = cycle.evaluate_approval(&reader, false).unwrap();
+    assert_eq!(verdict, ReviewApprovalVerdict::Approved);
+
+    let verdict_with_file = cycle.evaluate_approval(&reader, true).unwrap();
+    assert_eq!(verdict_with_file, ReviewApprovalVerdict::Approved);
+}
+
+/// Case 2: all Required scopes are NotStarted + review_json_exists == false → ApprovedWithBypass.
+#[test]
+fn test_evaluate_approval_all_not_started_no_file_returns_bypass() {
+    // Empty reader → all Required(NotStarted); review.json absent
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        MockDiffGetter::new(&["libs/domain/src/lib.rs"]),
+        MockHasher,
+    );
+    let reader = MockReviewReader::empty();
+
+    let verdict = cycle.evaluate_approval(&reader, false).unwrap();
+    assert_eq!(verdict, ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 1 });
+}
+
+/// Case 3: all Required scopes are NotStarted + review_json_exists == true → Blocked.
+#[test]
+fn test_evaluate_approval_all_not_started_with_file_returns_blocked() {
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        MockDiffGetter::new(&["libs/domain/src/lib.rs"]),
+        MockHasher,
+    );
+    let reader = MockReviewReader::empty();
+
+    let verdict = cycle.evaluate_approval(&reader, true).unwrap();
+    assert!(
+        matches!(verdict, ReviewApprovalVerdict::Blocked { required_scopes } if required_scopes.len() == 1)
+    );
+}
+
+/// Case 4: some Required scopes have FindingsRemain → Blocked regardless of bypass.
+#[test]
+fn test_evaluate_approval_findings_remain_returns_blocked() {
+    let finding =
+        ReviewerFinding::new("critical bug", Some("P1".to_owned()), None, None, None).unwrap();
+    let findings_verdict = Verdict::findings_remain(vec![finding]).unwrap();
+    // Stale hash so the stored hash does not match the current computed hash → FindingsRemain
+    let stale_hash = ReviewHash::computed("rvw1:sha256:deadbeef").unwrap();
+
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        two_scope_config(),
+        MockReviewer::zero_findings(),
+        MockDiffGetter::new(&["libs/domain/src/lib.rs"]),
+        MockHasher,
+    );
+    // domain → FindingsRemain (stored verdict is findings_remain)
+    let reader =
+        MockReviewReader::with_finals(vec![(domain_scope(), findings_verdict, stale_hash)]);
+
+    // review_json_exists = false should still be Blocked (bypass only applies to all-NotStarted)
+    let verdict = cycle.evaluate_approval(&reader, false).unwrap();
+    assert!(matches!(verdict, ReviewApprovalVerdict::Blocked { .. }));
+}
+
+/// Case 5: mixed Required(StaleHash) + Required(NotStarted) → Blocked (not all NotStarted).
+#[test]
+fn test_evaluate_approval_mixed_stale_and_not_started_returns_blocked() {
+    let stale_hash = ReviewHash::computed("rvw1:sha256:deadbeef").unwrap();
+
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        two_scope_config(),
+        MockReviewer::zero_findings(),
+        // Both scopes have files: domain (1 file) and usecase (1 file)
+        MockDiffGetter::new(&["libs/domain/src/lib.rs", "libs/usecase/src/lib.rs"]),
+        MockHasher,
+    );
+    // domain → StaleHash (stored ZeroFindings but hash mismatch)
+    // usecase → NotStarted (no entry in reader)
+    let reader =
+        MockReviewReader::with_finals(vec![(domain_scope(), Verdict::ZeroFindings, stale_hash)]);
+
+    // review_json_exists = false: bypass does NOT apply because not all are NotStarted
+    let verdict = cycle.evaluate_approval(&reader, false).unwrap();
+    assert!(matches!(verdict, ReviewApprovalVerdict::Blocked { required_scopes }
+        if required_scopes.len() == 2));
+}
+
+/// Case 6: diff getter failure propagates as ReviewCycleError from evaluate_approval.
+#[test]
+fn test_evaluate_approval_diff_error_propagates() {
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        FailingDiffGetter,
+        MockHasher,
+    );
+    let reader = MockReviewReader::empty();
+
+    let result = cycle.evaluate_approval(&reader, false);
+    assert!(matches!(result, Err(ReviewCycleError::Diff(_))));
+}
+
+/// Case 8: hasher failure propagates as ReviewCycleError::Hash from evaluate_approval.
+#[test]
+fn test_evaluate_approval_hash_error_propagates() {
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        MockDiffGetter::new(&["libs/domain/src/lib.rs"]),
+        FailingHasher,
+    );
+    let reader = MockReviewReader::empty();
+
+    let result = cycle.evaluate_approval(&reader, false);
+    assert!(matches!(result, Err(ReviewCycleError::Hash(_))));
+}
+
+/// Case 9: reader failure propagates as ReviewCycleError::Reader from evaluate_approval.
+#[test]
+fn test_evaluate_approval_reader_error_propagates() {
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        MockDiffGetter::new(&["libs/domain/src/lib.rs"]),
+        MockHasher,
+    );
+
+    let result = cycle.evaluate_approval(&FailingReviewReader, false);
+    assert!(matches!(result, Err(ReviewCycleError::Reader(_))));
+}
+
+/// Case 7: Blocked result contains the expected scope names.
+#[test]
+fn test_evaluate_approval_blocked_contains_expected_scopes() {
+    let usecase_scope = ScopeName::Main(MainScopeName::new("usecase").unwrap());
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        two_scope_config(),
+        MockReviewer::zero_findings(),
+        // Both scopes have files
+        MockDiffGetter::new(&["libs/domain/src/lib.rs", "libs/usecase/src/lib.rs"]),
+        MockHasher,
+    );
+    // No stored finals → both are Required(NotStarted), but review.json exists → Blocked
+    let reader = MockReviewReader::empty();
+
+    let verdict = cycle.evaluate_approval(&reader, true).unwrap();
+    match verdict {
+        ReviewApprovalVerdict::Blocked { required_scopes } => {
+            assert!(required_scopes.contains(&domain_scope()), "domain should be blocked");
+            assert!(required_scopes.contains(&usecase_scope), "usecase should be blocked");
+            assert_eq!(required_scopes.len(), 2);
+        }
+        other => panic!("expected Blocked, got {other:?}"),
+    }
 }

@@ -4,8 +4,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use domain::review_v2::{
-    FastVerdict, MainScopeName, ReviewHash, ReviewReader, ReviewReaderError, ReviewWriter,
-    ReviewWriterError, ReviewerFinding, ScopeName, Verdict,
+    FastVerdict, MainScopeName, ReviewExistsPort, ReviewHash, ReviewReader, ReviewReaderError,
+    ReviewWriter, ReviewWriterError, ReviewerFinding, RoundType, ScopeName, ScopeRound, Verdict,
 };
 
 use super::{
@@ -204,6 +204,30 @@ impl ReviewReader for FsReviewStore {
 
         Ok(result)
     }
+
+    fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError> {
+        let doc = self.read_doc()?;
+        let scope_key = scope.to_string();
+        let Some(entry) = doc.scopes.get(&scope_key) else {
+            return Ok(Vec::new());
+        };
+
+        let mut rounds = Vec::with_capacity(entry.rounds.len());
+        for round in &entry.rounds {
+            let round_type = parse_round_type(&round.round_type)?;
+            let verdict = parse_verdict(&round.verdict, &round.findings)?;
+            let findings = parse_findings(&round.findings)?;
+            let hash = if round.hash.is_empty() {
+                ReviewHash::Empty
+            } else {
+                ReviewHash::computed(&round.hash).map_err(|e| {
+                    ReviewReaderError::InvalidData(format!("invalid hash in review.json: {e}"))
+                })?
+            };
+            rounds.push(ScopeRound { round_type, verdict, findings, hash, at: round.at.clone() });
+        }
+        Ok(rounds)
+    }
 }
 
 impl ReviewWriter for FsReviewStore {
@@ -262,6 +286,24 @@ impl ReviewWriter for FsReviewStore {
     }
 }
 
+impl ReviewExistsPort for FsReviewStore {
+    /// Returns whether the review.json file exists on disk.
+    ///
+    /// # Errors
+    /// Returns `Ok(false)` on `NotFound`, `Err(ReviewReaderError::Io)` on other I/O errors
+    /// (e.g. `PermissionDenied`).
+    fn review_json_exists(&self) -> Result<bool, ReviewReaderError> {
+        match std::fs::metadata(&self.path) {
+            Ok(_) => Ok(true),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
+            Err(e) => Err(ReviewReaderError::Io {
+                path: self.path.display().to_string(),
+                detail: format!("metadata: {e}"),
+            }),
+        }
+    }
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────
 
 fn parse_scope_name(key: &str) -> Result<ScopeName, ReviewReaderError> {
@@ -272,6 +314,34 @@ fn parse_scope_name(key: &str) -> Result<ScopeName, ReviewReaderError> {
             .map(ScopeName::Main)
             .map_err(|e| ReviewReaderError::InvalidData(format!("invalid scope key '{key}': {e}")))
     }
+}
+
+fn parse_round_type(value: &str) -> Result<RoundType, ReviewReaderError> {
+    match value {
+        "fast" => Ok(RoundType::Fast),
+        "final" => Ok(RoundType::Final),
+        other => Err(ReviewReaderError::InvalidData(format!(
+            "unknown round_type in review.json: {other}"
+        ))),
+    }
+}
+
+fn parse_findings(findings: &[FindingEntry]) -> Result<Vec<ReviewerFinding>, ReviewReaderError> {
+    findings
+        .iter()
+        .map(|f| {
+            ReviewerFinding::new(
+                &f.message,
+                f.severity.clone(),
+                f.file.clone(),
+                f.line,
+                f.category.clone(),
+            )
+            .map_err(|e| {
+                ReviewReaderError::InvalidData(format!("invalid finding in review.json: {e}"))
+            })
+        })
+        .collect()
 }
 
 fn parse_verdict(
@@ -285,24 +355,7 @@ fn parse_verdict(
             findings.len()
         ))),
         "findings_remain" => {
-            let domain_findings: Result<Vec<ReviewerFinding>, _> = findings
-                .iter()
-                .map(|f| {
-                    ReviewerFinding::new(
-                        &f.message,
-                        f.severity.clone(),
-                        f.file.clone(),
-                        f.line,
-                        f.category.clone(),
-                    )
-                    .map_err(|e| {
-                        ReviewReaderError::InvalidData(format!(
-                            "invalid finding in review.json: {e}"
-                        ))
-                    })
-                })
-                .collect();
-            let domain_findings = domain_findings?;
+            let domain_findings = parse_findings(findings)?;
             Verdict::findings_remain(domain_findings)
                 .map_err(|e| ReviewReaderError::InvalidData(format!("verdict construction: {e}")))
         }

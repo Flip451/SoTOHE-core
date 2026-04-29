@@ -1,0 +1,444 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "`sotp review results` で review.json 直読みを置き換える",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "読み取り専用の正規 API として `sotp review results` を新設し、scope 別の `ReviewState` 表示 (旧 `review status` の機能を包含)、過去 N round の verdict / findings の CLI 取得、および commit hint 出力を 1 コマンドに統合することで、review.json の直読み慣行を規約的に排除する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "既存 `sotp review status` を削除 (後方互換 alias なし) し、`sotp review results` (flag なし既定実行) を旧 `status` の完全な等価コマンドとして位置付けることで、read API の一本化を達成する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "commit hint の判定ロジックおよび approval/bypass 判定を CLI 層から domain/usecase 層に lift することで、`sotp review check-approved` と `sotp review results` の hint が同じ usecase 戻り値を消費し、drift を構造的に排除する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`sotp review results` CLI サブコマンドの実装: `--track-id`, `--items-dir`, `--scope`/`--all`, `--limit N|all`, `--round-type fast|final|any`, `--no-hint` の各 flag を持つコマンドとして追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "text 単一フォーマットによる出力実装: 既定実行 (`--limit 0`) では state summary (header 行 + diff base 行 + scope 別 indicator + state line + summary 行) のみを出力する。state line はスコープの `ReviewState` から導出し、review.json にラウンド履歴がある scope については最新ラウンドの type / verdict / timestamp を state line に付加する (例: `[+] domain  final@... zero_findings`)。`--limit N > 0` では state summary に加え最新 round の findings 詳細と過去 round 履歴をインデント付きで展開する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`scope_config.all_scope_names()` が返す scope universe を完全列挙: named scopes + implicit `Other` scope をすべて state line として出力し、省略しない。diff にマッチしない scope は `[.] <scope>: not required (empty)` として表示する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "commit hint の実装: 全 scope が `NotRequired(*)` 状態かつ `review.json` が存在するとき (`--no-hint` 未指定の場合のみ) 、Summary 行の後に hint メッセージを append する。`ApprovedWithBypass` (all not started + review.json 不在) では hint を出さない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "approval/bypass 判定ロジックの domain/usecase への lift: `ReviewApprovalVerdict` 相当の enum を domain 層に導入し、`ReviewCycle` に `evaluate_approval` 相当のメソッドを usecase 層に追加する。CLI `run_check_approved` は usecase 戻り値を exit code + eprintln にマップするだけに痩せる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`sotp review status` CLI サブコマンドの削除 (後方互換 alias なし): `ReviewCommand::Status` variant + `StatusArgs` + `execute_status` + `run_status` を CLI から完全に除去し、使用箇所 (`.claude/`, `knowledge/`, `track/workflow.md`, `Makefile.toml` 等) をすべて `sotp review results` に更新する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`review.json` の存在確認を infrastructure 側 port に委譲: approval 判定に必要な「ローカルレビューが記録されているか」の I/O 判定を `ReviewStore` または別 port method として infrastructure 層に配置し、usecase 層が直接 `std::fs` に触れないようにする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D5"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "JSON 出力フォーマット (`--format json`): text 単一フォーマットのみを提供し、JSON output は本 track では採用しない (YAGNI — Rejected Alternatives §A)。具体的な script consumer の必要性が顕在化したタイミングで additive に追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "`sotp review check-approved` の CLI surface (exit code / 引数) 変更: `check-approved` は stateless gate として責務が独立しており、CLI interface は無変更。内部実装 (usecase への lift) は IN-05 に含むが、外部から観測可能な振る舞いは変えない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "`sotp review codex-local` の stdout JSON shape 変更、commit hint 追加、verdict サマリ追加: `codex-local` は 1 scope の review を回す責務のツールであり、track 全体の状態判定ロジックは混入しない (Rejected Alternatives §C)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "`review.json` スキーマ変更 (schema_version 2 → 3): 本 track では review.json のスキーマ自体を変えない。コマンドは既存 schema_version 2 の round 配列を読み取るだけ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "`review results --exit-code-on-blocked` のような `check-approved` 統合: 将来の拡張候補として ADR Reassess When に記録されているが、本 track のスコープ外 (Rejected Alternatives §D)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "全 scope が `NotRequired::Empty` かつ `review.json` が存在する edge case への明示的救済: hint が出るが diff が空なので `/track:commit` 側で弾かれる。ユーザーへの実害はなく、救済ロジックは入れない (ADR D5.2 既知の minor edge case)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D5"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "`sotp review results` は text 単一フォーマットのみを提供する。JSON 出力は本 track では実装しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "既定モード (`--all`) における出力の scope 一覧は `scope_config.all_scope_names()` が返す universe を完全列挙する。named scopes + `Other` を含み、差分なし / レビュー未実行の scope も省略しない。`--scope <name>` フィルタ指定時は対象 scope のみを表示する (AC-14 のフィルタ動作は CN-02 の完全列挙から除外される)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "commit hint は `check-approved` の OK 条件 (全 scope `NotRequired(*)`) + `review.json` 存在 の AND で発火する。`--no-hint` flag で抑制可能。`ApprovedWithBypass` ケース (all not started + review.json 不在) では hint を出さない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "approval/bypass 判定ロジックは usecase 層に配置し、CLI 層が直接ドメイン判定を実装しない。`review.json` 存在確認の I/O は infrastructure 側の port に委譲する。hexagonal architecture の layer dependency 規則に準拠する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/hexagonal-architecture.md",
+          "anchor": "Port Placement Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "`sotp review status` の削除は破壊的変更であり、後方互換 alias を置かない。使用箇所はすべて `sotp review results` に移行する。no-backward-compat convention に従う",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/no-backward-compat.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "`--limit` flag は履歴詳細の深さのみを制御し、state summary の表示有無には影響しない。`--limit 0` は「履歴 0 件」= state summary のみの意味であり、旧 `review status` の等価実行となる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "`sotp review check-approved` の CLI surface (exit code / 引数) は無変更とする。内部実装のみ usecase への lift を行い、外部から観測可能な振る舞い (exit 0 / exit 1 / eprintln メッセージ形式) を変えない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D6"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`sotp review results --track-id <id>` が実行可能であり、全 scope の state summary (indicator + scope + state line) と Summary 行を text フォーマットで stdout に出力する。出力は旧 `sotp review status` の出力と等価な情報を含む",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`sotp review results --track-id <id> --limit 2` を実行すると、各 scope の最新 round の findings 詳細 (message / severity / file:line / category) が state line 直下に展開され、`history (newer first, up to --limit):` 見出しの下に過去 round の履歴が表示される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`sotp review results --track-id <id> --limit all` を実行すると、全 round の履歴が展開される。`--limit 0` (既定) は state summary のみを出力し、履歴行は出力しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "出力の scope 一覧は `scope_config.all_scope_names()` が返す scope universe を完全列挙する。差分にマッチしない scope は `[.] <scope>: not required (empty)` として出力される。`Other` scope が常に含まれる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "全 scope が `NotRequired(*)` かつ `review.json` が存在するとき、Summary 行の後に commit hint が出力される。`--no-hint` を指定するとこの行は出力されない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`review.json` が存在しないとき、commit hint は出力されない。hint の発火条件は AC-05 の 2 条件 (全 NotRequired(*) かつ review.json 存在) の AND であり、review.json 不在はその条件を満たさない。典型例: PR ベースの bypass パスとして全 Required scope が `Required(NotStarted)` かつ review.json が存在しない場合。全 scope が `NotRequired(Empty)` の場合は review.json の有無を問わず hint の第 1 条件 (全 NotRequired(*)) を満たすが、review.json が存在しなければ第 2 条件を満たさず hint は出ない (review.json が存在する empty edge case は OS-06 参照)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`sotp review status` サブコマンドが CLI から削除されており、`sotp review status` を実行するとコマンド未知エラーとなる。後方互換 alias は存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`sotp review status` への参照が `.claude/` / `knowledge/` / `track/workflow.md` / `Makefile.toml` のすべての箇所で `sotp review results` に更新されており、dead reference が残らない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "approval/bypass 判定ロジックが usecase 層に実装されており (`ReviewApprovalVerdict` 相当の enum が domain 層に定義され、`ReviewCycle` または別 usecase 関数として `evaluate_approval(reader, review_json_exists) -> ReviewApprovalVerdict` 相当が usecase 層に存在する)、CLI `run_check_approved` が usecase 戻り値を exit code + eprintln にマップするだけの実装になっている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`sotp review check-approved` の外部から観測可能な振る舞い (exit 0 on approved / exit 1 on blocked, eprintln の [OK] / [BLOCKED] / [WARN] メッセージ形式) が変化しない。CLI surface は無変更",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`sotp review results` と `sotp review check-approved` の hint / approval 判定が同じ usecase 戻り値 (`ReviewApprovalVerdict`) を消費することで、両コマンドの振る舞いが常に同一の判定根拠から導出される。具体的に排除される drift は「hint が出るが check-approved は blocked」のパターン。hint は `review results` 独自の追加条件 (Approved かつ review.json 存在の AND) を満たす場合のみ発火するため、`Approved + review.json 不在` で hint が出ないのは drift ではなく仕様どおり。`ApprovedWithBypass` (PR ベース bypass パス) では hint を出さず check-approved は SUCCESS を返すが、これも両コマンドが同一の verdict を見た結果であり drift ではない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`review.json` 存在確認の I/O が usecase 層に直接書かれておらず、infrastructure 側の port method (`ReviewStore` または専用の port trait) を経由して判定されている。`cargo make check-layers` が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "`--round-type fast|final|any` flag が機能しており、`--limit > 0` 時に指定された round type のみの round が履歴に表示される。既定 `any` はすべての round type を対象とする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "`--scope <name>` flag が機能しており、指定した単一 scope の結果のみを表示する。`--all` (既定) は全 scope を表示する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-15",
+      "text": "`cargo make ci` の全項目 (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/review-protocol.md",
+      "anchor": "概要"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Trait-Based Abstraction (Hexagonal Architecture)"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 38,
+    "yellow": 0,
+    "red": 0
+  }
+}

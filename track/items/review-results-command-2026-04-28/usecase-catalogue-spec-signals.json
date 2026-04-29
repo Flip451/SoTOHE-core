@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0779bff9ae163cea3cdf4f551b789a4848f43406aa0e84c2046fb1e9c01b9f8c",
+  "signals": [
+    {
+      "type_name": "ReviewCycle",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCycleError",
+      "signal": "blue"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "extra_allow": [
-    "Bash(cargo make track-review-status:*)",
+    "Bash(cargo make track-review-results:*)",
     "Bash(cargo make track-set-commit-hash:*)",
     "Bash(cargo make track-check-approved:*)",
     "Bash(cargo make track-local-plan:*)",

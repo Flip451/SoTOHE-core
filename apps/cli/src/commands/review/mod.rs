@@ -8,16 +8,18 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use clap::{ArgGroup, Args, Subcommand};
-use infrastructure::git_cli::GitRepository;
+use domain::review_v2::ReviewExistsPort;
 #[cfg(test)]
 use usecase::review_workflow::ReviewVerdict;
 
 mod codex_local;
 mod compose_v2;
+mod results;
 #[cfg(test)]
 mod tests;
 
 use codex_local::execute_codex_local;
+use results::execute_results;
 
 const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
 
@@ -34,8 +36,12 @@ pub enum ReviewCommand {
     CodexLocal(CodexLocalArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),
-    /// Show per-scope review state for a track.
-    Status(StatusArgs),
+    /// Show review results: per-scope state summary, optional round history, and a commit hint.
+    ///
+    /// Read-only canonical API replacing direct `review.json` access. With `--limit 0`
+    /// (the default) the output is the state summary only — the equivalent of the
+    /// removed `sotp review status` subcommand.
+    Results(ResultsArgs),
 }
 
 /// CLI round type for auto-record.
@@ -142,15 +148,79 @@ pub struct CheckApprovedArgs {
     track_id: String,
 }
 
+/// Round-type filter for `sotp review results --round-type ...`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+pub enum RoundTypeFilter {
+    /// Include only fast rounds.
+    Fast,
+    /// Include only final rounds.
+    Final,
+    /// Include all rounds (default).
+    Any,
+}
+
+/// `--limit` value: `0` (state summary only, default) | `N` (a positive integer) | `all`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResultsLimit {
+    /// `--limit 0` — state summary only.
+    Zero,
+    /// `--limit N` (where `N >= 1`) — show up to `N` recent rounds.
+    Count(u32),
+    /// `--limit all` — show every round.
+    All,
+}
+
+impl std::str::FromStr for ResultsLimit {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.eq_ignore_ascii_case("all") {
+            return Ok(Self::All);
+        }
+        match s.parse::<u32>() {
+            Ok(0) => Ok(Self::Zero),
+            Ok(n) => Ok(Self::Count(n)),
+            Err(_) => Err(format!(
+                "invalid --limit value: '{s}' (expected non-negative integer or 'all')"
+            )),
+        }
+    }
+}
+
 #[derive(Debug, Args)]
-pub struct StatusArgs {
+#[command(group(
+    ArgGroup::new("scope_selector")
+        .args(["scope", "all"])
+        .multiple(false)
+))]
+pub struct ResultsArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
+    pub(super) items_dir: PathBuf,
 
     /// Track ID.
     #[arg(long)]
-    track_id: String,
+    pub(super) track_id: String,
+
+    /// Show only the named scope (mutually exclusive with `--all`).
+    #[arg(long)]
+    pub(super) scope: Option<String>,
+
+    /// Show every scope (equivalent to omitting `--scope`; mutually exclusive with `--scope`).
+    #[arg(long, default_value_t = false)]
+    pub(super) all: bool,
+
+    /// `0` (state summary only, default), a positive integer `N`, or `all`.
+    #[arg(long, default_value = "0")]
+    pub(super) limit: ResultsLimit,
+
+    /// Round-type filter applied to history rounds.
+    #[arg(long, value_enum, default_value_t = RoundTypeFilter::Any)]
+    pub(super) round_type: RoundTypeFilter,
+
+    /// Suppress the commit hint line.
+    #[arg(long)]
+    pub(super) no_hint: bool,
 }
 
 // These types are only needed by the test shim in codex_local.rs.
@@ -182,7 +252,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
     match cmd {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
-        ReviewCommand::Status(args) => execute_status(&args),
+        ReviewCommand::Results(args) => execute_results(&args),
     }
 }
 
@@ -190,11 +260,49 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
 // check-approved: Verify review.status == approved with current code hash
 // ---------------------------------------------------------------------------
 
+/// Formats an `ReviewApprovalVerdict` into the human-readable message and exit
+/// code for the `check-approved` command.
+///
+/// Extracted as a pure function so that tests can assert on the *exact* message
+/// prefix (`[OK]` / `[WARN]` / `[BLOCKED]`) without having to redirect stderr.
+///
+/// Observable surface (AC-10):
+/// - `Approved`            → `[OK] …`   + `ExitCode::SUCCESS`
+/// - `ApprovedWithBypass`  → `[WARN] …` + `ExitCode::SUCCESS`
+/// - `Blocked`             → `[BLOCKED] …` + `ExitCode::FAILURE`
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn format_approval_verdict(
+    verdict: domain::review_v2::ReviewApprovalVerdict,
+) -> (String, ExitCode) {
+    use domain::review_v2::ReviewApprovalVerdict;
+    match verdict {
+        ReviewApprovalVerdict::Approved => {
+            ("[OK] Review is approved and code hash is current".to_owned(), ExitCode::SUCCESS)
+        }
+        ReviewApprovalVerdict::ApprovedWithBypass { not_started_count } => (
+            format!(
+                "[WARN] No review.json found. Allowing commit for PR-based review ({not_started_count} scope(s))."
+            ),
+            ExitCode::SUCCESS,
+        ),
+        ReviewApprovalVerdict::Blocked { required_scopes } => {
+            let mut display: Vec<_> =
+                required_scopes.iter().map(|scope| format!("  {scope}")).collect();
+            display.sort();
+            (
+                format!("[BLOCKED] Review not approved. Required scopes:\n{}", display.join("\n")),
+                ExitCode::FAILURE,
+            )
+        }
+    }
+}
+
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     match run_check_approved(args) {
-        Ok(()) => {
-            eprintln!("[OK] Review is approved and code hash is current");
-            ExitCode::SUCCESS
+        Ok(verdict) => {
+            let (msg, code) = format_approval_verdict(verdict);
+            eprintln!("{msg}");
+            code
         }
         Err(msg) => {
             eprintln!("{msg}");
@@ -203,123 +311,19 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     }
 }
 
-fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
-    use domain::review_v2::ReviewState;
-
-    // v2: no planning-only bypass. All files are classified into scopes.
-    // Empty scopes are NotRequired(Empty), reviewed scopes are NotRequired(ZeroFindings).
-    // The commit gate simply checks all scopes are NotRequired.
+fn run_check_approved(
+    args: &CheckApprovedArgs,
+) -> Result<domain::review_v2::ReviewApprovalVerdict, String> {
     let track_id = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
 
     let comp = compose_v2::build_review_v2(&track_id, &args.items_dir)?;
 
-    let states = comp
-        .cycle
-        .get_review_states(&comp.review_store)
-        .map_err(|e| format!("failed to get review states: {e}"))?;
+    let review_json_exists = comp
+        .review_store
+        .review_json_exists()
+        .map_err(|e| format!("failed to check review.json existence: {e}"))?;
 
-    // Collect scopes that still require review.
-    let required: Vec<_> =
-        states.iter().filter(|(_, state)| matches!(state, ReviewState::Required(_))).collect();
-
-    if required.is_empty() {
-        return Ok(());
-    }
-
-    // If review.json does not exist AND all required scopes are NotStarted,
-    // allow commit without review. This enables PR-based review workflows
-    // where local review is skipped intentionally.
-    // When review.json exists but is corrupt/unreadable, the store returns
-    // empty state (all NotStarted) as fail-closed — we must NOT bypass in
-    // that case, so we require the file to be absent.
-    // Resolve review.json relative to the git root (same as build_review_v2)
-    // to avoid CWD-dependent path mismatch.
-    let git = infrastructure::git_cli::SystemGitRepo::discover()
-        .map_err(|e| format!("git discover: {e}"))?;
-    let review_json = if args.items_dir.is_absolute() {
-        args.items_dir.join(&args.track_id).join("review.json")
-    } else {
-        git.root().join(&args.items_dir).join(&args.track_id).join("review.json")
-    };
-    let all_not_started = required.iter().all(|(_, state)| {
-        matches!(state, ReviewState::Required(domain::review_v2::RequiredReason::NotStarted))
-    });
-    if all_not_started && !review_json.exists() {
-        eprintln!(
-            "[WARN] No review.json found. Allowing commit for PR-based review ({} scope(s)).",
-            required.len()
-        );
-        return Ok(());
-    }
-
-    let mut display: Vec<_> =
-        required.iter().map(|(scope, state)| format!("  {scope}: {state}")).collect();
-    display.sort();
-    Err(format!("[BLOCKED] Review not approved. Required scopes:\n{}", display.join("\n")))
-}
-
-// ---------------------------------------------------------------------------
-// status: Show per-group Fast/Final review state
-// ---------------------------------------------------------------------------
-
-fn execute_status(args: &StatusArgs) -> ExitCode {
-    match run_status(args) {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(msg) => {
-            eprintln!("{msg}");
-            ExitCode::FAILURE
-        }
-    }
-}
-
-fn run_status(args: &StatusArgs) -> Result<(), String> {
-    use domain::review_v2::{NotRequiredReason, ReviewState};
-
-    let track_id =
-        domain::TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
-    let comp = compose_v2::build_review_v2(&track_id, &args.items_dir)?;
-
-    let states = comp
-        .cycle
-        .get_review_states(&comp.review_store)
-        .map_err(|e| format!("failed to get review states: {e}"))?;
-
-    if states.is_empty() {
-        println!("Review status: no scopes (empty diff)");
-        return Ok(());
-    }
-
-    println!("Review status (v2 scope-based):");
-    println!("Diff base: {}", comp.base);
-
-    let mut sorted: Vec<_> = states.iter().collect();
-    sorted.sort_by_key(|(scope, _)| scope.to_string());
-
-    let mut approved_count = 0;
-    let mut empty_count = 0;
-    let mut required_count = 0;
-    for (scope, state) in &sorted {
-        let indicator = match state {
-            ReviewState::Required(_) => {
-                required_count += 1;
-                "[-]"
-            }
-            ReviewState::NotRequired(NotRequiredReason::Empty) => {
-                empty_count += 1;
-                "[.]"
-            }
-            ReviewState::NotRequired(NotRequiredReason::ZeroFindings) => {
-                approved_count += 1;
-                "[+]"
-            }
-        };
-        println!("  {indicator} {scope}: {state}");
-    }
-
-    println!(
-        "Summary: {approved_count} approved, {empty_count} empty, {required_count} required, {} total",
-        sorted.len()
-    );
-
-    Ok(())
+    comp.cycle
+        .evaluate_approval(&comp.review_store, review_json_exists)
+        .map_err(|e| format!("failed to evaluate approval: {e}"))
 }

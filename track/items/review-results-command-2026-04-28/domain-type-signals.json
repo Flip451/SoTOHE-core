@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-29T03:35:10Z",
+  "declaration_hash": "fabd5a6fb4fa8f36e22f47ddc9ddf8e1582b5e51c2f4a280f83160dca54342e8",
+  "signals": [
+    {
+      "type_name": "ReviewApprovalVerdict",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Approved",
+        "ApprovedWithBypass",
+        "Blocked"
+      ]
+    },
+    {
+      "type_name": "ScopeRound",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "round_type: RoundType",
+        "verdict: Verdict",
+        "findings: Vec<ReviewerFinding>",
+        "hash: ReviewHash",
+        "at: String"
+      ]
+    },
+    {
+      "type_name": "ReviewReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn read_latest_finals(&self) -> Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError>",
+        "fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError>"
+      ]
+    },
+    {
+      "type_name": "ReviewWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn write_verdict(&self, scope: &ScopeName, verdict: &Verdict, hash: &ReviewHash) -> Result<(), ReviewWriterError>",
+        "fn write_fast_verdict(&self, scope: &ScopeName, verdict: &FastVerdict, hash: &ReviewHash) -> Result<(), ReviewWriterError>",
+        "fn init(&self) -> Result<(), ReviewWriterError>",
+        "fn reset(&self) -> Result<(), ReviewWriterError>"
+      ]
+    },
+    {
+      "type_name": "ReviewExistsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn review_json_exists(&self) -> Result<bool, ReviewReaderError>"
+      ]
+    }
+  ]
+}

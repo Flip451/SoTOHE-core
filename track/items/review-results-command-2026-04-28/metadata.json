@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "review-results-command-2026-04-28",
+  "title": "`sotp review results` で review.json 直読みを置き換える",
+  "branch": "track/review-results-command-2026-04-28",
+  "created_at": "2026-04-28T19:23:04Z",
+  "updated_at": "2026-04-28T19:23:04Z"
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-29T03:14:23Z",
+  "declaration_hash": "e885380a653662f912fe35283fdada402915291908c50d1231d60b39192f1e3e",
+  "signals": [
+    {
+      "type_name": "FsReviewStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn read_latest_finals(&self) -> Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError>",
+        "fn read_all_rounds(&self, scope: &ScopeName) -> Result<Vec<ScopeRound>, ReviewReaderError>",
+        "fn write_verdict(&self, scope: &ScopeName, verdict: &Verdict, hash: &ReviewHash) -> Result<(), ReviewWriterError>",
+        "fn write_fast_verdict(&self, scope: &ScopeName, verdict: &FastVerdict, hash: &ReviewHash) -> Result<(), ReviewWriterError>",
+        "fn init(&self) -> Result<(), ReviewWriterError>",
+        "fn reset(&self) -> Result<(), ReviewWriterError>",
+        "fn review_json_exists(&self) -> Result<bool, ReviewReaderError>"
+      ]
+    }
+  ]
+}

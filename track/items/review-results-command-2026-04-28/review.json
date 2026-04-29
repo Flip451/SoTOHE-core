@@ -1,0 +1,1480 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3957d092d95db9b1ebc064e940153cd2db024980be7e3ded9091de269da51a5",
+          "at": "2026-04-28T19:28:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR defines two incompatible commit-hint predicates: Context/D1 say the hint is for “all scopes completed and at least one zero_findings”, but D5 makes the implementation condition `check-approved OK` plus `review.json` existence and D5.2 explicitly allows an all-Empty diff with zero zero_findings to emit the hint. That leaves implementers with conflicting requirements for whether `>=1 zero_findings` is mandatory; either D5 should include that predicate or the earlier decision text should be relaxed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+              "line": 196,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d3957d092d95db9b1ebc064e940153cd2db024980be7e3ded9091de269da51a5",
+          "at": "2026-04-28T19:30:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 defines the commit hint condition as all scopes complete plus at least one `zero_findings`, but D5 changes the executable condition to `check-approved` OK plus `review.json` existence, and D5.2 explicitly says that an all-`NotRequired::Empty` case can still emit the hint. Those statements conflict on whether a real zero-findings review is required before recommending `/track:commit`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+              "line": 194,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d3957d092d95db9b1ebc064e940153cd2db024980be7e3ded9091de269da51a5",
+          "at": "2026-04-28T19:31:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ed02a57a9112d3c5927fd1a4b0ac278885d24be73357c66a8bf58abb5605ee",
+          "at": "2026-04-28T19:33:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 requires empty scopes to render as `NotRequired(Empty)`, but AC-04 later says they should render as `[.] <scope>: not required (empty)`. Those are different user-visible output contracts, so the spec is internally inconsistent and does not give implementation a single target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/spec.json",
+              "line": 61,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-06 models the bypass path as `NotRequired(NotStarted)`, which conflicts with the rest of the design: `NotStarted` is the required-side state in the review-state taxonomy, while the bypass variant is supposed to be the no-review path. As written, the branch is semantically unimplementable because `not_started_count` cannot be derived from a `NotRequired` state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/spec.json",
+              "line": 314,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:65c1bc0df79851eb1dfbe4e3e3c71c1dcc84546d6916a015c027796a2e4fc4a6",
+          "at": "2026-04-28T20:09:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The bypass/approval state is defined inconsistently. `domain-types.json` and the T001/T003 plan text describe `ApprovedWithBypass` as `all NotRequired(*)` with `review.json` absent, but `spec.json` AC-06 (and the IN-04/CN-03 parenthetical) describe the same no-hint path as `Required(NotStarted)` with `review.json` absent. Those are different state classes, so the implementation cannot tell which condition should drive the verdict and hint suppression.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
+              "line": 314,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ReviewApprovalVerdict` ends with `No serde in domain (CN-05)`, but CN-05 in this spec is the no-backward-compat/status-deletion constraint, not a serialization rule. That cross-reference is self-evidently wrong and should point to the actual serialization convention or be removed.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 6,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:dc96d97c8f334b8f8d490310e26c40735469ce289ccf2ff1f3f793b68dc6bae9",
+          "at": "2026-04-28T20:15:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` does not cover the three `GO-*` elements from `spec.json` at all, so the phase-3 coverage gate is not actually tracking all 38 spec elements as claimed in the briefing; the goals are left orphaned in the SSoT chain.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/task-coverage.json",
+              "line": 3,
+              "category": "coverage"
+            },
+            {
+              "message": "The `ReviewCycle` catalogue entry is missing the planned `evaluate_approval` member in structured form: `expected_members` is empty and the generated view shows `—`, so phase 2 no longer records the actual API delta that the plan says is being introduced.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/usecase-types.json",
+              "line": 10,
+              "category": "catalogue"
+            }
+          ],
+          "hash": "rvw1:sha256:22e219f945953aed89738040da659be19529734a34ff686ce4e651fdfbde5743",
+          "at": "2026-04-28T20:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22e219f945953aed89738040da659be19529734a34ff686ce4e651fdfbde5743",
+          "at": "2026-04-28T20:25:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 says the plan must avoid any case where `results` emits no hint while `check-approved` is OK, but CN-03/AC-06 intentionally suppress the hint for `ApprovedWithBypass`, and T004 maps `ApprovedWithBypass` to `ExitCode::SUCCESS`. As written, the acceptance criteria contradict the bypass behavior and make the plan impossible to satisfy literally.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
+              "line": 364,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ReviewCycle` catalogue entry describes adding `evaluate_approval(...)`, but the structured catalogue data records `expected_members: []` and has no structured expected method for `evaluate_approval`. This contradicts the entry's own action/description and causes generated views/contract maps to lose the usecase method that the plan depends on.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/usecase-types.json",
+              "line": 10,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:22e219f945953aed89738040da659be19529734a34ff686ce4e651fdfbde5743",
+          "at": "2026-04-28T20:27:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ReviewExistsPort` treats I/O errors as `false`/absent, but absence is the condition that enables the PR-based bypass path. That is fail-open, not fail-closed: a metadata or permission error while checking `review.json` could be interpreted as no local review and allow `ApprovedWithBypass` instead of blocking or propagating the error. The port should return a `Result` or otherwise classify unknown existence as non-bypassable.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "error handling"
+            },
+            {
+              "message": "`Approved` is defined as requiring both all scopes `NotRequired(*)` and `review.json` existence, while `ApprovedWithBypass` covers absent `review.json`. That conflicts with the spec’s separation between the check-approved OK condition (`all NotRequired(*)`) and the extra `review.json` condition for emitting the results hint; with all scopes not required but no `review.json`, the plan has no verdict that preserves the existing `[OK]` check-approved behavior while suppressing the hint.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ad17c01fd2c30c28a472b52572b23fca3d19a567d39a687dec051b7e5340ea05",
+          "at": "2026-04-28T20:34:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ApprovedWithBypass` has contradictory eligibility rules: the task first defines it as `all NotRequired(*) AND !review_json_exists`, but then says it carries the count of `Required(NotStarted)` scopes and explicitly tests `all Required(NotStarted) + review_json_exists=false -> ApprovedWithBypass{N}`. A state set cannot both be all `NotRequired(*)` and contain `Required(NotStarted)`, so implementers cannot determine whether the PR-bypass path should succeed or block.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ApprovedWithBypass { not_started_count: 0 }` rendering is inconsistent. T003 says this case means all scopes were empty and should be silent `[OK]`, while T004 maps every `ApprovedWithBypass` variant to `[WARN] + SUCCESS`. This makes the no-diff/no-review case observably ambiguous and can break the promised unchanged `check-approved` surface.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan calls `review_json_exists(&self) -> bool` with I/O errors treated as absent a fail-closed behavior, but the same plan treats `review_json_exists=false` as an `ApprovedWithBypass` success path. That makes permission/read errors potentially approve the gate instead of propagating or blocking, contradicting the stated fail-closed semantics and the repository error-handling rule.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c4971bfcd10b39044077c0b53c8187e24d782c332a0a5e047e2dc9f59e5f2395",
+          "at": "2026-04-28T20:39:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 says the shared ReviewApprovalVerdict eliminates the drift case where the review is Approved but no commit hint is shown, but AC-06 explicitly requires no hint when review.json is absent, and the planned usecase classifies all NotRequired scopes as Approved regardless of review_json_exists. That leaves a valid Approved + no-hint path, so the acceptance criteria contradict each other.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
+              "line": 363,
+              "category": "contradiction"
+            },
+            {
+              "message": "ReviewExistsPort is specified as an infallible bool API where I/O errors are treated as false/absent. That contradicts the repository error-handling rule that errors must propagate via Result and not be silently swallowed, and it can turn an unreadable review.json into the same state as an absent file.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:08c23a08bc367294a91162bff20f4fcb5a1dae4ae0d6090027f8bc31e603b84e",
+          "at": "2026-04-28T20:46:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 says the shared `ReviewApprovalVerdict` should eliminate the drift case where the result is `Approved` but no hint is shown. That conflicts with AC-06 and the implementation plan: T003 classifies all `NotRequired(*)` states as `Approved` regardless of `review_json_exists`, while T005 explicitly suppresses the hint for `Approved + no review.json`. The empty-diff/no-review-json case therefore has contradictory acceptance criteria for whether `Approved` without a hint is allowed.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
+              "line": 363,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b563fd86c5275f41ea6a52b99ba5cd01a282880a2dbae22a2fe797e866db24f2",
+          "at": "2026-04-28T20:51:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` only uses `get_review_states` for the default summary and defers round reading to `--limit > 0`, but ADR D2 requires the state summary itself to include the latest round verdict on each scope line. As written, the `--limit 0` path cannot render the `verdict@...` information the ADR calls for.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7de3fbc4fb70c32a9d11659c4cfaa9284f120561040f978b4479a3357029bddf",
+          "at": "2026-04-28T20:55:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f96f2b8fbb96f33edd671827b03cfe14e17d2e3b533541b9d527d7f07faf5f8a",
+          "at": "2026-04-28T20:59:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ReviewExistsPort is specified as an infallible bool API that treats I/O errors as absent, but absence is also the condition that enables the ApprovedWithBypass success path. That silently converts permission/metadata failures while checking review.json into a possible bypass instead of propagating or blocking, contradicting the repository error-handling rule that errors must not be swallowed. Make the port return a Result or classify unknown existence as non-bypassable.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f96f2b8fbb96f33edd671827b03cfe14e17d2e3b533541b9d527d7f07faf5f8a",
+          "at": "2026-04-28T21:02:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e20384d0f3bc05a18b9805af80e12f46a9243c8d6871cd268188c85508ec2140",
+          "at": "2026-04-28T21:07:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 requires the output scope list to enumerate the full `scope_config.all_scope_names()` universe and omit no scopes, but AC-14 requires `--scope <name>` to display only that single scope. Without an explicit exception for filtered mode, the plan asks implementers to both include every scope and only one scope for the same command surface.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
+              "line": 185,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e20384d0f3bc05a18b9805af80e12f46a9243c8d6871cd268188c85508ec2140",
+          "at": "2026-04-28T21:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 treats the `all scope == NotRequired(Empty)` case as one where `review.json` is absent, but OS-06 states the same `NotRequired(Empty)` edge case can occur with `review.json` present and should emit the hint. These requirements conflict; clarify which state is intended for the empty-diff case.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
+              "line": 314,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e25cc52fe6b50a5e5a63177842f116f5ea875f8e7ca04d05a7aba603826b5905",
+          "at": "2026-04-28T21:12:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 says the default `--limit 0` path renders a `header line` and `diff base line` before the state summary, but `IN-02`/`CN-06` define the default mode as state-summary-only output (`indicator + state line + summary line`). The plan and spec disagree on what `sotp review results` prints in the default case.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/plan.md",
+              "line": 59,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6e710ca04d05657d27bcfbdbcef2f605e8f32679788732e3a341b3af85e3bd42",
+          "at": "2026-04-28T21:15:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a315c7b7c8235bc158ee7770612482ab72e70474d544bc6270ab35790b04492",
+          "at": "2026-04-28T21:18:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The catalogue entry directly cites `ADR D5.1` in its description. The plan-artifact SoT chain requires type catalogues to cite only `spec_refs[]` and not jump directly back to ADRs; this should be rephrased/grounded via the existing IN/AC/CN spec refs instead.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 6,
+              "category": "broken_reference"
+            },
+            {
+              "message": "`ReviewExistsPort` is specified as infallible `bool` and explicitly treats I/O errors such as permission denied as `false`/absent. That contradicts the repository error-handling rule against silent error swallowing, and it can turn a filesystem read failure into `ApprovedWithBypass` because `evaluate_approval` treats `review_json_exists=false` as the bypass condition. The port should propagate the existence-check error instead of collapsing it to absence.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "error_handling"
+            },
+            {
+              "message": "T005 narrows the default results output to `get_review_states` state text and states that no round timestamp is required, but ADR D2/D3/D6 define the default state summary as including the latest round verdict in the state line. As written, `--limit 0` can become only the old `review status` view rather than the new `results` view promised by the design.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a315c7b7c8235bc158ee7770612482ab72e70474d544bc6270ab35790b04492",
+          "at": "2026-04-28T21:21:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7ff7cb9e51d90b31260a5ac63efaf6fafcffc0b954fd8e08273ec82135f058c",
+          "at": "2026-04-28T21:24:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ReviewExistsPort` is specified as an infallible `bool` API that treats I/O errors such as permission denied as `false`. That makes an unreadable `review.json` indistinguishable from an absent one, so the `ApprovedWithBypass` path can be selected by an I/O failure rather than by the intended “no local review recorded” state. This silently swallows an external I/O error and the claim that there is no `Result` to propagate is semantically wrong for filesystem existence checks; the port should propagate existence-check errors instead of collapsing them into absence.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a7ff7cb9e51d90b31260a5ac63efaf6fafcffc0b954fd8e08273ec82135f058c",
+          "at": "2026-04-28T21:28:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e739e3ac177f8c7ea5552107710010b7b2e872a48ca96f42ea8aaac4a6c1dff",
+          "at": "2026-04-28T21:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 says the default `--limit 0` path reuses `get_review_states` and only `--limit N` requires reading `review.json` rounds, but the ADR-defined default state summary is supposed to include the latest round verdict in each state line. As written, the default implementation path can only reproduce the old status-style state text and has no planned source for the `final@... zero_findings`/latest-round information promised by `results`.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 58,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `ReviewCycle` catalogue entry describes adding the new `evaluate_approval(...)` API, but the structured catalogue records `expected_members: []` and has no structured `expected_methods` entry for that method. This leaves the Phase 2 type catalogue/generated view without the API delta that T003-T005 depend on, despite the entry being an action `modify`.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/usecase-types.json",
+              "line": 10,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9e739e3ac177f8c7ea5552107710010b7b2e872a48ca96f42ea8aaac4a6c1dff",
+          "at": "2026-04-28T21:35:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 depends on a history-reading `ReviewReader` API (`read_all_rounds` or equivalent) to satisfy AC-02/AC-03, but the plan never adds a corresponding catalogue entry or dedicated task for extending the port. As written, the results command would need either an untracked interface change or a hexagonal-boundary violation to render the history block.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e76aa50e1b5f5d5d2ceb2d610cc018a10dec81afc9fecef8e5cf043f26a24bcb",
+          "at": "2026-04-28T21:41:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c07421079024641b6fbce743b837483808907513e608ba8536d5f539a07bb2e0",
+          "at": "2026-04-28T21:45:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The domain catalogue adds `ReviewReader::read_all_rounds` with return type `Result<Vec<StoredRound>, ReviewReaderError>`, but the plan artifacts never define or catalogue `StoredRound` or state which task introduces it. T005 depends on that type to carry round type, verdict, timestamp, and findings for `--limit` output, so the implementation contract is incomplete and an implementer cannot satisfy the port signature from the plan alone.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 90,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c07421079024641b6fbce743b837483808907513e608ba8536d5f539a07bb2e0",
+          "at": "2026-04-28T21:48:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` renders a third domain-layer entry, `ReviewReader` (row 14), even though the source `domain-types.json` only defines `ReviewApprovalVerdict` and `ReviewExistsPort`. The generated catalogue/contract-map therefore disagree with the JSON SSoT and the `ReviewReader` change is left untraced; either add the JSON entry and coverage for it, or remove the extra row from the generated view.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/domain-types.md",
+              "line": 14,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ce0564293cf8ee26b131e2f578b20dea06696d0eae55f7fc2242f80cdc292be0",
+          "at": "2026-04-28T21:51:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan does not schedule error-path tests for the new public APIs. T002 only covers `ReviewExistsPort` success/absence cases, T003 only covers verdict classification, and T004/T005 mention refactoring/rendering tests without any explicit I/O-failure propagation cases. That leaves the required public-API error coverage unplanned for `review_json_exists`, `evaluate_approval`, and the CLI paths that consume them.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 12,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:aabb23e4a9b3c25a087d626140337c0bba9ad4284228e68bd09b44659f7c9a73",
+          "at": "2026-04-28T21:55:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4af1603b8786e02a7a23d31622b24fc5819236db2e42bf7a6f085602db9d117",
+          "at": "2026-04-28T21:58:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The domain catalogue view contains an unaccepted red signal for `ReviewReader` even though the plan treats it as a reference-only pre-existing port and T008 requires all verify gates to pass. Because no task resolves this red signal, the plan is internally inconsistent: either specify the intended `ReviewReader` method contract for T005 or remove the reference until the extension is defined.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.md",
+              "line": 14,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005 tells implementers to append the latest round type/verdict/timestamp suffix “per AC-04 format”, but AC-04 only defines full scope-universe enumeration and the `[.] <scope>: not required (empty)` behavior. The latest-round suffix format is described in IN-02/D3, so this is a broken cross-reference in the implementation plan.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:c4af1603b8786e02a7a23d31622b24fc5819236db2e42bf7a6f085602db9d117",
+          "at": "2026-04-28T22:00:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` claims a strict T001→T008 execution order in prose, but the task records themselves only carry `id`, `description`, `status`, and `commit_hash`; there is no machine-readable `depends_on` field anywhere in the plan. That leaves the required DAG unencoded, so the sequencing called out in the briefing cannot be validated or enforced from this artifact.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 55,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T005 is underspecified for history rendering: it mentions `read_all_rounds or equivalent` and needs latest round verdict/timestamp plus findings/history output, but the plan never defines the round-history payload or the method signature/return type that would carry those records. Without that contract, the new results command cannot be implemented from the plan artifacts alone.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:251b7d32428a6c5fea76e7247dd2a48ee6a4fddf04b8f8bce166b26529de12eb",
+          "at": "2026-04-28T22:04:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a710164c9d4a315c7b126e603a2ea13fe81953c38635f008d260fcc996acafc",
+          "at": "2026-04-28T22:12:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a710164c9d4a315c7b126e603a2ea13fe81953c38635f008d260fcc996acafc",
+          "at": "2026-04-28T22:17:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` introduces a new domain-side `ScopeRound` struct for history payloads, but the phase-2 type catalogue only records `ReviewApprovalVerdict` and `ReviewExistsPort`. That leaves a planned domain type outside the catalogue/trace chain, so the implementation plan is no longer fully self-describing for the new round-history data model.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/plan.md",
+              "line": 59,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2a710164c9d4a315c7b126e603a2ea13fe81953c38635f008d260fcc996acafc",
+          "at": "2026-04-28T22:19:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 introduces a new domain-side `ScopeRound` payload and a `read_all_rounds` API, but the phase-2 catalogues in this artifact set only model `ReviewApprovalVerdict`, `ReviewExistsPort`, `ReviewCycle`, and `FsReviewStore`. That leaves the round-history contract outside the SSoT chain, so the results command plan is not self-describing for the new history data it depends on.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2a710164c9d4a315c7b126e603a2ea13fe81953c38635f008d260fcc996acafc",
+          "at": "2026-04-28T22:22:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:569e87fffb982305557cd358e2b8eed361cf55536c2c17ff4a33384989e67ebc",
+          "at": "2026-04-28T22:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-13 requires `--round-type fast|final|any` to filter displayed history when `--limit > 0`, and task coverage maps AC-13 solely to T005. However T005 only adds the `RoundTypeFilter` flag and reads/renders all `ScopeRound` history; it never instructs implementers to apply the selected round-type filter or add tests for fast/final/any. As written, the plan can satisfy the flag-surface part while leaving AC-13's required filtering behavior uncovered.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ScopeRound` is described as a plain data struct with concrete fields (`round_type`, `verdict`, `findings`, `hash`, `at`), but the same catalogue entry sets `expected_members` to an empty list, and the generated markdown consequently renders its details as `—`. This makes the type catalogue contradict its own type contract and can lead implementers or generated checks to treat `ScopeRound` as an empty value object instead of the required round-history payload.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:569e87fffb982305557cd358e2b8eed361cf55536c2c17ff4a33384989e67ebc",
+          "at": "2026-04-28T22:31:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cac08a67596f8cfcaa394c85d4fa655fc838b757e4eb63ad60b4cb0b3867833f",
+          "at": "2026-04-28T22:37:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T005 summary says `--limit 0` mode only reuses `get_review_states` while `--limit N` requires reading `review.json` rounds, but the spec and the detailed T005 section require the state summary, including default `--limit 0`, to include the latest round type/verdict/timestamp when review history exists. If an implementer follows the summary, the default replacement for `review status` will omit the required latest-round suffix.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cac08a67596f8cfcaa394c85d4fa655fc838b757e4eb63ad60b4cb0b3867833f",
+          "at": "2026-04-28T22:39:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0706a64fa7b57b6bbecea2fb43c59f3039ff272ebb4631898b9139f6c167ba1c",
+          "at": "2026-04-28T22:42:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0706a64fa7b57b6bbecea2fb43c59f3039ff272ebb4631898b9139f6c167ba1c",
+          "at": "2026-04-28T22:45:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T22:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The transition delta removes the `commit_hash` field from every task entry instead of preserving it as `null`. This contradicts the plan-artifacts contract for this round: T001 should only move to `in_progress` while keeping `commit_hash: null`, and T002-T008 task metadata should remain unchanged.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T22:57:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:00:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T001 transition removed the `commit_hash` field from every task entry instead of preserving it as `null`. This contradicts the transition contract for this round, which says only T001 status should change and its commit hash should remain unset while T002-T008 metadata stays unchanged; it also drops the task/hash state that the workflow uses for approval tracking.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:01:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T001 transition should only change the task state while leaving unresolved task commit metadata as `commit_hash: null`; instead `commit_hash` is absent from T001 and the same null field was dropped from T002-T008. That contradicts the transition contract that non-T001 task entries remain unchanged and leaves the plan artifact without the expected pre-commit marker for unresolved tasks.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:03:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:10:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc39a2e54c13a1f4bea1161e7fbd338792d80f532a146dabe7da01ca56a80919",
+          "at": "2026-04-28T23:11:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1219afba10fe727ba80572ae3368759e4b91755d9d2b6fbdd3151479f165fb98",
+          "at": "2026-04-28T23:13:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1219afba10fe727ba80572ae3368759e4b91755d9d2b6fbdd3151479f165fb98",
+          "at": "2026-04-28T23:15:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3f32f19e6daf799323ef27451c64ead0b3e92bdc9f87c0a8dcf670c388aa681",
+          "at": "2026-04-28T23:44:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3f32f19e6daf799323ef27451c64ead0b3e92bdc9f87c0a8dcf670c388aa681",
+          "at": "2026-04-28T23:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:683fe94e98a05e74bbf6568dfd39ead0588495356380bca74ee1bcc7be1ddb86",
+          "at": "2026-04-28T23:55:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:683fe94e98a05e74bbf6568dfd39ead0588495356380bca74ee1bcc7be1ddb86",
+          "at": "2026-04-28T23:59:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4612544c24a24f1a4dafcac20ebc864058da438f246ed7ecf06a59784d604b9",
+          "at": "2026-04-29T00:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4612544c24a24f1a4dafcac20ebc864058da438f246ed7ecf06a59784d604b9",
+          "at": "2026-04-29T00:21:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72836e3de554c0c3130992f41a3a840f6f31431f9798e22e03510c26c04568fb",
+          "at": "2026-04-29T00:52:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72836e3de554c0c3130992f41a3a840f6f31431f9798e22e03510c26c04568fb",
+          "at": "2026-04-29T00:54:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` still defines `ScopeRound.hash` as `ReviewHashValue`, but `domain-types.json` now widens the same field to `ReviewHash` so empty-hash rounds can be represented. The plan artifacts disagree on the shape of the round-history payload, and the same stale type also appears in `plan.md:59`.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d789f5cdef232a57a8c83a0d5dad98516cc1b5f09c40396fecf5a164fb77678",
+          "at": "2026-04-29T01:20:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0a183307cce2950812e214f67573d785425bae05a56465f4033d4a8f1ce4655",
+          "at": "2026-04-29T01:23:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0a183307cce2950812e214f67573d785425bae05a56465f4033d4a8f1ce4655",
+          "at": "2026-04-29T01:27:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0a183307cce2950812e214f67573d785425bae05a56465f4033d4a8f1ce4655",
+          "at": "2026-04-29T01:28:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0a183307cce2950812e214f67573d785425bae05a56465f4033d4a8f1ce4655",
+          "at": "2026-04-29T01:34:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:310f1b6c76a74bdad9b7705fc1f40b7fc29a4fc02f23c195d9d6dab832827c98",
+          "at": "2026-04-29T01:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:310f1b6c76a74bdad9b7705fc1f40b7fc29a4fc02f23c195d9d6dab832827c98",
+          "at": "2026-04-29T01:41:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0910957b008fde954d241d6aa48ed68c759fba87261572b9f5656a64cdab6247",
+          "at": "2026-04-29T02:20:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0910957b008fde954d241d6aa48ed68c759fba87261572b9f5656a64cdab6247",
+          "at": "2026-04-29T02:22:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:275339f11f9c8811dcd1a6d45a6b7855a8d4a932169afa6fb739ad5074b5acdf",
+          "at": "2026-04-29T02:35:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 is being transitioned to `done` in the same plan-artifact delta as T008, but the briefing scopes this round as T008-only finalization with T001-T007 already complete and unchanged. That contradicts the task ordering narrative here: T008 says it must run after T007 is complete, yet the artifact now records T007 completion as part of the same finalization update. Keep T007's prior completed state/provenance unchanged and only transition T008 in this round.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/impl-plan.json",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:275339f11f9c8811dcd1a6d45a6b7855a8d4a932169afa6fb739ad5074b5acdf",
+          "at": "2026-04-29T02:37:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:275339f11f9c8811dcd1a6d45a6b7855a8d4a932169afa6fb739ad5074b5acdf",
+          "at": "2026-04-29T02:40:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This regenerated contract map now drops the domain/usecase contract nodes and the `FsReviewStore -> ReviewExistsPort` edge entirely, so it no longer reflects the adapter’s declared interfaces in `infrastructure-types.json` and contradicts the stated intent that only catalogue declarations were being补完.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc9201343a57cc6a3376af9144495b4aea8cc3aae9f38378ab40ee6349f95da5",
+          "at": "2026-04-29T03:20:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsReviewStore` is still rendered here as implementing only `ReviewExistsPort`, but the updated type artifacts declare it also implements `ReviewReader` and `ReviewWriter`. That leaves the plan-artifact set internally inconsistent about this adapter's contract surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:356ddf466e1959a107bd96b31bad74ff937402af1033be59f35e186d5c94bd88",
+          "at": "2026-04-29T03:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` only reflects `FsReviewStore` as an implementation of `ReviewExistsPort` plus a `read_all_rounds` edge, but the paired `infrastructure-types.json` now declares `ReviewReader` and `ReviewWriter` as implemented traits as well. That leaves the regenerated contract map semantically incomplete and inconsistent with the type summary.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 20,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:356ddf466e1959a107bd96b31bad74ff937402af1033be59f35e186d5c94bd88",
+          "at": "2026-04-29T03:26:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56c041bee24ec65f1c394de2cfe2d6564ab5eb8b64c40322045801f7ea481bf3",
+          "at": "2026-04-29T03:30:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScopeRound` says `read_all_rounds` is introduced in T005, but the new `ReviewReader` entry says the same method was added in T001. The artifacts disagree on when the port/method became available, so the plan is internally inconsistent about the dependency timeline.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` now shows a direct `FsReviewStore -> ScopeRound` edge in addition to the `FsReviewStore -.impl.-> ReviewReader` edge. That makes the diagram assert an adapter-level dependency on `ScopeRound`, which contradicts the stated intent of only surfacing the new `ReviewReader` contract relationship for `read_all_rounds`. If this map is meant to represent the contract surface, the extra direct edge is misleading and should be removed or explicitly justified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:40:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:42:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:45:04Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12958373d856af6fe8750a6796e1f3f47c53111d815fa6137f41dbe44c551f12",
+          "at": "2026-04-29T02:20:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12958373d856af6fe8750a6796e1f3f47c53111d815fa6137f41dbe44c551f12",
+          "at": "2026-04-29T02:22:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c07d9e83de62f3e265eedf128181753f7db71aea2c632dd603fbe131398bf84f",
+          "at": "2026-04-29T02:59:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c07d9e83de62f3e265eedf128181753f7db71aea2c632dd603fbe131398bf84f",
+          "at": "2026-04-29T03:00:52Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Renaming the wrapper task here breaks the wrapper smoke test in `scripts/test_make_wrappers.py`, which still looks for `[tasks.track-review-status]` and `bin/sotp make track-review-status`. CI will fail until that test is updated to `track-review-results` or the old wrapper name is retained.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 891,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
+          "at": "2026-04-29T02:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
+          "at": "2026-04-29T02:22:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
+          "at": "2026-04-29T02:23:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c94c238dabca983176fbf241c45cdfce1c105a6ca0c9cacb835ef718c69fe0",
+          "at": "2026-04-29T02:27:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c94c238dabca983176fbf241c45cdfce1c105a6ca0c9cacb835ef718c69fe0",
+          "at": "2026-04-29T02:29:23Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `[BLOCKED]` branch no longer prints the per-scope reason that the previous CLI emitted (`scope: state`); it now shows only bare scope names. That is a user-visible contract change for a guard command, because operators can no longer tell whether a scope is blocked by `NotStarted`, `FindingsRemain`, or `StaleHash`. The new tests in `tests.rs` only assert exit codes, so this regression is currently unprotected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/mod.rs",
+              "line": 208,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
+          "at": "2026-04-29T00:22:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `check-approved` tests only assert the exit code; they never capture or compare stderr, so the required `[OK]` / `[WARN]` / `[BLOCKED]` surface in AC-10 is untested and a prefix regression would still pass.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 754,
+              "category": "testing"
+            },
+            {
+              "message": "In the blocked-path fixture, `review.json` is written without a matching `review_operational` exclusion, so the file itself becomes an extra required scope (typically `Other`). The test can therefore fail for the wrong reason and does not isolate the intended `domain`-scope bypass-block path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 798,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
+          "at": "2026-04-29T00:25:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Blocked` output no longer preserves the previous stderr format: it drops the per-scope `: {state}` suffix and now prints only scope names. That changes a user-visible CLI contract for `check-approved` even though the exit code and prefix stay the same, so any consumer or snapshot relying on the full blocked message will regress.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 218,
+              "category": "behavioral regression"
+            }
+          ],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:35:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:36:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI surface is only exercised through pure rendering helpers; there is no coverage for clap parsing or the `run_results` entry path, so regressions in `--limit` parsing and the `--scope`/`--all` contract can ship unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 205,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
+          "at": "2026-04-29T00:56:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--scope` is effectively broken here: `--all` is a `bool` with `default_value_t = true` inside the same `ArgGroup`, so clap will treat `all` as present even when the user did not pass it. That makes `sotp review results --scope ...` conflict with the default `--all` and prevents the single-scope mode required by AC-14.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 203,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
+          "at": "2026-04-29T01:01:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`results_scope_select` makes `scope` mutually exclusive with `all`, but `all` is a `bool` with `default_value_t = true`. Clap treats defaulted values as present, so `sotp review results --scope ...` will conflict with the implicit `--all` default and the single-scope path becomes unreachable.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 204,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
+          "at": "2026-04-29T01:04:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0240404a95cd16906704fa58752c1e30addf81e3bbbfebdfc3dae56d363d6040",
+          "at": "2026-04-29T01:07:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d770c5ddeb5f029f4e95ff1d6bc3e75ec73cc32bb14b94f0d50fa00603453811",
+          "at": "2026-04-29T01:22:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d770c5ddeb5f029f4e95ff1d6bc3e75ec73cc32bb14b94f0d50fa00603453811",
+          "at": "2026-04-29T01:25:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
+          "at": "2026-04-29T01:40:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
+          "at": "2026-04-29T01:42:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5014d86934e0b87fdf1eedac75c991dd6a94174749be0ff90a30ec3ac032cbbe",
+          "at": "2026-04-29T02:20:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5014d86934e0b87fdf1eedac75c991dd6a94174749be0ff90a30ec3ac032cbbe",
+          "at": "2026-04-29T02:22:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:299dab699c8023595decb9119de9ee3e61e4cf161306c13a96b78506ca0ed39f",
+          "at": "2026-04-29T02:55:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:299dab699c8023595decb9119de9ee3e61e4cf161306c13a96b78506ca0ed39f",
+          "at": "2026-04-29T02:58:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:58:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
+          "at": "2026-04-29T00:52:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
+          "at": "2026-04-29T00:53:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test will not compile: `matches!(round.hash, ReviewHash::Empty)` moves `round.hash` out of `round`, so the next line cannot borrow `round.hash` again. Use a borrow in the match (`matches!(&round.hash, ReviewHash::Empty)`) or check `round.hash.is_empty()` instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/review_v2/tests.rs",
+              "line": 694,
+              "category": "compile_error"
+            }
+          ],
+          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
+          "at": "2026-04-29T01:21:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new empty-hash test moves `round.hash` into `matches!` and then uses `round.hash` again on the next assertion, which will not compile because `ReviewHash` is not `Copy`. Borrow the field in the match or avoid the second use after the move.",
+              "severity": "P1",
+              "file": "libs/domain/src/review_v2/tests.rs",
+              "line": 694,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
+          "at": "2026-04-29T01:22:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
+          "at": "2026-04-29T01:23:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
+          "at": "2026-04-29T01:25:40Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:45:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:47:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` rejects `ReviewHash::Empty` by calling `ReviewHashValue::new(&round.hash)`, but `write_verdict`/`write_fast_verdict` persist empty hashes as `\"\"` and `read_latest_finals` already accepts them. Any existing or future round written with an empty hash will now make `sotp review results` fail instead of round-tripping the stored data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 221,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
+          "at": "2026-04-29T00:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` now rejects rounds whose persisted `hash` is empty, but the writer can still serialize `ReviewHash::Empty` and the existing round-trip path already accepts that case in `read_latest_finals`. As a result, `sotp review results` will fail on valid `review.json` data that contains an empty-hash round instead of reporting the history.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 221,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
+          "at": "2026-04-29T00:55:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` silently skips any persisted round whose `hash` is empty. That loses valid stored history because `write_verdict`/`write_fast_verdict` can serialize `ReviewHash::Empty`, and `read_latest_finals` already accepts that case; as a result, `sotp review results` will omit the round and its latest-round suffix instead of round-tripping the recorded data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b58c66c4e7e3bdd89bb1d5107b55aee94298bf4a2554d4d57a74326d55a04804",
+          "at": "2026-04-29T00:58:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
+          "at": "2026-04-29T01:20:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
+          "at": "2026-04-29T01:22:01Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add a regression test for `evaluate_approval`'s error path. The new public API only has success-case coverage, so a future break in `get_review_states` error propagation (diff/hash/reader failures) would go undetected despite the repo policy requiring error-case tests for public APIs.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/tests.rs",
+              "line": 404,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:39ef3531c2dfe734818eed82d3b5d99decb4d5629256128b61ba5b0436e42af8",
+          "at": "2026-04-28T23:55:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `evaluate_approval` public API is only covered by success cases here. There is no test for `ReviewCycleError` propagation from `get_review_states`, and the blocked cases only assert `required_scopes.len()` instead of the actual scope set. A regression that swallows diff/hash/reader failures or returns the wrong blocked scopes would still pass this suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
+              "line": 404,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:39ef3531c2dfe734818eed82d3b5d99decb4d5629256128b61ba5b0436e42af8",
+          "at": "2026-04-28T23:57:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_approval()` is only covered for the diff failure path here. The method also propagates `ReviewHasherError` and `ReviewReaderError` from `get_review_states()`, but there are no tests for those error cases, so regressions in those paths would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
+              "line": 532,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7849ad24131a487bbc62e11eb8cd7aff81b216a9ab01598366e456f40cb05f12",
+          "at": "2026-04-29T00:01:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`required_scopes` is collected from `states.into_iter()` over a `HashMap`, so the blocked-scope list has nondeterministic order. That makes this public verdict unstable between runs and can change downstream CLI output or snapshot tests even when the underlying set of blocked scopes is the same. Stabilize the ordering before returning it.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/cycle.rs",
+              "line": 196,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:37d7e3233d524db949ae66b1900816581c5bb0f0c2c48cc534a7ac96798174ac",
+          "at": "2026-04-29T00:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:432ba302c4e5168ffdfd242437d6618a8594ea222679aa0e1f2586161570adfa",
+          "at": "2026-04-29T00:06:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:432ba302c4e5168ffdfd242437d6618a8594ea222679aa0e1f2586161570adfa",
+          "at": "2026-04-29T00:08:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb1a0f1a6126f1fb2fbdf3867cf48b97194ad97add80f6ce388235a9c5c606b4",
+          "at": "2026-04-29T00:52:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb1a0f1a6126f1fb2fbdf3867cf48b97194ad97add80f6ce388235a9c5c606b4",
+          "at": "2026-04-29T00:53:23Z"
+        }
+      ]
+    }
+  }
+}

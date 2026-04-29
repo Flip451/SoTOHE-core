@@ -66,6 +66,23 @@ needed" — the recurring pre-commit flap that the ordering rule exists to
 prevent. If a briefing lists the raw `bin/sotp review codex-local` form,
 translate it to `cargo make track-local-review -- ...` before running.
 
+**Read prior-round findings via `cargo make track-review-results`, never by
+opening `review.json` directly.** The `sotp review results` subcommand is the
+canonical read-only API for review state and round history. Useful invocations
+when you need to inspect what the reviewer said previously for your scope:
+
+- Latest fast-round findings only:
+  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit 1 --round-type fast`
+- Latest final-round findings only:
+  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit 1 --round-type final`
+- Full round history for the scope:
+  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit all`
+
+`--limit 0` (the default) shows only the per-scope state summary and is the
+right form when you just need to confirm `required (stale hash)` /
+`required (findings remain)` / `approved`. See `.claude/commands/track/review.md`
+§ "track-review-results flag reference" for the complete option list.
+
 1. **Review**: Run `cargo make track-local-review` with the provided briefing and fast model.
 2. **Parse verdict**: Read the verdict from command output.
    - `zero_findings` → return `completed`
@@ -73,6 +90,9 @@ translate it to `cargo make track-local-review -- ...` before running.
    - Error → return `failed`
 3. **Fix phase**:
    - Verify each finding's factual claims via `Grep` / `Read` before acting.
+   - To recall the previous round's findings without re-running the reviewer,
+     use `cargo make track-review-results -- --track-id {track-id} --scope {scope} --limit 1 --round-type fast`
+     (or `final` for full-model rounds).
    - P3 findings from pre-existing unchanged code: note but do not fix.
    - P0/P1/P2: implement the fix within scope boundaries.
    - If a fix requires out-of-scope files: return `blocked_cross_scope`.
