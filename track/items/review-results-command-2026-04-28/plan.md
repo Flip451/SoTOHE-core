@@ -11,7 +11,7 @@ T006 (status deletion) depends on T005; deleting status before results is in pla
 T007 (doc cleanup) depends on T006; searching for status references after the CLI deletion ensures no false survivors.
 T008 (CI gate) is the final verification task and depends on all prior tasks.
 
-## Tasks (6/8 resolved)
+## Tasks (8/8 resolved)
 
 ### S001 — Domain Layer: ReviewApprovalVerdict + ReviewExistsPort (T001)
 
@@ -71,7 +71,7 @@ T008 (CI gate) is the final verification task and depends on all prior tasks.
 > IN-06 / AC-08 / CN-05: documentation-only commit updating all sotp review status references in .claude/, knowledge/, track/workflow.md, Makefile.toml.
 > No code changes. Sequenced after T006 so the CLI deletion is confirmed before searching for reference survivors.
 
-- [~] **T007**: Update all review status references to review results across doc and config files. Depends on: T006. (1) Search for all occurrences of sotp review status and review-status in: .claude/ (all .md and .json files), knowledge/ (all .md files), track/workflow.md, Makefile.toml. (2) Replace each occurrence with sotp review results (or review-results as appropriate). (3) Verify no dead references remain (AC-08). Files expected to contain references include: .claude/agents/review-fix-lead.md, .claude/commands/track/*.md, knowledge/conventions/review-protocol.md, track/workflow.md, Makefile.toml sotp review status wrapper (if any). This is a documentation-only commit with no code changes. Spec refs: IN-06, AC-08, CN-05.
+- [x] **T007**: Update all review status references to review results across doc and config files. Depends on: T006. (1) Search for all occurrences of sotp review status and review-status in: .claude/ (all .md and .json files), knowledge/ (all .md files), track/workflow.md, Makefile.toml. (2) Replace each occurrence with sotp review results (or review-results as appropriate). (3) Verify no dead references remain (AC-08). Files expected to contain references include: .claude/agents/review-fix-lead.md, .claude/commands/track/*.md, knowledge/conventions/review-protocol.md, track/workflow.md, Makefile.toml sotp review status wrapper (if any). This is a documentation-only commit with no code changes. Spec refs: IN-06, AC-08, CN-05.
 
 ### S008 — CI Gate Verification (T008)
 
@@ -79,4 +79,4 @@ T008 (CI gate) is the final verification task and depends on all prior tasks.
 > Confirms fmt-check / clippy / nextest / deny / check-layers / verify-* all green.
 > Final smoke-test: sotp review results --track-id <id> produces state summary; sotp review status returns clap error.
 
-- [ ] **T008**: Run cargo make ci and verify all gates pass. Depends on: T001, T002, T003, T004, T005, T006, T007. Execute after T001-T007 are complete. Verify: fmt-check + clippy + nextest + deny + check-layers all pass, verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass. Confirm sotp review results --track-id <id> and sotp review check-approved --track-id <id> produce the expected output and exit codes. Confirm sotp review status produces a clap unknown-command error. CI green is required before finalizing. Spec refs: AC-15.
+- [x] **T008**: Run cargo make ci and verify all gates pass. Depends on: T001, T002, T003, T004, T005, T006, T007. Execute after T001-T007 are complete. Verify: fmt-check + clippy + nextest + deny + check-layers all pass, verify-plan-artifact-refs / verify-adr-signals / verify-view-freshness and all other verify-* subcommands pass. Confirm sotp review results --track-id <id> and sotp review check-approved --track-id <id> produce the expected output and exit codes. Confirm sotp review status produces a clap unknown-command error. CI green is required before finalizing. Spec refs: AC-15.
