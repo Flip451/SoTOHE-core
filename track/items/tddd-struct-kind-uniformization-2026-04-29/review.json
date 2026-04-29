@@ -1,6 +1,515 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
+          "at": "2026-04-29T12:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
+          "at": "2026-04-29T12:53:46Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 describes `domain_service` as the place for DDD domain services, including stateless aggregate-crossing operations, but the selection rules only admit structs with at least one field and route zero-field cases to `free_function`. As written, the new kind does not actually cover the stateless domain-service case it claims to solve.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 161,
+              "category": "contradiction"
+            },
+            {
+              "message": "S2 says the current `methods_of()` special handling becomes unnecessary, but the replacement still keeps direct arms for `SecondaryPort` and `ApplicationService` and preserves the `SecondaryAdapter` trait-impl path. This is a simplification, not elimination, so the claim is overstated.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 235,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
+          "at": "2026-04-29T10:34:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`field empty enforcement` for `value_object.expected_methods` would make every `value_object` method illegal, including the `new() -> Result<Self, FooError>` constructors this ADR says M1 is meant to enable. If getters/accessors are still allowed, the rule needs to target a narrower notion of behavior than \"all methods\".",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 304,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `SecondaryAdapter` renderer branch still reads only `implements[].expected_methods`, so the new direct `expected_methods` added to `SecondaryAdapter` in M1 would never affect contract-map rendering or validation. That leaves one of the introduced schema fields effectively dead.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 260,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
+          "at": "2026-04-29T10:37:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 describes `domain_service` as a stateless domain service, but the same section makes it a field-bearing kind (`expected_members`) and then requires at least one member in the selection criteria. That leaves the new kind's semantics inconsistent: readers cannot tell whether it is meant for pure stateless services or stateful behavioral structs.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 166,
+              "category": "contradiction"
+            },
+            {
+              "message": "M1 says all nine struct kinds gain `expected_methods`, but the proposed `methods_of()` rewrite still excludes `Typestate` from the uniform match arm. As written, one of the supposedly uniformized struct kinds remains on the old non-method path, so the renderer change does not actually match the decision text.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 246,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
+          "at": "2026-04-29T10:39:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 says `methods_of()` will be made uniform after M1, but the proposed match still special-cases `SecondaryAdapter` via `implements` only. That leaves any methods declared on `SecondaryAdapter.expected_methods` invisible to the contract-map, so the renderer change does not actually match the schema uniformization promised in M1.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 262,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a52f2631e960ee28345856b3681feb80b5a029a7ee99729498d1627c666e9bf3",
+          "at": "2026-04-29T10:43:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR is listed in the README index with status `—`, but the ADR frontmatter marks all decisions as `proposed`; this leaves the index out of sync with the artifact's lifecycle state. Use an explicit lifecycle state here instead of `—`.",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 98,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e2ad73cfc1ced99c7a38faea51585dc5ae68fb5b6527590e861e56dcefe2a0b9",
+          "at": "2026-04-29T10:45:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afd9bb586f77424d94820c2ac74d676c935ca5d5e4cf1b72990bd9a2ce876161",
+          "at": "2026-04-29T10:47:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 says `methods_of()` will use \"uniform 処理 (特例分岐なし)\" and that the existing special branches become unnecessary, but the proposed implementation still gives `SecondaryAdapter` its own branch that merges top-level `expected_methods` with `implements[].expected_methods`. That leaves the design intent ambiguous: either `SecondaryAdapter` is intentionally special and the surrounding text/consequences should stop promising no special case, or the implementation sketch should handle it uniformly like the other struct kinds.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 246,
+              "category": "contradiction"
+            },
+            {
+              "message": "§4 treats the `ComplianceContext`-class behavioral struct not appearing in the graph as a downstream effect of `methods_of()`/schema non-uniformity, but later the ADR states that the current `ComplianceContext` has no catalogue declaration and will be authored in another track. An undeclared type cannot be made visible by renderer/schema uniformization, so the ADR conflates missing catalogue coverage with missing method-edge rendering and overstates what M1/S2 will resolve.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 88,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:afd9bb586f77424d94820c2ac74d676c935ca5d5e4cf1b72990bd9a2ce876161",
+          "at": "2026-04-29T10:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain_service` の配置方針が矛盾しています。S1 では placement table と判定基準で usecase 層配置を「trans-domain な application logic の場合のみ要根拠」として許容している一方、S3 の linter primitive 例では `domain_service` を「domain 層のみ」として enforce するとしています。このままだと実装者が linter を domain-only にすべきか、usecase 条件付き許容にすべきか判断できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "line": 333,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b2240e835241faff78dd4cf16bc52a99fae65a20781276e4593176eddaceed1a",
+          "at": "2026-04-29T11:07:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df4b244ff51ad046a66b1485d370ec8f43eceabf5633748b494efac19668c724",
+          "at": "2026-04-29T11:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Line 22 combines `#[serde(default)]` with “JSON の後方互換は持たない”. A defaulted field will still deserialize pre-change JSON that omits `expected_methods`, so the plan is asking for backward compatibility and forbidding it at the same time. Pick one behavior and align the codec task with it.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 22,
+              "category": "contradiction"
+            },
+            {
+              "message": "Lines 48-57 require `KindLayerConstraint` / `InvalidLayer`, but no task passes layer context into `CatalogueLinter::run` or provides another layer registry source. The adapter only sees `&TypeCatalogueDocument`, and the interactor only injects `CatalogueLoader` + `CatalogueLinter`, so this primitive cannot be evaluated as written. Add an explicit layer context to the port or move the check into the loader/interactor before this can be implemented.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:3396fec5a3361aac93ff781613c9614e26dbc060568e181ace39c41eeb27dc83",
+          "at": "2026-04-29T11:41:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Line 22 mixes `#[serde(default)]` with a no-backward-compat requirement. A defaulted field will still accept pre-change JSON missing `expected_methods`, so the codec requirement contradicts itself.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 22,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005/T006 define `KindLayerConstraint`, but the port only receives `&TypeCatalogueDocument` and the interactor never passes any layer registry or layer context into `run`. As written, this primitive has no source of truth for permitted-layer checks.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 48,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The `CatalogueLinterRule` description claims the validating constructor rejects unknown kind tags, but T004 only models empty-string/layer validation and the error shape has no way to represent an unknown target kind. That validation promise is not supported by the plan.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
+              "line": 75,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3396fec5a3361aac93ff781613c9614e26dbc060568e181ace39c41eeb27dc83",
+          "at": "2026-04-29T11:43:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 defines `CatalogueLinter::run` without `layer_id`, but the rest of the plan models the same port with `layer_id: &str` and T005/T006 are written against that 3-argument signature. As written, the plan gives two incompatible interfaces for `CatalogueLinter`, so the adapter and interactor tasks cannot be implemented consistently until T004 is aligned.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f1ff94b8406ed5ac8bc22524cb4fb33d978b4e00495455fdb0191ff6e45a193",
+          "at": "2026-04-29T11:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` is missing the required `DO NOT EDIT DIRECTLY` generated-file marker, which contradicts CN-08 and the same convention preserved in the other rendered markdown artifacts.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/contract-map.md",
+              "line": 1,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:7afcb7984bc98198f509000c196fe7a3e1dad78b82cea0dcdf91df8e9e1b0939",
+          "at": "2026-04-29T11:50:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
+          "at": "2026-04-29T11:53:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The InMemoryCatalogueLinter entry says rule opt-out via `disabled_rules` is supported, and T005 requires the adapter to hold `disabled_rules: Vec<String>` so disabled rules suppress violations, but the catalogue contract declares `expected_members: []`. An implementer following this artifact can build a stateless adapter and miss the CN-06 opt-out requirement.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/infrastructure-types.json",
+              "line": 102,
+              "category": "contradiction"
+            },
+            {
+              "message": "The usecase interactor description injects `FsCatalogueLoader`, a concrete infrastructure adapter, even though the same entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and T007 says the CLI composition root wires `FsCatalogueLoader`. This contradicts the intended trait boundary and can lead the usecase layer to depend on infrastructure.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 114,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
+          "at": "2026-04-29T11:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "RunCatalogueLintInteractor is described as injecting the concrete `FsCatalogueLoader`, while the same catalogue entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and the implementation plan places `FsCatalogueLoader` wiring in the CLI composition root. This contradicts the trait boundary for the usecase layer and can lead implementation toward an infrastructure dependency.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 114,
+              "category": "contradiction"
+            },
+            {
+              "message": "InMemoryCatalogueLinter is required to support rule opt-out via `disabled_rules`, and T005 says the adapter holds `disabled_rules: Vec<String>`, but the catalogue contract declares `expected_members: []`. An implementer following this artifact can build a stateless adapter and miss the CN-06 opt-out requirement.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/infrastructure-types.json",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
+          "at": "2026-04-29T12:00:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "RunCatalogueLintInteractor is described as injecting the concrete `FsCatalogueLoader`, while the same catalogue entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and the implementation plan places `FsCatalogueLoader` wiring in the CLI composition root. This contradicts the trait boundary for the usecase layer and can lead implementation toward an infrastructure dependency.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 114,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:182cb2ffb65b096dbfdfbdee07015353aff8fcd0742ec3f4389077f35cfe1fa3",
+          "at": "2026-04-29T12:06:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "M1/CN-01 requires every struct-based kind to carry `expected_methods`, and T002 explicitly makes the new codec reject missing `expected_methods` by omitting `#[serde(default)]`. However the newly authored catalogue entries still use the pre-M1 shape; for example `CatalogueLinterRule` is a `value_object` with `expected_members` only. The same omission appears on `CatalogueLintViolation`, `RunCatalogueLintCommand`, `RunCatalogueLintInteractor`, and `InMemoryCatalogueLinter`. After T002, these artifacts become invalid unless the plan updates them to include empty/top-level `expected_methods`.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
+              "line": 74,
+              "category": "contradiction"
+            },
+            {
+              "message": "T006 describes the usecase interactor as depending only on domain ports (`Arc<dyn CatalogueLoader>` and `Arc<dyn CatalogueLinter>`) and using mocks in tests, but the same task declares T005, the infrastructure adapter, as a prerequisite. That contradicts the port-based layer boundary and the intended composition-root split where T007 wires concrete adapters; T006 should be unblocked after T004, while T007 should depend on both T005 and T006.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:daffca1a189f1681e9e01fb52c2a0baa11eb92f5bce3422fa5efc238d07f91ad",
+          "at": "2026-04-29T12:12:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f61c5ffa35e6d1373c7f3a8c766e4c57a60a3dacf9f49d3e8056f63316b17814",
+          "at": "2026-04-29T12:17:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63a5f396eaefc08f138b63a8c4707b7b86cdc63e28e87efe15df87a3e874bf26",
+          "at": "2026-04-29T12:53:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63a5f396eaefc08f138b63a8c4707b7b86cdc63e28e87efe15df87a3e874bf26",
+          "at": "2026-04-29T12:56:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed2046263576ab6ed34027f964e2666f7f07a3d8570e088692ae779a2d50f555",
+          "at": "2026-04-29T13:08:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed2046263576ab6ed34027f964e2666f7f07a3d8570e088692ae779a2d50f555",
+          "at": "2026-04-29T13:11:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinter` is a `secondary_port`, but this artifact adds `expected_methods` to it. The scope policy explicitly says `secondary_port` entries must not gain that field, so this JSON no longer matches the intended plan-artifact schema.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
+              "line": 194,
+              "category": "factual error"
+            },
+            {
+              "message": "`RunCatalogueLint` is an `application_service`, but this artifact adds `expected_methods` to it. The scope policy explicitly excludes `application_service` entries from the new field, so this entry is semantically inconsistent with the intended codec/catalogue shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "line": 87,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:45:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:49:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService placement is described inconsistently: this task text says `domain/usecase ✓`, but the surrounding S1/S8 matrix says `usecase △`. The plan needs one consistent rule for whether usecase placement is fully allowed or only conditional.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:55:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:56:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
+          "at": "2026-04-29T13:59:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cc871b8fe129812dc91423a9d88e1223f2a5a83aff8f6bac1c4682fa77c4770",
+          "at": "2026-04-29T14:13:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cc871b8fe129812dc91423a9d88e1223f2a5a83aff8f6bac1c4682fa77c4770",
+          "at": "2026-04-29T14:14:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
+          "at": "2026-04-29T15:55:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
+          "at": "2026-04-29T15:56:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
+          "at": "2026-04-29T16:00:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
+          "at": "2026-04-29T16:03:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is now marked in progress and the plan describes the six linter foundation types as the active deliverable, but the rendered domain type view only refreshes four of them to 🔵 and leaves `CatalogueLinterRule` / `CatalogueLintViolation` at 🟡. That makes the plan artifact internally inconsistent about whether the T004 domain types have been detected, so readers and gates see a partial signal refresh for a single six-type task.",
+              "severity": "P1",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.md",
+              "line": 14,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
+          "at": "2026-04-29T16:05:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
+          "at": "2026-04-29T16:08:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810d69305d76d8296e55548bde61941397bdec1e9bff978cf0a9fa4b58055144",
+          "at": "2026-04-29T16:14:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810d69305d76d8296e55548bde61941397bdec1e9bff978cf0a9fa4b58055144",
+          "at": "2026-04-29T16:15:47Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -506,38 +1015,6 @@
         }
       ]
     },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:54:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:55:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:45:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:47:26Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -618,24 +1095,67 @@
           "findings": [],
           "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
           "at": "2026-04-29T15:08:12Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
-          "at": "2026-04-29T12:52:00Z"
+          "hash": "rvw1:sha256:1a4be6f09b5fe2f85c8261fa261d771dccff1a83c260055e38d754c065c9381c",
+          "at": "2026-04-29T16:15:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Invalid `target_field` values are only validated inside the per-entry loop after `target_kind` matches. If a bad FieldEmpty/FieldNonEmpty rule targets a kind that is absent from the catalogue, `run()` returns `Ok([])` instead of `CatalogueLinterError::InvalidRuleConfig`, contrary to the documented unknown-field error behavior. Validate field-rule target fields once per rule before scanning entries.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/in_memory_catalogue_linter.rs",
+              "line": 226,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:1a4be6f09b5fe2f85c8261fa261d771dccff1a83c260055e38d754c065c9381c",
+          "at": "2026-04-29T16:19:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
-          "at": "2026-04-29T12:53:46Z"
+          "hash": "rvw1:sha256:b5d991761e593dd819ee5181d303c9190efb265595a5599b73000fcb54a17c47",
+          "at": "2026-04-29T16:22:24Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:47:26Z"
         }
       ]
     },
@@ -741,483 +1261,6 @@
           "findings": [],
           "hash": "rvw1:sha256:25d9a1ac52e751108e44b780e0dc311c0c9b60fd36e448640e59ed61e8a23349",
           "at": "2026-04-29T15:59:06Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "S1 describes `domain_service` as the place for DDD domain services, including stateless aggregate-crossing operations, but the selection rules only admit structs with at least one field and route zero-field cases to `free_function`. As written, the new kind does not actually cover the stateless domain-service case it claims to solve.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 161,
-              "category": "contradiction"
-            },
-            {
-              "message": "S2 says the current `methods_of()` special handling becomes unnecessary, but the replacement still keeps direct arms for `SecondaryPort` and `ApplicationService` and preserves the `SecondaryAdapter` trait-impl path. This is a simplification, not elimination, so the claim is overstated.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 235,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
-          "at": "2026-04-29T10:34:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`field empty enforcement` for `value_object.expected_methods` would make every `value_object` method illegal, including the `new() -> Result<Self, FooError>` constructors this ADR says M1 is meant to enable. If getters/accessors are still allowed, the rule needs to target a narrower notion of behavior than \"all methods\".",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 304,
-              "category": "contradiction"
-            },
-            {
-              "message": "The `SecondaryAdapter` renderer branch still reads only `implements[].expected_methods`, so the new direct `expected_methods` added to `SecondaryAdapter` in M1 would never affect contract-map rendering or validation. That leaves one of the introduced schema fields effectively dead.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 260,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
-          "at": "2026-04-29T10:37:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "S1 describes `domain_service` as a stateless domain service, but the same section makes it a field-bearing kind (`expected_members`) and then requires at least one member in the selection criteria. That leaves the new kind's semantics inconsistent: readers cannot tell whether it is meant for pure stateless services or stateful behavioral structs.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 166,
-              "category": "contradiction"
-            },
-            {
-              "message": "M1 says all nine struct kinds gain `expected_methods`, but the proposed `methods_of()` rewrite still excludes `Typestate` from the uniform match arm. As written, one of the supposedly uniformized struct kinds remains on the old non-method path, so the renderer change does not actually match the decision text.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 246,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5f742941c31fe84a70260b6808f54a016570db5c0bfadef47028d5a7f8527ba3",
-          "at": "2026-04-29T10:39:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "S2 says `methods_of()` will be made uniform after M1, but the proposed match still special-cases `SecondaryAdapter` via `implements` only. That leaves any methods declared on `SecondaryAdapter.expected_methods` invisible to the contract-map, so the renderer change does not actually match the schema uniformization promised in M1.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 262,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:a52f2631e960ee28345856b3681feb80b5a029a7ee99729498d1627c666e9bf3",
-          "at": "2026-04-29T10:43:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ADR is listed in the README index with status `—`, but the ADR frontmatter marks all decisions as `proposed`; this leaves the index out of sync with the artifact's lifecycle state. Use an explicit lifecycle state here instead of `—`.",
-              "severity": "P1",
-              "file": "knowledge/adr/README.md",
-              "line": 98,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e2ad73cfc1ced99c7a38faea51585dc5ae68fb5b6527590e861e56dcefe2a0b9",
-          "at": "2026-04-29T10:45:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:afd9bb586f77424d94820c2ac74d676c935ca5d5e4cf1b72990bd9a2ce876161",
-          "at": "2026-04-29T10:47:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "S2 says `methods_of()` will use \"uniform 処理 (特例分岐なし)\" and that the existing special branches become unnecessary, but the proposed implementation still gives `SecondaryAdapter` its own branch that merges top-level `expected_methods` with `implements[].expected_methods`. That leaves the design intent ambiguous: either `SecondaryAdapter` is intentionally special and the surrounding text/consequences should stop promising no special case, or the implementation sketch should handle it uniformly like the other struct kinds.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 246,
-              "category": "contradiction"
-            },
-            {
-              "message": "§4 treats the `ComplianceContext`-class behavioral struct not appearing in the graph as a downstream effect of `methods_of()`/schema non-uniformity, but later the ADR states that the current `ComplianceContext` has no catalogue declaration and will be authored in another track. An undeclared type cannot be made visible by renderer/schema uniformization, so the ADR conflates missing catalogue coverage with missing method-edge rendering and overstates what M1/S2 will resolve.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 88,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:afd9bb586f77424d94820c2ac74d676c935ca5d5e4cf1b72990bd9a2ce876161",
-          "at": "2026-04-29T10:52:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain_service` の配置方針が矛盾しています。S1 では placement table と判定基準で usecase 層配置を「trans-domain な application logic の場合のみ要根拠」として許容している一方、S3 の linter primitive 例では `domain_service` を「domain 層のみ」として enforce するとしています。このままだと実装者が linter を domain-only にすべきか、usecase 条件付き許容にすべきか判断できません。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
-              "line": 333,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b2240e835241faff78dd4cf16bc52a99fae65a20781276e4593176eddaceed1a",
-          "at": "2026-04-29T11:07:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df4b244ff51ad046a66b1485d370ec8f43eceabf5633748b494efac19668c724",
-          "at": "2026-04-29T11:10:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Line 22 combines `#[serde(default)]` with “JSON の後方互換は持たない”. A defaulted field will still deserialize pre-change JSON that omits `expected_methods`, so the plan is asking for backward compatibility and forbidding it at the same time. Pick one behavior and align the codec task with it.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
-              "line": 22,
-              "category": "contradiction"
-            },
-            {
-              "message": "Lines 48-57 require `KindLayerConstraint` / `InvalidLayer`, but no task passes layer context into `CatalogueLinter::run` or provides another layer registry source. The adapter only sees `&TypeCatalogueDocument`, and the interactor only injects `CatalogueLoader` + `CatalogueLinter`, so this primitive cannot be evaluated as written. Add an explicit layer context to the port or move the check into the loader/interactor before this can be implemented.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
-              "line": 48,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:3396fec5a3361aac93ff781613c9614e26dbc060568e181ace39c41eeb27dc83",
-          "at": "2026-04-29T11:41:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Line 22 mixes `#[serde(default)]` with a no-backward-compat requirement. A defaulted field will still accept pre-change JSON missing `expected_methods`, so the codec requirement contradicts itself.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
-              "line": 22,
-              "category": "contradiction"
-            },
-            {
-              "message": "T005/T006 define `KindLayerConstraint`, but the port only receives `&TypeCatalogueDocument` and the interactor never passes any layer registry or layer context into `run`. As written, this primitive has no source of truth for permitted-layer checks.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
-              "line": 48,
-              "category": "infeasibility"
-            },
-            {
-              "message": "The `CatalogueLinterRule` description claims the validating constructor rejects unknown kind tags, but T004 only models empty-string/layer validation and the error shape has no way to represent an unknown target kind. That validation promise is not supported by the plan.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
-              "line": 75,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:3396fec5a3361aac93ff781613c9614e26dbc060568e181ace39c41eeb27dc83",
-          "at": "2026-04-29T11:43:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T004 defines `CatalogueLinter::run` without `layer_id`, but the rest of the plan models the same port with `layer_id: &str` and T005/T006 are written against that 3-argument signature. As written, the plan gives two incompatible interfaces for `CatalogueLinter`, so the adapter and interactor tasks cannot be implemented consistently until T004 is aligned.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
-              "line": 39,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9f1ff94b8406ed5ac8bc22524cb4fb33d978b4e00495455fdb0191ff6e45a193",
-          "at": "2026-04-29T11:48:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`contract-map.md` is missing the required `DO NOT EDIT DIRECTLY` generated-file marker, which contradicts CN-08 and the same convention preserved in the other rendered markdown artifacts.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/contract-map.md",
-              "line": 1,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:7afcb7984bc98198f509000c196fe7a3e1dad78b82cea0dcdf91df8e9e1b0939",
-          "at": "2026-04-29T11:50:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
-          "at": "2026-04-29T11:53:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The InMemoryCatalogueLinter entry says rule opt-out via `disabled_rules` is supported, and T005 requires the adapter to hold `disabled_rules: Vec<String>` so disabled rules suppress violations, but the catalogue contract declares `expected_members: []`. An implementer following this artifact can build a stateless adapter and miss the CN-06 opt-out requirement.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/infrastructure-types.json",
-              "line": 102,
-              "category": "contradiction"
-            },
-            {
-              "message": "The usecase interactor description injects `FsCatalogueLoader`, a concrete infrastructure adapter, even though the same entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and T007 says the CLI composition root wires `FsCatalogueLoader`. This contradicts the intended trait boundary and can lead the usecase layer to depend on infrastructure.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
-              "line": 114,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
-          "at": "2026-04-29T11:57:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "RunCatalogueLintInteractor is described as injecting the concrete `FsCatalogueLoader`, while the same catalogue entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and the implementation plan places `FsCatalogueLoader` wiring in the CLI composition root. This contradicts the trait boundary for the usecase layer and can lead implementation toward an infrastructure dependency.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
-              "line": 114,
-              "category": "contradiction"
-            },
-            {
-              "message": "InMemoryCatalogueLinter is required to support rule opt-out via `disabled_rules`, and T005 says the adapter holds `disabled_rules: Vec<String>`, but the catalogue contract declares `expected_members: []`. An implementer following this artifact can build a stateless adapter and miss the CN-06 opt-out requirement.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/infrastructure-types.json",
-              "line": 102,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0675741ebe93572bd0139f466dd44c196fe5fe60ec26712c7dd1d657606b611c",
-          "at": "2026-04-29T12:00:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "RunCatalogueLintInteractor is described as injecting the concrete `FsCatalogueLoader`, while the same catalogue entry declares `catalogue_loader: Arc<dyn CatalogueLoader>` and the implementation plan places `FsCatalogueLoader` wiring in the CLI composition root. This contradicts the trait boundary for the usecase layer and can lead implementation toward an infrastructure dependency.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
-              "line": 114,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:182cb2ffb65b096dbfdfbdee07015353aff8fcd0742ec3f4389077f35cfe1fa3",
-          "at": "2026-04-29T12:06:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "M1/CN-01 requires every struct-based kind to carry `expected_methods`, and T002 explicitly makes the new codec reject missing `expected_methods` by omitting `#[serde(default)]`. However the newly authored catalogue entries still use the pre-M1 shape; for example `CatalogueLinterRule` is a `value_object` with `expected_members` only. The same omission appears on `CatalogueLintViolation`, `RunCatalogueLintCommand`, `RunCatalogueLintInteractor`, and `InMemoryCatalogueLinter`. After T002, these artifacts become invalid unless the plan updates them to include empty/top-level `expected_methods`.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
-              "line": 74,
-              "category": "contradiction"
-            },
-            {
-              "message": "T006 describes the usecase interactor as depending only on domain ports (`Arc<dyn CatalogueLoader>` and `Arc<dyn CatalogueLinter>`) and using mocks in tests, but the same task declares T005, the infrastructure adapter, as a prerequisite. That contradicts the port-based layer boundary and the intended composition-root split where T007 wires concrete adapters; T006 should be unblocked after T004, while T007 should depend on both T005 and T006.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/impl-plan.json",
-              "line": 36,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:daffca1a189f1681e9e01fb52c2a0baa11eb92f5bce3422fa5efc238d07f91ad",
-          "at": "2026-04-29T12:12:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f61c5ffa35e6d1373c7f3a8c766e4c57a60a3dacf9f49d3e8056f63316b17814",
-          "at": "2026-04-29T12:17:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63a5f396eaefc08f138b63a8c4707b7b86cdc63e28e87efe15df87a3e874bf26",
-          "at": "2026-04-29T12:53:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63a5f396eaefc08f138b63a8c4707b7b86cdc63e28e87efe15df87a3e874bf26",
-          "at": "2026-04-29T12:56:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed2046263576ab6ed34027f964e2666f7f07a3d8570e088692ae779a2d50f555",
-          "at": "2026-04-29T13:08:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed2046263576ab6ed34027f964e2666f7f07a3d8570e088692ae779a2d50f555",
-          "at": "2026-04-29T13:11:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueLinter` is a `secondary_port`, but this artifact adds `expected_methods` to it. The scope policy explicitly says `secondary_port` entries must not gain that field, so this JSON no longer matches the intended plan-artifact schema.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
-              "line": 194,
-              "category": "factual error"
-            },
-            {
-              "message": "`RunCatalogueLint` is an `application_service`, but this artifact adds `expected_methods` to it. The scope policy explicitly excludes `application_service` entries from the new field, so this entry is semantically inconsistent with the intended codec/catalogue shape.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
-              "line": 87,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
-          "at": "2026-04-29T13:45:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
-          "at": "2026-04-29T13:49:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService placement is described inconsistently: this task text says `domain/usecase ✓`, but the surrounding S1/S8 matrix says `usecase △`. The plan needs one consistent rule for whether usecase placement is fully allowed or only conditional.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
-              "line": 13,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
-          "at": "2026-04-29T13:55:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
-          "at": "2026-04-29T13:56:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d34929e7b3330ba238c1b4075abfad59b677d862ec0805ce77c4da520160b56",
-          "at": "2026-04-29T13:59:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cc871b8fe129812dc91423a9d88e1223f2a5a83aff8f6bac1c4682fa77c4770",
-          "at": "2026-04-29T14:13:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cc871b8fe129812dc91423a9d88e1223f2a5a83aff8f6bac1c4682fa77c4770",
-          "at": "2026-04-29T14:14:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
-          "at": "2026-04-29T15:55:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
-          "at": "2026-04-29T15:56:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ad06744af1ac1e14e5aa378a6296911b8de5d2cbf72f3cc1a7b58886f701d28",
-          "at": "2026-04-29T16:00:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
-          "at": "2026-04-29T16:03:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T004 is now marked in progress and the plan describes the six linter foundation types as the active deliverable, but the rendered domain type view only refreshes four of them to 🔵 and leaves `CatalogueLinterRule` / `CatalogueLintViolation` at 🟡. That makes the plan artifact internally inconsistent about whether the T004 domain types have been detected, so readers and gates see a partial signal refresh for a single six-type task.",
-              "severity": "P1",
-              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.md",
-              "line": 14,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
-          "at": "2026-04-29T16:05:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f80b5256d6b3ae688cf336f17f72c60eb001ac0263546ba82f416cc7487f1f3e",
-          "at": "2026-04-29T16:08:22Z"
         }
       ]
     }

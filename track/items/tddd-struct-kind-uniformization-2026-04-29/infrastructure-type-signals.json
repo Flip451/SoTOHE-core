@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T16:08:46Z",
+  "generated_at": "2026-04-29T16:23:23Z",
   "declaration_hash": "5371eb2506532b24162808ab3cf704eb1b530d2ed4ee8103194b4c10bb650cee",
   "signals": [
     {
@@ -25,7 +25,13 @@
       "type_name": "InMemoryCatalogueLinter",
       "kind_tag": "secondary_adapter",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "found_items": [
+        "fn run(&self, rules: &[CatalogueLinterRule], catalogue: &TypeCatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>"
+      ],
+      "missing_items": [
+        "disabled_rules: Vec<String>"
+      ]
     }
   ]
 }
