@@ -122,6 +122,7 @@ pub fn render_contract_map(
     out.push_str("    classDef query fill:#f3e5f5,stroke:#8e24aa\n");
     out.push_str("    classDef factory fill:#fff8e1,stroke:#f9a825\n");
     out.push_str("    classDef free_function fill:#f1f8e9,stroke:#558b2f\n");
+    out.push_str("    classDef domain_service fill:#fce4ec,stroke:#c62828\n");
 
     // 4a. Subgraphs.
     for layer in &active_layers {
@@ -383,6 +384,7 @@ fn node_shape(layer: &LayerId, entry: &TypeCatalogueEntry) -> String {
         TypeDefinitionKind::Command { .. } => format!("{id}[{name}]:::command"),
         TypeDefinitionKind::Query { .. } => format!("{id}[{name}]:::query"),
         TypeDefinitionKind::Factory { .. } => format!("{id}[{name}]:::factory"),
+        TypeDefinitionKind::DomainService { .. } => format!("{id}[{name}]:::domain_service"),
         TypeDefinitionKind::FreeFunction { .. } => format!("{id}[{name}]:::free_function"),
     }
 }
@@ -408,6 +410,7 @@ fn methods_of(kind: &TypeDefinitionKind) -> Vec<&MethodDeclaration> {
         | TypeDefinitionKind::Command { .. }
         | TypeDefinitionKind::Query { .. }
         | TypeDefinitionKind::Factory { .. }
+        | TypeDefinitionKind::DomainService { .. }
         | TypeDefinitionKind::FreeFunction { .. } => Vec::new(),
     }
 }
@@ -478,6 +481,7 @@ mod tests {
                 TypeDefinitionKind::Typestate {
                     transitions: TypestateTransitions::To(vec!["VerifiedUser".to_owned()]),
                     expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
             entry("DomainError", TypeDefinitionKind::ErrorType { expected_variants: vec![] }),
@@ -489,7 +493,10 @@ mod tests {
             ),
             entry(
                 "RegisterUserCommand",
-                TypeDefinitionKind::Command { expected_members: Vec::new() },
+                TypeDefinitionKind::Command {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
             ),
         ]);
         let infra_doc = doc(vec![entry(
@@ -497,6 +504,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![postgres_impl],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
         )]);
 
@@ -531,7 +539,7 @@ mod tests {
     }
 
     #[test]
-    fn test_render_contract_map_emits_14_shape_variants_correctly() {
+    fn test_render_contract_map_emits_15_shape_variants_correctly() {
         let l = layer("sample");
         let entries = vec![
             entry(
@@ -539,10 +547,17 @@ mod tests {
                 TypeDefinitionKind::Typestate {
                     transitions: TypestateTransitions::Terminal,
                     expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
             entry("EKind", TypeDefinitionKind::Enum { expected_variants: vec![] }),
-            entry("Vo", TypeDefinitionKind::ValueObject { expected_members: Vec::new() }),
+            entry(
+                "Vo",
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             entry("Err", TypeDefinitionKind::ErrorType { expected_variants: vec![] }),
             entry("SPort", TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }),
             entry(
@@ -550,21 +565,60 @@ mod tests {
                 TypeDefinitionKind::SecondaryAdapter {
                     implements: vec![],
                     expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
             entry("AppSvc", TypeDefinitionKind::ApplicationService { expected_methods: vec![] }),
-            entry("UCase", TypeDefinitionKind::UseCase { expected_members: Vec::new() }),
+            entry(
+                "UCase",
+                TypeDefinitionKind::UseCase {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             entry(
                 "Intc",
                 TypeDefinitionKind::Interactor {
                     expected_members: Vec::new(),
                     declares_application_service: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
-            entry("DtoK", TypeDefinitionKind::Dto { expected_members: Vec::new() }),
-            entry("CmdK", TypeDefinitionKind::Command { expected_members: Vec::new() }),
-            entry("QryK", TypeDefinitionKind::Query { expected_members: Vec::new() }),
-            entry("FactK", TypeDefinitionKind::Factory { expected_members: Vec::new() }),
+            entry(
+                "DtoK",
+                TypeDefinitionKind::Dto {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
+            entry(
+                "CmdK",
+                TypeDefinitionKind::Command {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
+            entry(
+                "QryK",
+                TypeDefinitionKind::Query {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
+            entry(
+                "FactK",
+                TypeDefinitionKind::Factory {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
+            entry(
+                "DsvcK",
+                TypeDefinitionKind::DomainService {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             entry(
                 "FFn",
                 TypeDefinitionKind::FreeFunction {
@@ -602,6 +656,14 @@ mod tests {
         assert!(text.contains("L6_sample_CmdK[CmdK]:::command"), "command rect + classDef");
         assert!(text.contains("L6_sample_QryK[QryK]:::query"), "query rect + classDef");
         assert!(text.contains("L6_sample_FactK[FactK]:::factory"), "factory rect + classDef");
+        assert!(
+            text.contains("L6_sample_DsvcK[DsvcK]:::domain_service"),
+            "domain_service rect + classDef"
+        );
+        assert!(
+            text.contains("classDef domain_service"),
+            "domain_service classDef must be declared in diagram header"
+        );
         assert!(
             text.contains("L6_sample_FFn[FFn]:::free_function"),
             "free_function rect + classDef"
@@ -727,7 +789,10 @@ mod tests {
         let gateway = layer("my-gateway");
         let d = doc(vec![entry(
             "Foo",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         )]);
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
         catalogues.insert(gateway.clone(), d);
@@ -753,11 +818,17 @@ mod tests {
         let underscore = layer("my_gateway");
         let d_hyphen = doc(vec![entry(
             "Foo",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         )]);
         let d_underscore = doc(vec![entry(
             "Bar",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         )]);
 
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
@@ -827,7 +898,10 @@ mod tests {
 
         let domain_doc = doc(vec![entry(
             "Subject",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         )]);
         let usecase_doc = doc(vec![entry(
             "Greeter",
@@ -893,7 +967,13 @@ mod tests {
         )];
         let domain_doc = doc(vec![
             entry("App", TypeDefinitionKind::ApplicationService { expected_methods: ctor }),
-            entry("Settings", TypeDefinitionKind::ValueObject { expected_members: Vec::new() }),
+            entry(
+                "Settings",
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
         ]);
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
         catalogues.insert(domain.clone(), domain_doc);
@@ -987,6 +1067,7 @@ mod tests {
                 TypeDefinitionKind::SecondaryAdapter {
                     implements: vec![adapter_impl],
                     expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
         ]);
@@ -1051,6 +1132,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["UserManagement".to_owned()],
+                expected_methods: Vec::new(),
             },
         );
         let svc_entry = entry(
@@ -1087,6 +1169,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["DoThing".to_owned()],
+                expected_methods: Vec::new(),
             },
         );
         let svc_entry =
@@ -1120,6 +1203,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["MissingService".to_owned()],
+                expected_methods: Vec::new(),
             },
         );
 
@@ -1163,8 +1247,13 @@ mod tests {
                 expected_is_async: false,
             },
         );
-        let vo_entry =
-            entry("UserId", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let vo_entry = entry(
+            "UserId",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
 
         let domain_doc = doc(vec![fn_entry, vo_entry]);
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
@@ -1200,8 +1289,13 @@ mod tests {
                 expected_is_async: false,
             },
         );
-        let result_entry =
-            entry("MyResult", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let result_entry = entry(
+            "MyResult",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
 
         let domain_doc = doc(vec![fn_entry, result_entry]);
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
@@ -1236,9 +1330,14 @@ mod tests {
                 expected_is_async: false,
             },
         );
-        let in_entry = entry("InputDto", TypeDefinitionKind::Dto { expected_members: Vec::new() });
-        let out_entry =
-            entry("OutputDto", TypeDefinitionKind::Dto { expected_members: Vec::new() });
+        let in_entry = entry(
+            "InputDto",
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() },
+        );
+        let out_entry = entry(
+            "OutputDto",
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() },
+        );
 
         let domain_doc = doc(vec![fn_entry, in_entry, out_entry]);
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();

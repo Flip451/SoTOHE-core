@@ -97,27 +97,52 @@ fn parse_kind_filter(raw: &str) -> Result<Vec<TypeDefinitionKind>, CliError> {
             "typestate" => TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             "enum" => TypeDefinitionKind::Enum { expected_variants: Vec::new() },
-            "value_object" => TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            "value_object" => TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             "error_type" => TypeDefinitionKind::ErrorType { expected_variants: Vec::new() },
             "secondary_port" => TypeDefinitionKind::SecondaryPort { expected_methods: Vec::new() },
             "secondary_adapter" => TypeDefinitionKind::SecondaryAdapter {
                 implements: Vec::new(),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             "application_service" => {
                 TypeDefinitionKind::ApplicationService { expected_methods: Vec::new() }
             }
-            "use_case" => TypeDefinitionKind::UseCase { expected_members: Vec::new() },
+            "use_case" => TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             "interactor" => TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             },
-            "dto" => TypeDefinitionKind::Dto { expected_members: Vec::new() },
-            "command" => TypeDefinitionKind::Command { expected_members: Vec::new() },
-            "query" => TypeDefinitionKind::Query { expected_members: Vec::new() },
-            "factory" => TypeDefinitionKind::Factory { expected_members: Vec::new() },
+            "dto" => TypeDefinitionKind::Dto {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            "command" => TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            "query" => TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            "factory" => TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            "domain_service" => TypeDefinitionKind::DomainService {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             "free_function" => TypeDefinitionKind::FreeFunction {
                 module_path: None,
                 expected_params: Vec::new(),
@@ -129,7 +154,7 @@ fn parse_kind_filter(raw: &str) -> Result<Vec<TypeDefinitionKind>, CliError> {
                     "unknown --kind-filter value '{other}'; expected one of: \
                      typestate, enum, value_object, error_type, secondary_port, \
                      secondary_adapter, application_service, use_case, interactor, \
-                     dto, command, query, factory, free_function"
+                     dto, command, query, factory, domain_service, free_function"
                 )));
             }
         };

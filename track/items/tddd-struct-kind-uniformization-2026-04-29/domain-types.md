@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TypeDefinitionKind | enum | modify | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, FreeFunction, DomainService | 🟡 | 🔵 |
+| TypeDefinitionKind | enum | modify | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, FreeFunction, DomainService | 🔵 | 🔵 |
 | CatalogueLinterRuleKind | enum | — | FieldEmpty, FieldNonEmpty, KindLayerConstraint | 🟡 | 🔵 |
 
 ## Value Objects

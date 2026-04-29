@@ -841,14 +841,21 @@ fn type_definition_kind_from_dto(
                 TypestateTransitions::To(transitions_to.clone())
             };
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Typestate { transitions, expected_members: members })
+            Ok(TypeDefinitionKind::Typestate {
+                transitions,
+                expected_members: members,
+                expected_methods: Vec::new(),
+            })
         }
         TypeDefinitionKindDto::Enum { expected_variants } => {
             Ok(TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() })
         }
         TypeDefinitionKindDto::ValueObject { expected_members } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::ValueObject { expected_members: members })
+            Ok(TypeDefinitionKind::ValueObject {
+                expected_members: members,
+                expected_methods: Vec::new(),
+            })
         }
         TypeDefinitionKindDto::ErrorType { expected_variants } => {
             Ok(TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() })
@@ -863,30 +870,43 @@ fn type_definition_kind_from_dto(
         }
         TypeDefinitionKindDto::UseCase { expected_members } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::UseCase { expected_members: members })
+            Ok(TypeDefinitionKind::UseCase {
+                expected_members: members,
+                expected_methods: Vec::new(),
+            })
         }
         TypeDefinitionKindDto::Interactor { expected_members, declares_application_service } => {
             let members = decode_member_list(entry_name, expected_members)?;
             Ok(TypeDefinitionKind::Interactor {
                 expected_members: members,
                 declares_application_service: declares_application_service.clone(),
+                expected_methods: Vec::new(),
             })
         }
         TypeDefinitionKindDto::Dto { expected_members } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Dto { expected_members: members })
+            Ok(TypeDefinitionKind::Dto { expected_members: members, expected_methods: Vec::new() })
         }
         TypeDefinitionKindDto::Command { expected_members } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Command { expected_members: members })
+            Ok(TypeDefinitionKind::Command {
+                expected_members: members,
+                expected_methods: Vec::new(),
+            })
         }
         TypeDefinitionKindDto::Query { expected_members } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Query { expected_members: members })
+            Ok(TypeDefinitionKind::Query {
+                expected_members: members,
+                expected_methods: Vec::new(),
+            })
         }
         TypeDefinitionKindDto::Factory { expected_members } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Factory { expected_members: members })
+            Ok(TypeDefinitionKind::Factory {
+                expected_members: members,
+                expected_methods: Vec::new(),
+            })
         }
         TypeDefinitionKindDto::SecondaryAdapter { implements, expected_members } => {
             let decls = decode_trait_impl_list(entry_name, implements)?;
@@ -894,6 +914,7 @@ fn type_definition_kind_from_dto(
             Ok(TypeDefinitionKind::SecondaryAdapter {
                 implements: decls,
                 expected_members: members,
+                expected_methods: Vec::new(),
             })
         }
         TypeDefinitionKindDto::FreeFunction {
@@ -1113,7 +1134,7 @@ fn type_catalogue_entry_to_dto(
     entry: &TypeCatalogueEntry,
 ) -> Result<TypeCatalogueEntryDto, TypeCatalogueCodecError> {
     let kind = match entry.kind() {
-        TypeDefinitionKind::Typestate { transitions, expected_members } => {
+        TypeDefinitionKind::Typestate { transitions, expected_members, .. } => {
             let transitions_to = match transitions {
                 TypestateTransitions::Terminal => vec![],
                 TypestateTransitions::To(v) => v.clone(),
@@ -1132,7 +1153,7 @@ fn type_catalogue_entry_to_dto(
             }
             TypeDefinitionKindDto::Enum { expected_variants: expected_variants.clone() }
         }
-        TypeDefinitionKind::ValueObject { expected_members } => {
+        TypeDefinitionKind::ValueObject { expected_members, .. } => {
             let members = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::ValueObject { expected_members: members }
         }
@@ -1156,40 +1177,51 @@ fn type_catalogue_entry_to_dto(
             let dtos = encode_method_list(entry.name(), expected_methods)?;
             TypeDefinitionKindDto::ApplicationService { expected_methods: dtos }
         }
-        TypeDefinitionKind::UseCase { expected_members } => {
+        TypeDefinitionKind::UseCase { expected_members, .. } => {
             let members = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::UseCase { expected_members: members }
         }
-        TypeDefinitionKind::Interactor { expected_members, declares_application_service } => {
+        TypeDefinitionKind::Interactor {
+            expected_members, declares_application_service, ..
+        } => {
             let members = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::Interactor {
                 expected_members: members,
                 declares_application_service: declares_application_service.clone(),
             }
         }
-        TypeDefinitionKind::Dto { expected_members } => {
+        TypeDefinitionKind::Dto { expected_members, .. } => {
             let members = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::Dto { expected_members: members }
         }
-        TypeDefinitionKind::Command { expected_members } => {
+        TypeDefinitionKind::Command { expected_members, .. } => {
             let members = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::Command { expected_members: members }
         }
-        TypeDefinitionKind::Query { expected_members } => {
+        TypeDefinitionKind::Query { expected_members, .. } => {
             let members = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::Query { expected_members: members }
         }
-        TypeDefinitionKind::Factory { expected_members } => {
+        TypeDefinitionKind::Factory { expected_members, .. } => {
             let members = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::Factory { expected_members: members }
         }
-        TypeDefinitionKind::SecondaryAdapter { implements, expected_members } => {
+        TypeDefinitionKind::SecondaryAdapter { implements, expected_members, .. } => {
             let impl_dtos = encode_trait_impl_list(entry.name(), implements)?;
             let member_dtos = encode_member_list(entry.name(), expected_members)?;
             TypeDefinitionKindDto::SecondaryAdapter {
                 implements: impl_dtos,
                 expected_members: member_dtos,
             }
+        }
+        TypeDefinitionKind::DomainService { .. } => {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry.name().to_owned(),
+                reason: "kind 'domain_service' is recognised by the domain enum but the codec \
+                         DTO has not yet been extended to encode it — see ADR \
+                         2026-04-28-0135 S1 / track task T002"
+                    .to_owned(),
+            });
         }
         TypeDefinitionKind::FreeFunction {
             module_path,

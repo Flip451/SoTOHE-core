@@ -165,6 +165,7 @@ const SECTIONS: &[Section] = &[
     Section { heading: "## Queries", kind_tag: "query" },
     Section { heading: "## Factories", kind_tag: "factory" },
     Section { heading: "## Secondary Adapters", kind_tag: "secondary_adapter" },
+    Section { heading: "## Domain Services", kind_tag: "domain_service" },
     Section { heading: "## Free Functions", kind_tag: "free_function" },
 ];
 
@@ -366,6 +367,7 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
         | TypeDefinitionKind::Command { .. }
         | TypeDefinitionKind::Query { .. }
         | TypeDefinitionKind::Factory { .. }
+        | TypeDefinitionKind::DomainService { .. }
         | TypeDefinitionKind::FreeFunction { .. } => "\u{2014}".to_owned(),
         TypeDefinitionKind::SecondaryAdapter { implements, .. } => {
             if implements.is_empty() {
@@ -488,7 +490,10 @@ mod tests {
     fn test_render_type_catalogue_table_header_present_when_entries_exist() {
         let doc = make_doc(vec![make_entry(
             "Foo",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         )]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(
@@ -505,7 +510,13 @@ mod tests {
     fn test_render_type_catalogue_section_headers_appear_for_present_kinds() {
         // D7: each present kind renders under its designated section header.
         let doc = make_doc(vec![
-            make_entry("Foo", TypeDefinitionKind::ValueObject { expected_members: Vec::new() }),
+            make_entry(
+                "Foo",
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             make_entry("Bar", TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }),
         ]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
@@ -539,6 +550,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
         );
         let doc = make_doc(vec![entry]);
@@ -554,6 +566,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
         );
         let doc = make_doc(vec![entry]);
@@ -575,8 +588,13 @@ mod tests {
 
     #[test]
     fn test_render_value_object_entry_row() {
-        let entry =
-            make_entry("TrackId", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let entry = make_entry(
+            "TrackId",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| TrackId | value_object |"), "missing value_object row");
@@ -644,7 +662,10 @@ mod tests {
     fn test_render_use_case_entry_row() {
         let entry = make_entry(
             "SaveTrackUseCase",
-            TypeDefinitionKind::UseCase { expected_members: Vec::new() },
+            TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
@@ -658,6 +679,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             },
         );
         let doc = make_doc(vec![entry]);
@@ -667,8 +689,10 @@ mod tests {
 
     #[test]
     fn test_render_dto_entry_row() {
-        let entry =
-            make_entry("CreateUserDto", TypeDefinitionKind::Dto { expected_members: Vec::new() });
+        let entry = make_entry(
+            "CreateUserDto",
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| CreateUserDto | dto |"), "missing dto row");
@@ -678,7 +702,10 @@ mod tests {
     fn test_render_command_entry_row() {
         let entry = make_entry(
             "CreateUserCommand",
-            TypeDefinitionKind::Command { expected_members: Vec::new() },
+            TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
@@ -687,8 +714,13 @@ mod tests {
 
     #[test]
     fn test_render_query_entry_row() {
-        let entry =
-            make_entry("GetUserQuery", TypeDefinitionKind::Query { expected_members: Vec::new() });
+        let entry = make_entry(
+            "GetUserQuery",
+            TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| GetUserQuery | query |"), "missing query row");
@@ -696,8 +728,13 @@ mod tests {
 
     #[test]
     fn test_render_factory_entry_row() {
-        let entry =
-            make_entry("UserFactory", TypeDefinitionKind::Factory { expected_members: Vec::new() });
+        let entry = make_entry(
+            "UserFactory",
+            TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("| UserFactory | factory |"), "missing factory row");
@@ -712,6 +749,7 @@ mod tests {
                 TypeDefinitionKind::Typestate {
                     transitions: TypestateTransitions::To(vec!["Published".into()]),
                     expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
             make_entry(
@@ -720,7 +758,13 @@ mod tests {
                     expected_variants: vec!["Planned".into(), "Done".into()],
                 },
             ),
-            make_entry("TrackId", TypeDefinitionKind::ValueObject { expected_members: Vec::new() }),
+            make_entry(
+                "TrackId",
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             make_entry(
                 "AppError",
                 TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
@@ -749,18 +793,49 @@ mod tests {
                     )],
                 },
             ),
-            make_entry("SaveUseCase", TypeDefinitionKind::UseCase { expected_members: Vec::new() }),
+            make_entry(
+                "SaveUseCase",
+                TypeDefinitionKind::UseCase {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             make_entry(
                 "SaveInteractor",
                 TypeDefinitionKind::Interactor {
                     expected_members: Vec::new(),
                     declares_application_service: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
-            make_entry("SaveDto", TypeDefinitionKind::Dto { expected_members: Vec::new() }),
-            make_entry("SaveCommand", TypeDefinitionKind::Command { expected_members: Vec::new() }),
-            make_entry("GetQuery", TypeDefinitionKind::Query { expected_members: Vec::new() }),
-            make_entry("AggFactory", TypeDefinitionKind::Factory { expected_members: Vec::new() }),
+            make_entry(
+                "SaveDto",
+                TypeDefinitionKind::Dto {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
+            make_entry(
+                "SaveCommand",
+                TypeDefinitionKind::Command {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
+            make_entry(
+                "GetQuery",
+                TypeDefinitionKind::Query {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
+            make_entry(
+                "AggFactory",
+                TypeDefinitionKind::Factory {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
         ];
         let doc = make_doc(entries);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
@@ -820,8 +895,13 @@ mod tests {
 
     #[test]
     fn test_render_signal_column_shows_dash_when_no_signals() {
-        let entry =
-            make_entry("Draft", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let entry = make_entry(
+            "Draft",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(output.contains("\u{2014}"), "missing em-dash for unevaluated signal");
@@ -829,8 +909,13 @@ mod tests {
 
     #[test]
     fn test_render_signal_column_shows_blue_when_signal_blue() {
-        let entry =
-            make_entry("Draft", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let entry = make_entry(
+            "Draft",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let mut doc = make_doc(vec![entry]);
         doc.set_signals(vec![TypeSignal::new(
             "Draft",
@@ -847,8 +932,13 @@ mod tests {
 
     #[test]
     fn test_render_signal_column_shows_red_when_signal_red() {
-        let entry =
-            make_entry("Ghost", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let entry = make_entry(
+            "Ghost",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let mut doc = make_doc(vec![entry]);
         doc.set_signals(vec![TypeSignal::new(
             "Ghost",
@@ -871,13 +961,20 @@ mod tests {
                 TypeDefinitionKind::Typestate {
                     transitions: TypestateTransitions::To(vec!["Published".into()]),
                     expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
                 },
             ),
             make_entry(
                 "TrackStatus",
                 TypeDefinitionKind::Enum { expected_variants: vec!["Planned".into()] },
             ),
-            make_entry("TrackId", TypeDefinitionKind::ValueObject { expected_members: Vec::new() }),
+            make_entry(
+                "TrackId",
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
         ];
         let doc = make_doc(entries);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
@@ -892,8 +989,13 @@ mod tests {
 
     #[test]
     fn test_render_add_action_shows_dash() {
-        let entry =
-            make_entry("Foo", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let entry = make_entry(
+            "Foo",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         // Add action renders as em-dash
@@ -905,7 +1007,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "OldType",
             "deleted",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             domain::TypeAction::Delete,
             true,
         )
@@ -944,8 +1049,13 @@ mod tests {
         // output matches the legacy 5-column layout — no `Cat-Spec` header
         // and no extra column. A pre-existing caller that passes `None`
         // must see byte-identical output to the pre-T020 version.
-        let entry =
-            make_entry("Foo", TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        let entry = make_entry(
+            "Foo",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+        );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
         assert!(
@@ -964,15 +1074,33 @@ mod tests {
         // appended to the header and each entry row. Signal values map to
         // the same emoji set as the existing Signal column.
         let entries = vec![
-            make_entry("FooBlue", TypeDefinitionKind::ValueObject { expected_members: Vec::new() }),
+            make_entry(
+                "FooBlue",
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             make_entry(
                 "BarYellow",
-                TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
             ),
-            make_entry("BazRed", TypeDefinitionKind::ValueObject { expected_members: Vec::new() }),
+            make_entry(
+                "BazRed",
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
+            ),
             make_entry(
                 "QuxMissing",
-                TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
             ),
         ];
         let doc = make_doc(entries);
@@ -1023,7 +1151,10 @@ mod tests {
         // the em-dash fallback, not a panic or misaligned row.
         let entry = make_entry(
             "Unmapped",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
         );
         let doc = make_doc(vec![entry]);
         // Spec signals document with a DIFFERENT entry name so the lookup misses.
@@ -1084,7 +1215,10 @@ mod tests {
         let vo_entry = TypeCatalogueEntry::new(
             "SameName",
             "value object entry",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Delete,
             true,
         )
@@ -1156,24 +1290,46 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeDefinitionKind::Enum { expected_variants: Vec::new() },
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeDefinitionKind::ErrorType { expected_variants: Vec::new() },
             TypeDefinitionKind::SecondaryPort { expected_methods: Vec::new() },
             TypeDefinitionKind::ApplicationService { expected_methods: Vec::new() },
-            TypeDefinitionKind::UseCase { expected_members: Vec::new() },
+            TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             },
-            TypeDefinitionKind::Dto { expected_members: Vec::new() },
-            TypeDefinitionKind::Command { expected_members: Vec::new() },
-            TypeDefinitionKind::Query { expected_members: Vec::new() },
-            TypeDefinitionKind::Factory { expected_members: Vec::new() },
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() },
+            TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeDefinitionKind::SecondaryAdapter {
                 implements: Vec::new(),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            TypeDefinitionKind::DomainService {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeDefinitionKind::FreeFunction {
                 module_path: None,

@@ -836,6 +836,7 @@ mod tests {
             "desc",
             TypeDefinitionKind::ValueObject {
                 expected_members: vec![MemberDeclaration::field("0", "u64")],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -868,7 +869,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "NewType",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -922,7 +926,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "SaveTrackUseCase",
             "Struct use case",
-            TypeDefinitionKind::UseCase { expected_members: Vec::new() },
+            TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1003,7 +1010,10 @@ mod tests {
             TypeCatalogueEntry::new(
                 "DeclaredNew",
                 "d",
-                TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
                 TypeAction::Add,
                 true,
             )
@@ -1011,7 +1021,10 @@ mod tests {
             TypeCatalogueEntry::new(
                 "DeclaredExisting",
                 "d",
-                TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
                 TypeAction::Add,
                 true,
             )
@@ -1053,7 +1066,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1076,7 +1092,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1092,7 +1111,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Modify,
             true,
         )
@@ -1112,7 +1134,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Modify,
             true,
         )
@@ -1131,7 +1156,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Reference,
             true,
         )
@@ -1152,7 +1180,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Reference,
             true,
         )
@@ -1175,7 +1206,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Ghost",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Delete,
             true,
         )
@@ -1194,7 +1228,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Ghost",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Delete,
             true,
         )
@@ -1212,7 +1249,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "d",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Delete,
             true,
         )
@@ -1236,7 +1276,10 @@ mod tests {
         TypeCatalogueEntry::new(
             name,
             "test entry",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1588,6 +1631,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,

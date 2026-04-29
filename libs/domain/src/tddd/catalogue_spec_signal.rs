@@ -691,7 +691,10 @@ mod tests {
         TypeCatalogueEntry::with_refs(
             name,
             "test entry",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
             spec_refs,
@@ -903,7 +906,10 @@ mod tests {
                 TypeCatalogueEntry::new(
                     s.type_name.clone(),
                     "generated fixture",
-                    TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                    TypeDefinitionKind::ValueObject {
+                        expected_members: Vec::new(),
+                        expected_methods: Vec::new(),
+                    },
                     TypeAction::Add,
                     true,
                 )
@@ -1033,7 +1039,10 @@ mod tests {
                 TypeCatalogueEntry::new(
                     "A",
                     "desc",
-                    TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                    TypeDefinitionKind::ValueObject {
+                        expected_members: Vec::new(),
+                        expected_methods: Vec::new(),
+                    },
                     TypeAction::Add,
                     true,
                 )
@@ -1041,7 +1050,10 @@ mod tests {
                 TypeCatalogueEntry::new(
                     "B",
                     "desc",
-                    TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                    TypeDefinitionKind::ValueObject {
+                        expected_members: Vec::new(),
+                        expected_methods: Vec::new(),
+                    },
                     TypeAction::Add,
                     true,
                 )
@@ -1090,7 +1102,10 @@ mod tests {
                 TypeCatalogueEntry::new(
                     "Real",
                     "desc",
-                    TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                    TypeDefinitionKind::ValueObject {
+                        expected_members: Vec::new(),
+                        expected_methods: Vec::new(),
+                    },
                     TypeAction::Add,
                     true,
                 )
