@@ -385,9 +385,9 @@ class MakeWrappersTest(unittest.TestCase):
         self.assertIn('bin/sotp make track-local-review', task_body)
         self.assertIn('"$@"', task_body)
 
-    def test_track_review_status_wrapper_delegates_to_sotp_make(self) -> None:
+    def test_track_review_results_wrapper_delegates_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.track-review-status]"
+        task_header = "[tasks.track-review-results]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
         task_body = (
@@ -395,7 +395,7 @@ class MakeWrappersTest(unittest.TestCase):
         )
 
         self.assertIn('script_runner = "@shell"', task_body)
-        self.assertIn('bin/sotp make track-review-status', task_body)
+        self.assertIn('bin/sotp make track-review-results', task_body)
         self.assertIn('"$@"', task_body)
 
     def test_track_set_commit_hash_wrapper_delegates_to_sotp_make(self) -> None:

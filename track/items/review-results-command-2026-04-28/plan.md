@@ -11,7 +11,7 @@ T006 (status deletion) depends on T005; deleting status before results is in pla
 T007 (doc cleanup) depends on T006; searching for status references after the CLI deletion ensures no false survivors.
 T008 (CI gate) is the final verification task and depends on all prior tasks.
 
-## Tasks (5/8 resolved)
+## Tasks (6/8 resolved)
 
 ### S001 — Domain Layer: ReviewApprovalVerdict + ReviewExistsPort (T001)
 
@@ -64,14 +64,14 @@ T008 (CI gate) is the final verification task and depends on all prior tasks.
 > No backward-compat alias per no-backward-compat convention.
 > Sequenced after T005 so the replacement command is in place before the old one is removed.
 
-- [~] **T006**: Delete sotp review status CLI subcommand (no backward-compat alias). Depends on: T005. (1) Remove ReviewCommand::Status(StatusArgs) variant from apps/cli/src/commands/review/mod.rs. (2) Remove StatusArgs struct. (3) Remove execute_status() and run_status() functions. (4) Remove the Status arm from execute() match dispatch. (5) Update apps/cli/src/commands/review/tests.rs to remove any Status-specific test cases. (6) Confirm sotp review status is now an unknown-command error (clap error exit). Must not add any alias for backward-compat (CN-05 / no-backward-compat convention). Spec refs: IN-06, AC-07, CN-05.
+- [x] **T006**: Delete sotp review status CLI subcommand (no backward-compat alias). Depends on: T005. (1) Remove ReviewCommand::Status(StatusArgs) variant from apps/cli/src/commands/review/mod.rs. (2) Remove StatusArgs struct. (3) Remove execute_status() and run_status() functions. (4) Remove the Status arm from execute() match dispatch. (5) Update apps/cli/src/commands/review/tests.rs to remove any Status-specific test cases. (6) Confirm sotp review status is now an unknown-command error (clap error exit). Must not add any alias for backward-compat (CN-05 / no-backward-compat convention). Spec refs: IN-06, AC-07, CN-05. (`980fc09c31be8297397e11569d829cdd6e34e55e`)
 
 ### S007 — Docs and Config: review status -> review results Reference Updates (T007)
 
 > IN-06 / AC-08 / CN-05: documentation-only commit updating all sotp review status references in .claude/, knowledge/, track/workflow.md, Makefile.toml.
 > No code changes. Sequenced after T006 so the CLI deletion is confirmed before searching for reference survivors.
 
-- [ ] **T007**: Update all review status references to review results across doc and config files. Depends on: T006. (1) Search for all occurrences of sotp review status and review-status in: .claude/ (all .md and .json files), knowledge/ (all .md files), track/workflow.md, Makefile.toml. (2) Replace each occurrence with sotp review results (or review-results as appropriate). (3) Verify no dead references remain (AC-08). Files expected to contain references include: .claude/agents/review-fix-lead.md, .claude/commands/track/*.md, knowledge/conventions/review-protocol.md, track/workflow.md, Makefile.toml sotp review status wrapper (if any). This is a documentation-only commit with no code changes. Spec refs: IN-06, AC-08, CN-05.
+- [~] **T007**: Update all review status references to review results across doc and config files. Depends on: T006. (1) Search for all occurrences of sotp review status and review-status in: .claude/ (all .md and .json files), knowledge/ (all .md files), track/workflow.md, Makefile.toml. (2) Replace each occurrence with sotp review results (or review-results as appropriate). (3) Verify no dead references remain (AC-08). Files expected to contain references include: .claude/agents/review-fix-lead.md, .claude/commands/track/*.md, knowledge/conventions/review-protocol.md, track/workflow.md, Makefile.toml sotp review status wrapper (if any). This is a documentation-only commit with no code changes. Spec refs: IN-06, AC-08, CN-05.
 
 ### S008 — CI Gate Verification (T008)
 

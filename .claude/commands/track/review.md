@@ -39,14 +39,14 @@ Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the
 Partition changed files into **observation groups** by architecture layer. Each group gets its own
 focused briefing and reviewer invocation. All groups run **in parallel** via Agent Teams.
 
-### 2a. Determine review scope via `track-review-status`
+### 2a. Determine review scope via `track-review-results`
 
-Run `cargo make track-review-status -- --track-id {track-id}` to get the authoritative
+Run `cargo make track-review-results -- --track-id {track-id}` to get the authoritative
 per-scope review state. This command computes diff-based scope hashes and reports which
 groups need review:
 
 ```
-cargo make track-review-status -- --track-id {track-id}
+cargo make track-review-results -- --track-id {track-id}
 ```
 
 Output example:
@@ -70,7 +70,7 @@ Use this output to determine which groups need reviewer invocation:
 - `approved` — already reviewed and up-to-date, skip
 - `not required (empty)` — no changed files in this group, skip
 
-**Do NOT manually classify files into groups** — `track-review-status` handles partition,
+**Do NOT manually classify files into groups** — `track-review-results` handles partition,
 hash computation, and approval state tracking. Only invoke reviewers for groups that
 report `required`.
 

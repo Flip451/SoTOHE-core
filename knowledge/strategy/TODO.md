@@ -830,7 +830,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-44** (MEDIUM): `sotp review reset-cycle` CLI コマンド — スコープ変更（新グループ追加等）時に review.json のサイクルを安全にリセットする。現状は手動 `rm review.json` のみでバリデーションもログもない。リセットが必要なのはグループ構成が変わった場合のみ。同一グループ内の fix → re-review ではリセット不要。設計: review.json を削除ではなく `review.json.archive-{timestamp}` にリネームしてアーカイブする形にする（履歴保持）
 - [ ] **RVW-45** (MEDIUM): harness-policy グループ分類不整合 — `review-scope.json` で `.claude/commands/**` は `harness-policy` に定義されているが、`--group harness-policy` の auto-record が exit 105 で失敗し `--group other` では成功した。partition と auto-record 内部の group 名照合にバグの可能性。発見: 2026-04-02 review-finding-fidelity セッション
 - [ ] **RVW-46** (MEDIUM): レビューシステムのメンタルモデル文書 — cycle/group/scope/hash の関係、expected-groups の意味、スコープ変更時のリセット条件が運用文書に不足。初見の AI エージェントには難しい
-- [ ] **RVW-47** (MEDIUM): `sotp review status` コマンド — 各グループの fast/final zero_findings 取得状況を一覧表示。現状は review.json 目視か check-approved のバイナリ結果しかなく、どのグループが残っているか分からない
+- [x] ~~**RVW-47** (MEDIUM): `sotp review status` コマンド — 各グループの fast/final zero_findings 取得状況を一覧表示。現状は review.json 目視か check-approved のバイナリ結果しかなく、どのグループが残っているか分からない~~ ✅ done in `review-results-command-2026-04-28` (T005) — `sotp review results` (旧 status を包含) として実装。`--limit 0` 既定で state summary、`--limit N` で findings + history、`--round-type` filter、commit hint 付き
 - [ ] **RVW-48** (LOW): `sotp diff-groups` コマンド — 現在の diff を review-scope.json でグループ分類して表示。`--expected-groups` を手動で組み立てる必要がなくなる
 - [ ] **RVW-49** (LOW): `sotp review scope-check` コマンド — review.json のサイクルスコープと現在の worktree diff を比較し、スコープ不整合（リセットが必要か）を事前検知
 - [ ] **RVW-50** (MEDIUM): partition → record-round → review.json の結合テスト強化 — 個々のコンポーネントは正しくても境界面のバリデーションが手薄。RVW-34 T003 完了後のフォローアップ候補

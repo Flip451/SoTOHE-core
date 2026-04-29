@@ -888,10 +888,10 @@ description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff bas
 script_runner = "@shell"
 script = ['bin/sotp make track-set-commit-hash "$@"']
 
-[tasks.track-review-status]
-description = "[wrapper] Show per-scope review status for a track"
+[tasks.track-review-results]
+description = "[wrapper] Show per-scope review results for a track (state summary by default)"
 script_runner = "@shell"
-script = ['bin/sotp make track-review-status "$@"']
+script = ['bin/sotp make track-review-results "$@"']
 
 [tasks.track-check-approved]
 description = "[wrapper] Check that the review state is approved and code hash is current"

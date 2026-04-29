@@ -71,8 +71,8 @@ pub enum MakeTask {
     TrackLocalPlan,
     /// Run the local Codex reviewer.
     TrackLocalReview,
-    /// Show per-scope review status.
-    TrackReviewStatus,
+    /// Show per-scope review results (state summary by default).
+    TrackReviewResults,
     /// Check that the review state is approved and code hash is current.
     TrackCheckApproved,
     /// Switch to main branch and pull latest.
@@ -182,7 +182,7 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackSetOverride => dispatch_track_set_override(&args.raw_args),
         MakeTask::TrackLocalPlan => dispatch_track_local_plan(&args.raw_args),
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
-        MakeTask::TrackReviewStatus => dispatch_track_review_status(&args.raw_args),
+        MakeTask::TrackReviewResults => dispatch_track_review_results(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
         MakeTask::TrackPlanBranch => dispatch_track_plan_branch(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
@@ -452,8 +452,8 @@ fn build_forwarded_args(prefix: &[&str], raw_args: &[String]) -> Vec<String> {
     args
 }
 
-fn dispatch_track_review_status(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let args = build_forwarded_args(&["review", "status"], raw_args);
+fn dispatch_track_review_results(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let args = build_forwarded_args(&["review", "results"], raw_args);
     let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
     run_sotp(&refs)
 }
