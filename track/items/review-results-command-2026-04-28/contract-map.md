@@ -8,6 +8,8 @@ flowchart LR
     subgraph domain [domain]
         L6_domain_ReviewApprovalVerdict{{ReviewApprovalVerdict}}
         L6_domain_ScopeRound(ScopeRound)
+        L6_domain_ReviewReader[[ReviewReader]]
+        L6_domain_ReviewWriter[[ReviewWriter]]
         L6_domain_ReviewExistsPort[[ReviewExistsPort]]
     end
     subgraph usecase [usecase]
@@ -17,5 +19,9 @@ flowchart LR
     subgraph infrastructure [infrastructure]
         L14_infrastructure_FsReviewStore[FsReviewStore]:::secondary_adapter
     end
+    L14_infrastructure_FsReviewStore -->|"read_all_rounds"| L6_domain_ScopeRound
     L14_infrastructure_FsReviewStore -.impl.-> L6_domain_ReviewExistsPort
+    L14_infrastructure_FsReviewStore -.impl.-> L6_domain_ReviewReader
+    L14_infrastructure_FsReviewStore -.impl.-> L6_domain_ReviewWriter
+    L6_domain_ReviewReader -->|"read_all_rounds"| L6_domain_ScopeRound
 ```

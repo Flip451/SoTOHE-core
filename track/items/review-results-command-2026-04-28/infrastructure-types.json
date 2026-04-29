@@ -9,6 +9,89 @@
       "kind": "secondary_adapter",
       "implements": [
         {
+          "trait_name": "ReviewReader",
+          "expected_methods": [
+            {
+              "name": "read_latest_finals",
+              "receiver": "&self",
+              "params": [],
+              "returns": "Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError>",
+              "is_async": false
+            },
+            {
+              "name": "read_all_rounds",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "scope",
+                  "ty": "&ScopeName"
+                }
+              ],
+              "returns": "Result<Vec<ScopeRound>, ReviewReaderError>",
+              "is_async": false
+            }
+          ]
+        },
+        {
+          "trait_name": "ReviewWriter",
+          "expected_methods": [
+            {
+              "name": "write_verdict",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "scope",
+                  "ty": "&ScopeName"
+                },
+                {
+                  "name": "verdict",
+                  "ty": "&Verdict"
+                },
+                {
+                  "name": "hash",
+                  "ty": "&ReviewHash"
+                }
+              ],
+              "returns": "Result<(), ReviewWriterError>",
+              "is_async": false
+            },
+            {
+              "name": "write_fast_verdict",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "scope",
+                  "ty": "&ScopeName"
+                },
+                {
+                  "name": "verdict",
+                  "ty": "&FastVerdict"
+                },
+                {
+                  "name": "hash",
+                  "ty": "&ReviewHash"
+                }
+              ],
+              "returns": "Result<(), ReviewWriterError>",
+              "is_async": false
+            },
+            {
+              "name": "init",
+              "receiver": "&self",
+              "params": [],
+              "returns": "Result<(), ReviewWriterError>",
+              "is_async": false
+            },
+            {
+              "name": "reset",
+              "receiver": "&self",
+              "params": [],
+              "returns": "Result<(), ReviewWriterError>",
+              "is_async": false
+            }
+          ]
+        },
+        {
           "trait_name": "ReviewExistsPort",
           "expected_methods": [
             {

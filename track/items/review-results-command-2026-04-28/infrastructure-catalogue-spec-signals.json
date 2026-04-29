@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6d7097c4e254d865f41d445420ac72c05c8a4a97f1da5b6ab0cf11d21c9c8d37",
+  "catalogue_declaration_hash": "e885380a653662f912fe35283fdada402915291908c50d1231d60b39192f1e3e",
   "signals": [
     {
       "type_name": "FsReviewStore",

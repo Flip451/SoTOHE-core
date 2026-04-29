@@ -1,416 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `[BLOCKED]` branch no longer prints the per-scope reason that the previous CLI emitted (`scope: state`); it now shows only bare scope names. That is a user-visible contract change for a guard command, because operators can no longer tell whether a scope is blocked by `NotStarted`, `FindingsRemain`, or `StaleHash`. The new tests in `tests.rs` only assert exit codes, so this regression is currently unprotected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/mod.rs",
-              "line": 208,
-              "category": "behavior regression"
-            }
-          ],
-          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
-          "at": "2026-04-29T00:22:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `check-approved` tests only assert the exit code; they never capture or compare stderr, so the required `[OK]` / `[WARN]` / `[BLOCKED]` surface in AC-10 is untested and a prefix regression would still pass.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/tests.rs",
-              "line": 754,
-              "category": "testing"
-            },
-            {
-              "message": "In the blocked-path fixture, `review.json` is written without a matching `review_operational` exclusion, so the file itself becomes an extra required scope (typically `Other`). The test can therefore fail for the wrong reason and does not isolate the intended `domain`-scope bypass-block path.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/tests.rs",
-              "line": 798,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
-          "at": "2026-04-29T00:25:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Blocked` output no longer preserves the previous stderr format: it drops the per-scope `: {state}` suffix and now prints only scope names. That changes a user-visible CLI contract for `check-approved` even though the exit code and prefix stay the same, so any consumer or snapshot relying on the full blocked message will regress.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/mod.rs",
-              "line": 218,
-              "category": "behavioral regression"
-            }
-          ],
-          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
-          "at": "2026-04-29T00:32:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
-          "at": "2026-04-29T00:35:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
-          "at": "2026-04-29T00:36:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new CLI surface is only exercised through pure rendering helpers; there is no coverage for clap parsing or the `run_results` entry path, so regressions in `--limit` parsing and the `--scope`/`--all` contract can ship unnoticed.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/mod.rs",
-              "line": 205,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
-          "at": "2026-04-29T00:56:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`--scope` is effectively broken here: `--all` is a `bool` with `default_value_t = true` inside the same `ArgGroup`, so clap will treat `all` as present even when the user did not pass it. That makes `sotp review results --scope ...` conflict with the default `--all` and prevents the single-scope mode required by AC-14.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/mod.rs",
-              "line": 203,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
-          "at": "2026-04-29T01:01:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`results_scope_select` makes `scope` mutually exclusive with `all`, but `all` is a `bool` with `default_value_t = true`. Clap treats defaulted values as present, so `sotp review results --scope ...` will conflict with the implicit `--all` default and the single-scope path becomes unreachable.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/mod.rs",
-              "line": 204,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
-          "at": "2026-04-29T01:04:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0240404a95cd16906704fa58752c1e30addf81e3bbbfebdfc3dae56d363d6040",
-          "at": "2026-04-29T01:07:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d770c5ddeb5f029f4e95ff1d6bc3e75ec73cc32bb14b94f0d50fa00603453811",
-          "at": "2026-04-29T01:22:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d770c5ddeb5f029f4e95ff1d6bc3e75ec73cc32bb14b94f0d50fa00603453811",
-          "at": "2026-04-29T01:25:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
-          "at": "2026-04-29T01:40:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
-          "at": "2026-04-29T01:42:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5014d86934e0b87fdf1eedac75c991dd6a94174749be0ff90a30ec3ac032cbbe",
-          "at": "2026-04-29T02:20:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5014d86934e0b87fdf1eedac75c991dd6a94174749be0ff90a30ec3ac032cbbe",
-          "at": "2026-04-29T02:22:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:299dab699c8023595decb9119de9ee3e61e4cf161306c13a96b78506ca0ed39f",
-          "at": "2026-04-29T02:55:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:299dab699c8023595decb9119de9ee3e61e4cf161306c13a96b78506ca0ed39f",
-          "at": "2026-04-29T02:58:52Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
-          "at": "2026-04-28T23:45:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
-          "at": "2026-04-28T23:47:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_all_rounds` rejects `ReviewHash::Empty` by calling `ReviewHashValue::new(&round.hash)`, but `write_verdict`/`write_fast_verdict` persist empty hashes as `\"\"` and `read_latest_finals` already accepts them. Any existing or future round written with an empty hash will now make `sotp review results` fail instead of round-tripping the stored data.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 221,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
-          "at": "2026-04-29T00:53:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_all_rounds` now rejects rounds whose persisted `hash` is empty, but the writer can still serialize `ReviewHash::Empty` and the existing round-trip path already accepts that case in `read_latest_finals`. As a result, `sotp review results` will fail on valid `review.json` data that contains an empty-hash round instead of reporting the history.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 221,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
-          "at": "2026-04-29T00:55:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_all_rounds` silently skips any persisted round whose `hash` is empty. That loses valid stored history because `write_verdict`/`write_fast_verdict` can serialize `ReviewHash::Empty`, and `read_latest_finals` already accepts that case; as a result, `sotp review results` will omit the round and its latest-round suffix instead of round-tripping the recorded data.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 222,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b58c66c4e7e3bdd89bb1d5107b55aee94298bf4a2554d4d57a74326d55a04804",
-          "at": "2026-04-29T00:58:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
-          "at": "2026-04-29T01:20:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
-          "at": "2026-04-29T01:22:01Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:12958373d856af6fe8750a6796e1f3f47c53111d815fa6137f41dbe44c551f12",
-          "at": "2026-04-29T02:20:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:12958373d856af6fe8750a6796e1f3f47c53111d815fa6137f41dbe44c551f12",
-          "at": "2026-04-29T02:22:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c07d9e83de62f3e265eedf128181753f7db71aea2c632dd603fbe131398bf84f",
-          "at": "2026-04-29T02:59:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c07d9e83de62f3e265eedf128181753f7db71aea2c632dd603fbe131398bf84f",
-          "at": "2026-04-29T03:00:52Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
-          "at": "2026-04-28T22:57:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
-          "at": "2026-04-28T22:58:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
-          "at": "2026-04-29T00:52:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
-          "at": "2026-04-29T00:53:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This test will not compile: `matches!(round.hash, ReviewHash::Empty)` moves `round.hash` out of `round`, so the next line cannot borrow `round.hash` again. Use a borrow in the match (`matches!(&round.hash, ReviewHash::Empty)`) or check `round.hash.is_empty()` instead.",
-              "severity": "P1",
-              "file": "libs/domain/src/review_v2/tests.rs",
-              "line": 694,
-              "category": "compile_error"
-            }
-          ],
-          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
-          "at": "2026-04-29T01:21:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new empty-hash test moves `round.hash` into `matches!` and then uses `round.hash` again on the next assertion, which will not compile because `ReviewHash` is not `Copy`. Borrow the field in the match or avoid the second use after the move.",
-              "severity": "P1",
-              "file": "libs/domain/src/review_v2/tests.rs",
-              "line": 694,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
-          "at": "2026-04-29T01:22:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
-          "at": "2026-04-29T01:23:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
-          "at": "2026-04-29T01:25:40Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Renaming the wrapper task here breaks the wrapper smoke test in `scripts/test_make_wrappers.py`, which still looks for `[tasks.track-review-status]` and `bin/sotp make track-review-status`. CI will fail until that test is updated to `track-review-results` or the old wrapper name is retained.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 891,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
-          "at": "2026-04-29T02:21:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
-          "at": "2026-04-29T02:22:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
-          "at": "2026-04-29T02:23:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99c94c238dabca983176fbf241c45cdfce1c105a6ca0c9cacb835ef718c69fe0",
-          "at": "2026-04-29T02:27:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99c94c238dabca983176fbf241c45cdfce1c105a6ca0c9cacb835ef718c69fe0",
-          "at": "2026-04-29T02:29:23Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -1285,6 +875,512 @@
           "findings": [],
           "hash": "rvw1:sha256:275339f11f9c8811dcd1a6d45a6b7855a8d4a932169afa6fb739ad5074b5acdf",
           "at": "2026-04-29T02:40:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This regenerated contract map now drops the domain/usecase contract nodes and the `FsReviewStore -> ReviewExistsPort` edge entirely, so it no longer reflects the adapter’s declared interfaces in `infrastructure-types.json` and contradicts the stated intent that only catalogue declarations were being补完.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc9201343a57cc6a3376af9144495b4aea8cc3aae9f38378ab40ee6349f95da5",
+          "at": "2026-04-29T03:20:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsReviewStore` is still rendered here as implementing only `ReviewExistsPort`, but the updated type artifacts declare it also implements `ReviewReader` and `ReviewWriter`. That leaves the plan-artifact set internally inconsistent about this adapter's contract surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:356ddf466e1959a107bd96b31bad74ff937402af1033be59f35e186d5c94bd88",
+          "at": "2026-04-29T03:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` only reflects `FsReviewStore` as an implementation of `ReviewExistsPort` plus a `read_all_rounds` edge, but the paired `infrastructure-types.json` now declares `ReviewReader` and `ReviewWriter` as implemented traits as well. That leaves the regenerated contract map semantically incomplete and inconsistent with the type summary.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 20,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:356ddf466e1959a107bd96b31bad74ff937402af1033be59f35e186d5c94bd88",
+          "at": "2026-04-29T03:26:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56c041bee24ec65f1c394de2cfe2d6564ab5eb8b64c40322045801f7ea481bf3",
+          "at": "2026-04-29T03:30:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScopeRound` says `read_all_rounds` is introduced in T005, but the new `ReviewReader` entry says the same method was added in T001. The artifacts disagree on when the port/method became available, so the plan is internally inconsistent about the dependency timeline.",
+              "severity": "P1",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` now shows a direct `FsReviewStore -> ScopeRound` edge in addition to the `FsReviewStore -.impl.-> ReviewReader` edge. That makes the diagram assert an adapter-level dependency on `ScopeRound`, which contradicts the stated intent of only surfacing the new `ReviewReader` contract relationship for `read_all_rounds`. If this map is meant to represent the contract surface, the extra direct edge is misleading and should be removed or explicitly justified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/contract-map.md",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:40:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:42:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1ecdf4794d908f8668f7613ab18ecb3d2810ca7075195f8b03f6131c94fec9",
+          "at": "2026-04-29T03:45:04Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12958373d856af6fe8750a6796e1f3f47c53111d815fa6137f41dbe44c551f12",
+          "at": "2026-04-29T02:20:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12958373d856af6fe8750a6796e1f3f47c53111d815fa6137f41dbe44c551f12",
+          "at": "2026-04-29T02:22:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c07d9e83de62f3e265eedf128181753f7db71aea2c632dd603fbe131398bf84f",
+          "at": "2026-04-29T02:59:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c07d9e83de62f3e265eedf128181753f7db71aea2c632dd603fbe131398bf84f",
+          "at": "2026-04-29T03:00:52Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Renaming the wrapper task here breaks the wrapper smoke test in `scripts/test_make_wrappers.py`, which still looks for `[tasks.track-review-status]` and `bin/sotp make track-review-status`. CI will fail until that test is updated to `track-review-results` or the old wrapper name is retained.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 891,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
+          "at": "2026-04-29T02:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
+          "at": "2026-04-29T02:22:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1400f83ef80cdd166a2c3ccbd9b15fbc78fb40f79e797c6f8f832d86607ab97",
+          "at": "2026-04-29T02:23:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c94c238dabca983176fbf241c45cdfce1c105a6ca0c9cacb835ef718c69fe0",
+          "at": "2026-04-29T02:27:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c94c238dabca983176fbf241c45cdfce1c105a6ca0c9cacb835ef718c69fe0",
+          "at": "2026-04-29T02:29:23Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `[BLOCKED]` branch no longer prints the per-scope reason that the previous CLI emitted (`scope: state`); it now shows only bare scope names. That is a user-visible contract change for a guard command, because operators can no longer tell whether a scope is blocked by `NotStarted`, `FindingsRemain`, or `StaleHash`. The new tests in `tests.rs` only assert exit codes, so this regression is currently unprotected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/mod.rs",
+              "line": 208,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
+          "at": "2026-04-29T00:22:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `check-approved` tests only assert the exit code; they never capture or compare stderr, so the required `[OK]` / `[WARN]` / `[BLOCKED]` surface in AC-10 is untested and a prefix regression would still pass.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 754,
+              "category": "testing"
+            },
+            {
+              "message": "In the blocked-path fixture, `review.json` is written without a matching `review_operational` exclusion, so the file itself becomes an extra required scope (typically `Other`). The test can therefore fail for the wrong reason and does not isolate the intended `domain`-scope bypass-block path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 798,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:adcdf469ad52646292ba81fd1e0069b70d341c598055a1ed3f41c449781d994c",
+          "at": "2026-04-29T00:25:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Blocked` output no longer preserves the previous stderr format: it drops the per-scope `: {state}` suffix and now prints only scope names. That changes a user-visible CLI contract for `check-approved` even though the exit code and prefix stay the same, so any consumer or snapshot relying on the full blocked message will regress.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 218,
+              "category": "behavioral regression"
+            }
+          ],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:35:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7525bcc635659a4a55f5aad20eb16e0ea46a93b2bc7a689427d6d090ef773a19",
+          "at": "2026-04-29T00:36:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI surface is only exercised through pure rendering helpers; there is no coverage for clap parsing or the `run_results` entry path, so regressions in `--limit` parsing and the `--scope`/`--all` contract can ship unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 205,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
+          "at": "2026-04-29T00:56:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--scope` is effectively broken here: `--all` is a `bool` with `default_value_t = true` inside the same `ArgGroup`, so clap will treat `all` as present even when the user did not pass it. That makes `sotp review results --scope ...` conflict with the default `--all` and prevents the single-scope mode required by AC-14.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 203,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
+          "at": "2026-04-29T01:01:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`results_scope_select` makes `scope` mutually exclusive with `all`, but `all` is a `bool` with `default_value_t = true`. Clap treats defaulted values as present, so `sotp review results --scope ...` will conflict with the implicit `--all` default and the single-scope path becomes unreachable.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 204,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:d49bfd86deaf10c929d3765ade0ffd8c49536e69215d680f5eacb907e974739a",
+          "at": "2026-04-29T01:04:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0240404a95cd16906704fa58752c1e30addf81e3bbbfebdfc3dae56d363d6040",
+          "at": "2026-04-29T01:07:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d770c5ddeb5f029f4e95ff1d6bc3e75ec73cc32bb14b94f0d50fa00603453811",
+          "at": "2026-04-29T01:22:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d770c5ddeb5f029f4e95ff1d6bc3e75ec73cc32bb14b94f0d50fa00603453811",
+          "at": "2026-04-29T01:25:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
+          "at": "2026-04-29T01:40:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0aba44d11f718ffe349aa7f5c1680793bda5dceb171a52d3e4690d0caa02769a",
+          "at": "2026-04-29T01:42:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5014d86934e0b87fdf1eedac75c991dd6a94174749be0ff90a30ec3ac032cbbe",
+          "at": "2026-04-29T02:20:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5014d86934e0b87fdf1eedac75c991dd6a94174749be0ff90a30ec3ac032cbbe",
+          "at": "2026-04-29T02:22:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:299dab699c8023595decb9119de9ee3e61e4cf161306c13a96b78506ca0ed39f",
+          "at": "2026-04-29T02:55:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:299dab699c8023595decb9119de9ee3e61e4cf161306c13a96b78506ca0ed39f",
+          "at": "2026-04-29T02:58:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea98c6d199f6ad98e89db720ae91dcbad5a9ace7119773eb8ebe163a7136c51",
+          "at": "2026-04-28T22:58:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
+          "at": "2026-04-29T00:52:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eae9c9770f086fa43415872a14ba9bd32d763e038a9414ca38b8ad8283807154",
+          "at": "2026-04-29T00:53:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test will not compile: `matches!(round.hash, ReviewHash::Empty)` moves `round.hash` out of `round`, so the next line cannot borrow `round.hash` again. Use a borrow in the match (`matches!(&round.hash, ReviewHash::Empty)`) or check `round.hash.is_empty()` instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/review_v2/tests.rs",
+              "line": 694,
+              "category": "compile_error"
+            }
+          ],
+          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
+          "at": "2026-04-29T01:21:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new empty-hash test moves `round.hash` into `matches!` and then uses `round.hash` again on the next assertion, which will not compile because `ReviewHash` is not `Copy`. Borrow the field in the match or avoid the second use after the move.",
+              "severity": "P1",
+              "file": "libs/domain/src/review_v2/tests.rs",
+              "line": 694,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8aad56f0accde0d137e6de4cd1d3fd007f596f161eb5621c0de98a158778970c",
+          "at": "2026-04-29T01:22:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
+          "at": "2026-04-29T01:23:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:916cb98b173a662465d154c285afade278bb2a7577f8c1eacad36a35b1085f06",
+          "at": "2026-04-29T01:25:40Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:45:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceefd4396deeb9e19dd3e5538242d34fcb2fc475a8c57a22f0cf4ca7cda9f99",
+          "at": "2026-04-28T23:47:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` rejects `ReviewHash::Empty` by calling `ReviewHashValue::new(&round.hash)`, but `write_verdict`/`write_fast_verdict` persist empty hashes as `\"\"` and `read_latest_finals` already accepts them. Any existing or future round written with an empty hash will now make `sotp review results` fail instead of round-tripping the stored data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 221,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
+          "at": "2026-04-29T00:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` now rejects rounds whose persisted `hash` is empty, but the writer can still serialize `ReviewHash::Empty` and the existing round-trip path already accepts that case in `read_latest_finals`. As a result, `sotp review results` will fail on valid `review.json` data that contains an empty-hash round instead of reporting the history.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 221,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:48a2ba060c6f262ea2ee0b357a153a529e66e8283dcdc2cc1167b9d272758cf7",
+          "at": "2026-04-29T00:55:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_all_rounds` silently skips any persisted round whose `hash` is empty. That loses valid stored history because `write_verdict`/`write_fast_verdict` can serialize `ReviewHash::Empty`, and `read_latest_finals` already accepts that case; as a result, `sotp review results` will omit the round and its latest-round suffix instead of round-tripping the recorded data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b58c66c4e7e3bdd89bb1d5107b55aee94298bf4a2554d4d57a74326d55a04804",
+          "at": "2026-04-29T00:58:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
+          "at": "2026-04-29T01:20:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b295c7333441a91b5adfce99ed1f972074e2e99f83fdbeca94a0c47d90b9c6",
+          "at": "2026-04-29T01:22:01Z"
         }
       ]
     },

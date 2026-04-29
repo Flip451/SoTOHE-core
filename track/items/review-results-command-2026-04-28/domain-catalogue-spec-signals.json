@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3171c41d1ad000475f9276b47001494ba262c6b005154ec315eda85935aa1c01",
+  "catalogue_declaration_hash": "fabd5a6fb4fa8f36e22f47ddc9ddf8e1582b5e51c2f4a280f83160dca54342e8",
   "signals": [
     {
       "type_name": "ReviewApprovalVerdict",
@@ -8,6 +8,14 @@
     },
     {
       "type_name": "ScopeRound",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewWriter",
       "signal": "blue"
     },
     {

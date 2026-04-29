@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsReviewStore | secondary_adapter | modify | impl ReviewExistsPort | 🟡 | 🔵 |
+| FsReviewStore | secondary_adapter | modify | impl ReviewReader, impl ReviewWriter, impl ReviewExistsPort | 🔵 | 🔵 |
 
