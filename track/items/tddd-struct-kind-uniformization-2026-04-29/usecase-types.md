@@ -4,13 +4,13 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunCatalogueLintError | error_type | — | CatalogueLoad, LintExecution, InvalidLayer | 🟡 | 🔵 |
+| RunCatalogueLintError | error_type | — | CatalogueLoad, LintExecution, InvalidLayer | 🔵 | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunCatalogueLint | application_service | — | fn execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError> | 🟡 | 🔵 |
+| RunCatalogueLint | application_service | — | fn execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError> | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -23,5 +23,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunCatalogueLintCommand | command | — | — | 🟡 | 🔵 |
+| RunCatalogueLintCommand | command | — | — | 🔵 | 🔵 |
 

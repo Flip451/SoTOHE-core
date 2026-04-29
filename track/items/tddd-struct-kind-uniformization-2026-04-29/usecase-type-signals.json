@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T16:23:22Z",
+  "generated_at": "2026-04-29T16:48:41Z",
   "declaration_hash": "da76d1c80ab72147204048409c4417f96f5c4dcde103aaa4cb10520acd40dfe6",
   "signals": [
     {
@@ -15,26 +15,46 @@
     {
       "type_name": "RunCatalogueLintCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "layer_id: String",
+        "rules: Vec<CatalogueLinterRule>"
+      ]
     },
     {
       "type_name": "RunCatalogueLintError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoad",
+        "LintExecution",
+        "InvalidLayer"
+      ]
     },
     {
       "type_name": "RunCatalogueLint",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>"
+      ]
     },
     {
       "type_name": "RunCatalogueLintInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "found_items": [
+        "impl RunCatalogueLint"
+      ],
+      "missing_items": [
+        "catalogue_loader: Arc<dyn CatalogueLoader>",
+        "linter: Arc<dyn CatalogueLinter>"
+      ]
     }
   ]
 }
