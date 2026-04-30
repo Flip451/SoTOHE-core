@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55e77dba0ed272c8014bcc8554d505a1318e10323ba7cc363038be6272c87786",
+          "at": "2026-04-30T09:38:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Positive consequence says the CLI will depend on usecase only, but D1 explicitly keeps `infrastructure` in `apps/cli`'s `may_depend_on`, and Rejected Alt C rejects banning cli→infrastructure. This is a semantic contradiction in the ADR's stated dependency boundary; the consequence should be narrowed to domain-facing data/operations going through usecase, or otherwise account for the retained infrastructure dependency.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+              "line": 108,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:55e77dba0ed272c8014bcc8554d505a1318e10323ba7cc363038be6272c87786",
+          "at": "2026-04-30T09:41:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Neutral consequence says existing grandfathered `cli→domain` references are unaffected, but D1 removes `domain` from `apps/cli` dependencies, D2 migrates all 25 direct references in one track, and D3 explicitly avoids any transitional allow list. That leaves the ADR with conflicting design intent about whether any existing CLI-to-domain references may remain grandfathered.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+              "line": 122,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7ba8cfe71def58bc56b386418a5ab20aa69a5a05fa2642509b0bfcc9ddceb6f9",
+          "at": "2026-04-30T09:42:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93d57e79c4d59fb2ad779a886b3a36dce5e20608a82b4f1a37f6e1fb50339cc8",
+          "at": "2026-04-30T09:44:36Z"
+        }
+      ]
+    }
+  }
+}

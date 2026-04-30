@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "cli-via-usecase-only-2026-04-30",
+  "title": "CLI→domain 直接参照禁止と usecase 経由への一本化",
+  "branch": "track/cli-via-usecase-only-2026-04-30",
+  "created_at": "2026-04-30T09:25:02Z",
+  "updated_at": "2026-04-30T09:25:02Z"
+}
