@@ -109,6 +109,25 @@ pub(crate) fn build_review_v2(
     Ok(ReviewV2Composition { cycle, review_store, commit_hash_store, base })
 }
 
+/// Resolves the diff base + diff getter for `sotp review files`.
+///
+/// Wraps `build_v2_shared` and returns only the pieces needed to wire a
+/// `ScopeQueryInteractor`: the diff base commit and a `GitDiffGetter`.
+/// Callers should run `load_scope_config_only` + scope validation **first**
+/// so that `UnknownScope` is reported before any diff I/O is initiated by
+/// `ScopeQueryInteractor::files` (AC-08).
+///
+/// # Errors
+/// Returns a human-readable error string on failure.
+pub(super) fn resolve_diff_base_and_getter(
+    track_id: &TrackId,
+    items_dir: &Path,
+) -> Result<(GitDiffGetter, CommitHash), String> {
+    let (_scope_config, _review_store, _commit_hash_store, base) =
+        build_v2_shared(track_id, items_dir)?;
+    Ok((GitDiffGetter, base))
+}
+
 /// Loads just the `ReviewScopeConfig` for a given track/items_dir, without
 /// initialising review/hash stores or resolving the diff base.
 ///

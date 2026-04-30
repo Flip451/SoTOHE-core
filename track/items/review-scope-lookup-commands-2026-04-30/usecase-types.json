@@ -1,0 +1,267 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ScopeQueryService",
+      "description": "Application service (driving port) trait for scope routing queries. Provides two read-only methods: classify takes a list of FilePaths and returns per-path ScopeClassification results (Named / Other / Excluded); files takes a ScopeName and returns the subset of current diff files belonging to that scope. The driving force is the CLI layer (classify / files subcommands); the implementation is ScopeQueryInteractor. This trait is the primary port boundary between the CLI and the usecase layer per ADR D6 (ReviewCycle-independent minimum-dependency application service). The method signatures use domain types (FilePath, ScopeName) for inputs; classify returns usecase-layer types (PathClassification wrapped in Result with ScopeQueryError), while files returns domain-layer FilePath elements (the path type originates in the domain) with ScopeQueryError as the error type.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "classify",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<FilePath>"
+            }
+          ],
+          "returns": "Result<Vec<PathClassification>, ScopeQueryError>",
+          "is_async": false
+        },
+        {
+          "name": "files",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ScopeName"
+            }
+          ],
+          "returns": "Result<Vec<FilePath>, ScopeQueryError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-07",
+          "hash": "4dbc7cdb6a09d193657652afc6394669b0568b98a0e94a2500fd8a74c56bf849"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-05",
+          "hash": "d7f77d98f924bcbc66e40e2996b54cb7440d4f6e9e2a1f4e58a46ed33c4da31e"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-06",
+          "hash": "81705dd401f8d0f7f55309328d4191e502430e0a3466ccf3175b5950f2e99cc9"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-11",
+          "hash": "e86e8e082f64e82c4ded3507be3fcefc76d5dc09d41441d8c59bd48f8f21e2f3"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-12",
+          "hash": "7349d4c22b3f2231aeefa4aa9fd5c5a8122670c54360e0cd71c90bac0b88c501"
+        }
+      ]
+    },
+    {
+      "name": "ScopeQueryInteractor",
+      "description": "Struct implementing ScopeQueryService. Holds scope_config: ReviewScopeConfig (domain type providing classify / contains_scope / all_scope_names), a generic diff_getter: D (generic over DiffGetter), and base: CommitHash (diff base resolved from .commit_hash or git rev-parse main fallback per CN-08). The classify method delegates to scope_config.classify without I/O; scope_config.classify returns HashMap<ScopeName, Vec<FilePath>> (scope-centric), so the interactor inverts it to a per-file classification: paths absent from all HashMap values are Excluded (dropped by operational/other_track filters), paths under ScopeName::Other are Other, paths under ScopeName::Main(name) are Named(head, tail) where head is the first MainScopeName and tail is the remaining Vec<MainScopeName> (matching the ScopeClassification::Named(MainScopeName, Vec<MainScopeName>) definition that makes the non-empty invariant unrepresentable). The files method first validates the requested scope via scope_config.contains_scope and returns UnknownScope immediately if the scope is not configured — before any diff I/O; only after successful scope validation does it call diff_getter.list_diff_files and then scope_config.classify to return the subset matching the requested scope. This ordering guarantees that an undefined scope name always yields UnknownScope and never DiffGet (IN-04, AC-08). Does NOT depend on Reviewer or ReviewHasher (CN-06 — minimum dependency per ADR D6). The interactor is constructed at the CLI composition root alongside scope_config / diff_getter / base from the existing build_v2_shared helper pattern.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "scope_config",
+          "ty": "ReviewScopeConfig"
+        },
+        {
+          "kind": "field",
+          "name": "diff_getter",
+          "ty": "D"
+        },
+        {
+          "kind": "field",
+          "name": "base",
+          "ty": "CommitHash"
+        }
+      ],
+      "declares_application_service": [
+        "ScopeQueryService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-07",
+          "hash": "4dbc7cdb6a09d193657652afc6394669b0568b98a0e94a2500fd8a74c56bf849"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-05",
+          "hash": "d7f77d98f924bcbc66e40e2996b54cb7440d4f6e9e2a1f4e58a46ed33c4da31e"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-06",
+          "hash": "81705dd401f8d0f7f55309328d4191e502430e0a3466ccf3175b5950f2e99cc9"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-11",
+          "hash": "e86e8e082f64e82c4ded3507be3fcefc76d5dc09d41441d8c59bd48f8f21e2f3"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-12",
+          "hash": "7349d4c22b3f2231aeefa4aa9fd5c5a8122670c54360e0cd71c90bac0b88c501"
+        }
+      ]
+    },
+    {
+      "name": "ScopeQueryError",
+      "description": "Error enum for ScopeQueryService operations. DiffGet wraps DiffGetError from the DiffGetter port (used by the files method when git diff retrieval fails). UnknownScope is emitted by the files method when the requested scope name is not in scope_config.all_scope_names(). This error is reachable even though the parameter type is ScopeName: MainScopeName is only format-validated (non-empty, ASCII, not 'other') — it is NOT validated against the set of configured scopes. Therefore ScopeName::Main(name) can hold a name like 'nonexistent-group' that passes Rust type-checking but is absent from the config; the service checks contains_scope and returns UnknownScope in that case. The CLI layer surfaces this error as 'Unknown scope: <name>. Known scopes: <list>' (AC-08).",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "DiffGet",
+        "UnknownScope"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "aa6b145d6040ea335edaa2b09cea2a89d501f9842f1fd56afecd9b73bf601fae"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-08",
+          "hash": "b22c38c21b30116dcedda116d6f96f0b2c12c67ed087310271effc2cdffa136a"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-07",
+          "hash": "4dbc7cdb6a09d193657652afc6394669b0568b98a0e94a2500fd8a74c56bf849"
+        }
+      ]
+    },
+    {
+      "name": "ScopeClassification",
+      "description": "Enum representing the scope classification result for a single file path. Named carries at least one MainScopeName — represented as Named(MainScopeName, Vec<MainScopeName>) (head + tail) so the variant structurally cannot be empty and cannot hold ScopeName::Other, making Named/Other mutually exclusive and the at-least-one invariant unrepresentable as illegal state. Other indicates the file matched no named scope and falls to the implicit other scope. Excluded indicates the file was filtered out by operational or other_track patterns before scope matching — corresponds to the CLI <excluded> sentinel (D7). The CLI layer maps Named(head, tail) to sorted CSV (head sorted together with tail, alphabetical), Other to the string 'other', and Excluded to '<excluded>' for output. All three variants are mutually exclusive: a path is either excluded, matched to named scope(s), or other.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Named",
+        "Other",
+        "Excluded"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-05",
+          "hash": "ae3208efeb06d9953876e15095de9cfb2afa531529edbcfee25977b343c72f10"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-02",
+          "hash": "d84fb0fadaf810d6327355262f345f395d636f659c6dea3fe94875aa445f271e"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "ad3ace84adf7d5926e13c4159d6accabc30dfa9c9574258653c1f2a88f61d08d"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-10",
+          "hash": "5ac65f83d7ec2fe265738d101f2d4d92be2ddc2543249650ea567e237e8b96c7"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-07",
+          "hash": "9a90f18f38a61a22700f8b73be2ab790ee637a92a68b5c706c2dcccf1e448e97"
+        }
+      ]
+    },
+    {
+      "name": "PathClassification",
+      "description": "Read-only value record pairing a validated FilePath with its ScopeClassification. Returned by ScopeQueryService::classify in input-argument order (CN-04: order preserved). The path field holds the same FilePath the caller provided; classification holds the result of scope_config.classify for that path. No behavior methods — the record is consumed by the CLI layer which renders path + classification into the tab-delimited output line.",
+      "approved": true,
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "path",
+          "ty": "FilePath"
+        },
+        {
+          "kind": "field",
+          "name": "classification",
+          "ty": "ScopeClassification"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-05",
+          "hash": "ae3208efeb06d9953876e15095de9cfb2afa531529edbcfee25977b343c72f10"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "927b297c8ff069301bc9b3959e3b47ed8f9eb36754ee5ee219e4e97e3e15740e"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-01",
+          "hash": "7550afebe4e47b9160ebed2ac6db3f79a57672ee215133c17cf58436f5658ddd"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-07",
+          "hash": "4dbc7cdb6a09d193657652afc6394669b0568b98a0e94a2500fd8a74c56bf849"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-05",
+          "hash": "d7f77d98f924bcbc66e40e2996b54cb7440d4f6e9e2a1f4e58a46ed33c4da31e"
+        }
+      ]
+    },
+    {
+      "name": "DiffGetter",
+      "description": "Secondary port (driven by infrastructure) for obtaining the list of changed files relative to a diff base commit. Pre-existing port in the usecase::review_v2::ports module. Referenced here to document ScopeQueryInteractor's dependency: the interactor holds a generic parameter D: DiffGetter and calls list_diff_files(&self.base) in the files() method to enumerate diff-range files before classifying them into scopes. CN-06 constrains ScopeQueryInteractor to DiffGetter + ReviewScopeConfig only (no Reviewer / ReviewHasher).",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "list_diff_files",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "base",
+              "ty": "&CommitHash"
+            }
+          ],
+          "returns": "Result<Vec<FilePath>, DiffGetError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-06",
+          "hash": "81705dd401f8d0f7f55309328d4191e502430e0a3466ccf3175b5950f2e99cc9"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-09",
+          "hash": "5e8672f8d3a5936c24b0af1f172e379ef9685357c83f024ed6b26c3e3a74a72e"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-12",
+          "hash": "7349d4c22b3f2231aeefa4aa9fd5c5a8122670c54360e0cd71c90bac0b88c501"
+        }
+      ]
+    }
+  ]
+}

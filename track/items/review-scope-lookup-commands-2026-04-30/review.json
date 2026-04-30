@@ -1,0 +1,730 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
+          "at": "2026-04-30T06:04:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify` builds the scope list by inverting `ReviewScopeConfig::classify` into a `HashMap<FilePath, Vec<MainScopeName>>`, but it does not deduplicate scope names per path. Because the public API preserves one output per input path, a duplicated input like `[\"libs/domain/src/lib.rs\", \"libs/domain/src/lib.rs\"]` makes the domain classifier push the same file into the `domain` bucket twice, and this code turns that into `Named(domain, [domain])` for both results. The CLI would then report a path as matching the same scope multiple times, which is not a real multi-scope match. Deduplicate `names` after sorting or classify each input occurrence independently.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/scope_query.rs",
+              "line": 132,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
+          "at": "2026-04-30T06:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46a1a47bde28a040a880e0e392761e148d44b7e763f88c2c8c15115bc947bf82",
+          "at": "2026-04-30T06:08:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46b21b68a722847e7e756086a10054be1a1b537f0ec027acd5bf7298005fc36c",
+          "at": "2026-04-30T06:53:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46b21b68a722847e7e756086a10054be1a1b537f0ec027acd5bf7298005fc36c",
+          "at": "2026-04-30T06:53:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46b21b68a722847e7e756086a10054be1a1b537f0ec027acd5bf7298005fc36c",
+          "at": "2026-04-30T06:56:02Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ccccfcd9b004c2749fc3b1e15c7adad8d8dd03ecf68651b486e1ff12219fca5",
+          "at": "2026-04-30T06:31:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ccccfcd9b004c2749fc3b1e15c7adad8d8dd03ecf68651b486e1ff12219fca5",
+          "at": "2026-04-30T06:34:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2f425d81c9b040c3dd49a726f2352dce49ffb023ec2bcdae358ddb539910a6e",
+          "at": "2026-04-30T06:42:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2f425d81c9b040c3dd49a726f2352dce49ffb023ec2bcdae358ddb539910a6e",
+          "at": "2026-04-30T06:45:31Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D4` says `files` should go through `ReviewCycle::get_scope_target`, but `D6` says the new scope-routing query must be implemented as a separate application service independent of `ReviewCycle`. Those prescriptions conflict, so the intended dependency shape is unclear.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 93,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b2785379275b13ebd4e848e16cb399188dd36bae6849d49b348716f33ec48719",
+          "at": "2026-04-30T03:15:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5934e98a2cdb136a2808ed51e9cda6d99ca0c3bb0fccbe622e218fc264b600e",
+          "at": "2026-04-30T03:17:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5934e98a2cdb136a2808ed51e9cda6d99ca0c3bb0fccbe622e218fc264b600e",
+          "at": "2026-04-30T03:19:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 says `--track-id` is required because `track/review-scope.json` needs `<track-id>` placeholder expansion, but `classify` is specified everywhere as path-only while still using the same scope routing and even displaying `other_track` exclusions. That leaves `sotp review classify track/items/...` under-specified for track-scoped paths: the command cannot deterministically know which track is the current one unless the ADR defines a track-id source for `classify` too.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 60,
+              "category": "contradiction"
+            },
+            {
+              "message": "Rejected Alternative E says the zero-argument `classify` use case, “all current diff paths -> scope mapping,” is already covered by `review results`, but the Context explicitly says `review results` does not output per-scope individual file lists. This makes the rejection rationale internally inconsistent; it should be reframed around `files --scope`/shell composition or another non-contradictory reason.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 212,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d5934e98a2cdb136a2808ed51e9cda6d99ca0c3bb0fccbe622e218fc264b600e",
+          "at": "2026-04-30T03:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `files` command signature is inconsistent: D1 introduces `sotp review files --scope <name>` and D2 repeats that adopted form without `--track-id`, but D4 later makes `--track-id` a required argument for `files` and D5's example includes it. This leaves the CLI contract ambiguous for implementers and users.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:86eb2e8559186eb720fb4474026012e636a2bdf2e6b06d6628d4a49463a999a9",
+          "at": "2026-04-30T03:28:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fbef81869b9fd507466ae1626a5561ced6293778d1c857bbdb22ad08e1df37e",
+          "at": "2026-04-30T03:29:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says `ScopeQueryInteractor` has only `scope_config` and `base` fields, but the same task also says `files()` calls `diff_getter.list_diff_files(&self.base)`. With no stored `diff_getter` field or equivalent state, this service cannot be implemented as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 13,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The `files` API is typed as `files(scope: ScopeName)`, but this module also says `UnknownScope` is emitted when the requested scope name is not in `scope_config.all_scope_names()`. Once the CLI has converted user input into `ScopeName`, there is no invalid-scope state left for the service to detect, so this error path is unreachable unless the API carries the raw string or a validation result.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 113,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b2924baed55f716e76575a82ddf8c211bac4aa90d584df74b763a5fadbe47ad5",
+          "at": "2026-04-30T03:58:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 describes `ScopeQueryInteractor` as holding only `scope_config` and `base`, but the same task requires `files()` to call `diff_getter.list_diff_files(&self.base)`. As written, there is no stored `DiffGetter` receiver, so the interactor cannot implement the required method literally. This also conflicts with the generated usecase contract, which models `diff_getter: D` as an owned field.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 13,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:a86b97a9f5552067d677b980f3002f91e4eab57f9a2fe42e6ee7f38d803d8bf1",
+          "at": "2026-04-30T04:02:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 conflicts with the rest of the classify contract: `IN-01`/`AC-01`-`AC-05` and `plan.md` T002 require `classify` to accept at least one path and emit one `<path>\\t<scope>` row per input, so empty stdout is not reachable just because no named scope matched. The only empty-output case would be zero inputs, which the CLI forbids.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+              "line": 367,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:53e0dd043c31bfe11a9ad4502a189bc17111c3685b79650c768d23bed6a4e715",
+          "at": "2026-04-30T04:08:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `ReviewScopeConfig` contract is internally inconsistent: the prose says `classify(&[FilePath])`, but `expected_methods` records the parameter as `Vec<FilePath>`. That changes the advertised API shape for downstream codegen and makes the domain contract self-contradictory.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/domain-types.json",
+              "line": 6,
+              "category": "factual_error"
+            },
+            {
+              "message": "`ScopeClassification::Named` is typed as `Vec<ScopeName>`, but `ScopeName` already includes the implicit `Other` variant. As written, the plan allows a \"named\" classification to carry `Other`, which conflicts with the description that Named holds only named scopes and makes the `Named`/`Other` split ambiguous.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 145,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e8f99b40996588e6c5fa54754d2c8d8de96e17628beb3ea6aca95fb1d5939a52",
+          "at": "2026-04-30T04:12:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 says unknown scopes are validated with `scope_config.all_scope_names()`, but the spec's IN-04 and the `ReviewScopeConfig` contract require `contains_scope` for this check. That gives implementors two different validation rules for the same command, so the plan is spec-inconsistent as written.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:36f10ac2ce41fc13393bfc650c2e911af45ea1a99bfb926978e19e157c39a087",
+          "at": "2026-04-30T04:15:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` marks AC-11 as covered by T001/T002/T003, but AC-11 also requires the final `cargo make check-layers` gate to pass. Only T004 actually runs that check, so this coverage entry overstates completion of the criterion and can report the layer-boundary check as satisfied before it has been executed.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/task-coverage.json",
+              "line": 44,
+              "category": "factual error"
+            },
+            {
+              "message": "T002 makes `sotp review classify` resolve the diff base and wire `GitDiffGetter`/`base` into the interactor even though the command never consumes diff-derived data. That adds an unrelated failure mode to a path-only classifier, so a valid repo-relative path can still fail before classification if base resolution is unavailable.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 22,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:5f9ca02030cc3ff2dbc7d56aaea6a2e33a7d8f10cd39ca3d43666ff79e19edbe",
+          "at": "2026-04-30T04:18:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1/T001 asks `ScopeQueryInteractor::classify` to emit `ScopeClassification::Excluded`, but the only documented domain input is `ReviewScopeConfig::classify(&[FilePath]) -> HashMap<ScopeName, Vec<FilePath>>` plus `contains_scope`/`all_scope_names`. That model can distinguish `Main` vs `Other`, but it has no way to tell whether a path missing from the map is `Other` or `<excluded>`, so the interactor cannot implement AC-03/AC-10 as written. The domain contract needs an explicit exclusion signal or the usecase type needs to drop `Excluded`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 8,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f5a9de494c67660979d4519a0ae31006a9087367546ea509d36ec85bfca9a7ad",
+          "at": "2026-04-30T04:22:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 specifies comma-separated output for multi-match paths, but the plan never defines a canonical ordering for the matched scope names. Because `ReviewScopeConfig::classify` is backed by hash maps, `Named(Vec<MainScopeName>)` can be rendered in different orders across runs unless the plan adds an explicit sort, making the CLI output nondeterministic and the acceptance criterion flaky.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.md",
+              "line": 49,
+              "category": "factual error"
+            },
+            {
+              "message": "`ScopeClassification::Named(Vec<MainScopeName>)` is described as representing \"one or more\" matches, but the chosen type still admits `Named([])`. That means the plan does not actually make the stated invariant unrepresentable, so the contract is weaker than the text claims.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 145,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1c038bad06cabf49fdae5fce30fa1ee6c9a7d9def4056d9c2c76b2060bfb7291",
+          "at": "2026-04-30T04:26:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d558320211008faed37a4f504e6eef196e9b1fb7134a27f20c09a4778378b47",
+          "at": "2026-04-30T04:30:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScopeQueryInteractor`'s contract describes classifying named matches as `Named(Vec<MainScopeName>)`, but the same usecase catalogue defines `ScopeClassification` as `Named(MainScopeName, Vec<MainScopeName>)` to make the non-empty invariant unrepresentable. Since the rendered markdown only lists the variant name, this conflicting JSON prose can drive an implementation toward a possibly-empty `Vec`, undermining the intended type invariant.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d558320211008faed37a4f504e6eef196e9b1fb7134a27f20c09a4778378b47",
+          "at": "2026-04-30T04:34:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa79c23ed67c3b13e2ae1f89a9dad05e5e9fab2cb24cd7944d60811da874ce29",
+          "at": "2026-04-30T04:38:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56bc1579819487bf6b4316e943ba0b7d48190b5deca284f6a4dcd25f5b23636d",
+          "at": "2026-04-30T04:45:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56bc1579819487bf6b4316e943ba0b7d48190b5deca284f6a4dcd25f5b23636d",
+          "at": "2026-04-30T04:47:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 states that both `classify` and `files` output scope names constrained by `scope_config.all_scope_names()`, but the same spec defines `files` as outputting only file paths in IN-02/IN-06/AC-07. This makes the `files` contract self-contradictory; either limit this universe rule to `classify` output, or reword it as validation of the requested `--scope` for `files`.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.md",
+              "line": 25,
+              "category": "contradiction"
+            },
+            {
+              "message": "The interactor description says `files` calls `diff_getter.list_diff_files` and then classifies, while the error contract says the service checks `contains_scope` and returns `UnknownScope` for an undefined scope. If diff retrieval happens first, an undefined scope can surface `DiffGet` instead of `UnknownScope`, contradicting the service error semantics and the planned UnknownScope test. The plan should require scope validation before any diff access in `ScopeQueryInteractor::files`.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:56bc1579819487bf6b4316e943ba0b7d48190b5deca284f6a4dcd25f5b23636d",
+          "at": "2026-04-30T04:53:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScopeQueryService` describes `ScopeClassification` as one of the domain types it depends on, but the same contract defines `ScopeClassification` as a new usecase enum. That is a semantic layer-placement error in the type contract and conflicts with the plan's usecase-layer service design.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The implementation plan gives conflicting behavior for `ScopeQueryInteractor::files`: this task text says `files` gets diff files via `diff_getter.list_diff_files` and then classifies them, while the usecase type contract requires `files` to validate `scope_config.contains_scope` first and return `UnknownScope` before any diff I/O. If implemented from this plan text, an unknown scope can surface a diff/base failure instead of the AC-08 `Unknown scope` error.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f71f85166ce45f9cecab6be72455d80e83d132a54c3c429d9c8d28c0df978618",
+          "at": "2026-04-30T04:58:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f51802bfdf893bcebc17c8ed09bf4c2fc82b0f6981d66ba7236155a26ff9fec6",
+          "at": "2026-04-30T05:01:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01479132c7f1af968c1a5b367b1b3e1c29392b986c43f6c6694898e97b6348ca",
+          "at": "2026-04-30T05:07:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 wires `files` through `build_v2_shared` and only then validates `scope_config.contains_scope()`. `build_v2_shared` resolves the diff base first, so an invalid `--scope` can still fail on unrelated `.commit_hash`/`git rev-parse main` errors before the planned `Unknown scope: ...` path is reachable. That makes AC-08 order-dependent on diff-base state and contradicts the validation-first flow described in the same section.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 32,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:01479132c7f1af968c1a5b367b1b3e1c29392b986c43f6c6694898e97b6348ca",
+          "at": "2026-04-30T05:10:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2eb24bd4f56fc3699839e5bd53d300590267220d80defb6200528e63997b0504",
+          "at": "2026-04-30T05:13:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScopeClassification::Named` is specified in terms of `MainScopeName`, and `ScopeName` is also described as `Main(MainScopeName)`, but the type catalogue never introduces `MainScopeName` as a standalone contract type. That leaves the new `Named` payload and the unknown-scope path underspecified at the artifact level, so the usecase contract cannot be implemented from the published plan alone.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 145,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2eb24bd4f56fc3699839e5bd53d300590267220d80defb6200528e63997b0504",
+          "at": "2026-04-30T05:17:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2951ebb60b19db7dda6fb6b7925e039403e3c7949a03c633924ffa1c84ddb2e",
+          "at": "2026-04-30T05:20:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2951ebb60b19db7dda6fb6b7925e039403e3c7949a03c633924ffa1c84ddb2e",
+          "at": "2026-04-30T05:24:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2951ebb60b19db7dda6fb6b7925e039403e3c7949a03c633924ffa1c84ddb2e",
+          "at": "2026-04-30T05:31:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2951ebb60b19db7dda6fb6b7925e039403e3c7949a03c633924ffa1c84ddb2e",
+          "at": "2026-04-30T05:39:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2951ebb60b19db7dda6fb6b7925e039403e3c7949a03c633924ffa1c84ddb2e",
+          "at": "2026-04-30T05:48:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4be4fc3520aecf6852af40dbfb0f426ec97e402d37bec9aa276ce3ca7f4d8082",
+          "at": "2026-04-30T06:03:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4be4fc3520aecf6852af40dbfb0f426ec97e402d37bec9aa276ce3ca7f4d8082",
+          "at": "2026-04-30T06:04:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` still leaves two T001-owned entries in mixed states: `PathClassification` is `Signal=🔵 / Cat-Spec=🟡` and `ScopeQueryInteractor` is `Signal=🟡 / Cat-Spec=🔵`. That conflicts with the same artifact set marking T001 as `done` in `impl-plan.json` / `plan.md`, so the generated plan artifacts are internally inconsistent about whether the completed task has fully resolved its usecase types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/usecase-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e4c9148fc5c825d265e3339c976618b03edd450ce98a0ffa413aa3c5b51a4d23",
+          "at": "2026-04-30T06:14:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 only calls out `ScopeQueryInteractor::files` tests for `UnknownScope` and `DiffGet` errors. The successful path of the public `files` API is missing from the plan, so a regression in the `contains_scope`/`classify` wiring could ship without any direct coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 11,
+              "category": "test coverage"
+            },
+            {
+              "message": "T003 promises human-readable handling for `DiffGet` failures, but the listed unit tests never exercise that branch. Add an explicit failure-path test for the CLI so the stderr/exit-status behavior cannot regress silently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 32,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e4c9148fc5c825d265e3339c976618b03edd450ce98a0ffa413aa3c5b51a4d23",
+          "at": "2026-04-30T06:15:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1be0ec1b44e2d3d1917034c1153e56ec5aaa442d14b4ab76727faa15ce3034cd",
+          "at": "2026-04-30T06:17:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked `done`, but the same change also alters the completed task's definition by adding a new success-path unit test requirement. A completion-only transition should not expand the scope of the task being marked complete, because the `done` status now applies to a materially different task definition than the one that was pending before this change.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 is still `todo`, but this plan-artifact update also changes its acceptance/test requirements by adding DiffGet error-path coverage. That is unrelated to the T001 completion transition and contradicts the stated plan-artifact intent that T002-T004 remain unchanged in this round.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/impl-plan.json",
+              "line": 16,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1be0ec1b44e2d3d1917034c1153e56ec5aaa442d14b4ab76727faa15ce3034cd",
+          "at": "2026-04-30T06:20:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4c9148fc5c825d265e3339c976618b03edd450ce98a0ffa413aa3c5b51a4d23",
+          "at": "2026-04-30T06:24:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6391554f807ea8bb891e17c5a58759ea26561a804c763a8918936290676de080",
+          "at": "2026-04-30T06:30:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6391554f807ea8bb891e17c5a58759ea26561a804c763a8918936290676de080",
+          "at": "2026-04-30T06:31:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6391554f807ea8bb891e17c5a58759ea26561a804c763a8918936290676de080",
+          "at": "2026-04-30T06:35:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d43699ad1a8070e2330794e2f7597f69b1b3a24c72f337fe31a5c477f3ca9120",
+          "at": "2026-04-30T06:41:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d43699ad1a8070e2330794e2f7597f69b1b3a24c72f337fe31a5c477f3ca9120",
+          "at": "2026-04-30T06:42:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea8a7934a849010887eb18b2a306736fea0c709a849f18cef2bf294e77b2b4a4",
+          "at": "2026-04-30T06:53:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea8a7934a849010887eb18b2a306736fea0c709a849f18cef2bf294e77b2b4a4",
+          "at": "2026-04-30T06:55:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScopeQueryService` の説明で `all return types are defined in this usecase module` とありますが、`files` の戻り値は `Vec<FilePath>` で domain 型を含んでいます。メソッド署名と説明文が一致していません。",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 6,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea8a7934a849010887eb18b2a306736fea0c709a849f18cef2bf294e77b2b4a4",
+          "at": "2026-04-30T06:57:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9ae0e16db9588f9c1430cded7c57d6c01592e43b98e711668400ba41c75e9d6",
+          "at": "2026-04-30T06:59:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `ScopeQueryService` description says the method signatures use domain types for both inputs and outputs, but the actual returns are `PathClassification` and `ScopeQueryError`, which are usecase-layer types. That makes the port contract text semantically misleading about the boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "line": 6,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:d9ae0e16db9588f9c1430cded7c57d6c01592e43b98e711668400ba41c75e9d6",
+          "at": "2026-04-30T07:01:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d50578bef637903bfb73c5bcf21c2e84078be3a618b633c05a17f528d278169e",
+          "at": "2026-04-30T07:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d50578bef637903bfb73c5bcf21c2e84078be3a618b633c05a17f528d278169e",
+          "at": "2026-04-30T07:06:37Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
+          "at": "2026-04-30T04:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
+          "at": "2026-04-30T04:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `verify-plan-artifact-refs` branch only handles `[OK]` and `SpecRef hash mismatch`, but the verifier also emits unresolved anchors, invalid anchors, coverage violations, and I/O/JSON failures. Those outcomes are now undefined, so a non-hash verifier failure can neither be repaired nor failed closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 125,
+              "category": "missing error handling"
+            },
+            {
+              "message": "The recovery path tells `type-designer` to refresh `<layer>-catalogue-spec-signals.json`, but that agent's own contract restricts Bash to its internal pipeline commands and does not include `catalogue-spec-signals` (`.claude/agents/type-designer.md:472-474`). The requested remediation is therefore outside the subagent's allowed tool scope and may never execute.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 127,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a02f2bdcd43564e6b9f2edece05602fc155bb56e5ab49dbe083db6e44e9a4336",
+          "at": "2026-04-30T05:31:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
+          "at": "2026-04-30T05:36:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
+          "at": "2026-04-30T05:39:26Z"
+        }
+      ]
+    }
+  }
+}

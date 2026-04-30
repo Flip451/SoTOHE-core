@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "GitDiffGetter",
+      "description": "Infrastructure adapter implementing the DiffGetter usecase port via git CLI. Pre-existing adapter — not modified by this track. Referenced here to document that GitDiffGetter is the concrete implementation wired into ScopeQueryInteractor at the CLI composition root. The list_diff_files method computes the 4-source union (merge-base diff, staged, unstaged, untracked) and returns Vec<FilePath>. ScopeQueryInteractor depends on the DiffGetter trait (CN-06); GitDiffGetter is the only implementation in infrastructure. No new infrastructure types are added by this track: the wiring is a CLI composition concern (apps/cli which has tddd.enabled=false).",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "DiffGetter",
+          "expected_methods": [
+            {
+              "name": "list_diff_files",
+              "receiver": "&self",
+              "params": [
+                {
+                  "name": "base",
+                  "ty": "&CommitHash"
+                }
+              ],
+              "returns": "Result<Vec<FilePath>, DiffGetError>",
+              "is_async": false
+            }
+          ]
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-06",
+          "hash": "81705dd401f8d0f7f55309328d4191e502430e0a3466ccf3175b5950f2e99cc9"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-09",
+          "hash": "5e8672f8d3a5936c24b0af1f172e379ef9685357c83f024ed6b26c3e3a74a72e"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-12",
+          "hash": "7349d4c22b3f2231aeefa4aa9fd5c5a8122670c54360e0cd71c90bac0b88c501"
+        }
+      ]
+    }
+  ]
+}

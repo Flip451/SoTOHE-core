@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "73718ae1bc9c7295e60633276e93371f1806a259542f3d0e4fdc55e68b1fe287",
+  "signals": [
+    {
+      "type_name": "ScopeQueryService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeQueryInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeQueryError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeClassification",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PathClassification",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DiffGetter",
+      "signal": "blue"
+    }
+  ]
+}
