@@ -75,6 +75,346 @@
           "findings": [],
           "hash": "rvw1:sha256:bef487c7a652da9978ad37efc54d1a5c9649700ec70d8e9ee0d099dd89905655",
           "at": "2026-04-30T17:35:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ae0f67954c14f6decc82d7b9c0aca2d374f11ddcd62bdade93cac360da0d3c8",
+          "at": "2026-04-30T17:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`block-test-file-deletion` is wired through `ShellParserPortToDomainAdapter`, which reconstructs argv with `split_whitespace()` from the port's lossy `argv.join(\" \")` strings. For a guarded command such as `bash -c 'rm tests/foo.rs'`, the parsed shell payload becomes tokens like `bash`, `-c`, `rm`, `tests/foo.rs`; the existing handler then takes only `rm` as the `-c` inner command and sees no test-file argument, so it allows the deletion. This regresses the security-critical test deletion guard once CLI dispatch moves through this service.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook_dispatch.rs",
+              "line": 132,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae0f67954c14f6decc82d7b9c0aca2d374f11ddcd62bdade93cac360da0d3c8",
+          "at": "2026-04-30T17:47:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`block-direct-git-ops` is routed through the lossy `ShellParserPortToDomainAdapter`, which reconstructs `SimpleCommand` with `redirect_texts: Vec::new()` and `has_output_redirect: false`. When T010 wires CLI dispatch through this service, commands that the existing hook blocks via the full domain parser, such as `echo x > src/lib.rs` or other Bash output redirects, will be seen as plain argv and allowed, bypassing the file-write guard policy.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook_dispatch.rs",
+              "line": 227,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a90d8398f5ecb72b607d5588d01f83588aaa6867b9689a9af2b2aec93b088be5",
+          "at": "2026-04-30T17:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`HookDispatchInteractor::new` exposes `domain::guard::ShellParser` in the public usecase API instead of the T002 usecase-owned `ShellParserPort` described in the briefing. That means the CLI wiring for this service will still have to depend on the domain parser trait rather than staying behind the usecase boundary; add an internal adapter (or usecase-owned faithful parser port) and keep the constructor typed to the usecase port.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook_dispatch.rs",
+              "line": 175,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:542fce5f253504bc71832db1e0bab7248dd578cc85e55b6a64bc4138343a0589",
+          "at": "2026-04-30T17:56:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` now declares `pub mod hook_dispatch;`, but `libs/usecase/src/hook_dispatch.rs` is untracked and absent from the git diff. If this change is committed as-is, consumers will get a module-not-found compile failure for `hook_dispatch`. Add the new module file to version control with the `lib.rs` change.",
+              "severity": "P0",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 11,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:2fadbd40b23b692e2253e009b45e660315cbd0bceb33b5aea0c130e9ad562e37",
+          "at": "2026-04-30T18:01:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fadbd40b23b692e2253e009b45e660315cbd0bceb33b5aea0c130e9ad562e37",
+          "at": "2026-04-30T18:05:56Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12a only checks that `plan.md`, `contract-map.md`, and `<layer>-types.md` exist, so an old `cargo make track-sync-views` result can still satisfy the gate. That means skipping step 11 can leave stale rendered views on disk while the final post-condition still claims the outputs are “freshly regenerated”.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "The recovery path on `verify catalogue-spec-signals` failure is an unconditional `step 9 -> step 11 -> step 12b` retry with no attempt cap or escalation. If the coverage mismatch persists, the agent can loop indefinitely, which is the failure mode the briefing explicitly asked to avoid.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 169,
+              "category": "reliability"
+            }
+          ],
+          "hash": "rvw1:sha256:24aa9b49db2db459e916dbfcabdc240045a42dd974453535d24aa36ae93685a4",
+          "at": "2026-04-30T13:27:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now explicitly regenerates `plan.md`, but the new 12a glob check never verifies it. That leaves one of the `cargo make track-sync-views` outputs able to stay missing or stale without tripping the final gate, so the stated \"all outputs are freshly regenerated\" post-condition is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "The freshness gate only re-validates `catalogue-spec-signals`; it never checks the `type-signals` artifact from step 10. By inference, a skipped or stale `type-signals` run can still leave `<layer>-types.md` incomplete while 12a/12b both pass, so the new self-verify does not cover all pipeline outputs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d514692a6ad2ce88aff872a40dc5a9f50178c53fe1bf4d974faa7dee58b74840",
+          "at": "2026-04-30T13:31:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new mandatory 12b gate (`bin/sotp verify catalogue-spec-signals`) is not reflected in the Bash allowlist. The Scope Ownership/Bash usage section still lists only the `track ...` subcommands plus `track-sync-views`, so an agent following the whitelist literally can treat the freshness check as out of scope and skip it. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526) and [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 526,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Step 12a is internally inconsistent about how many paths it verifies. The block enumerates 9 paths total (7 per-layer paths plus `contract-map.md` and `plan.md`), but the closing sentence says “all 8 expected paths.” That mismatch makes the final self-check contract ambiguous and easy to misapply. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 181,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:eb689ce58f489c14c67f0126f3c5f467b87aa0d48439261ced3e05b8d24e8db3",
+          "at": "2026-04-30T13:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12 still only proves freshness for `catalogue-spec-signals.json`; the graph outputs, `plan.md`, `contract-map.md`, and `<layer>-type-signals.json` are only checked for existence. A stale artifact from an earlier run can still satisfy 12a/12b, so the new post-condition that all prior outputs are “freshly regenerated” is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:61d40f7066291e652c2e21106fc7c7622a167c6fec9f6d0dde2f9288467e0d48",
+          "at": "2026-04-30T13:36:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Step 12a still does not prove `<layer>-types.json` was freshly produced in this session. The only source-of-truth artefact in the existence check is globbed, so a stale catalogue file left over from a prior run will satisfy the guard even if step 7 was skipped. That leaves the exact skipped-step/stale-artifact failure mode this change is meant to block. Consider requiring a same-session write receipt for step 7, or a content/freshness check on `<layer>-types.json`, not just existence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 157,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9aeb2ba69044dfa151bc37694b937c96fbb72c990b969c37dcbc8011d0d393bf",
+          "at": "2026-04-30T13:39:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:41:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now requires `cargo make track-sync-views`, and the step explicitly says it renders `plan.md`, but Scope Ownership still lists `plan.md` under writes forbidden and Rules still say not to modify it. An agent following the lower section can either skip the new required sync step or treat its required `plan.md` update as a policy violation, leaving rendered views stale.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 534,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The Step 9 command is documented as `bin/sotp track catalogue-spec-signals <id>` without the supported `--layer <layer_id>` filter, even though this pipeline is per layer in scope. For a single-layer run, this command processes every catalogue-spec-enabled layer and can fail on unrelated missing/stale catalogues outside the assigned layer, blocking the scoped Phase 2 pass.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 127,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:44:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 9 is documented as `bin/sotp track catalogue-spec-signals <id>` with no `[--layer <layer_id>]`, unlike the surrounding per-layer pipeline commands. The CLI supports `--layer`; without documenting it, a type-design run scoped to a single layer will regenerate all catalogue-spec signal files and can fail on or modify out-of-scope layers. This breaks the layer scope contract and can block otherwise valid single-layer Phase 2 runs.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 127,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:45:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now requires `cargo make track-sync-views`, and the new self-check requires `track/items/<id>/plan.md` to exist, but the Scope Ownership/Rules section still forbids modifying `plan.md`. Since `track-sync-views` renders `plan.md`, the agent instructions are contradictory: a compliant agent can treat the required Step 11 write as forbidden and skip or fail the refreshed-view step the policy is trying to enforce. Clarify that `plan.md` must not be edited directly, but may be regenerated by the required `cargo make track-sync-views` command.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 534,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:7357e084d9164706d3abc6925100f10272e1b5eceee17fedad6b329261bf71f1",
+          "at": "2026-04-30T13:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12b is meant to verify freshness for the explicit track `<id>`, but the documented command has no track argument and relies on the current git branch to choose what to verify. The existing `verify catalogue-spec-signals` command skips successfully on non-`track/*` branches and would verify a different track if the checkout is on a different track branch, so this policy can let the agent emit a final message without checking the `<id>` it just processed. Require a precondition that the current branch resolves to the same `<id>` and treat a SKIP/mismatch as failure, or use a track-bound verification command.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3202d9fc93296b607ae303cc6e18b1f537b75d4d6c080f3f2d24ef96ad748047",
+          "at": "2026-04-30T13:50:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
+          "at": "2026-04-30T13:52:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
+          "at": "2026-04-30T13:53:49Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Collapsing every parsed command to `cmd.argv.join(\" \")` and then filtering out empty strings makes the new `ShellParserPort` path lose redirect-only commands and quoted-argument boundaries. In the usecase adapter, that means inputs like `> /tmp/file` can disappear before policy evaluation, so the guard can no longer block output-redirection writes reliably.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 47,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a2f7e5b2b410e7b865aaccfe4b7664baabad30594fa8db88002868646f43fd60",
+          "at": "2026-04-30T17:15:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `ShellParserPort` implementation at this file is not exercised by any test. The updated tests were switched to `ShellParser::split_shell(...)`, so they still only cover the domain-trait path and never verify the new `Vec<String>` serialization (`argv.join(\" \")`) or its error mapping. That leaves the only new behavior in this diff unguarded, so a regression in the infrastructure port would slip through.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 35,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:376118a71903dda79dc29728583555d7ed9a061d23e1ecea6d55d3a7f1e63efd",
+          "at": "2026-04-30T17:19:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: serializing each parsed command with `cmd.argv.join(\" \")` here is not lossless. Any argument that contains whitespace gets split back into separate argv entries by the usecase adapter, so shell-reentry inputs like `bash -c 'git push origin main'` are reconstructed as `bash -c git push origin main`. That breaks the `-c` payload boundary and can let blocked commands slip past policy checks.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 53,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f8415da470b0239045f5c79775dd0452110208a680f872c10f5552b8314289d3",
+          "at": "2026-04-30T17:22:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Serializing redirect-only commands as `\"\"` creates a guard bypass in the new CLI path: `ShellParserPortAdapter` will re-parse that entry as `argv: []` with `has_output_redirect = false`, so `domain::guard::policy::check_simple_command` never hits its output-redirect block. A command like `> /tmp/file` will be treated as allowed instead of blocked if this port is used for enforcement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 58,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7275ea5cfb1ec00e9e539605419d8061d32b9c0d1f12a7ba7893174c2badf4eb",
+          "at": "2026-04-30T17:25:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
+          "at": "2026-04-30T17:28:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
+          "at": "2026-04-30T17:30:46Z"
         }
       ]
     },
@@ -692,272 +1032,225 @@
           "findings": [],
           "hash": "rvw1:sha256:4cff8a0cddf32a6522023d8283fc50dcddde2b067be8806744a56f4fac955409",
           "at": "2026-04-30T17:36:36Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Collapsing every parsed command to `cmd.argv.join(\" \")` and then filtering out empty strings makes the new `ShellParserPort` path lose redirect-only commands and quoted-argument boundaries. In the usecase adapter, that means inputs like `> /tmp/file` can disappear before policy evaluation, so the guard can no longer block output-redirection writes reliably.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 47,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:a2f7e5b2b410e7b865aaccfe4b7664baabad30594fa8db88002868646f43fd60",
-          "at": "2026-04-30T17:15:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `ShellParserPort` implementation at this file is not exercised by any test. The updated tests were switched to `ShellParser::split_shell(...)`, so they still only cover the domain-trait path and never verify the new `Vec<String>` serialization (`argv.join(\" \")`) or its error mapping. That leaves the only new behavior in this diff unguarded, so a regression in the infrastructure port would slip through.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 35,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:376118a71903dda79dc29728583555d7ed9a061d23e1ecea6d55d3a7f1e63efd",
-          "at": "2026-04-30T17:19:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P0: serializing each parsed command with `cmd.argv.join(\" \")` here is not lossless. Any argument that contains whitespace gets split back into separate argv entries by the usecase adapter, so shell-reentry inputs like `bash -c 'git push origin main'` are reconstructed as `bash -c git push origin main`. That breaks the `-c` payload boundary and can let blocked commands slip past policy checks.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 53,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:f8415da470b0239045f5c79775dd0452110208a680f872c10f5552b8314289d3",
-          "at": "2026-04-30T17:22:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Serializing redirect-only commands as `\"\"` creates a guard bypass in the new CLI path: `ShellParserPortAdapter` will re-parse that entry as `argv: []` with `has_output_redirect = false`, so `domain::guard::policy::check_simple_command` never hits its output-redirect block. A command like `> /tmp/file` will be treated as allowed instead of blocked if this port is used for enforcement.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 58,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:7275ea5cfb1ec00e9e539605419d8061d32b9c0d1f12a7ba7893174c2badf4eb",
-          "at": "2026-04-30T17:25:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
-          "at": "2026-04-30T17:28:42Z"
+          "hash": "rvw1:sha256:7be474363f80db6d908fe965434a124399f72365e03e0dcc5c393f2180056c2c",
+          "at": "2026-04-30T17:45:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
-          "at": "2026-04-30T17:30:46Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+          "hash": "rvw1:sha256:7be474363f80db6d908fe965434a124399f72365e03e0dcc5c393f2180056c2c",
+          "at": "2026-04-30T17:47:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1325cd6666a6926e999122f315402a7f5eeecaec6103954e1f2e9aa59bb06d39",
+          "at": "2026-04-30T18:07:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1325cd6666a6926e999122f315402a7f5eeecaec6103954e1f2e9aa59bb06d39",
+          "at": "2026-04-30T18:08:48Z"
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 12a only checks that `plan.md`, `contract-map.md`, and `<layer>-types.md` exist, so an old `cargo make track-sync-views` result can still satisfy the gate. That means skipping step 11 can leave stale rendered views on disk while the final post-condition still claims the outputs are “freshly regenerated”.",
+              "message": "`plan.md` still says S1 groups guard and hook because they \"share the ShellParser secondary port\", but the new `HookShellParserPort` entry makes the hook path depend on a distinct port. That leaves the section description and T003 scope out of sync with the catalogue, so the plan no longer describes the architecture it is meant to implement.",
               "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 145,
-              "category": "correctness"
+              "file": "track/items/cli-via-usecase-only-2026-04-30/plan.md",
+              "line": 83,
+              "category": "contradiction"
             },
             {
-              "message": "The recovery path on `verify catalogue-spec-signals` failure is an unconditional `step 9 -> step 11 -> step 12b` retry with no attempt cap or escalation. If the coverage mismatch persists, the agent can loop indefinitely, which is the failure mode the briefing explicitly asked to avoid.",
+              "message": "`usecase-types.json` says `ConchShellParser` implements `HookShellParserPort`, but the rendered contract map only shows `ConchShellParser -> ShellParserPort` and has no edge for the new port. The catalogue and contract map therefore disagree about the adapter ownership of `HookShellParserPort`.",
               "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 169,
-              "category": "reliability"
+              "file": "track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
+              "line": 96,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:24aa9b49db2db459e916dbfcabdc240045a42dd974453535d24aa36ae93685a4",
-          "at": "2026-04-30T13:27:51Z"
+          "hash": "rvw1:sha256:e9db1eb8c3cf5695e3bb2431af2bcf9377352406a54bd3cf3dbffd9db4f82f9e",
+          "at": "2026-04-30T18:14:26Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 11 now explicitly regenerates `plan.md`, but the new 12a glob check never verifies it. That leaves one of the `cargo make track-sync-views` outputs able to stay missing or stale without tripping the final gate, so the stated \"all outputs are freshly regenerated\" post-condition is not actually enforced.",
+              "message": "HookShellParserPort is described as being used by hook dispatch, but the same entry then says \"CallerPort callers (GuardCheckInteractor) receive the full struct.\" GuardCheckInteractor belongs to the guard path, so this misstates the consumer and mixes the two responsibilities.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 145,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 2533,
+              "category": "factual error"
             },
             {
-              "message": "The freshness gate only re-validates `catalogue-spec-signals`; it never checks the `type-signals` artifact from step 10. By inference, a skipped or stale `type-signals` run can still leave `<layer>-types.md` incomplete while 12a/12b both pass, so the new self-verify does not cover all pipeline outputs.",
+              "message": "ConchShellParser's prose says this track adds only the ShellParserPort impl, but the machine-readable `implements` list also adds HookShellParserPort. The narrative underreports the actual adapter change and is out of sync with the contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 166,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d514692a6ad2ce88aff872a40dc5a9f50178c53fe1bf4d974faa7dee58b74840",
-          "at": "2026-04-30T13:31:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new mandatory 12b gate (`bin/sotp verify catalogue-spec-signals`) is not reflected in the Bash allowlist. The Scope Ownership/Bash usage section still lists only the `track ...` subcommands plus `track-sync-views`, so an agent following the whitelist literally can treat the freshness check as out of scope and skip it. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526) and [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 526,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 70,
+              "category": "contradiction"
             },
             {
-              "message": "P1: Step 12a is internally inconsistent about how many paths it verifies. The block enumerates 9 paths total (7 per-layer paths plus `contract-map.md` and `plan.md`), but the closing sentence says “all 8 expected paths.” That mismatch makes the final self-check contract ambiguous and easy to misapply. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181).",
+              "message": "HookShellParserPort is the only new catalogue entry that still carries `informal_grounds`, which contradicts the plan-artifacts rule that this round's catalogue should not retain informal grounds after the ADR handoff.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 181,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 2567,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:eb689ce58f489c14c67f0126f3c5f467b87aa0d48439261ced3e05b8d24e8db3",
-          "at": "2026-04-30T13:34:23Z"
+          "hash": "rvw1:sha256:0895fcae39a1d99f8e412b0ce6c0b6af24c1b280fb9b53df83004c89437f2270",
+          "at": "2026-04-30T18:18:43Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 12 still only proves freshness for `catalogue-spec-signals.json`; the graph outputs, `plan.md`, `contract-map.md`, and `<layer>-type-signals.json` are only checked for existence. A stale artifact from an earlier run can still satisfy 12a/12b, so the new post-condition that all prior outputs are “freshly regenerated” is not actually enforced.",
+              "message": "`HookShellParserPort` is introduced as a usecase public port, but its description and signature explicitly expose `domain::guard::SimpleCommand` and `domain::guard::ParseError`. That conflicts with `CN-01` / `IN-03`, which require the usecase public API to avoid direct domain-type exposure, so this port reintroduces the boundary leak the track is trying to remove.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 145,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 2533,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:61d40f7066291e652c2e21106fc7c7622a167c6fec9f6d0dde2f9288467e0d48",
-          "at": "2026-04-30T13:36:54Z"
+          "hash": "rvw1:sha256:0ea9cb4832e64bab0fe8ff5a9eacc41195a979760293d1445482a5f2ce98a6cb",
+          "at": "2026-04-30T18:21:02Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: Step 12a still does not prove `<layer>-types.json` was freshly produced in this session. The only source-of-truth artefact in the existence check is globbed, so a stale catalogue file left over from a prior run will satisfy the guard even if step 7 was skipped. That leaves the exact skipped-step/stale-artifact failure mode this change is meant to block. Consider requiring a same-session write receipt for step 7, or a content/freshness check on `<layer>-types.json`, not just existence.",
+              "message": "T003 is still scoped as a usecase-only hook-dispatch task, but the updated plan summary and the infrastructure catalogue now assign `HookShellParserPort` plus the `ConchShellParser` wiring to the same work. A literal implementation of T003 would leave that new port/adapter change unowned, so the task is not self-contained.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 157,
-              "category": "correctness"
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "line": 17,
+              "category": "infeasibility"
+            },
+            {
+              "message": "D1 still states that the usecase public API should not expose domain types and should use DTO/Command/Query/Result types instead, but this new subsection makes `HookShellParserPort` a public usecase port whose signature directly exposes `domain::guard::SimpleCommand` and `ParseError`. The exception is named, but the ADR never reconciles it with the original D1 rule, so the decision text now conflicts with itself.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+              "line": 73,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:9aeb2ba69044dfa151bc37694b937c96fbb72c990b969c37dcbc8011d0d393bf",
-          "at": "2026-04-30T13:39:15Z"
+          "hash": "rvw1:sha256:da28f66d5853cce0daac39f870fb70cfc16eb9971c7adfda872e41def3e746e4",
+          "at": "2026-04-30T18:24:13Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
-          "at": "2026-04-30T13:41:53Z"
+          "hash": "rvw1:sha256:224befb046b507f950e478c16761a81ce1672a492b2ddc3fb7e1591edb45cc1a",
+          "at": "2026-04-30T18:26:50Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 11 now requires `cargo make track-sync-views`, and the step explicitly says it renders `plan.md`, but Scope Ownership still lists `plan.md` under writes forbidden and Rules still say not to modify it. An agent following the lower section can either skip the new required sync step or treat its required `plan.md` update as a policy violation, leaving rendered views stale.",
+              "message": "HookShellParserPort is added as a usecase public secondary port, but its signature returns domain guard types (`Result<Vec<SimpleCommand>, ParseError>`) and the description explicitly says those are `domain::guard::SimpleCommand` and `domain::guard::ParseError`. This contradicts the same entry's CN-01/IN-03 coverage and ADR D1's Direction X boundary, which require usecase public APIs consumed from CLI to expose usecase-owned DTO/Command/Query/Result types rather than domain types. As written, T003 blesses a domain-type leak through the usecase API instead of satisfying the strict CLI-via-usecase boundary.",
               "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 534,
-              "category": "architecture violation"
-            },
-            {
-              "message": "The Step 9 command is documented as `bin/sotp track catalogue-spec-signals <id>` without the supported `--layer <layer_id>` filter, even though this pipeline is per layer in scope. For a single-layer run, this command processes every catalogue-spec-enabled layer and can fail on unrelated missing/stale catalogues outside the assigned layer, blocking the scoped Phase 2 pass.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 127,
-              "category": "architecture violation"
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 2533,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
-          "at": "2026-04-30T13:44:29Z"
+          "hash": "rvw1:sha256:224befb046b507f950e478c16761a81ce1672a492b2ddc3fb7e1591edb45cc1a",
+          "at": "2026-04-30T18:29:59Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 9 is documented as `bin/sotp track catalogue-spec-signals <id>` with no `[--layer <layer_id>]`, unlike the surrounding per-layer pipeline commands. The CLI supports `--layer`; without documenting it, a type-design run scoped to a single layer will regenerate all catalogue-spec signal files and can fail on or modify out-of-scope layers. This breaks the layer scope contract and can block otherwise valid single-layer Phase 2 runs.",
+              "message": "`HookShellParserPort` is added as a public usecase secondary port whose signature returns `Result<Vec<SimpleCommand>, ParseError>` and the description explicitly says those are `domain::guard` types. That contradicts the same plan's CN-01/D1 direction that usecase public API must not expose domain types, and T009 only removes `pub use domain::` re-exports, so this signature exposure would remain. Implementers are left with conflicting architecture requirements for whether this port is allowed.",
               "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 127,
-              "category": "scope"
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 2533,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
-          "at": "2026-04-30T13:45:51Z"
+          "hash": "rvw1:sha256:6b3850dd40a7545c4485509592a6f780f3a9684e51656c97923e8851205be097",
+          "at": "2026-04-30T18:33:32Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 11 now requires `cargo make track-sync-views`, and the new self-check requires `track/items/<id>/plan.md` to exist, but the Scope Ownership/Rules section still forbids modifying `plan.md`. Since `track-sync-views` renders `plan.md`, the agent instructions are contradictory: a compliant agent can treat the required Step 11 write as forbidden and skip or fail the refreshed-view step the policy is trying to enforce. Clarify that `plan.md` must not be edited directly, but may be regenerated by the required `cargo make track-sync-views` command.",
+              "message": "`ConchShellParser` is now described as adding both `ShellParserPort` and `HookShellParserPort` implementations “scoped by IN-06”, but IN-06 only scopes the existing `ShellParserPort`/`SchemaExporterPort` adapter implementations and its task coverage is T002/T004. The new T003 hook parser adapter work is therefore being justified by a spec item that does not actually cover it, leaving the plan/spec trace for this infrastructure change inconsistent.",
               "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 534,
-              "category": "architecture"
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 70,
+              "category": "broken_reference"
             }
           ],
-          "hash": "rvw1:sha256:7357e084d9164706d3abc6925100f10272e1b5eceee17fedad6b329261bf71f1",
-          "at": "2026-04-30T13:47:52Z"
+          "hash": "rvw1:sha256:6b3850dd40a7545c4485509592a6f780f3a9684e51656c97923e8851205be097",
+          "at": "2026-04-30T18:36:47Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 12b is meant to verify freshness for the explicit track `<id>`, but the documented command has no track argument and relies on the current git branch to choose what to verify. The existing `verify catalogue-spec-signals` command skips successfully on non-`track/*` branches and would verify a different track if the checkout is on a different track branch, so this policy can let the agent emit a final message without checking the `<id>` it just processed. Require a precondition that the current branch resolves to the same `<id>` and treat a SKIP/mismatch as failure, or use a track-bound verification command.",
+              "message": "`ConchShellParser` says both the `ShellParserPort` and `HookShellParserPort` impls are “scoped by IN-06”, but `spec.json` defines IN-06 only for `ShellParserPort`/`SchemaExporterPort` and adds IN-07 specifically for the `HookShellParserPort` impl. This leaves the catalogue entry with conflicting scope attribution for the hook parser work; the hook impl should be attributed to IN-07, not IN-06.",
               "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 178,
-              "category": "correctness"
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 70,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:3202d9fc93296b607ae303cc6e18b1f537b75d4d6c080f3f2d24ef96ad748047",
-          "at": "2026-04-30T13:50:04Z"
+          "hash": "rvw1:sha256:7abfd63fbeeca5372f5ad148bca523b3a19f5c0f63286343e06f7f0bdb510d6f",
+          "at": "2026-04-30T18:40:27Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
-          "at": "2026-04-30T13:52:49Z"
+          "hash": "rvw1:sha256:49d30d1bc98d130872330b28ba4d556e9982ab7ff1f6a7d4bec3b87352b935cf",
+          "at": "2026-04-30T18:43:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`HookShellParserPort` is documented as the CN-01 exception for the hook-dispatch path, but its `spec_refs` only point to `IN-03` and `IN-04`. That leaves the new exception port without a direct anchor to the constraint/rationale that justifies exposing `SimpleCommand` and `ParseError`, so the catalogue trace for this special-case type is incomplete.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 2532,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:280a1d2517f0e3f35fbc2184e64e1a43099ebde6164cba1e6374896a811a0faf",
+          "at": "2026-04-30T18:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a13b03ddacdc2b9db81ac68ed23b079255e96e850c7163fe82b8cfb28b45def7",
+          "at": "2026-04-30T18:52:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
-          "at": "2026-04-30T13:53:49Z"
+          "hash": "rvw1:sha256:a13b03ddacdc2b9db81ac68ed23b079255e96e850c7163fe82b8cfb28b45def7",
+          "at": "2026-04-30T18:56:26Z"
         }
       ]
     }

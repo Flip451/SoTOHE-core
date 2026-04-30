@@ -8,6 +8,7 @@ pub mod contract_map_workflow;
 pub mod git_workflow;
 pub mod guard;
 pub mod hook;
+pub mod hook_dispatch;
 pub mod merge_gate;
 pub mod pr_review;
 pub mod pr_workflow;

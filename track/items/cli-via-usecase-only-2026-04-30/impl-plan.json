@@ -9,12 +9,13 @@
     {
       "id": "T002",
       "description": "Add guard boundary types and service to usecase layer: GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, ShellParserPort; also add ShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn ShellParserPort>",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "94ec2339cc32504b0eb92615706480f454ec02c3"
     },
     {
       "id": "T003",
-      "description": "Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor",
-      "status": "todo"
+      "description": "Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, HookShellParserPort; also add HookShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn HookShellParserPort> into HookDispatchInteractor",
+      "status": "done"
     },
     {
       "id": "T004",
@@ -79,9 +80,9 @@
         "id": "S1",
         "title": "Usecase Boundary — Guard and Hook",
         "description": [
-          "Introduce the usecase-owned boundary types and application service traits covering the guard shell-command check and hook dispatch concerns. These two concerns share the ShellParser secondary port and are logically related (both are enforcement-time checks), so they are grouped in one section.",
-          "T002 covers GuardDecision, GuardCheckOutput, GuardCheckService, and GuardCheckInteractor.",
-          "T003 covers HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchService, and HookDispatchInteractor."
+          "Introduce the usecase-owned boundary types and application service traits covering the guard shell-command check and hook dispatch concerns. Both concerns are enforcement-time checks and are grouped in one section, but they use distinct secondary ports: T002 adds ShellParserPort (lossy Vec<String>, used by GuardCheckInteractor) and T003 adds HookShellParserPort (full-fidelity SimpleCommand, used by HookDispatchInteractor) so that hook guard policy can enforce block-direct-git-ops without security regression.",
+          "T002 covers GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, and ShellParserPort.",
+          "T003 covers HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, and HookShellParserPort."
         ],
         "task_ids": [
           "T002",

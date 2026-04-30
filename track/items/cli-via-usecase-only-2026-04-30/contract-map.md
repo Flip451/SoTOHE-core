@@ -86,12 +86,14 @@ flowchart LR
         L7_usecase_CommitHashPersistenceService[/CommitHashPersistenceService\]
         L7_usecase_CommitHashPersistenceError>CommitHashPersistenceError]
         L7_usecase_CommitHashPersistenceInteractor[\CommitHashPersistenceInteractor/]
+        L7_usecase_HookShellParserPort[[HookShellParserPort]]
     end
     subgraph infrastructure [infrastructure]
         L14_infrastructure_FsTrackStore[FsTrackStore]:::secondary_adapter
         L14_infrastructure_RustdocSchemaExporter[RustdocSchemaExporter]:::secondary_adapter
         L14_infrastructure_ConchShellParser[ConchShellParser]:::secondary_adapter
     end
+    L14_infrastructure_ConchShellParser -.impl.-> L7_usecase_HookShellParserPort
     L14_infrastructure_ConchShellParser -.impl.-> L7_usecase_ShellParserPort
     L14_infrastructure_RustdocSchemaExporter -.impl.-> L7_usecase_SchemaExporterPort
     L7_usecase_CommitHashPersistenceInteractor -.impl.-> L7_usecase_CommitHashPersistenceService

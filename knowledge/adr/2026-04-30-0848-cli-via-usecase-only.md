@@ -36,7 +36,7 @@ decisions:
 
 `architecture-rules.json` の `apps/cli` レイヤーの `may_depend_on` を `["usecase", "infrastructure"]` に変更する。cli crate の `Cargo.toml` からも `domain = { path = "../../libs/domain" }` を削除する。
 
-cli が必要とするデータ・操作はすべて usecase 層を経由してアクセスする。usecase は domain 型をそのまま外部に再公開せず（`pub use domain::...` を介した re-export を禁ずる）、cli が消費する形に整えた DTO / Command / Query / Result 型を usecase 自身が定義してそれを公開する。usecase の内部実装では domain 型を扱ってよいが、その型は usecase の public API には出てこない。
+cli が必要とするデータ・操作はすべて usecase 層を経由してアクセスする。usecase は domain 型をそのまま外部に再公開せず（`pub use domain::...` を介した re-export を禁ずる）、cli が消費する形に整えた DTO / Command / Query / Result 型を usecase 自身が定義してそれを公開する。usecase の内部実装では domain 型を扱ってよいが、その型は usecase の public API には出てこない。ただし、セキュリティ上の必要性（guard ロジックの安全な委譲など）から domain 型を usecase の secondary port signature に限定的に含める場合は、以下のサブセクションに記録する。
 
 これにより cli は domain 型の存在を知らずに動き、boundary の型は usecase が単独責任で持つ。将来 cli 以外の delivery adapter（例: web server / gRPC）が増えた場合も同じ usecase API を経由できる前提が整う。
 
@@ -67,6 +67,10 @@ cli から usecase へのコマンドは string プリミティブを渡す。`d
 **commit-hash 永続化の境界（OQ-5）**
 
 `domain::CommitHash` と `domain::review_v2::CommitHashWriter` のアクセスは usecase 内 service (`CommitHashPersistenceService`) に収める。cli は記録済み SHA を string として受け取り、確認メッセージの表示のみを担う。
+
+**セキュリティ優先の port 設計（hook dispatch の CN-01 例外）**
+
+`HookShellParserPort`（hook dispatch 用 secondary port）は、`domain::guard::SimpleCommand` と `domain::guard::ParseError` をその signature に直接含む。これは CN-01 の「usecase public API に domain 型を出さない」原則の例外であり、セキュリティ要件による意図的な設計である：`block-direct-git-ops` / `block-test-file-deletion` の guard ロジックは `redirect_texts` および `has_output_redirect` フィールドを必要とし、`ShellParserPort`（lossy `Vec<String>`）ではこれらのフィールドを伝達できない。cli は `Arc<dyn HookShellParserPort>` だけを参照し、`domain::guard::SimpleCommand` 自体をコマンド層で構築・解釈することはない（cli は opaque な container として受け渡すのみ）。型の re-export も行わないため、cli の public surface への domain 型の漏洩は最小限に抑えられる。
 
 **DTO の usecase 層への配置（一般原則）**
 

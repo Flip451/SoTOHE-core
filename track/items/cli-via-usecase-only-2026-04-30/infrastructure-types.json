@@ -67,7 +67,7 @@
     },
     {
       "name": "ConchShellParser",
-      "description": "Infrastructure adapter implementing domain::guard::ShellParser and usecase::ShellParserPort. This track adds the ShellParserPort impl to ConchShellParser (action: modify, scoped by IN-06), which is an in-scope infrastructure change required so the CLI composition root can wire it as Arc<dyn usecase::ShellParserPort> into GuardCheckInteractor without importing domain::guard::ShellParser. The existing domain::guard::ShellParser impl is unchanged (OS-05 applies to that impl); only the new ShellParserPort impl is added. Composition-root DI wiring is permitted under CN-04.",
+      "description": "Infrastructure adapter implementing domain::guard::ShellParser, usecase::ShellParserPort, and usecase::HookShellParserPort. This track adds the ShellParserPort impl to ConchShellParser (scoped by IN-06) and the HookShellParserPort impl (scoped by IN-07). Both are in-scope infrastructure changes required so the CLI composition root can wire it as Arc<dyn usecase::ShellParserPort> into GuardCheckInteractor and as Arc<dyn usecase::HookShellParserPort> into HookDispatchInteractor without importing domain::guard::ShellParser directly. The existing domain::guard::ShellParser impl is unchanged (OS-05 applies to that impl); only the new port impls are added. Composition-root DI wiring is permitted under CN-04.",
       "approved": true,
       "action": "modify",
       "kind": "secondary_adapter",
@@ -77,6 +77,9 @@
         },
         {
           "trait_name": "ShellParserPort"
+        },
+        {
+          "trait_name": "HookShellParserPort"
         }
       ],
       "expected_members": [],
@@ -86,6 +89,11 @@
           "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
           "anchor": "IN-06",
           "hash": "5f6e4f21c13496a2e4e390883ddb33fe88a43776e773a5002db393e180dca9e3"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-07",
+          "hash": "4c298ae0f82322ca3a99efa7dd37725c9eb5263fdec5e34d2725a05edb2268a5"
         },
         {
           "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",

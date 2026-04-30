@@ -6,7 +6,7 @@
 |------|------|--------|---------|--------|----------|
 | GuardDecision | enum | — | Allow, Block | 🔵 | 🔵 |
 | ReviewApprovalDecision | enum | — | Approved, ApprovedWithBypass, Blocked | 🟡 | 🔵 |
-| HookVerdictDecision | enum | — | Allow, Block | 🟡 | 🔵 |
+| HookVerdictDecision | enum | — | Allow, Block | 🔵 | 🔵 |
 | ReviewRoundType | enum | — | Fast, Final | 🟡 | 🔵 |
 
 ## Error Types
@@ -15,7 +15,7 @@
 |------|------|--------|---------|--------|----------|
 | ExportSchemaError | error_type | — | ExportFailed, SerializationFailed | 🟡 | 🔵 |
 | ReviewCheckApprovedError | error_type | — | InvalidTrackId, ReviewStoreError, EvaluationFailed | 🟡 | 🔵 |
-| HookDispatchError | error_type | — | UnknownHookName, HandlerFailed | 🟡 | 🔵 |
+| HookDispatchError | error_type | — | UnknownHookName, HandlerFailed | 🔵 | 🔵 |
 | TrackPhaseError | error_type | — | InvalidTrackId, TrackNotFound, ImplPlanLoadFailed | 🟡 | 🔵 |
 | VerifyCatalogueConsistencyError | error_type | — | InvalidTrackId, CatalogueLoadFailed, SchemaExportFailed, BaselineLoadFailed | 🟡 | 🔵 |
 | VerifySpecSignalsError | error_type | — | InvalidTrackId, CatalogueLoadFailed, SignalEvaluationFailed | 🟡 | 🔵 |
@@ -32,6 +32,7 @@
 |------|------|--------|---------|--------|----------|
 | ShellParserPort | secondary_port | — | fn split_shell(&self, input: &str) -> Result<Vec<String>, String> | 🔵 | 🔵 |
 | SchemaExporterPort | secondary_port | — | fn export_as_json(&self, crate_name: &str) -> Result<String, String> | 🟡 | 🔵 |
+| HookShellParserPort | secondary_port | — | fn split_shell(&self, input: &str) -> Result<Vec<SimpleCommand>, ParseError> | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -40,7 +41,7 @@
 | GuardCheckService | application_service | — | fn check(&self, command: String) -> GuardCheckOutput | 🔵 | 🔵 |
 | ExportSchemaService | application_service | — | fn export(&self, command: ExportSchemaCommand) -> Result<String, ExportSchemaError> | 🟡 | 🔵 |
 | ReviewCheckApprovedService | application_service | — | fn check_approved(&self, track_id: String, items_dir: PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError> | 🟡 | 🔵 |
-| HookDispatchService | application_service | — | fn dispatch(&self, hook_name: String, command: HookDispatchCommand) -> Result<HookVerdictOutput, HookDispatchError> | 🟡 | 🔵 |
+| HookDispatchService | application_service | — | fn dispatch(&self, hook_name: String, command: HookDispatchCommand) -> Result<HookVerdictOutput, HookDispatchError> | 🔵 | 🔵 |
 | TrackPhaseService | application_service | — | fn resolve(&self, track_id: String, items_dir: PathBuf) -> Result<TrackPhaseOutput, TrackPhaseError> | 🟡 | 🔵 |
 | VerifyCatalogueConsistencyService | application_service | — | fn verify(&self, track_id: String, items_dir: PathBuf, workspace_root: PathBuf) -> Result<VerifyCatalogueConsistencyOutput, VerifyCatalogueConsistencyError> | 🟡 | 🔵 |
 | VerifyCatalogueSpecSignalsService | application_service | — | fn verify(&self, track_id: String, items_dir: PathBuf, skip_stale: bool) -> Result<VerifySpecSignalsOutput, VerifySpecSignalsError> | 🟡 | 🔵 |
@@ -61,7 +62,7 @@
 | GuardCheckInteractor | interactor | — | — | 🔵 | 🔵 |
 | ExportSchemaInteractor | interactor | — | — | 🟡 | 🔵 |
 | ReviewCheckApprovedInteractor | interactor | — | — | 🟡 | 🔵 |
-| HookDispatchInteractor | interactor | — | — | 🟡 | 🔵 |
+| HookDispatchInteractor | interactor | — | — | 🔵 | 🔵 |
 | TrackPhaseInteractor | interactor | — | — | 🟡 | 🔵 |
 | VerifyCatalogueConsistencyInteractor | interactor | — | — | 🟡 | 🔵 |
 | VerifyCatalogueSpecSignalsInteractor | interactor | — | — | 🟡 | 🔵 |
@@ -83,7 +84,7 @@
 | GuardCheckOutput | dto | — | — | 🔵 | 🔵 |
 | TaskOperationOutput | dto | — | — | 🟡 | 🔵 |
 | ReviewApprovalOutput | dto | — | — | 🟡 | 🔵 |
-| HookVerdictOutput | dto | — | — | 🟡 | 🔵 |
+| HookVerdictOutput | dto | — | — | 🔵 | 🔵 |
 | TrackPhaseOutput | dto | — | — | 🟡 | 🔵 |
 | VerifyCatalogueConsistencyOutput | dto | — | — | 🟡 | 🔵 |
 | VerifySpecSignalsOutput | dto | — | — | 🟡 | 🔵 |
@@ -101,7 +102,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ExportSchemaCommand | command | — | — | 🟡 | 🔵 |
-| HookDispatchCommand | command | — | — | 🟡 | 🔵 |
+| HookDispatchCommand | command | — | — | 🔵 | 🔵 |
 | TaskTransitionCommand | command | — | — | 🟡 | 🔵 |
 | AddTaskCommand | command | — | — | 🟡 | 🔵 |
 | SetOverrideCommand | command | — | — | 🟡 | 🔵 |

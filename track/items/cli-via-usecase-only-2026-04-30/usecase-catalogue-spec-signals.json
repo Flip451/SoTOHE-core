@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4d9a6a7ae5865c5a234bc31bb480ad3308be5b150919ae93753e756ef2b40a63",
+  "catalogue_declaration_hash": "cdbfdc32b079b3543a0f0689dc9c67ffd93f86f3d59d106b6a444e8299c5efe9",
   "signals": [
     {
       "type_name": "TrackStatusOutput",
@@ -292,6 +292,10 @@
     },
     {
       "type_name": "CommitHashPersistenceInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "HookShellParserPort",
       "signal": "blue"
     }
   ]

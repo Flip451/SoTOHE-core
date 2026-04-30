@@ -1,16 +1,16 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # CLI→domain 直接参照禁止と usecase 経由への一本化
 
-## Tasks (1/14 resolved)
+## Tasks (2/14 resolved)
 
 ### S1 — Usecase Boundary — Guard and Hook
 
-> Introduce the usecase-owned boundary types and application service traits covering the guard shell-command check and hook dispatch concerns. These two concerns share the ShellParser secondary port and are logically related (both are enforcement-time checks), so they are grouped in one section.
-> T002 covers GuardDecision, GuardCheckOutput, GuardCheckService, and GuardCheckInteractor.
-> T003 covers HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchService, and HookDispatchInteractor.
+> Introduce the usecase-owned boundary types and application service traits covering the guard shell-command check and hook dispatch concerns. Both concerns are enforcement-time checks and are grouped in one section, but they use distinct secondary ports: T002 adds ShellParserPort (lossy Vec<String>, used by GuardCheckInteractor) and T003 adds HookShellParserPort (full-fidelity SimpleCommand, used by HookDispatchInteractor) so that hook guard policy can enforce block-direct-git-ops without security regression.
+> T002 covers GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, and ShellParserPort.
+> T003 covers HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, and HookShellParserPort.
 
-- [x] **T002**: Add guard boundary types and service to usecase layer: GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, ShellParserPort; also add ShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn ShellParserPort>
-- [ ] **T003**: Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor
+- [x] **T002**: Add guard boundary types and service to usecase layer: GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, ShellParserPort; also add ShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn ShellParserPort> (`94ec2339cc32504b0eb92615706480f454ec02c3`)
+- [x] **T003**: Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, HookShellParserPort; also add HookShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn HookShellParserPort> into HookDispatchInteractor
 
 ### S2 — Usecase Boundary — Domain Schema Export
 

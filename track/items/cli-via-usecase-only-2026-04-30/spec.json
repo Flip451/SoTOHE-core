@@ -99,6 +99,16 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-07",
+        "text": "IN-04 の CN-01 例外 port である HookShellParserPort の実装を ConchShellParser に追加する。これにより CLI composition root が Arc<dyn HookShellParserPort> を HookDispatchInteractor に注入できる。domain 層の実装は変更しない (OS-05 を遵守)。当該変更は T003 で実施する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [

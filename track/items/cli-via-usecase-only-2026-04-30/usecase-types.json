@@ -2527,6 +2527,43 @@
           "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
         }
       ]
+    },
+    {
+      "name": "HookShellParserPort",
+      "description": "Usecase-owned secondary port (driven port) trait for full-fidelity shell command parsing used by hook dispatch. Returns Result<Vec<SimpleCommand>, ParseError> — preserving redirect_texts and has_output_redirect fields from domain::guard::SimpleCommand — so that hook guard policy can enforce block-direct-git-ops and block-test-file-deletion without security regression. Unlike ShellParserPort (lossy Vec<String>), this port exposes domain::guard::SimpleCommand and domain::guard::ParseError in its signature; HookDispatchInteractor receives the full struct rather than raw strings. The infrastructure adapter ConchShellParser implements this port. CLI composition root injects ConchShellParser as Arc<dyn HookShellParserPort> into the hook dispatch interactor, so cli/hook_dispatch.rs never needs to import domain::guard::ShellParser directly. NOTE: this port is an intentional exception to CN-01 (no domain types in usecase public API) for security reasons — the full SimpleCommand struct is required to enforce redirect-based guard rules; the exception is recorded in ADR D1 subsection 'Security-first port design (hook dispatch CN-01 exception)'.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "split_shell",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Vec<SimpleCommand>, ParseError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "55a22beb3619e2294da4a3bdf31cc167674b3bfc8ade5d3c3ce2018174ecee61"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "5311087b35e69944df24bcd283086c1b6cffb58f63480e0e1f6c2d3cde967f4e"
+        }
+      ]
     }
   ]
 }

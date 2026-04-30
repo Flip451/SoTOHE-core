@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-30T17:36:53Z",
-  "declaration_hash": "4d9a6a7ae5865c5a234bc31bb480ad3308be5b150919ae93753e756ef2b40a63",
+  "generated_at": "2026-04-30T18:56:50Z",
+  "declaration_hash": "cdbfdc32b079b3543a0f0689dc9c67ffd93f86f3d59d106b6a444e8299c5efe9",
   "signals": [
     {
       "type_name": "TrackStatusOutput",
@@ -125,38 +125,62 @@
     {
       "type_name": "HookDispatchCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "tool_name: String",
+        "command: Option<String>",
+        "file_path: Option<PathBuf>",
+        "content: Option<String>"
+      ]
     },
     {
       "type_name": "HookVerdictOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "decision: HookVerdictDecision",
+        "reason: Option<String>"
+      ]
     },
     {
       "type_name": "HookVerdictDecision",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Allow",
+        "Block"
+      ]
     },
     {
       "type_name": "HookDispatchService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn dispatch(&self, hook_name: String, command: HookDispatchCommand) -> Result<HookVerdictOutput, HookDispatchError>"
+      ]
     },
     {
       "type_name": "HookDispatchError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "UnknownHookName",
+        "HandlerFailed"
+      ]
     },
     {
       "type_name": "HookDispatchInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl HookDispatchService"
+      ]
     },
     {
       "type_name": "ReviewRoundType",
@@ -505,6 +529,15 @@
       "kind_tag": "interactor",
       "signal": "yellow",
       "found_type": false
+    },
+    {
+      "type_name": "HookShellParserPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn split_shell(&self, input: &str) -> Result<Vec<SimpleCommand>, ParseError>"
+      ]
     }
   ]
 }
