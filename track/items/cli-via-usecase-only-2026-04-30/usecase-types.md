@@ -23,7 +23,7 @@
 | TaskOperationError | error_type | — | InvalidTrackId, InvalidTaskId, InvalidCommitHash, TrackNotFound, TaskNotFound, TransitionFailed, StoreFailed, BranchGuardFailed, BranchlessGuardFailed | 🔵 | 🔵 |
 | PreCommitTypeSignalsError | error_type | — | GitDiscoverFailed, RulesFileMissing, RulesParseError, SymlinkRejected, MetadataLoadFailed, ImplPlanLoadFailed, TypeSignalsRecomputeFailed | 🔵 | 🔵 |
 | RunReviewError | error_type | — | InvalidTrackId, InvalidGroupName, CompositionFailed, ReviewerFailed | 🔵 | 🔵 |
-| VerifyCatalogueSpecRefsError | error_type | modify | InvalidTrackId, SymlinkRejected, RulesFileMissing, RulesParseError, TrackDirectoryMissing, SpecJsonMissing, CatalogueDecodeFailed, SignalDecodeFailed | 🔵 | 🔵 |
+| VerifyCatalogueSpecRefsError | error_type | modify | InvalidTrackId, SymlinkRejected, RulesFileMissing, RulesParseError, TrackDirectoryMissing, SpecJsonMissing, CatalogueDecodeFailed, SignalDecodeFailed | 🟡 | 🔵 |
 | CommitHashPersistenceError | error_type | — | InvalidTrackId, GitDiscoverFailed, BranchMismatch, RevParseFailed, InvalidSha, StoreWriteFailed, TrackDirMissing | 🔵 | 🔵 |
 
 ## Secondary Ports

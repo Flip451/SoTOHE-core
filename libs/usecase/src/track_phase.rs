@@ -1,29 +1,19 @@
-//! Track phase resolution — re-exports from domain and adds usecase-layer
-//! application service types (TrackPhaseService / TrackPhaseInteractor).
+//! Track phase resolution application service types
+//! (TrackPhaseService / TrackPhaseInteractor).
 //!
-//! The canonical domain implementation lives in `domain::track_phase`.
-//! This module re-exports it for consumers that depend on the usecase crate
-//! AND adds the new usecase-owned service trait / interactor required by
-//! T007 so the CLI never imports `domain::track_phase::TrackPhaseInfo` or
+//! Adds the usecase-owned service trait / interactor required by T007 so the
+//! CLI never imports `domain::track_phase::TrackPhaseInfo` or
 //! `domain::ImplPlanReader` directly (CN-01 / D1).
-//!
-//! Note: the `pub use domain::track_phase::*` re-exports are intentionally
-//! preserved here (see T009 plan for eventual removal) so that existing code
-//! that consumes `usecase::track_phase::resolve_phase` keeps compiling.
-
-// Domain re-exports (preserved for backward compat — T009 will remove).
-pub use domain::track_phase::{
-    NextCommand, TrackPhase, TrackPhaseInfo, next_command, resolve_phase, resolve_phase_from_record,
-};
-
-// ── Usecase-layer types (T007) ────────────────────────────────────────────────
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
 use thiserror::Error;
 
-use domain::{ImplPlanReader, RepositoryError, TrackId, TrackReadError, TrackReader};
+use domain::{
+    ImplPlanReader, RepositoryError, TrackId, TrackReadError, TrackReader,
+    track_phase::resolve_phase,
+};
 
 // ── TrackPhaseOutput ──────────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-30T22:29:39Z",
+  "generated_at": "2026-04-30T22:38:08Z",
   "declaration_hash": "cdbfdc32b079b3543a0f0689dc9c67ffd93f86f3d59d106b6a444e8299c5efe9",
   "signals": [
     {
@@ -715,9 +715,9 @@
     {
       "type_name": "VerifyCatalogueSpecRefsError",
       "kind_tag": "error_type",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
-      "found_items": [
+      "missing_items": [
         "InvalidTrackId",
         "SymlinkRejected",
         "RulesFileMissing",
@@ -726,6 +726,16 @@
         "SpecJsonMissing",
         "CatalogueDecodeFailed",
         "SignalDecodeFailed"
+      ],
+      "extra_items": [
+        "BranchTrackMismatch",
+        "CatalogueFetchError",
+        "CatalogueNotFound",
+        "InvalidCatalogueHash",
+        "NonActiveTrack",
+        "SignalsFetchError",
+        "SpecFetchError",
+        "SpecNotFound"
       ]
     },
     {

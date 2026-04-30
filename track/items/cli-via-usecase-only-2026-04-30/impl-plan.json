@@ -21,32 +21,37 @@
     {
       "id": "T004",
       "description": "Add domain schema export boundary types and service to usecase layer: ExportSchemaCommand, ExportSchemaError, ExportSchemaService, ExportSchemaInteractor, SchemaExporterPort; also add SchemaExporterPort impl to RustdocSchemaExporter (infrastructure) so the CLI composition root can wire Arc<dyn SchemaExporterPort>",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9d895b683c071409282e9e85af812268a17d91ed"
     },
     {
       "id": "T005",
       "description": "Add review boundary types, services, and interactors to usecase layer: ReviewApprovalDecision, ReviewApprovalOutput, ReviewCheckApprovedService, ReviewCheckApprovedError, ReviewCheckApprovedInteractor, RunReviewCommand, RunReviewOutput, RunReviewError, RunReviewService, RunReviewInteractor, ReviewRoundType",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9d895b683c071409282e9e85af812268a17d91ed"
     },
     {
       "id": "T006",
       "description": "Add track task operation boundary types, services, and interactors to usecase layer: TaskTransitionCommand, AddTaskCommand, SetOverrideCommand, ClearOverrideCommand, TaskOperationError, TaskOperationOutput, TaskOperationService, TaskOperationInteractor, TaskQueryService, TaskQueryInteractor, NextTaskOutput, TaskCountsOutput, TrackStatusOutput",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9d895b683c071409282e9e85af812268a17d91ed"
     },
     {
       "id": "T007",
       "description": "Add track phase resolution and catalogue verify boundary types, services, and interactors to usecase layer: TrackPhaseOutput, TrackPhaseError, TrackPhaseService, TrackPhaseInteractor, VerifyCatalogueConsistencyService, VerifyCatalogueConsistencyOutput, VerifyCatalogueConsistencyError, VerifyCatalogueConsistencyInteractor, VerifyCatalogueSpecSignalsService, VerifySpecSignalsOutput, VerifySpecSignalsError, VerifyCatalogueSpecSignalsInteractor, TypeSignalsService, LayerSignalSummary, TypeSignalsError, TypeSignalsInteractor, VerifyCatalogueSpecRefsService, VerifyCatalogueSpecRefsOutput, VerifyCatalogueSpecRefsError, VerifyCatalogueSpecRefsInteractor",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9d895b683c071409282e9e85af812268a17d91ed"
     },
     {
       "id": "T008",
       "description": "Add pre-commit type-signals and commit-hash persistence boundary types, services, and interactors to usecase layer: PreCommitTypeSignalsService, PreCommitTypeSignalsOutput, PreCommitTypeSignalsError, PreCommitTypeSignalsInteractor, CommitHashPersistenceService, CommitHashPersistenceError, CommitHashPersistenceInteractor",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9d895b683c071409282e9e85af812268a17d91ed"
     },
     {
       "id": "T009",
       "description": "Remove pub use domain:: re-exports from usecase layer public API (e.g. libs/usecase/src/track_phase.rs) to satisfy CN-01 and AC-04",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",

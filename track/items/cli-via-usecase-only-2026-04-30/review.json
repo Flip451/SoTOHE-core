@@ -1,6 +1,113 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Collapsing every parsed command to `cmd.argv.join(\" \")` and then filtering out empty strings makes the new `ShellParserPort` path lose redirect-only commands and quoted-argument boundaries. In the usecase adapter, that means inputs like `> /tmp/file` can disappear before policy evaluation, so the guard can no longer block output-redirection writes reliably.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 47,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a2f7e5b2b410e7b865aaccfe4b7664baabad30594fa8db88002868646f43fd60",
+          "at": "2026-04-30T17:15:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `ShellParserPort` implementation at this file is not exercised by any test. The updated tests were switched to `ShellParser::split_shell(...)`, so they still only cover the domain-trait path and never verify the new `Vec<String>` serialization (`argv.join(\" \")`) or its error mapping. That leaves the only new behavior in this diff unguarded, so a regression in the infrastructure port would slip through.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 35,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:376118a71903dda79dc29728583555d7ed9a061d23e1ecea6d55d3a7f1e63efd",
+          "at": "2026-04-30T17:19:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: serializing each parsed command with `cmd.argv.join(\" \")` here is not lossless. Any argument that contains whitespace gets split back into separate argv entries by the usecase adapter, so shell-reentry inputs like `bash -c 'git push origin main'` are reconstructed as `bash -c git push origin main`. That breaks the `-c` payload boundary and can let blocked commands slip past policy checks.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 53,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f8415da470b0239045f5c79775dd0452110208a680f872c10f5552b8314289d3",
+          "at": "2026-04-30T17:22:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Serializing redirect-only commands as `\"\"` creates a guard bypass in the new CLI path: `ShellParserPortAdapter` will re-parse that entry as `argv: []` with `has_output_redirect = false`, so `domain::guard::policy::check_simple_command` never hits its output-redirect block. A command like `> /tmp/file` will be treated as allowed instead of blocked if this port is used for enforcement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "line": 58,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7275ea5cfb1ec00e9e539605419d8061d32b9c0d1f12a7ba7893174c2badf4eb",
+          "at": "2026-04-30T17:25:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
+          "at": "2026-04-30T17:28:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
+          "at": "2026-04-30T17:30:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `map_err` calls add a new textual prefix before returning the `String`, but `ExportSchemaInteractor` already wraps any port error as `ExportSchemaError::ExportFailed`. Once this adapter is wired in, failures will surface as `schema export failed: schema export failed: ...` or `schema export failed: schema serialization failed: ...`, which changes the existing user-facing error contract. Return the underlying error text unchanged here and let the usecase layer own the prefix.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 47,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f8ba0d6450ec7356e1d4556a6d7056c120ad84e077752f76f9b7c5a7c3f2b205",
+          "at": "2026-04-30T19:23:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c7e0bb9db18f5d0d7d8ebf73a99918aa24f85f493f5c5a240eb89402de366cb",
+          "at": "2026-04-30T19:25:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c7e0bb9db18f5d0d7d8ebf73a99918aa24f85f493f5c5a240eb89402de366cb",
+          "at": "2026-04-30T19:27:03Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -685,113 +792,20 @@
           "findings": [],
           "hash": "rvw1:sha256:c083b1bdf340e3890c6d2c3a9a672a94a93d3595d0789d770714056c1c15baf1",
           "at": "2026-04-30T22:18:28Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Collapsing every parsed command to `cmd.argv.join(\" \")` and then filtering out empty strings makes the new `ShellParserPort` path lose redirect-only commands and quoted-argument boundaries. In the usecase adapter, that means inputs like `> /tmp/file` can disappear before policy evaluation, so the guard can no longer block output-redirection writes reliably.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 47,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:a2f7e5b2b410e7b865aaccfe4b7664baabad30594fa8db88002868646f43fd60",
-          "at": "2026-04-30T17:15:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `ShellParserPort` implementation at this file is not exercised by any test. The updated tests were switched to `ShellParser::split_shell(...)`, so they still only cover the domain-trait path and never verify the new `Vec<String>` serialization (`argv.join(\" \")`) or its error mapping. That leaves the only new behavior in this diff unguarded, so a regression in the infrastructure port would slip through.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 35,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:376118a71903dda79dc29728583555d7ed9a061d23e1ecea6d55d3a7f1e63efd",
-          "at": "2026-04-30T17:19:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P0: serializing each parsed command with `cmd.argv.join(\" \")` here is not lossless. Any argument that contains whitespace gets split back into separate argv entries by the usecase adapter, so shell-reentry inputs like `bash -c 'git push origin main'` are reconstructed as `bash -c git push origin main`. That breaks the `-c` payload boundary and can let blocked commands slip past policy checks.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 53,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:f8415da470b0239045f5c79775dd0452110208a680f872c10f5552b8314289d3",
-          "at": "2026-04-30T17:22:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Serializing redirect-only commands as `\"\"` creates a guard bypass in the new CLI path: `ShellParserPortAdapter` will re-parse that entry as `argv: []` with `has_output_redirect = false`, so `domain::guard::policy::check_simple_command` never hits its output-redirect block. A command like `> /tmp/file` will be treated as allowed instead of blocked if this port is used for enforcement.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
-              "line": 58,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:7275ea5cfb1ec00e9e539605419d8061d32b9c0d1f12a7ba7893174c2badf4eb",
-          "at": "2026-04-30T17:25:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
-          "at": "2026-04-30T17:28:42Z"
+          "hash": "rvw1:sha256:984bb2df836e71c1b505220b167287c0ac0cdaa4dce9d90d46bd0c0c7f0408b2",
+          "at": "2026-04-30T22:33:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3bb3c6e97789cd03dcf4ec416f1d64ac9345a65cfaa6d6d86e3ccf5ac24174a4",
-          "at": "2026-04-30T17:30:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Both `map_err` calls add a new textual prefix before returning the `String`, but `ExportSchemaInteractor` already wraps any port error as `ExportSchemaError::ExportFailed`. Once this adapter is wired in, failures will surface as `schema export failed: schema export failed: ...` or `schema export failed: schema serialization failed: ...`, which changes the existing user-facing error contract. Return the underlying error text unchanged here and let the usecase layer own the prefix.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 47,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:f8ba0d6450ec7356e1d4556a6d7056c120ad84e077752f76f9b7c5a7c3f2b205",
-          "at": "2026-04-30T19:23:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c7e0bb9db18f5d0d7d8ebf73a99918aa24f85f493f5c5a240eb89402de366cb",
-          "at": "2026-04-30T19:25:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c7e0bb9db18f5d0d7d8ebf73a99918aa24f85f493f5c5a240eb89402de366cb",
-          "at": "2026-04-30T19:27:03Z"
+          "hash": "rvw1:sha256:984bb2df836e71c1b505220b167287c0ac0cdaa4dce9d90d46bd0c0c7f0408b2",
+          "at": "2026-04-30T22:34:37Z"
         }
       ]
     },
@@ -1858,6 +1872,34 @@
           "findings": [],
           "hash": "rvw1:sha256:15f7745e0a8fbeaf5cb987442ada98355dfccbf16726de48a7bf3870e4f26576",
           "at": "2026-04-30T22:29:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15e579583e21f603a14d0df99982204a10d87218e9be137773f322814d115208",
+          "at": "2026-04-30T22:33:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15e579583e21f603a14d0df99982204a10d87218e9be137773f322814d115208",
+          "at": "2026-04-30T22:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a8eefa908ae54ab01d9129309446dac4f4c6ba56776a87302bec2eecd78a09a",
+          "at": "2026-04-30T22:36:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a8eefa908ae54ab01d9129309446dac4f4c6ba56776a87302bec2eecd78a09a",
+          "at": "2026-04-30T22:37:52Z"
         }
       ]
     }
