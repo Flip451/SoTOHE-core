@@ -54,6 +54,11 @@
       "description": "cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-07)。T001-T008 完了後に実行する。(1) cargo make fmt-check — rustfmt の差分がないことを確認する。(2) cargo make clippy — warnings が 0 であることを確認する (-D warnings)。(3) cargo make test (nextest) — 新規追加した全ユニットテスト + 既存テストがすべて pass することを確認する (AC-07)。(4) cargo make deny — ライセンス・禁止クレートチェックが pass することを確認する。(5) cargo make check-layers — レイヤー依存関係チェック (domain が infrastructure に依存していないこと等) が pass することを確認する。(6) cargo make verify-* — plan-artifact-refs / plan-progress / arch-docs など既存の verify タスクが pass することを確認する。T001-T003 の変更 (TypeDefinitionKind + codec + renderer) が既存テストを壊していないことを特に確認する。失敗した gate があれば同タスク内で修正する。前提: T001-T008 完了。",
       "status": "done",
       "commit_hash": "935bab43c8e96f885c2051115bb0029e0bdbd4f0"
+    },
+    {
+      "id": "T010",
+      "description": "T010 fix Yellow signals: remove private fields from expected_members on CatalogueLinterRule / CatalogueLintViolation / RunCatalogueLintInteractor / InMemoryCatalogueLinter (per project pattern: private fields with accessor methods → expected_members: []), and remove TypeDefinitionKindDto from infrastructure-types.json (private codec internal type, not part of public contract). Re-run sotp track type-signals to refresh signal files and verify all types reach Blue.",
+      "status": "in_progress"
     }
   ],
   "plan": {
@@ -69,7 +74,8 @@
           "unit tests: 全 struct 系 9 kind で expected_methods 保持確認 / DomainService 正常構築 / kind_tag() 全 15 variant / TypeGraph・baseline の無変更コンパイル確認。"
         ],
         "task_ids": [
-          "T001"
+          "T001",
+          "T010"
         ]
       },
       {

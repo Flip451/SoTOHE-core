@@ -1,115 +1,56 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
-          "at": "2026-04-29T12:56:00Z"
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:54:00Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DomainService` entries still will not render: `render_type_catalogue` only iterates entries whose `kind_tag()` matches a tag in `SECTIONS`, and this list has no `domain_service` section. The new `render_details` arm is therefore unreachable for `DomainService`, and the existing coverage test also misses it because its sample list omits `TypeDefinitionKind::DomainService`. Any in-memory catalogue containing a domain service will silently drop that row from the generated markdown.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 154,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
-          "at": "2026-04-29T12:58:00Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:55:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
-          "at": "2026-04-29T13:12:25Z"
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:45:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
-          "at": "2026-04-29T13:15:29Z"
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:47:26Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
-          "at": "2026-04-29T13:46:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "DomainService is a new struct-based kind, but it is not included in the Phase 1.5 forbidden-field guard. A `domain_service` entry with `expected_methods` plus a stale field such as `implements`, `expected_variants`, or `transitions_to` will pass this pre-validation and serde will silently drop the stale field during flattened enum deserialization, reintroducing the data-loss case this guard is meant to prevent. Add `domain_service` to this guard or add an equivalent DomainService-specific check.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 380,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
-          "at": "2026-04-29T13:49:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:127fcc0b2ec873ccd19ccf463e2712fad566050782c6b78f6e4de67526b80d6c",
-          "at": "2026-04-29T13:53:18Z"
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T16:58:51Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
-          "at": "2026-04-29T15:06:47Z"
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T17:01:12Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
-          "at": "2026-04-29T15:08:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a4be6f09b5fe2f85c8261fa261d771dccff1a83c260055e38d754c065c9381c",
-          "at": "2026-04-29T16:15:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Invalid `target_field` values are only validated inside the per-entry loop after `target_kind` matches. If a bad FieldEmpty/FieldNonEmpty rule targets a kind that is absent from the catalogue, `run()` returns `Ok([])` instead of `CatalogueLinterError::InvalidRuleConfig`, contrary to the documented unknown-field error behavior. Validate field-rule target fields once per rule before scanning entries.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/in_memory_catalogue_linter.rs",
-              "line": 226,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:1a4be6f09b5fe2f85c8261fa261d771dccff1a83c260055e38d754c065c9381c",
-          "at": "2026-04-29T16:19:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5d991761e593dd819ee5181d303c9190efb265595a5599b73000fcb54a17c47",
-          "at": "2026-04-29T16:22:24Z"
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T17:08:29Z"
         }
       ]
     },
@@ -662,6 +603,52 @@
         }
       ]
     },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
+          "at": "2026-04-29T12:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
+          "at": "2026-04-29T12:53:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:31:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:34:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:35:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:41:43Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -767,56 +754,115 @@
         }
       ]
     },
-    "cli": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:54:00Z"
+          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
+          "at": "2026-04-29T12:56:00Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:55:45Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DomainService` entries still will not render: `render_type_catalogue` only iterates entries whose `kind_tag()` matches a tag in `SECTIONS`, and this list has no `domain_service` section. The new `render_details` arm is therefore unreachable for `DomainService`, and the existing coverage test also misses it because its sample list omits `TypeDefinitionKind::DomainService`. Any in-memory catalogue containing a domain service will silently drop that row from the generated markdown.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 154,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0c6a989682fbbfe7ac008536664387a830fe7d064d9136e1eb3d4adbf8a0c766",
+          "at": "2026-04-29T12:58:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:45:16Z"
+          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
+          "at": "2026-04-29T13:12:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:47:26Z"
+          "hash": "rvw1:sha256:b05c45e94fe38d280c7703891a080c4aa3b3f4ea55e71f9d98fc20b7dffe1f6a",
+          "at": "2026-04-29T13:15:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T16:58:51Z"
+          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
+          "at": "2026-04-29T13:46:15Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T17:01:12Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DomainService is a new struct-based kind, but it is not included in the Phase 1.5 forbidden-field guard. A `domain_service` entry with `expected_methods` plus a stale field such as `implements`, `expected_variants`, or `transitions_to` will pass this pre-validation and serde will silently drop the stale field during flattened enum deserialization, reintroducing the data-loss case this guard is meant to prevent. Add `domain_service` to this guard or add an equivalent DomainService-specific check.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 380,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8ceaa796cdedb6a69bb5d38f51179580d288a9604b9fa3e3977b63e172dce0c5",
+          "at": "2026-04-29T13:49:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T17:08:29Z"
+          "hash": "rvw1:sha256:127fcc0b2ec873ccd19ccf463e2712fad566050782c6b78f6e4de67526b80d6c",
+          "at": "2026-04-29T13:53:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
+          "at": "2026-04-29T15:06:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed0051cf6f24cd26fde37967f0d6eb864ad52477d5fa69f1aa81aa63ef135840",
+          "at": "2026-04-29T15:08:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a4be6f09b5fe2f85c8261fa261d771dccff1a83c260055e38d754c065c9381c",
+          "at": "2026-04-29T16:15:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Invalid `target_field` values are only validated inside the per-entry loop after `target_kind` matches. If a bad FieldEmpty/FieldNonEmpty rule targets a kind that is absent from the catalogue, `run()` returns `Ok([])` instead of `CatalogueLinterError::InvalidRuleConfig`, contrary to the documented unknown-field error behavior. Validate field-rule target fields once per rule before scanning entries.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/in_memory_catalogue_linter.rs",
+              "line": 226,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:1a4be6f09b5fe2f85c8261fa261d771dccff1a83c260055e38d754c065c9381c",
+          "at": "2026-04-29T16:19:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5d991761e593dd819ee5181d303c9190efb265595a5599b73000fcb54a17c47",
+          "at": "2026-04-29T16:22:24Z"
         }
       ]
     },
@@ -1435,52 +1481,27 @@
           "findings": [],
           "hash": "rvw1:sha256:10a0fb9c89cdf819af856e599e0ba7c39fc27e2f919825fdf15af725b2033394",
           "at": "2026-04-29T17:36:38Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
-          "at": "2026-04-29T12:52:00Z"
+          "hash": "rvw1:sha256:8170f715a39df9bfbe48b64a0798831aec5bb94644b0340e73281b4bba800008",
+          "at": "2026-04-30T00:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8170f715a39df9bfbe48b64a0798831aec5bb94644b0340e73281b4bba800008",
+          "at": "2026-04-30T00:19:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
-          "at": "2026-04-29T12:53:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:31:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:34:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:35:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:41:43Z"
+          "hash": "rvw1:sha256:8170f715a39df9bfbe48b64a0798831aec5bb94644b0340e73281b4bba800008",
+          "at": "2026-04-30T00:26:52Z"
         }
       ]
     }

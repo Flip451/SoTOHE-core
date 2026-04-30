@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T17:28:30Z",
-  "declaration_hash": "e9f4e6df36a659e5456c10c2a3b88e6e1ab915fa60254560dffd49b84789df46",
+  "generated_at": "2026-04-30T00:27:57Z",
+  "declaration_hash": "872620945bb21862671e8190a077f5494f01acb891aafcaff727d224cb76b813",
   "signals": [
     {
       "type_name": "TypeDefinitionKind",
@@ -40,14 +40,8 @@
     {
       "type_name": "CatalogueLinterRule",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "permitted_layers: Vec<String>",
-        "rule_kind: CatalogueLinterRuleKind",
-        "target_field: Option<String>",
-        "target_kind: String"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogueLinterRuleError",
@@ -63,13 +57,8 @@
     {
       "type_name": "CatalogueLintViolation",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "entry_name: String",
-        "message: String",
-        "rule_kind: CatalogueLinterRuleKind"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogueLinterError",

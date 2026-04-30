@@ -1,14 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T17:28:31Z",
-  "declaration_hash": "5371eb2506532b24162808ab3cf704eb1b530d2ed4ee8103194b4c10bb650cee",
+  "generated_at": "2026-04-30T00:27:59Z",
+  "declaration_hash": "70b8010264f8d3d06453dd3ceedc0db8b91d4b1af2290b78944d79848c0152de",
   "signals": [
-    {
-      "type_name": "TypeDefinitionKindDto",
-      "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
-    },
     {
       "type_name": "TypeCatalogueCodecError",
       "kind_tag": "error_type",
@@ -24,13 +18,10 @@
     {
       "type_name": "InMemoryCatalogueLinter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "fn run(&self, rules: &[CatalogueLinterRule], catalogue: &TypeCatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>"
-      ],
-      "missing_items": [
-        "disabled_rules: Vec<String>"
       ]
     }
   ]

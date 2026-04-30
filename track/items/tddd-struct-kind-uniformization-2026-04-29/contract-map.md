@@ -23,7 +23,6 @@ flowchart LR
         L7_usecase_RunCatalogueLintInteractor[\RunCatalogueLintInteractor/]
     end
     subgraph infrastructure [infrastructure]
-        L14_infrastructure_TypeDefinitionKindDto{{TypeDefinitionKindDto}}
         L14_infrastructure_TypeCatalogueCodecError>TypeCatalogueCodecError]
         L14_infrastructure_InMemoryCatalogueLinter[InMemoryCatalogueLinter]:::secondary_adapter
     end

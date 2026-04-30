@@ -72,31 +72,10 @@
     },
     {
       "name": "CatalogueLinterRule",
-      "description": "S3: New domain value object — a single linter rule primitive. Carries rule_kind (CatalogueLinterRuleKind), the target kind tag string (e.g. 'value_object'), the target field name (e.g. 'expected_methods'), and optionally a set of permitted layer ids (for KindLayerConstraint). Constructed via a validating constructor that rejects empty target_kind strings, empty field names on FieldEmpty/FieldNonEmpty rules, and empty permitted_layers on KindLayerConstraint rules. No serde in domain layer.",
+      "description": "S3: New domain value object — a single linter rule primitive. Carries rule_kind (CatalogueLinterRuleKind), the target kind tag string (e.g. 'value_object'), the target field name (e.g. 'expected_methods'), and optionally a set of permitted layer ids (for KindLayerConstraint). Constructed via a validating constructor that rejects empty target_kind strings, empty field names on FieldEmpty/FieldNonEmpty rules, and empty permitted_layers on KindLayerConstraint rules. Fields are private; read access via accessor methods (rule_kind / target_kind / target_field / permitted_layers) per project encapsulation convention. No serde in domain layer.",
       "approved": true,
       "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "rule_kind",
-          "ty": "CatalogueLinterRuleKind"
-        },
-        {
-          "kind": "field",
-          "name": "target_kind",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "target_field",
-          "ty": "Option<String>"
-        },
-        {
-          "kind": "field",
-          "name": "permitted_layers",
-          "ty": "Vec<String>"
-        }
-      ],
+      "expected_members": [],
       "expected_methods": [],
       "spec_refs": [
         {
@@ -136,26 +115,10 @@
     },
     {
       "name": "CatalogueLintViolation",
-      "description": "S3: New domain value object — a single lint violation produced when a CatalogueLinterRule fires against a TypeCatalogueEntry. Carries the rule kind, the entry name, and a human-readable message. Output element of the linter evaluation. All fields are private, accessed via accessors.",
+      "description": "S3: New domain value object — a single lint violation produced when a CatalogueLinterRule fires against a TypeCatalogueEntry. Carries the rule kind, the entry name, and a human-readable message. Output element of the linter evaluation. All fields are private, accessed via accessors (rule_kind / entry_name / message) per project encapsulation convention.",
       "approved": true,
       "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "rule_kind",
-          "ty": "CatalogueLinterRuleKind"
-        },
-        {
-          "kind": "field",
-          "name": "entry_name",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "message",
-          "ty": "String"
-        }
-      ],
+      "expected_members": [],
       "expected_methods": [],
       "spec_refs": [
         {

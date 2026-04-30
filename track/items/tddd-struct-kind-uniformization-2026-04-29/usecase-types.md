@@ -17,7 +17,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | RenderContractMapInteractor | interactor | reference | — | 🔵 | 🔵 |
-| RunCatalogueLintInteractor | interactor | — | — | 🟡 | 🔵 |
+| RunCatalogueLintInteractor | interactor | — | — | 🔵 | 🔵 |
 
 ## Commands
 

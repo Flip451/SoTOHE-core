@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD struct kind 均質化と type catalogue linter framework の導入
 
-## Tasks (9/9 resolved)
+## Tasks (9/10 resolved)
 
 ### S1 — Domain Layer — M1+S1: TypeDefinitionKind Uniformization + DomainService Variant (T001)
 
@@ -11,6 +11,7 @@
 > unit tests: 全 struct 系 9 kind で expected_methods 保持確認 / DomainService 正常構築 / kind_tag() 全 15 variant / TypeGraph・baseline の無変更コンパイル確認。
 
 - [x] **T001**: domain 層の TypeDefinitionKind enum を M1 + S1 に従い変更する。(1) struct 系 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) すべてに `expected_methods: Vec<MethodDeclaration>` フィールドを追加する — 既存の `expected_members` は保持し例外なく uniform にする (IN-01 / CN-01 / AC-01)。Typestate は `{ transitions, expected_members, expected_methods }` に、ValueObject は `{ expected_members, expected_methods }` に、UseCase は `{ expected_members, expected_methods }` に、Interactor は `{ expected_members, declares_application_service, expected_methods }` に、Dto / Command / Query / Factory は `{ expected_members, expected_methods }` に、SecondaryAdapter は `{ implements, expected_members, expected_methods }` に変更する。(2) `DomainService { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> }` variant を新設する (IN-02 / CN-03 / CN-04 / AC-01)。(3) `kind_tag()` メソッドに `DomainService` arm を追加する (`"domain_service"`)。(4) TypeGraph / baseline schema は変更しない (CN-07 / IN-07) — 既存 `TypeNode::members` / `TypeNode::methods` および `TypeBaselineEntry::members` / `TypeBaselineEntry::methods` が uniform 化後の catalogue field を受け取れることを確認する。(5) doc コメントを各 variant に更新する (DomainService の配置層制約 domain/usecase ✓、infrastructure ✗ を明示する)。unit tests (命名規則: test_{target}_{condition}_{expected_result}): TypeDefinitionKind の全 struct 系 9 kind で `expected_methods` フィールドが存在し Vec<MethodDeclaration> を保持できること / DomainService variant の正常構築 (expected_members + expected_methods 両方) / `kind_tag()` が全 15 variant で正しいタグを返すこと / 既存の TypeGraph / baseline の struct が変更なしにコンパイルされること (TypeNode / TypeBaselineEntry のフィールド変更がないことをコンパイル検証)。前提: なし (最初のタスク)。 (`1308741bd7f3743029fa627984595d2e0799965a`)
+- [~] **T010**: T010 fix Yellow signals: remove private fields from expected_members on CatalogueLinterRule / CatalogueLintViolation / RunCatalogueLintInteractor / InMemoryCatalogueLinter (per project pattern: private fields with accessor methods → expected_members: []), and remove TypeDefinitionKindDto from infrastructure-types.json (private codec internal type, not part of public contract). Re-run sotp track type-signals to refresh signal files and verify all types reach Blue.
 
 ### S2 — Infrastructure Layer — M1+S1: Catalogue Codec Update (T002)
 

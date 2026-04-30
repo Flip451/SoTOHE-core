@@ -11,8 +11,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueLinterRule | value_object | — | — | 🟡 | 🔵 |
-| CatalogueLintViolation | value_object | — | — | 🟡 | 🔵 |
+| CatalogueLinterRule | value_object | — | — | 🔵 | 🔵 |
+| CatalogueLintViolation | value_object | — | — | 🔵 | 🔵 |
 
 ## Error Types
 

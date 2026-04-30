@@ -1,11 +1,5 @@
 <!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY -->
 
-## Enums
-
-| Name | Kind | Action | Details | Signal | Cat-Spec |
-|------|------|--------|---------|--------|----------|
-| TypeDefinitionKindDto | enum | modify | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, FreeFunction, DomainService | 🟡 | 🔵 |
-
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
@@ -16,5 +10,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| InMemoryCatalogueLinter | secondary_adapter | — | impl CatalogueLinter | 🟡 | 🔵 |
+| InMemoryCatalogueLinter | secondary_adapter | — | impl CatalogueLinter | 🔵 | 🔵 |
 

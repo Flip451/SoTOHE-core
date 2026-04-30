@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T17:28:30Z",
-  "declaration_hash": "da76d1c80ab72147204048409c4417f96f5c4dcde103aaa4cb10520acd40dfe6",
+  "generated_at": "2026-04-30T00:27:58Z",
+  "declaration_hash": "77d5dd9d2f52048f1048611390ccaf3cea846b456f93cfa8125341c2e37f91de",
   "signals": [
     {
       "type_name": "RenderContractMapInteractor",
@@ -46,14 +46,10 @@
     {
       "type_name": "RunCatalogueLintInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "impl RunCatalogueLint"
-      ],
-      "missing_items": [
-        "catalogue_loader: Arc<dyn CatalogueLoader>",
-        "linter: Arc<dyn CatalogueLinter>"
       ]
     }
   ]

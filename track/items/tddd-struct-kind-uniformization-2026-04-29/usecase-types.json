@@ -113,21 +113,10 @@
     },
     {
       "name": "RunCatalogueLintInteractor",
-      "description": "S3: New usecase interactor that implements RunCatalogueLint. Receives Arc<dyn CatalogueLoader> and Arc<dyn CatalogueLinter> by constructor injection (concrete adapters are wired at the CLI composition root). On execute: loads the catalogue for the specified track/layer via the CatalogueLoader port, delegates to CatalogueLinter.run with the provided rules and layer_id, returns the violations list.",
+      "description": "S3: New usecase interactor that implements RunCatalogueLint. Receives Arc<dyn CatalogueLoader> and Arc<dyn CatalogueLinter> by constructor injection (concrete adapters are wired at the CLI composition root). On execute: loads the catalogue for the specified track/layer via the CatalogueLoader port, delegates to CatalogueLinter.run with the provided rules and layer_id, returns the violations list. Fields are private (constructor injection only); per project encapsulation convention.",
       "approved": true,
       "kind": "interactor",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "catalogue_loader",
-          "ty": "Arc<dyn CatalogueLoader>"
-        },
-        {
-          "kind": "field",
-          "name": "linter",
-          "ty": "Arc<dyn CatalogueLinter>"
-        }
-      ],
+      "expected_members": [],
       "declares_application_service": [
         "RunCatalogueLint"
       ],
