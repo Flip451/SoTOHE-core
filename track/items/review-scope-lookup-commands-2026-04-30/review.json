@@ -1,6 +1,93 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
+          "at": "2026-04-30T06:04:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify` builds the scope list by inverting `ReviewScopeConfig::classify` into a `HashMap<FilePath, Vec<MainScopeName>>`, but it does not deduplicate scope names per path. Because the public API preserves one output per input path, a duplicated input like `[\"libs/domain/src/lib.rs\", \"libs/domain/src/lib.rs\"]` makes the domain classifier push the same file into the `domain` bucket twice, and this code turns that into `Named(domain, [domain])` for both results. The CLI would then report a path as matching the same scope multiple times, which is not a real multi-scope match. Deduplicate `names` after sorting or classify each input occurrence independently.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/scope_query.rs",
+              "line": 132,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
+          "at": "2026-04-30T06:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46a1a47bde28a040a880e0e392761e148d44b7e763f88c2c8c15115bc947bf82",
+          "at": "2026-04-30T06:08:23Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
+          "at": "2026-04-30T04:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
+          "at": "2026-04-30T04:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `verify-plan-artifact-refs` branch only handles `[OK]` and `SpecRef hash mismatch`, but the verifier also emits unresolved anchors, invalid anchors, coverage violations, and I/O/JSON failures. Those outcomes are now undefined, so a non-hash verifier failure can neither be repaired nor failed closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 125,
+              "category": "missing error handling"
+            },
+            {
+              "message": "The recovery path tells `type-designer` to refresh `<layer>-catalogue-spec-signals.json`, but that agent's own contract restricts Bash to its internal pipeline commands and does not include `catalogue-spec-signals` (`.claude/agents/type-designer.md:472-474`). The requested remediation is therefore outside the subagent's allowed tool scope and may never execute.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 127,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a02f2bdcd43564e6b9f2edece05602fc155bb56e5ab49dbe083db6e44e9a4336",
+          "at": "2026-04-30T05:31:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
+          "at": "2026-04-30T05:36:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
+          "at": "2026-04-30T05:39:26Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -16,6 +103,20 @@
           "findings": [],
           "hash": "rvw1:sha256:2ccccfcd9b004c2749fc3b1e15c7adad8d8dd03ecf68651b486e1ff12219fca5",
           "at": "2026-04-30T06:34:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2f425d81c9b040c3dd49a726f2352dce49ffb023ec2bcdae358ddb539910a6e",
+          "at": "2026-04-30T06:42:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2f425d81c9b040c3dd49a726f2352dce49ffb023ec2bcdae358ddb539910a6e",
+          "at": "2026-04-30T06:45:31Z"
         }
       ]
     },
@@ -522,93 +623,20 @@
           "findings": [],
           "hash": "rvw1:sha256:6391554f807ea8bb891e17c5a58759ea26561a804c763a8918936290676de080",
           "at": "2026-04-30T06:35:27Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
-          "at": "2026-04-30T06:04:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`classify` builds the scope list by inverting `ReviewScopeConfig::classify` into a `HashMap<FilePath, Vec<MainScopeName>>`, but it does not deduplicate scope names per path. Because the public API preserves one output per input path, a duplicated input like `[\"libs/domain/src/lib.rs\", \"libs/domain/src/lib.rs\"]` makes the domain classifier push the same file into the `domain` bucket twice, and this code turns that into `Named(domain, [domain])` for both results. The CLI would then report a path as matching the same scope multiple times, which is not a real multi-scope match. Deduplicate `names` after sorting or classify each input occurrence independently.",
-              "severity": "P1",
-              "file": "libs/usecase/src/review_v2/scope_query.rs",
-              "line": 132,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
-          "at": "2026-04-30T06:05:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46a1a47bde28a040a880e0e392761e148d44b7e763f88c2c8c15115bc947bf82",
-          "at": "2026-04-30T06:08:23Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
-          "at": "2026-04-30T04:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
-          "at": "2026-04-30T04:07:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `verify-plan-artifact-refs` branch only handles `[OK]` and `SpecRef hash mismatch`, but the verifier also emits unresolved anchors, invalid anchors, coverage violations, and I/O/JSON failures. Those outcomes are now undefined, so a non-hash verifier failure can neither be repaired nor failed closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
-              "line": 125,
-              "category": "missing error handling"
-            },
-            {
-              "message": "The recovery path tells `type-designer` to refresh `<layer>-catalogue-spec-signals.json`, but that agent's own contract restricts Bash to its internal pipeline commands and does not include `catalogue-spec-signals` (`.claude/agents/type-designer.md:472-474`). The requested remediation is therefore outside the subagent's allowed tool scope and may never execute.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
-              "line": 127,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:a02f2bdcd43564e6b9f2edece05602fc155bb56e5ab49dbe083db6e44e9a4336",
-          "at": "2026-04-30T05:31:15Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
-          "at": "2026-04-30T05:36:15Z"
+          "hash": "rvw1:sha256:d43699ad1a8070e2330794e2f7597f69b1b3a24c72f337fe31a5c477f3ca9120",
+          "at": "2026-04-30T06:41:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
-          "at": "2026-04-30T05:39:26Z"
+          "hash": "rvw1:sha256:d43699ad1a8070e2330794e2f7597f69b1b3a24c72f337fe31a5c477f3ca9120",
+          "at": "2026-04-30T06:42:36Z"
         }
       ]
     }

@@ -14,7 +14,7 @@
     {
       "id": "T003",
       "description": "`sotp review files --scope <name> --track-id <id>` CLI サブコマンドを実装する。`apps/cli/src/commands/review/files.rs` を新規作成し、`mod.rs` の `ReviewCommand` enum に `Files(FilesArgs)` variant を追加して dispatch を繋ぐ。(1) `FilesArgs`: `--scope <name>` (必須 String) + `--track-id <id>` (必須 String) + `--items-dir` (default `track/items`)。(2) execute 実装: (a) `compose_v2::load_scope_config_only` で `scope_config` のみを先にロードする (diff base 解決なし)。(b) scope 名を `scope_config.contains_scope()` で検証し (IN-04)、未定義 scope は `Unknown scope: <name>. Known scopes: <list>` を stderr に出力して即 exit FAILURE (AC-08 — scope validation が diff I/O より必ず先に実行される)。Known scopes の一覧表示には `scope_config.all_scope_names()` の universe を sorted で使用する。(c) scope 名が有効な場合のみ `compose_v2::build_v2_shared` で `diff_getter` (GitDiffGetter) / `base` (CommitHash) を取得して `ScopeQueryInteractor` を wire する。diff base の解決は既存 `review results` と同じ規則 (`.commit_hash` ファイル → 不在時は `git rev-parse main` fallback) を使用する (IN-09 / CN-08)。(d) `ScopeQueryService::files` を呼び出し `Vec<FilePath>` を受け取る。(e) diff getter 由来の順を保ちながら (`CN-04`) 各 `FilePath` を 1 行ずつ stdout に print する (IN-06 / AC-07)。(f) 0 件の場合は empty stdout + exit 0 (AC-09)。(g) DiffGet エラー時は human-readable メッセージを stderr 出力 + exit FAILURE。unit tests: 未定義 scope 名で `Unknown scope: <name>. Known scopes: <list>` が stderr + exit FAILURE になること (AC-08) / 0 件の場合が empty stdout + exit 0 になること (AC-09) / diff range に scope のファイルがある場合に 1 行ずつ stdout 出力されること (AC-07) / 既存 review results / check-approved / codex-local が影響を受けないこと (各コマンドが独立して動作すること) (AC-13)。前提: T001 完了 (ScopeQueryService / ScopeQueryInteractor が usecase 層に存在する)。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T004",
