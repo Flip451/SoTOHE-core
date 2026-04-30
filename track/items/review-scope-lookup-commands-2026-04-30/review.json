@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D4` says `files` should go through `ReviewCycle::get_scope_target`, but `D6` says the new scope-routing query must be implemented as a separate application service independent of `ReviewCycle`. Those prescriptions conflict, so the intended dependency shape is unclear.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 93,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b2785379275b13ebd4e848e16cb399188dd36bae6849d49b348716f33ec48719",
+          "at": "2026-04-30T03:15:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5934e98a2cdb136a2808ed51e9cda6d99ca0c3bb0fccbe622e218fc264b600e",
+          "at": "2026-04-30T03:17:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5934e98a2cdb136a2808ed51e9cda6d99ca0c3bb0fccbe622e218fc264b600e",
+          "at": "2026-04-30T03:19:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 says `--track-id` is required because `track/review-scope.json` needs `<track-id>` placeholder expansion, but `classify` is specified everywhere as path-only while still using the same scope routing and even displaying `other_track` exclusions. That leaves `sotp review classify track/items/...` under-specified for track-scoped paths: the command cannot deterministically know which track is the current one unless the ADR defines a track-id source for `classify` too.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 60,
+              "category": "contradiction"
+            },
+            {
+              "message": "Rejected Alternative E says the zero-argument `classify` use case, “all current diff paths -> scope mapping,” is already covered by `review results`, but the Context explicitly says `review results` does not output per-scope individual file lists. This makes the rejection rationale internally inconsistent; it should be reframed around `files --scope`/shell composition or another non-contradictory reason.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 212,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d5934e98a2cdb136a2808ed51e9cda6d99ca0c3bb0fccbe622e218fc264b600e",
+          "at": "2026-04-30T03:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `files` command signature is inconsistent: D1 introduces `sotp review files --scope <name>` and D2 repeats that adopted form without `--track-id`, but D4 later makes `--track-id` a required argument for `files` and D5's example includes it. This leaves the CLI contract ambiguous for implementers and users.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-1547-review-scope-lookup-commands.md",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:86eb2e8559186eb720fb4474026012e636a2bdf2e6b06d6628d4a49463a999a9",
+          "at": "2026-04-30T03:28:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fbef81869b9fd507466ae1626a5561ced6293778d1c857bbdb22ad08e1df37e",
+          "at": "2026-04-30T03:29:50Z"
+        }
+      ]
+    }
+  }
+}
