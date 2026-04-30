@@ -58,7 +58,8 @@
     {
       "id": "T010",
       "description": "T010 fix Yellow signals: remove private fields from expected_members on CatalogueLinterRule / CatalogueLintViolation / RunCatalogueLintInteractor / InMemoryCatalogueLinter (per project pattern: private fields with accessor methods → expected_members: []), and remove TypeDefinitionKindDto from infrastructure-types.json (private codec internal type, not part of public contract). Re-run sotp track type-signals to refresh signal files and verify all types reach Blue.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3fb16ff58a3a58a9584b5799c418c7cf389a499e"
     }
   ],
   "plan": {

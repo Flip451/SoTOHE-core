@@ -1,654 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:54:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
-          "at": "2026-04-29T12:55:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:45:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
-          "at": "2026-04-29T13:47:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T16:58:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T17:01:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
-          "at": "2026-04-29T17:08:29Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 1 offers \"continue on the current branch\" when the starting branch is not `main`, but Step 2 still unconditionally creates `track/<id>` from `main`. That leaves no actual execution path for the suggested non-main continuation option, so the command can send the user into an impossible choice.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
-              "line": 19,
-              "category": "logic"
-            },
-            {
-              "message": "The non-empty `git status` handling is internally inconsistent for the intended baseline-file case: it first says every listed item needs user handling, then says `knowledge/` baseline files need no action and can just be carried to Step 3, while still requiring the user to resolve the non-empty state before proceeding. As written, the common baseline case can still block the bootstrap flow without a clear resolution rule.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
-              "line": 20,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:091f7499e58730859aaaeedf2d13c9ff163cf9cbf65c9f9a7823f80221836104",
-          "at": "2026-04-29T10:32:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review` reads the current track's `metadata.json` before it can proceed. At that point step 4 has not created `track/items/<track-id>/metadata.json` yet, so the documented 'typical' flow is not actually executable in this order.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 28,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
-          "at": "2026-04-29T10:38:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review`’s own context-gathering step requires the track’s `metadata.json` to already exist. Because `metadata.json` is only created in step 4, the documented first-commit path is not executable in the order shown.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 28,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
-          "at": "2026-04-29T10:40:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The step sequence no longer matches the harness-policy intent: step 3 is now `metadata.json` creation, step 4 is verification, and the `/track:review` → `/track:commit` guidance is pushed to step 5. That makes the renumbered workflow inconsistent with the requested 1-5 ordering and leaves the earlier `step 5 below` reference pointing at a different kind of action than the briefing intended.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 28,
-              "category": "documentation"
-            },
-            {
-              "message": "Step 5 says that having `metadata.json` 'satisfies `/track:review`'s prerequisite of reading `metadata.json` / `plan.md` / `spec.md`', but this init flow only creates `metadata.json`. `plan.md` and `spec.md` are not produced here, so the command is asserting prerequisite satisfaction that it does not actually establish.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 38,
-              "category": "documentation"
-            }
-          ],
-          "hash": "rvw1:sha256:42e7024e447f0d4aaf92cebeb02e7ed2e380f5d9ce60de31ca2cb7f30398dfe9",
-          "at": "2026-04-29T10:44:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
-          "at": "2026-04-29T10:49:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 5 sends the user directly from metadata verification to `/track:review` and says `plan.md` is auto-rendered, but steps 1-4 never run `cargo make track-sync-views`. A freshly initialized track can therefore reach the first-review flow with only `metadata.json` present, while the review command expects `plan.md`/track context before invoking the reviewer. Add an explicit `track-sync-views` step before the `/track:review` guidance, or make the guidance point to a command path that performs the sync first.",
-              "severity": "P1",
-              "file": ".claude/commands/track/init.md",
-              "line": 38,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
-          "at": "2026-04-29T10:53:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b628f2e6bf0a880f1373c89415b0dcb391ab395047189287319ed14bd3e5d19",
-          "at": "2026-04-29T11:00:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Broadening `completed` to mean “zero_findings for the assigned round_type” is incompatible with the caller contract in `.claude/commands/track/review.md:199-234`, which still treats `completed` as the fast-round handoff that triggers step 2f full-model confirmation. If a final-round agent reports `completed`, the orchestrator will mis-handle it as another fast completion and re-enter confirmation instead of terminating.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 28,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:f894bdbc377fac533cdaff70f2ff88c3d2f5427afafc3169a110f5ab63e6763f",
-          "at": "2026-04-29T13:46:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 2.5 overstates what `--round-type` does. The `track/review.md` docs say the filter only applies to displayed history, while the state-line summary still reflects the newest round regardless of the filter. As written, an agent can still misread the unfiltered summary and treat the wrong round as the completion verdict.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 93,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:f894bdbc377fac533cdaff70f2ff88c3d2f5427afafc3169a110f5ab63e6763f",
-          "at": "2026-04-29T13:47:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
-          "at": "2026-04-29T13:49:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`completed` now means “the assigned round_type returned zero_findings,” but the orchestrator flow in `.claude/commands/track/review.md` still treats `completed` as a fast-round-only signal and immediately launches final confirmation. A successful `final` round would therefore re-trigger confirmation instead of terminating the scope, so the escalation loop does not converge.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 28,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
-          "at": "2026-04-29T13:54:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
-          "at": "2026-04-29T13:56:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The agent definition still includes a parenthetical incident reference, `over-long review loops (28-round history)`, despite the harness-policy checklist requiring the body to be rule/step-list only with past incident references removed. This leaves the requested policy cleanup incomplete.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 47,
-              "category": "policy_compliance"
-            }
-          ],
-          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
-          "at": "2026-04-29T13:58:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 2.5 tells the agent to verify an inline entry containing `verdict: zero_findings`, but the referenced `track-review-results --limit 1` output does not emit a `verdict:` field for the displayed round; the current API renders the filtered latest round as `findings: zero_findings` or a findings list, while only history lines contain `<round>@<timestamp> <verdict>`. This makes the mandatory completion check look for a string the canonical API does not print, so an agent can fail to ever report `completed` after a successful review.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 99,
-              "category": "broken-ref"
-            }
-          ],
-          "hash": "rvw1:sha256:e212c85723fa579a364a00d59017746546fff1ec8da6bf9266a769619491c2db",
-          "at": "2026-04-29T13:59:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df63d60cf6dbe69f75571d490a3e529469306a5be48c34d728b0be15da7ca493",
-          "at": "2026-04-29T14:01:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 2 removes the `track-review-results` flag reference section, but `.claude/agents/review-fix-lead.md:81-82` still points readers at that subsection for the complete option list. That leaves a dangling cross-document reference in the review workflow documentation.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 32,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:ff7a80d11a4807cdb47f2a203b6ef40c100bf064d31cf38c346d4fe2c72ed197",
-          "at": "2026-04-29T14:16:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 0 dropped the branchless planning-only guard and the legacy `plan.md` fallback in the same rewrite. That leaves `/track:review` on `plan/<id>` branches without the documented activation gate that keeps code-bearing diffs out of the review path, and it no longer loads required conventions for legacy tracks that still rely on `plan.md` instead of `spec.md`.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 16,
-              "category": "contradiction"
-            },
-            {
-              "message": "Step 4 says the agent prompt must include the scope file list, but the only mechanism it documents is auto-injection into the reviewer subprocess. `.claude/agents/review-fix-lead.md` still treats that file list as direct orchestrator input, so this prompt no longer explains how to satisfy the agent contract or enforce the scope boundary from the orchestrator side.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 77,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:88fe3de920bb0f3edccf6e22143b21e46752ef5ea6bfeb4eb1883c3b3413c894",
-          "at": "2026-04-29T14:24:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d23c2af8a48918f60447f07b027ecf2b47e37786e7f41cdebc32a12ba02ceffc",
-          "at": "2026-04-29T14:31:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 5 is internally inconsistent with the review-fix-lead contract: it says the orchestrator should react to 'final returns new findings' and relaunch based on the finding nature, but this file and `.claude/agents/review-fix-lead.md` both describe the agent as handling review→fix→re-review internally and only reporting `completed`/`blocked_cross_scope`/`failed`. That makes the final-findings branch unreachable and leaves no documented path for the orchestrator to obtain those findings.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 97,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c3a964beb7a944e324c75c3461f2a9555b02a86c6d11557a81b568328948a142",
-          "at": "2026-04-29T14:38:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 0 now only tells the reviewer to read conventions listed in `spec.md`, but legacy tracks still keep `## Related Conventions (Required Reading)` in `plan.md` instead (for example `track/items/track-plan-activation-2026-03-14/plan.md`). On those tracks, `/track:review` will skip mandatory convention docs and can review against incomplete requirements.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 16,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:c3a964beb7a944e324c75c3461f2a9555b02a86c6d11557a81b568328948a142",
-          "at": "2026-04-29T14:40:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ba435d8a3f16ad4e8670a0419037109ad4b4009846469fd858915f81dfd992b9",
-          "at": "2026-04-29T14:43:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 now says the review-fix-lead agent resolves its modification boundary from `track/review-scope.json` glob patterns intersected with the current diff, but the `other` scope is implicit and has no group patterns in that config. Since Step 2 can still mark `other` as required, the orchestrator no longer provides any concrete owned-file list for that agent, leaving it unable to distinguish in-scope fixes from cross-scope edits. This breaks the per-scope review loop for unmatched changed files.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 79,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ba435d8a3f16ad4e8670a0419037109ad4b4009846469fd858915f81dfd992b9",
-          "at": "2026-04-29T14:45:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 no longer tells the orchestrator to include the scope file list in the `review-fix-lead` prompt, even though the agent contract requires that list as its modification boundary. This is especially broken for the `other` scope: the new text says the CLI-injected file list is authoritative, but the listed minimum prompt only passes a briefing path and reviewer invocation, so the fix agent has no reliable pre-fix boundary for files that have no `review-scope.json` patterns. An `other`-scope review could therefore fail closed or edit out of scope. Add the scope file list back to the required agent prompt content, or specify the exact canonical command/output the agent must use to obtain it before fixing.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 73,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:b5d28441dc0f7d037e876d1381902117583d4ac8637a9fd5a9ca1c7a56b4cc67",
-          "at": "2026-04-29T14:48:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 defines the `other` agent boundary as the full changed file list minus named-group and `review_operational` matches, but the actual scope classifier excludes `other_track` patterns before assigning files to `Other` (`track/items/<other-track>/**`, `track/archive/**`). If a diff contains real `other` files plus another track/archive file, the orchestrator prompt would authorize the review-fix-lead agent to modify files that the CLI did not classify into the `other` scope and that are not part of the reviewed target, breaking the scope-ownership contract. The `other` boundary needs to subtract `other_track` matches as well, with the existing current-track exception handled by the classifier logic.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 80,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:72315cdbb1d0cf6a81eaaa36916343ca6ab48c15bac8b4da66a890315cbbd705",
-          "at": "2026-04-29T14:50:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 defines named-scope ownership as all changed files matching the group's glob patterns, but the CLI classifier excludes `review_operational` and `other_track` files before assigning any named scope. For `plan-artifacts`, whose pattern includes `track/items/<track-id>/**`, this prompt would authorize the agent to modify operational files like `review.json` or type-signal outputs that the CLI does not classify or hash into that scope, breaking the scope-ownership contract. The named-scope file list should be computed with the same exclusion layers as the CLI classifier.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 78,
-              "category": "scope-contract"
-            }
-          ],
-          "hash": "rvw1:sha256:c598e4c887092799b154e20c90c5b076ffdc824ebb645c946c7ecc5af62613af",
-          "at": "2026-04-29T14:53:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8adc1c69c995386cca1bf874b69f9faacfe87b7e659d01d587f14784e2c8d3a9",
-          "at": "2026-04-29T14:56:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 5 asks the orchestrator to react to 'final returns new findings' by updating the briefing and relaunching, but `.claude/agents/review-fix-lead.md` defines the agent as internally looping until it reports `completed`, `blocked_cross_scope`, or `failed`, and Step 4 says the orchestrator does not parse reviewer JSON directly. There is no documented path for the orchestrator to observe intermediate final-round findings, so this branch is unreachable and the escalation flow is incomplete.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 116,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:e4620508ac4b348b96fcf1e33d6abe1cfebdcf8ff13165600de9186f06eae019",
-          "at": "2026-04-29T15:02:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing the `### 2b. Build per-group briefing` anchor breaks existing source traces that still point at `review.md §2b. Build per-group briefing` (for example `track/items/review-scope-prompt-injection-2026-04-18/spec.md:28` and its metadata). Those docs now reference a nonexistent section name.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 44,
-              "category": "broken ref"
-            },
-            {
-              "message": "The `track-review-results flag reference` subsection is no longer a complete option list, but `.claude/agents/review-fix-lead.md:81-82` still tells agents to use it as one. The new text only lists a few common flags and omits supported options such as `--all` and `--no-hint`, so the cross-doc contract is now false.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 39,
-              "category": "cross-doc contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9c4fe5345bff55b7e92fa485a3c172681720a0930378337d7203dc992261c640",
-          "at": "2026-04-29T15:09:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`bin/sotp review results --help` is not a usable lookup path under this repo's permission policy, which denies direct `bin/sotp` invocations when a `cargo make` wrapper exists. That makes the 'complete option list' instruction a dead end for agents following the documented workflow; point this at an allowed wrapper/source instead.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 82,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:30e752dcd961cb12344478a4e7344a417ae884127aca3eec6f8a74c13ffc9829",
-          "at": "2026-04-29T15:13:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:48244d2d7e9646a42652cec1e4a5d366a01acfdf1fedbffdec40fd70117b1bcc",
-          "at": "2026-04-29T15:15:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 5 is unreachable as written: it asks the orchestrator to react when a `final` round “returns new findings”, but `.claude/agents/review-fix-lead.md` only reports `completed` / `blocked_cross_scope` / `failed`, and Step 4 explicitly says the orchestrator does not parse reviewer JSON directly. There is no documented way to observe `findings_remain` from the final round, so the relaunch branch cannot actually run.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 103,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:48244d2d7e9646a42652cec1e4a5d366a01acfdf1fedbffdec40fd70117b1bcc",
-          "at": "2026-04-29T15:18:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The scope-file-list recipe excludes every `other_track` match before keeping named-group files, but the v2 classifier keeps current-track `track/items/<track-id>/**` files even when they match an `other_track` glob. As written, current-track `plan-artifacts` files can be dropped from the agent allowlist, which breaks the modification boundary for that scope.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 78,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:365968e0ef2ec0ea976a8589ed6b1014a5e8bc798554436dc831c4ad90b68db5",
-          "at": "2026-04-29T15:20:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 still tells the orchestrator to derive and inject the per-scope file list from `track/review-scope.json`, but the CLI already appends that list inside `CodexReviewer::build_full_prompt` (`apps/cli/src/commands/review/codex_local.rs`). That leaves two sources of truth for scope ownership and reintroduces manual classification drift that Step 2 says the CLI owns.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 78,
-              "category": "cross_doc"
-            }
-          ],
-          "hash": "rvw1:sha256:d41ee04ec97d8235d0fb9b85d1b878f19860d5c1b613008377eb8d7217b0f12f",
-          "at": "2026-04-29T15:23:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b8d99fb78ed8370f3a3214e1c5920da71e2a6357a0af0a1c95240c5bda84800",
-          "at": "2026-04-29T15:26:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The opening summary says `/track:review` should not allow commit until every required scope reaches `final` round `zero_findings`, but Step 6 documents the supported `NotStarted` bypass for PR-only reviews (`review.json` absent and all required scopes `NotStarted`), which lets `track-check-approved` exit 0 without any final round. The summary overstates the gate for a valid workflow path.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 7,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8b8d99fb78ed8370f3a3214e1c5920da71e2a6357a0af0a1c95240c5bda84800",
-          "at": "2026-04-29T15:32:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
-          "at": "2026-04-29T15:34:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
-          "at": "2026-04-29T15:36:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
-          "at": "2026-04-29T15:39:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
-          "at": "2026-04-29T15:48:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The R3 bullet for `domain_service` says `依存なし or 軽量、状態なし`, but R6 immediately below requires `expected_members >= 1` and defines `domain_service` as a field-bearing domain struct. As written, this can misclassify stateless helpers as `domain_service` instead of `free_function`; the text should say stateful/field-bearing behavior, or otherwise exclude `状態なし` here.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md",
-              "line": 93,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:fa6292df43b20f0da4cbfafb9d2139e125be55d25030ebc9329a6ca1a4f895fc",
-          "at": "2026-04-29T17:14:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19ae65b06cde7d5536af31039d3ecce733193af4830b4a1356fd8f9778a2c646",
-          "at": "2026-04-29T17:16:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The enforcement guidance still says future reviewer briefings should embed only the R1-R5 checklist, but this change introduces R6 as a required domain_service selection rule and the review checklist now escalates R1-R6. Leaving this stale range means downstream automated review prompts can omit the new domain_service checks entirely, which contradicts the SSoT update this task is meant to make.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 180,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:19ae65b06cde7d5536af31039d3ecce733193af4830b4a1356fd8f9778a2c646",
-          "at": "2026-04-29T17:18:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d5bedbd952640a4c6ac2deb4b1c4c7a678c6413aae1e061db7ac44fd9a93e6fa",
-          "at": "2026-04-29T17:19:48Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
-          "at": "2026-04-29T12:52:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
-          "at": "2026-04-29T12:53:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:31:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:34:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:35:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
-          "at": "2026-04-29T16:41:43Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -1502,6 +854,668 @@
           "findings": [],
           "hash": "rvw1:sha256:8170f715a39df9bfbe48b64a0798831aec5bb94644b0340e73281b4bba800008",
           "at": "2026-04-30T00:26:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6639d32ec09ba6b3cf3897847dfdb8843ace3d97f09ed2681e193a9858302eb3",
+          "at": "2026-04-30T00:29:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6639d32ec09ba6b3cf3897847dfdb8843ace3d97f09ed2681e193a9858302eb3",
+          "at": "2026-04-30T00:31:18Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 offers \"continue on the current branch\" when the starting branch is not `main`, but Step 2 still unconditionally creates `track/<id>` from `main`. That leaves no actual execution path for the suggested non-main continuation option, so the command can send the user into an impossible choice.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "line": 19,
+              "category": "logic"
+            },
+            {
+              "message": "The non-empty `git status` handling is internally inconsistent for the intended baseline-file case: it first says every listed item needs user handling, then says `knowledge/` baseline files need no action and can just be carried to Step 3, while still requiring the user to resolve the non-empty state before proceeding. As written, the common baseline case can still block the bootstrap flow without a clear resolution rule.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "line": 20,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:091f7499e58730859aaaeedf2d13c9ff163cf9cbf65c9f9a7823f80221836104",
+          "at": "2026-04-29T10:32:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review` reads the current track's `metadata.json` before it can proceed. At that point step 4 has not created `track/items/<track-id>/metadata.json` yet, so the documented 'typical' flow is not actually executable in this order.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
+          "at": "2026-04-29T10:38:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 tells users to run `/track:review` → `/track:commit` immediately after branch creation, but `/track:review`’s own context-gathering step requires the track’s `metadata.json` to already exist. Because `metadata.json` is only created in step 4, the documented first-commit path is not executable in the order shown.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:79a4e8d7bf4faf5dbdbaffcaae27bdd4e1618970332dd155d47477e9e8c4e015",
+          "at": "2026-04-29T10:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The step sequence no longer matches the harness-policy intent: step 3 is now `metadata.json` creation, step 4 is verification, and the `/track:review` → `/track:commit` guidance is pushed to step 5. That makes the renumbered workflow inconsistent with the requested 1-5 ordering and leaves the earlier `step 5 below` reference pointing at a different kind of action than the briefing intended.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 28,
+              "category": "documentation"
+            },
+            {
+              "message": "Step 5 says that having `metadata.json` 'satisfies `/track:review`'s prerequisite of reading `metadata.json` / `plan.md` / `spec.md`', but this init flow only creates `metadata.json`. `plan.md` and `spec.md` are not produced here, so the command is asserting prerequisite satisfaction that it does not actually establish.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 38,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:42e7024e447f0d4aaf92cebeb02e7ed2e380f5d9ce60de31ca2cb7f30398dfe9",
+          "at": "2026-04-29T10:44:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
+          "at": "2026-04-29T10:49:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 sends the user directly from metadata verification to `/track:review` and says `plan.md` is auto-rendered, but steps 1-4 never run `cargo make track-sync-views`. A freshly initialized track can therefore reach the first-review flow with only `metadata.json` present, while the review command expects `plan.md`/track context before invoking the reviewer. Add an explicit `track-sync-views` step before the `/track:review` guidance, or make the guidance point to a command path that performs the sync first.",
+              "severity": "P1",
+              "file": ".claude/commands/track/init.md",
+              "line": 38,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a3827374412034af7f8ea205bcb58335ee7d291a4cac7210e4e6bb82febb2054",
+          "at": "2026-04-29T10:53:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b628f2e6bf0a880f1373c89415b0dcb391ab395047189287319ed14bd3e5d19",
+          "at": "2026-04-29T11:00:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Broadening `completed` to mean “zero_findings for the assigned round_type” is incompatible with the caller contract in `.claude/commands/track/review.md:199-234`, which still treats `completed` as the fast-round handoff that triggers step 2f full-model confirmation. If a final-round agent reports `completed`, the orchestrator will mis-handle it as another fast completion and re-enter confirmation instead of terminating.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 28,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:f894bdbc377fac533cdaff70f2ff88c3d2f5427afafc3169a110f5ab63e6763f",
+          "at": "2026-04-29T13:46:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2.5 overstates what `--round-type` does. The `track/review.md` docs say the filter only applies to displayed history, while the state-line summary still reflects the newest round regardless of the filter. As written, an agent can still misread the unfiltered summary and treat the wrong round as the completion verdict.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 93,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:f894bdbc377fac533cdaff70f2ff88c3d2f5427afafc3169a110f5ab63e6763f",
+          "at": "2026-04-29T13:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:49:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`completed` now means “the assigned round_type returned zero_findings,” but the orchestrator flow in `.claude/commands/track/review.md` still treats `completed` as a fast-round-only signal and immediately launches final confirmation. A successful `final` round would therefore re-trigger confirmation instead of terminating the scope, so the escalation loop does not converge.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 28,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:54:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:56:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The agent definition still includes a parenthetical incident reference, `over-long review loops (28-round history)`, despite the harness-policy checklist requiring the body to be rule/step-list only with past incident references removed. This leaves the requested policy cleanup incomplete.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 47,
+              "category": "policy_compliance"
+            }
+          ],
+          "hash": "rvw1:sha256:f7636003be99498d76a7534db5a3cb297b7bcf4cabaa5ed2d4da7ba4e3378d9a",
+          "at": "2026-04-29T13:58:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2.5 tells the agent to verify an inline entry containing `verdict: zero_findings`, but the referenced `track-review-results --limit 1` output does not emit a `verdict:` field for the displayed round; the current API renders the filtered latest round as `findings: zero_findings` or a findings list, while only history lines contain `<round>@<timestamp> <verdict>`. This makes the mandatory completion check look for a string the canonical API does not print, so an agent can fail to ever report `completed` after a successful review.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 99,
+              "category": "broken-ref"
+            }
+          ],
+          "hash": "rvw1:sha256:e212c85723fa579a364a00d59017746546fff1ec8da6bf9266a769619491c2db",
+          "at": "2026-04-29T13:59:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df63d60cf6dbe69f75571d490a3e529469306a5be48c34d728b0be15da7ca493",
+          "at": "2026-04-29T14:01:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 removes the `track-review-results` flag reference section, but `.claude/agents/review-fix-lead.md:81-82` still points readers at that subsection for the complete option list. That leaves a dangling cross-document reference in the review workflow documentation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 32,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ff7a80d11a4807cdb47f2a203b6ef40c100bf064d31cf38c346d4fe2c72ed197",
+          "at": "2026-04-29T14:16:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 dropped the branchless planning-only guard and the legacy `plan.md` fallback in the same rewrite. That leaves `/track:review` on `plan/<id>` branches without the documented activation gate that keeps code-bearing diffs out of the review path, and it no longer loads required conventions for legacy tracks that still rely on `plan.md` instead of `spec.md`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 16,
+              "category": "contradiction"
+            },
+            {
+              "message": "Step 4 says the agent prompt must include the scope file list, but the only mechanism it documents is auto-injection into the reviewer subprocess. `.claude/agents/review-fix-lead.md` still treats that file list as direct orchestrator input, so this prompt no longer explains how to satisfy the agent contract or enforce the scope boundary from the orchestrator side.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 77,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:88fe3de920bb0f3edccf6e22143b21e46752ef5ea6bfeb4eb1883c3b3413c894",
+          "at": "2026-04-29T14:24:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d23c2af8a48918f60447f07b027ecf2b47e37786e7f41cdebc32a12ba02ceffc",
+          "at": "2026-04-29T14:31:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 is internally inconsistent with the review-fix-lead contract: it says the orchestrator should react to 'final returns new findings' and relaunch based on the finding nature, but this file and `.claude/agents/review-fix-lead.md` both describe the agent as handling review→fix→re-review internally and only reporting `completed`/`blocked_cross_scope`/`failed`. That makes the final-findings branch unreachable and leaves no documented path for the orchestrator to obtain those findings.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 97,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c3a964beb7a944e324c75c3461f2a9555b02a86c6d11557a81b568328948a142",
+          "at": "2026-04-29T14:38:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 now only tells the reviewer to read conventions listed in `spec.md`, but legacy tracks still keep `## Related Conventions (Required Reading)` in `plan.md` instead (for example `track/items/track-plan-activation-2026-03-14/plan.md`). On those tracks, `/track:review` will skip mandatory convention docs and can review against incomplete requirements.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 16,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:c3a964beb7a944e324c75c3461f2a9555b02a86c6d11557a81b568328948a142",
+          "at": "2026-04-29T14:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba435d8a3f16ad4e8670a0419037109ad4b4009846469fd858915f81dfd992b9",
+          "at": "2026-04-29T14:43:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 now says the review-fix-lead agent resolves its modification boundary from `track/review-scope.json` glob patterns intersected with the current diff, but the `other` scope is implicit and has no group patterns in that config. Since Step 2 can still mark `other` as required, the orchestrator no longer provides any concrete owned-file list for that agent, leaving it unable to distinguish in-scope fixes from cross-scope edits. This breaks the per-scope review loop for unmatched changed files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 79,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ba435d8a3f16ad4e8670a0419037109ad4b4009846469fd858915f81dfd992b9",
+          "at": "2026-04-29T14:45:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 no longer tells the orchestrator to include the scope file list in the `review-fix-lead` prompt, even though the agent contract requires that list as its modification boundary. This is especially broken for the `other` scope: the new text says the CLI-injected file list is authoritative, but the listed minimum prompt only passes a briefing path and reviewer invocation, so the fix agent has no reliable pre-fix boundary for files that have no `review-scope.json` patterns. An `other`-scope review could therefore fail closed or edit out of scope. Add the scope file list back to the required agent prompt content, or specify the exact canonical command/output the agent must use to obtain it before fixing.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 73,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b5d28441dc0f7d037e876d1381902117583d4ac8637a9fd5a9ca1c7a56b4cc67",
+          "at": "2026-04-29T14:48:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 defines the `other` agent boundary as the full changed file list minus named-group and `review_operational` matches, but the actual scope classifier excludes `other_track` patterns before assigning files to `Other` (`track/items/<other-track>/**`, `track/archive/**`). If a diff contains real `other` files plus another track/archive file, the orchestrator prompt would authorize the review-fix-lead agent to modify files that the CLI did not classify into the `other` scope and that are not part of the reviewed target, breaking the scope-ownership contract. The `other` boundary needs to subtract `other_track` matches as well, with the existing current-track exception handled by the classifier logic.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 80,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:72315cdbb1d0cf6a81eaaa36916343ca6ab48c15bac8b4da66a890315cbbd705",
+          "at": "2026-04-29T14:50:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 defines named-scope ownership as all changed files matching the group's glob patterns, but the CLI classifier excludes `review_operational` and `other_track` files before assigning any named scope. For `plan-artifacts`, whose pattern includes `track/items/<track-id>/**`, this prompt would authorize the agent to modify operational files like `review.json` or type-signal outputs that the CLI does not classify or hash into that scope, breaking the scope-ownership contract. The named-scope file list should be computed with the same exclusion layers as the CLI classifier.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 78,
+              "category": "scope-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:c598e4c887092799b154e20c90c5b076ffdc824ebb645c946c7ecc5af62613af",
+          "at": "2026-04-29T14:53:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8adc1c69c995386cca1bf874b69f9faacfe87b7e659d01d587f14784e2c8d3a9",
+          "at": "2026-04-29T14:56:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 asks the orchestrator to react to 'final returns new findings' by updating the briefing and relaunching, but `.claude/agents/review-fix-lead.md` defines the agent as internally looping until it reports `completed`, `blocked_cross_scope`, or `failed`, and Step 4 says the orchestrator does not parse reviewer JSON directly. There is no documented path for the orchestrator to observe intermediate final-round findings, so this branch is unreachable and the escalation flow is incomplete.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 116,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:e4620508ac4b348b96fcf1e33d6abe1cfebdcf8ff13165600de9186f06eae019",
+          "at": "2026-04-29T15:02:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the `### 2b. Build per-group briefing` anchor breaks existing source traces that still point at `review.md §2b. Build per-group briefing` (for example `track/items/review-scope-prompt-injection-2026-04-18/spec.md:28` and its metadata). Those docs now reference a nonexistent section name.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 44,
+              "category": "broken ref"
+            },
+            {
+              "message": "The `track-review-results flag reference` subsection is no longer a complete option list, but `.claude/agents/review-fix-lead.md:81-82` still tells agents to use it as one. The new text only lists a few common flags and omits supported options such as `--all` and `--no-hint`, so the cross-doc contract is now false.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 39,
+              "category": "cross-doc contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9c4fe5345bff55b7e92fa485a3c172681720a0930378337d7203dc992261c640",
+          "at": "2026-04-29T15:09:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bin/sotp review results --help` is not a usable lookup path under this repo's permission policy, which denies direct `bin/sotp` invocations when a `cargo make` wrapper exists. That makes the 'complete option list' instruction a dead end for agents following the documented workflow; point this at an allowed wrapper/source instead.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 82,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:30e752dcd961cb12344478a4e7344a417ae884127aca3eec6f8a74c13ffc9829",
+          "at": "2026-04-29T15:13:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48244d2d7e9646a42652cec1e4a5d366a01acfdf1fedbffdec40fd70117b1bcc",
+          "at": "2026-04-29T15:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 is unreachable as written: it asks the orchestrator to react when a `final` round “returns new findings”, but `.claude/agents/review-fix-lead.md` only reports `completed` / `blocked_cross_scope` / `failed`, and Step 4 explicitly says the orchestrator does not parse reviewer JSON directly. There is no documented way to observe `findings_remain` from the final round, so the relaunch branch cannot actually run.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 103,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:48244d2d7e9646a42652cec1e4a5d366a01acfdf1fedbffdec40fd70117b1bcc",
+          "at": "2026-04-29T15:18:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The scope-file-list recipe excludes every `other_track` match before keeping named-group files, but the v2 classifier keeps current-track `track/items/<track-id>/**` files even when they match an `other_track` glob. As written, current-track `plan-artifacts` files can be dropped from the agent allowlist, which breaks the modification boundary for that scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 78,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:365968e0ef2ec0ea976a8589ed6b1014a5e8bc798554436dc831c4ad90b68db5",
+          "at": "2026-04-29T15:20:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 still tells the orchestrator to derive and inject the per-scope file list from `track/review-scope.json`, but the CLI already appends that list inside `CodexReviewer::build_full_prompt` (`apps/cli/src/commands/review/codex_local.rs`). That leaves two sources of truth for scope ownership and reintroduces manual classification drift that Step 2 says the CLI owns.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 78,
+              "category": "cross_doc"
+            }
+          ],
+          "hash": "rvw1:sha256:d41ee04ec97d8235d0fb9b85d1b878f19860d5c1b613008377eb8d7217b0f12f",
+          "at": "2026-04-29T15:23:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b8d99fb78ed8370f3a3214e1c5920da71e2a6357a0af0a1c95240c5bda84800",
+          "at": "2026-04-29T15:26:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The opening summary says `/track:review` should not allow commit until every required scope reaches `final` round `zero_findings`, but Step 6 documents the supported `NotStarted` bypass for PR-only reviews (`review.json` absent and all required scopes `NotStarted`), which lets `track-check-approved` exit 0 without any final round. The summary overstates the gate for a valid workflow path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8b8d99fb78ed8370f3a3214e1c5920da71e2a6357a0af0a1c95240c5bda84800",
+          "at": "2026-04-29T15:32:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
+          "at": "2026-04-29T15:34:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
+          "at": "2026-04-29T15:36:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
+          "at": "2026-04-29T15:39:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0dfe0d84068751a28f32f8cdc1f3ecb9da6f4b4925563ff64a78abb0ec80bc3",
+          "at": "2026-04-29T15:48:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The R3 bullet for `domain_service` says `依存なし or 軽量、状態なし`, but R6 immediately below requires `expected_members >= 1` and defines `domain_service` as a field-bearing domain struct. As written, this can misclassify stateless helpers as `domain_service` instead of `free_function`; the text should say stateful/field-bearing behavior, or otherwise exclude `状態なし` here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 93,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fa6292df43b20f0da4cbfafb9d2139e125be55d25030ebc9329a6ca1a4f895fc",
+          "at": "2026-04-29T17:14:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19ae65b06cde7d5536af31039d3ecce733193af4830b4a1356fd8f9778a2c646",
+          "at": "2026-04-29T17:16:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The enforcement guidance still says future reviewer briefings should embed only the R1-R5 checklist, but this change introduces R6 as a required domain_service selection rule and the review checklist now escalates R1-R6. Leaving this stale range means downstream automated review prompts can omit the new domain_service checks entirely, which contradicts the SSoT update this task is meant to make.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 180,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19ae65b06cde7d5536af31039d3ecce733193af4830b4a1356fd8f9778a2c646",
+          "at": "2026-04-29T17:18:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5bedbd952640a4c6ac2deb4b1c4c7a678c6413aae1e061db7ac44fd9a93e6fa",
+          "at": "2026-04-29T17:19:48Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a25ed0f7459c78d23305e4e45df091b669dc0472a4b65ef2d4258c546aedbd9",
+          "at": "2026-04-29T12:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f96b0692301d71d884677a996dbc2edb24435ca598be773e822116d652d56",
+          "at": "2026-04-29T13:47:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T16:58:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T17:01:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49297354f7c32870b41e301c5087a6516980a0c79db215f519c6fa056eb5d1fa",
+          "at": "2026-04-29T17:08:29Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f63782c7155ce47577c2cb6017f76b1252ea9445af937fdad3ec2dcf3d93d867",
+          "at": "2026-04-29T12:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:971bb38080e3c417aa0c10f340e6413fc89c58536d24d39a98fca4fc22e2c658",
+          "at": "2026-04-29T12:53:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:31:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:34:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:35:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c024c1f5efe3b6134b7ad14a75b9f00f6b7293600dd9f1ee3384cf34e0468f67",
+          "at": "2026-04-29T16:41:43Z"
         }
       ]
     }
