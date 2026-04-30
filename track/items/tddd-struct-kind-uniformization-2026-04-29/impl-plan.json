@@ -64,7 +64,8 @@
     {
       "id": "T011",
       "description": "T011 contract-map.md の Generated marker (CN-08) を追加: T010 commit 時に bin/sotp が古かったため marker code (T003 で追加された renderer line 122) を含まず、sync-views が marker 無しで上書きした。本 task で bin/sotp 再ビルド後に renderer 経由で再生成し marker を復元する。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "bd4f3614c953db7f29cc7471fad07a40d22ee4c1"
     }
   ],
   "plan": {
