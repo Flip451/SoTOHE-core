@@ -6,7 +6,9 @@
       "kind": "secondary_adapter",
       "description": "infrastructure-layer adapter",
       "approved": true,
-      "implements": []
+      "implements": [],
+      "expected_members": [],
+      "expected_methods": []
     }
   ]
 }

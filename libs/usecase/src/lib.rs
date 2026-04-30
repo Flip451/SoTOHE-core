@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 //! Use case layer for the SoTOHE-core track state machine.
 
+pub mod catalogue_lint_workflow;
 pub mod catalogue_spec_refs;
 pub mod catalogue_spec_signals;
 pub mod contract_map_workflow;

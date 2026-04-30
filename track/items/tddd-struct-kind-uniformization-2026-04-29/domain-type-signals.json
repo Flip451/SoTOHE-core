@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-30T00:53:40Z",
+  "declaration_hash": "872620945bb21862671e8190a077f5494f01acb891aafcaff727d224cb76b813",
+  "signals": [
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ApplicationService",
+        "Command",
+        "DomainService",
+        "Dto",
+        "Enum",
+        "ErrorType",
+        "Factory",
+        "FreeFunction",
+        "Interactor",
+        "Query",
+        "SecondaryAdapter",
+        "SecondaryPort",
+        "Typestate",
+        "UseCase",
+        "ValueObject"
+      ]
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FieldEmpty",
+        "FieldNonEmpty",
+        "KindLayerConstraint"
+      ]
+    },
+    {
+      "type_name": "CatalogueLinterRule",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinterRuleError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyTargetKind",
+        "EmptyTargetField",
+        "EmptyPermittedLayers"
+      ]
+    },
+    {
+      "type_name": "CatalogueLintViolation",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinterError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidRuleConfig"
+      ]
+    },
+    {
+      "type_name": "CatalogueLinter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn run(&self, rules: &[CatalogueLinterRule], catalogue: &TypeCatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>"
+      ]
+    }
+  ]
+}

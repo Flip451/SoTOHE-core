@@ -366,10 +366,6 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
             "cargo make track-local-review -- --model {fast_model} --round-type fast --group",
             "--track-id",
             "--briefing-file tmp/reviewer-runtime/briefing-",
-            "{\"verdict\":\"zero_findings\",\"findings\":[]}",
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123}]}",
-            "Every object field is required by the output schema.",
-            "use `null` for that field instead of omitting it.",
         ],
         &[
             "timeout 180 codex exec --model {model} --sandbox read-only --full-auto",

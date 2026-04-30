@@ -64,6 +64,10 @@ pub use tddd::catalogue::{
     MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
     TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
 };
+pub use tddd::catalogue_linter::{
+    CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
+    CatalogueLinterRuleError, CatalogueLinterRuleKind,
+};
 pub use tddd::catalogue_spec_signal::{
     CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION, CatalogueSpecSignal, CatalogueSpecSignalsDocument,
     SpecRefFinding, SpecRefFindingKind, check_catalogue_spec_ref_integrity,

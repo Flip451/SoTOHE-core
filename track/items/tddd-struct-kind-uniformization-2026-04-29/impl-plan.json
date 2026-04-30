@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "domain 層の TypeDefinitionKind enum を M1 + S1 に従い変更する。(1) struct 系 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) すべてに `expected_methods: Vec<MethodDeclaration>` フィールドを追加する — 既存の `expected_members` は保持し例外なく uniform にする (IN-01 / CN-01 / AC-01)。Typestate は `{ transitions, expected_members, expected_methods }` に、ValueObject は `{ expected_members, expected_methods }` に、UseCase は `{ expected_members, expected_methods }` に、Interactor は `{ expected_members, declares_application_service, expected_methods }` に、Dto / Command / Query / Factory は `{ expected_members, expected_methods }` に、SecondaryAdapter は `{ implements, expected_members, expected_methods }` に変更する。(2) `DomainService { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> }` variant を新設する (IN-02 / CN-03 / CN-04 / AC-01)。(3) `kind_tag()` メソッドに `DomainService` arm を追加する (`\"domain_service\"`)。(4) TypeGraph / baseline schema は変更しない (CN-07 / IN-07) — 既存 `TypeNode::members` / `TypeNode::methods` および `TypeBaselineEntry::members` / `TypeBaselineEntry::methods` が uniform 化後の catalogue field を受け取れることを確認する。(5) doc コメントを各 variant に更新する (DomainService の配置層制約 domain/usecase ✓、infrastructure ✗ を明示する)。unit tests (命名規則: test_{target}_{condition}_{expected_result}): TypeDefinitionKind の全 struct 系 9 kind で `expected_methods` フィールドが存在し Vec<MethodDeclaration> を保持できること / DomainService variant の正常構築 (expected_members + expected_methods 両方) / `kind_tag()` が全 15 variant で正しいタグを返すこと / 既存の TypeGraph / baseline の struct が変更なしにコンパイルされること (TypeNode / TypeBaselineEntry のフィールド変更がないことをコンパイル検証)。前提: なし (最初のタスク)。",
+      "status": "done",
+      "commit_hash": "1308741bd7f3743029fa627984595d2e0799965a"
+    },
+    {
+      "id": "T002",
+      "description": "infrastructure 層の catalogue codec (TypeDefinitionKindDto) を M1 + S1 に従い更新する。(1) struct 系 9 kind すべての serde DTO variant に `expected_methods: Vec<MethodDto>` フィールドを追加する — `#[serde(default)]` は付与しない (旧 schema を誤って受け入れないため; CN-02: 旧 schema を読む経路は持たない)。Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory の各 DTO variant に `expected_methods` を追加する。SecondaryAdapter は既存の `implements` + `expected_members` に加えて `expected_methods` を追加する (top-level `expected_methods` が新設される)。(2) `DomainService` DTO variant を新設する: `{ expected_members: Vec<MemberDeclarationDto>, expected_methods: Vec<MethodDto> }`。(3) Phase 1.5 の validation guard (FORBIDDEN_FIELDS_STRUCT_KINDS) を更新する: `STRUCT_AND_EXISTENCE_KINDS` の各 kind で `expected_methods` が forbidden でなくなるよう修正する — `expected_methods` を FORBIDDEN_FIELDS_STRUCT_KINDS から除外する (現状は struct 系 kind に `expected_methods` が禁止されているが M1 で解禁)。`secondary_adapter` の FORBIDDEN_FIELDS_SECONDARY_ADAPTER からも `expected_methods` を除外し、`implements` と共存させる。(4) domain 型と DTO 間の `From` / `Into` 変換実装を更新する: `TypeDefinitionKind::DomainService` ↔ `TypeDefinitionKindDto::DomainService` の変換を追加し、既存 struct 系 9 kind の変換に `expected_methods` フィールドを追加する。(5) ラウンドトリップテスト: 全 struct 系 9 kind + DomainService について `encode → JSON → decode` のラウンドトリップが通ること (AC-03)。domain_service が infrastructure layer に配置された場合は codec レベルでは拒否しない (layer constraint は S3 linter の kind-layer constraint primitive で enforce) が、domain_service の kind タグが正しく encode/decode されることを確認する。unit tests: 全 struct 系 9 kind + DomainService の encode/decode round-trip / `expected_methods` フィールドが空の場合と非空の場合の round-trip / Phase 1.5 guard の更新が struct 系 kind で `expected_methods` を許可するようになったことを検証 / `DomainService` variant が JSON で `\"kind\": \"domain_service\"` としてシリアライズされることを確認。後続 catalogue file 更新 (このタスクと同一コミット内): T002 codec 実装完了後、このトラック内の `domain-types.json`, `usecase-types.json`, `infrastructure-types.json` に含まれる struct 系 kind エントリ (CatalogueLinterRule / CatalogueLintViolation / RunCatalogueLintCommand / RunCatalogueLintInteractor / InMemoryCatalogueLinter) に `expected_methods: []` フィールドを追加する — 新 codec は `#[serde(default)]` なしのため `expected_methods` が欠如したファイルは decode 時に失敗する。前提: T001 完了。",
+      "status": "done",
+      "commit_hash": "05d52a7102a820d2e9eef6d945c831f4bb8c5e82"
+    },
+    {
+      "id": "T003",
+      "description": "domain 層の contract_map_render.rs の `methods_of()` を S2 に従い全 struct kind 対応に拡張する。(1) `methods_of()` を更新して struct 系 8 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory) + SecondaryPort + ApplicationService + DomainService を top-level `expected_methods` を uniform に返す 1 つの arm で処理する (IN-03 / AC-02 / CN-05)。(2) `SecondaryAdapter` は top-level `expected_methods` (M1 で新設) と `implements[].expected_methods` の 2 source merge arm として維持する (CN-05 / AC-02) — `expected_methods.iter().chain(implements.iter().flat_map(TraitImplDecl::expected_methods)).collect()` のパターンで実装する。(3) `Enum` / `ErrorType` / `FreeFunction` は引き続き `Vec::new()` を返す arm で処理する。(4) `contract_map_render.rs` の合計行数が 700 行制限を超えないことを確認する (architecture-rules.json `module_limits.max_lines`)。(5) contract-map レンダラー (`libs/domain/src/tddd/contract_map_render.rs` または `libs/infrastructure/src/tddd/contract_map_adapter.rs`) が `<!-- Generated ... — DO NOT EDIT DIRECTLY -->` marker を出力していない場合はその追加を行い、renderer 出力に marker が含まれることを確認する (CN-08)。unit tests: struct 系 8 kind + SecondaryPort + ApplicationService + DomainService それぞれで `methods_of()` が top-level `expected_methods` を返すこと / SecondaryAdapter が top-level + implements の 2 source merge を返すこと / Enum / ErrorType / FreeFunction で空 Vec を返すこと / 実際の `render_contract_map` 呼び出しで catalogue 宣言済み struct の method edge が生成されること (既存の integration test の補強)。前提: T001 完了 (methods_of が新しい enum shape に対応するため)。",
+      "status": "done",
+      "commit_hash": "cc35539f872a7ceff473f9a4d5d270f3f82b4e87"
+    },
+    {
+      "id": "T004",
+      "description": "domain 層に S3 linter framework の基盤型を新規追加する。新モジュールを `libs/domain/src/tddd/catalogue_linter.rs` として作成し、`tddd/mod.rs` に `pub mod catalogue_linter` を追加する。以下の型を追加する: (1) `CatalogueLinterRuleKind` enum — variants: `FieldEmpty` / `FieldNonEmpty` / `KindLayerConstraint` (IN-05 / AC-05)。(2) `CatalogueLinterRule` value object — fields: `rule_kind: CatalogueLinterRuleKind`, `target_kind: String`, `target_field: Option<String>`, `permitted_layers: Vec<String>` — validating constructor で空文字列 `target_kind` / FieldEmpty・FieldNonEmpty の空文字列 `target_field` / KindLayerConstraint の空 `permitted_layers` を拒否する (CN-06 / AC-05)。(3) `CatalogueLinterRuleError` error 型 — variants: `EmptyTargetKind` / `EmptyTargetField` / `EmptyPermittedLayers`。(4) `CatalogueLintViolation` value object — fields: `rule_kind: CatalogueLinterRuleKind`, `entry_name: String`, `message: String` — private fields with accessors。(5) `CatalogueLinterError` error 型 — variants: `InvalidRuleConfig`。(6) `CatalogueLinter` secondary port trait — `run(&self, rules: &[CatalogueLinterRule], catalogue: &TypeCatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>` — `layer_id` は KindLayerConstraint primitive のために呼び出し元が注入する (IN-05 / AC-05)。serde derives は domain 層に追加しない (hexagonal rule: serde は infrastructure 層のみ)。`libs/domain/src/lib.rs` の re-exports を更新して新型を公開する。unit tests: `CatalogueLinterRule` の validating constructor (全 3 error variant / happy path for all 3 rule kinds) / `CatalogueLintViolation` の構築とアクセサ / `CatalogueLinterRuleKind` の全 variant / `CatalogueLinterRuleError` の全 variant。前提: T001 完了。",
+      "status": "done",
+      "commit_hash": "35e3d9cec543c1b0964623aec3eca17645e65fc1"
+    },
+    {
+      "id": "T005",
+      "description": "infrastructure 層に `InMemoryCatalogueLinter` secondary adapter を追加する。新ファイル `libs/infrastructure/src/tddd/in_memory_catalogue_linter.rs` を作成し、`tddd/mod.rs` に `pub mod in_memory_catalogue_linter` を追加する。`CatalogueLinter` port を実装する: `run(&self, rules: &[CatalogueLinterRule], catalogue: &TypeCatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>` — `layer_id` パラメータは呼び出し元 (interactor) が注入する。`TypeCatalogueDocument` 自体は layer identity を持たないため、呼び出し元が `RunCatalogueLintCommand.layer_id` を渡す設計とする (AC-04 の layer constraint 経路)。3 primitive の実装: (a) `FieldEmpty` — catalogue の各 entry の kind tag が `rule.target_kind` と一致する場合、`rule.target_field` で指定されたフィールドが空 Vec でなければ violation を生成する。フィールドの空/非空判定は `TypeDefinitionKind` の pattern match で行う (例: `expected_methods.is_empty()` を checked する) — 不明フィールド名は `CatalogueLinterError::InvalidRuleConfig` として返す。(b) `FieldNonEmpty` — 上記の逆: フィールドが空なら violation を生成する。(c) `KindLayerConstraint` — 呼び出し元から注入された `layer_id` が `rule.permitted_layers` に含まれない場合、kind tag が `rule.target_kind` と一致する entry について violation を生成する。opt-out per CN-06: `InMemoryCatalogueLinter` は `disabled_rules: Vec<String>` (rule を識別する文字列リスト、例: rule_kind + target_kind の結合) を保持し、disabled rule に一致する場合は violation を生成しない — これにより false positive を opt-out できる。unit tests: FieldEmpty ルールで expected_methods が空の value_object entry が violation なし / expected_methods が非空の value_object entry が violation を生成 / FieldNonEmpty ルールで declares_application_service が非空の interactor entry が violation なし / KindLayerConstraint ルールで domain_service が permitted 外 layer_id を渡した場合の violation 生成 / disabled_rules による opt-out / InvalidRuleConfig の error path / 複数ルールの組み合わせ適用。前提: T004 完了。",
+      "status": "done",
+      "commit_hash": "60edec744ae69341b21e8826d0cada3cb02797eb"
+    },
+    {
+      "id": "T006",
+      "description": "usecase 層に S3 の `RunCatalogueLint` use case を追加する。新ファイル `libs/usecase/src/catalogue_lint_workflow.rs` を作成し、`lib.rs` に `pub mod catalogue_lint_workflow` を追加する。以下の型を追加する: (1) `RunCatalogueLintCommand` command struct — fields: `track_id: String`, `layer_id: String`, `rules: Vec<CatalogueLinterRule>` (IN-05 / AC-05)。(2) `RunCatalogueLintError` error 型 — variants: `CatalogueLoad(CatalogueLoaderError)` / `LintExecution(CatalogueLinterError)` / `InvalidLayer(String)` (IN-05)。(3) `RunCatalogueLint` application service trait — `execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>` (IN-05 / AC-05)。(4) `RunCatalogueLintInteractor` struct — fields: `catalogue_loader: Arc<dyn CatalogueLoader>`, `linter: Arc<dyn CatalogueLinter>` — implements `RunCatalogueLint`. Interactor の execute 実装: (a) `catalogue_loader.load_all(track_id)` を呼び出す — 全 TDDD-enabled layer の catalogue map (`layer_order: Vec<LayerId>`, `catalogues: BTreeMap<LayerId, TypeCatalogueDocument>`) を取得する。次に `layer_order` に `layer_id` が含まれるか検証し、含まれない場合は `InvalidLayer` を返す。その後 `catalogues.get(layer_id)` で対象 layer の `TypeCatalogueDocument` を取得する。(b) 取得した `TypeCatalogueDocument` と `cmd.rules` および `cmd.layer_id` を `linter.run(rules, catalogue, &cmd.layer_id)` に渡す (KindLayerConstraint primitive のための layer context 注入)。(c) violations list を返す。Usecase 純粋性 (no std::fs / no println! / no chrono / no env access)。unit tests: mockall による `CatalogueLoader` + `CatalogueLinter` mock を使い: 正常ケース (violation なし / あり) / CatalogueLoad error propagation / LintExecution error propagation / InvalidLayer error (layer_id が TDDD-enabled でない場合)。前提: T004 完了 (domain types — ports and value types available; T005 is not a prerequisite because the interactor tests use mockall mocks for both ports, not the concrete InMemoryCatalogueLinter adapter)。",
+      "status": "done",
+      "commit_hash": "482bd26ad9a3bb21c7116b1129863fc0d2454c9a"
+    },
+    {
+      "id": "T007",
+      "description": "CLI の `bin/sotp track lint` サブコマンドを実装し、`RunCatalogueLint` use case を呼び出せるようにする (IN-05 / AC-05)。既存の `sotp track contract-map` / `sotp track type-signals` などのサブコマンドと同じ構成パターンに従い、CLI layer (`apps/cli/src/`) の track サブコマンド群に `lint` subcommand を追加する。CLI layer は TDDD-disabled (`architecture-rules.json` の `tddd.enabled: false`) のため catalogue は持たない。CLI は `RunCatalogueLintInteractor` + `InMemoryCatalogueLinter` + `FsCatalogueLoader` (既存 adapter) を composition root で wire する。linter framework の詳細な config schema / rule DSL (OS-02 に相当) はこのタスクのスコープ外 — 今タスクでは最低限 hardcoded な primitive rules (value_object の expected_methods 空強制 + domain_service の kind-layer constraint) を直接コード内で定義した形でテスト可能なデモ実装として接続する。`--track-id` と `--layer-id` をフラグとして受け取り、violations を stdout に出力し、violations > 0 の場合は exit 1 で終了する (AC-05)。integration test: `FsCatalogueLoader` のテスト用 fixture catalogue (この track の domain-types.json など) を対象に `RunCatalogueLint` を呼び出し violation が期待通り返ること。前提: T005 完了 (InMemoryCatalogueLinter) + T006 完了 (usecase interactor)。",
+      "status": "done",
+      "commit_hash": "d4f99909342234840bc93db0624d3226be6307de"
+    },
+    {
+      "id": "T008",
+      "description": "knowledge/conventions/type-designer-kind-selection.md を S1 + S3 に従い更新する (IN-06 / AC-06)。(1) R1 layer-kind 互換マトリクスに `domain_service` 行を追加する: `domain` ✓ / `usecase` △ (trans-domain な application logic の場合のみ要根拠) / `infrastructure` ✗ (IN-02 / CN-03)。(2) R3 value_object semantic restriction の説明に「M1 以降は `expected_methods` フィールドを schema として持てるが、behavior method を宣言することは S3 linter の field-empty ルールで enforce される」旨の補足を追加する。(3) R5 No Fallback ルール (どの kind も fit しないとき value_object 等に押し込まない) に `domain_service` を選択肢として追加する: field を持ち behavior method を持つ domain struct の正しい住所として `domain_service` を明示する。(4) `domain_service` の kind 判定基準を追記する (ADR S1 の判定基準に準拠): struct + expected_members >= 1 field + expected_methods >= 1 method + 状態遷移なし + application_service / secondary_port 実装なし + domain 層配置 (usecase は要根拠) = domain_service を採用する。行数が目安 400 行を超えないよう既存セクションの冗長な記述を削減して追記する。前提: T001 完了 (DomainService variant が存在することを前提として記述)。",
+      "status": "done",
+      "commit_hash": "571d6b8f450cdb3de19b5a19a8a2120bcb842e22"
+    },
+    {
+      "id": "T009",
+      "description": "cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-07)。T001-T008 完了後に実行する。(1) cargo make fmt-check — rustfmt の差分がないことを確認する。(2) cargo make clippy — warnings が 0 であることを確認する (-D warnings)。(3) cargo make test (nextest) — 新規追加した全ユニットテスト + 既存テストがすべて pass することを確認する (AC-07)。(4) cargo make deny — ライセンス・禁止クレートチェックが pass することを確認する。(5) cargo make check-layers — レイヤー依存関係チェック (domain が infrastructure に依存していないこと等) が pass することを確認する。(6) cargo make verify-* — plan-artifact-refs / plan-progress / arch-docs など既存の verify タスクが pass することを確認する。T001-T003 の変更 (TypeDefinitionKind + codec + renderer) が既存テストを壊していないことを特に確認する。失敗した gate があれば同タスク内で修正する。前提: T001-T008 完了。",
+      "status": "done",
+      "commit_hash": "935bab43c8e96f885c2051115bb0029e0bdbd4f0"
+    },
+    {
+      "id": "T010",
+      "description": "T010 fix Yellow signals: remove private fields from expected_members on CatalogueLinterRule / CatalogueLintViolation / RunCatalogueLintInteractor / InMemoryCatalogueLinter (per project pattern: private fields with accessor methods → expected_members: []), and remove TypeDefinitionKindDto from infrastructure-types.json (private codec internal type, not part of public contract). Re-run sotp track type-signals to refresh signal files and verify all types reach Blue.",
+      "status": "done",
+      "commit_hash": "3fb16ff58a3a58a9584b5799c418c7cf389a499e"
+    },
+    {
+      "id": "T011",
+      "description": "T011 contract-map.md の Generated marker (CN-08) を追加: T010 commit 時に bin/sotp が古かったため marker code (T003 で追加された renderer line 122) を含まず、sync-views が marker 無しで上書きした。本 task で bin/sotp 再ビルド後に renderer 経由で再生成し marker を復元する。",
+      "status": "done",
+      "commit_hash": "bd4f3614c953db7f29cc7471fad07a40d22ee4c1"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain Layer — M1+S1: TypeDefinitionKind Uniformization + DomainService Variant (T001)",
+        "description": [
+          "ADR M1: struct 系 9 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory / SecondaryAdapter) すべてに `expected_methods: Vec<MethodDeclaration>` フィールドを追加する。既存 `expected_members` は保持し例外なく uniform にする (IN-01 / CN-01)。",
+          "ADR S1: `DomainService { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> }` variant を新設する (IN-02 / CN-03 / CN-04)。domain ✓ / usecase △ / infrastructure ✗。",
+          "TypeGraph / baseline schema は変更しない (CN-07 / IN-07) — 既存 TypeNode / TypeBaselineEntry フィールドが uniform 化後の catalogue を受け取れる。",
+          "unit tests: 全 struct 系 9 kind で expected_methods 保持確認 / DomainService 正常構築 / kind_tag() 全 15 variant / TypeGraph・baseline の無変更コンパイル確認。"
+        ],
+        "task_ids": [
+          "T001",
+          "T010"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Infrastructure Layer — M1+S1: Catalogue Codec Update (T002)",
+        "description": [
+          "TypeDefinitionKindDto の struct 系 9 kind に `expected_methods: Vec<MethodDto>` を追加し、DomainService DTO variant を新設する (IN-04 / CN-02)。",
+          "Phase 1.5 validation guard の更新: FORBIDDEN_FIELDS_STRUCT_KINDS から `expected_methods` を除外し、struct 系 kind での expected_methods 宣言を許可する。secondary_adapter の FORBIDDEN_FIELDS_SECONDARY_ADAPTER からも除外する。",
+          "後方互換は持たない — 旧 schema (expected_methods なし) を読む経路は不要 (CN-02)。",
+          "round-trip tests: 全 struct 系 9 kind + DomainService の encode/decode が一致することを確認する (AC-03)。"
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Domain Layer — S2: contract_map_render.rs methods_of() Extension (T003)",
+        "description": [
+          "methods_of() を全 struct kind 対応に拡張する: struct 系 8 kind + SecondaryPort + ApplicationService + DomainService を top-level expected_methods を uniform に返す 1 arm で処理する (IN-03 / AC-02)。",
+          "SecondaryAdapter は top-level expected_methods + implements[].expected_methods の 2 source merge 専用 arm を維持する (CN-05 / AC-02)。",
+          "Enum / ErrorType / FreeFunction は引き続き Vec::new() を返す。",
+          "unit tests: 各 kind の methods_of() 返却値を確認 / SecondaryAdapter の 2 source merge 動作確認 / render_contract_map 呼び出しで catalogue 宣言済み struct の method edge 生成確認。"
+        ],
+        "task_ids": [
+          "T003",
+          "T011"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Domain Layer — S3: Linter Framework Types + Port (T004)",
+        "description": [
+          "新モジュール libs/domain/src/tddd/catalogue_linter.rs に S3 の 6 型を追加する: CatalogueLinterRuleKind enum / CatalogueLinterRule value object (validating constructor) / CatalogueLinterRuleError error type / CatalogueLintViolation value object / CatalogueLinterError error type / CatalogueLinter secondary port trait (IN-05 / AC-05 / CN-06)。",
+          "serde なし (domain 層 hexagonal rule)。validating constructor で EmptyTargetKind / EmptyTargetField / EmptyPermittedLayers を拒否する。",
+          "unit tests: CatalogueLinterRule の constructor 全 error path + happy path (全 3 rule kind) / CatalogueLintViolation の構築とアクセサ確認。"
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Infrastructure Layer — S3: InMemoryCatalogueLinter Adapter (T005)",
+        "description": [
+          "libs/infrastructure/src/tddd/in_memory_catalogue_linter.rs に InMemoryCatalogueLinter を追加し、CatalogueLinter port を実装する (IN-05 / AC-05)。",
+          "3 primitive を実装: FieldEmpty (kind 一致 entry の target_field が空でなければ violation) / FieldNonEmpty (空なら violation) / KindLayerConstraint (layer が permitted_layers にない場合に violation)。",
+          "opt-out: disabled_rules: Vec<String> で false positive を回避できる設計 (CN-06)。",
+          "unit tests: 各 primitive の violation 生成 / violation なし / opt-out / InvalidRuleConfig path。"
+        ],
+        "task_ids": [
+          "T005"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Usecase Layer — S3: RunCatalogueLint Interactor (T006)",
+        "description": [
+          "libs/usecase/src/catalogue_lint_workflow.rs に RunCatalogueLintCommand / RunCatalogueLintError / RunCatalogueLint / RunCatalogueLintInteractor を追加する (IN-05 / AC-05)。",
+          "Interactor は Arc<dyn CatalogueLoader> + Arc<dyn CatalogueLinter> を注入し、catalogue load → linter.run → violations return のパイプラインを実装する。",
+          "Usecase 純粋性 (no std::fs / no I/O)。",
+          "unit tests: mockall による CatalogueLoader + CatalogueLinter mock を使い正常ケース / error propagation / InvalidLayer の各ケースを確認する。"
+        ],
+        "task_ids": [
+          "T006"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "CLI Layer — S3: sotp track lint Subcommand (T007)",
+        "description": [
+          "apps/cli/src に sotp track lint サブコマンドを追加し、RunCatalogueLintInteractor + InMemoryCatalogueLinter + FsCatalogueLoader を wire する (IN-05 / AC-05)。",
+          "CLI は --track-id と --layer-id を受け取り violations を stdout に出力する。violations > 0 なら exit 1。",
+          "config schema / rule DSL の詳細設計は OS-02 のスコープ外 — デモ実装として hardcoded rules で動作確認する。"
+        ],
+        "task_ids": [
+          "T007"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "Convention Update — S1+S3: type-designer-kind-selection.md (T008)",
+        "description": [
+          "knowledge/conventions/type-designer-kind-selection.md を更新する (IN-06 / AC-06):",
+          "R1 layer-kind マトリクスに domain_service 行追加 (domain ✓ / usecase △ / infrastructure ✗)。",
+          "R3 value_object semantic restriction に M1 以降の expected_methods フィールド存在と S3 linter による空強制の補足追記。",
+          "R5 No Fallback ルールに domain_service を正しい住所として明示 (field + behavior method を持つ domain struct の kind 選択肢)。",
+          "domain_service の kind 判定基準を追記する (ADR S1 の判定基準に準拠)。"
+        ],
+        "task_ids": [
+          "T008"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "Final CI Gate Verification (T009)",
+        "description": [
+          "T001-T008 完了後に cargo make ci を実行し、fmt-check + clippy + nextest + deny + check-layers + verify-* 全 gate が pass することを確認する (AC-07)。",
+          "M1 / S1 / S2 の変更が既存テストを壊していないことを特に確認する。",
+          "失敗した gate があれば同タスク内で修正する。"
+        ],
+        "task_ids": [
+          "T009"
+        ]
+      }
+    ]
+  }
+}

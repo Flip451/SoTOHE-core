@@ -236,16 +236,28 @@ mod tests {
             domain,
             doc(vec![entry(
                 "User",
-                TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+                TypeDefinitionKind::ValueObject {
+                    expected_members: Vec::new(),
+                    expected_methods: Vec::new(),
+                },
             )]),
         );
         catalogues.insert(
             usecase,
             doc(vec![
-                entry("RegisterUser", TypeDefinitionKind::UseCase { expected_members: Vec::new() }),
+                entry(
+                    "RegisterUser",
+                    TypeDefinitionKind::UseCase {
+                        expected_members: Vec::new(),
+                        expected_methods: Vec::new(),
+                    },
+                ),
                 entry(
                     "RegisterUserCommand",
-                    TypeDefinitionKind::Command { expected_members: Vec::new() },
+                    TypeDefinitionKind::Command {
+                        expected_members: Vec::new(),
+                        expected_methods: Vec::new(),
+                    },
                 ),
             ]),
         );
@@ -395,7 +407,10 @@ mod tests {
         let interactor = RenderContractMapInteractor::new(loader, writer);
         let cmd = RenderContractMapCommand {
             track_id: track_id("t006"),
-            kind_filter: Some(vec![TypeDefinitionKind::UseCase { expected_members: Vec::new() }]),
+            kind_filter: Some(vec![TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            }]),
             layer_filter: None,
         };
         let out = interactor.execute(&cmd).unwrap();

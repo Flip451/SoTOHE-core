@@ -12,6 +12,7 @@
 
 pub mod baseline;
 pub mod catalogue;
+pub mod catalogue_linter;
 pub mod catalogue_ports;
 pub mod catalogue_spec_signal;
 pub mod consistency;

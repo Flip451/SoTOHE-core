@@ -175,6 +175,11 @@ enum MemberDeclarationDto {
 /// `Interactor` additionally carries `declares_application_service: Vec<String>`.
 /// `FreeFunction` variant added with `module_path`, `expected_params`,
 /// `expected_returns`, and `expected_is_async` fields.
+///
+/// T002 (TDDD-02): All 9 struct-based variants now carry `expected_methods:
+/// Vec<MethodDto>` (M1 uniformization). `DomainService` variant added (S1).
+/// No `#[serde(default)]` on `expected_methods` — pre-M1 schema is rejected
+/// per CN-02 (new-schema-only codec).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 enum TypeDefinitionKindDto {
@@ -182,6 +187,7 @@ enum TypeDefinitionKindDto {
         transitions_to: Vec<String>,
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     #[serde(rename = "enum")]
     Enum {
@@ -190,6 +196,7 @@ enum TypeDefinitionKindDto {
     ValueObject {
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     ErrorType {
         expected_variants: Vec<String>,
@@ -206,6 +213,7 @@ enum TypeDefinitionKindDto {
     UseCase {
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     /// ApplicationService implementation struct.
     Interactor {
@@ -217,26 +225,31 @@ enum TypeDefinitionKindDto {
         /// array and then fail the non-empty validation on re-decode).
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         declares_application_service: Vec<String>,
+        expected_methods: Vec<MethodDto>,
     },
     /// Pure data-transfer object struct.
     Dto {
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     /// CQRS command object struct.
     Command {
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     /// CQRS query object struct.
     Query {
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     /// Aggregate/entity factory struct.
     Factory {
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     /// Struct implementing one or more hexagonal secondary port traits.
     SecondaryAdapter {
@@ -244,6 +257,7 @@ enum TypeDefinitionKindDto {
         implements: Vec<TraitImplDeclDto>,
         #[serde(default)]
         expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
     /// T003: Module-public free function declaration.
     FreeFunction {
@@ -257,6 +271,14 @@ enum TypeDefinitionKindDto {
         expected_returns: Vec<String>,
         #[serde(default)]
         expected_is_async: bool,
+    },
+    /// T002 (TDDD-02) S1: Domain service struct — carries both `expected_members`
+    /// and `expected_methods`. Permitted in domain layer (and usecase with
+    /// justification); rejected by S3 linter at infrastructure layer.
+    DomainService {
+        #[serde(default)]
+        expected_members: Vec<MemberDeclarationDto>,
+        expected_methods: Vec<MethodDto>,
     },
 }
 
@@ -347,17 +369,31 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 .and_then(|v| v.as_str())
                 .unwrap_or("<unnamed>");
 
-            // Kinds that must not carry `expected_methods`, `expected_variants`,
-            // `transitions_to`, or `implements`.
-            // T003: `value_object` is still existence-only for those fields.
-            // Struct-based kinds (use_case, interactor, dto, command, query, factory,
-            // typestate, secondary_adapter) now carry `expected_members`, so
-            // `expected_members` is NOT forbidden for them.
-            // `free_function` is similarly treated as its own structured kind.
-            const STRUCT_AND_EXISTENCE_KINDS: &[&str] =
-                &["use_case", "interactor", "dto", "command", "query", "factory", "value_object"];
+            // T002 (TDDD-02 M1+S1): Struct-based kinds now carry `expected_methods`
+            // (M1 uniformization), so `expected_methods` is removed from the
+            // forbidden list for all struct-based kinds (including `value_object`,
+            // `use_case`, `interactor`, `dto`, `command`, `query`, `factory`,
+            // `typestate`, `secondary_adapter`, and `domain_service`).
+            //
+            // These kinds must still not carry `expected_variants`, `transitions_to`,
+            // or `implements` (those belong to other variants).
+            //
+            // Note: `typestate` and `secondary_adapter` have their own dedicated guards
+            // below (they permit `transitions_to` and `implements` respectively), so they
+            // are excluded from this list.  `domain_service` (S1) supports only
+            // `expected_members` and `expected_methods` and is included here.
+            const STRUCT_AND_EXISTENCE_KINDS: &[&str] = &[
+                "use_case",
+                "interactor",
+                "dto",
+                "command",
+                "query",
+                "factory",
+                "value_object",
+                "domain_service",
+            ];
             const FORBIDDEN_FIELDS_STRUCT_KINDS: &[&str] =
-                &["expected_methods", "expected_variants", "transitions_to", "implements"];
+                &["expected_variants", "transitions_to", "implements"];
             if STRUCT_AND_EXISTENCE_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_STRUCT_KINDS {
@@ -366,7 +402,8 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                                 name: name.to_owned(),
                                 reason: format!(
                                     "kind '{}' does not support field '{}' — \
-                                     this kind only supports 'expected_members' for member declarations",
+                                     this kind only supports 'expected_members' and \
+                                     'expected_methods' for member/method declarations",
                                     kind, forbidden
                                 ),
                             });
@@ -413,13 +450,16 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 }
             }
 
-            // `secondary_adapter` carries `implements` and `expected_members` but must
-            // not carry fields belonging to other structured variants (`expected_methods`,
-            // `expected_variants`, `transitions_to`).  Without this guard those fields
-            // would be silently dropped by serde.
+            // `secondary_adapter` carries `implements`, `expected_members`, and (M1)
+            // `expected_methods` but must not carry fields belonging to other structured
+            // variants (`expected_variants`, `transitions_to`).  Without this guard those
+            // fields would be silently dropped by serde.
+            //
+            // T002 (TDDD-02 M1): `expected_methods` removed from the forbidden list —
+            // struct-based kinds now support top-level `expected_methods` (M1 uniform).
             if kind == "secondary_adapter" {
                 const FORBIDDEN_FIELDS_SECONDARY_ADAPTER: &[&str] =
-                    &["expected_methods", "expected_variants", "transitions_to"];
+                    &["expected_variants", "transitions_to"];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_SECONDARY_ADAPTER {
                         if obj.contains_key(*forbidden) {
@@ -427,7 +467,8 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                                 name: name.to_owned(),
                                 reason: format!(
                                     "kind 'secondary_adapter' does not support field '{}' — \
-                                     use 'implements' for per-trait method declarations",
+                                     use 'implements' for per-trait method declarations or \
+                                     'expected_methods' for top-level method declarations",
                                     forbidden
                                 ),
                             });
@@ -463,12 +504,16 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 }
             }
 
-            // `typestate` carries `transitions_to` and `expected_members` but must not
-            // carry fields belonging to other variants (`expected_methods`, `expected_variants`).
-            // Without this guard those fields would be silently dropped by serde.
+            // `typestate` carries `transitions_to`, `expected_members`, and (M1)
+            // `expected_methods` but must not carry fields belonging to other variants
+            // (`expected_variants`).  Without this guard those fields would be silently
+            // dropped by serde.
+            //
+            // T002 (TDDD-02 M1): `expected_methods` removed from the forbidden list —
+            // typestate is a struct-based kind and now supports `expected_methods` (M1
+            // uniform).
             if kind == "typestate" {
-                const FORBIDDEN_FIELDS_TYPESTATE: &[&str] =
-                    &["expected_methods", "expected_variants"];
+                const FORBIDDEN_FIELDS_TYPESTATE: &[&str] = &["expected_variants"];
                 if let Some(obj) = entry_obj {
                     for forbidden in FORBIDDEN_FIELDS_TYPESTATE {
                         if obj.contains_key(*forbidden) {
@@ -476,7 +521,8 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                                 name: name.to_owned(),
                                 reason: format!(
                                     "kind 'typestate' does not support field '{}' — \
-                                     use 'transitions_to'/'expected_members' for typestate declarations",
+                                     use 'transitions_to'/'expected_members'/'expected_methods' \
+                                     for typestate declarations",
                                     forbidden
                                 ),
                             });
@@ -834,21 +880,30 @@ fn type_definition_kind_from_dto(
     dto: &TypeDefinitionKindDto,
 ) -> Result<TypeDefinitionKind, TypeCatalogueCodecError> {
     match dto {
-        TypeDefinitionKindDto::Typestate { transitions_to, expected_members } => {
+        TypeDefinitionKindDto::Typestate { transitions_to, expected_members, expected_methods } => {
             let transitions = if transitions_to.is_empty() {
                 TypestateTransitions::Terminal
             } else {
                 TypestateTransitions::To(transitions_to.clone())
             };
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Typestate { transitions, expected_members: members })
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::Typestate {
+                transitions,
+                expected_members: members,
+                expected_methods: methods,
+            })
         }
         TypeDefinitionKindDto::Enum { expected_variants } => {
             Ok(TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() })
         }
-        TypeDefinitionKindDto::ValueObject { expected_members } => {
+        TypeDefinitionKindDto::ValueObject { expected_members, expected_methods } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::ValueObject { expected_members: members })
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::ValueObject {
+                expected_members: members,
+                expected_methods: methods,
+            })
         }
         TypeDefinitionKindDto::ErrorType { expected_variants } => {
             Ok(TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() })
@@ -861,39 +916,64 @@ fn type_definition_kind_from_dto(
             let decls = decode_method_list(entry_name, expected_methods)?;
             Ok(TypeDefinitionKind::ApplicationService { expected_methods: decls })
         }
-        TypeDefinitionKindDto::UseCase { expected_members } => {
+        TypeDefinitionKindDto::UseCase { expected_members, expected_methods } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::UseCase { expected_members: members })
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::UseCase { expected_members: members, expected_methods: methods })
         }
-        TypeDefinitionKindDto::Interactor { expected_members, declares_application_service } => {
+        TypeDefinitionKindDto::Interactor {
+            expected_members,
+            declares_application_service,
+            expected_methods,
+        } => {
             let members = decode_member_list(entry_name, expected_members)?;
+            let methods = decode_method_list(entry_name, expected_methods)?;
             Ok(TypeDefinitionKind::Interactor {
                 expected_members: members,
                 declares_application_service: declares_application_service.clone(),
+                expected_methods: methods,
             })
         }
-        TypeDefinitionKindDto::Dto { expected_members } => {
+        TypeDefinitionKindDto::Dto { expected_members, expected_methods } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Dto { expected_members: members })
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::Dto { expected_members: members, expected_methods: methods })
         }
-        TypeDefinitionKindDto::Command { expected_members } => {
+        TypeDefinitionKindDto::Command { expected_members, expected_methods } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Command { expected_members: members })
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::Command { expected_members: members, expected_methods: methods })
         }
-        TypeDefinitionKindDto::Query { expected_members } => {
+        TypeDefinitionKindDto::Query { expected_members, expected_methods } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Query { expected_members: members })
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::Query { expected_members: members, expected_methods: methods })
         }
-        TypeDefinitionKindDto::Factory { expected_members } => {
+        TypeDefinitionKindDto::Factory { expected_members, expected_methods } => {
             let members = decode_member_list(entry_name, expected_members)?;
-            Ok(TypeDefinitionKind::Factory { expected_members: members })
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::Factory { expected_members: members, expected_methods: methods })
         }
-        TypeDefinitionKindDto::SecondaryAdapter { implements, expected_members } => {
+        TypeDefinitionKindDto::SecondaryAdapter {
+            implements,
+            expected_members,
+            expected_methods,
+        } => {
             let decls = decode_trait_impl_list(entry_name, implements)?;
             let members = decode_member_list(entry_name, expected_members)?;
+            let methods = decode_method_list(entry_name, expected_methods)?;
             Ok(TypeDefinitionKind::SecondaryAdapter {
                 implements: decls,
                 expected_members: members,
+                expected_methods: methods,
+            })
+        }
+        TypeDefinitionKindDto::DomainService { expected_members, expected_methods } => {
+            let members = decode_member_list(entry_name, expected_members)?;
+            let methods = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::DomainService {
+                expected_members: members,
+                expected_methods: methods,
             })
         }
         TypeDefinitionKindDto::FreeFunction {
@@ -1113,13 +1193,18 @@ fn type_catalogue_entry_to_dto(
     entry: &TypeCatalogueEntry,
 ) -> Result<TypeCatalogueEntryDto, TypeCatalogueCodecError> {
     let kind = match entry.kind() {
-        TypeDefinitionKind::Typestate { transitions, expected_members } => {
+        TypeDefinitionKind::Typestate { transitions, expected_members, expected_methods } => {
             let transitions_to = match transitions {
                 TypestateTransitions::Terminal => vec![],
                 TypestateTransitions::To(v) => v.clone(),
             };
             let members = encode_member_list(entry.name(), expected_members)?;
-            TypeDefinitionKindDto::Typestate { transitions_to, expected_members: members }
+            let methods = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::Typestate {
+                transitions_to,
+                expected_members: members,
+                expected_methods: methods,
+            }
         }
         TypeDefinitionKind::Enum { expected_variants } => {
             if expected_variants.is_empty() {
@@ -1132,9 +1217,13 @@ fn type_catalogue_entry_to_dto(
             }
             TypeDefinitionKindDto::Enum { expected_variants: expected_variants.clone() }
         }
-        TypeDefinitionKind::ValueObject { expected_members } => {
+        TypeDefinitionKind::ValueObject { expected_members, expected_methods } => {
             let members = encode_member_list(entry.name(), expected_members)?;
-            TypeDefinitionKindDto::ValueObject { expected_members: members }
+            let methods = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::ValueObject {
+                expected_members: members,
+                expected_methods: methods,
+            }
         }
         TypeDefinitionKind::ErrorType { expected_variants } => {
             if expected_variants.is_empty() {
@@ -1156,39 +1245,60 @@ fn type_catalogue_entry_to_dto(
             let dtos = encode_method_list(entry.name(), expected_methods)?;
             TypeDefinitionKindDto::ApplicationService { expected_methods: dtos }
         }
-        TypeDefinitionKind::UseCase { expected_members } => {
+        TypeDefinitionKind::UseCase { expected_members, expected_methods } => {
             let members = encode_member_list(entry.name(), expected_members)?;
-            TypeDefinitionKindDto::UseCase { expected_members: members }
+            let methods = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::UseCase { expected_members: members, expected_methods: methods }
         }
-        TypeDefinitionKind::Interactor { expected_members, declares_application_service } => {
+        TypeDefinitionKind::Interactor {
+            expected_members,
+            declares_application_service,
+            expected_methods,
+        } => {
             let members = encode_member_list(entry.name(), expected_members)?;
+            let methods = encode_method_list(entry.name(), expected_methods)?;
             TypeDefinitionKindDto::Interactor {
                 expected_members: members,
                 declares_application_service: declares_application_service.clone(),
+                expected_methods: methods,
             }
         }
-        TypeDefinitionKind::Dto { expected_members } => {
+        TypeDefinitionKind::Dto { expected_members, expected_methods } => {
             let members = encode_member_list(entry.name(), expected_members)?;
-            TypeDefinitionKindDto::Dto { expected_members: members }
+            let methods = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::Dto { expected_members: members, expected_methods: methods }
         }
-        TypeDefinitionKind::Command { expected_members } => {
+        TypeDefinitionKind::Command { expected_members, expected_methods } => {
             let members = encode_member_list(entry.name(), expected_members)?;
-            TypeDefinitionKindDto::Command { expected_members: members }
+            let methods = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::Command { expected_members: members, expected_methods: methods }
         }
-        TypeDefinitionKind::Query { expected_members } => {
+        TypeDefinitionKind::Query { expected_members, expected_methods } => {
             let members = encode_member_list(entry.name(), expected_members)?;
-            TypeDefinitionKindDto::Query { expected_members: members }
+            let methods = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::Query { expected_members: members, expected_methods: methods }
         }
-        TypeDefinitionKind::Factory { expected_members } => {
+        TypeDefinitionKind::Factory { expected_members, expected_methods } => {
             let members = encode_member_list(entry.name(), expected_members)?;
-            TypeDefinitionKindDto::Factory { expected_members: members }
+            let methods = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::Factory { expected_members: members, expected_methods: methods }
         }
-        TypeDefinitionKind::SecondaryAdapter { implements, expected_members } => {
+        TypeDefinitionKind::SecondaryAdapter { implements, expected_members, expected_methods } => {
             let impl_dtos = encode_trait_impl_list(entry.name(), implements)?;
             let member_dtos = encode_member_list(entry.name(), expected_members)?;
+            let method_dtos = encode_method_list(entry.name(), expected_methods)?;
             TypeDefinitionKindDto::SecondaryAdapter {
                 implements: impl_dtos,
                 expected_members: member_dtos,
+                expected_methods: method_dtos,
+            }
+        }
+        TypeDefinitionKind::DomainService { expected_members, expected_methods } => {
+            let member_dtos = encode_member_list(entry.name(), expected_members)?;
+            let method_dtos = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::DomainService {
+                expected_members: member_dtos,
+                expected_methods: method_dtos,
             }
         }
         TypeDefinitionKind::FreeFunction {
@@ -1425,10 +1535,10 @@ mod tests {
     const FULL_JSON: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Draft", "kind": "typestate", "description": "Draft state", "transitions_to": ["Published"], "approved": true },
-    { "name": "Published", "kind": "typestate", "description": "Published state", "transitions_to": [], "approved": true },
+    { "name": "Draft", "kind": "typestate", "description": "Draft state", "transitions_to": ["Published"], "expected_members": [], "expected_methods": [], "approved": true },
+    { "name": "Published", "kind": "typestate", "description": "Published state", "transitions_to": [], "expected_members": [], "expected_methods": [], "approved": true },
     { "name": "TrackStatus", "kind": "enum", "description": "Track status", "expected_variants": ["Planned", "Done"], "approved": true },
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true },
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "expected_members": [], "expected_methods": [], "approved": true },
     { "name": "SchemaExportError", "kind": "error_type", "description": "Export error", "expected_variants": ["NightlyNotFound"], "approved": true },
     {
       "name": "SchemaExporter",
@@ -1516,7 +1626,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Foo", "kind": "value_object", "description": "no approved field" }
+    { "name": "Foo", "kind": "value_object", "description": "no approved field", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1561,7 +1671,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "", "kind": "value_object", "description": "bad", "approved": true }
+    { "name": "", "kind": "value_object", "description": "bad", "expected_methods": [], "approved": true }
   ]
 }"#;
         let err = decode(json).unwrap_err();
@@ -1672,7 +1782,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Draft", "kind": "typestate", "description": "d", "transitions_to": ["NonExistent"] }
+    { "name": "Draft", "kind": "typestate", "description": "d", "transitions_to": ["NonExistent"], "expected_methods": [] }
   ]
 }"#;
         let err = decode(json).unwrap_err();
@@ -1702,7 +1812,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Draft", "kind": "typestate", "description": "Draft state", "transitions_to": [] }
+    { "name": "Draft", "kind": "typestate", "description": "Draft state", "transitions_to": [], "expected_methods": [] }
   ],
   "signals": [
     { "type_name": "Draft", "kind_tag": "typestate", "signal": "blue", "found_type": true }
@@ -1724,18 +1834,22 @@ mod tests {
     }
 
     #[test]
-    fn test_encode_value_object_omits_kind_specific_fields() {
+    fn test_encode_value_object_omits_typestate_and_enum_fields() {
+        // M1: value_object now carries `expected_methods` (emitted even when empty).
+        // It must still NOT carry `transitions_to` (typestate-only) or
+        // `expected_variants` (enum/error_type-only).
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "ID", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "ID", "approved": true, "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
         let encoded = encode(&doc).unwrap();
         assert!(!encoded.contains("transitions_to"));
         assert!(!encoded.contains("expected_variants"));
-        assert!(!encoded.contains("expected_methods"));
+        // expected_methods IS now emitted for value_object (even as empty array)
+        assert!(encoded.contains("expected_methods"));
     }
 
     #[test]
@@ -1743,7 +1857,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Draft", "kind": "value_object", "description": "Draft" }
+    { "name": "Draft", "kind": "value_object", "description": "Draft", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1757,7 +1871,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Foo", "kind": "value_object", "description": "d" }
+    { "name": "Foo", "kind": "value_object", "description": "d", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1769,7 +1883,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
+    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1781,7 +1895,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Changed", "kind": "value_object", "description": "d", "action": "modify" }
+    { "name": "Changed", "kind": "value_object", "description": "d", "action": "modify", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1793,7 +1907,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Ref", "kind": "value_object", "description": "d", "action": "reference" }
+    { "name": "Ref", "kind": "value_object", "description": "d", "action": "reference", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1805,7 +1919,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Foo", "kind": "value_object", "description": "d" }
+    { "name": "Foo", "kind": "value_object", "description": "d", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1818,7 +1932,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
+    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1831,7 +1945,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
+    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1845,7 +1959,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Foo", "kind": "value_object", "description": "d", "action": "rename" }
+    { "name": "Foo", "kind": "value_object", "description": "d", "action": "rename", "expected_methods": [] }
   ]
 }"#;
         assert!(decode(json).is_err());
@@ -1858,7 +1972,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
+    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete", "expected_methods": [] },
     {
       "name": "Foo",
       "kind": "secondary_port",
@@ -1881,8 +1995,8 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Foo", "kind": "value_object", "description": "a" },
-    { "name": "Foo", "kind": "value_object", "description": "b" }
+    { "name": "Foo", "kind": "value_object", "description": "a", "expected_methods": [] },
+    { "name": "Foo", "kind": "value_object", "description": "b", "expected_methods": [] }
   ]
 }"#;
         let err = decode(json).unwrap_err();
@@ -1894,8 +2008,8 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "OldDraft", "kind": "typestate", "description": "old draft", "action": "delete", "transitions_to": ["OldPublished"] },
-    { "name": "OldPublished", "kind": "typestate", "description": "old published", "action": "delete", "transitions_to": [] }
+    { "name": "OldDraft", "kind": "typestate", "description": "old draft", "action": "delete", "transitions_to": ["OldPublished"], "expected_methods": [] },
+    { "name": "OldPublished", "kind": "typestate", "description": "old published", "action": "delete", "transitions_to": [], "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1913,7 +2027,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Draft", "kind": "value_object", "description": "Draft", "approved": true }
+    { "name": "Draft", "kind": "value_object", "description": "Draft", "approved": true, "expected_methods": [] }
   ],
   "signals": [
     {
@@ -1970,7 +2084,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "SaveTrackUseCase", "kind": "use_case", "description": "Save track use case" }
+    { "name": "SaveTrackUseCase", "kind": "use_case", "description": "Save track use case", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1982,7 +2096,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "SaveTrackInteractor", "kind": "interactor", "description": "Interactor" }
+    { "name": "SaveTrackInteractor", "kind": "interactor", "description": "Interactor", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -1994,7 +2108,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "CreateUserDto", "kind": "dto", "description": "DTO" }
+    { "name": "CreateUserDto", "kind": "dto", "description": "DTO", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2006,7 +2120,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "CreateUserCommand", "kind": "command", "description": "CQRS command" }
+    { "name": "CreateUserCommand", "kind": "command", "description": "CQRS command", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2018,7 +2132,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "GetUserQuery", "kind": "query", "description": "CQRS query" }
+    { "name": "GetUserQuery", "kind": "query", "description": "CQRS query", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2030,7 +2144,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "UserFactory", "kind": "factory", "description": "Factory" }
+    { "name": "UserFactory", "kind": "factory", "description": "Factory", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2066,7 +2180,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "SaveTrackUseCase", "kind": "use_case", "description": "use case" }
+    { "name": "SaveTrackUseCase", "kind": "use_case", "description": "use case", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2081,7 +2195,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "SaveTrackInteractor", "kind": "interactor", "description": "interactor" }
+    { "name": "SaveTrackInteractor", "kind": "interactor", "description": "interactor", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2096,7 +2210,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "CreateUserDto", "kind": "dto", "description": "dto" }
+    { "name": "CreateUserDto", "kind": "dto", "description": "dto", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2111,7 +2225,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "CreateUserCommand", "kind": "command", "description": "command" }
+    { "name": "CreateUserCommand", "kind": "command", "description": "command", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2126,7 +2240,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "GetUserQuery", "kind": "query", "description": "query" }
+    { "name": "GetUserQuery", "kind": "query", "description": "query", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2141,7 +2255,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "UserFactory", "kind": "factory", "description": "factory" }
+    { "name": "UserFactory", "kind": "factory", "description": "factory", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2152,16 +2266,17 @@ mod tests {
     }
 
     #[test]
-    fn test_round_trip_all_13_variants() {
-        // Verifies that all 13 TypeDefinitionKind variants round-trip through
-        // JSON encode/decode correctly.
+    fn test_round_trip_all_15_variants() {
+        // T002 (TDDD-02): Verifies that all 15 TypeDefinitionKind variants round-trip
+        // through JSON encode/decode correctly (was 13 before M1+S1: added DomainService
+        // and updated all 9 struct-based kinds to carry expected_methods).
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Draft", "kind": "typestate", "description": "typestate", "transitions_to": ["Published"] },
-    { "name": "Published", "kind": "typestate", "description": "typestate terminal", "transitions_to": [] },
+    { "name": "Draft", "kind": "typestate", "description": "typestate", "transitions_to": ["Published"], "expected_methods": [] },
+    { "name": "Published", "kind": "typestate", "description": "typestate terminal", "transitions_to": [], "expected_methods": [] },
     { "name": "TrackStatus", "kind": "enum", "description": "enum", "expected_variants": ["Planned", "Done"] },
-    { "name": "TrackId", "kind": "value_object", "description": "value object" },
+    { "name": "TrackId", "kind": "value_object", "description": "value object", "expected_methods": [] },
     { "name": "AppError", "kind": "error_type", "description": "error type", "expected_variants": ["NotFound"] },
     {
       "name": "TrackRepo",
@@ -2179,25 +2294,37 @@ mod tests {
         { "name": "execute", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
       ]
     },
-    { "name": "SaveUseCase", "kind": "use_case", "description": "use case" },
-    { "name": "SaveInteractor", "kind": "interactor", "description": "interactor" },
-    { "name": "SaveDto", "kind": "dto", "description": "dto" },
-    { "name": "SaveCommand", "kind": "command", "description": "command" },
-    { "name": "GetQuery", "kind": "query", "description": "query" },
-    { "name": "AggFactory", "kind": "factory", "description": "factory" },
+    { "name": "SaveUseCase", "kind": "use_case", "description": "use case", "expected_methods": [] },
+    { "name": "SaveInteractor", "kind": "interactor", "description": "interactor", "expected_methods": [] },
+    { "name": "SaveDto", "kind": "dto", "description": "dto", "expected_methods": [] },
+    { "name": "SaveCommand", "kind": "command", "description": "command", "expected_methods": [] },
+    { "name": "GetQuery", "kind": "query", "description": "query", "expected_methods": [] },
+    { "name": "AggFactory", "kind": "factory", "description": "factory", "expected_methods": [] },
     {
       "name": "FsStore",
       "kind": "secondary_adapter",
       "description": "adapter",
-      "implements": [{ "trait_name": "TrackReader" }]
+      "implements": [{ "trait_name": "TrackReader" }],
+      "expected_methods": []
+    },
+    {
+      "name": "AuditService",
+      "kind": "domain_service",
+      "description": "domain service",
+      "expected_members": [
+        { "kind": "field", "name": "rules", "ty": "Vec<AuditRule>" }
+      ],
+      "expected_methods": [
+        { "name": "audit", "receiver": "&self", "params": [], "returns": "Vec<AuditResult>", "is_async": false }
+      ]
     }
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert_eq!(doc.entries().len(), 14);
+        assert_eq!(doc.entries().len(), 15);
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
-        assert_eq!(doc2.entries().len(), 14);
+        assert_eq!(doc2.entries().len(), 15);
         for (a, b) in doc.entries().iter().zip(doc2.entries()) {
             assert_eq!(a.name(), b.name());
             assert_eq!(a.kind(), b.kind());
@@ -2207,28 +2334,30 @@ mod tests {
     // --- T002: existence-only variant stale-field rejection (Phase 1.5) ---
 
     #[test]
-    fn test_decode_use_case_with_stale_expected_methods_rejected() {
-        // Phase 1.5: existence-only variants must not carry kind-specific fields
-        // that belong to other variants (e.g. expected_methods from SecondaryPort).
+    fn test_decode_use_case_with_expected_methods_accepted() {
+        // T002 (TDDD-02 M1): struct-based kinds now accept `expected_methods`.
+        // This test confirms that `use_case` with `expected_methods` decodes successfully
+        // (the old Phase 1.5 guard that rejected it has been updated to allow it).
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
     {
       "name": "SaveUseCase",
       "kind": "use_case",
-      "description": "use case with stale field",
+      "description": "use case with expected_methods",
       "expected_methods": [
         { "name": "execute", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
       ]
     }
   ]
 }"#;
-        let err = decode(json).unwrap_err();
-        assert!(
-            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
-            "expected InvalidEntry for stale expected_methods on use_case, got: {:?}",
-            err
-        );
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::UseCase { expected_methods, .. } = kind else {
+            panic!("expected UseCase kind, got {kind:?}");
+        };
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "execute");
     }
 
     #[test]
@@ -2254,7 +2383,9 @@ mod tests {
 
     #[test]
     fn test_decode_value_object_with_stale_transitions_to_rejected() {
-        // value_object is also existence-only (pre-existing); same protection applies.
+        // T002 (TDDD-02 M1): value_object now carries expected_methods, but it must
+        // still NOT carry `transitions_to` (which is typestate-specific). The Phase
+        // 1.5 guard for struct-based kinds keeps `transitions_to` in the forbidden list.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -2262,7 +2393,8 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "value object with stale field",
-      "transitions_to": ["Published"]
+      "transitions_to": ["Published"],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2287,7 +2419,8 @@ mod tests {
       "description": "Adapter implementing ReviewReader",
       "implements": [
         { "trait_name": "ReviewReader" }
-      ]
+      ],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2318,7 +2451,8 @@ mod tests {
           ]
         },
         { "trait_name": "TrackWriter" }
-      ]
+      ],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2351,7 +2485,8 @@ mod tests {
             { "name": "find", "receiver": "&self", "params": [{ "name": "id", "ty": "ReviewId" }], "returns": "Option<Review>", "is_async": false }
           ]
         }
-      ]
+      ],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2374,7 +2509,8 @@ mod tests {
       "name": "FsReviewStore",
       "kind": "secondary_adapter",
       "description": "Adapter",
-      "implements": [{ "trait_name": "ReviewReader" }]
+      "implements": [{ "trait_name": "ReviewReader" }],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2392,13 +2528,14 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "FsStore", "kind": "value_object", "description": "old", "action": "delete" },
+    { "name": "FsStore", "kind": "value_object", "description": "old", "action": "delete", "expected_methods": [] },
     {
       "name": "FsStore",
       "kind": "secondary_adapter",
       "description": "new",
       "action": "add",
-      "implements": [{ "trait_name": "ReviewReader" }]
+      "implements": [{ "trait_name": "ReviewReader" }],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2416,7 +2553,7 @@ mod tests {
 
     #[test]
     fn test_decode_existence_only_kind_with_implements_rejected() {
-        // Phase 1.5: existence-only kinds (use_case, etc.) must not carry `implements`
+        // Phase 1.5: struct-based kinds (use_case, etc.) must not carry `implements`
         // (which belongs to secondary_adapter). Without this guard, the field would be
         // silently dropped by serde instead of triggering an error.
         let json = r#"{
@@ -2426,7 +2563,8 @@ mod tests {
       "name": "SaveUseCase",
       "kind": "use_case",
       "description": "use case with stale implements field",
-      "implements": [{ "trait_name": "SomePort" }]
+      "implements": [{ "trait_name": "SomePort" }],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2448,7 +2586,8 @@ mod tests {
       "name": "FsReviewStore",
       "kind": "secondary_adapter",
       "description": "Adapter",
-      "implements": [{ "trait_name": "domain::ports::ReviewReader" }]
+      "implements": [{ "trait_name": "domain::ports::ReviewReader" }],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2465,17 +2604,17 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_secondary_adapter_with_stale_expected_methods_rejected() {
-        // Phase 1.5: secondary_adapter must not carry `expected_methods` (that field
-        // belongs to secondary_port / application_service). Without this guard, serde
-        // would silently drop the field and the data loss would be invisible.
+    fn test_decode_secondary_adapter_with_expected_methods_accepted() {
+        // T002 (TDDD-02 M1): secondary_adapter now supports top-level `expected_methods`
+        // alongside `implements`. The old Phase 1.5 guard that rejected it has been
+        // updated to allow it (M1 uniformization).
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
     {
       "name": "FsReviewStore",
       "kind": "secondary_adapter",
-      "description": "Adapter with stale expected_methods",
+      "description": "Adapter with top-level expected_methods",
       "implements": [{ "trait_name": "ReviewReader" }],
       "expected_methods": [
         { "name": "find", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
@@ -2483,12 +2622,13 @@ mod tests {
     }
   ]
 }"#;
-        let err = decode(json).unwrap_err();
-        assert!(
-            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
-            "expected InvalidEntry for stale expected_methods on secondary_adapter, got: {:?}",
-            err
-        );
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::SecondaryAdapter { expected_methods, .. } = kind else {
+            panic!("expected SecondaryAdapter kind, got {kind:?}");
+        };
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "find");
     }
 
     #[test]
@@ -2525,7 +2665,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "ID" }
+    { "name": "TrackId", "kind": "value_object", "description": "ID", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2544,6 +2684,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "spec_refs": [
         {{ "file": "track/items/my-track/spec.json", "anchor": "IN-01", "hash": "{hash}" }}
       ]
@@ -2568,6 +2709,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "informal_grounds": [
         { "kind": "discussion", "summary": "user asked to defer Q15 anchor semantics" }
       ]
@@ -2596,6 +2738,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "spec_refs": [
         {{ "file": "track/items/my-track/spec.json", "anchor": "AC-02", "hash": "{hash}" }}
       ],
@@ -2627,7 +2770,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "ID" }
+    { "name": "TrackId", "kind": "value_object", "description": "ID", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2647,6 +2790,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "spec_refs": [
         {{ "file": "spec.json", "anchor": "INVALID", "hash": "{hash}" }}
       ]
@@ -2671,6 +2815,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "spec_refs": [
         { "file": "spec.json", "anchor": "IN-01", "hash": "not-a-hex-hash" }
       ]
@@ -2694,6 +2839,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "informal_grounds": [
         { "kind": "unknown_kind", "summary": "some summary" }
       ]
@@ -2717,6 +2863,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "informal_grounds": [
         { "kind": "feedback", "summary": "" }
       ]
@@ -2749,6 +2896,7 @@ mod tests {
       "name": "TrackId",
       "kind": "value_object",
       "description": "ID",
+      "expected_methods": [],
       "informal_grounds": [
         {{ "kind": "{kind_str}", "summary": "test summary" }}
       ]
@@ -2829,7 +2977,8 @@ mod tests {
       "name": "BadInteractor",
       "kind": "interactor",
       "description": "interactor with empty declares_application_service",
-      "declares_application_service": []
+      "declares_application_service": [],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2849,7 +2998,7 @@ mod tests {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "SaveInteractor", "kind": "interactor", "description": "interactor, no DAS field" }
+    { "name": "SaveInteractor", "kind": "interactor", "description": "interactor, no DAS field", "expected_methods": [] }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -2872,7 +3021,8 @@ mod tests {
       "name": "RenderContractMapInteractor",
       "kind": "interactor",
       "description": "interactor with DAS",
-      "declares_application_service": ["RenderContractMap"]
+      "declares_application_service": ["RenderContractMap"],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -2895,7 +3045,8 @@ mod tests {
       "name": "RenderContractMapInteractor",
       "kind": "interactor",
       "description": "interactor",
-      "declares_application_service": ["RenderContractMap", "AnotherService"]
+      "declares_application_service": ["RenderContractMap", "AnotherService"],
+      "expected_methods": []
     }
   ]
 }"#;
@@ -3100,6 +3251,278 @@ mod tests {
         assert!(
             matches!(err, TypeCatalogueCodecError::UnsupportedSchemaVersion(u32::MAX)),
             "expected UnsupportedSchemaVersion(u32::MAX) for overflow schema_version, got: {err:?}"
+        );
+    }
+
+    // --- T002 (TDDD-02 M1+S1): struct kind expected_methods round-trip tests ---
+
+    #[test]
+    fn test_round_trip_typestate_with_expected_methods() {
+        // M1: typestate now carries top-level expected_methods.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Draft",
+      "kind": "typestate",
+      "description": "draft state",
+      "transitions_to": ["Published"],
+      "expected_methods": [
+        { "name": "validate", "receiver": "&self", "params": [], "returns": "bool", "is_async": false }
+      ]
+    },
+    { "name": "Published", "kind": "typestate", "description": "published", "transitions_to": [], "expected_methods": [] }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::Typestate { expected_methods, .. } = kind else {
+            panic!("expected Typestate kind, got {kind:?}");
+        };
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "validate");
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_round_trip_value_object_with_expected_methods() {
+        // M1: value_object now carries top-level expected_methods.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Email",
+      "kind": "value_object",
+      "description": "email value object",
+      "expected_members": [
+        { "kind": "field", "name": "raw", "ty": "String" }
+      ],
+      "expected_methods": [
+        { "name": "as_str", "receiver": "&self", "params": [], "returns": "str", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::ValueObject { expected_methods, .. } = kind else {
+            panic!("expected ValueObject kind, got {kind:?}");
+        };
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "as_str");
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_round_trip_use_case_with_expected_methods_non_empty() {
+        // M1: use_case with a non-empty expected_methods round-trips correctly.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RunCatalogueLintUseCase",
+      "kind": "use_case",
+      "description": "lint use case",
+      "expected_methods": [
+        { "name": "execute", "receiver": "&self", "params": [{ "name": "cmd", "ty": "RunLintCommand" }], "returns": "Result<Vec<Violation>, LintError>", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::UseCase { expected_methods, .. } = kind else {
+            panic!("expected UseCase kind, got {kind:?}");
+        };
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "execute");
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"use_case\""));
+    }
+
+    #[test]
+    fn test_round_trip_secondary_adapter_with_top_level_expected_methods() {
+        // M1: secondary_adapter can carry top-level expected_methods alongside implements.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsLinter",
+      "kind": "secondary_adapter",
+      "description": "adapter",
+      "implements": [{ "trait_name": "CatalogueLinter" }],
+      "expected_methods": [
+        { "name": "run", "receiver": "&self", "params": [], "returns": "Vec<Violation>", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::SecondaryAdapter { implements, expected_methods, .. } = kind else {
+            panic!("expected SecondaryAdapter kind, got {kind:?}");
+        };
+        assert_eq!(implements.len(), 1);
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "run");
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"secondary_adapter\""));
+    }
+
+    #[test]
+    fn test_round_trip_domain_service_with_members_and_methods() {
+        // S1: DomainService variant encodes as "kind": "domain_service" and round-trips.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "PricingService",
+      "kind": "domain_service",
+      "description": "pricing domain service",
+      "expected_members": [
+        { "kind": "field", "name": "rules", "ty": "Vec<PricingRule>" }
+      ],
+      "expected_methods": [
+        { "name": "calculate", "receiver": "&self", "params": [{ "name": "cart", "ty": "Cart" }], "returns": "Price", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::DomainService { expected_members, expected_methods } = kind else {
+            panic!("expected DomainService kind, got {kind:?}");
+        };
+        assert_eq!(expected_members.len(), 1);
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "calculate");
+
+        let encoded = encode(&doc).unwrap();
+        // S1: DomainService must serialize as "domain_service" kind tag.
+        assert!(
+            encoded.contains("\"domain_service\""),
+            "DomainService must encode as \"domain_service\" kind tag, got:\n{encoded}"
+        );
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert_eq!(doc2.entries()[0].name(), "PricingService");
+    }
+
+    #[test]
+    fn test_round_trip_domain_service_empty_fields() {
+        // S1: DomainService with empty expected_members and expected_methods round-trips.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "NullService",
+      "kind": "domain_service",
+      "description": "empty domain service",
+      "expected_members": [],
+      "expected_methods": []
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        assert!(encoded.contains("\"domain_service\""));
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_m1_phase15_guard_allows_expected_methods_on_all_struct_kinds() {
+        // T002 (TDDD-02 M1): Phase 1.5 guard must accept expected_methods on all 9
+        // struct-based kinds. This test verifies that none of them are rejected.
+        let struct_kinds_with_methods = vec![
+            r#"{ "name": "T", "kind": "typestate", "description": "d", "transitions_to": [], "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "V", "kind": "value_object", "description": "d", "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "U", "kind": "use_case", "description": "d", "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "I", "kind": "interactor", "description": "d", "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "D", "kind": "dto", "description": "d", "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "C", "kind": "command", "description": "d", "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "Q", "kind": "query", "description": "d", "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "F", "kind": "factory", "description": "d", "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+            r#"{ "name": "SA", "kind": "secondary_adapter", "description": "d", "implements": [], "expected_methods": [{ "name": "m", "receiver": "&self", "params": [], "returns": "()", "is_async": false }] }"#,
+        ];
+        for entry_json in &struct_kinds_with_methods {
+            let json =
+                format!(r#"{{ "schema_version": 2, "type_definitions": [ {entry_json} ] }}"#);
+            assert!(
+                decode(&json).is_ok(),
+                "M1: expected_methods must be accepted on struct kind: {entry_json}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_m1_struct_kinds_still_reject_expected_variants() {
+        // M1: struct-based kinds now allow expected_methods but must still NOT
+        // allow expected_variants (which belongs to enum/error_type only).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "MyDto",
+      "kind": "dto",
+      "description": "dto with stale expected_variants",
+      "expected_methods": [],
+      "expected_variants": ["A", "B"]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale expected_variants on dto, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_m1_struct_kinds_still_reject_implements() {
+        // M1: struct-based kinds (excluding secondary_adapter) must still NOT
+        // allow implements (which belongs to secondary_adapter only).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "MyFactory",
+      "kind": "factory",
+      "description": "factory with stale implements",
+      "expected_methods": [],
+      "implements": [{ "trait_name": "SomePort" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale implements on factory, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_m1_missing_expected_methods_on_struct_kind_returns_error() {
+        // M1/CN-02: struct-based kinds now require `expected_methods` (no
+        // `#[serde(default)]`). JSON without the field must be rejected.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "MyDto", "kind": "dto", "description": "dto without expected_methods" }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::Json(_)),
+            "expected Json error for missing expected_methods on dto, got: {err:?}"
         );
     }
 }

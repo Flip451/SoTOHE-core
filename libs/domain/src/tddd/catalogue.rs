@@ -341,32 +341,44 @@ pub enum TypestateTransitions {
 /// Each variant carries the expected items that the type should expose so that
 /// an automated scanner can compute a `TypeSignal` for the entry.
 ///
-/// Layer-neutral naming (T001): this used to be `DomainTypeKind` when the
-/// catalogue lived only in the domain layer. The rename reflects that TDDD now
-/// applies to usecase and future layers via `architecture-rules.json` layer
-/// blocks (ADR 0002 §D1).
+/// Layer-neutral naming: this used to be `DomainTypeKind` when the catalogue
+/// lived only in the domain layer. The rename reflects that TDDD now applies
+/// to usecase and future layers via `architecture-rules.json` layer blocks
+/// (ADR 0002 §D1).
 ///
-/// T002: Added `expected_members` to 9 struct-based kinds (Typestate,
+/// M1 / S1 (ADR 2026-04-28-0135): Every struct-based kind (Typestate,
 /// ValueObject, UseCase, Interactor, Dto, Command, Query, Factory,
-/// SecondaryAdapter), added `declares_application_service` to Interactor,
-/// and added the new `FreeFunction` variant.
+/// SecondaryAdapter) carries both `expected_members` and `expected_methods`
+/// uniformly — the schema represents capability, semantic restrictions
+/// (e.g. value_object having no behavioral methods) are enforced separately
+/// by the catalogue linter (S3). The new `DomainService` variant covers
+/// behavioral structs that own field state and behavioral methods but do
+/// not implement an `ApplicationService` trait.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TypeDefinitionKind {
     /// A type whose instances carry state-machine phase information.
     ///
-    /// `expected_members` lists the struct fields that the typestate type
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
-    Typestate { transitions: TypestateTransitions, expected_members: Vec<MemberDeclaration> },
+    /// `expected_members` lists the struct fields the typestate is expected
+    /// to expose (L1 resolution). `expected_methods` lists the L1 method
+    /// signatures expected on this typestate (e.g. transition functions).
+    Typestate {
+        transitions: TypestateTransitions,
+        expected_members: Vec<MemberDeclaration>,
+        expected_methods: Vec<MethodDeclaration>,
+    },
     /// A `pub enum` with a fixed set of variants.
     /// `expected_variants` lists the names that must appear.
     Enum { expected_variants: Vec<String> },
     /// A newtype or small struct used solely as a validated value.
     ///
-    /// `expected_members` lists the struct fields that the value object
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
-    ValueObject { expected_members: Vec<MemberDeclaration> },
+    /// `expected_members` lists the struct fields. `expected_methods` is
+    /// schema-uniform (M1) but value_object semantics restrict behavioral
+    /// methods — this is enforced by the catalogue linter (S3 field-empty
+    /// rule), not by the schema.
+    ValueObject {
+        expected_members: Vec<MemberDeclaration>,
+        expected_methods: Vec<MethodDeclaration>,
+    },
     /// An `enum` used exclusively as an error type.
     /// `expected_variants` lists the variants that must appear.
     ErrorType { expected_variants: Vec<String> },
@@ -390,47 +402,47 @@ pub enum TypeDefinitionKind {
     ApplicationService { expected_methods: Vec<MethodDeclaration> },
     /// A struct-only use case type.
     ///
-    /// `expected_members` lists the struct fields that the use case struct
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
-    UseCase { expected_members: Vec<MemberDeclaration> },
+    /// `expected_members` lists the struct fields. `expected_methods` lists
+    /// the L1 method signatures expected on this use case struct.
+    UseCase { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> },
     /// An `ApplicationService` implementation struct.
     ///
-    /// `expected_members` lists the struct fields that the interactor struct
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
+    /// `expected_members` lists the struct fields. `expected_methods` lists
+    /// the L1 method signatures expected on the interactor itself (in
+    /// addition to `ApplicationService` trait methods, which are checked
+    /// via `declares_application_service`).
     ///
     /// `declares_application_service` lists the `ApplicationService` trait
     /// names that this interactor is expected to implement. Domain layer
-    /// allows empty Vec; codec (T003) enforces at-least-one constraint.
+    /// allows empty Vec; codec enforces at-least-one constraint.
     Interactor {
         expected_members: Vec<MemberDeclaration>,
         declares_application_service: Vec<String>,
+        expected_methods: Vec<MethodDeclaration>,
     },
     /// A pure data-transfer object struct.
     ///
-    /// `expected_members` lists the struct fields that the DTO struct
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
-    Dto { expected_members: Vec<MemberDeclaration> },
+    /// `expected_members` lists the struct fields. `expected_methods` is
+    /// schema-uniform (M1) but DTO semantics restrict behavioral methods
+    /// to encoding/decoding helpers — restriction enforced by the catalogue
+    /// linter (S3), not by the schema.
+    Dto { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> },
     /// A CQRS command object struct.
     ///
-    /// `expected_members` lists the struct fields that the command struct
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
-    Command { expected_members: Vec<MemberDeclaration> },
+    /// `expected_members` lists the struct fields. `expected_methods`
+    /// follows the schema-uniform M1 model.
+    Command { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> },
     /// A CQRS query object struct.
     ///
-    /// `expected_members` lists the struct fields that the query struct
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
-    Query { expected_members: Vec<MemberDeclaration> },
+    /// `expected_members` lists the struct fields. `expected_methods`
+    /// follows the schema-uniform M1 model.
+    Query { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> },
     /// An aggregate or entity factory struct.
     ///
-    /// `expected_members` lists the struct fields that the factory struct
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
-    Factory { expected_members: Vec<MemberDeclaration> },
+    /// `expected_members` lists the struct fields. `expected_methods` lists
+    /// the L1 method signatures expected on this factory (typically
+    /// reconstitution / construction methods).
+    Factory { expected_members: Vec<MemberDeclaration>, expected_methods: Vec<MethodDeclaration> },
     /// A struct that implements one or more hexagonal secondary (driven) port
     /// traits.
     ///
@@ -438,12 +450,36 @@ pub enum TypeDefinitionKind {
     /// An empty `implements` vec means existence-check only (the struct must
     /// exist, no impl constraint is checked).
     ///
-    /// `expected_members` lists the struct fields that the adapter struct
-    /// is expected to expose (L1 resolution). Evaluated by T008+; in T002
-    /// this field is present but not yet used by the signal evaluator.
+    /// `expected_members` lists the struct fields. `expected_methods` lists
+    /// L1 method signatures defined directly on the adapter struct (e.g.
+    /// constructor / helper methods); trait method signatures live under
+    /// `implements[].expected_methods`. Renderer `methods_of()` will merge
+    /// the two sources once T003 is implemented (S2 planned behaviour).
     ///
     /// See ADR `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md` §D1.
-    SecondaryAdapter { implements: Vec<TraitImplDecl>, expected_members: Vec<MemberDeclaration> },
+    SecondaryAdapter {
+        implements: Vec<TraitImplDecl>,
+        expected_members: Vec<MemberDeclaration>,
+        expected_methods: Vec<MethodDeclaration>,
+    },
+    /// A behavioral struct that owns field state and behavioral methods,
+    /// but does not implement an `ApplicationService` trait — the canonical
+    /// home for DDD-style domain services and similar.
+    ///
+    /// Layer constraint (S1): `domain_service` is allowed in the `domain`
+    /// layer (✓), allowed in the `usecase` layer with explicit grounds (△),
+    /// and forbidden in the `infrastructure` layer (✗). Enforcement lives
+    /// in the catalogue linter (S3 kind-layer constraint), not in this
+    /// schema definition.
+    ///
+    /// Differs from `Interactor`: `domain_service` does not declare an
+    /// `ApplicationService` trait implementation. If the type implements
+    /// `ApplicationService` choose `Interactor`; if it implements a
+    /// `SecondaryPort` choose `SecondaryAdapter`; otherwise this kind.
+    DomainService {
+        expected_members: Vec<MemberDeclaration>,
+        expected_methods: Vec<MethodDeclaration>,
+    },
     /// A free function (non-method top-level or sub-module pub fn).
     ///
     /// `module_path` is `None` for top-level pub fn declarations, or
@@ -480,6 +516,7 @@ impl TypeDefinitionKind {
             Self::Query { .. } => "query",
             Self::Factory { .. } => "factory",
             Self::SecondaryAdapter { .. } => "secondary_adapter",
+            Self::DomainService { .. } => "domain_service",
             Self::FreeFunction { .. } => "free_function",
         }
     }
@@ -828,7 +865,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -841,7 +881,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "OldType",
             "Intentionally deleted",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Delete,
             true,
         )
@@ -854,7 +897,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "ChangedType",
             "Modified existing type",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Modify,
             true,
         )
@@ -867,7 +913,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "RefType",
             "Referenced for docs",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Reference,
             true,
         )
@@ -884,6 +933,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Approved".into(), "Rejected".into()]),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -905,7 +955,10 @@ mod tests {
         let result = TypeCatalogueEntry::new(
             "",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         );
@@ -917,7 +970,10 @@ mod tests {
         let result = TypeCatalogueEntry::new(
             "   ",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         );
@@ -929,12 +985,21 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Email",
             "Validated email address",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &TypeDefinitionKind::ValueObject { expected_members: Vec::new() });
+        assert_eq!(
+            entry.kind(),
+            &TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new()
+            }
+        );
         assert_eq!(entry.kind().kind_tag(), "value_object");
     }
 
@@ -1032,12 +1097,21 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "SaveTrackUseCase",
             "Use case for saving a track",
-            TypeDefinitionKind::UseCase { expected_members: Vec::new() },
+            TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &TypeDefinitionKind::UseCase { expected_members: Vec::new() });
+        assert_eq!(
+            entry.kind(),
+            &TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new()
+            }
+        );
         assert_eq!(entry.kind().kind_tag(), "use_case");
     }
 
@@ -1049,6 +1123,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1059,6 +1134,7 @@ mod tests {
             &TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             }
         );
         assert_eq!(entry.kind().kind_tag(), "interactor");
@@ -1069,12 +1145,15 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackDto",
             "Data transfer object for a track",
-            TypeDefinitionKind::Dto { expected_members: Vec::new() },
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &TypeDefinitionKind::Dto { expected_members: Vec::new() });
+        assert_eq!(
+            entry.kind(),
+            &TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() }
+        );
         assert_eq!(entry.kind().kind_tag(), "dto");
     }
 
@@ -1083,12 +1162,21 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "CreateTrackCommand",
             "CQRS command to create a track",
-            TypeDefinitionKind::Command { expected_members: Vec::new() },
+            TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &TypeDefinitionKind::Command { expected_members: Vec::new() });
+        assert_eq!(
+            entry.kind(),
+            &TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new()
+            }
+        );
         assert_eq!(entry.kind().kind_tag(), "command");
     }
 
@@ -1097,12 +1185,21 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "FindTrackQuery",
             "CQRS query to find a track",
-            TypeDefinitionKind::Query { expected_members: Vec::new() },
+            TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &TypeDefinitionKind::Query { expected_members: Vec::new() });
+        assert_eq!(
+            entry.kind(),
+            &TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new()
+            }
+        );
         assert_eq!(entry.kind().kind_tag(), "query");
     }
 
@@ -1111,12 +1208,21 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackFactory",
             "Factory for creating Track aggregates",
-            TypeDefinitionKind::Factory { expected_members: Vec::new() },
+            TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &TypeDefinitionKind::Factory { expected_members: Vec::new() });
+        assert_eq!(
+            entry.kind(),
+            &TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new()
+            }
+        );
         assert_eq!(entry.kind().kind_tag(), "factory");
     }
 
@@ -1126,26 +1232,55 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             }
             .kind_tag(),
             TypeDefinitionKind::Enum { expected_variants: vec![] }.kind_tag(),
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() }.kind_tag(),
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            }
+            .kind_tag(),
             TypeDefinitionKind::ErrorType { expected_variants: vec![] }.kind_tag(),
             TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }.kind_tag(),
             TypeDefinitionKind::ApplicationService { expected_methods: vec![] }.kind_tag(),
-            TypeDefinitionKind::UseCase { expected_members: Vec::new() }.kind_tag(),
+            TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            }
+            .kind_tag(),
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             }
             .kind_tag(),
-            TypeDefinitionKind::Dto { expected_members: Vec::new() }.kind_tag(),
-            TypeDefinitionKind::Command { expected_members: Vec::new() }.kind_tag(),
-            TypeDefinitionKind::Query { expected_members: Vec::new() }.kind_tag(),
-            TypeDefinitionKind::Factory { expected_members: Vec::new() }.kind_tag(),
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() }
+                .kind_tag(),
+            TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            }
+            .kind_tag(),
+            TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            }
+            .kind_tag(),
+            TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            }
+            .kind_tag(),
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            }
+            .kind_tag(),
+            TypeDefinitionKind::DomainService {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             }
             .kind_tag(),
             TypeDefinitionKind::FreeFunction {
@@ -1157,7 +1292,104 @@ mod tests {
             .kind_tag(),
         ];
         let unique: std::collections::HashSet<&str> = tags.iter().copied().collect();
-        assert_eq!(unique.len(), 14, "all 14 kind tags must be distinct");
+        assert_eq!(unique.len(), 15, "all 15 kind tags must be distinct");
+    }
+
+    // --- M1 / S1: expected_methods uniformity + DomainService variant ---
+
+    #[test]
+    fn test_struct_kinds_carry_expected_methods_field() {
+        // Build one method declaration to confirm every struct-based kind
+        // (M1) accepts a non-empty `expected_methods` list at the type level.
+        let method =
+            MethodDeclaration::new("len", Some("&self".to_owned()), vec![], "usize", false);
+        let methods = vec![method];
+
+        let typestate = TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::Terminal,
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let value_object = TypeDefinitionKind::ValueObject {
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let use_case = TypeDefinitionKind::UseCase {
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let interactor = TypeDefinitionKind::Interactor {
+            expected_members: Vec::new(),
+            declares_application_service: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let dto = TypeDefinitionKind::Dto {
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let command = TypeDefinitionKind::Command {
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let query = TypeDefinitionKind::Query {
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let factory = TypeDefinitionKind::Factory {
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+        let secondary_adapter = TypeDefinitionKind::SecondaryAdapter {
+            implements: Vec::new(),
+            expected_members: Vec::new(),
+            expected_methods: methods.clone(),
+        };
+
+        // PartialEq comparison verifies the field exists with the expected
+        // payload — if the field were missing the construct would not even
+        // compile (E0063), which is itself part of the M1 invariant.
+        assert_eq!(typestate, typestate.clone());
+        assert_eq!(value_object, value_object.clone());
+        assert_eq!(use_case, use_case.clone());
+        assert_eq!(interactor, interactor.clone());
+        assert_eq!(dto, dto.clone());
+        assert_eq!(command, command.clone());
+        assert_eq!(query, query.clone());
+        assert_eq!(factory, factory.clone());
+        assert_eq!(secondary_adapter, secondary_adapter.clone());
+    }
+
+    #[test]
+    fn test_domain_service_variant_carries_members_and_methods() {
+        let member = MemberDeclaration::Field {
+            name: "audit_log".to_owned(),
+            ty: "Vec<AuditEntry>".to_owned(),
+        };
+        let method = MethodDeclaration::new(
+            "transfer",
+            Some("&mut self".to_owned()),
+            vec![
+                ParamDeclaration::new("from", "AccountId"),
+                ParamDeclaration::new("to", "AccountId"),
+            ],
+            "Result<(), DomainError>",
+            false,
+        );
+
+        let kind = TypeDefinitionKind::DomainService {
+            expected_members: vec![member.clone()],
+            expected_methods: vec![method.clone()],
+        };
+
+        assert_eq!(kind.kind_tag(), "domain_service");
+        match kind {
+            TypeDefinitionKind::DomainService { expected_members, expected_methods } => {
+                assert_eq!(expected_members.len(), 1);
+                assert_eq!(expected_methods.len(), 1);
+                assert_eq!(expected_methods[0].name(), "transfer");
+            }
+            _ => panic!("expected DomainService variant"),
+        }
     }
 
     #[test]
@@ -1165,7 +1397,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1178,7 +1413,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "AiSuggested",
             "AI-added type",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             false,
         )
@@ -1221,7 +1459,10 @@ mod tests {
         let value_obj = TypeCatalogueEntry::new(
             "Email",
             "Validated email",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1247,7 +1488,10 @@ mod tests {
         let value_obj = TypeCatalogueEntry::new(
             "Email",
             "Validated email",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1264,6 +1508,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1275,6 +1520,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["StateA".into()]),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1294,7 +1540,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1307,7 +1556,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Foo",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1326,7 +1578,10 @@ mod tests {
         let entry = TypeCatalogueEntry::with_refs(
             "Bar",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Modify,
             true,
             vec![spec_ref.clone()],
@@ -1346,7 +1601,10 @@ mod tests {
         let entry = TypeCatalogueEntry::with_refs(
             "Baz",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             false,
             vec![],
@@ -1363,7 +1621,10 @@ mod tests {
         let result = TypeCatalogueEntry::with_refs(
             "",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
             vec![],
@@ -1383,7 +1644,10 @@ mod tests {
         let result = TypeCatalogueEntry::with_refs(
             "Foo",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
             vec![ref1, ref2],
@@ -1443,6 +1707,7 @@ mod tests {
         let kind = TypeDefinitionKind::SecondaryAdapter {
             implements: vec![],
             expected_members: Vec::new(),
+            expected_methods: Vec::new(),
         };
         assert_eq!(kind.kind_tag(), "secondary_adapter");
     }
@@ -1453,6 +1718,7 @@ mod tests {
         let kind = TypeDefinitionKind::SecondaryAdapter {
             implements: vec![decl],
             expected_members: Vec::new(),
+            expected_methods: Vec::new(),
         };
         if let TypeDefinitionKind::SecondaryAdapter { implements, .. } = &kind {
             assert_eq!(implements.len(), 1);

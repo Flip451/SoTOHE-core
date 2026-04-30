@@ -329,6 +329,29 @@ pub enum TrackCommand {
         #[arg(long)]
         layer: Option<String>,
     },
+
+    /// Run catalogue lint rules against a layer catalogue and report violations.
+    ///
+    /// Wires `FsCatalogueLoader` + `InMemoryCatalogueLinter` +
+    /// `RunCatalogueLintInteractor` at the composition root and runs a hardcoded
+    /// demo rule set (ADR `tddd-struct-kind-uniformization-and-catalogue-linter`
+    /// §S3 / IN-05 / AC-05).
+    ///
+    /// Exits with code 1 when any violations are found, 0 when none.
+    Lint {
+        /// Track ID (directory name under `track/items`).
+        #[arg(long)]
+        track_id: String,
+
+        /// Layer ID to lint (e.g. `domain`, `usecase`, `infrastructure`).
+        #[arg(long)]
+        layer_id: String,
+
+        /// Workspace root directory (must contain `architecture-rules.json`).
+        /// Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -403,6 +426,7 @@ pub enum ViewAction {
     },
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn execute(cmd: TrackCommand) -> ExitCode {
     use crate::CliError;
 
@@ -496,6 +520,9 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 workspace_root,
                 layer,
             )
+        }
+        TrackCommand::Lint { track_id, layer_id, workspace_root } => {
+            tddd::lint::execute_lint(workspace_root, track_id, layer_id)
         }
     };
     match result {

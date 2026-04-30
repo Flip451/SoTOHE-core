@@ -482,7 +482,7 @@ mod tests {
     const DOMAIN_TYPES_MINIMAL: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "test", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "test", "approved": true, "expected_members": [], "expected_methods": [] }
   ],
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }

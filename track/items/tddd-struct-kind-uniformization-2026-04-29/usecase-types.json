@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RenderContractMapInteractor",
+      "description": "S2: Pre-existing usecase interactor that implements RenderContractMap. After S2, the RenderContractMapInteractor drives the updated methods_of() (now handling all struct-based kinds uniformly). No structural change to the interactor's public interface — it continues to implement RenderContractMap with the same execute signature. Referenced here because S2 changes behavior of the domain function it delegates to, and the interactor is the driving entry point for contract-map rendering.",
+      "approved": true,
+      "action": "reference",
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RenderContractMap"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-03",
+          "hash": "e288d4b1a7008b61f569c49cf06710da64237285f3ee056249abd83cbee1322e"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-02",
+          "hash": "6f36930b5aa7fd0aa460c28a311e9c0a4e50a05907948a537b7376d73a9a1f66"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLintCommand",
+      "description": "S3: New usecase command object for the catalogue lint use case. Carries the track_id, layer_id, and the set of rule configurations to evaluate. Acts as the input to RunCatalogueLintInteractor. CQRS command — command objects are write-oriented (linting produces violation reports as output).",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "layer_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "rules",
+          "ty": "Vec<CatalogueLinterRule>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLintError",
+      "description": "S3: New usecase error type for the RunCatalogueLint application service. CatalogueLoad: failure loading the catalogue file. LintExecution: a CatalogueLinterError propagated from the port. InvalidLayer: the specified layer_id is not a TDDD-enabled layer.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueLoad",
+        "LintExecution",
+        "InvalidLayer"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLint",
+      "description": "S3: New usecase application service (primary driving port) — the interface that the CLI bin/sotp track lint subcommand drives. Declares one execute method: takes RunCatalogueLintCommand, returns Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>. The interactor (RunCatalogueLintInteractor) receives Arc<dyn CatalogueLoader> and Arc<dyn CatalogueLinter> by injection; the concrete adapters (FsCatalogueLoader, InMemoryCatalogueLinter) are wired at the CLI composition root.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "RunCatalogueLintCommand"
+            }
+          ],
+          "returns": "Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLintInteractor",
+      "description": "S3: New usecase interactor that implements RunCatalogueLint. Receives Arc<dyn CatalogueLoader> and Arc<dyn CatalogueLinter> by constructor injection (concrete adapters are wired at the CLI composition root). On execute: loads the catalogue for the specified track/layer via the CatalogueLoader port, delegates to CatalogueLinter.run with the provided rules and layer_id, returns the violations list. Fields are private (constructor injection only); per project encapsulation convention.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RunCatalogueLint"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "abb65d3ca2ed34c4e337bb2353ffdf46bdb436e9fdafea225b42b66333011e4d"
+        },
+        {
+          "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/spec.json",
+          "anchor": "AC-05",
+          "hash": "c1778b4d1675a9c4b045b4c4723f06a61d130936288367bb9a9a33fc601c3312"
+        }
+      ]
+    }
+  ]
+}

@@ -592,7 +592,10 @@ mod tests {
         TypeCatalogueEntry::with_refs(
             name,
             "test",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
             vec![SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(hash_byte))],

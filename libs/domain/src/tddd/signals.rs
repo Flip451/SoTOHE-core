@@ -178,7 +178,7 @@ fn evaluate_single(
     }
 
     match entry.kind() {
-        TypeDefinitionKind::Typestate { transitions, expected_members } => evaluate_typestate(
+        TypeDefinitionKind::Typestate { transitions, expected_members, .. } => evaluate_typestate(
             name,
             &kind_tag,
             transitions,
@@ -190,7 +190,7 @@ fn evaluate_single(
         TypeDefinitionKind::Enum { expected_variants } => {
             evaluate_enum(name, &kind_tag, expected_variants, profile, action)
         }
-        TypeDefinitionKind::ValueObject { expected_members } => {
+        TypeDefinitionKind::ValueObject { expected_members, .. } => {
             evaluate_struct_with_members(name, &kind_tag, expected_members, profile, action)
         }
         TypeDefinitionKind::ErrorType { expected_variants } => {
@@ -202,25 +202,26 @@ fn evaluate_single(
         TypeDefinitionKind::ApplicationService { expected_methods } => {
             evaluate_application_service(name, &kind_tag, expected_methods, profile, action)
         }
-        TypeDefinitionKind::UseCase { expected_members }
-        | TypeDefinitionKind::Dto { expected_members }
-        | TypeDefinitionKind::Command { expected_members }
-        | TypeDefinitionKind::Query { expected_members }
-        | TypeDefinitionKind::Factory { expected_members } => {
+        TypeDefinitionKind::UseCase { expected_members, .. }
+        | TypeDefinitionKind::Dto { expected_members, .. }
+        | TypeDefinitionKind::Command { expected_members, .. }
+        | TypeDefinitionKind::Query { expected_members, .. }
+        | TypeDefinitionKind::Factory { expected_members, .. }
+        | TypeDefinitionKind::DomainService { expected_members, .. } => {
             evaluate_struct_with_members(name, &kind_tag, expected_members, profile, action)
         }
-        TypeDefinitionKind::Interactor { expected_members, declares_application_service } => {
-            evaluate_interactor(
-                name,
-                &kind_tag,
-                expected_members,
-                declares_application_service,
-                profile,
-                workspace_crates,
-                action,
-            )
-        }
-        TypeDefinitionKind::SecondaryAdapter { implements, expected_members } => {
+        TypeDefinitionKind::Interactor {
+            expected_members, declares_application_service, ..
+        } => evaluate_interactor(
+            name,
+            &kind_tag,
+            expected_members,
+            declares_application_service,
+            profile,
+            workspace_crates,
+            action,
+        ),
+        TypeDefinitionKind::SecondaryAdapter { implements, expected_members, .. } => {
             evaluate_secondary_adapter(
                 name,
                 &kind_tag,
@@ -1270,6 +1271,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1281,6 +1283,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1299,6 +1302,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1320,6 +1324,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1342,6 +1347,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Reference,
             true,
@@ -1359,7 +1365,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackId",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1374,7 +1383,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackId",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1392,7 +1404,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "OldType",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Delete,
             true,
         )
@@ -1408,7 +1423,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "OldType",
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Delete,
             true,
         )
@@ -1714,7 +1732,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "SaveTrackUseCase",
             "desc",
-            TypeDefinitionKind::UseCase { expected_members: Vec::new() },
+            TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1729,7 +1750,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "SaveTrackUseCase",
             "desc",
-            TypeDefinitionKind::UseCase { expected_members: Vec::new() },
+            TypeDefinitionKind::UseCase {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1747,6 +1771,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1765,6 +1790,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1780,7 +1806,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackDto",
             "desc",
-            TypeDefinitionKind::Dto { expected_members: Vec::new() },
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() },
             TypeAction::Add,
             true,
         )
@@ -1795,7 +1821,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackDto",
             "desc",
-            TypeDefinitionKind::Dto { expected_members: Vec::new() },
+            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() },
             TypeAction::Add,
             true,
         )
@@ -1810,7 +1836,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "CreateTrackCommand",
             "desc",
-            TypeDefinitionKind::Command { expected_members: Vec::new() },
+            TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1825,7 +1854,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "CreateTrackCommand",
             "desc",
-            TypeDefinitionKind::Command { expected_members: Vec::new() },
+            TypeDefinitionKind::Command {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1840,7 +1872,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "FindTrackQuery",
             "desc",
-            TypeDefinitionKind::Query { expected_members: Vec::new() },
+            TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1855,7 +1890,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "FindTrackQuery",
             "desc",
-            TypeDefinitionKind::Query { expected_members: Vec::new() },
+            TypeDefinitionKind::Query {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1870,7 +1908,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackFactory",
             "desc",
-            TypeDefinitionKind::Factory { expected_members: Vec::new() },
+            TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1885,7 +1926,10 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "TrackFactory",
             "desc",
-            TypeDefinitionKind::Factory { expected_members: Vec::new() },
+            TypeDefinitionKind::Factory {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             TypeAction::Add,
             true,
         )
@@ -1904,6 +1948,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1926,6 +1971,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -1937,6 +1983,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2021,6 +2068,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![TraitImplDecl::new("ReviewReader", vec![])],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2043,6 +2091,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![TraitImplDecl::new("ReviewReader", vec![])],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2068,6 +2117,7 @@ mod tests {
                     TraitImplDecl::new("ReviewWriter", vec![]),
                 ],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2095,6 +2145,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![TraitImplDecl::new("ReviewReader", vec![declared_method])],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2125,6 +2176,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2146,6 +2198,7 @@ mod tests {
                     TraitImplDecl::new("TrackWriter", vec![]),
                 ],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2229,7 +2282,10 @@ mod tests {
         TypeCatalogueEntry::new(
             name,
             "desc",
-            TypeDefinitionKind::ValueObject { expected_members: Vec::new() },
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
             action,
             true,
         )
@@ -2561,6 +2617,7 @@ mod tests {
             "desc",
             TypeDefinitionKind::ValueObject {
                 expected_members: vec![MemberDeclaration::field("0", "String")],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2585,6 +2642,7 @@ mod tests {
             "desc",
             TypeDefinitionKind::ValueObject {
                 expected_members: vec![MemberDeclaration::field("value", "String")],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2609,6 +2667,7 @@ mod tests {
             "desc",
             TypeDefinitionKind::ValueObject {
                 expected_members: vec![MemberDeclaration::field("value", "String")],
+                expected_methods: Vec::new(),
             },
             TypeAction::Reference,
             true,
@@ -2627,6 +2686,7 @@ mod tests {
             "desc",
             TypeDefinitionKind::ValueObject {
                 expected_members: vec![MemberDeclaration::field("value", "String")],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2656,6 +2716,7 @@ mod tests {
             "desc",
             TypeDefinitionKind::ValueObject {
                 expected_members: vec![MemberDeclaration::field("value", "String")],
+                expected_methods: Vec::new(),
             },
             TypeAction::Modify,
             true,
@@ -2685,6 +2746,7 @@ mod tests {
             TypeDefinitionKind::ValueObject {
                 // Declares field "amount" as u64.
                 expected_members: vec![MemberDeclaration::field("amount", "u64")],
+                expected_methods: Vec::new(),
             },
             TypeAction::Reference,
             true,
@@ -2713,6 +2775,7 @@ mod tests {
                     MemberDeclaration::field("id", "StatusId"),
                     MemberDeclaration::field("label", "String"),
                 ],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2739,6 +2802,7 @@ mod tests {
             TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::Terminal,
                 expected_members: vec![],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2780,6 +2844,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["SaveTrackUseCase".to_string()],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2803,6 +2868,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["SaveTrackUseCase".to_string()],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2825,6 +2891,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["SaveTrackUseCase".to_string()],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2857,6 +2924,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["SaveTrackUseCase".to_string()],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2887,6 +2955,7 @@ mod tests {
             TypeDefinitionKind::Interactor {
                 expected_members: Vec::new(),
                 declares_application_service: vec!["SaveTrackUseCase".to_string()],
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2925,6 +2994,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![TraitImplDecl::new("ReviewReader", vec![])],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,
@@ -2957,6 +3027,7 @@ mod tests {
             TypeDefinitionKind::SecondaryAdapter {
                 implements: vec![TraitImplDecl::new("ReviewReader", vec![])],
                 expected_members: Vec::new(),
+                expected_methods: Vec::new(),
             },
             TypeAction::Add,
             true,

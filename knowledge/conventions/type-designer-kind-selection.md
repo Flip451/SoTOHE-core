@@ -36,6 +36,7 @@
 | `typestate` | ✓ | △ | △ | 状態遷移は domain 概念。usecase / infra に置くのは domain leak の疑い |
 | `enum` | ✓ | ✓ | ✓ | layer-flexible (有限の値集合を表現する変種型) |
 | `value_object` | ✓ | △ | △ | "validated value" は domain 概念。layer-flexible だが domain 外配置は要根拠 |
+| `domain_service` | ✓ | △ | ✗ | domain knowledge を集約する behavior 中心 struct (S1)。usecase は trans-domain な application logic で要根拠 |
 | `error_type` | ✓ | ✓ | ✓ | layer-flexible (各層がそれぞれの責務に応じた error 型を持つ) |
 | `secondary_port` | ✓ | ✓ | ✗ | hexagonal: driven port は domain または usecase に置く (CN-05; usecase port 例: `Reviewer`, `DiffGetter`) |
 | `application_service` | ✗ | **✓ ONLY** | ✗ | hexagonal: driving port (use-case interface) は usecase layer |
@@ -81,12 +82,15 @@
 
 「validated value」の判定基準: `new()` (またはコンストラクタ) で field に格納される値の不変条件 (invariant) を確立し、その後は read-only として参照されるか。値そのものを返す getter / accessor は OK。**値以外の何かを計算して返す method は behavior** であり value_object 違反。
 
+> M1 以降の schema 上は struct 系全 9 kind が `expected_methods` フィールドを uniform に持つが、`value_object` で behavior method を宣言することは依然として違反である。S3 linter の `FieldEmpty` rule (`target_kind=value_object`, `target_field=expected_methods`) で機械的に enforce する。
+
 behavior を持つ struct は以下のいずれかに振り分ける:
 
 - 依存なし stateless → `free_function` (R2)
 - 依存あり (port を呼び出す) → `interactor` (usecase) または `secondary_adapter` (infrastructure)
 - 集約構築 → `factory`
 - 状態遷移あり → `typestate` cluster
+- field を持つ domain behavior (状態遷移なし、依存なし) → `domain_service` (R6)
 
 ### R4. Kind Distribution Reconnaissance (起草前の偵察義務)
 
@@ -111,10 +115,31 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 
 1. 候補 kind を列挙し、R1 マトリクスで層と kind の組合せを絞り込む
 2. kind が確定しない場合 → R2 (free_function) と R3 (value_object 制限) を再確認
-3. それでも確定しない場合 → 起草を止め、`## Open Questions` に「kind が確定しない理由」と「検討した候補とその却下理由」を列挙して orchestrator に escalation
-4. orchestrator は ADR / spec の補強 (adr-editor / spec-designer の re-invoke) または user 判断を仰ぐ
+3. それでも確定しない場合 → R6 (`domain_service`) の判定基準で domain 層 behavior の住所として fit するか確認
+4. それでも確定しない場合 → 起草を止め、`## Open Questions` に「kind が確定しない理由」と「検討した候補とその却下理由」を列挙して orchestrator に escalation
+5. orchestrator は ADR / spec の補強 (adr-editor / spec-designer の re-invoke) または user 判断を仰ぐ
 
-`value_object` で迷ったときの最も多い真の答えは `free_function` (R2) である。次に多いのは `interactor` (依存あり) または `secondary_adapter` (port 実装)。`value_object` を選ぶ前に、これらの候補を必ず検討する。
+`value_object` で迷ったときの最も多い真の答えは `free_function` (R2) である。次に多いのは `interactor` (依存あり) / `secondary_adapter` (port 実装) / `domain_service` (R6: field を持つ domain behavior)。`value_object` を選ぶ前に、これらの候補を必ず検討する。
+
+### R6. domain_service Selection Criteria (S1: field を持つ domain behavior の住所)
+
+`kind: domain_service` は **field を持ち behavior method を持つ domain struct** の正しい住所である。`value_object` (R3 違反) や `interactor` (依存ありの usecase 層) との混同を防ぐため、以下の全条件を満たす場合に採用する。
+
+採用条件 (AND):
+
+- struct (enum / typestate cluster ではない)
+- `expected_members` >= 1 field (state を保持する; ゼロフィールドは R2 の free_function 候補)
+- `expected_methods` >= 1 method (behavior を持つ; ゼロメソッドは R3 の value_object 候補)
+- 状態遷移なし (ある場合は typestate cluster — R3 の振り分け)
+- `application_service` / `secondary_port` の実装ではない (実装する場合は `interactor` / `secondary_adapter`)
+- 配置層は domain (default) / usecase (要根拠 — trans-domain な application logic で domain knowledge を集約する場合のみ、`informal_grounds[]` に記録) / infrastructure (forbidden)
+
+判定例:
+
+- `PolicyEvaluator { rules: Vec<Rule> }` + `evaluate(&self, ctx: &Context) -> Decision` → `domain_service` (state あり、behavior あり、依存なし)
+- `Email(String)` + `new()` のみ → `value_object` (R3: 検証済み値、behavior なし)
+- `parse_yaml(input: &str) -> Result<...>` → `free_function` (R2: state なし、依存なし)
+- `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `interactor` (R1: 依存あり、usecase 層)
 
 ## Examples
 
@@ -141,17 +166,18 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 
 type-designer 自身および reviewer は draft 段階で以下を確認する:
 
-- [ ] 各 entry の `kind` × layer の組合せが R1 マトリクスで OK か (✗ / ONLY 違反がないか)
+- [ ] 各 entry の `kind` × layer の組合せが R1 マトリクスで OK か (✗ / ONLY 違反がないか、`domain_service` は infrastructure 層に置かれていないか)
 - [ ] zero-field struct + 1 method の entry がないか (あれば R2: free_function に折り畳めないか確認)
-- [ ] `kind: value_object` の entry がすべて R3 を満たすか (validated value のみで behavior を持たないか)
+- [ ] `kind: value_object` の entry がすべて R3 を満たすか (validated value のみで behavior を持たないか、`expected_methods` が空か)
+- [ ] field + behavior を持つ domain struct が `domain_service` (R6) で起草されているか (`value_object` / `interactor` への誤分類がないか)
 - [ ] kind 起草前に偵察 (R4) を実施したか (近接 track の kind 分布を確認したか)
 - [ ] catch-all として `value_object` / `use_case` を選んでいないか (R5)
-- [ ] R1〜R5 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
+- [ ] R1〜R6 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
 
 ## Enforcement
 
 - 第一線: catalogue を起草する agent の定義で本 convention の reading + compliance を義務付ける
-- 第二線: reviewer briefing template (将来 `track/review-prompts/<scope>.md` 配下に追加可能) に R1〜R5 の checklist を埋め込む
+- 第二線: reviewer briefing template (将来 `track/review-prompts/<scope>.md` 配下に追加可能) に R1〜R6 の checklist を埋め込む
 - 第三線: `bin/sotp track type-signals` の signal 評価 (catalogue → spec の trace integrity)。kind 違反は signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
 
 将来の自動化候補: catalogue codec (`libs/infrastructure/src/tddd/catalogue_codec.rs`) で R1 layer-kind マトリクスを machine-readable に表現し、`bin/sotp` の codec validation で reject する (`forbidden` 組合せ → codec error)。

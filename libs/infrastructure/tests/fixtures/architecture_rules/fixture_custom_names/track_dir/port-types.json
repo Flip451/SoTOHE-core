@@ -5,7 +5,9 @@
       "name": "PortValue",
       "kind": "value_object",
       "description": "port-layer value object",
-      "approved": true
+      "approved": true,
+      "expected_members": [],
+      "expected_methods": []
     }
   ]
 }

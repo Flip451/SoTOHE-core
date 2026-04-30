@@ -743,7 +743,7 @@ mod tests {
     const DOMAIN_TYPES_WITH_ONE_ENTRY: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_members": [], "expected_methods": [] }
   ]
 }"#;
 
@@ -755,7 +755,7 @@ mod tests {
     const DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_members": [], "expected_methods": [] }
   ],
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
@@ -765,7 +765,7 @@ mod tests {
     const DOMAIN_TYPES_WITH_RED_SIGNAL: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_members": [], "expected_methods": [] }
   ],
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "red", "found_type": false }
@@ -855,7 +855,7 @@ mod tests {
     const DOMAIN_TYPES_WITH_YELLOW_SIGNAL: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_members": [], "expected_methods": [] }
   ],
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "yellow", "found_type": false }
@@ -931,7 +931,7 @@ mod tests {
     const DOMAIN_TYPES_WITH_UNDECLARED_RED_SIGNAL: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_members": [], "expected_methods": [] }
   ],
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true },

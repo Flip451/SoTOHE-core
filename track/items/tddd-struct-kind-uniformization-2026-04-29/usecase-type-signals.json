@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-30T00:53:40Z",
+  "declaration_hash": "77d5dd9d2f52048f1048611390ccaf3cea846b456f93cfa8125341c2e37f91de",
+  "signals": [
+    {
+      "type_name": "RenderContractMapInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RenderContractMap"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "layer_id: String",
+        "rules: Vec<CatalogueLinterRule>"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoad",
+        "LintExecution",
+        "InvalidLayer"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RunCatalogueLint"
+      ]
+    }
+  ]
+}

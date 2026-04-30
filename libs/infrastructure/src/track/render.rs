@@ -2590,7 +2590,7 @@ mod tests {
     const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_members": [], "expected_methods": [] }
   ]
 }"#;
 
@@ -3027,14 +3027,14 @@ mod tests {
     const USECASE_TYPES_JSON_MINIMAL: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "TrackReader", "kind": "value_object", "description": "Test usecase type", "approved": true }
+    { "name": "TrackReader", "kind": "value_object", "description": "Test usecase type", "approved": true, "expected_members": [], "expected_methods": [] }
   ]
 }"#;
 
     const INFRASTRUCTURE_TYPES_JSON_MINIMAL: &str = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "FsTrackStore", "kind": "value_object", "description": "Test infrastructure type", "approved": true }
+    { "name": "FsTrackStore", "kind": "value_object", "description": "Test infrastructure type", "approved": true, "expected_members": [], "expected_methods": [] }
   ]
 }"#;
 

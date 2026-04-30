@@ -1332,6 +1332,8 @@ mod tests {
       "description": "desc",
       "kind": "value_object",
       "approved": true,
+      "expected_members": [],
+      "expected_methods": [],
       "spec_refs": [
         {{
           "file": "track/items/test-track/spec.json",
@@ -1363,6 +1365,8 @@ mod tests {
       "description": "desc",
       "kind": "value_object",
       "approved": true,
+      "expected_members": [],
+      "expected_methods": [],
       "spec_refs": [
         {
           "file": "track/items/nonexistent/spec.json",
@@ -1393,6 +1397,8 @@ mod tests {
       "description": "desc",
       "kind": "value_object",
       "approved": true,
+      "expected_members": [],
+      "expected_methods": [],
       "spec_refs": [
         {
           "file": "track/items/test-track/spec.json",
@@ -1430,6 +1436,8 @@ mod tests {
       "description": "desc",
       "kind": "value_object",
       "approved": true,
+      "expected_members": [],
+      "expected_methods": [],
       "spec_refs": [
         {{
           "file": "track/items/test-track/spec.json",
@@ -1466,7 +1474,9 @@ mod tests {
       "name": "MyType",
       "description": "desc",
       "kind": "value_object",
-      "approved": true
+      "approved": true,
+      "expected_members": [],
+      "expected_methods": []
     }
   ]
 }"#;
