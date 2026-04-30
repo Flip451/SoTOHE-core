@@ -92,11 +92,27 @@ right form when you just need to confirm `required (stale hash)` /
    cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type {round_type} --limit 1
    ```
    `--limit 1` prints the most recent round entry for the assigned round_type as a findings
-   block below the state-line. The state-line suffix (`[+] {scope}: approved  {round_type}@{ts} zero_findings`)
-   and the findings block (`findings: zero_findings`) are the two signals for a passing round.
-   - State-line shows `[+]` / `approved` AND findings block shows `findings: zero_findings` → return `completed`.
-   - State-line shows `[-]` / `required` OR findings block lists findings → re-loop into the fix phase (the API is authoritative over parsed stdout).
-   - No matching entry for the assigned round_type (empty output below state-line) → re-loop.
+   block below the state-line.
+
+   **State-line vs findings block (read this carefully).** The state-line suffix
+   (`[+] approved` / `[-] required (...)`) reflects **merge-gate readiness for the scope**,
+   which combines `fast verdict` + `final verdict` + `hash freshness`. It is NOT a per-round
+   verdict. The findings block (`findings: zero_findings` / `findings: ...`) below the
+   state-line IS the authoritative signal for the assigned round_type.
+
+   For `round_type == fast`, the state-line can read `[-] required (stale hash)` even when
+   this fast round is `zero_findings`, because the gate also evaluates the *final* round
+   (older or absent in fast-only mode). That gate-level state is the orchestrator's concern,
+   not this agent's — do not re-loop on it.
+
+   - **`round_type == fast`** — decide from the findings block only:
+     - findings block shows `findings: zero_findings` → return `completed`, regardless of state-line.
+     - findings block lists findings → re-loop into the fix phase.
+     - No matching entry for the assigned round_type (empty output below state-line) → re-loop.
+   - **`round_type == final`** — state-line and findings block should agree:
+     - State-line shows `[+]` / `approved` AND findings block shows `findings: zero_findings` → return `completed`.
+     - State-line shows `[-]` / `required` OR findings block lists findings → re-loop into the fix phase (the API is authoritative over parsed stdout).
+     - No matching entry for the assigned round_type (empty output below state-line) → re-loop.
 3. **Fix phase**:
    - Verify each finding's factual claims via `Grep` / `Read` before acting.
    - To recall previous-round findings without re-running the reviewer,
@@ -106,6 +122,10 @@ right form when you just need to confirm `required (stale hash)` /
    - P0/P1/P2: implement the fix within scope boundaries.
    - If a fix requires out-of-scope files: return `blocked_cross_scope`.
    - Run `cargo make ci-rust` to verify fixes compile.
+   - **Cross-doc hash sync (mandatory after editing `spec.json` or `impl-plan.json`)**: spec / impl-plan の anchor 文言が変わると、それを cite している catalogue (`<layer>-types.json` の `spec_refs[].hash`) が stale になる。`cargo make verify-plan-artifact-refs` を回して hash drift を検出する (これは `cargo make ci-rust` には含まれず、`cargo make ci` でのみ走る verify。spec/impl-plan を一度でも編集した round では agent loop 中に明示的に呼び出す)。
+     - `[OK] All checks passed.` → step 4 (re-review) へ進む。
+     - `SpecRef hash mismatch ...` エラー → catalogue 側の修正は **catalogue の専属 writer = type-designer** の責務なので、自分で `<layer>-types.json` を直接編集してはいけない。代わりに Agent tool を `subagent_type: "type-designer"` で起動し、briefing に (a) mismatch エラーの全文 (`expected ... actual ...`)、(b) 自分が編集した spec / impl-plan anchor の一覧、(c) `spec_refs[].hash` refresh + 連動 derived view (`<layer>-types.md` / `contract-map.md` / `<layer>-type-signals.json`) の再生成、(d) hash sync のみで catalogue の semantic content (kind / expected_methods / etc) は変えない、を明示する。type-designer 完了後 `cargo make verify-plan-artifact-refs` を再度回して `OK` を確認、その上で step 4 に進む。
+     - その他のエラー (`unresolved SpecRef anchor` / `invalid anchor` / coverage violation / I/O or JSON parse error 等) → catalogue の `spec_refs[].anchor` 値そのものが不正か、spec.json / impl-plan.json の構造が壊れているケース。自分で編集した anchor 一覧と verifier の出力全文を添えて orchestrator に `failed` を返し、人手の判断を仰ぐ。
 4. **Re-review**: Run the reviewer again with updated briefing (include previous findings
    and fixes applied). Go to step 2.
 

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8fd08b9084372864d0ab11d3b62aab9da7a16f90db2d4c930735ed6270171fdc",
+  "signals": [
+    {
+      "type_name": "ReviewScopeConfig",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FilePath",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeName",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MainScopeName",
+      "signal": "blue"
+    }
+  ]
+}

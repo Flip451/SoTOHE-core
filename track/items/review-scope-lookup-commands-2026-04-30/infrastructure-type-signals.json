@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-30T05:50:10Z",
+  "declaration_hash": "df981d8fcaed2148c2e25c5b5b9fa4adad49af7c4d6c0b010b6bef99437300fa",
+  "signals": [
+    {
+      "type_name": "GitDiffGetter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn list_diff_files(&self, base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError>"
+      ]
+    }
+  ]
+}

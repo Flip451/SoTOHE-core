@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "ReviewScopeConfig",
+      "description": "Domain struct holding scope classification configuration. Pre-existing type — API surface is unchanged per OS-05 (domain API is not modified by this track). Referenced here to document the dependency used by ScopeQueryInteractor: classify(&[FilePath]) -> HashMap<ScopeName, Vec<FilePath>> performs the core routing; contains_scope(scope) validates scope names for the files command (AC-08); all_scope_names() returns the universe of named + implicit scopes for CN-07 universe compliance check. No serde derives in domain (hexagonal boundary). The struct is constructed by the infrastructure composition root via load_v2_scope_config.",
+      "approved": true,
+      "action": "reference",
+      "kind": "domain_service",
+      "expected_members": [],
+      "expected_methods": [
+        {
+          "name": "classify",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "files",
+              "ty": "&[FilePath]"
+            }
+          ],
+          "returns": "HashMap<ScopeName, Vec<FilePath>>",
+          "is_async": false
+        },
+        {
+          "name": "contains_scope",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ScopeName"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "all_scope_names",
+          "receiver": "&self",
+          "params": [],
+          "returns": "HashSet<ScopeName>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "cfaee71e0851edaaeef36d36bcfe612975d9fac4147309ce54f93b6ec5ce09e4"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "906bcd10166cc294db4c18166833b5416d13d3ccbcdef233ecc8c5e7ef433894"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "aa6b145d6040ea335edaa2b09cea2a89d501f9842f1fd56afecd9b73bf601fae"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-07",
+          "hash": "9a90f18f38a61a22700f8b73be2ab790ee637a92a68b5c706c2dcccf1e448e97"
+        }
+      ]
+    },
+    {
+      "name": "FilePath",
+      "description": "Validated repo-relative file path. Pre-existing domain value object. Referenced here because FilePath is the input type for ScopeQueryService::classify (IN-01, IN-03) and the output type for ScopeQueryService::files (IN-02). FilePath::new provides the string-level validation (Empty / Absolute / Traversal rejection) specified in CN-03 / AC-05. The CLI layer calls FilePath::new on each path argument and surfaces FilePathError as a human-readable error before invoking the service.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "906bcd10166cc294db4c18166833b5416d13d3ccbcdef233ecc8c5e7ef433894"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-03",
+          "hash": "f41351f6248db1314840bc0558a72be412bbdcfe00e7696ff1d2bf57d5b3b645"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-04",
+          "hash": "ddb4b1f5977058848813349322f4c0a9be0840c81ba4055bd7681cb4ee535ec4"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-05",
+          "hash": "d39053c9a408c39d2ee7ec4d39f4a9bc2a13af60c19052186701737da9bf158f"
+        }
+      ]
+    },
+    {
+      "name": "ScopeName",
+      "description": "Review scope identifier enum. Pre-existing domain type. Main(MainScopeName) for named scopes; Other for the implicit unmatched scope. Referenced here because ScopeName is the scope parameter for ScopeQueryService::files (IN-02, IN-04, AC-08) and is produced by ReviewScopeConfig::classify / all_scope_names. The CLI layer accepts a scope name string and constructs ScopeName for the service call; unknown scope names are detected via contains_scope (AC-08).",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "Main",
+        "Other"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "aa6b145d6040ea335edaa2b09cea2a89d501f9842f1fd56afecd9b73bf601fae"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-08",
+          "hash": "536b07c8ee3b57112e7e0c49d6c2b73ae911e939493d9114ecfb1a45b1e42518"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "AC-08",
+          "hash": "b22c38c21b30116dcedda116d6f96f0b2c12c67ed087310271effc2cdffa136a"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-07",
+          "hash": "9a90f18f38a61a22700f8b73be2ab790ee637a92a68b5c706c2dcccf1e448e97"
+        }
+      ]
+    },
+    {
+      "name": "MainScopeName",
+      "description": "Validated named scope identifier. Pre-existing domain newtype (String wrapper). Validates: non-empty, ASCII only, not the reserved string 'other'. Referenced here because MainScopeName is the payload type of ScopeName::Main and of ScopeClassification::Named(MainScopeName, Vec<MainScopeName>). The at-least-one invariant of Named is enforced at the Rust type level via the head + tail tuple structure (Named(MainScopeName, Vec<MainScopeName>)), not by validating MainScopeName itself. Domain API is unchanged per OS-05.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-08",
+          "hash": "536b07c8ee3b57112e7e0c49d6c2b73ae911e939493d9114ecfb1a45b1e42518"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-07",
+          "hash": "9a90f18f38a61a22700f8b73be2ab790ee637a92a68b5c706c2dcccf1e448e97"
+        }
+      ]
+    }
+  ]
+}

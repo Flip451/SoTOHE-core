@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "usecase 層に scope routing query application service を新設する。`libs/usecase/src/review_v2/` に以下の型を追加する: (1) `ScopeClassification` enum — variants: `Named(MainScopeName, Vec<MainScopeName>)` / `Other` / `Excluded`。head + tail の非空 tuple 構造により `Named` は少なくとも 1 件の `MainScopeName` を持つことが型レベルで保証される。`ScopeName::Other` を含むことができないため Named/Other の排他性も型レベルで保証される。path が named scope に 1 つ以上マッチする場合 `Named`、マッチなしは `Other`、operational/other_track pattern で除外された path は `Excluded`。(2) `PathClassification` value object — fields: `path: FilePath`, `classification: ScopeClassification`。ScopeQueryService::classify が入力順で返す結果レコード (CN-04)。(3) `ScopeQueryError` error enum — variants: `DiffGet(DiffGetError)` (files method の git diff 取得失敗時) / `UnknownScope(ScopeName)` (files method の scope 名検証失敗時、AC-08)。(4) `ScopeQueryService` application service trait — `classify(&self, paths: Vec<FilePath>) -> Result<Vec<PathClassification>, ScopeQueryError>` および `files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError>` の 2 メソッド (IN-07 / CN-05 / CN-06)。(5) `ScopeQueryInteractor` struct — fields: `scope_config: ReviewScopeConfig`, `diff_getter: D`, `base: CommitHash`; generic parameter `D: DiffGetter`。`ScopeQueryService` を implement する: classify は scope_config.classify を呼び I/O なし (CN-03 対応)。scope_config.classify は `HashMap<ScopeName, Vec<FilePath>>` (scope → files) を返すため、ScopeQueryInteractor::classify は結果を file → [ScopeNames] の形に逆引きし、入力各 path に対し (a) 結果 HashMap のいずれの値にも存在しない path を `Excluded`、(b) `ScopeName::Other` にのみ存在する path を `Other`、(c) `ScopeName::Main(name)` に存在する path を `Named(head, tail)` にマッピングする (matched scope names の最初を head, 残りを tail として非空 tuple を構成する)。files は最初に `scope_config.contains_scope` でスコープ名を検証し、未定義の場合は即 `UnknownScope` を返す (IN-04 / AC-08); スコープ名が有効な場合のみ `diff_getter.list_diff_files(&self.base)` で diff files を取得し scope_config.classify で分類して scope 一致 files を返す (scope validation が diff I/O より必ず先に実行される)。`Reviewer` / `ReviewHasher` に依存しない (CN-06)。diff_getter の wiring は generic parameter 経由 (trait-based abstraction)。`mod.rs` の `pub use` を更新して新型を公開する。unit tests (命名規則 test_{target}_{condition}_{expected_result}): ScopeClassification の全 variant 構築 / PathClassification の構築と field access / ScopeQueryError の全 variant / ScopeQueryInteractor::classify が scope_config.classify を正しく PathClassification に変換すること (I/O なしで動作) / ScopeQueryInteractor::files が UnknownScope を返すこと (scope が未定義の場合) / ScopeQueryInteractor::files が DiffGet error を wrap して返すこと / ScopeQueryInteractor が Reviewer / ReviewHasher を import しないこと (dependency が DiffGetter + ReviewScopeConfig のみ)。前提: なし (最初のタスク)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "`sotp review classify --track-id <id> <path>...` CLI サブコマンドを実装する。`apps/cli/src/commands/review/classify.rs` を新規作成し、`mod.rs` の `ReviewCommand` enum に `Classify(ClassifyArgs)` variant を追加して dispatch を繋ぐ。(1) `ClassifyArgs`: `--track-id <id>` (必須 String) + `paths: Vec<String>` (1 個以上の positional 引数、clap `num_args(1..)` で enforce)。(2) `--items-dir` (default `track/items`) を既存コマンドと同様に追加する (compose_v2 への wiring に必要)。(3) execute 実装: (a) `FilePath::new` で各 path を検証し、失敗した path の `FilePathError` を human-readable メッセージに整形して stderr 出力 + exit FAILURE (IN-03 / CN-03 / AC-05)。全 path 検証後に 1 件以上エラーがある場合は early exit する。(b) compose_v2 の `load_scope_config_only` を呼び `ScopeQueryInteractor` を wire する (`ScopeQueryInteractor::new(scope_config, diff_getter, base)` 構成; diff_getter は `GitDiffGetter`、base は `classify` が `files()` を呼ばないため diff base 解決は不要 — `CommitHash` のプレースホルダー値を使用するか `build_v2_shared` の base 解決をオプションとして実装する。base 解決の失敗が `classify` の結果に影響しないことを保証する)。(c) `ScopeQueryService::classify` を呼び出し `Vec<PathClassification>` を受け取る。(d) 入力引数順を保ちながら (`CN-04`) 各 `PathClassification` を `<path>TAB<scope-csv>` 形式でフォーマットして stdout に 1 行ずつ print する: `Named(head, tail)` → head と tail を統合してアルファベット昇順にソートしたカンマ区切り CSV (AC-02 — デターミニスティックな出力のためソート必須); `Other` → `\"other\"` (AC-10); `Excluded` → `\"<excluded>\"` (AC-03)。(e) 出力 0 件 (全 path が空の vec にマップされる場合はありえないが、classify は全 path を返す仕様のため実質 empty は発生しない) でも exit 0 (AC-06 相当)。unit tests: FilePath::new エラーのケース (絶対パス / `..` 含む / 空文字) が stderr + exit FAILURE になること (AC-05) / 存在しないファイルの正常な repo-relative path が classify 成功すること (AC-04) / Named / Other / Excluded の各 PathClassification が正しい文字列にフォーマットされること (AC-01 / AC-02 / AC-03 / AC-10) / multi-match が CSV 1 行になること (AC-02)。前提: T001 完了 (ScopeQueryService / ScopeQueryInteractor が usecase 層に存在する)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "`sotp review files --scope <name> --track-id <id>` CLI サブコマンドを実装する。`apps/cli/src/commands/review/files.rs` を新規作成し、`mod.rs` の `ReviewCommand` enum に `Files(FilesArgs)` variant を追加して dispatch を繋ぐ。(1) `FilesArgs`: `--scope <name>` (必須 String) + `--track-id <id>` (必須 String) + `--items-dir` (default `track/items`)。(2) execute 実装: (a) `compose_v2::load_scope_config_only` で `scope_config` のみを先にロードする (diff base 解決なし)。(b) scope 名を `scope_config.contains_scope()` で検証し (IN-04)、未定義 scope は `Unknown scope: <name>. Known scopes: <list>` を stderr に出力して即 exit FAILURE (AC-08 — scope validation が diff I/O より必ず先に実行される)。Known scopes の一覧表示には `scope_config.all_scope_names()` の universe を sorted で使用する。(c) scope 名が有効な場合のみ `compose_v2::build_v2_shared` で `diff_getter` (GitDiffGetter) / `base` (CommitHash) を取得して `ScopeQueryInteractor` を wire する。diff base の解決は既存 `review results` と同じ規則 (`.commit_hash` ファイル → 不在時は `git rev-parse main` fallback) を使用する (IN-09 / CN-08)。(d) `ScopeQueryService::files` を呼び出し `Vec<FilePath>` を受け取る。(e) diff getter 由来の順を保ちながら (`CN-04`) 各 `FilePath` を 1 行ずつ stdout に print する (IN-06 / AC-07)。(f) 0 件の場合は empty stdout + exit 0 (AC-09)。(g) DiffGet エラー時は human-readable メッセージを stderr 出力 + exit FAILURE。unit tests: 未定義 scope 名で `Unknown scope: <name>. Known scopes: <list>` が stderr + exit FAILURE になること (AC-08) / 0 件の場合が empty stdout + exit 0 になること (AC-09) / diff range に scope のファイルがある場合に 1 行ずつ stdout 出力されること (AC-07) / 既存 review results / check-approved / codex-local が影響を受けないこと (各コマンドが独立して動作すること) (AC-13)。前提: T001 完了 (ScopeQueryService / ScopeQueryInteractor が usecase 層に存在する)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "`cargo make ci` の全 gate が pass することを確認する (AC-14)。T001-T003 完了後に実行する: (1) `cargo make fmt-check` — rustfmt の差分がないことを確認する。(2) `cargo make clippy` — warnings が 0 であること (-D warnings)。(3) `cargo make test` (nextest) — 新規追加した全 unit test + 既存テストがすべて pass すること。(4) `cargo make deny` — ライセンス・禁止クレートチェックが pass すること。(5) `cargo make check-layers` — layer 依存関係チェックが pass すること (新規 usecase 型が domain に依存し infrastructure に依存しないことを確認)。(6) `cargo make verify-*` — plan-artifact-refs / plan-progress / arch-docs など既存 verify タスクが pass すること。失敗した gate があれば同タスク内で修正する。前提: T001-T003 完了。",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Usecase Layer — ScopeQueryService Application Service (T001)",
+        "description": [
+          "libs/usecase/src/review_v2/ に scope routing query application service を新設する: ScopeClassification enum (Named / Other / Excluded) / PathClassification value object / ScopeQueryError error enum (DiffGet / UnknownScope) / ScopeQueryService trait (classify + files) / ScopeQueryInteractor struct (fields: scope_config, diff_getter: D, base; generic D: DiffGetter)。",
+          "ScopeQueryInteractor は ReviewCycle と独立した最小 dependency の application service として実装する: Reviewer / ReviewHasher には依存せず、DiffGetter port と ReviewScopeConfig (domain) のみに依存する (CN-05 / CN-06 / ADR D6)。",
+          "classify は I/O なしで scope_config.classify を呼ぶのみ (CN-03); files はまず scope_config.contains_scope でスコープ名を検証し未定義の場合は即 UnknownScope を返す (IN-04 / AC-08); 検証通過後のみ diff_getter.list_diff_files で diff files を取得してから scope_config.classify で分類する (IN-09 / CN-08)。",
+          "unit tests: 全型の構築 / classify の PathClassification 変換 / files の UnknownScope + DiffGet error path / dependency が DiffGetter + ReviewScopeConfig のみであること。"
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "CLI Layer — sotp review classify Subcommand (T002)",
+        "description": [
+          "apps/cli/src/commands/review/classify.rs を新規作成し、ReviewCommand enum に Classify variant を追加する。",
+          "FilePath::new による string-level バリデーション (Empty / Absolute / Traversal 拒否) を CLI layer で実施し、エラーは human-readable に stderr 出力 + exit FAILURE (CN-03 / AC-05)。",
+          "PathClassification を <path>TAB<scope-csv> 形式にフォーマット: Named → CSV, Other → 'other', Excluded → '<excluded>' (IN-05 / CN-04 / CN-07 / AC-01-AC-06 / AC-10)。",
+          "compose_v2 の load_scope_config_only を使い scope_config を取得し ScopeQueryInteractor を wire する (AC-11 / AC-12 — classify は diff_getter を実際には呼ばないが interactor の generic parameter として GitDiffGetter を注入する)。"
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "CLI Layer — sotp review files Subcommand (T003)",
+        "description": [
+          "apps/cli/src/commands/review/files.rs を新規作成し、ReviewCommand enum に Files variant を追加する。",
+          "--scope 名を scope_config.contains_scope() で検証し (IN-04)、未定義 scope は 'Unknown scope: <name>. Known scopes: <list>' を stderr 出力 + exit FAILURE (AC-08)。Known scopes の一覧表示には scope_config.all_scope_names() を使う。",
+          "ScopeQueryService::files を呼び出し、FilePath を 1 行ずつ stdout に出力する。0 件は empty stdout + exit 0 (IN-06 / AC-07 / AC-09 / CN-04)。",
+          "scope 名検証 (contains_scope) を load_scope_config_only で先に実施し、検証通過後のみ build_v2_shared で diff base を解決して wire する (scope validation が diff I/O より必ず先 — IN-04 / AC-08 / IN-09 / CN-08)。",
+          "既存 review results / check-approved / codex-local の CLI surface は無変更 (AC-13)。"
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Final CI Gate Verification (T004)",
+        "description": [
+          "T001-T003 完了後に cargo make ci を実行し、fmt-check + clippy + nextest + deny + check-layers + verify-* 全 gate が pass することを確認する (AC-14)。",
+          "新規 usecase 型が check-layers を pass すること (domain → usecase direction のみ、infrastructure 非依存)。",
+          "失敗した gate があれば同タスク内で修正する。"
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      }
+    ]
+  }
+}
