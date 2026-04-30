@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD struct kind 均質化と type catalogue linter framework の導入
 
-## Tasks (10/10 resolved)
+## Tasks (10/11 resolved)
 
 ### S1 — Domain Layer — M1+S1: TypeDefinitionKind Uniformization + DomainService Variant (T001)
 
@@ -30,6 +30,7 @@
 > unit tests: 各 kind の methods_of() 返却値を確認 / SecondaryAdapter の 2 source merge 動作確認 / render_contract_map 呼び出しで catalogue 宣言済み struct の method edge 生成確認。
 
 - [x] **T003**: domain 層の contract_map_render.rs の `methods_of()` を S2 に従い全 struct kind 対応に拡張する。(1) `methods_of()` を更新して struct 系 8 kind (Typestate / ValueObject / UseCase / Interactor / Dto / Command / Query / Factory) + SecondaryPort + ApplicationService + DomainService を top-level `expected_methods` を uniform に返す 1 つの arm で処理する (IN-03 / AC-02 / CN-05)。(2) `SecondaryAdapter` は top-level `expected_methods` (M1 で新設) と `implements[].expected_methods` の 2 source merge arm として維持する (CN-05 / AC-02) — `expected_methods.iter().chain(implements.iter().flat_map(TraitImplDecl::expected_methods)).collect()` のパターンで実装する。(3) `Enum` / `ErrorType` / `FreeFunction` は引き続き `Vec::new()` を返す arm で処理する。(4) `contract_map_render.rs` の合計行数が 700 行制限を超えないことを確認する (architecture-rules.json `module_limits.max_lines`)。(5) contract-map レンダラー (`libs/domain/src/tddd/contract_map_render.rs` または `libs/infrastructure/src/tddd/contract_map_adapter.rs`) が `<!-- Generated ... — DO NOT EDIT DIRECTLY -->` marker を出力していない場合はその追加を行い、renderer 出力に marker が含まれることを確認する (CN-08)。unit tests: struct 系 8 kind + SecondaryPort + ApplicationService + DomainService それぞれで `methods_of()` が top-level `expected_methods` を返すこと / SecondaryAdapter が top-level + implements の 2 source merge を返すこと / Enum / ErrorType / FreeFunction で空 Vec を返すこと / 実際の `render_contract_map` 呼び出しで catalogue 宣言済み struct の method edge が生成されること (既存の integration test の補強)。前提: T001 完了 (methods_of が新しい enum shape に対応するため)。 (`cc35539f872a7ceff473f9a4d5d270f3f82b4e87`)
+- [~] **T011**: T011 contract-map.md の Generated marker (CN-08) を追加: T010 commit 時に bin/sotp が古かったため marker code (T003 で追加された renderer line 122) を含まず、sync-views が marker 無しで上書きした。本 task で bin/sotp 再ビルド後に renderer 経由で再生成し marker を復元する。
 
 ### S4 — Domain Layer — S3: Linter Framework Types + Port (T004)
 

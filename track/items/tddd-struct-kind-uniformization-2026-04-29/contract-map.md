@@ -1,3 +1,4 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
 ```mermaid
 flowchart LR
     classDef secondary_adapter fill:#fafafa,stroke:#999,stroke-dasharray: 4 4
