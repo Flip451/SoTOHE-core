@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # CLI→domain 直接参照禁止と usecase 経由への一本化
 
-## Tasks (0/14 resolved)
+## Tasks (1/14 resolved)
 
 ### S1 — Usecase Boundary — Guard and Hook
 
@@ -9,7 +9,7 @@
 > T002 covers GuardDecision, GuardCheckOutput, GuardCheckService, and GuardCheckInteractor.
 > T003 covers HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchService, and HookDispatchInteractor.
 
-- [ ] **T002**: Add guard boundary types and service to usecase layer: GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, ShellParserPort; also add ShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn ShellParserPort>
+- [x] **T002**: Add guard boundary types and service to usecase layer: GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, ShellParserPort; also add ShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn ShellParserPort>
 - [ ] **T003**: Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor
 
 ### S2 — Usecase Boundary — Domain Schema Export

@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GuardDecision | enum | — | Allow, Block | 🟡 | 🔵 |
+| GuardDecision | enum | — | Allow, Block | 🔵 | 🔵 |
 | ReviewApprovalDecision | enum | — | Approved, ApprovedWithBypass, Blocked | 🟡 | 🔵 |
 | HookVerdictDecision | enum | — | Allow, Block | 🟡 | 🔵 |
 | ReviewRoundType | enum | — | Fast, Final | 🟡 | 🔵 |
@@ -30,14 +30,14 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ShellParserPort | secondary_port | — | fn split_shell(&self, input: &str) -> Result<Vec<String>, String> | 🟡 | 🔵 |
+| ShellParserPort | secondary_port | — | fn split_shell(&self, input: &str) -> Result<Vec<String>, String> | 🔵 | 🔵 |
 | SchemaExporterPort | secondary_port | — | fn export_as_json(&self, crate_name: &str) -> Result<String, String> | 🟡 | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GuardCheckService | application_service | — | fn check(&self, command: String) -> GuardCheckOutput | 🟡 | 🔵 |
+| GuardCheckService | application_service | — | fn check(&self, command: String) -> GuardCheckOutput | 🔵 | 🔵 |
 | ExportSchemaService | application_service | — | fn export(&self, command: ExportSchemaCommand) -> Result<String, ExportSchemaError> | 🟡 | 🔵 |
 | ReviewCheckApprovedService | application_service | — | fn check_approved(&self, track_id: String, items_dir: PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError> | 🟡 | 🔵 |
 | HookDispatchService | application_service | — | fn dispatch(&self, hook_name: String, command: HookDispatchCommand) -> Result<HookVerdictOutput, HookDispatchError> | 🟡 | 🔵 |
@@ -58,7 +58,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GuardCheckInteractor | interactor | — | — | 🟡 | 🔵 |
+| GuardCheckInteractor | interactor | — | — | 🔵 | 🔵 |
 | ExportSchemaInteractor | interactor | — | — | 🟡 | 🔵 |
 | ReviewCheckApprovedInteractor | interactor | — | — | 🟡 | 🔵 |
 | HookDispatchInteractor | interactor | — | — | 🟡 | 🔵 |
@@ -80,7 +80,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | TrackStatusOutput | dto | — | — | 🟡 | 🔵 |
-| GuardCheckOutput | dto | — | — | 🟡 | 🔵 |
+| GuardCheckOutput | dto | — | — | 🔵 | 🔵 |
 | TaskOperationOutput | dto | — | — | 🟡 | 🔵 |
 | ReviewApprovalOutput | dto | — | — | 🟡 | 🔵 |
 | HookVerdictOutput | dto | — | — | 🟡 | 🔵 |

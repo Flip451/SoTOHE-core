@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-30T17:03:27Z",
+  "generated_at": "2026-04-30T17:36:54Z",
   "declaration_hash": "03636336c80dc77591b648fa6cc385ae87ab671d126ef668531becf763b56ca5",
   "signals": [
     {
@@ -30,13 +30,11 @@
     {
       "type_name": "ConchShellParser",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
-        "ShellParser"
-      ],
-      "missing_items": [
-        "impl ShellParserPort"
+        "ShellParser",
+        "ShellParserPort"
       ]
     }
   ]

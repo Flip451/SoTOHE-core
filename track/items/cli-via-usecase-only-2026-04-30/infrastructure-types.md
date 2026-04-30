@@ -6,5 +6,5 @@
 |------|------|--------|---------|--------|----------|
 | FsTrackStore | secondary_adapter | reference | impl TrackReader, impl TrackWriter, impl ImplPlanReader, impl ImplPlanWriter | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🟡 | 🔵 |
-| ConchShellParser | secondary_adapter | modify | impl ShellParser, impl ShellParserPort | 🟡 | 🔵 |
+| ConchShellParser | secondary_adapter | modify | impl ShellParser, impl ShellParserPort | 🔵 | 🔵 |
 

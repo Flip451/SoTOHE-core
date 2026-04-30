@@ -6,6 +6,7 @@ pub mod catalogue_spec_refs;
 pub mod catalogue_spec_signals;
 pub mod contract_map_workflow;
 pub mod git_workflow;
+pub mod guard;
 pub mod hook;
 pub mod merge_gate;
 pub mod pr_review;

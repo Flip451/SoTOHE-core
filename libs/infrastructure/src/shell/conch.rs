@@ -13,6 +13,7 @@ use conch_parser::lexer::Lexer;
 use conch_parser::parse::DefaultParser;
 
 use domain::guard::{ParseError, ShellParser, SimpleCommand};
+use usecase::guard::ShellParserPort;
 
 use super::flatten::{
     collect_command_substitutions_from_word, extract_redirect_word, flatten_top_level_word,
@@ -22,12 +23,59 @@ use super::flatten::{
 /// Maximum nesting depth for command substitution extraction.
 const MAX_NESTING_DEPTH: usize = 16;
 
-/// conch-parser backed implementation of [`ShellParser`].
+/// conch-parser backed implementation of [`ShellParser`] and [`ShellParserPort`].
 pub struct ConchShellParser;
 
 impl ShellParser for ConchShellParser {
     fn split_shell(&self, input: &str) -> Result<Vec<SimpleCommand>, ParseError> {
         split_shell_inner(input, 0)
+    }
+}
+
+impl ShellParserPort for ConchShellParser {
+    /// Splits a shell command string into individual command strings.
+    ///
+    /// Each returned `String` is the argv tokens of one simple command joined
+    /// by a single space. Parse errors are converted to an `Err(String)`.
+    ///
+    /// # Representation contract
+    ///
+    /// Each entry is `argv.join(" ")`.  This is intentionally **not** a lossless
+    /// serialisation: arguments that contain internal whitespace (e.g. a quoted
+    /// string like `'git push origin main'`) will be split back into separate
+    /// tokens by the usecase adapter's `split_whitespace` reconstruction.
+    ///
+    /// This is a deliberate boundary simplification (see catalogue accepted
+    /// deviations).  It does **not** create a security gap because the domain
+    /// guard policy uses substring matching (`tokens_contain_git`) that detects
+    /// "git" whether it appears as a standalone token or embedded inside a
+    /// multi-word argument such as `"git push origin main"`.  Any `join(" ")`
+    /// artifact that reconstructs extra tokens therefore cannot hide a git
+    /// reference that was present in the original argv.
+    ///
+    /// # Redirect-only commands
+    ///
+    /// Commands with an empty argv (e.g. a bare redirect `> /tmp/file`) are
+    /// **excluded** from the returned `Vec<String>`.  The `has_output_redirect`
+    /// flag cannot be transmitted through the `Vec<String>` interface, so
+    /// including an empty-string entry would cause the usecase adapter to
+    /// reconstruct a `SimpleCommand { argv: [], has_output_redirect: false }`
+    /// that the domain policy would incorrectly allow.  Excluding them is the
+    /// correct behaviour for this interface boundary.
+    ///
+    /// **Accepted design trade-off**: output-redirect enforcement for bare
+    /// redirect-only commands is unavailable when wired through
+    /// `ShellParserPort`.  See catalogue accepted deviations for rationale.
+    /// Full redirect enforcement remains available via the `ShellParser`
+    /// (domain) port when `ConchShellParser` is wired directly.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `String` describing the parse failure if the shell command
+    /// cannot be parsed (e.g. nesting depth exceeded or unmatched quote).
+    fn split_shell(&self, input: &str) -> Result<Vec<String>, String> {
+        let commands = split_shell_inner(input, 0).map_err(|e| e.to_string())?;
+        Ok(commands.into_iter().map(|cmd| cmd.argv.join(" ")).filter(|s| !s.is_empty()).collect())
     }
 }
 
@@ -385,6 +433,9 @@ fn collect_from_compound_kind(
 mod tests {
     use rstest::rstest;
 
+    use domain::guard::ShellParser;
+    use usecase::guard::ShellParserPort;
+
     use super::*;
 
     fn parser() -> ConchShellParser {
@@ -401,20 +452,20 @@ mod tests {
         #[case] input: &str,
         #[case] expected_count: usize,
     ) {
-        let cmds = parser().split_shell(input).unwrap();
+        let cmds = ShellParser::split_shell(&parser(), input).unwrap();
         assert_eq!(cmds.len(), expected_count);
     }
 
     #[test]
     fn test_split_simple_command() {
-        let cmds = parser().split_shell("git status").unwrap();
+        let cmds = ShellParser::split_shell(&parser(), "git status").unwrap();
         assert_eq!(cmds.len(), 1);
         assert_eq!(cmds[0].argv, vec!["git", "status"]);
     }
 
     #[test]
     fn test_split_semicolon() {
-        let cmds = parser().split_shell("echo a; echo b").unwrap();
+        let cmds = ShellParser::split_shell(&parser(), "echo a; echo b").unwrap();
         assert_eq!(cmds.len(), 2);
         assert_eq!(cmds[0].argv, vec!["echo", "a"]);
         assert_eq!(cmds[1].argv, vec!["echo", "b"]);
@@ -422,7 +473,7 @@ mod tests {
 
     #[test]
     fn test_split_pipe() {
-        let cmds = parser().split_shell("ls | grep foo").unwrap();
+        let cmds = ShellParser::split_shell(&parser(), "ls | grep foo").unwrap();
         assert_eq!(cmds.len(), 2);
         assert_eq!(cmds[0].argv, vec!["ls"]);
         assert_eq!(cmds[1].argv, vec!["grep", "foo"]);
@@ -430,7 +481,7 @@ mod tests {
 
     #[test]
     fn test_split_does_not_split_inside_quotes() {
-        let cmds = parser().split_shell("echo 'a && b'").unwrap();
+        let cmds = ShellParser::split_shell(&parser(), "echo 'a && b'").unwrap();
         assert_eq!(cmds.len(), 1);
         assert_eq!(cmds[0].argv, vec!["echo", "a && b"]);
     }
@@ -448,7 +499,7 @@ mod tests {
         #[case] input: &str,
         #[case] expected_nested_argv: Vec<&str>,
     ) {
-        let cmds = parser().split_shell(input).unwrap();
+        let cmds = ShellParser::split_shell(&parser(), input).unwrap();
         assert!(
             cmds.len() >= 2,
             "expected at least 2 commands (outer + nested) for {:?}, got {}",
@@ -466,7 +517,7 @@ mod tests {
 
     #[test]
     fn test_split_redirect_without_substitution() {
-        let cmds = parser().split_shell("echo hi > /tmp/file.txt").unwrap();
+        let cmds = ShellParser::split_shell(&parser(), "echo hi > /tmp/file.txt").unwrap();
         assert_eq!(cmds.len(), 1);
         assert_eq!(cmds[0].argv, vec!["echo", "hi"]);
     }
@@ -477,7 +528,56 @@ mod tests {
         for _ in 0..20 {
             cmd = format!("echo $({})", cmd);
         }
-        let result = parser().split_shell(&cmd);
+        let result = ShellParser::split_shell(&parser(), &cmd);
         assert!(matches!(result, Err(ParseError::NestingDepthExceeded { .. })));
+    }
+
+    // -- ShellParserPort::split_shell tests --
+
+    #[test]
+    fn test_shell_parser_port_simple_command_returns_argv_joined() {
+        let result = ShellParserPort::split_shell(&parser(), "git status").unwrap();
+        assert_eq!(result, vec!["git status"]);
+    }
+
+    #[test]
+    fn test_shell_parser_port_multiple_commands_returns_multiple_entries() {
+        let result = ShellParserPort::split_shell(&parser(), "echo a; echo b").unwrap();
+        assert_eq!(result, vec!["echo a", "echo b"]);
+    }
+
+    #[test]
+    fn test_shell_parser_port_multi_word_argv_joined_by_space() {
+        let result = ShellParserPort::split_shell(&parser(), "cargo make test").unwrap();
+        assert_eq!(result, vec!["cargo make test"]);
+    }
+
+    #[test]
+    fn test_shell_parser_port_redirect_only_command_excluded() {
+        // `> /tmp/file` has no argv tokens; it is excluded from the result because
+        // including "" would cause the usecase adapter to reconstruct an incorrect
+        // `SimpleCommand { argv: [], has_output_redirect: false }` that the domain
+        // policy would allow. Exclusion is the correct behaviour for this interface.
+        let result = ShellParserPort::split_shell(&parser(), "> /tmp/file").unwrap();
+        assert!(result.is_empty(), "redirect-only commands must be excluded, got: {result:?}");
+    }
+
+    #[test]
+    fn test_shell_parser_port_empty_input_returns_empty_vec() {
+        let result = ShellParserPort::split_shell(&parser(), "").unwrap();
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_shell_parser_port_parse_error_returns_err_string() {
+        // Nesting depth exceeded produces an Err(String).
+        let mut cmd = "echo hello".to_string();
+        for _ in 0..20 {
+            cmd = format!("echo $({})", cmd);
+        }
+        let result = ShellParserPort::split_shell(&parser(), &cmd);
+        assert!(result.is_err(), "expected Err for nesting depth exceeded");
+        let msg = result.unwrap_err();
+        assert!(!msg.is_empty(), "error message should be non-empty");
     }
 }

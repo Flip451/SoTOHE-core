@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-30T17:03:26Z",
+  "generated_at": "2026-04-30T17:36:53Z",
   "declaration_hash": "4d9a6a7ae5865c5a234bc31bb480ad3308be5b150919ae93753e756ef2b40a63",
   "signals": [
     {
@@ -12,32 +12,49 @@
     {
       "type_name": "GuardDecision",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Allow",
+        "Block"
+      ]
     },
     {
       "type_name": "GuardCheckOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "decision: GuardDecision",
+        "reason: String"
+      ]
     },
     {
       "type_name": "GuardCheckService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn check(&self, command: String) -> GuardCheckOutput"
+      ]
     },
     {
       "type_name": "GuardCheckInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl GuardCheckService"
+      ]
     },
     {
       "type_name": "ShellParserPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn split_shell(&self, input: &str) -> Result<Vec<String>, String>"
+      ]
     },
     {
       "type_name": "SchemaExporterPort",
