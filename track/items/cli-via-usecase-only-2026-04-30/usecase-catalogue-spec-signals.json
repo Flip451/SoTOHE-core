@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "4d9a6a7ae5865c5a234bc31bb480ad3308be5b150919ae93753e756ef2b40a63",
+  "signals": [
+    {
+      "type_name": "TrackStatusOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GuardDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GuardCheckOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GuardCheckService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GuardCheckInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ShellParserPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ExportSchemaService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ExportSchemaCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ExportSchemaError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ExportSchemaInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewApprovalOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewApprovalDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCheckApprovedService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCheckApprovedError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "HookDispatchCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "HookVerdictOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "HookVerdictDecision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "HookDispatchService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "HookDispatchError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "HookDispatchInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewRoundType",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackPhaseOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackPhaseService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackPhaseError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackPhaseInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifySpecSignalsOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifySpecSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LayerSignalSummary",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyAdrSignals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyAdrSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrVerifyOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeQueryService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeClassificationOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeQueryInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskTransitionCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AddTaskCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SetOverrideCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ClearOverrideCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskQueryService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskQueryInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "NextTaskOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskCountsOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PreCommitTypeSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PreCommitTypeSignalsOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PreCommitTypeSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CommitHashPersistenceService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CommitHashPersistenceError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CommitHashPersistenceInteractor",
+      "signal": "blue"
+    }
+  ]
+}

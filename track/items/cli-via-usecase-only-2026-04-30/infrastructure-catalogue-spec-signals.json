@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "03636336c80dc77591b648fa6cc385ae87ab671d126ef668531becf763b56ca5",
+  "signals": [
+    {
+      "type_name": "FsTrackStore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ConchShellParser",
+      "signal": "blue"
+    }
+  ]
+}

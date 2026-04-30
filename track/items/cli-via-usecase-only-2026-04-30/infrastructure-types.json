@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsTrackStore",
+      "description": "Filesystem-backed TrackStore adapter. Wired in CLI composition root. After migration, the CLI still wires FsTrackStore at the composition root (CN-04); no change to FsTrackStore itself (OS-05). Recorded as a reference to confirm the adapter remains infrastructure-layer (secondary_adapter).",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "TrackReader"
+        },
+        {
+          "trait_name": "TrackWriter"
+        },
+        {
+          "trait_name": "ImplPlanReader"
+        },
+        {
+          "trait_name": "ImplPlanWriter"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "RustdocSchemaExporter",
+      "description": "Infrastructure adapter implementing domain::schema::SchemaExporter and usecase::SchemaExporterPort. This track adds the SchemaExporterPort impl to RustdocSchemaExporter (action: modify, scoped by IN-06), which is an in-scope infrastructure change required so the CLI composition root can wire it as Arc<dyn usecase::SchemaExporterPort> into ExportSchemaInteractor without importing domain::schema::SchemaExporter directly. The existing domain::schema::SchemaExporter impl is unchanged (OS-05). The SchemaExporterPort::export_as_json impl calls the domain SchemaExporter::export method internally and serializes the SchemaExport result to JSON.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "SchemaExporter"
+        },
+        {
+          "trait_name": "SchemaExporterPort"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-06",
+          "hash": "5f6e4f21c13496a2e4e390883ddb33fe88a43776e773a5002db393e180dca9e3"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        }
+      ]
+    },
+    {
+      "name": "ConchShellParser",
+      "description": "Infrastructure adapter implementing domain::guard::ShellParser and usecase::ShellParserPort. This track adds the ShellParserPort impl to ConchShellParser (action: modify, scoped by IN-06), which is an in-scope infrastructure change required so the CLI composition root can wire it as Arc<dyn usecase::ShellParserPort> into GuardCheckInteractor without importing domain::guard::ShellParser. The existing domain::guard::ShellParser impl is unchanged (OS-05 applies to that impl); only the new ShellParserPort impl is added. Composition-root DI wiring is permitted under CN-04.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ShellParser"
+        },
+        {
+          "trait_name": "ShellParserPort"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-06",
+          "hash": "5f6e4f21c13496a2e4e390883ddb33fe88a43776e773a5002db393e180dca9e3"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    }
+  ]
+}

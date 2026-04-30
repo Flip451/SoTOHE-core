@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-30T17:03:25Z",
+  "declaration_hash": "62c549c0968598b88dde954fdedbcd740c895d005da8e2b50d8dad73b6ad961c",
+  "signals": [
+    {
+      "type_name": "TrackId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitHash",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Decision",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Allow",
+        "Block"
+      ]
+    }
+  ]
+}

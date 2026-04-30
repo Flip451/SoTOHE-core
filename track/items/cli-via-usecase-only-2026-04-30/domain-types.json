@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackId",
+      "description": "Value object for a track identifier. Currently imported directly by CLI in 25 files. After migration, the CLI will pass raw strings to usecase boundaries; usecase constructs TrackId internally. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "CommitHash",
+      "description": "Value object for a git commit hash string. Currently constructed by CLI and passed to usecase. After migration, usecase accepts raw Option<String> commit hash and constructs CommitHash internally. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "Decision",
+      "description": "Domain enum for guard/hook Allow/Block decisions. Currently imported by CLI guard and hook commands. After migration, CLI sees only usecase-owned GuardDecision enum; domain::Decision stays internal to usecase/infrastructure. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "Allow",
+        "Block"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    }
+  ]
+}

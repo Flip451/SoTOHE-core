@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-30T17:03:27Z",
+  "declaration_hash": "03636336c80dc77591b648fa6cc385ae87ab671d126ef668531becf763b56ca5",
+  "signals": [
+    {
+      "type_name": "FsTrackStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TrackReader",
+        "TrackWriter",
+        "ImplPlanReader",
+        "ImplPlanWriter"
+      ]
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "SchemaExporter"
+      ],
+      "missing_items": [
+        "impl SchemaExporterPort"
+      ]
+    },
+    {
+      "type_name": "ConchShellParser",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ShellParser"
+      ],
+      "missing_items": [
+        "impl ShellParserPort"
+      ]
+    }
+  ]
+}

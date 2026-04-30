@@ -2,7 +2,7 @@
 adr_id: 2026-04-30-0848-cli-via-usecase-only
 decisions:
   - id: D1
-    user_decision_ref: "chat_segment:adr-add-cli-via-usecase-only:2026-04-30"
+    user_decision_ref: "chat_segment:adr-add-cli-via-usecase-only:2026-04-30; oq-resolution:direction-x-full-strict:2026-04-30"
     candidate_selection: "from:[A-status-quo,B-pub-use-reexport,C-cli-infra-also-banned,strict-DTO] chose:strict-DTO"
     status: proposed
   - id: D2
@@ -39,6 +39,38 @@ decisions:
 cli が必要とするデータ・操作はすべて usecase 層を経由してアクセスする。usecase は domain 型をそのまま外部に再公開せず（`pub use domain::...` を介した re-export を禁ずる）、cli が消費する形に整えた DTO / Command / Query / Result 型を usecase 自身が定義してそれを公開する。usecase の内部実装では domain 型を扱ってよいが、その型は usecase の public API には出てこない。
 
 これにより cli は domain 型の存在を知らずに動き、boundary の型は usecase が単独責任で持つ。将来 cli 以外の delivery adapter（例: web server / gRPC）が増えた場合も同じ usecase API を経由できる前提が整う。
+
+#### D1 適用時の境界判断パターン
+
+D1 の「全 strict」解釈（cli は domain 型を一切参照しない）を実装に落とす際、以下のパターンで usecase 側の責任範囲を確定した。これらはユーザーが Direction X (full strict) を選択した際の具体的境界判断の永続 record である。
+
+**エラー集約（OQ-1）**
+
+cli が従来直接参照していた domain error の `#[from]` variants は、usecase 側で単一のエラー型（`TaskOperationError` 等）に集約する。cli は usecase error のみを知り、`cli/src/error.rs` でこれを `CliError::Message` 等に変換する。
+
+**string プリミティブ受け渡しと domain 型の usecase 内部構築（OQ-2）**
+
+cli から usecase へのコマンドは string プリミティブを渡す。`domain::TrackId`・`domain::TaskId`・`domain::CommitHash`・`domain::StatusOverride` 等の domain 値オブジェクトへの変換は usecase（interactor）内部で行い、cli の `commands/` 配下に domain import を出さない。Query 系も同様に usecase 内で`domain::TaskStatusKind`・`domain::ImplPlanReader` 等を用いて結果を DTO に変換してから返す。
+
+**ConfidenceSignal 分類の usecase 閉じ込め（OQ-3）**
+
+`domain::ConfidenceSignal` の Red / Yellow / Blue 分類ロジックは usecase 内 service (`PreCommitTypeSignalsService` 等) に収め、cli の `commands/make.rs` が同 enum を直接参照しない形にする。出力 DTO に verdict と信号リストを格納し、cli は DTO フィールドを読むだけにする。
+
+**review run 境界（OQ-4）**
+
+`domain::review_v2::ReviewCycle` のオーケストレーション、および `domain::review_v2::Verdict`・`FastVerdict`・`ReviewCycleError` の知識は usecase 内の service (`RunReviewService` 等) に封じ込める。cli の `commands/review/` は RunReviewCommand (string / primitive のみ) を渡し、RunReviewOutput (DTO) を受け取る。
+
+**verify 系 domain 型の cli への流出防止（OQ-6）**
+
+`domain::tddd::LayerId`・`domain::ContentHash`・`domain::SpecRefFinding`・`domain::check_catalogue_spec_ref_integrity` 等は usecase 層の service に包み (`VerifyCatalogueSpecRefsService` 等)、cli の `commands/verify_*` はその DTO のみを参照する。findings の整形（`domain::SpecRefFindingKind` への match など）も usecase 側で済ませてから文字列として返す。
+
+**commit-hash 永続化の境界（OQ-5）**
+
+`domain::CommitHash` と `domain::review_v2::CommitHashWriter` のアクセスは usecase 内 service (`CommitHashPersistenceService`) に収める。cli は記録済み SHA を string として受け取り、確認メッセージの表示のみを担う。
+
+**DTO の usecase 層への配置（一般原則）**
+
+上記以外の DTO（`HookVerdictOutput`・`TrackPhaseOutput`・`VerifyCatalogueConsistencyOutput`・`VerifySpecSignalsOutput`・`LayerSignalSummary` 等）も、対応する usecase service の出力として usecase crate に置く。cli はこれらを import するが、その背後にある domain 型 (`domain::hook::HookVerdict`・`domain::track_phase::TrackPhaseInfo`・`domain::ConfidenceSignal` 等) は import しない。
 
 ### D2: 移行は専用の単一 track で一括で行う
 

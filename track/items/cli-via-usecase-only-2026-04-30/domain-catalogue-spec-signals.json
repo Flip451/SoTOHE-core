@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "62c549c0968598b88dde954fdedbcd740c895d005da8e2b50d8dad73b6ad961c",
+  "signals": [
+    {
+      "type_name": "TrackId",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CommitHash",
+      "signal": "blue"
+    },
+    {
+      "type_name": "Decision",
+      "signal": "blue"
+    }
+  ]
+}

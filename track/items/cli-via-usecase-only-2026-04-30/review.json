@@ -46,6 +46,735 @@
           "findings": [],
           "hash": "rvw1:sha256:93d57e79c4d59fb2ad779a886b3a36dce5e20608a82b4f1a37f6e1fb50339cc8",
           "at": "2026-04-30T09:44:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` does not trace the three GO-* requirements from [spec.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/spec.json:5) at all: this file only maps `in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria`, so the briefing claim that every spec element is linked to at least one task is not actually satisfied.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/task-coverage.json",
+              "line": 1,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:f132e824e0a5c2b1f928dac3c01b422e6fba158c556f768abeaaef16993b956a",
+          "at": "2026-04-30T13:29:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` stops its `out_of_scope` map at `OS-05`, but `spec.json` defines `OS-06` (`cli` 以外の delivery adapter 追加). That leaves one declared out-of-scope requirement with no task coverage, so the coverage artifact is incomplete.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/task-coverage.json",
+              "line": 10,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:f132e824e0a5c2b1f928dac3c01b422e6fba158c556f768abeaaef16993b956a",
+          "at": "2026-04-30T13:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new D1 record says it captures OQ-1〜OQ-6, but the subsection only documents OQ-1, OQ-2, OQ-3, OQ-4, and OQ-6. OQ-5 is never recorded, so the claimed permanent boundary record is incomplete.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+              "line": 45,
+              "category": "factual error"
+            },
+            {
+              "message": "Section S4 says the review boundary batch includes `ReviewRoundType`, but T005 does not list it. Since `ReviewRoundType` is also catalogued in `usecase-types.json`, the plan is internally inconsistent about what that task is meant to create.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "line": 29,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:19b1f9bc565a0b1e5ba45374dd93dfe58e5fa9306690f347fc5bcb9f775e2dad",
+          "at": "2026-04-30T13:38:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e55b79d1e79bda367341d68a0f3f68e9d1b1452b1188248b5f75a260f85fe93c",
+          "at": "2026-04-30T13:43:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 makes T001 remove the cli→domain layer dependency first and explicitly says the build will break until later tasks restore it. That contradicts the ADR decision that the `architecture-rules.json` and `apps/cli/Cargo.toml` changes happen last after the usecase boundary and CLI migration are in place, and undermines the no-transitional-allowance rationale in D3. The implementation plan should either keep the enforcement flip last or update the ADR/spec to record the changed sequencing intent.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "line": 95,
+              "category": "contradiction"
+            },
+            {
+              "message": "The track task catalogue defines mutation command DTOs such as `TaskTransitionCommand`, `AddTaskCommand`, `SetOverrideCommand`, and `ClearOverrideCommand`, but the only task-operation application service catalogued here is `TaskQueryService`, whose methods cover only `next_task` and `task_counts`. As written, T006 does not provide a usecase public API that can consume those mutation commands, so T011 cannot migrate the track mutation commands away from domain-typed usecase calls without inventing uncatalogued services or continuing to expose domain types.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1411,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e55b79d1e79bda367341d68a0f3f68e9d1b1452b1188248b5f75a260f85fe93c",
+          "at": "2026-04-30T13:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 omits `HookDispatchError` from the hook dispatch boundary types it is supposed to add, but `usecase-types.json` defines `HookDispatchError` and `HookDispatchService.dispatch` returns `Result<HookVerdictOutput, HookDispatchError>`. As written, the task can be completed as described while leaving the catalogued service signature without its required error type, so the plan and catalogue disagree on the required implementation surface.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bf66b2d324e66be633f61f0e29e12ed8be914b5f0f385848c5128a3b9cd381a5",
+          "at": "2026-04-30T13:58:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T012 is planned to migrate review classify/files by wiring the existing `ScopeQueryService`, but the referenced service API still exposes `ScopeName` in `files(scope: ScopeName)` and returns/accepts `FilePath`-based values. The same entry says this migration is meant to remove direct `domain::review_v2::...ScopeName` imports, while IN-03/CN-01 require usecase-owned DTO/command/query/result types at the public boundary. As written, the plan leaves the review classify/files boundary dependent on the very domain review types this track is supposed to hide; add a strict usecase-owned string/DTO wrapper or include the needed boundary types before T012.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1148,
+              "category": "contradiction"
+            },
+            {
+              "message": "`RunReviewCommand` is described as carrying `briefing_file`, but `expected_members` only declares `track_id`, `round_type`, `group`, `model`, `timeout_seconds`, `base_prompt`, and `items_dir`. That makes the command catalogue internally inconsistent and leaves the run-review CLI input surface under-specified for T005/T012; either declare the `briefing_file` member or remove it from the required command payload if it is not actually part of the boundary.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1723,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:de4051de7924a98463cbee0051dddb1b9e962adf90cfe67b4530db6a9b7b5723",
+          "at": "2026-04-30T14:03:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T012 says the classify/files migration will add string-accepting ScopeQueryService adapter methods or a dedicated facade so CLI handlers pass Vec<String>/String and never import domain::review_v2::FilePath, ScopeName, or MainScopeName, but the usecase catalogue still records ScopeQueryService as the boundary with methods taking Vec<FilePath> and ScopeName and returning FilePath-based results. That leaves the planned public usecase API exposing exactly the domain review types the plan says must be hidden, so the plan artifacts contradict D1/CN-01 and do not describe an executable CLI migration for these commands.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1160,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7966ba03868db5877cd5c31aab7d030aed610ce80192dc27a8e75f822658a37",
+          "at": "2026-04-30T14:10:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScopeQueryService` is catalogued as a public `application_service`, but its expected methods still expose `Vec<FilePath>`, `ScopeName`, `Vec<FilePath>`, and `PathClassification` while the same entry says those domain review types are hidden behind the usecase boundary. This contradicts CN-01/IN-03's requirement that usecase public APIs expose only usecase-owned DTO/Command/Query/Result types, and leaves T012 able to add string wrappers without actually removing the domain-typed public boundary.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1160,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:126bb2300bedebcb5a1399745ea7e133aa8a1573da7455e83af13a1f7a2034a9",
+          "at": "2026-04-30T14:14:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 records the review-run boundary as `RunReviewCommand` carrying only string/primitive values, but the catalogue defines `RunReviewCommand.round_type` as the usecase enum `ReviewRoundType`. That makes the CLI consume a boundary enum for this command instead of the recorded string/primitive interface, so the plan contradicts the ADR decision it is implementing.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1780,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:32257eabce5420e75c8cfb23684f37fc5448930107eb2d2775f5b5961b087a80",
+          "at": "2026-04-30T14:19:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan says the CLI composition root will wire `ConchShellParser` into `GuardCheckInteractor`, while this adapter is only recorded as implementing `domain::guard::ShellParser` and is a `reference`/no-change infrastructure type. The corresponding usecase entry says `GuardCheckInteractor` is constructed with an `Arc<dyn ShellParser>`. With `apps/cli` losing its domain dependency and AC-03 banning CLI `domain::guard::ShellParser` imports, T010 has no domain-free way to perform this wiring unless the plan also adds a usecase-owned port or an infrastructure/usecase factory that hides the domain trait. As written, the DI plan contradicts the strict boundary and is not executable.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 67,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6c941f6597dcdbc7946c11a4c4d71e600e39dca6dd276cde9b8dc6f4f1e648d8",
+          "at": "2026-04-30T14:25:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ReviewRoundType` is described as something the CLI consumes directly, but `RunReviewCommand` later says `round_type` is a `String` specifically so the CLI never imports `ReviewRoundType`; this leaves the run-review boundary contract contradictory.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 679,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ShellParserPort` says the interactor receives a usecase-owned port and then \"casts to the domain trait\" when calling domain guard logic. A `dyn ShellParserPort` cannot be cast into an unrelated `domain::guard::ShellParser` trait object; the plan needs an explicit adapter/delegation strategy or a different port shape, otherwise this boundary is not implementable as described.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 164,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:cf1fb0584f3054b255d2f88207ae463b3b1fa55c3d3d4d782cbd5fdee2f8329d",
+          "at": "2026-04-30T14:31:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The schema-export boundary does not define a usecase-owned port even though this track removes CLI access to `domain::schema::SchemaExporter`. The catalogue says `ExportSchemaInteractor` holds a `SchemaExporter` secondary port and delegates to `domain::schema::SchemaExporter`, while the spec requires usecase public APIs to expose only usecase-owned DTO/Command/Query/Result types and IN-04 explicitly lists `domain::schema::SchemaExporter` as a CLI import to eliminate. As written, the plan either exposes the domain port through the interactor construction boundary or leaves the CLI-to-infrastructure wiring undefined. Add a usecase-owned schema exporter port/adapter pattern, analogous to `ShellParserPort`, or otherwise clarify how the adapter is injected without leaking the domain trait.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 287,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e2df66daf23aba3f0ecf55ccae2ce5ae54172075f2e8d2041a2d7473cd764bdd",
+          "at": "2026-04-30T14:37:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ConchShellParser` is described as being wired as `Arc<dyn usecase::ShellParserPort>`, but the catalogue marks the adapter as `action: \"reference\"` and its `implements` list only contains the old `ShellParser` trait. Because `ShellParserPort` is newly introduced by this plan, the adapter needs an explicit modify entry/implementation; otherwise the S1/T010 wiring is not executable and the generated contract map also omits the `ConchShellParser -> ShellParserPort` implementation edge.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 70,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T012 says the new string-based `ScopeQueryService` methods are implemented in `ScopeQueryInteractor`, and the service description says domain value construction happens inside that interactor, but `usecase-types.json` has no `ScopeQueryInteractor` modify/reference entry. The catalogue therefore does not represent a type that the plan explicitly requires changing, leaving the contract map stale/incomplete for the review-scope boundary design.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1228,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6df540a49ca6ff8571ccda91dae12e92c49a5282ad116c50c2ddaa94f3512ffb",
+          "at": "2026-04-30T14:46:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S9/S10 require the CLI migration to “wire new interactors”, but the usecase catalogue only defines interactors for GuardCheck, ExportSchema, HookDispatch, TrackPhase, and ScopeQuery. The services needed by these sections, such as TaskOperationService, TaskQueryService, PreCommitTypeSignalsService, CommitHashPersistenceService, RunReviewService, and the verify services, have no corresponding implementation/interactor entry or task ownership. An implementer following this plan cannot complete the CLI migration without inventing unplanned usecase types.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/plan.md",
+              "line": 64,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The infrastructure catalogue marks RustdocSchemaExporter as modified to implement the new SchemaExporterPort, and ConchShellParser is similarly modified for ShellParserPort, but the implementation plan scopes T002/T004 to usecase-layer additions and later CLI tasks only wire the adapters. No task owns the required infrastructure impl changes, so the planned Arc<dyn SchemaExporterPort>/ShellParserPort wiring cannot compile from the listed tasks alone.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 43,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:67ab5e9c3755fe6d2426c76762342414bfd8d048b894a4c198d38d4a50ad4ee4",
+          "at": "2026-04-30T14:58:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GuardCheckInteractor` is described as holding an injected `Arc<dyn ShellParserPort>`, but its catalogue contract declares `expected_members: []`. The same pattern appears on other interactors that are supposed to hold injected ports/services. Since `expected_members` is the contract for interactor struct fields, the plan currently specifies zero-field interactors while also requiring dependency injection, making the boundary implementation internally inconsistent and potentially unwireable from the CLI composition root.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 142,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9c69527cdee7b052fa7cf57a7785e336c412a672a0f201f20d68d0bd28f1c42d",
+          "at": "2026-04-30T15:11:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyAdrSignals` is being kept as a referenced usecase boundary for T012, but its public method still returns `AdrVerifyReport` instead of a usecase-owned DTO/Result type. That contradicts CN-01's requirement that CLI-consumed usecase APIs expose only usecase-owned DTO/Command/Query/Result types, and it leaves the review/verify migration plan unable to satisfy the stated “replace all domain imports with usecase boundary types” goal without adding a wrapper/output type for ADR signal verification.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1306,
+              "category": "architecture_violation"
+            }
+          ],
+          "hash": "rvw1:sha256:5ae71e6b404494f45d5ad3480511c3c1b2b79e9ffc015bd02676efc9a5b7625f",
+          "at": "2026-04-30T15:18:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011's actionable task description omits `commands/track/tddd/`, but the same S9 section explicitly includes `commands/track/.../tddd/` and the spec calls out `domain::tddd::*` as part of the imports to remove. This contradiction can cause the implementation task to skip the tddd track commands, leaving AC-03/IN-04 incomplete.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:772ea3a03c73174f1e683386689bc52d98adb32344e358deb379acdaf8fb531f",
+          "at": "2026-04-30T15:23:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrVerifyOutput` says the CLI uses `red_count >= 1` for the non-zero exit code “per AC-01”, but AC-01 is the architecture-rules dependency criterion, not an exit-code/verify behavior criterion. This is a broken cross-reference in the catalogue and points implementers at the wrong acceptance criterion; it should either cite the external-behavior criterion (AC-10) or drop the AC reference.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1325,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:7444fdb1b05657e6b0e63c7fc32a426a372d1d85d5900f50173607a164a62aea",
+          "at": "2026-04-30T15:27:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05b96f923ca445d75ee8a3680c8902e36c97d33a99093b0c8da46c058355f2ec",
+          "at": "2026-04-30T15:30:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `VerifyAdrSignals` entry references `VerifyAdrSignalsCommand` and `VerifyAdrSignalsError`, and the later `ScopeQueryService` entry references `ScopeQueryError`, but none of those types are defined anywhere in this catalogue. That leaves the usecase contract internally inconsistent and makes the T012 migration path incomplete until the missing boundary types are added or the signatures are rewritten to existing types. The generated markdown mirror repeats the same gap.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1291,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:e5268430739015ef6371e52eb3f52ddaea561fa3d17d23038df4ca9690b4c3a4",
+          "at": "2026-04-30T15:49:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackPhaseInteractor` and `TaskOperationInteractor` are both described as depending on storage \"ports\" (`TrackReader + ImplPlanReader` for phase resolution, and the `FsTrackStore` port for task operations), but this plan never introduces those ports. The only storage-related infrastructure node is `FsTrackStore` as a `secondary_adapter`, and the contract map only adds `ShellParserPort` and `SchemaExporterPort`. As written, S4/S5 cannot be implemented as a proper hexagonal boundary without adding unplanned types, so the downstream CLI migration tasks are underspecified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 885,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e5268430739015ef6371e52eb3f52ddaea561fa3d17d23038df4ca9690b4c3a4",
+          "at": "2026-04-30T15:52:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskOperationInteractor` now says the CLI composition root injects `FsTrackStore` directly \"without importing it as a port\", but `TaskOperationService` still describes the interactor as persisting via the `FsTrackStore` port, and `contract-map.md` models `FsTrackStore` as a `secondary_adapter`. The same type is being described with two different architectural roles, so the plan artifact is internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1544,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d270be36ebbf637952326f646ccf2f7a4a43fbe004844bd7208eeb5804e94796",
+          "at": "2026-04-30T15:58:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12e359226399565dd201eb8782035ad8f6a27971eaca02257f3672b0b0a195e3",
+          "at": "2026-04-30T16:01:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` omits coverage for the three `goal` spec elements (`GO-01`, `GO-02`, `GO-03`). The spec declares 28 elements and the rendered spec shows these goals without any `[tasks: ...]` mapping, so the plan does not satisfy the stated requirement that every spec element is linked to at least one task.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/task-coverage.json",
+              "line": 2,
+              "category": "coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:12e359226399565dd201eb8782035ad8f6a27971eaca02257f3672b0b0a195e3",
+          "at": "2026-04-30T16:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12e359226399565dd201eb8782035ad8f6a27971eaca02257f3672b0b0a195e3",
+          "at": "2026-04-30T16:10:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyAdrSignals`/`VerifyAdrSignalsInteractor`/`AdrVerifyOutput` are marked as `modify` in the usecase catalogue, but `impl-plan.json:170-176` and `plan.md:70-72` never allocate a usecase-side task for that API change. T012 only updates the CLI callers and explicitly says to use the existing `VerifyAdrSignals` service, so the catalogue and implementation plan disagree about whether this round changes the verify-ADR-signals boundary or only its consumers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1291,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09ba4f30e2c7b435ea2d69934a1fac5ff0fa90da2d805c7b1aa376cfffebad9a",
+          "at": "2026-04-30T16:17:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T012` and the mirrored `S10` text say `ScopeQueryService::classify_by_strings` returns `Vec<ScopeClassificationOutput>` and `files_by_string` returns `Vec<String>`, but the authoritative `ScopeQueryService` contract in `usecase-types.json` returns `Result<..., ScopeQueryError>` for both methods. As written, the plan drops the error channel and makes the API shape inconsistent across the artifacts.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e9242da38ee92d909073deaa1a0393b1753ec28c912123886c129856868b433a",
+          "at": "2026-04-30T16:21:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyAdrSignals` and `ScopeQueryService` both reference boundary types that are never defined in this catalogue: `VerifyAdrSignalsCommand`, `VerifyAdrSignalsError`, and `ScopeQueryError`. Because the plan relies on those names in the modified method signatures, the usecase contract is not self-contained and the T012 migration surface is incomplete until those types are added or the signatures are rewritten to existing catalogued types.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1291,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:b400ba229ab98908e909bb817632c9ba933741402e3c3bac30898a7fa5acb943",
+          "at": "2026-04-30T16:26:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b400ba229ab98908e909bb817632c9ba933741402e3c3bac30898a7fa5acb943",
+          "at": "2026-04-30T16:31:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase catalogue requires concrete interactors such as ReviewCheckApprovedInteractor and RunReviewInteractor, but the corresponding review implementation task only lists the service/output/error/command types and never schedules those interactors. The same omission repeats for several other catalogue interactors in the task-operation, verification, pre-commit, and commit-hash groups, while later CLI migration sections say to wire the new interactors. As written, the plan leaves required catalogue types unscheduled and makes the implementation path incomplete unless the implementer invents extra work outside the task plan.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "line": 30,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b400ba229ab98908e909bb817632c9ba933741402e3c3bac30898a7fa5acb943",
+          "at": "2026-04-30T16:35:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure catalogue is inconsistent with this review scope's stated design intent that domain/infrastructure entries are references only. `RustdocSchemaExporter` is marked `action: \"modify\"` here, and `ConchShellParser` is likewise marked `modify` later, because the plan adds usecase port impls to infrastructure adapters. That leaves the plan unclear on whether infrastructure changes are in scope for this track.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 43,
+              "category": "contradiction"
+            },
+            {
+              "message": "The command boundary is internally contradictory: the surrounding descriptions say CLI-to-usecase commands carry only string/primitive fields, but these command objects include `PathBuf` fields such as `items_dir` here, and the same pattern appears for `RunReviewCommand` (`briefing_file` / `items_dir`). Implementers cannot tell whether paths should cross the usecase boundary as strings or as `PathBuf`.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1578,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b06a5b267b78e6175f1ebf1919f9c79ca8ab185408759d51dc29982d9335ba98",
+          "at": "2026-04-30T16:39:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan still exposes domain traits through usecase interactor APIs: TaskOperationInteractor is specified as generic over `domain::TrackReader + domain::TrackWriter + domain::ImplPlanReader + domain::ImplPlanWriter` (and TrackPhaseInteractor does the same at line 886). That contradicts CN-01/D1's requirement that domain types not appear in the usecase public API; removing only `pub use domain::...` in T009 would not address public generic bounds. The plan needs a usecase-owned port/factory boundary here, or another design that keeps those domain traits out of the public usecase surface consumed by the CLI.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "line": 1544,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7ef622a70fca251b9633d784688ae1af4106e858c9f2cce8602efe4c8f934040",
+          "at": "2026-04-30T16:45:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ConchShellParser` is marked and described as an in-scope infrastructure modification that adds the `ShellParserPort` implementation required by IN-04, but its `spec_refs` point only to `CN-04` and `OS-05`. `OS-05` is the out-of-scope guarantee that domain internals are unchanged, so this entry has no in-scope trace for the actual modification, unlike the parallel `RustdocSchemaExporter` entry. Either reference IN-04 here or stop treating this adapter as modified.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 90,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:a6060e18c7383e053ef66d12dd71360665bffdab1c8d7c5a2afbd63a43e1cf2b",
+          "at": "2026-04-30T16:51:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RustdocSchemaExporter` and `ConchShellParser` are declared as infrastructure `action: modify` entries and justified as “required by IN-04”, but IN-04 only scopes replacing CLI-side domain imports, while IN-03 only scopes new usecase boundary types. The impl plan also schedules these infrastructure port impl additions in T002/T004, so the artifacts disagree about whether infrastructure adapter changes are actually in scope for this track. Add an explicit in-scope/AC item for the infrastructure `*Port` impls, or remove those modifications from the plan/catalogue.",
+              "severity": "P1",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:40c0c91a63b6c55bd5f8a5382dcc664a339a16cf0034ddd18dfba56796e2d1d1",
+          "at": "2026-04-30T16:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:471f2928286c15d8343a764d9855d45cdd3867ae11e9a594b15379dfac0c49de",
+          "at": "2026-04-30T17:02:42Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12a only checks that `plan.md`, `contract-map.md`, and `<layer>-types.md` exist, so an old `cargo make track-sync-views` result can still satisfy the gate. That means skipping step 11 can leave stale rendered views on disk while the final post-condition still claims the outputs are “freshly regenerated”.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "The recovery path on `verify catalogue-spec-signals` failure is an unconditional `step 9 -> step 11 -> step 12b` retry with no attempt cap or escalation. If the coverage mismatch persists, the agent can loop indefinitely, which is the failure mode the briefing explicitly asked to avoid.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 169,
+              "category": "reliability"
+            }
+          ],
+          "hash": "rvw1:sha256:24aa9b49db2db459e916dbfcabdc240045a42dd974453535d24aa36ae93685a4",
+          "at": "2026-04-30T13:27:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now explicitly regenerates `plan.md`, but the new 12a glob check never verifies it. That leaves one of the `cargo make track-sync-views` outputs able to stay missing or stale without tripping the final gate, so the stated \"all outputs are freshly regenerated\" post-condition is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "The freshness gate only re-validates `catalogue-spec-signals`; it never checks the `type-signals` artifact from step 10. By inference, a skipped or stale `type-signals` run can still leave `<layer>-types.md` incomplete while 12a/12b both pass, so the new self-verify does not cover all pipeline outputs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d514692a6ad2ce88aff872a40dc5a9f50178c53fe1bf4d974faa7dee58b74840",
+          "at": "2026-04-30T13:31:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new mandatory 12b gate (`bin/sotp verify catalogue-spec-signals`) is not reflected in the Bash allowlist. The Scope Ownership/Bash usage section still lists only the `track ...` subcommands plus `track-sync-views`, so an agent following the whitelist literally can treat the freshness check as out of scope and skip it. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526) and [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 526,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Step 12a is internally inconsistent about how many paths it verifies. The block enumerates 9 paths total (7 per-layer paths plus `contract-map.md` and `plan.md`), but the closing sentence says “all 8 expected paths.” That mismatch makes the final self-check contract ambiguous and easy to misapply. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 181,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:eb689ce58f489c14c67f0126f3c5f467b87aa0d48439261ced3e05b8d24e8db3",
+          "at": "2026-04-30T13:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12 still only proves freshness for `catalogue-spec-signals.json`; the graph outputs, `plan.md`, `contract-map.md`, and `<layer>-type-signals.json` are only checked for existence. A stale artifact from an earlier run can still satisfy 12a/12b, so the new post-condition that all prior outputs are “freshly regenerated” is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:61d40f7066291e652c2e21106fc7c7622a167c6fec9f6d0dde2f9288467e0d48",
+          "at": "2026-04-30T13:36:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Step 12a still does not prove `<layer>-types.json` was freshly produced in this session. The only source-of-truth artefact in the existence check is globbed, so a stale catalogue file left over from a prior run will satisfy the guard even if step 7 was skipped. That leaves the exact skipped-step/stale-artifact failure mode this change is meant to block. Consider requiring a same-session write receipt for step 7, or a content/freshness check on `<layer>-types.json`, not just existence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 157,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9aeb2ba69044dfa151bc37694b937c96fbb72c990b969c37dcbc8011d0d393bf",
+          "at": "2026-04-30T13:39:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:41:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now requires `cargo make track-sync-views`, and the step explicitly says it renders `plan.md`, but Scope Ownership still lists `plan.md` under writes forbidden and Rules still say not to modify it. An agent following the lower section can either skip the new required sync step or treat its required `plan.md` update as a policy violation, leaving rendered views stale.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 534,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The Step 9 command is documented as `bin/sotp track catalogue-spec-signals <id>` without the supported `--layer <layer_id>` filter, even though this pipeline is per layer in scope. For a single-layer run, this command processes every catalogue-spec-enabled layer and can fail on unrelated missing/stale catalogues outside the assigned layer, blocking the scoped Phase 2 pass.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 127,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:44:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 9 is documented as `bin/sotp track catalogue-spec-signals <id>` with no `[--layer <layer_id>]`, unlike the surrounding per-layer pipeline commands. The CLI supports `--layer`; without documenting it, a type-design run scoped to a single layer will regenerate all catalogue-spec signal files and can fail on or modify out-of-scope layers. This breaks the layer scope contract and can block otherwise valid single-layer Phase 2 runs.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 127,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:45:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now requires `cargo make track-sync-views`, and the new self-check requires `track/items/<id>/plan.md` to exist, but the Scope Ownership/Rules section still forbids modifying `plan.md`. Since `track-sync-views` renders `plan.md`, the agent instructions are contradictory: a compliant agent can treat the required Step 11 write as forbidden and skip or fail the refreshed-view step the policy is trying to enforce. Clarify that `plan.md` must not be edited directly, but may be regenerated by the required `cargo make track-sync-views` command.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 534,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:7357e084d9164706d3abc6925100f10272e1b5eceee17fedad6b329261bf71f1",
+          "at": "2026-04-30T13:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12b is meant to verify freshness for the explicit track `<id>`, but the documented command has no track argument and relies on the current git branch to choose what to verify. The existing `verify catalogue-spec-signals` command skips successfully on non-`track/*` branches and would verify a different track if the checkout is on a different track branch, so this policy can let the agent emit a final message without checking the `<id>` it just processed. Require a precondition that the current branch resolves to the same `<id>` and treat a SKIP/mismatch as failure, or use a track-bound verification command.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3202d9fc93296b607ae303cc6e18b1f537b75d4d6c080f3f2d24ef96ad748047",
+          "at": "2026-04-30T13:50:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
+          "at": "2026-04-30T13:52:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
+          "at": "2026-04-30T13:53:49Z"
         }
       ]
     }

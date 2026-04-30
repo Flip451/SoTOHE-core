@@ -1,0 +1,493 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-30T17:03:26Z",
+  "declaration_hash": "4d9a6a7ae5865c5a234bc31bb480ad3308be5b150919ae93753e756ef2b40a63",
+  "signals": [
+    {
+      "type_name": "TrackStatusOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "GuardDecision",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "GuardCheckOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "GuardCheckService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "GuardCheckInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ShellParserPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ExportSchemaService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ExportSchemaCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ExportSchemaError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ExportSchemaInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskOperationOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewApprovalOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewApprovalDecision",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewCheckApprovedService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewCheckApprovedError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "HookDispatchCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "HookVerdictOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "HookVerdictDecision",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "HookDispatchService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "HookDispatchError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "HookDispatchInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewRoundType",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackPhaseOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackPhaseService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackPhaseError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackPhaseInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueConsistencyInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueSpecSignalsService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifySpecSignalsOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifySpecSignalsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueSpecSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeSignalsService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "LayerSignalSummary",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyAdrSignals",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyOutput, VerifyAdrSignalsError>"
+      ]
+    },
+    {
+      "type_name": "VerifyAdrSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl VerifyAdrSignals"
+      ]
+    },
+    {
+      "type_name": "AdrVerifyOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ScopeQueryService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn classify_by_strings(&self, paths: Vec<String>) -> Result<Vec<ScopeClassificationOutput>, ScopeQueryError>",
+        "fn files_by_string(&self, scope: String) -> Result<Vec<String>, ScopeQueryError>"
+      ],
+      "extra_items": [
+        "fn classify(&self, paths: Vec<FilePath>) -> Result<Vec<PathClassification>, ScopeQueryError>",
+        "fn files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError>"
+      ]
+    },
+    {
+      "type_name": "ScopeClassificationOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ScopeQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "impl ScopeQueryService"
+      ],
+      "extra_items": [
+        "base: CommitHash",
+        "diff_getter: D",
+        "scope_config: ReviewScopeConfig"
+      ]
+    },
+    {
+      "type_name": "TaskOperationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskTransitionCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AddTaskCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SetOverrideCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ClearOverrideCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskQueryService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "NextTaskOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskCountsOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PreCommitTypeSignalsService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PreCommitTypeSignalsOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PreCommitTypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunReviewCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunReviewOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunReviewError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunReviewInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RunReviewService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "InvalidTrackId",
+        "SymlinkRejected",
+        "RulesFileMissing",
+        "RulesParseError",
+        "TrackDirectoryMissing",
+        "SpecJsonMissing",
+        "CatalogueDecodeFailed",
+        "SignalDecodeFailed"
+      ],
+      "extra_items": [
+        "BranchTrackMismatch",
+        "CatalogueFetchError",
+        "CatalogueNotFound",
+        "InvalidCatalogueHash",
+        "NonActiveTrack",
+        "SignalsFetchError",
+        "SpecFetchError",
+        "SpecNotFound"
+      ]
+    },
+    {
+      "type_name": "VerifyCatalogueSpecRefsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "impl VerifyCatalogueSpecRefsService"
+      ],
+      "extra_items": [
+        "impl VerifyCatalogueSpecRefs (workspace trait not declared)"
+      ]
+    },
+    {
+      "type_name": "CommitHashPersistenceService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CommitHashPersistenceError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CommitHashPersistenceInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}
