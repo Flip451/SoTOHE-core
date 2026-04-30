@@ -450,6 +450,126 @@
           "findings": [],
           "hash": "rvw1:sha256:e2951ebb60b19db7dda6fb6b7925e039403e3c7949a03c633924ffa1c84ddb2e",
           "at": "2026-04-30T05:48:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4be4fc3520aecf6852af40dbfb0f426ec97e402d37bec9aa276ce3ca7f4d8082",
+          "at": "2026-04-30T06:03:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4be4fc3520aecf6852af40dbfb0f426ec97e402d37bec9aa276ce3ca7f4d8082",
+          "at": "2026-04-30T06:04:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` still leaves two T001-owned entries in mixed states: `PathClassification` is `Signal=🔵 / Cat-Spec=🟡` and `ScopeQueryInteractor` is `Signal=🟡 / Cat-Spec=🔵`. That conflicts with the same artifact set marking T001 as `done` in `impl-plan.json` / `plan.md`, so the generated plan artifacts are internally inconsistent about whether the completed task has fully resolved its usecase types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/usecase-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e4c9148fc5c825d265e3339c976618b03edd450ce98a0ffa413aa3c5b51a4d23",
+          "at": "2026-04-30T06:14:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 only calls out `ScopeQueryInteractor::files` tests for `UnknownScope` and `DiffGet` errors. The successful path of the public `files` API is missing from the plan, so a regression in the `contains_scope`/`classify` wiring could ship without any direct coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 11,
+              "category": "test coverage"
+            },
+            {
+              "message": "T003 promises human-readable handling for `DiffGet` failures, but the listed unit tests never exercise that branch. Add an explicit failure-path test for the CLI so the stderr/exit-status behavior cannot regress silently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "line": 32,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e4c9148fc5c825d265e3339c976618b03edd450ce98a0ffa413aa3c5b51a4d23",
+          "at": "2026-04-30T06:15:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1be0ec1b44e2d3d1917034c1153e56ec5aaa442d14b4ab76727faa15ce3034cd",
+          "at": "2026-04-30T06:17:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked `done`, but the same change also alters the completed task's definition by adding a new success-path unit test requirement. A completion-only transition should not expand the scope of the task being marked complete, because the `done` status now applies to a materially different task definition than the one that was pending before this change.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 is still `todo`, but this plan-artifact update also changes its acceptance/test requirements by adding DiffGet error-path coverage. That is unrelated to the T001 completion transition and contradicts the stated plan-artifact intent that T002-T004 remain unchanged in this round.",
+              "severity": "P1",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/impl-plan.json",
+              "line": 16,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1be0ec1b44e2d3d1917034c1153e56ec5aaa442d14b4ab76727faa15ce3034cd",
+          "at": "2026-04-30T06:20:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4c9148fc5c825d265e3339c976618b03edd450ce98a0ffa413aa3c5b51a4d23",
+          "at": "2026-04-30T06:24:02Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
+          "at": "2026-04-30T06:04:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify` builds the scope list by inverting `ReviewScopeConfig::classify` into a `HashMap<FilePath, Vec<MainScopeName>>`, but it does not deduplicate scope names per path. Because the public API preserves one output per input path, a duplicated input like `[\"libs/domain/src/lib.rs\", \"libs/domain/src/lib.rs\"]` makes the domain classifier push the same file into the `domain` bucket twice, and this code turns that into `Named(domain, [domain])` for both results. The CLI would then report a path as matching the same scope multiple times, which is not a real multi-scope match. Deduplicate `names` after sorting or classify each input occurrence independently.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/scope_query.rs",
+              "line": 132,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:b0650abb89f43c73aaed1ceb57e67955a814af1bcbb92f823dd379b331c00265",
+          "at": "2026-04-30T06:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46a1a47bde28a040a880e0e392761e148d44b7e763f88c2c8c15115bc947bf82",
+          "at": "2026-04-30T06:08:23Z"
         }
       ]
     }

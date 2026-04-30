@@ -4,19 +4,19 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ScopeClassification | enum | — | Named, Other, Excluded | 🟡 | 🔵 |
+| ScopeClassification | enum | — | Named, Other, Excluded | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PathClassification | value_object | — | — | 🟡 | 🟡 |
+| PathClassification | value_object | — | — | 🔵 | 🟡 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ScopeQueryError | error_type | — | DiffGet, UnknownScope | 🟡 | 🔵 |
+| ScopeQueryError | error_type | — | DiffGet, UnknownScope | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -28,7 +28,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ScopeQueryService | application_service | — | fn classify(&self, paths: Vec<FilePath>) -> Result<Vec<PathClassification>, ScopeQueryError>, fn files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError> | 🟡 | 🔵 |
+| ScopeQueryService | application_service | — | fn classify(&self, paths: Vec<FilePath>) -> Result<Vec<PathClassification>, ScopeQueryError>, fn files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError> | 🔵 | 🔵 |
 
 ## Interactors
 
