@@ -10,7 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PathClassification | value_object | — | — | 🔵 | 🟡 |
+| PathClassification | value_object | — | — | 🔵 | 🔵 |
 
 ## Error Types
 
@@ -34,5 +34,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ScopeQueryInteractor | interactor | — | — | 🟡 | 🔵 |
+| ScopeQueryInteractor | interactor | — | — | 🔵 | 🔵 |
 

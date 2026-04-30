@@ -3,7 +3,7 @@
   "type_definitions": [
     {
       "name": "ScopeQueryService",
-      "description": "Application service (driving port) trait for scope routing queries. Provides two read-only methods: classify takes a list of FilePaths and returns per-path ScopeClassification results (Named / Other / Excluded); files takes a ScopeName and returns the subset of current diff files belonging to that scope. The driving force is the CLI layer (classify / files subcommands); the implementation is ScopeQueryInteractor. This trait is the primary port boundary between the CLI and the usecase layer per ADR D6 (ReviewCycle-independent minimum-dependency application service). The method signatures use domain types (FilePath, ScopeName) for inputs and usecase-layer types (ScopeClassification, PathClassification, ScopeQueryError) for return values; all return types are defined in this usecase module.",
+      "description": "Application service (driving port) trait for scope routing queries. Provides two read-only methods: classify takes a list of FilePaths and returns per-path ScopeClassification results (Named / Other / Excluded); files takes a ScopeName and returns the subset of current diff files belonging to that scope. The driving force is the CLI layer (classify / files subcommands); the implementation is ScopeQueryInteractor. This trait is the primary port boundary between the CLI and the usecase layer per ADR D6 (ReviewCycle-independent minimum-dependency application service). The method signatures use domain types (FilePath, ScopeName) for inputs; classify returns usecase-layer types (PathClassification wrapped in Result with ScopeQueryError), while files returns domain-layer FilePath elements (the path type originates in the domain) with ScopeQueryError as the error type.",
       "approved": true,
       "kind": "application_service",
       "expected_methods": [
@@ -212,12 +212,16 @@
           "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
           "anchor": "AC-01",
           "hash": "7550afebe4e47b9160ebed2ac6db3f79a57672ee215133c17cf58436f5658ddd"
-        }
-      ],
-      "informal_grounds": [
+        },
         {
-          "kind": "user_directive",
-          "summary": "Placed in usecase layer (R1 value_object is triangle, requires grounds): usecase-internal query result record; FilePath invariant (validated, repo-relative) established at CLI call-site; no serde boundary."
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "IN-07",
+          "hash": "4dbc7cdb6a09d193657652afc6394669b0568b98a0e94a2500fd8a74c56bf849"
+        },
+        {
+          "file": "track/items/review-scope-lookup-commands-2026-04-30/spec.json",
+          "anchor": "CN-05",
+          "hash": "d7f77d98f924bcbc66e40e2996b54cb7440d4f6e9e2a1f4e58a46ed33c4da31e"
         }
       ]
     },

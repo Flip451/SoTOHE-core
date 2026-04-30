@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-30T06:46:07Z",
-  "declaration_hash": "4202175525300ec944537b888e7c24d0d685d539e0fedecb34ac5ac4fb6bf040",
+  "generated_at": "2026-04-30T07:07:37Z",
+  "declaration_hash": "73718ae1bc9c7295e60633276e93371f1806a259542f3d0e4fdc55e68b1fe287",
   "signals": [
     {
       "type_name": "ScopeQueryService",
@@ -16,15 +16,13 @@
     {
       "type_name": "ScopeQueryInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
-        "impl ScopeQueryService"
-      ],
-      "missing_items": [
-        "base: CommitHash",
+        "scope_config: ReviewScopeConfig",
         "diff_getter: D",
-        "scope_config: ReviewScopeConfig"
+        "base: CommitHash",
+        "impl ScopeQueryService"
       ]
     },
     {

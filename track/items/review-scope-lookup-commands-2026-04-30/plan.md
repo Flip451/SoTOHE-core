@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # scope 分類ロジックの CLI 公開 (classify / files)
 
-## Tasks (3/4 resolved)
+## Tasks (4/4 resolved)
 
 ### S1 — Usecase Layer — ScopeQueryService Application Service (T001)
 
@@ -37,4 +37,4 @@
 > 新規 usecase 型が check-layers を pass すること (domain → usecase direction のみ、infrastructure 非依存)。
 > 失敗した gate があれば同タスク内で修正する。
 
-- [ ] **T004**: `cargo make ci` の全 gate が pass することを確認する (AC-14)。T001-T003 完了後に実行する: (1) `cargo make fmt-check` — rustfmt の差分がないことを確認する。(2) `cargo make clippy` — warnings が 0 であること (-D warnings)。(3) `cargo make test` (nextest) — 新規追加した全 unit test + 既存テストがすべて pass すること。(4) `cargo make deny` — ライセンス・禁止クレートチェックが pass すること。(5) `cargo make check-layers` — layer 依存関係チェックが pass すること (新規 usecase 型が domain に依存し infrastructure に依存しないことを確認)。(6) `cargo make verify-*` — plan-artifact-refs / plan-progress / arch-docs など既存 verify タスクが pass すること。失敗した gate があれば同タスク内で修正する。前提: T001-T003 完了。
+- [x] **T004**: `cargo make ci` の全 gate が pass することを確認する (AC-14)。T001-T003 完了後に実行する: (1) `cargo make fmt-check` — rustfmt の差分がないことを確認する。(2) `cargo make clippy` — warnings が 0 であること (-D warnings)。(3) `cargo make test` (nextest) — 新規追加した全 unit test + 既存テストがすべて pass すること。(4) `cargo make deny` — ライセンス・禁止クレートチェックが pass すること。(5) `cargo make check-layers` — layer 依存関係チェックが pass すること (新規 usecase 型が domain に依存し infrastructure に依存しないことを確認)。(6) `cargo make verify-*` — plan-artifact-refs / plan-progress / arch-docs など既存 verify タスクが pass すること。失敗した gate があれば同タスク内で修正する。前提: T001-T003 完了。

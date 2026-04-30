@@ -105,10 +105,15 @@ pub trait ScopeQueryService {
 /// Holds `scope_config` (domain), a generic `diff_getter: D` (driven port),
 /// and the diff `base` commit. Does NOT depend on `Reviewer` or
 /// `ReviewHasher` (CN-06).
+///
+/// Fields are public so the type catalogue's declared `expected_members`
+/// resolve in rustdoc's public schema (the TDDD type-signal pipeline only
+/// observes `pub` members). Construction normally goes through `new()`;
+/// direct field access is allowed for composition-root wiring and tests.
 pub struct ScopeQueryInteractor<D: DiffGetter> {
-    scope_config: ReviewScopeConfig,
-    diff_getter: D,
-    base: CommitHash,
+    pub scope_config: ReviewScopeConfig,
+    pub diff_getter: D,
+    pub base: CommitHash,
 }
 
 impl<D: DiffGetter> ScopeQueryInteractor<D> {
