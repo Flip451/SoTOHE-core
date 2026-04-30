@@ -15,32 +15,33 @@
     {
       "id": "T003",
       "description": "Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, HookShellParserPort; also add HookShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn HookShellParserPort> into HookDispatchInteractor",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "686690866f5d8fbf7c1dd1fbffe67226db3e5a73"
     },
     {
       "id": "T004",
       "description": "Add domain schema export boundary types and service to usecase layer: ExportSchemaCommand, ExportSchemaError, ExportSchemaService, ExportSchemaInteractor, SchemaExporterPort; also add SchemaExporterPort impl to RustdocSchemaExporter (infrastructure) so the CLI composition root can wire Arc<dyn SchemaExporterPort>",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",
       "description": "Add review boundary types, services, and interactors to usecase layer: ReviewApprovalDecision, ReviewApprovalOutput, ReviewCheckApprovedService, ReviewCheckApprovedError, ReviewCheckApprovedInteractor, RunReviewCommand, RunReviewOutput, RunReviewError, RunReviewService, RunReviewInteractor, ReviewRoundType",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",
       "description": "Add track task operation boundary types, services, and interactors to usecase layer: TaskTransitionCommand, AddTaskCommand, SetOverrideCommand, ClearOverrideCommand, TaskOperationError, TaskOperationOutput, TaskOperationService, TaskOperationInteractor, TaskQueryService, TaskQueryInteractor, NextTaskOutput, TaskCountsOutput, TrackStatusOutput",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",
       "description": "Add track phase resolution and catalogue verify boundary types, services, and interactors to usecase layer: TrackPhaseOutput, TrackPhaseError, TrackPhaseService, TrackPhaseInteractor, VerifyCatalogueConsistencyService, VerifyCatalogueConsistencyOutput, VerifyCatalogueConsistencyError, VerifyCatalogueConsistencyInteractor, VerifyCatalogueSpecSignalsService, VerifySpecSignalsOutput, VerifySpecSignalsError, VerifyCatalogueSpecSignalsInteractor, TypeSignalsService, LayerSignalSummary, TypeSignalsError, TypeSignalsInteractor, VerifyCatalogueSpecRefsService, VerifyCatalogueSpecRefsOutput, VerifyCatalogueSpecRefsError, VerifyCatalogueSpecRefsInteractor",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",
       "description": "Add pre-commit type-signals and commit-hash persistence boundary types, services, and interactors to usecase layer: PreCommitTypeSignalsService, PreCommitTypeSignalsOutput, PreCommitTypeSignalsError, PreCommitTypeSignalsInteractor, CommitHashPersistenceService, CommitHashPersistenceError, CommitHashPersistenceInteractor",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T009",

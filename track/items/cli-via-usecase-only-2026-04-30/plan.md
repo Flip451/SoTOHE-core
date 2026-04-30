@@ -10,20 +10,20 @@
 > T003 covers HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, and HookShellParserPort.
 
 - [x] **T002**: Add guard boundary types and service to usecase layer: GuardDecision, GuardCheckOutput, GuardCheckService, GuardCheckInteractor, ShellParserPort; also add ShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn ShellParserPort> (`94ec2339cc32504b0eb92615706480f454ec02c3`)
-- [x] **T003**: Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, HookShellParserPort; also add HookShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn HookShellParserPort> into HookDispatchInteractor
+- [x] **T003**: Add hook dispatch boundary types and service to usecase layer: HookDispatchCommand, HookVerdictOutput, HookVerdictDecision, HookDispatchError, HookDispatchService, HookDispatchInteractor, HookShellParserPort; also add HookShellParserPort impl to ConchShellParser (infrastructure) so the CLI composition root can wire Arc<dyn HookShellParserPort> into HookDispatchInteractor (`686690866f5d8fbf7c1dd1fbffe67226db3e5a73`)
 
 ### S2 — Usecase Boundary — Domain Schema Export
 
 > Introduce the ExportSchema family (command, error, service, interactor) plus the SchemaExporterPort secondary port so that the CLI domain export-schema subcommand can be migrated away from importing domain::schema::SchemaExporter directly.
 > SchemaExporterPort is a usecase-owned driven port whose export_as_json method returns a serialized JSON string. RustdocSchemaExporter (infrastructure) implements SchemaExporterPort in addition to domain::schema::SchemaExporter. The CLI composition root wires RustdocSchemaExporter as Arc<dyn SchemaExporterPort> into ExportSchemaInteractor without importing the domain trait.
 
-- [ ] **T004**: Add domain schema export boundary types and service to usecase layer: ExportSchemaCommand, ExportSchemaError, ExportSchemaService, ExportSchemaInteractor, SchemaExporterPort; also add SchemaExporterPort impl to RustdocSchemaExporter (infrastructure) so the CLI composition root can wire Arc<dyn SchemaExporterPort>
+- [~] **T004**: Add domain schema export boundary types and service to usecase layer: ExportSchemaCommand, ExportSchemaError, ExportSchemaService, ExportSchemaInteractor, SchemaExporterPort; also add SchemaExporterPort impl to RustdocSchemaExporter (infrastructure) so the CLI composition root can wire Arc<dyn SchemaExporterPort>
 
 ### S3 — Usecase Boundary — Review
 
 > Introduce the review boundary types covering check-approved (ReviewApprovalDecision, ReviewApprovalOutput, ReviewCheckApprovedService, ReviewCheckApprovedError) and run-review (RunReviewCommand, RunReviewOutput, RunReviewError, RunReviewService, ReviewRoundType). All of these protect the CLI from importing domain::review_v2::* directly.
 
-- [ ] **T005**: Add review boundary types, services, and interactors to usecase layer: ReviewApprovalDecision, ReviewApprovalOutput, ReviewCheckApprovedService, ReviewCheckApprovedError, ReviewCheckApprovedInteractor, RunReviewCommand, RunReviewOutput, RunReviewError, RunReviewService, RunReviewInteractor, ReviewRoundType
+- [~] **T005**: Add review boundary types, services, and interactors to usecase layer: ReviewApprovalDecision, ReviewApprovalOutput, ReviewCheckApprovedService, ReviewCheckApprovedError, ReviewCheckApprovedInteractor, RunReviewCommand, RunReviewOutput, RunReviewError, RunReviewService, RunReviewInteractor, ReviewRoundType
 
 ### S4 — Usecase Boundary — Track Task Operations
 
@@ -31,21 +31,21 @@
 > TaskOperationService is the application service trait for mutation operations (transition_task, add_task, set_override, clear_override), accepting the command objects and returning TaskOperationOutput.
 > This section eliminates the largest cluster of domain type imports in the CLI (domain::TrackId, domain::CommitHash, domain::TrackMetadata, domain::derive_track_status, domain::DomainError, domain::TaskStatusKind, domain::ImplPlanReader).
 
-- [ ] **T006**: Add track task operation boundary types, services, and interactors to usecase layer: TaskTransitionCommand, AddTaskCommand, SetOverrideCommand, ClearOverrideCommand, TaskOperationError, TaskOperationOutput, TaskOperationService, TaskOperationInteractor, TaskQueryService, TaskQueryInteractor, NextTaskOutput, TaskCountsOutput, TrackStatusOutput
+- [~] **T006**: Add track task operation boundary types, services, and interactors to usecase layer: TaskTransitionCommand, AddTaskCommand, SetOverrideCommand, ClearOverrideCommand, TaskOperationError, TaskOperationOutput, TaskOperationService, TaskOperationInteractor, TaskQueryService, TaskQueryInteractor, NextTaskOutput, TaskCountsOutput, TrackStatusOutput
 
 ### S5 — Usecase Boundary — Track Phase and Catalogue Verification
 
 > Introduce boundary types for track phase resolution (TrackPhaseOutput, TrackPhaseError, TrackPhaseService, TrackPhaseInteractor) and all catalogue verification services (VerifyCatalogueConsistencyService, VerifyCatalogueSpecSignalsService, TypeSignalsService, VerifyCatalogueSpecRefsService and their associated Output/Error DTOs and LayerSignalSummary).
 > These cover domain::ImplPlanReader, domain::ConfidenceSignal, domain::TypeCatalogueDocument, domain::ConsistencyReport, and related types.
 
-- [ ] **T007**: Add track phase resolution and catalogue verify boundary types, services, and interactors to usecase layer: TrackPhaseOutput, TrackPhaseError, TrackPhaseService, TrackPhaseInteractor, VerifyCatalogueConsistencyService, VerifyCatalogueConsistencyOutput, VerifyCatalogueConsistencyError, VerifyCatalogueConsistencyInteractor, VerifyCatalogueSpecSignalsService, VerifySpecSignalsOutput, VerifySpecSignalsError, VerifyCatalogueSpecSignalsInteractor, TypeSignalsService, LayerSignalSummary, TypeSignalsError, TypeSignalsInteractor, VerifyCatalogueSpecRefsService, VerifyCatalogueSpecRefsOutput, VerifyCatalogueSpecRefsError, VerifyCatalogueSpecRefsInteractor
+- [~] **T007**: Add track phase resolution and catalogue verify boundary types, services, and interactors to usecase layer: TrackPhaseOutput, TrackPhaseError, TrackPhaseService, TrackPhaseInteractor, VerifyCatalogueConsistencyService, VerifyCatalogueConsistencyOutput, VerifyCatalogueConsistencyError, VerifyCatalogueConsistencyInteractor, VerifyCatalogueSpecSignalsService, VerifySpecSignalsOutput, VerifySpecSignalsError, VerifyCatalogueSpecSignalsInteractor, TypeSignalsService, LayerSignalSummary, TypeSignalsError, TypeSignalsInteractor, VerifyCatalogueSpecRefsService, VerifyCatalogueSpecRefsOutput, VerifyCatalogueSpecRefsError, VerifyCatalogueSpecRefsInteractor
 
 ### S6 — Usecase Boundary — Pre-commit and Commit Hash Persistence
 
 > Introduce PreCommitTypeSignalsService (with Output and Error) and CommitHashPersistenceService (with Error) so that commands/make.rs can stop importing domain::ConfidenceSignal and domain::CommitHash directly.
 > These are the final pieces of the usecase boundary surface that must be in place before the CLI migration tasks can be completed.
 
-- [ ] **T008**: Add pre-commit type-signals and commit-hash persistence boundary types, services, and interactors to usecase layer: PreCommitTypeSignalsService, PreCommitTypeSignalsOutput, PreCommitTypeSignalsError, PreCommitTypeSignalsInteractor, CommitHashPersistenceService, CommitHashPersistenceError, CommitHashPersistenceInteractor
+- [~] **T008**: Add pre-commit type-signals and commit-hash persistence boundary types, services, and interactors to usecase layer: PreCommitTypeSignalsService, PreCommitTypeSignalsOutput, PreCommitTypeSignalsError, PreCommitTypeSignalsInteractor, CommitHashPersistenceService, CommitHashPersistenceError, CommitHashPersistenceInteractor
 
 ### S7 — Remove Usecase pub-use Re-exports
 
