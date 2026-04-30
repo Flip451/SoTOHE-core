@@ -12,12 +12,14 @@ use domain::review_v2::ReviewExistsPort;
 #[cfg(test)]
 use usecase::review_workflow::ReviewVerdict;
 
+mod classify;
 mod codex_local;
 mod compose_v2;
 mod results;
 #[cfg(test)]
 mod tests;
 
+use classify::{ClassifyArgs, execute_classify};
 use codex_local::execute_codex_local;
 use results::execute_results;
 
@@ -42,6 +44,11 @@ pub enum ReviewCommand {
     /// (the default) the output is the state summary only — the equivalent of the
     /// removed `sotp review status` subcommand.
     Results(ResultsArgs),
+    /// Classify each given path into review scopes (`<path>TAB<scope-csv>` lines).
+    ///
+    /// Pure-logic command: validates paths via `FilePath::new` and consults the
+    /// scope config without invoking the diff getter.
+    Classify(ClassifyArgs),
 }
 
 /// CLI round type for auto-record.
@@ -253,6 +260,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
         ReviewCommand::Results(args) => execute_results(&args),
+        ReviewCommand::Classify(args) => execute_classify(&args),
     }
 }
 

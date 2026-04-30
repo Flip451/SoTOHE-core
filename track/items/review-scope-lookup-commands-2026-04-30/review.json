@@ -1,57 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
-          "at": "2026-04-30T04:06:00Z"
+          "hash": "rvw1:sha256:2ccccfcd9b004c2749fc3b1e15c7adad8d8dd03ecf68651b486e1ff12219fca5",
+          "at": "2026-04-30T06:31:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
-          "at": "2026-04-30T04:07:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `verify-plan-artifact-refs` branch only handles `[OK]` and `SpecRef hash mismatch`, but the verifier also emits unresolved anchors, invalid anchors, coverage violations, and I/O/JSON failures. Those outcomes are now undefined, so a non-hash verifier failure can neither be repaired nor failed closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
-              "line": 125,
-              "category": "missing error handling"
-            },
-            {
-              "message": "The recovery path tells `type-designer` to refresh `<layer>-catalogue-spec-signals.json`, but that agent's own contract restricts Bash to its internal pipeline commands and does not include `catalogue-spec-signals` (`.claude/agents/type-designer.md:472-474`). The requested remediation is therefore outside the subagent's allowed tool scope and may never execute.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
-              "line": 127,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:a02f2bdcd43564e6b9f2edece05602fc155bb56e5ab49dbe083db6e44e9a4336",
-          "at": "2026-04-30T05:31:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
-          "at": "2026-04-30T05:36:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
-          "at": "2026-04-30T05:39:26Z"
+          "hash": "rvw1:sha256:2ccccfcd9b004c2749fc3b1e15c7adad8d8dd03ecf68651b486e1ff12219fca5",
+          "at": "2026-04-30T06:34:07Z"
         }
       ]
     },
@@ -537,6 +501,27 @@
           "findings": [],
           "hash": "rvw1:sha256:e4c9148fc5c825d265e3339c976618b03edd450ce98a0ffa413aa3c5b51a4d23",
           "at": "2026-04-30T06:24:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6391554f807ea8bb891e17c5a58759ea26561a804c763a8918936290676de080",
+          "at": "2026-04-30T06:30:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6391554f807ea8bb891e17c5a58759ea26561a804c763a8918936290676de080",
+          "at": "2026-04-30T06:31:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6391554f807ea8bb891e17c5a58759ea26561a804c763a8918936290676de080",
+          "at": "2026-04-30T06:35:27Z"
         }
       ]
     },
@@ -570,6 +555,60 @@
           "findings": [],
           "hash": "rvw1:sha256:46a1a47bde28a040a880e0e392761e148d44b7e763f88c2c8c15115bc947bf82",
           "at": "2026-04-30T06:08:23Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
+          "at": "2026-04-30T04:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28cf1d166d6d69af62b09255ffd386b0adfaaf11394a6a0fc350fdc5564c144b",
+          "at": "2026-04-30T04:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `verify-plan-artifact-refs` branch only handles `[OK]` and `SpecRef hash mismatch`, but the verifier also emits unresolved anchors, invalid anchors, coverage violations, and I/O/JSON failures. Those outcomes are now undefined, so a non-hash verifier failure can neither be repaired nor failed closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 125,
+              "category": "missing error handling"
+            },
+            {
+              "message": "The recovery path tells `type-designer` to refresh `<layer>-catalogue-spec-signals.json`, but that agent's own contract restricts Bash to its internal pipeline commands and does not include `catalogue-spec-signals` (`.claude/agents/type-designer.md:472-474`). The requested remediation is therefore outside the subagent's allowed tool scope and may never execute.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 127,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a02f2bdcd43564e6b9f2edece05602fc155bb56e5ab49dbe083db6e44e9a4336",
+          "at": "2026-04-30T05:31:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
+          "at": "2026-04-30T05:36:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a174c00b3af3d3e855d76a63a7e08ae66a836349b5355f91ef2ea2d3ddc23474",
+          "at": "2026-04-30T05:39:26Z"
         }
       ]
     }
