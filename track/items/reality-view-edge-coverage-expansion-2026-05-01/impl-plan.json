@@ -4,7 +4,7 @@
     {
       "id": "T001",
       "description": "Remove receiver-less guard from collect_edges() Methods branch and split edge_kind from 'method' into 'method_return' (return-value origin) and 'method_param' (argument origin): (a) delete the is_none() early-continue so associated functions become edge sources, (b) add method.params() scan alongside the existing method.returns() scan, (c) emit 'method_return' for return-value edges and 'method_param' for argument edges, (d) apply self-loop suppression (target != source_name) on the argument side as well",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {

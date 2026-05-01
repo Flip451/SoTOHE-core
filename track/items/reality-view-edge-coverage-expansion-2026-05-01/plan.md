@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別
 
-## Tasks (0/4 resolved)
+## Tasks (1/4 resolved)
 
 ### S1 — collect_edges() — receiver-less method coverage + edge_kind split
 
@@ -11,7 +11,7 @@
 > This task touches only the collect_edges() function body and the doc-comment for the edge_kind values. No change to the public function signature or the EdgeSet enum (CN-01).
 > T001 is a prerequisite for T003 because the new kind tags must exist before render_edge_symbol() dispatch can be extended.
 
-- [ ] **T001**: Remove receiver-less guard from collect_edges() Methods branch and split edge_kind from 'method' into 'method_return' (return-value origin) and 'method_param' (argument origin): (a) delete the is_none() early-continue so associated functions become edge sources, (b) add method.params() scan alongside the existing method.returns() scan, (c) emit 'method_return' for return-value edges and 'method_param' for argument edges, (d) apply self-loop suppression (target != source_name) on the argument side as well
+- [x] **T001**: Remove receiver-less guard from collect_edges() Methods branch and split edge_kind from 'method' into 'method_return' (return-value origin) and 'method_param' (argument origin): (a) delete the is_none() early-continue so associated functions become edge sources, (b) add method.params() scan alongside the existing method.returns() scan, (c) emit 'method_return' for return-value edges and 'method_param' for argument edges, (d) apply self-loop suppression (target != source_name) on the argument side as well
 
 ### S2 — collect_edges() — trait method scanning
 

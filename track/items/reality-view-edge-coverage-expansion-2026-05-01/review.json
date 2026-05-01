@@ -156,6 +156,53 @@
           "findings": [],
           "hash": "rvw1:sha256:041466d123b03ac4cea8a32d43b3c0cfdad161e067775b9e07b94fbbdc49a29d",
           "at": "2026-05-01T16:23:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9997cb3fdc347c62d7c8a2ce08880772228d7d436afaf28bd7cf42e5bb5f1107",
+          "at": "2026-05-01T16:31:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` no longer records `commit_hash: null` for any task. The plan-artifact update is supposed to advance only T001's status while leaving task commit hashes unset until the finalize commit; deleting the key from T001-T004 changes the task schema/content beyond that status transition and removes the explicit pending-hash state the track workflow relies on.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9997cb3fdc347c62d7c8a2ce08880772228d7d436afaf28bd7cf42e5bb5f1107",
+          "at": "2026-05-01T16:33:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23ae411c222de6846a380b00d05b2775a45c8c29cb32ee301b0cb8ed5e5f152b",
+          "at": "2026-05-01T16:37:28Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5ab3d02b8ef1d3f0ad6fe66796645f7b9366f1ea25d983569d94843e6af4d93",
+          "at": "2026-05-01T16:32:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5ab3d02b8ef1d3f0ad6fe66796645f7b9366f1ea25d983569d94843e6af4d93",
+          "at": "2026-05-01T16:36:22Z"
         }
       ]
     }

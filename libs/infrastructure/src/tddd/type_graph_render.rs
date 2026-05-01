@@ -341,7 +341,10 @@ pub fn write_type_graph_file(
 ///
 /// Returns `(source, label, target, edge_kind)` tuples. Deduplicates and sorts.
 /// Edge kinds:
-/// - `"method"`: inherent method with self-receiver (solid arrow `-->|label|`)
+/// - `"method_return"`: inherent or associated method, return-type origin
+///   (solid arrow `-->|label|`)
+/// - `"method_param"`: inherent or associated method, parameter-type origin
+///   (open-circle endpoint `--o|label|`)
 /// - `"field"`: struct field whose type is a workspace type (solid no-arrow `---|label|`)
 /// - `"impl"`: trait implementation (dashed arrow `-.->|impl|`)
 fn collect_edges(
@@ -356,18 +359,28 @@ fn collect_edges(
         for source_name in graph.type_names() {
             if let Some(node) = graph.get_type(source_name) {
                 for method in node.methods() {
-                    if method.receiver().is_none() {
-                        continue;
-                    }
-                    let targets = extract_type_names(method.returns());
-                    for target in targets {
+                    let return_targets = extract_type_names(method.returns());
+                    for target in return_targets {
                         if graph_type_names.contains(target) && target != source_name.as_str() {
                             edges.push((
                                 source_name.clone(),
                                 method.name().to_string(),
                                 target.to_string(),
-                                "method",
+                                "method_return",
                             ));
+                        }
+                    }
+                    for param in method.params() {
+                        let param_targets = extract_type_names(param.ty());
+                        for target in param_targets {
+                            if graph_type_names.contains(target) && target != source_name.as_str() {
+                                edges.push((
+                                    source_name.clone(),
+                                    method.name().to_string(),
+                                    target.to_string(),
+                                    "method_param",
+                                ));
+                            }
                         }
                     }
                 }
@@ -1284,7 +1297,7 @@ mod tests {
     }
 
     #[test]
-    fn test_render_skips_associated_functions_without_self() {
+    fn test_render_emits_associated_function_return_edge() {
         let mut types = HashMap::new();
         types.insert(
             "Factory".to_string(),
@@ -1296,8 +1309,8 @@ mod tests {
         let output = render_type_graph_flat(&graph, "domain", &TypeGraphRenderOptions::default());
 
         assert!(
-            !output.contains("Factory -->|create| Product"),
-            "associated functions without self must not create edges"
+            output.contains("Factory -->|create| Product"),
+            "associated functions must emit a method_return edge from their return type"
         );
     }
 
