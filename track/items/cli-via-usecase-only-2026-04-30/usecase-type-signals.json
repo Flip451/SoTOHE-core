@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-30T22:38:08Z",
-  "declaration_hash": "cdbfdc32b079b3543a0f0689dc9c67ffd93f86f3d59d106b6a444e8299c5efe9",
+  "generated_at": "2026-05-01T04:19:12Z",
+  "declaration_hash": "caa7063a3425470cf580442837c51f3106d352d7a70b6a04c2940ba3e7becfa4",
   "signals": [
     {
       "type_name": "TrackStatusOutput",
@@ -430,7 +430,7 @@
       "kind_tag": "application_service",
       "signal": "yellow",
       "found_type": true,
-      "missing_items": [
+      "found_items": [
         "fn classify_by_strings(&self, paths: Vec<String>) -> Result<Vec<ScopeClassificationOutput>, ScopeQueryError>",
         "fn files_by_string(&self, scope: String) -> Result<Vec<String>, ScopeQueryError>"
       ],
@@ -442,8 +442,12 @@
     {
       "type_name": "ScopeClassificationOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "path: String",
+        "scopes: Vec<String>"
+      ]
     },
     {
       "type_name": "ScopeQueryInteractor",
@@ -790,6 +794,177 @@
       "found_type": true,
       "found_items": [
         "fn split_shell(&self, input: &str) -> Result<Vec<SimpleCommand>, ParseError>"
+      ]
+    },
+    {
+      "type_name": "ScopeQueryError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiffGet",
+        "UnknownScope",
+        "InvalidPath",
+        "InvalidScopeName"
+      ]
+    },
+    {
+      "type_name": "ActivateTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "kind_filter: Option<Vec<String>>",
+        "layer_filter: Option<Vec<String>>"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound",
+        "UnknownKindFilter",
+        "InvalidTrackId"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "rendered_layer_count: usize",
+        "total_entry_count: usize"
+      ]
+    },
+    {
+      "type_name": "RenderContractMap",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RenderContractMap"
+      ]
+    },
+    {
+      "type_name": "LintRuleKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FieldEmpty",
+        "FieldNonEmpty",
+        "KindLayerConstraint"
+      ]
+    },
+    {
+      "type_name": "LintRuleSpec",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "kind: LintRuleKind",
+        "target_kind: String",
+        "target_field: Option<String>",
+        "permitted_layers: Vec<String>"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "layer_id: String",
+        "rules: Vec<LintRuleSpec>"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoad",
+        "LintExecution",
+        "InvalidLayer",
+        "InvalidRuleSpec"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RunCatalogueLint"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>"
+      ]
+    },
+    {
+      "type_name": "check_compliance_render",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn check_compliance_render(prompt: &str) -> Option<String>"
+      ]
+    },
+    {
+      "type_name": "has_skill_command",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn has_skill_command(prompt: &str) -> bool"
+      ]
+    },
+    {
+      "type_name": "reject_branchless_guard_by_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn reject_branchless_guard_by_str(reader: &impl TrackReader, track_id_str: &str, target_status: &str, schema_version: u32) -> Result<(), TrackResolutionError>"
+      ]
+    },
+    {
+      "type_name": "reject_branchless_implementation_transition_by_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn reject_branchless_implementation_transition_by_str(schema_version: u32, branch: Option<&str>, track_id_str: &str, target_status: &str) -> Result<(), TrackResolutionError>"
       ]
     }
   ]

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c05979ad185a307ed1333de38ccbe15a9d92c7dce3e31c332abcb128e6b48048",
+  "catalogue_declaration_hash": "3b998760898fe5b052d3d5aeff1ec7b4f91d629d4bd1134b28c5121ffc50f1cc",
   "signals": [
     {
       "type_name": "FsTrackStore",
@@ -12,6 +12,198 @@
     },
     {
       "type_name": "ConchShellParser",
+      "signal": "blue"
+    },
+    {
+      "type_name": "NullDiffGetter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "NullReviewer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CodexReviewOutcome",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewV2Composition",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewV2CompositionWithCodex",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CaptureBaselineError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EvaluateSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeGraphExportError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SignalSummary",
+      "signal": "blue"
+    },
+    {
+      "type_name": "run_example_demo",
+      "signal": "blue"
+    },
+    {
+      "type_name": "persist_commit_hash_for_track",
+      "signal": "blue"
+    },
+    {
+      "type_name": "append_scope_briefing_reference_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_check_approved_service",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_review_v2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_review_v2_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_review_v2_with_reviewer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_review_v2_with_reviewer_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_run_review_service",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_scope_query_interactor_no_diff_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "build_scope_query_interactor_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "check_approved_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "get_briefing_for_scope_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "load_scope_config_only",
+      "signal": "blue"
+    },
+    {
+      "type_name": "load_scope_config_only_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "render_review_results_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "resolve_diff_base_and_getter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "run_codex_review_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "validate_review_group_name_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "validate_scope_for_track_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "validate_track_id_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "capture_baseline_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "refresh_one_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "execute_type_graph_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "evaluate_and_write_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "execute_type_signals_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "validate_action_diagnostics",
+      "signal": "blue"
+    },
+    {
+      "type_name": "validate_and_write_catalogue",
+      "signal": "blue"
+    },
+    {
+      "type_name": "read_track_status_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "execute_verify_adr_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "any_enabled_catalogue_present",
+      "signal": "blue"
+    },
+    {
+      "type_name": "format_finding",
+      "signal": "blue"
+    },
+    {
+      "type_name": "read_spec_element_hashes",
+      "signal": "blue"
+    },
+    {
+      "type_name": "verify_one_layer_formatted",
+      "signal": "blue"
+    },
+    {
+      "type_name": "execute_catalogue_spec_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "execute_catalogue_spec_signals_check",
+      "signal": "blue"
+    },
+    {
+      "type_name": "consistency_report_to_findings",
+      "signal": "blue"
+    },
+    {
+      "type_name": "evaluate_consistency_from_components",
+      "signal": "blue"
+    },
+    {
+      "type_name": "execute_spec_code_consistency_str",
       "signal": "blue"
     }
   ]

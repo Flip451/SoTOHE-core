@@ -1,8 +1,7 @@
-use domain::ImplPlanReader;
-
 use crate::CliError;
 
 use super::*;
+use usecase::track_phase::TrackPhaseService as _;
 
 pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
     let ResolveArgs { items_dir, track_id } = args;
@@ -27,24 +26,17 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
             .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?,
     };
 
-    let track_id = TrackId::try_new(&effective_track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
+    // Read schema_version from metadata.json (pure JSON, no domain types needed).
+    let schema_version = read_schema_version_from_json(&items_dir, &effective_track_id);
 
-    let (track, meta) = read_track_metadata(&items_dir, &track_id)
+    // Use TrackPhaseInteractor (usecase service) to resolve the phase.
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+    let service =
+        usecase::track_phase::TrackPhaseInteractor::new(Arc::clone(&store), schema_version);
+
+    let info = service
+        .resolve(effective_track_id, items_dir)
         .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
-
-    // Load impl-plan.json via FsTrackStore::load_impl_plan (fail-closed):
-    // - Absent file → Ok(None) — valid for planning-only tracks (no branch, no plan).
-    // - Present but corrupt/unreadable → Err — propagated as a hard failure.
-    // Planning-only tracks (no branch, no plan) receive None and are reported correctly.
-    let store = FsTrackStore::new(items_dir.clone());
-    let impl_plan = store
-        .load_impl_plan(&track_id)
-        .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
-
-    // Note: TrackStatus::Archived is not reachable from derive_track_status();
-    // archived tracks live under track/archive/ and are not resolved by this command.
-    let info = domain::track_phase::resolve_phase(&track, meta.schema_version, impl_plan.as_ref());
 
     println!("Current phase: {}", info.phase);
     println!("Reason: {}", info.reason);
@@ -65,12 +57,4 @@ fn auto_detect_track_id_from_branch() -> Result<String, String> {
     let branch = repo.current_branch().map_err(|e| e.to_string())?;
     usecase::track_resolution::resolve_track_id_from_branch(branch.as_deref())
         .map_err(|e| e.to_string())
-}
-
-/// Read-only metadata load via `infrastructure::track::codec`.
-pub(super) fn read_track_metadata(
-    items_dir: &std::path::Path,
-    track_id: &TrackId,
-) -> Result<(domain::TrackMetadata, DocumentMeta), domain::RepositoryError> {
-    infrastructure::track::fs_store::read_track_metadata(items_dir, track_id)
 }

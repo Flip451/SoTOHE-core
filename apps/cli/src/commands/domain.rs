@@ -2,12 +2,12 @@
 
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::sync::Arc;
 
 use clap::{Args, Subcommand};
 
-use domain::schema::SchemaExporter;
 use infrastructure::schema_export::RustdocSchemaExporter;
-use infrastructure::schema_export_codec;
+use usecase::export_schema::{ExportSchemaCommand, ExportSchemaInteractor, ExportSchemaService};
 
 use crate::CliError;
 
@@ -46,11 +46,29 @@ pub fn execute(cmd: DomainCommand) -> ExitCode {
 
 fn export_schema(args: &ExportSchemaArgs) -> Result<ExitCode, CliError> {
     let workspace_root = discover_workspace_root()?;
-    let exporter = RustdocSchemaExporter::new(workspace_root);
-    let schema = exporter.export(&args.crate_name).map_err(|e| CliError::Message(e.to_string()))?;
 
-    let json = schema_export_codec::encode(&schema, args.pretty)
-        .map_err(|e| CliError::Message(format!("JSON serialization failed: {e}")))?;
+    // Composition root: wire RustdocSchemaExporter (infrastructure) as
+    // Arc<dyn SchemaExporterPort> into ExportSchemaInteractor.
+    // CLI never imports domain::schema::SchemaExporter (CN-01 satisfied).
+    let exporter = Arc::new(RustdocSchemaExporter::new(workspace_root));
+    let service = ExportSchemaInteractor::new(exporter);
+
+    let raw_json = service
+        .export(ExportSchemaCommand { crate_name: args.crate_name.clone() })
+        .map_err(|e| CliError::Message(e.to_string()))?;
+
+    // The infrastructure adapter always serializes with pretty formatting.
+    // When --pretty=false (the default), compact the output by re-parsing
+    // and re-serializing without indentation so the flag has its advertised
+    // effect.
+    let json = if args.pretty {
+        raw_json
+    } else {
+        let value: serde_json::Value = serde_json::from_str(&raw_json)
+            .map_err(|e| CliError::Message(format!("failed to parse schema JSON: {e}")))?;
+        serde_json::to_string(&value)
+            .map_err(|e| CliError::Message(format!("failed to compact schema JSON: {e}")))?
+    };
 
     if let Some(path) = &args.output {
         std::fs::write(path, &json)

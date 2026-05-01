@@ -1,7 +1,8 @@
 //! Hook dispatch subcommand for security-critical hooks.
 //!
 //! Reads Claude Code hook JSON from stdin, dispatches to the appropriate
-//! `HookHandler`, and exits with the correct code:
+//! handler via `usecase::hook_dispatch::HookDispatchInteractor`, and exits
+//! with the correct code:
 //! - Exit 0 = allow
 //! - Exit 2 = block (Claude Code hook protocol)
 //!
@@ -12,8 +13,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
 
-use domain::hook::HookContext;
 use infrastructure::shell::ConchShellParser;
+use usecase::hook_dispatch::{
+    HookDispatchCommand, HookDispatchInteractor, HookDispatchService, HookVerdictDecision,
+};
 
 /// CLI-layer serde type for Claude Code hook JSON envelope.
 /// Security-critical fields (`tool_name`) must NOT use `#[serde(default)]` —
@@ -105,17 +108,6 @@ fn collect_text_parts(value: &serde_json::Value, parts: &mut Vec<String>) {
     }
 }
 
-impl From<HookEnvelope> for domain::hook::HookInput {
-    fn from(env: HookEnvelope) -> Self {
-        Self {
-            tool_name: env.tool_name,
-            command: env.tool_input.command,
-            file_path: env.tool_input.file_path,
-            content: env.tool_input.content,
-        }
-    }
-}
-
 /// Hook names as CLI value enum (clap layer only — DIP).
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
 pub enum CliHookName {
@@ -136,6 +128,15 @@ impl CliHookName {
     /// Returns `true` if this is a PostToolUse hook (cannot block).
     fn is_post_tool_use(self) -> bool {
         false
+    }
+
+    /// Returns the hook name string used by `HookDispatchService`.
+    fn hook_name(self) -> &'static str {
+        match self {
+            Self::BlockDirectGitOps => "block-direct-git-ops",
+            Self::BlockTestFileDeletion => "block-test-file-deletion",
+            Self::SkillCompliance => "skill-compliance",
+        }
     }
 }
 
@@ -188,49 +189,37 @@ fn execute_dispatch(hook: CliHookName) -> ExitCode {
         }
     };
 
-    // Build domain types
-    let input: domain::hook::HookInput = envelope.into();
-
-    let ctx =
-        HookContext { project_dir: std::env::var("CLAUDE_PROJECT_DIR").ok().map(PathBuf::from) };
-
-    // Composition root: build the shell parser adapter and inject into handlers
-    let parser: Arc<dyn domain::guard::ShellParser> = Arc::new(ConchShellParser);
-
-    // Dispatch to the appropriate handler
-    let result = match hook {
-        CliHookName::BlockDirectGitOps => {
-            let handler = usecase::hook::GuardHookHandler { parser: Arc::clone(&parser) };
-            handler_handle(&handler, &ctx, &input)
-        }
-        CliHookName::BlockTestFileDeletion => {
-            let handler =
-                usecase::hook::TestFileDeletionGuardHandler { parser: Arc::clone(&parser) };
-            handler_handle(&handler, &ctx, &input)
-        }
-        CliHookName::SkillCompliance => return ExitCode::SUCCESS,
+    // Build HookDispatchCommand from the CLI-level envelope.
+    // CLI never constructs domain::hook::HookInput directly (CN-01 satisfied).
+    let dispatch_cmd = HookDispatchCommand {
+        tool_name: envelope.tool_name,
+        command: envelope.tool_input.command,
+        file_path: envelope.tool_input.file_path,
+        content: envelope.tool_input.content,
     };
 
+    // Composition root: wire ConchShellParser as Arc<dyn HookShellParserPort>
+    // into HookDispatchInteractor. HookShellParserPort is a CN-01 accepted
+    // exception: CLI passes Arc<dyn HookShellParserPort> but never constructs
+    // domain::guard::SimpleCommand or calls domain::guard::ShellParser directly.
+    let parser_port = Arc::new(ConchShellParser);
+    let project_dir = std::env::var("CLAUDE_PROJECT_DIR").ok().map(PathBuf::from);
+    let service = HookDispatchInteractor::new(parser_port, project_dir);
+
+    let result = service.dispatch(hook.hook_name().to_owned(), dispatch_cmd);
+
     match result {
-        Ok(verdict) => emit_verdict(&verdict),
+        Ok(verdict) => emit_verdict(verdict.decision, verdict.reason.as_deref()),
         Err(e) => handle_error(is_post, &format!("hook error: {e}")),
     }
 }
 
-fn handler_handle(
-    handler: &dyn usecase::hook::HookHandler,
-    ctx: &HookContext,
-    input: &domain::hook::HookInput,
-) -> Result<domain::hook::HookVerdict, domain::hook::HookError> {
-    handler.handle(ctx, input)
-}
-
 /// Emits the hook verdict to stdout and returns the appropriate exit code.
-fn emit_verdict(verdict: &domain::hook::HookVerdict) -> ExitCode {
+fn emit_verdict(decision: HookVerdictDecision, reason: Option<&str>) -> ExitCode {
     // Guard: plain text reason + exit 2, or empty + exit 0
-    if verdict.is_blocked() {
-        if let Some(reason) = &verdict.reason {
-            println!("{reason}");
+    if decision == HookVerdictDecision::Block {
+        if let Some(r) = reason {
+            println!("{r}");
         }
         exit_code(2)
     } else {
@@ -289,17 +278,16 @@ fn execute_user_prompt_submit(_hook: CliHookName) -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    // Early exit: skip filesystem I/O when no /track: command is present
+    // Early exit: skip filesystem I/O when no /track: command is present.
+    // CN-01 / AC-03: use usecase::skill_compliance wrappers to avoid importing
+    // domain::skill_compliance::SkillMatch or domain::skill_compliance::ComplianceContext.
     let has_track_command = prompt.to_lowercase().contains("/track:");
-    let skill_match = domain::skill_compliance::detect_skill_command(&prompt);
-    if !has_track_command && skill_match.is_none() {
+    if !has_track_command && !usecase::skill_compliance::has_skill_command(&prompt) {
         return ExitCode::SUCCESS;
     }
 
     // Run compliance check
-    let ctx = domain::skill_compliance::check_compliance(&prompt);
-
-    if let Some(additional_context) = ctx.render() {
+    if let Some(additional_context) = usecase::skill_compliance::check_compliance_render(&prompt) {
         let output = serde_json::json!({
             "hookSpecificOutput": {
                 "hookEventName": "UserPromptSubmit",

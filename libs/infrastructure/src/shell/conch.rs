@@ -14,6 +14,7 @@ use conch_parser::parse::DefaultParser;
 
 use domain::guard::{ParseError, ShellParser, SimpleCommand};
 use usecase::guard::ShellParserPort;
+use usecase::hook_dispatch::HookShellParserPort;
 
 use super::flatten::{
     collect_command_substitutions_from_word, extract_redirect_word, flatten_top_level_word,
@@ -76,6 +77,24 @@ impl ShellParserPort for ConchShellParser {
     fn split_shell(&self, input: &str) -> Result<Vec<String>, String> {
         let commands = split_shell_inner(input, 0).map_err(|e| e.to_string())?;
         Ok(commands.into_iter().map(|cmd| cmd.argv.join(" ")).filter(|s| !s.is_empty()).collect())
+    }
+}
+
+impl HookShellParserPort for ConchShellParser {
+    /// Splits a shell command string into faithful [`SimpleCommand`] values.
+    ///
+    /// Delegates to the same `split_shell_inner` implementation as the
+    /// [`ShellParser`] trait impl, preserving `argv`, `redirect_texts`, and
+    /// `has_output_redirect` fields. This is the faithful, quote-preserving
+    /// variant required by `block-direct-git-ops` and `block-test-file-deletion`
+    /// hook guards.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ParseError`] on invalid shell syntax (e.g. nesting depth
+    /// exceeded or unmatched quote).
+    fn split_shell(&self, input: &str) -> Result<Vec<SimpleCommand>, ParseError> {
+        split_shell_inner(input, 0)
     }
 }
 

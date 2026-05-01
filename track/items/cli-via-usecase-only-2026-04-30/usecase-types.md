@@ -8,6 +8,7 @@
 | ReviewApprovalDecision | enum | — | Approved, ApprovedWithBypass, Blocked | 🔵 | 🔵 |
 | HookVerdictDecision | enum | — | Allow, Block | 🔵 | 🔵 |
 | ReviewRoundType | enum | — | Fast, Final | 🔵 | 🔵 |
+| LintRuleKind | enum | — | FieldEmpty, FieldNonEmpty, KindLayerConstraint | 🔵 | 🔵 |
 
 ## Error Types
 
@@ -25,6 +26,9 @@
 | RunReviewError | error_type | — | InvalidTrackId, InvalidGroupName, CompositionFailed, ReviewerFailed | 🔵 | 🔵 |
 | VerifyCatalogueSpecRefsError | error_type | modify | InvalidTrackId, SymlinkRejected, RulesFileMissing, RulesParseError, TrackDirectoryMissing, SpecJsonMissing, CatalogueDecodeFailed, SignalDecodeFailed | 🟡 | 🔵 |
 | CommitHashPersistenceError | error_type | — | InvalidTrackId, GitDiscoverFailed, BranchMismatch, RevParseFailed, InvalidSha, StoreWriteFailed, TrackDirMissing | 🔵 | 🔵 |
+| ScopeQueryError | error_type | modify | DiffGet, UnknownScope, InvalidPath, InvalidScopeName | 🔵 | 🔵 |
+| RenderContractMapError | error_type | modify | CatalogueLoaderFailed, ContractMapWriterFailed, EmptyCatalogue, LayerNotFound, UnknownKindFilter, InvalidTrackId | 🔵 | 🔵 |
+| RunCatalogueLintError | error_type | modify | CatalogueLoad, LintExecution, InvalidLayer, InvalidRuleSpec | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -54,6 +58,14 @@
 | RunReviewService | application_service | — | fn run(&self, command: RunReviewCommand) -> Result<RunReviewOutput, RunReviewError> | 🔵 | 🔵 |
 | VerifyCatalogueSpecRefsService | application_service | — | fn verify(&self, track_id: String, items_dir: PathBuf, workspace_root: PathBuf, skip_stale: bool) -> Result<VerifyCatalogueSpecRefsOutput, VerifyCatalogueSpecRefsError> | 🔵 | 🔵 |
 | CommitHashPersistenceService | application_service | — | fn persist(&self, track_id: String, workspace_root: PathBuf) -> Result<String, CommitHashPersistenceError> | 🔵 | 🔵 |
+| RenderContractMap | application_service | modify | fn execute(&self, cmd: &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError> | 🔵 | 🔵 |
+| RunCatalogueLint | application_service | modify | fn execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError> | 🔵 | 🟡 |
+
+## Use Cases
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| ActivateTrackUseCase | use_case | modify | — | 🔵 | 🟡 |
 
 ## Interactors
 
@@ -75,6 +87,8 @@
 | RunReviewInteractor | interactor | — | — | 🔵 | 🔵 |
 | VerifyCatalogueSpecRefsInteractor | interactor | modify | — | 🟡 | 🔵 |
 | CommitHashPersistenceInteractor | interactor | — | — | 🔵 | 🔵 |
+| RenderContractMapInteractor | interactor | modify | — | 🔵 | 🔵 |
+| RunCatalogueLintInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -90,12 +104,14 @@
 | VerifySpecSignalsOutput | dto | — | — | 🔵 | 🔵 |
 | LayerSignalSummary | dto | — | — | 🔵 | 🔵 |
 | AdrVerifyOutput | dto | — | — | 🟡 | 🔵 |
-| ScopeClassificationOutput | dto | — | — | 🟡 | 🔵 |
+| ScopeClassificationOutput | dto | — | — | 🔵 | 🔵 |
 | NextTaskOutput | dto | — | — | 🔵 | 🔵 |
 | TaskCountsOutput | dto | — | — | 🔵 | 🔵 |
 | PreCommitTypeSignalsOutput | dto | — | — | 🔵 | 🔵 |
 | RunReviewOutput | dto | — | — | 🔵 | 🔵 |
 | VerifyCatalogueSpecRefsOutput | dto | — | — | 🔵 | 🔵 |
+| RenderContractMapOutput | dto | — | — | 🔵 | 🔵 |
+| LintRuleSpec | dto | — | — | 🔵 | 🟡 |
 
 ## Commands
 
@@ -108,4 +124,15 @@
 | SetOverrideCommand | command | — | — | 🔵 | 🔵 |
 | ClearOverrideCommand | command | — | — | 🔵 | 🔵 |
 | RunReviewCommand | command | — | — | 🔵 | 🔵 |
+| RenderContractMapCommand | command | modify | — | 🔵 | 🔵 |
+| RunCatalogueLintCommand | command | modify | — | 🔵 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| check_compliance_render | free_function | — | — | 🟡 | 🔵 |
+| has_skill_command | free_function | — | — | 🟡 | 🔵 |
+| reject_branchless_guard_by_str | free_function | — | — | 🟡 | 🟡 |
+| reject_branchless_implementation_transition_by_str | free_function | — | — | 🟡 | 🔵 |
 

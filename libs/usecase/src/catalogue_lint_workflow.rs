@@ -14,14 +14,47 @@
 //! no `std::fs`, no `println!`, no `chrono`, no env access.
 //! All I/O flows through the domain ports.
 
-use std::sync::Arc;
-
 use domain::TrackId;
 use domain::tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
+    CatalogueLinterRuleKind,
 };
 use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
 use thiserror::Error;
+
+// Note: `std::sync::Arc` is no longer needed here since the interactor uses
+// generic type parameters instead of trait objects.
+
+// ---------------------------------------------------------------------------
+// Usecase-owned lint rule types (no domain imports in CLI / callers)
+// ---------------------------------------------------------------------------
+
+/// Usecase-owned mirror of `domain::tddd::catalogue_linter::CatalogueLinterRuleKind`.
+///
+/// Callers (e.g. CLI) use this enum so they never import domain types
+/// directly (CN-01 / AC-03).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LintRuleKind {
+    /// Rule asserts that the named field must be empty for entries of the target kind.
+    FieldEmpty,
+    /// Rule asserts that the named field must be non-empty for entries of the target kind.
+    FieldNonEmpty,
+    /// Rule constrains which layers entries of the target kind may appear in.
+    KindLayerConstraint,
+}
+
+/// Usecase-owned string-only description of a single lint rule.
+///
+/// Callers (e.g. CLI) construct `LintRuleSpec` values without importing
+/// domain types. The interactor converts them to `CatalogueLinterRule`
+/// internally.
+#[derive(Debug, Clone)]
+pub struct LintRuleSpec {
+    pub kind: LintRuleKind,
+    pub target_kind: String,
+    pub target_field: Option<String>,
+    pub permitted_layers: Vec<String>,
+}
 
 /// Command input for [`RunCatalogueLint::execute`].
 ///
@@ -34,7 +67,8 @@ pub struct RunCatalogueLintCommand {
     /// Must be one of the TDDD-enabled layers known to the [`CatalogueLoader`].
     pub layer_id: String,
     /// Set of lint rules to evaluate against the catalogue.
-    pub rules: Vec<CatalogueLinterRule>,
+    /// Use [`LintRuleSpec`] so callers never import domain types directly.
+    pub rules: Vec<LintRuleSpec>,
 }
 
 /// Error variants returned by [`RunCatalogueLintInteractor::execute`].
@@ -52,6 +86,10 @@ pub enum RunCatalogueLintError {
     /// the set returned by [`CatalogueLoader::load_all`]).
     #[error("layer '{0}' is not a TDDD-enabled layer")]
     InvalidLayer(String),
+
+    /// A [`LintRuleSpec`] could not be converted to a domain rule.
+    #[error("invalid lint rule spec: {0}")]
+    InvalidRuleSpec(String),
 }
 
 /// Primary port for the catalogue lint use case.
@@ -63,10 +101,15 @@ pub trait RunCatalogueLint: Send + Sync {
     ///
     /// # Errors
     ///
+    /// Returns [`RunCatalogueLintError::CatalogueLoad`] when `cmd.track_id`
+    /// is not a syntactically valid track identifier (surfaced via the loader
+    /// error path since the declared error variants share that boundary) or on
+    /// a real loader failure.
     /// Returns [`RunCatalogueLintError::InvalidLayer`] when `cmd.layer_id`
     /// is not present in the TDDD-enabled layer set returned by the loader.
-    /// Returns [`RunCatalogueLintError::CatalogueLoad`] on loader failure.
     /// Returns [`RunCatalogueLintError::LintExecution`] on linter failure.
+    /// Returns [`RunCatalogueLintError::InvalidRuleSpec`] when a
+    /// [`LintRuleSpec`] cannot be converted to a domain rule.
     fn execute(
         &self,
         cmd: RunCatalogueLintCommand,
@@ -75,23 +118,36 @@ pub trait RunCatalogueLint: Send + Sync {
 
 /// Default [`RunCatalogueLint`] implementation that composes
 /// [`CatalogueLoader`] and [`CatalogueLinter`] secondary ports.
-pub struct RunCatalogueLintInteractor {
-    catalogue_loader: Arc<dyn CatalogueLoader>,
-    linter: Arc<dyn CatalogueLinter>,
+///
+/// Generic over `L: CatalogueLoader` and `Li: CatalogueLinter` so callers
+/// (e.g. the CLI composition root) pass concrete types without needing to
+/// import the domain port traits directly.
+pub struct RunCatalogueLintInteractor<L, Li>
+where
+    L: CatalogueLoader,
+    Li: CatalogueLinter,
+{
+    catalogue_loader: L,
+    linter: Li,
 }
 
-impl RunCatalogueLintInteractor {
+impl<L, Li> RunCatalogueLintInteractor<L, Li>
+where
+    L: CatalogueLoader,
+    Li: CatalogueLinter,
+{
     /// Creates a new interactor wrapping the supplied secondary ports.
     #[must_use]
-    pub fn new(
-        catalogue_loader: Arc<dyn CatalogueLoader>,
-        linter: Arc<dyn CatalogueLinter>,
-    ) -> Self {
+    pub fn new(catalogue_loader: L, linter: Li) -> Self {
         Self { catalogue_loader, linter }
     }
 }
 
-impl RunCatalogueLint for RunCatalogueLintInteractor {
+impl<L, Li> RunCatalogueLint for RunCatalogueLintInteractor<L, Li>
+where
+    L: CatalogueLoader + Send + Sync,
+    Li: CatalogueLinter + Send + Sync,
+{
     fn execute(
         &self,
         cmd: RunCatalogueLintCommand,
@@ -100,25 +156,35 @@ impl RunCatalogueLint for RunCatalogueLintInteractor {
         // We convert here rather than in the command so the command struct
         // stays a plain data carrier (no domain import leak into the command
         // layer boundary).
-        let track_id = TrackId::try_new(&cmd.track_id).map_err(|_| {
-            // Invalid track IDs surface as a load error because the loader
-            // would reject them anyway — we surface early with a descriptive
-            // message via CatalogueLoaderError.
+        // Validate and parse track_id. An invalid string is surfaced as a
+        // CatalogueLoad error because the declared RunCatalogueLintError
+        // variants do not include a dedicated InvalidTrackId variant; the
+        // loader would reject it at the same boundary anyway, so the error
+        // kind is consistent with what callers expect for bad input.
+        let track_id = TrackId::try_new(&cmd.track_id).map_err(|e| {
             CatalogueLoaderError::LayerDiscoveryFailed {
-                reason: format!("invalid track_id '{}'", cmd.track_id),
+                reason: format!("invalid track_id '{}': {e}", cmd.track_id),
             }
         })?;
 
-        // Step 2: load all TDDD-enabled layers for this track.
+        // Step 2: convert LintRuleSpec values to domain CatalogueLinterRule values.
+        let rules: Vec<CatalogueLinterRule> = cmd
+            .rules
+            .iter()
+            .map(lint_rule_spec_to_domain)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(RunCatalogueLintError::InvalidRuleSpec)?;
+
+        // Step 3: load all TDDD-enabled layers for this track.
         let (layer_order, catalogues) = self.catalogue_loader.load_all(&track_id)?;
 
-        // Step 3: validate that the requested layer_id is TDDD-enabled.
+        // Step 4: validate that the requested layer_id is TDDD-enabled.
         let target_layer = layer_order
             .iter()
             .find(|l| l.as_ref() == cmd.layer_id.as_str())
             .ok_or_else(|| RunCatalogueLintError::InvalidLayer(cmd.layer_id.clone()))?;
 
-        // Step 4: retrieve the catalogue for the target layer.
+        // Step 5: retrieve the catalogue for the target layer.
         // The loader contract guarantees every layer in layer_order has a
         // corresponding entry in catalogues, so this is safe (no IndexSlicing).
         let catalogue = catalogues.get(target_layer).ok_or_else(|| {
@@ -131,11 +197,30 @@ impl RunCatalogueLint for RunCatalogueLintInteractor {
             }
         })?;
 
-        // Step 5: run the linter against the catalogue.
-        let violations = self.linter.run(&cmd.rules, catalogue, &cmd.layer_id)?;
+        // Step 6: run the linter against the catalogue.
+        let violations = self.linter.run(&rules, catalogue, &cmd.layer_id)?;
 
         Ok(violations)
     }
+}
+
+/// Convert a [`LintRuleSpec`] to a domain [`CatalogueLinterRule`].
+///
+/// Returns `Err(String)` when the spec is rejected by `CatalogueLinterRule::try_new`
+/// (e.g. empty target_kind or missing target_field for FieldEmpty rules).
+fn lint_rule_spec_to_domain(spec: &LintRuleSpec) -> Result<CatalogueLinterRule, String> {
+    let kind = match &spec.kind {
+        LintRuleKind::FieldEmpty => CatalogueLinterRuleKind::FieldEmpty,
+        LintRuleKind::FieldNonEmpty => CatalogueLinterRuleKind::FieldNonEmpty,
+        LintRuleKind::KindLayerConstraint => CatalogueLinterRuleKind::KindLayerConstraint,
+    };
+    CatalogueLinterRule::try_new(
+        kind,
+        spec.target_kind.clone(),
+        spec.target_field.clone(),
+        spec.permitted_layers.clone(),
+    )
+    .map_err(|e| e.to_string())
 }
 
 // ---------------------------------------------------------------------------
@@ -233,14 +318,13 @@ mod tests {
         (order, catalogues)
     }
 
-    fn field_non_empty_rule() -> CatalogueLinterRule {
-        CatalogueLinterRule::try_new(
-            CatalogueLinterRuleKind::FieldNonEmpty,
-            "secondary_port",
-            Some("expected_methods".to_owned()),
-            vec![],
-        )
-        .unwrap()
+    fn field_non_empty_rule_spec() -> LintRuleSpec {
+        LintRuleSpec {
+            kind: LintRuleKind::FieldNonEmpty,
+            target_kind: "secondary_port".to_owned(),
+            target_field: Some("expected_methods".to_owned()),
+            permitted_layers: vec![],
+        }
     }
 
     fn violation(name: &str) -> CatalogueLintViolation {
@@ -255,7 +339,7 @@ mod tests {
         RunCatalogueLintCommand {
             track_id: track.to_owned(),
             layer_id: layer.to_owned(),
-            rules: vec![field_non_empty_rule()],
+            rules: vec![field_non_empty_rule_spec()],
         }
     }
 
@@ -276,7 +360,7 @@ mod tests {
         let mut linter = MockLinter::new();
         linter.expect_run().times(1).returning(|_, _, _| Ok(vec![]));
 
-        let interactor = RunCatalogueLintInteractor::new(Arc::new(loader), Arc::new(linter));
+        let interactor = RunCatalogueLintInteractor::new(loader, linter);
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(result.is_ok());
@@ -302,7 +386,7 @@ mod tests {
         let mut linter = MockLinter::new();
         linter.expect_run().times(1).returning(move |_, _, _| Ok(vec![v1.clone(), v2.clone()]));
 
-        let interactor = RunCatalogueLintInteractor::new(Arc::new(loader), Arc::new(linter));
+        let interactor = RunCatalogueLintInteractor::new(loader, linter);
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(result.is_ok());
@@ -327,7 +411,7 @@ mod tests {
         let mut linter = MockLinter::new();
         linter.expect_run().times(0);
 
-        let interactor = RunCatalogueLintInteractor::new(Arc::new(loader), Arc::new(linter));
+        let interactor = RunCatalogueLintInteractor::new(loader, linter);
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(result.is_err());
@@ -355,7 +439,7 @@ mod tests {
             Err(CatalogueLinterError::InvalidRuleConfig("contradictory rules".to_owned()))
         });
 
-        let interactor = RunCatalogueLintInteractor::new(Arc::new(loader), Arc::new(linter));
+        let interactor = RunCatalogueLintInteractor::new(loader, linter);
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(result.is_err());
@@ -382,7 +466,7 @@ mod tests {
         let mut linter = MockLinter::new();
         linter.expect_run().times(0);
 
-        let interactor = RunCatalogueLintInteractor::new(Arc::new(loader), Arc::new(linter));
+        let interactor = RunCatalogueLintInteractor::new(loader, linter);
         let result = interactor.execute(cmd("my-track", "presentation")); // not in set
 
         assert!(result.is_err());

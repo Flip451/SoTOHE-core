@@ -8,15 +8,12 @@
 use std::process::ExitCode;
 
 use clap::{Args, ValueEnum};
-use domain::ConfidenceSignal;
 use infrastructure::tddd::type_signals_codec;
 use infrastructure::track::symlink_guard;
 use infrastructure::verify::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::{
-    ensure_active_track, execute_type_signals_lenient_with_bindings,
-};
+use crate::commands::track::tddd::signals::execute_type_signals_lenient_with_bindings;
 
 /// Arguments for `sotp make <task> [args...]`.
 #[derive(Args)]
@@ -911,32 +908,14 @@ fn run_pre_commit_type_signals(
     // tracks with a user-visible error (protecting immutability). The pre-commit path
     // reaching a Done track is valid during the final done-metadata commit (all tasks
     // transitioned to done, metadata written, then committed).
+    //
+    // CN-01 / AC-03: use `read_track_status_str` (infrastructure adapter) so this
+    // file does not import domain::TrackId, domain::ImplPlanReader, or
+    // domain::derive_track_status directly.
     {
-        let valid_id = domain::TrackId::try_new(track_id).map_err(|e| {
-            CliError::Message(format!("[track-commit-message] invalid track ID '{track_id}': {e}"))
-        })?;
-        match infrastructure::track::fs_store::read_track_metadata(&items_dir, &valid_id) {
-            Ok((metadata, _doc_meta)) => {
-                // Status is derived on demand from impl-plan + status_override.
-                // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt
-                // impl-plan.json blocks the commit rather than being treated as absent.
-                use domain::ImplPlanReader;
-                let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir.clone());
-                let impl_plan = store.load_impl_plan(&valid_id).map_err(|e| {
-                    CliError::Message(format!(
-                        "[track-commit-message] BLOCKED: cannot load impl-plan for \
-                         '{track_id}': {e}"
-                    ))
-                })?;
-                // Derive the effective track status from impl-plan.json (if
-                // present) + status_override. When impl-plan.json is absent
-                // (Phase 0-2 pre-impl-plan state), `derive_track_status`
-                // returns Planned gracefully — no invariant check blocks the
-                // commit at this layer. The CLI-level `ensure_active_track`
-                // guard below handles frozen tracks (Done / Archived).
-                let effective_status =
-                    domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-                if ensure_active_track(effective_status, track_id).is_err() {
+        match infrastructure::track::fs_store::read_track_status_str(&items_dir, track_id) {
+            Ok(status_str) => {
+                if matches!(status_str.as_str(), "done" | "archived") {
                     // Track is Done or Archived — skip pre-commit type-signal recomputation.
                     // The frozen track's signal files are already correct from when it was active.
                     // Return `None` bindings to signal the frozen-track state to the caller so
@@ -944,7 +923,7 @@ fn run_pre_commit_type_signals(
                     // `metadata.json` / `impl-plan.json` (which would reopen the TOCTOU window).
                     eprintln!(
                         "[track-commit-message] Pre-commit type signals: skipped \
-                         (track '{track_id}' is {effective_status} — declarations are frozen)."
+                         (track '{track_id}' is {status_str} — declarations are frozen)."
                     );
                     return Ok((ExitCode::SUCCESS, None));
                 }
@@ -1106,8 +1085,10 @@ fn run_pre_commit_type_signals(
             CliError::Message(format!("pre-commit: decode error on {}: {e}", signal_path.display()))
         })?;
         for signal in doc.signals() {
-            match signal.signal() {
-                ConfidenceSignal::Red => {
+            // CN-01 / AC-03: use `signal_as_str()` to avoid importing
+            // `domain::ConfidenceSignal` in the CLI layer.
+            match signal.signal_as_str() {
+                "red" => {
                     red_names.push(format!(
                         "{}: {} ({})",
                         binding.layer_id(),
@@ -1115,7 +1096,7 @@ fn run_pre_commit_type_signals(
                         signal.kind_tag()
                     ));
                 }
-                ConfidenceSignal::Yellow => {
+                "yellow" => {
                     yellow_names.push(format!(
                         "{}: {} ({})",
                         binding.layer_id(),
@@ -1166,55 +1147,14 @@ fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
 
 /// Persists the current HEAD SHA to `.commit_hash` (v2 incremental diff base).
 ///
+/// Delegates to `infrastructure::review_v2::persist_commit_hash_for_track` so
+/// that this function does not import `domain::CommitHash`, `domain::TrackId`,
+/// or `domain::review_v2::CommitHashWriter` directly (CN-01 / AC-03).
+///
 /// # Errors
 /// Returns a human-readable error string on failure.
 fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
-    use domain::review_v2::CommitHashWriter;
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-
-    // Validate track_id as a proper slug before using it as a path segment.
-    let validated_id =
-        domain::TrackId::try_new(track_id).map_err(|e| format!("invalid track id: {e}"))?;
-
-    let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
-    let root = git.root().to_path_buf();
-
-    // Branch guard: prevent cross-track corruption.
-    let branch_output = git
-        .output(&["rev-parse", "--abbrev-ref", "HEAD"])
-        .map_err(|e| format!("git rev-parse --abbrev-ref HEAD: {e}"))?;
-    if !branch_output.status.success() {
-        return Err("git rev-parse --abbrev-ref HEAD failed (cannot verify branch)".to_owned());
-    }
-    let branch = String::from_utf8_lossy(&branch_output.stdout).trim().to_owned();
-    let expected = format!("track/{validated_id}");
-    if branch != expected {
-        return Err(format!(
-            "current branch '{branch}' does not match track branch '{expected}'. \
-             Run from the correct track branch to prevent cross-track corruption."
-        ));
-    }
-
-    let head_output =
-        git.output(&["rev-parse", "HEAD"]).map_err(|e| format!("git rev-parse HEAD: {e}"))?;
-    if !head_output.status.success() {
-        return Err("git rev-parse HEAD failed".to_owned());
-    }
-    let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
-    let commit_hash = domain::CommitHash::try_new(&head_sha).map_err(|e| format!("{e}"))?;
-
-    let track_dir = root.join("track/items").join(validated_id.as_ref());
-    if !track_dir.is_dir() {
-        return Err(format!(
-            "track directory '{}' does not exist. \
-             Cannot write .commit_hash for non-existent track '{validated_id}'.",
-            track_dir.display(),
-        ));
-    }
-    let commit_hash_path = track_dir.join(".commit_hash");
-    let store = infrastructure::review_v2::FsCommitHashStore::new(commit_hash_path, root);
-    store.write(&commit_hash).map_err(|e| format!("{e}"))?;
-
+    let head_sha = infrastructure::review_v2::persist_commit_hash_for_track(track_id)?;
     eprintln!("[track-commit-message] Recorded .commit_hash: {head_sha}");
     Ok(())
 }

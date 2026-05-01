@@ -12,4 +12,18 @@
 |------|------|--------|---------|--------|----------|
 | TrackId | value_object | reference | — | 🔵 | 🔵 |
 | CommitHash | value_object | reference | — | 🔵 | 🔵 |
+| CatalogueLintViolation | value_object | reference | — | 🔵 | 🔵 |
+| TypeSignal | value_object | modify | — | 🔵 | 🟡 |
+
+## Error Types
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| TrackWriteError | error_type | reference | Domain, Repository | 🔵 | 🔵 |
+
+## Secondary Ports
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| TrackReader | secondary_port | reference | fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError> | 🔵 | 🔵 |
 

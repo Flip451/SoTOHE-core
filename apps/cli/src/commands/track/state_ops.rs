@@ -1,11 +1,9 @@
 //! CLI handlers for add-task, set-override, clear-override, next-task, and task-counts.
 
-use domain::{ImplPlanReader, TaskStatusKind, TrackId, derive_track_status};
-use infrastructure::track::fs_store::read_track_metadata;
-
 use crate::CliError;
 
 use super::*;
+use usecase::task_ops::{TaskOperationService as _, TaskQueryService as _};
 
 pub(super) fn execute_add_task(
     items_dir: PathBuf,
@@ -15,38 +13,64 @@ pub(super) fn execute_add_task(
     after: Option<String>,
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::try_new(&track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
-
-    // If --after is provided but not a valid TaskId, silently ignore it (append to end).
-    // This matches Python behavior where invalid after_task_id falls back to append.
-    let after_task_id = after.and_then(|a| TaskId::try_new(a).ok());
+    // Validate track_id as a safe slug before any filesystem probe.
+    validate_track_id_str(&track_id).map_err(CliError::Message)?;
 
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let store = Arc::new(FsTrackStore::new(items_dir));
+    let schema_version = read_schema_version_from_json(&items_dir, &track_id);
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+    let repo_dir_for_reader = repo_dir.clone();
+    let service = usecase::task_ops::TaskOperationInteractor::new(
+        Arc::clone(&store),
+        schema_version,
+        move |_items_dir| {
+            let output = std::process::Command::new("git")
+                .args(["rev-parse", "--abbrev-ref", "HEAD"])
+                .current_dir(&repo_dir_for_reader)
+                .output()
+                .map_err(|e| format!("failed to run git: {e}"))?;
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                return Err(format!("git rev-parse failed: {stderr}"));
+            }
+            Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
+        },
+    );
 
-    // Branch guard
-    if !skip_branch_check {
-        transition::verify_branch_guard(&*store, &track_id, &repo_dir)
-            .map_err(|msg| CliError::Message(format!("branch guard: {msg}")))?;
-    }
+    // If --after is provided but not a valid TaskId (format: T followed by one
+    // or more digits that fit in u64), silently ignore it and append to the end
+    // of the section. This preserves the historical lenient behavior where
+    // invalid after-task IDs were treated as "not found" → append.
+    // Mirrors domain::TaskId::try_new exactly (T prefix + non-empty digits + u64 parse).
+    let after_task_id = after.filter(|a| {
+        a.strip_prefix('T').is_some_and(|digits| {
+            !digits.is_empty()
+                && digits.chars().all(|ch| ch.is_ascii_digit())
+                && digits.parse::<u64>().is_ok()
+        })
+    });
 
-    let add_task = usecase::AddTaskUseCase::new(Arc::clone(&store));
-    let (track, new_task_id) = add_task
-        .execute(&track_id, &description, section.as_deref(), after_task_id.as_ref())
+    let cmd = usecase::task_ops::AddTaskCommand {
+        items_dir,
+        track_id: track_id.clone(),
+        description: description.clone(),
+        section,
+        after_task_id,
+        skip_branch_check,
+    };
+    let output = service
+        .add_task(cmd)
         .map_err(|err| CliError::Message(format!("add-task failed: {err}")))?;
 
-    // Derive status from updated impl-plan.json + status_override.
-    // Fail-closed: if the plan we just wrote is unreadable, surface the error.
-    let updated_impl_plan = store.load_impl_plan(&track_id).map_err(|err| {
-        CliError::Message(format!("add-task succeeded but cannot read impl-plan: {err}"))
-    })?;
-    let derived_status = derive_track_status(updated_impl_plan.as_ref(), track.status_override());
-    println!("[OK] Added task {new_task_id}: {description} (track status: {derived_status})");
+    let new_task_id = output.task_id.as_deref().unwrap_or("?");
+    println!(
+        "[OK] Added task {new_task_id}: {description} (track status: {})",
+        output.derived_status
+    );
 
-    sync_views(&project_root, &track_id);
+    sync_views(&project_root, &output.track_id);
     Ok(ExitCode::SUCCESS)
 }
 
@@ -57,41 +81,46 @@ pub(super) fn execute_set_override(
     reason: String,
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::try_new(&track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
-
-    let override_value = match status.as_str() {
-        "blocked" => domain::StatusOverride::blocked(reason)
-            .map_err(|e| CliError::Message(format!("invalid blocked reason: {e}")))?,
-        "cancelled" => domain::StatusOverride::cancelled(reason)
-            .map_err(|e| CliError::Message(format!("invalid cancelled reason: {e}")))?,
-        other => {
-            return Err(CliError::Message(format!(
-                "invalid override status '{other}': must be 'blocked' or 'cancelled'"
-            )));
-        }
-    };
+    // Validate track_id as a safe slug before any filesystem probe.
+    validate_track_id_str(&track_id).map_err(CliError::Message)?;
 
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let store = Arc::new(FsTrackStore::new(items_dir));
+    let schema_version = read_schema_version_from_json(&items_dir, &track_id);
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+    let repo_dir_for_reader = repo_dir.clone();
+    let service = usecase::task_ops::TaskOperationInteractor::new(
+        Arc::clone(&store),
+        schema_version,
+        move |_items_dir| {
+            let output = std::process::Command::new("git")
+                .args(["rev-parse", "--abbrev-ref", "HEAD"])
+                .current_dir(&repo_dir_for_reader)
+                .output()
+                .map_err(|e| format!("failed to run git: {e}"))?;
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                return Err(format!("git rev-parse failed: {stderr}"));
+            }
+            Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
+        },
+    );
 
-    if !skip_branch_check {
-        transition::verify_branch_guard(&*store, &track_id, &repo_dir)
-            .map_err(|msg| CliError::Message(format!("branch guard: {msg}")))?;
-    }
-
-    let set_override = usecase::SetOverrideUseCase::new(Arc::clone(&store));
-    let track = set_override
-        .execute(&track_id, Some(override_value))
+    let cmd = usecase::task_ops::SetOverrideCommand {
+        items_dir,
+        track_id: track_id.clone(),
+        status: status.clone(),
+        reason,
+        skip_branch_check,
+    };
+    let output = service
+        .set_override(cmd)
         .map_err(|err| CliError::Message(format!("set-override failed: {err}")))?;
 
-    // Derive status from status_override (no impl-plan needed for override display).
-    let derived_status = derive_track_status(None, track.status_override());
-    println!("[OK] Override set to '{}' (track status: {})", status, derived_status);
+    println!("[OK] Override set to '{}' (track status: {})", status, output.derived_status);
 
-    sync_views(&project_root, &track_id);
+    sync_views(&project_root, &output.track_id);
     Ok(ExitCode::SUCCESS)
 }
 
@@ -100,36 +129,44 @@ pub(super) fn execute_clear_override(
     track_id: String,
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::try_new(&track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
+    // Validate track_id as a safe slug before any filesystem probe.
+    validate_track_id_str(&track_id).map_err(CliError::Message)?;
 
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let store = Arc::new(FsTrackStore::new(items_dir));
+    let schema_version = read_schema_version_from_json(&items_dir, &track_id);
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+    let repo_dir_for_reader = repo_dir.clone();
+    let service = usecase::task_ops::TaskOperationInteractor::new(
+        Arc::clone(&store),
+        schema_version,
+        move |_items_dir| {
+            let output = std::process::Command::new("git")
+                .args(["rev-parse", "--abbrev-ref", "HEAD"])
+                .current_dir(&repo_dir_for_reader)
+                .output()
+                .map_err(|e| format!("failed to run git: {e}"))?;
+            if !output.status.success() {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                return Err(format!("git rev-parse failed: {stderr}"));
+            }
+            Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
+        },
+    );
 
-    if !skip_branch_check {
-        transition::verify_branch_guard(&*store, &track_id, &repo_dir)
-            .map_err(|msg| CliError::Message(format!("branch guard: {msg}")))?;
-    }
-
-    // clear-override only writes metadata.json (status_override → None).
-    // Track status is derived on demand from impl-plan.json; no secondary status sync needed.
-    let set_override = usecase::SetOverrideUseCase::new(Arc::clone(&store));
-    let track = set_override
-        .execute(&track_id, None)
+    let cmd = usecase::task_ops::ClearOverrideCommand {
+        items_dir,
+        track_id: track_id.clone(),
+        skip_branch_check,
+    };
+    let output = service
+        .clear_override(cmd)
         .map_err(|err| CliError::Message(format!("clear-override failed: {err}")))?;
 
-    // Derive display status from updated impl-plan.json.
-    // Fail-closed: if impl-plan.json is unreadable, surface the error rather than
-    // silently falling back to Planned.
-    let impl_plan = store.load_impl_plan(&track_id).map_err(|err| {
-        CliError::Message(format!("clear-override succeeded but cannot read impl-plan: {err}"))
-    })?;
-    let derived_status = derive_track_status(impl_plan.as_ref(), track.status_override());
-    println!("[OK] Override cleared (track status: {})", derived_status);
+    println!("[OK] Override cleared (track status: {})", output.derived_status);
 
-    sync_views(&project_root, &track_id);
+    sync_views(&project_root, &output.track_id);
     Ok(ExitCode::SUCCESS)
 }
 
@@ -137,33 +174,35 @@ pub(super) fn execute_next_task(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let valid_id = TrackId::try_new(&track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+    let service = usecase::task_ops::TaskQueryInteractor::new(Arc::clone(&store));
 
-    // Validate the track exists before proceeding; propagate read/not-found errors.
-    let (_track, _meta) = read_track_metadata(&items_dir, &valid_id)
+    // Retrieve the next open task. `NextTaskOutput` does not carry a status
+    // field, so the task status is determined separately via `task_counts`.
+    //
+    // `domain::ImplPlanDocument::next_open_task` returns in_progress tasks
+    // before todo tasks (in_progress has priority). Therefore:
+    //   - counts.in_progress > 0 → the returned task is an in_progress task.
+    //   - counts.in_progress == 0 → the returned task is a todo task.
+    // Both calls read the same underlying store, so counts and next_task are
+    // consistent within a single CLI invocation.
+    let next = service
+        .next_task(track_id.clone(), items_dir.clone())
         .map_err(|err| CliError::Message(format!("next-task failed: {err}")))?;
 
-    // Load impl-plan.json. Missing on an activated track is a corruption
-    // state — fail closed. Missing on a planning-only track is valid and
-    // reports "no open task".
-    //
-    // Activation is identified by branch materialization (`branch.is_some()`)
-    // — NOT by the derived status. A planning-only track may legitimately
-    // carry a `status_override = blocked / cancelled` and no impl-plan.json;
-    // using `derive_track_status != Planned` as the activation proxy would
-    // misclassify that state as corruption.
-    let store = FsTrackStore::new(items_dir);
-    let impl_plan = store
-        .load_impl_plan(&valid_id)
-        .map_err(|err| CliError::Message(format!("next-task failed reading impl-plan: {err}")))?;
-
-    match impl_plan.as_ref().and_then(|doc| doc.next_open_task()) {
+    match next {
         Some(task) => {
+            // Determine the task's status from counts. In_progress tasks take
+            // priority in `next_open_task`, so the returned task is in_progress
+            // if and only if `counts.in_progress > 0`.
+            let counts = service
+                .task_counts(track_id, items_dir)
+                .map_err(|err| CliError::Message(format!("next-task failed (counts): {err}")))?;
+            let task_status = if counts.in_progress > 0 { "in_progress" } else { "todo" };
             let payload = serde_json::json!({
-                "task_id": task.id().as_ref(),
-                "description": task.description(),
-                "status": task.status().kind().to_string(),
+                "task_id": task.task_id,
+                "description": task.description,
+                "status": task_status,
             });
             println!("{payload}");
             Ok(ExitCode::SUCCESS)
@@ -184,52 +223,24 @@ pub(super) fn execute_task_counts(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let valid_id = TrackId::try_new(&track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+    let service = usecase::task_ops::TaskQueryInteractor::new(Arc::clone(&store));
 
-    // Validate the track exists before proceeding; propagate read/not-found errors.
-    let (_track, _meta) = read_track_metadata(&items_dir, &valid_id)
+    let counts = service
+        .task_counts(track_id, items_dir)
         .map_err(|err| CliError::Message(format!("task-counts failed: {err}")))?;
 
-    // Load impl-plan.json.
-    let store = FsTrackStore::new(items_dir);
-    let impl_plan = store
-        .load_impl_plan(&valid_id)
-        .map_err(|err| CliError::Message(format!("task-counts failed reading impl-plan: {err}")))?;
-
-    let (total, todo, in_progress, done, skipped) = match &impl_plan {
-        Some(doc) => {
-            let total = doc.tasks().len();
-            let todo =
-                doc.tasks().iter().filter(|t| t.status().kind() == TaskStatusKind::Todo).count();
-            let in_progress = doc
-                .tasks()
-                .iter()
-                .filter(|t| t.status().kind() == TaskStatusKind::InProgress)
-                .count();
-            let done =
-                doc.tasks().iter().filter(|t| t.status().kind() == TaskStatusKind::Done).count();
-            let skipped =
-                doc.tasks().iter().filter(|t| t.status().kind() == TaskStatusKind::Skipped).count();
-            (total, todo, in_progress, done, skipped)
-        }
-        None => {
-            // impl-plan.json absent — report zeros (Phase 0-2 state or
-            // branchless planning track). `derive_track_status` returns
-            // Planned via its fallback when impl-plan.json is None.
-            (0, 0, 0, 0, 0)
-        }
-    };
-
+    let total = counts.todo + counts.in_progress + counts.done + counts.skipped;
     println!(
-        r#"{{"total":{total},"todo":{todo},"in_progress":{in_progress},"done":{done},"skipped":{skipped}}}"#
+        r#"{{"total":{total},"todo":{},"in_progress":{},"done":{},"skipped":{}}}"#,
+        counts.todo, counts.in_progress, counts.done, counts.skipped
     );
     Ok(ExitCode::SUCCESS)
 }
 
 /// Sync rendered views, printing results. Non-fatal on failure.
-fn sync_views(project_root: &std::path::Path, track_id: &TrackId) {
-    match render::sync_rendered_views(project_root, Some(track_id.as_ref())) {
+fn sync_views(project_root: &std::path::Path, track_id: &str) {
+    match render::sync_rendered_views(project_root, Some(track_id)) {
         Ok(changed) => {
             for path in changed {
                 match path.strip_prefix(project_root) {

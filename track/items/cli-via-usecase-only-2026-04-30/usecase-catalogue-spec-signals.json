@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cdbfdc32b079b3543a0f0689dc9c67ffd93f86f3d59d106b6a444e8299c5efe9",
+  "catalogue_declaration_hash": "caa7063a3425470cf580442837c51f3106d352d7a70b6a04c2940ba3e7becfa4",
   "signals": [
     {
       "type_name": "TrackStatusOutput",
@@ -296,6 +296,74 @@
     },
     {
       "type_name": "HookShellParserPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ScopeQueryError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ActivateTrackUseCase",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMap",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LintRuleKind",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LintRuleSpec",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "RunCatalogueLintCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunCatalogueLintError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "check_compliance_render",
+      "signal": "blue"
+    },
+    {
+      "type_name": "has_skill_command",
+      "signal": "blue"
+    },
+    {
+      "type_name": "reject_branchless_guard_by_str",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "reject_branchless_implementation_transition_by_str",
       "signal": "blue"
     }
   ]

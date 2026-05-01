@@ -18,6 +18,7 @@ pub mod pr_workflow;
 pub mod pre_commit_type_signals;
 pub mod review_v2;
 pub mod review_workflow;
+pub mod skill_compliance;
 pub mod task_completion;
 pub mod task_ops;
 pub mod track_activation;

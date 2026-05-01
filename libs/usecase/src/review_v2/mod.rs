@@ -26,6 +26,6 @@ pub use run_review::{
     RunReviewService,
 };
 pub use scope_query::{
-    PathClassification, ScopeClassification, ScopeQueryError, ScopeQueryInteractor,
-    ScopeQueryService,
+    PathClassification, ScopeClassification, ScopeClassificationOutput, ScopeQueryError,
+    ScopeQueryInteractor, ScopeQueryService,
 };

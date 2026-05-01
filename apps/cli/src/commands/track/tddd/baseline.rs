@@ -11,14 +11,6 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use domain::schema::{SchemaExportError, SchemaExporter};
-use infrastructure::code_profile_builder::build_type_graph;
-use infrastructure::schema_export::RustdocSchemaExporter;
-use infrastructure::tddd::{baseline_builder, baseline_codec};
-use infrastructure::track::atomic_write::atomic_write_file;
-use infrastructure::track::symlink_guard::reject_symlinks_below;
-use infrastructure::verify::tddd_layers::TdddLayerBinding;
-
 use crate::CliError;
 use crate::commands::track::tddd::signals::resolve_layers;
 
@@ -64,7 +56,8 @@ pub fn execute_baseline_capture(
         ));
     }
 
-    let _valid_id = domain::TrackId::try_new(&track_id)
+    // Validate the track_id without importing domain::TrackId (CN-01 / AC-03).
+    crate::commands::track::validate_track_id_str(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
     // Security: verify the items_dir root itself is not a symlink before using it as the
@@ -87,138 +80,16 @@ pub fn execute_baseline_capture(
     }
 
     for binding in &bindings {
-        capture_baseline_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
+        infrastructure::tddd::baseline_capture::capture_baseline_for_layer(
+            &items_dir,
+            &track_id,
+            &workspace_root,
+            binding,
+        )
+        .map_err(|e| CliError::Message(e.0))?;
     }
 
     Ok(ExitCode::SUCCESS)
-}
-
-/// Capture the baseline for a single TDDD layer binding.
-///
-/// Handles the skip-if-exists logic, symlink guards, rustdoc export,
-/// TypeGraph build, and atomic write for a single layer.
-fn capture_baseline_for_layer(
-    items_dir: &std::path::Path,
-    track_id: &str,
-    workspace_root: &std::path::Path,
-    binding: &TdddLayerBinding,
-) -> Result<(), CliError> {
-    let catalogue_filename = binding.catalogue_file();
-    let baseline_filename = binding.baseline_file();
-
-    let track_dir = items_dir.join(track_id);
-    let baseline_path = track_dir.join(&baseline_filename);
-
-    // Security: reject symlinks in path components below items_dir.
-    reject_symlinks_below(&baseline_path, items_dir)
-        .map_err(|e| CliError::Message(format!("symlink guard: {e}")))?;
-
-    // Idempotent: skip if baseline already exists as a regular file.
-    // Use is_file() rather than exists() so that a directory or other non-file node at
-    // that path does not silently produce a spurious success — it falls through and will
-    // fail at the write step with a meaningful error instead.
-    if baseline_path.is_file() {
-        println!(
-            "[OK] baseline-capture: {baseline_filename} already exists for '{track_id}' (delete the file manually to re-capture)"
-        );
-        return Ok(());
-    }
-
-    // Fail fast if the track directory does not exist.
-    if !track_dir.is_dir() {
-        return Err(CliError::Message(format!(
-            "track directory not found: {} (did you mean an existing track ID?)",
-            track_dir.display()
-        )));
-    }
-
-    // Read the configured catalogue file to extract typestate names for
-    // `build_type_graph`. Security: guard the leaf path too — a symlinked
-    // catalogue file inside the track directory could redirect reads
-    // outside the trusted tree.
-    let catalogue_path = track_dir.join(catalogue_filename);
-    reject_symlinks_below(&catalogue_path, items_dir)
-        .map_err(|e| CliError::Message(format!("symlink guard: {e}")))?;
-    // Read the catalogue file to extract typestate names. The catalogue is
-    // optional — it may not yet exist for a brand-new track. When it is
-    // absent we fall back to an empty set (conservative: treats all types as
-    // non-typestate, which is safe for baseline capture). When the catalogue
-    // is present but malformed we fail-closed to prevent silently capturing
-    // an incorrect baseline.
-    let typestate_names: std::collections::HashSet<String> =
-        match std::fs::read_to_string(&catalogue_path) {
-            Ok(json) => infrastructure::tddd::catalogue_codec::decode(&json)
-                .map(|doc| doc.typestate_names())
-                .map_err(|e| {
-                    CliError::Message(format!(
-                        "{} is malformed; fix or delete it before capturing baseline: {e}",
-                        catalogue_path.display()
-                    ))
-                })?,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => std::collections::HashSet::new(),
-            Err(e) => {
-                return Err(CliError::Message(format!(
-                    "cannot read {}: {e}",
-                    catalogue_path.display()
-                )));
-            }
-        };
-
-    // Resolve the target crate for schema export from the binding. Multi-target
-    // layers are modeled in `architecture-rules.json` (`schema_export.targets`)
-    // but full merge of multiple per-crate schema exports is not yet
-    // implemented. Fail-closed when more than one target is configured so that
-    // the caller is not silently given a baseline snapshot computed from only
-    // the first crate — that would drop types/traits from the remaining crates
-    // and produce false undeclared/Red results on later signal evaluation.
-    let layer_id = binding.layer_id();
-    let target_crate = match binding.targets() {
-        [single] => single,
-        [] => {
-            return Err(CliError::Message(format!(
-                "schema_export.targets is empty for layer '{layer_id}'; check architecture-rules.json"
-            )));
-        }
-        multi => {
-            return Err(CliError::Message(format!(
-                "layer '{layer_id}' has {} schema_export.targets ({:?}), but multi-target export is not yet implemented. Use a single-target layer or wait for multi-target merge support.",
-                multi.len(),
-                multi
-            )));
-        }
-    };
-
-    // Export the target crate's public API via rustdoc JSON.
-    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    let schema = exporter.export(target_crate).map_err(|e| {
-        let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
-            " (install with: rustup toolchain install nightly)".to_owned()
-        } else {
-            String::new()
-        };
-        CliError::Message(format!("failed to export schema: {e}{hint}"))
-    })?;
-
-    // Build TypeGraph and convert to TypeBaseline.
-    let graph = build_type_graph(&schema, &typestate_names);
-    let captured_at = infrastructure::timestamp_now()
-        .map_err(|e| CliError::Message(format!("timestamp error: {e}")))?;
-    let baseline = baseline_builder::build_baseline(&graph, captured_at);
-
-    // Encode and write.
-    let encoded = baseline_codec::encode(&baseline)
-        .map_err(|e| CliError::Message(format!("baseline encode error: {e}")))?;
-
-    atomic_write_file(&baseline_path, format!("{encoded}\n").as_bytes())
-        .map_err(|e| CliError::Message(format!("cannot write {}: {e}", baseline_path.display())))?;
-
-    let type_count = baseline.types().len();
-    let trait_count = baseline.traits().len();
-    println!(
-        "[OK] baseline-capture: wrote {baseline_filename} ({type_count} types, {trait_count} traits)"
-    );
-
-    Ok(())
 }
 
 #[cfg(test)]

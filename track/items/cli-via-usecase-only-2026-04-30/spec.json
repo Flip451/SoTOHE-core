@@ -62,7 +62,7 @@
       },
       {
         "id": "IN-03",
-        "text": "usecase 層に、cli が消費する形に整えた DTO / Command / Query / Result 型を新設する。usecase の public API に domain 型を直接公開しない (`pub use domain::...` による re-export を禁ずる)",
+        "text": "usecase 層に、cli が消費する形に整えた DTO / Command / Query / Result 型を新設する。`pub use domain::...` による re-export を禁ずる。cli が explicit に domain 型を `use domain::...` import しない境界を確立する (CN-01 参照)。T010-T013 実装で発見された tactical deferral 例外として usecase public API signature に domain 型が現れるケースが IN-08 / IN-09 / IN-10 に記録されている (各例外は ADR D1 scope 外、本 spec 限定)。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
@@ -109,6 +109,21 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-08",
+        "text": "CN-01 追加例外 (RunCatalogueLint): T010-T013 bundle で追加した RunCatalogueLint::execute の戻り型は Vec<CatalogueLintViolation> であり、CatalogueLintViolation は domain value object である。usecase 専用 DTO の導入は本 track の scope 外として見送り (tactical deferral)。CLI callers は Rust の型推論で violations にアクセスし `use domain::...CatalogueLintViolation` の explicit import なしで利用するため、`cargo make check-layers` は pass する。この例外は HookShellParserPort (IN-07) のセキュリティ要件とは異なる scope 限定の判断であり、ADR D1 に記録されていない。ADR D1 の「cli が domain 型を直接参照しない」原則はこの場合も CLI explicit import の不在によって成立している。本 spec 単独で受理する。",
+        "adr_refs": []
+      },
+      {
+        "id": "IN-09",
+        "text": "CN-01 追加例外 (reject_branchless_guard_by_str): usecase::track_resolution に追加した reject_branchless_guard_by_str の reader パラメーターは &impl TrackReader (domain trait) である。usecase 専用 port trait の導入は本 track の scope 外として見送り (tactical deferral)。CLI callers は具体型 FsTrackStore を型推論で渡し `use domain::...TrackReader` の explicit import なしで利用するため、`cargo make check-layers` は pass する。この例外は HookShellParserPort (IN-07) とは理由が異なる scope 限定の判断であり (IN-08 参照)、ADR D1 に記録されていない。本 spec 単独で受理する。",
+        "adr_refs": []
+      },
+      {
+        "id": "IN-10",
+        "text": "CN-01 追加例外 (ActivateTrackUseCase::execute_by_strings): execute_by_strings の戻り型は Result<ActivateTrackOutcome, TrackWriteError> であり、TrackWriteError は domain error type である。usecase 専用 error type の導入は本 track の scope 外として見送り (tactical deferral)。CLI callers は Err(err) をパターンマッチで受け取り `use domain::...TrackWriteError` の explicit import なしで利用する (apps/cli/src/commands/track/activate.rs は TrackWriteError を直接インポートしない)。`cargo make check-layers` は pass する。この例外は HookShellParserPort (IN-07) とは理由が異なる scope 限定の判断であり (IN-08 参照)、ADR D1 に記録されていない。本 spec 単独で受理する。",
+        "adr_refs": []
       }
     ],
     "out_of_scope": [
@@ -177,7 +192,7 @@
   "constraints": [
     {
       "id": "CN-01",
-      "text": "usecase の public API に domain 型を直接公開してはならない。cli が消費する型は usecase 自身が定義した DTO / Command / Query / Result 型に限定する (`pub use domain::...` による re-export を禁ずる)",
+      "text": "cli が domain 型を explicit に `use domain::...` import してはならない。`cargo make check-layers` で検出される cli → domain 直接依存は存在してはならない。usecase public API signature に domain 型が現れる場合でも、cli が型推論のみで利用し explicit import がなければ本 constraint は pass する (IN-08 / IN-09 / IN-10 参照)。これは ADR D1 の「usecase public API に domain 型を出さない」という理想状態よりも pragmatic な operative rule であり、ADR D1 と完全に一致するわけではない。ADR D1 に記録されたセキュリティ要件による例外: HookShellParserPort (IN-07)。T010-T013 実装で発見された spec 限定の tactical deferral 例外: IN-08 / IN-09 / IN-10。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",

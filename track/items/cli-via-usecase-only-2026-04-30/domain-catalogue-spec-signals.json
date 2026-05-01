@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "62c549c0968598b88dde954fdedbcd740c895d005da8e2b50d8dad73b6ad961c",
+  "catalogue_declaration_hash": "08dcc2a68e63a4cd135ea3b4c23daa22d9ffd3468a7c2ca5aa575e159ec44bfd",
   "signals": [
     {
       "type_name": "TrackId",
@@ -9,6 +9,22 @@
     {
       "type_name": "CommitHash",
       "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLintViolation",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackWriteError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignal",
+      "signal": "yellow"
     },
     {
       "type_name": "Decision",

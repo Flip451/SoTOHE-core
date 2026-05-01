@@ -5,11 +5,9 @@ use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Args, Subcommand};
-use domain::{CommitHash, TaskId, TrackBranch, TrackId, TrackReader};
 use infrastructure::git_cli::{
     GitRepository, SystemGitRepo, TrackBranchRecord, load_explicit_track_branch_from_items_dir,
 };
-use infrastructure::track::codec::DocumentMeta;
 use infrastructure::track::fs_store::FsTrackStore;
 use infrastructure::track::render;
 use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};
@@ -21,6 +19,172 @@ mod state_ops;
 pub(crate) mod tddd;
 mod transition;
 mod views;
+
+/// Validates a track ID string (lowercase slug: `[a-z0-9]([a-z0-9-]*[a-z0-9])?`).
+///
+/// Mirrors the validation performed by `domain::TrackId::try_new` without
+/// importing domain types.
+///
+/// # Errors
+///
+/// Returns an error string describing the failure.
+pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
+    if value.is_empty() {
+        return Err(format!("invalid track id: '{value}' (must not be empty)"));
+    }
+    let mut chars = value.chars();
+    match chars.next() {
+        Some(first) if first.is_ascii_lowercase() || first.is_ascii_digit() => {}
+        _ => {
+            return Err(format!(
+                "invalid track id: '{value}' (must start with lowercase letter or digit)"
+            ));
+        }
+    }
+    let mut previous_was_hyphen = false;
+    for ch in chars {
+        let is_valid = ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-';
+        if !is_valid {
+            return Err(format!("invalid track id: '{value}' (invalid character '{ch}')"));
+        }
+        if ch == '-' && previous_was_hyphen {
+            return Err(format!("invalid track id: '{value}' (double hyphen not allowed)"));
+        }
+        previous_was_hyphen = ch == '-';
+    }
+    if previous_was_hyphen {
+        return Err(format!("invalid track id: '{value}' (must not end with hyphen)"));
+    }
+    Ok(())
+}
+
+/// Validates a track branch name string (`track/<valid-track-id>`).
+///
+/// Mirrors the validation performed by `domain::TrackBranch::try_new` without
+/// importing domain types.
+///
+/// # Errors
+///
+/// Returns an error string describing the failure.
+pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
+    match value.strip_prefix("track/") {
+        Some(slug) => validate_track_id_str(slug)
+            .map_err(|_| format!("invalid track branch: '{value}' (slug part is invalid)")),
+        None => Err(format!("invalid track branch: '{value}' (must be in 'track/<id>' form)")),
+    }
+}
+
+/// Reads `schema_version` from `<items_dir>/<track_id>/metadata.json` as a
+/// pure JSON parse — no domain types required.
+///
+/// Falls back to `u32::MAX` (fail-safe sentinel) when the file is absent,
+/// unreadable, or lacks the field. Using `u32::MAX` keeps the branchless
+/// guard active for unknown files (guard fires for schema_version >= 3).
+/// Returning `2` would silently exempt the track from the guard — an unsafe
+/// default. Callers that specifically need "is this a legacy track?" should
+/// treat `u32::MAX` as "unknown / non-legacy".
+pub(crate) fn read_schema_version_from_json(items_dir: &std::path::Path, track_id: &str) -> u32 {
+    let path = items_dir.join(track_id).join("metadata.json");
+    let content = std::fs::read_to_string(&path).unwrap_or_default();
+    serde_json::from_str::<serde_json::Value>(&content)
+        .ok()
+        .and_then(|v| v.get("schema_version").and_then(serde_json::Value::as_u64))
+        .and_then(|n| u32::try_from(n).ok())
+        .unwrap_or(u32::MAX)
+}
+
+/// Derives the track status string from `impl-plan.json` and `metadata.json`
+/// as pure JSON — no domain types required.
+///
+/// Logic mirrors `domain::derive_track_status`:
+/// - If `status_override` is set → return its kind string ("blocked", "cancelled", etc.)
+/// - If no impl-plan (file absent) → "planned"
+/// - If impl-plan exists but is unreadable or malformed → "unknown" (fail-safe,
+///   callers that require a specific status should treat "unknown" as an error)
+/// - If any task is "in_progress" → "in_progress"
+/// - If all tasks are "done" or "skipped" (at least one task present) → "done"
+/// - All tasks "todo" → "planned"
+/// - Otherwise → "in_progress" (tasks present but mixed todo/in_progress/done/skipped)
+pub(crate) fn derive_track_status_from_json(items_dir: &std::path::Path, track_id: &str) -> String {
+    // Check status_override in metadata.json.
+    // The wire format uses `status_override.status` (e.g. "blocked" / "cancelled"),
+    // not `status_override.kind`. See infrastructure::track::codec for the encoding.
+    let metadata_path = items_dir.join(track_id).join("metadata.json");
+    if let Ok(content) = std::fs::read_to_string(&metadata_path) {
+        if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&content) {
+            if let Some(status) =
+                meta.get("status_override").and_then(|o| o.get("status")).and_then(|s| s.as_str())
+            {
+                return status.to_lowercase();
+            }
+        }
+    }
+
+    // Read impl-plan.json.
+    let impl_plan_path = items_dir.join(track_id).join("impl-plan.json");
+    // File absent = planning-only track (no impl-plan yet) → "planned".
+    // File present but unreadable/malformed → "unknown" (fail-safe: callers that check
+    // for "planned" will treat "unknown" as a blocking condition).
+    let content = match std::fs::read_to_string(&impl_plan_path) {
+        Ok(s) => s,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return "planned".to_owned();
+        }
+        Err(_) => {
+            return "unknown".to_owned();
+        }
+    };
+    let Ok(doc) = serde_json::from_str::<serde_json::Value>(&content) else {
+        return "unknown".to_owned();
+    };
+
+    // If the tasks field is absent or not an array in a present impl-plan.json,
+    // return "unknown" (fail-safe). Returning "planned" for a corrupted but
+    // parseable impl-plan would allow activation of an inconsistent track.
+    let tasks = match doc.get("tasks").and_then(|t| t.as_array()) {
+        Some(arr) => arr,
+        None => return "unknown".to_owned(),
+    };
+    if tasks.is_empty() {
+        return "planned".to_owned();
+    }
+
+    let mut has_in_progress = false;
+    let mut has_resolved = false; // any task in done or skipped
+    let mut all_resolved = true; // every task is done or skipped
+
+    for task in tasks {
+        let status = task.get("status").and_then(|s| s.as_str()).unwrap_or("todo");
+        match status {
+            "in_progress" => {
+                has_in_progress = true;
+                all_resolved = false;
+            }
+            "todo" => {
+                all_resolved = false;
+            }
+            "done" | "skipped" => {
+                has_resolved = true;
+            }
+            _ => {
+                all_resolved = false;
+            }
+        }
+    }
+
+    // Mirrors domain::derive_track_status exactly:
+    // 1. all tasks resolved (done OR skipped) → Done.
+    //    No requirement for at least one done — all-skipped is also a resolved plan.
+    if all_resolved {
+        return "done".to_owned();
+    }
+    // 2. any in_progress, or any resolved alongside unresolved tasks → InProgress.
+    if has_in_progress || has_resolved {
+        return "in_progress".to_owned();
+    }
+    // 3. all tasks todo (none resolved, none in_progress) → Planned.
+    "planned".to_owned()
+}
 
 pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
     let items_name = items_dir.file_name().and_then(|name| name.to_str());

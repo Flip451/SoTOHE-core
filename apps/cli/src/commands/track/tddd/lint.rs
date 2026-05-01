@@ -8,16 +8,12 @@
 
 use std::path::PathBuf;
 use std::process::ExitCode;
-use std::sync::Arc;
 
-use domain::tddd::catalogue_linter::{
-    CatalogueLinter, CatalogueLinterRule, CatalogueLinterRuleKind,
-};
-use domain::tddd::catalogue_ports::CatalogueLoader;
 use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
 use infrastructure::tddd::in_memory_catalogue_linter::InMemoryCatalogueLinter;
 use usecase::catalogue_lint_workflow::{
-    RunCatalogueLint, RunCatalogueLintCommand, RunCatalogueLintInteractor,
+    LintRuleKind, LintRuleSpec, RunCatalogueLint, RunCatalogueLintCommand,
+    RunCatalogueLintInteractor,
 };
 
 use crate::CliError;
@@ -40,30 +36,26 @@ pub fn execute_lint(
     // Build the hardcoded demo rule set:
     //   1) FieldEmpty on value_object / target_field=expected_methods
     //   2) KindLayerConstraint on domain_service / permitted_layers=[domain, usecase]
-    let rule_field_empty = CatalogueLinterRule::try_new(
-        CatalogueLinterRuleKind::FieldEmpty,
-        "value_object",
-        Some("expected_methods".to_owned()),
-        vec![],
-    )
-    .map_err(|e| CliError::Message(format!("failed to construct FieldEmpty rule: {e}")))?;
-
-    let rule_kind_layer = CatalogueLinterRule::try_new(
-        CatalogueLinterRuleKind::KindLayerConstraint,
-        "domain_service",
-        None,
-        vec!["domain".to_owned(), "usecase".to_owned()],
-    )
-    .map_err(|e| CliError::Message(format!("failed to construct KindLayerConstraint rule: {e}")))?;
-
-    let rules = vec![rule_field_empty, rule_kind_layer];
+    let rules = vec![
+        LintRuleSpec {
+            kind: LintRuleKind::FieldEmpty,
+            target_kind: "value_object".to_owned(),
+            target_field: Some("expected_methods".to_owned()),
+            permitted_layers: vec![],
+        },
+        LintRuleSpec {
+            kind: LintRuleKind::KindLayerConstraint,
+            target_kind: "domain_service".to_owned(),
+            target_field: None,
+            permitted_layers: vec!["domain".to_owned(), "usecase".to_owned()],
+        },
+    ];
 
     // Compose secondary ports and interactor.
     let items_dir = workspace_root.join("track/items");
     let rules_path = workspace_root.join("architecture-rules.json");
-    let loader: Arc<dyn CatalogueLoader> =
-        Arc::new(FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone()));
-    let linter: Arc<dyn CatalogueLinter> = Arc::new(InMemoryCatalogueLinter::new());
+    let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
+    let linter = InMemoryCatalogueLinter::new();
     let interactor = RunCatalogueLintInteractor::new(loader, linter);
 
     // Dispatch through the primary port.

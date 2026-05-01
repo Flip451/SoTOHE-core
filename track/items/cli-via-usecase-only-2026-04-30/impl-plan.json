@@ -4,7 +4,7 @@
     {
       "id": "T001",
       "description": "Update architecture-rules.json to remove domain from apps/cli may_depend_on, and delete domain dependency from apps/cli/Cargo.toml",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T002",
@@ -51,27 +51,28 @@
     {
       "id": "T009",
       "description": "Remove pub use domain:: re-exports from usecase layer public API (e.g. libs/usecase/src/track_phase.rs) to satisfy CN-01 and AC-04",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9732b4b84b85c7f5a39d8395588825bf4c07c805"
     },
     {
       "id": "T010",
       "description": "Migrate CLI guard, hook, and domain-export commands to usecase API: commands/guard.rs, commands/hook.rs, commands/domain.rs — replace all use domain:: imports with usecase boundary types",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T011",
       "description": "Migrate CLI track and make commands to usecase API: commands/track/ (activate, resolve, signals, state_ops, transition, views, tddd/), commands/make.rs — replace all use domain:: imports with usecase boundary types",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T012",
       "description": "Migrate CLI review and verify commands to usecase API: commands/review/ (codex_local, classify, files, results), commands/verify.rs, commands/verify_catalogue_spec_refs.rs, commands/plan/ — replace all use domain:: imports with usecase boundary types. Includes: (a) replacing the domain-typed ScopeQueryService::classify and ::files methods with string-accepting ScopeQueryService::classify_by_strings (accepting Vec<String>, returning Result<Vec<ScopeClassificationOutput>, ScopeQueryError>) and ScopeQueryService::files_by_string (accepting String scope name, returning Result<Vec<String>, ScopeQueryError>) in the ScopeQueryInteractor, so commands/review/classify.rs and commands/review/files.rs never import domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName; (b) adding AdrVerifyOutput DTO (new usecase-owned struct wrapping blue_count, yellow_count, red_count, grandfathered_count as usize) to the usecase layer; (c) modifying VerifyAdrSignals::verify return type from Result<domain::AdrVerifyReport, VerifyAdrSignalsError> to Result<AdrVerifyOutput, VerifyAdrSignalsError> and updating VerifyAdrSignalsInteractor::verify implementation accordingly, so that commands/verify.rs can use AdrVerifyOutput instead of importing domain::AdrVerifyReport.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T013",
       "description": "Remove domain error #[from] variants from cli/src/error.rs CliError, replacing them with CliError::Message conversions from usecase error types; confirm no remaining domain type reference in error.rs",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T014",
@@ -154,7 +155,7 @@
         "id": "S7",
         "title": "Remove Usecase pub-use Re-exports",
         "description": [
-          "Scan the usecase crate public API for any remaining pub use domain:: re-exports (e.g. track_phase.rs) and remove them. This enforces CN-01 (no domain types in usecase public API) and satisfies AC-04 before the CLI migration tasks begin touching the cli crate."
+          "Scan the usecase crate public API for any remaining pub use domain:: re-exports (e.g. track_phase.rs) and remove them. This eliminates explicit re-export leakage and satisfies AC-04 before the CLI migration tasks begin touching the cli crate. Note: CN-01 as applied here targets `pub use domain::` re-exports only; certain domain types may still appear in usecase public signatures as accepted CN-01 exceptions documented in spec.json IN-08/IN-09/IN-10."
         ],
         "task_ids": [
           "T009"
@@ -204,7 +205,7 @@
         "id": "S12",
         "title": "Layer Policy Enforcement",
         "description": [
-          "Update the architecture-rules.json SSoT and apps/cli/Cargo.toml to remove the domain dependency from the cli layer. This task is placed last (after all CLI source migration is complete in S1–S11) so that the enforcement gate and the source migration complete atomically — as specified by ADR D2. Once T001 is applied, the cargo make check-layers and cargo make deny gates are live and the build is already clean because T002–T013 have already replaced all domain imports."
+          "Update the architecture-rules.json SSoT and apps/cli/Cargo.toml to remove the domain dependency from the cli layer. Originally planned last (S12), T001 was bundled with T010-T013 because removing `use domain::` from CLI source before deleting the Cargo.toml domain dependency caused `cargo make deny` wrapper-match failures (CI required atomic removal). Once T001 is applied, the cargo make check-layers and cargo make deny gates are live and the build is clean because T002-T013 have replaced all domain imports."
         ],
         "task_ids": [
           "T001"

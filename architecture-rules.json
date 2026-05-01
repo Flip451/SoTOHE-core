@@ -102,7 +102,6 @@
       "crate": "cli",
       "path": "apps/cli",
       "may_depend_on": [
-        "domain",
         "infrastructure",
         "usecase"
       ],

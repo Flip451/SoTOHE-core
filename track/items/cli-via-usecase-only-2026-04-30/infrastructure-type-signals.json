@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-30T22:38:08Z",
-  "declaration_hash": "c05979ad185a307ed1333de38ccbe15a9d92c7dce3e31c332abcb128e6b48048",
+  "generated_at": "2026-05-01T04:19:13Z",
+  "declaration_hash": "3b998760898fe5b052d3d5aeff1ec7b4f91d629d4bd1134b28c5121ffc50f1cc",
   "signals": [
     {
       "type_name": "FsTrackStore",
@@ -28,14 +28,440 @@
     {
       "type_name": "ConchShellParser",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ShellParser",
-        "ShellParserPort"
-      ],
+        "ShellParserPort",
+        "HookShellParserPort"
+      ]
+    },
+    {
+      "type_name": "NullDiffGetter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiffGetter"
+      ]
+    },
+    {
+      "type_name": "NullReviewer",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Reviewer"
+      ]
+    },
+    {
+      "type_name": "CodexReviewOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FastCompleted",
+        "FinalCompleted",
+        "Skipped"
+      ]
+    },
+    {
+      "type_name": "ReviewV2Composition",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewV2CompositionWithCodex",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CaptureBaselineError",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "0: String"
+      ]
+    },
+    {
+      "type_name": "EvaluateSignalsError",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "0: String"
+      ]
+    },
+    {
+      "type_name": "TypeGraphExportError",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "0: String"
+      ]
+    },
+    {
+      "type_name": "SignalSummary",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "blue: usize",
+        "yellow: usize",
+        "red: usize",
+        "total: usize",
+        "undeclared_count: usize",
+        "skipped_count: usize",
+        "catalogue_file: String"
+      ]
+    },
+    {
+      "type_name": "run_example_demo",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
       "missing_items": [
-        "impl HookShellParserPort"
+        "fn run_example_demo() -> Result<String, String>"
+      ]
+    },
+    {
+      "type_name": "persist_commit_hash_for_track",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn persist_commit_hash_for_track(track_id: str) -> Result<String, String>"
+      ]
+    },
+    {
+      "type_name": "append_scope_briefing_reference_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn append_scope_briefing_reference_str(prompt: String, scope_name: str, track_id_str: str, items_dir: Path, is_safe_path_fn: Fn) -> Result<(), String>"
+      ]
+    },
+    {
+      "type_name": "build_check_approved_service",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_check_approved_service() -> Arc<dyn ReviewCheckApprovedService>"
+      ]
+    },
+    {
+      "type_name": "build_review_v2",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_review_v2(track_id: TrackId, items_dir: Path) -> Result<ReviewV2Composition, String>"
+      ]
+    },
+    {
+      "type_name": "build_review_v2_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_review_v2_str(track_id_str: str, items_dir: Path) -> Result<ReviewV2Composition, String>"
+      ]
+    },
+    {
+      "type_name": "build_review_v2_with_reviewer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_review_v2_with_reviewer(track_id: TrackId, items_dir: Path, reviewer: CodexReviewer) -> Result<ReviewV2CompositionWithCodex, String>"
+      ]
+    },
+    {
+      "type_name": "build_review_v2_with_reviewer_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_review_v2_with_reviewer_str(track_id_str: str, items_dir: Path, reviewer: CodexReviewer) -> Result<ReviewV2CompositionWithCodex, String>"
+      ]
+    },
+    {
+      "type_name": "build_run_review_service",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_run_review_service() -> Arc<dyn RunReviewService>"
+      ]
+    },
+    {
+      "type_name": "build_scope_query_interactor_no_diff_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_scope_query_interactor_no_diff_str(track_id_str: str, items_dir: Path) -> Result<ScopeQueryInteractor<NullDiffGetter>, String>"
+      ]
+    },
+    {
+      "type_name": "build_scope_query_interactor_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_scope_query_interactor_str(track_id_str: str, items_dir: Path) -> Result<ScopeQueryInteractor<GitDiffGetter>, String>"
+      ]
+    },
+    {
+      "type_name": "check_approved_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn check_approved_str(track_id_str: str, items_dir: Path) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>"
+      ]
+    },
+    {
+      "type_name": "get_briefing_for_scope_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn get_briefing_for_scope_str(scope_name: str, track_id_str: str, items_dir: Path) -> Result<Option<String>, String>"
+      ]
+    },
+    {
+      "type_name": "load_scope_config_only",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn load_scope_config_only(track_id: TrackId, items_dir: Path) -> Result<ReviewScopeConfig, String>"
+      ]
+    },
+    {
+      "type_name": "load_scope_config_only_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn load_scope_config_only_str(track_id_str: str, items_dir: Path) -> Result<ReviewScopeConfig, String>"
+      ]
+    },
+    {
+      "type_name": "render_review_results_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn render_review_results_str(track_id_str: str, items_dir: Path, scope_filter: Option<&str>, limit: Option<u32>, round_type: str, no_hint: bool) -> Result<String, String>"
+      ]
+    },
+    {
+      "type_name": "resolve_diff_base_and_getter",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn resolve_diff_base_and_getter(track_id: TrackId, items_dir: Path) -> Result<(GitDiffGetter, CommitHash), String>"
+      ]
+    },
+    {
+      "type_name": "run_codex_review_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn run_codex_review_str(track_id_str: str, items_dir: Path, group_str: str, round_type_str: str, reviewer: CodexReviewer) -> Result<CodexReviewOutcome, String>"
+      ]
+    },
+    {
+      "type_name": "validate_review_group_name_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn validate_review_group_name_str(group_name: str) -> Result<(), String>"
+      ]
+    },
+    {
+      "type_name": "validate_scope_for_track_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn validate_scope_for_track_str(track_id_str: str, items_dir: Path, scope_name: str) -> Result<(), String>"
+      ]
+    },
+    {
+      "type_name": "validate_track_id_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn validate_track_id_str(track_id_str: str) -> Result<(), String>"
+      ]
+    },
+    {
+      "type_name": "capture_baseline_for_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn capture_baseline_for_layer(items_dir: Path, track_id: str, workspace_root: Path, binding: TdddLayerBinding) -> Result<(), CaptureBaselineError>"
+      ]
+    },
+    {
+      "type_name": "refresh_one_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn refresh_one_layer(items_dir: Path, track_dir: Path, track_id: str, binding: TdddLayerBinding, writer: FsCatalogueSpecSignalsStore) -> Result<(), String>"
+      ]
+    },
+    {
+      "type_name": "execute_type_graph_for_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn execute_type_graph_for_layer(items_dir: Path, track_id: str, workspace_root: Path, binding: TdddLayerBinding, cluster_depth: usize, edge_set: EdgeSet) -> Result<ExitCode, TypeGraphExportError>"
+      ]
+    },
+    {
+      "type_name": "evaluate_and_write_signals",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn evaluate_and_write_signals(doc: TypeCatalogueDocument, profile: TypeGraph, baseline: TypeBaseline, domain_types_path: Path, track_dir: Path, signal_file_name: str, workspace_crates: HashSet<String>) -> Result<(ExitCode, SignalSummary), EvaluateSignalsError>"
+      ]
+    },
+    {
+      "type_name": "execute_type_signals_for_layer",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn execute_type_signals_for_layer(items_dir: Path, track_id: str, workspace_root: Path, binding: TdddLayerBinding) -> Result<ExitCode, EvaluateSignalsError>"
+      ]
+    },
+    {
+      "type_name": "validate_action_diagnostics",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn validate_action_diagnostics(report: ConsistencyReport) -> Result<(), EvaluateSignalsError>"
+      ]
+    },
+    {
+      "type_name": "validate_and_write_catalogue",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn validate_and_write_catalogue(report: ConsistencyReport, doc: TypeCatalogueDocument, domain_types_path: Path, track_dir: Path) -> Result<Vec<u8>, EvaluateSignalsError>"
+      ]
+    },
+    {
+      "type_name": "read_track_status_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn read_track_status_str(items_dir: Path, track_id_str: str) -> Result<String, String>"
+      ]
+    },
+    {
+      "type_name": "execute_verify_adr_signals",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn execute_verify_adr_signals(project_root: Path) -> VerifyOutcome"
+      ]
+    },
+    {
+      "type_name": "any_enabled_catalogue_present",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn any_enabled_catalogue_present(bindings: TdddLayerBinding, track_dir: Path, items_dir: Path) -> Result<bool, String>"
+      ]
+    },
+    {
+      "type_name": "format_finding",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn format_finding(finding: SpecRefFinding) -> String"
+      ]
+    },
+    {
+      "type_name": "read_spec_element_hashes",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn read_spec_element_hashes(track_dir: Path, items_dir: Path) -> Result<BTreeMap<SpecElementId, ContentHash>, String>"
+      ]
+    },
+    {
+      "type_name": "verify_one_layer_formatted",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn verify_one_layer_formatted(track_dir: Path, items_dir: Path, binding: TdddLayerBinding, spec_element_hashes: BTreeMap<SpecElementId, ContentHash>, skip_stale: bool) -> Result<Vec<String>, String>"
+      ]
+    },
+    {
+      "type_name": "execute_catalogue_spec_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "execute_catalogue_spec_signals_check",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "consistency_report_to_findings",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn consistency_report_to_findings(report: ConsistencyReport) -> Vec<VerifyFinding>"
+      ]
+    },
+    {
+      "type_name": "evaluate_consistency_from_components",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn evaluate_consistency_from_components(doc: TypeCatalogueDocument, graph: TypeGraph, baseline: TypeBaseline, workspace_crates: HashSet<String>) -> VerifyOutcome"
+      ]
+    },
+    {
+      "type_name": "execute_spec_code_consistency_str",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn execute_spec_code_consistency_str(track_id_str: str, crate_name: str, project_root: Path) -> VerifyOutcome"
       ]
     }
   ]

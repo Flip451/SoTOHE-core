@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use domain::verify::VerifyOutcome;
+use infrastructure::verify::{VerifyFinding, VerifyOutcome};
 
 /// Arguments for spec-level verify subcommands.
 #[derive(Args)]
@@ -225,14 +225,10 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                         args.strict,
                         &trusted_root,
                     ),
-                    Err(e) => {
-                        VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                            format!(
-                                "cannot resolve trusted_root for {}: {e}",
-                                args.spec_path.display()
-                            ),
-                        )])
-                    }
+                    Err(e) => VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "cannot resolve trusted_root for {}: {e}",
+                        args.spec_path.display()
+                    ))]),
                 };
             ("verify spec states", outcome)
         }
@@ -271,279 +267,26 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
 }
 
 /// Execute bidirectional spec ↔ code consistency check.
-#[allow(clippy::too_many_lines)]
 fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome {
-    use domain::schema::{SchemaExportError, SchemaExporter};
-
-    // Validate track ID.
-    let track_id = match domain::TrackId::try_new(&args.track_id) {
-        Ok(id) => id,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("invalid track ID: {e}"),
-            )]);
-        }
-    };
-
-    let track_dir = args.project_root.join("track/items").join(track_id.as_ref());
-    let domain_types_path = track_dir.join("domain-types.json");
-
-    // Read and decode domain-types.json.
-    let json = match std::fs::read_to_string(&domain_types_path) {
-        Ok(s) => s,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("cannot read {}: {e}", domain_types_path.display()),
-            )]);
-        }
-    };
-
-    let doc = match infrastructure::tddd::catalogue_codec::decode(&json) {
-        Ok(d) => d,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("domain-types.json decode error: {e}"),
-            )]);
-        }
-    };
-
-    // Export schema via rustdoc JSON.
-    let exporter =
-        infrastructure::schema_export::RustdocSchemaExporter::new(args.project_root.clone());
-    let schema = match exporter.export(&args.crate_name) {
-        Ok(s) => s,
-        Err(e) => {
-            let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
-                " (install with: rustup toolchain install nightly)"
-            } else {
-                ""
-            };
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("schema export failed: {e}{hint}"),
-            )]);
-        }
-    };
-
-    // Collect typestate names and build TypeGraph.
-    let typestate_names = doc.typestate_names();
-    let graph = infrastructure::code_profile_builder::build_type_graph(&schema, &typestate_names);
-
-    // Load baseline for 4-group evaluation.
-    let baseline_path = track_dir.join("domain-types-baseline.json");
-    let baseline = match std::fs::read_to_string(&baseline_path) {
-        Ok(bl_json) => match infrastructure::tddd::baseline_codec::decode(&bl_json) {
-            Ok(bl) => bl,
-            Err(e) => {
-                return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                    format!("baseline decode error: {e}"),
-                )]);
-            }
-        },
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "domain-types-baseline.json not found — run `sotp track baseline-capture {}`",
-                    args.track_id
-                ),
-            )]);
-        }
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("cannot read {}: {e}", baseline_path.display()),
-            )]);
-        }
-    };
-
-    // Load workspace crate names from architecture-rules.json for IN-10 reverse checks.
-    // Degrading to empty on file-absent is intentional: the check is suppressed
-    // rather than causing a hard error in legacy setups that predate the multilayer rules file.
-    let arch_rules_path = args.project_root.join("architecture-rules.json");
-    let workspace_crates = match infrastructure::verify::tddd_layers::load_workspace_crate_names(
-        &arch_rules_path,
+    infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str(
+        &args.track_id,
+        &args.crate_name,
         &args.project_root,
-    ) {
-        Ok(names) => names,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("cannot read architecture-rules.json: {e}"),
-            )]);
-        }
-    };
-
-    // Run bidirectional consistency check with baseline-aware 4-group evaluation.
-    evaluate_consistency_from_components(&doc, &graph, &baseline, &workspace_crates)
+    )
 }
 
-/// Core spec-code consistency evaluation given pre-built domain components.
-///
-/// Separated from `execute_spec_code_consistency` so the wiring from
-/// `check_consistency` → `consistency_report_to_findings` → `VerifyOutcome` can be
-/// exercised in unit tests without requiring the nightly toolchain.
-///
-/// # Arguments
-/// * `doc` — decoded `TypeCatalogueDocument` (entries read from `domain-types.json`)
-/// * `graph` — `TypeGraph` built from the schema export
-/// * `baseline` — decoded `TypeBaseline` from `domain-types-baseline.json`
-/// * `workspace_crates` — crate names from `architecture-rules.json` layers; enables
-///   IN-10 workspace-origin reverse checks.  Pass an empty set to suppress them.
-fn evaluate_consistency_from_components(
-    doc: &domain::TypeCatalogueDocument,
-    graph: &domain::TypeGraph,
-    baseline: &domain::TypeBaseline,
-    workspace_crates: &std::collections::HashSet<String>,
-) -> VerifyOutcome {
-    let report = domain::check_consistency(doc.entries(), graph, baseline, workspace_crates);
-    let findings = consistency_report_to_findings(&report);
-    print_consistency_report_json(&report);
-    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
-}
-
-/// Convert a `ConsistencyReport` into a flat list of `VerifyFinding`s for `VerifyOutcome`.
-///
-/// The domain layer patches an invalid `action=delete` (no baseline match) entry into a
-/// Red forward signal AND stores the name in `delete_errors()`.  To avoid duplicate
-/// findings for the same root cause, this function identifies the synthetic Red via its
-/// fingerprint (`found_type==false`, empty `missing_items`, empty `extra_items`) and
-/// suppresses it in favour of the more specific `delete_errors` message.  This is safe
-/// for same-name delete+add pairs because the `add` half has a different kind/found_type
-/// state and will not match the fingerprint.
-///
-/// # Returns
-///
-/// A `Vec<VerifyFinding>` with errors for Red signals, errors for undeclared/baseline-red
-/// items, warnings for contradictions, and errors for invalid delete declarations.
-fn consistency_report_to_findings(
-    report: &domain::ConsistencyReport,
-) -> Vec<domain::verify::VerifyFinding> {
-    let mut findings = Vec::new();
-
-    // Collect delete_error names upfront so their patched forward signals can be
-    // suppressed.  The fingerprint (name in delete_errors + found_type==false +
-    // empty missing + empty extra) identifies only the synthetic patch produced by
-    // the domain layer's delete-baseline validation — not the paired add entry.
-    let delete_error_names: std::collections::HashSet<&str> =
-        report.delete_errors().iter().map(String::as_str).collect();
-
-    // Forward: red signals become errors (excluding synthetic delete-error patches).
-    for sig in report.forward_signals() {
-        if sig.signal() == domain::ConfidenceSignal::Red {
-            let is_delete_error_signal = delete_error_names.contains(sig.type_name())
-                && !sig.found_type()
-                && sig.missing_items().is_empty()
-                && sig.extra_items().is_empty();
-            if !is_delete_error_signal {
-                findings.push(domain::verify::VerifyFinding::error(format!(
-                    "{} ({}): Red — missing={:?}, extra={:?}",
-                    sig.type_name(),
-                    sig.kind_tag(),
-                    sig.missing_items(),
-                    sig.extra_items(),
-                )));
-            }
-        }
-    }
-
-    // Group 4: undeclared types/traits (not in baseline, not declared) → Red.
-    for name in report.undeclared_types() {
-        findings.push(domain::verify::VerifyFinding::error(format!(
-            "undeclared new type in code: `{name}` — add to domain-types.json"
-        )));
-    }
-    for name in report.undeclared_traits() {
-        findings.push(domain::verify::VerifyFinding::error(format!(
-            "undeclared new trait in code: `{name}` — add to domain-types.json"
-        )));
-    }
-    for name in report.undeclared_functions() {
-        findings.push(domain::verify::VerifyFinding::error(format!(
-            "undeclared new free function in code: `{name}` — add a FreeFunction entry to domain-types.json"
-        )));
-    }
-
-    // Group 3: baseline structural changes or deletions → Red.
-    for name in report.baseline_red_types() {
-        findings.push(domain::verify::VerifyFinding::error(format!(
-            "undeclared structural change to baseline type: `{name}` — add to domain-types.json"
-        )));
-    }
-    for name in report.baseline_red_traits() {
-        findings.push(domain::verify::VerifyFinding::error(format!(
-            "undeclared structural change to baseline trait: `{name}` — add to domain-types.json"
-        )));
-    }
-    for name in report.baseline_red_functions() {
-        findings.push(domain::verify::VerifyFinding::error(format!(
-            "undeclared structural change or deletion of baseline free function: `{name}` — add a FreeFunction entry to domain-types.json"
-        )));
-    }
-
-    // Action-baseline contradictions → warnings (advisory, not CI-blocking).
-    for contradiction in report.contradictions() {
-        findings.push(domain::verify::VerifyFinding::warning(format!(
-            "{} (action={}): {:?}",
-            contradiction.name(),
-            contradiction.action().action_tag(),
-            contradiction.kind(),
-        )));
-    }
-
-    // Delete baseline validation errors → hard errors (CI-blocking, specific diagnostic).
-    // These replace the suppressed generic Red forward signal for the same entry.
-    for name in report.delete_errors() {
-        findings.push(domain::verify::VerifyFinding::error(format!(
-            "action=delete for `{name}` but type not in baseline — cannot delete non-existent type"
-        )));
-    }
-
-    findings
-}
-
-/// Serialize a `ConsistencyReport` as a JSON line to stdout via serde_json.
-fn print_consistency_report_json(report: &domain::ConsistencyReport) {
-    let signal_str = |s: domain::ConfidenceSignal| match s {
-        domain::ConfidenceSignal::Blue => "blue",
-        domain::ConfidenceSignal::Yellow => "yellow",
-        domain::ConfidenceSignal::Red => "red",
-        _ => "unknown",
-    };
-    let forward: Vec<serde_json::Value> = report
-        .forward_signals()
-        .iter()
-        .map(|s| {
-            serde_json::json!({
-                "type_name": s.type_name(),
-                "kind_tag": s.kind_tag(),
-                "signal": signal_str(s.signal()),
-                "found_type": s.found_type(),
-                "found_items": s.found_items(),
-                "missing_items": s.missing_items(),
-                "extra_items": s.extra_items(),
-            })
-        })
-        .collect();
-    let contradictions: Vec<serde_json::Value> = report
-        .contradictions()
-        .iter()
-        .map(|c| {
-            serde_json::json!({
-                "name": c.name(),
-                "action": c.action().action_tag(),
-                "kind": format!("{:?}", c.kind()),
-            })
-        })
-        .collect();
-    let output = serde_json::json!({
-        "forward_signals": forward,
-        "undeclared_types": report.undeclared_types(),
-        "undeclared_traits": report.undeclared_traits(),
-        "skipped_count": report.skipped_count(),
-        "baseline_red_types": report.baseline_red_types(),
-        "baseline_red_traits": report.baseline_red_traits(),
-        "contradictions": contradictions,
-        "delete_errors": report.delete_errors(),
-    });
-    println!("{output}");
-}
+// Thin delegation aliases and type re-exports so that CLI test code can call these
+// helpers and construct domain types via `super::*` without importing `domain::` directly
+// (AC-03 compliance in test code).
+#[cfg(test)]
+use infrastructure::verify::spec_code_consistency::{
+    consistency_report_to_findings, evaluate_consistency_from_components,
+};
+#[cfg(test)]
+use infrastructure::verify::{
+    Severity, Timestamp, TypeAction, TypeBaseline, TypeBaselineEntry, TypeCatalogueDocument,
+    TypeCatalogueEntry, TypeDefinitionKind, TypeGraph, TypeKind, check_consistency,
+};
 
 /// Execute plan-artifact-refs verification.
 ///
@@ -555,12 +298,13 @@ fn print_consistency_report_json(report: &domain::ConsistencyReport) {
 fn execute_plan_artifact_refs(args: PlanArtifactRefsArgs) -> VerifyOutcome {
     match &args.track_dir {
         Some(dir) if dir.is_dir() => infrastructure::verify::plan_artifact_refs::verify(dir),
-        Some(dir) => VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-            format!("Track directory does not exist: {}", dir.display()),
-        )]),
+        Some(dir) => VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "Track directory does not exist: {}",
+            dir.display()
+        ))]),
         None => match resolve_active_track_dir() {
             Some(dir) => infrastructure::verify::plan_artifact_refs::verify(&dir),
-            None => VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+            None => VerifyOutcome::from_findings(vec![VerifyFinding::error(
                 "Cannot resolve active track directory: not on a track/* branch or directory does \
                  not exist. Use --track-dir <PATH> to specify the track directory explicitly."
                     .to_owned(),
@@ -591,401 +335,42 @@ fn resolve_active_track_dir() -> Option<std::path::PathBuf> {
     if track_dir.is_dir() { Some(track_dir) } else { None }
 }
 
-/// Check catalogue-spec signal gate results for each tddd-enabled layer on
-/// the current branch. Resolves the active track via `track/*` branch name,
-/// loads `<layer>-catalogue-spec-signals.json` per enabled layer, and
-/// delegates to `domain::check_catalogue_spec_signals`. Absent signals file
-/// is silently skipped (lenient CI mode — the pre-commit refresh step will
-/// generate it before the next commit).
-#[allow(clippy::too_many_lines)]
+/// Check catalogue-spec signal gate results for each tddd-enabled layer.
+///
+/// Thin delegation to the infrastructure layer which handles all domain type
+/// construction internally (CN-01 / AC-03).
 fn execute_catalogue_spec_signals_check(args: CatalogueSpecSignalsArgs) -> VerifyOutcome {
-    use infrastructure::git_cli::GitRepository as _;
-    use usecase::track_resolution::{TrackResolutionError, resolve_track_id_from_branch};
-
-    // Resolve the active track id from the current branch. SKIP (pass) on
-    // non-track/* branches (including plan/* and main) — consistent with the
-    // sibling `verify-spec-states-current` and `verify-catalogue-spec-refs`
-    // patterns. Uses the strict helper (resolve_track_id_from_branch) so that
-    // plan/* branches return the SKIP Info finding rather than running the check
-    // against a potentially absent signals file.
-    //
-    // An invalid track slug (e.g., `track/Bad Slug`) is NOT silently skipped —
-    // it fails closed as an error so CI reports the misconfiguration rather than
-    // passing without checking any signals.
-    //
-    // `SystemGitRepo::discover()` failure is fail-closed (not SKIP): if the
-    // git repository cannot be discovered, this gate has no safe basis for
-    // skipping and must surface the error in CI. Only a successful `discover()`
-    // + a `current_branch()` that returns `None` (detached HEAD) is treated as
-    // a SKIP, because detached HEAD is a well-defined non-branch state.
-    let repo = match infrastructure::git_cli::SystemGitRepo::discover() {
-        Ok(r) => r,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("[ERROR] cannot discover git repository: {e}"),
-            )]);
-        }
-    };
-    // `current_branch()` Err → fail closed (git spawn failure must not silently SKIP).
-    // `current_branch()` Ok(None) → git rev-parse exit non-zero → also fail closed.
-    // Detached HEAD returns Ok(Some("HEAD")) and is handled in the Some(b) arm below.
-    let branch = match repo.current_branch() {
-        Ok(Some(b)) => b,
-        Ok(None) => {
-            // `git rev-parse --abbrev-ref HEAD` exited non-zero: treat as git failure
-            // (fail closed) so CI does not silently pass without checking any signals.
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                "[ERROR] git rev-parse --abbrev-ref HEAD failed (non-zero exit)".to_owned(),
-            )]);
-        }
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("[ERROR] cannot read current branch: {e}"),
-            )]);
-        }
-    };
-    let track_id = match resolve_track_id_from_branch(Some(branch.as_str())) {
-        Ok(id) => id,
-        Err(TrackResolutionError::InvalidTrackId(slug, e)) => {
-            // Fail closed: malformed branch slug is an operator error, not a
-            // skip condition. Let it surface in CI.
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("[ERROR] invalid track id '{slug}' from branch '{branch}': {e}"),
-            )]);
-        }
-        Err(_) => {
-            // Not a track/* branch (plan/*, main, "HEAD" = detached, etc.) → SKIP.
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::new(
-                domain::verify::Severity::Info,
-                format!("[SKIP] not on a track branch (branch: {branch})"),
-            )]);
-        }
-    };
-
-    // Anchor relative default paths at the repo root so the command works
-    // correctly regardless of which subdirectory the process is invoked from.
-    // Mirrors `resolve_active_track_dir` and the sibling branch-bound helpers in
-    // this file. `resolve_repo_path` is a no-op for absolute paths.
-    let items_dir = infrastructure::git_cli::resolve_repo_path(repo.root(), &args.items_dir);
-    let workspace_root =
-        infrastructure::git_cli::resolve_repo_path(repo.root(), &args.workspace_root);
-
-    execute_catalogue_spec_signals(items_dir, track_id, workspace_root, args.strict)
+    infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals_check(
+        args.items_dir,
+        args.workspace_root,
+        args.strict,
+    )
 }
 
 /// Core catalogue-spec-signals check logic with explicit, resolved parameters.
 ///
-/// Separated from `execute_catalogue_spec_signals_check` so the guard logic
-/// (symlink guards, per-layer signals loop) can be exercised from tests without
-/// requiring a real git environment.
-///
-/// # Errors
-///
-/// Returns a `VerifyOutcome` with error findings on symlink violations, missing
-/// `architecture-rules.json`, or signals decode errors.
-#[allow(clippy::too_many_lines)]
+/// Thin delegation to infrastructure so CLI test code can call this function
+/// without importing `domain::` directly.
+#[cfg(test)]
 fn execute_catalogue_spec_signals(
     items_dir: std::path::PathBuf,
     track_id: String,
     workspace_root: std::path::PathBuf,
     strict: bool,
 ) -> VerifyOutcome {
-    use domain::check_catalogue_spec_signals;
-    use infrastructure::tddd::catalogue_spec_signals_codec;
-    use infrastructure::track::symlink_guard::reject_symlinks_below;
-
-    // Security: `reject_symlinks_below` treats its second argument as the trusted
-    // root and only guards components *below* it.  A symlinked `items_dir` would
-    // therefore bypass all downstream symlink guards.  Guard `items_dir` itself
-    // with `symlink_metadata` before using it as the trusted root.
-    // Mirrors the pattern in `execute_verify_catalogue_spec_refs`.
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "symlink guard: refusing to follow symlink at items_dir: {}",
-                    items_dir.display()
-                ),
-            )]);
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("symlink guard: cannot stat items_dir {}: {e}", items_dir.display()),
-            )]);
-        }
-    }
-
-    // Security: guard `workspace_root` against a directly symlinked root directory.
-    match workspace_root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "symlink guard: refusing to follow symlink at workspace_root: {}",
-                    workspace_root.display()
-                ),
-            )]);
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "symlink guard: cannot stat workspace_root {}: {e}",
-                    workspace_root.display()
-                ),
-            )]);
-        }
-    }
-
-    // Security: guard the track directory itself against a symlinked subdirectory
-    // below `items_dir`. A symlinked `items_dir/<track_id>` directory would escape
-    // the trusted tree before `reject_symlinks_below` (anchored at `items_dir`) can
-    // catch it. Mirrors the pattern in `execute_verify_catalogue_spec_refs`.
-    let track_dir = items_dir.join(&track_id);
-    match track_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "symlink guard: refusing to follow symlink at track directory: {}",
-                    track_dir.display()
-                ),
-            )]);
-        }
-        Ok(_) => {}
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Fail closed: a valid `track/*` branch with a missing track directory
-            // means the checkout is broken or `--items-dir` is wrong. Mirrors the
-            // `check-catalogue-spec-signals-local` Makefile task which exits 1 in
-            // this case. Do not silently PASS — the gate would be disabled.
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "track directory not found: {} \
-                     (branch maps to missing track; check --items-dir)",
-                    track_dir.display()
-                ),
-            )]);
-        }
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!("symlink guard: cannot stat track directory {}: {e}", track_dir.display()),
-            )]);
-        }
-    }
-
-    // Enumerate tddd-enabled layers. Fail-closed: a missing `architecture-rules.json`
-    // means we cannot know which catalogues to check — do not fall back to a synthetic
-    // `domain` binding (which is the `load_tddd_layers_from_path` legacy-compat default).
-    // Mirrors the fail-closed logic in `execute_verify_catalogue_spec_refs`.
-    let rules_path = workspace_root.join("architecture-rules.json");
-    let bindings = match reject_symlinks_below(&rules_path, &workspace_root) {
-        Ok(true) => {
-            let content = match std::fs::read_to_string(&rules_path) {
-                Ok(s) => s,
-                Err(e) => {
-                    return VerifyOutcome::from_findings(vec![
-                        domain::verify::VerifyFinding::error(format!(
-                            "cannot read architecture-rules.json at '{}': {e}",
-                            rules_path.display()
-                        )),
-                    ]);
-                }
-            };
-            match infrastructure::verify::tddd_layers::parse_tddd_layers(&content) {
-                Ok(b) => b,
-                Err(e) => {
-                    return VerifyOutcome::from_findings(vec![
-                        domain::verify::VerifyFinding::error(format!(
-                            "architecture-rules.json parse error at '{}': {e}",
-                            rules_path.display()
-                        )),
-                    ]);
-                }
-            }
-        }
-        Ok(false) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "architecture-rules.json not found at '{}'; \
-                     cannot enumerate TDDD layers for verification",
-                    rules_path.display()
-                ),
-            )]);
-        }
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-                format!(
-                    "symlink guard: architecture-rules.json at '{}': {e}",
-                    rules_path.display()
-                ),
-            )]);
-        }
-    };
-
-    // Fail closed: an empty bindings list means no TDDD-enabled layers were found.
-    // This could happen if all `tddd.enabled` flags were removed or `--workspace-root`
-    // points at a mismatched workspace. Return an error so the gate is not silently
-    // disabled. Mirrors the sibling `execute_verify_catalogue_spec_refs` guard.
-    if bindings.is_empty() {
-        return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(format!(
-            "no tddd.enabled layers found in architecture-rules.json at '{}'; \
-                 cannot verify catalogue-spec signals",
-            rules_path.display()
-        ))]);
-    }
-
-    let mut outcome = VerifyOutcome::pass();
-    for binding in &bindings {
-        if !binding.catalogue_spec_signal_enabled() {
-            // ADR §D5.4 phased activation — skip layers that have not opted in.
-            continue;
-        }
-        let layer_id = binding.layer_id();
-        let signals_path = track_dir.join(format!("{layer_id}-catalogue-spec-signals.json"));
-        // Security: reject symlinks in path components below items_dir before
-        // checking file existence or reading. Returns Ok(false) when absent.
-        match reject_symlinks_below(&signals_path, &items_dir) {
-            Ok(false) => {
-                // Lenient CI: missing signals file is "layer not yet activated
-                // for catalogue-spec signals" — the pre-commit refresh will
-                // generate it before the commit, so CI does not block on absence.
-                continue;
-            }
-            Ok(true) => {}
-            Err(e) => {
-                outcome.add(domain::verify::VerifyFinding::error(format!(
-                    "symlink guard: {}: {e}",
-                    signals_path.display()
-                )));
-                continue;
-            }
-        }
-        let text = match std::fs::read_to_string(&signals_path) {
-            Ok(s) => s,
-            Err(e) => {
-                outcome.add(domain::verify::VerifyFinding::error(format!(
-                    "{}: {e}",
-                    signals_path.display()
-                )));
-                continue;
-            }
-        };
-        let doc = match catalogue_spec_signals_codec::decode(&text) {
-            Ok(d) => d,
-            Err(e) => {
-                outcome.add(domain::verify::VerifyFinding::error(format!(
-                    "{}: decode error: {e}",
-                    signals_path.display()
-                )));
-                continue;
-            }
-        };
-        let catalogue_file = binding.catalogue_file();
-
-        // Coverage validation requires the catalogue itself (not just its
-        // filename) so `check_catalogue_spec_signals` can confirm every
-        // catalogue entry has a matching signal. Without this, a tampered
-        // signals file with a valid `catalogue_declaration_hash` could omit
-        // entries and bypass Yellow / Red gating.
-        let catalogue_path = track_dir.join(catalogue_file);
-        match reject_symlinks_below(&catalogue_path, &items_dir) {
-            Ok(true) => {}
-            Ok(false) => {
-                outcome.add(domain::verify::VerifyFinding::error(format!(
-                    "catalogue file not found: {}",
-                    catalogue_path.display()
-                )));
-                continue;
-            }
-            Err(e) => {
-                outcome.add(domain::verify::VerifyFinding::error(format!(
-                    "symlink guard: {}: {e}",
-                    catalogue_path.display()
-                )));
-                continue;
-            }
-        }
-        let catalogue_text = match std::fs::read_to_string(&catalogue_path) {
-            Ok(s) => s,
-            Err(e) => {
-                outcome.add(domain::verify::VerifyFinding::error(format!(
-                    "{}: {e}",
-                    catalogue_path.display()
-                )));
-                continue;
-            }
-        };
-        let catalogue_doc = match infrastructure::tddd::catalogue_codec::decode(&catalogue_text) {
-            Ok(d) => d,
-            Err(e) => {
-                outcome.add(domain::verify::VerifyFinding::error(format!(
-                    "{}: decode error: {e}",
-                    catalogue_path.display()
-                )));
-                continue;
-            }
-        };
-        let layer_outcome =
-            check_catalogue_spec_signals(&catalogue_doc, &doc, strict, catalogue_file);
-        for finding in layer_outcome.findings() {
-            outcome.add(finding.clone());
-        }
-    }
-    outcome
+    infrastructure::verify::catalogue_spec_signals::execute_catalogue_spec_signals(
+        items_dir,
+        track_id,
+        workspace_root,
+        strict,
+    )
 }
 
 /// Execute the `verify adr-signals` subcommand.
 ///
-/// Composes [`infrastructure::adr_decision::FsAdrFileAdapter`] with
-/// [`usecase::verify_adr_signals::VerifyAdrSignalsInteractor`] at the
-/// composition root, runs the verification, and translates the resulting
-/// [`domain::AdrVerifyReport`] into a [`VerifyOutcome`]:
-///
-/// - `red_count >= 1` → error finding (drives exit 1) plus a stderr summary
-///   per AC-01 (`stderr にエラーメッセージ (red_count 含む集計)`).
-/// - `yellow_count >= 1` (no red) → warning finding (still exit 0).
-/// - all blue (or empty directory) → info finding (exit 0).
+/// Thin delegation to infrastructure so CLI never imports `domain::` directly.
 fn execute_verify_adr_signals(project_root: &std::path::Path) -> VerifyOutcome {
-    use std::sync::Arc;
-
-    use domain::AdrFilePort;
-    use domain::verify::{Severity, VerifyFinding};
-    use infrastructure::adr_decision::FsAdrFileAdapter;
-    use usecase::verify_adr_signals::{
-        VerifyAdrSignals, VerifyAdrSignalsCommand, VerifyAdrSignalsInteractor,
-    };
-
-    let adr_dir = project_root.join("knowledge/adr");
-    let adapter = FsAdrFileAdapter::new(adr_dir);
-    let port: Arc<dyn AdrFilePort> = Arc::new(adapter);
-    let interactor = VerifyAdrSignalsInteractor::new(port);
-
-    let report = match interactor.verify(VerifyAdrSignalsCommand) {
-        Ok(r) => r,
-        Err(e) => {
-            let msg = format!("verify-adr-signals failed: {e}");
-            eprintln!("{msg}");
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(msg)]);
-        }
-    };
-
-    let summary = format!(
-        "ADR signal counts: blue={} yellow={} red={} grandfathered={}",
-        report.blue_count(),
-        report.yellow_count(),
-        report.red_count(),
-        report.grandfathered_count(),
-    );
-
-    if report.red_count() >= 1 {
-        eprintln!("[verify-adr-signals] {summary} (red_count >= 1 → CI block)");
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(summary)]);
-    }
-
-    if report.yellow_count() >= 1 {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(summary)]);
-    }
-
-    VerifyOutcome::from_findings(vec![VerifyFinding::new(Severity::Info, summary)])
+    infrastructure::verify::adr_signals::execute_verify_adr_signals(project_root)
 }
 
 /// Combine architecture_rules + doc_patterns + convention_docs checks.
@@ -1132,17 +517,14 @@ mod tests {
 
     #[test]
     fn test_print_outcome_returns_failure_for_errors() {
-        let outcome = VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
-            "something broke",
-        )]);
+        let outcome = VerifyOutcome::from_findings(vec![VerifyFinding::error("something broke")]);
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::FAILURE);
     }
 
     #[test]
     fn test_print_outcome_returns_success_for_warnings_only() {
-        let outcome =
-            VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::warning("note this")]);
+        let outcome = VerifyOutcome::from_findings(vec![VerifyFinding::warning("note this")]);
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::SUCCESS);
     }
@@ -1441,11 +823,11 @@ mod tests {
 
     // --- consistency_report_to_findings tests ---
 
-    fn make_entry_for_test(name: &str, action: domain::TypeAction) -> domain::TypeCatalogueEntry {
-        domain::TypeCatalogueEntry::new(
+    fn make_entry_for_test(name: &str, action: TypeAction) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(
             name,
             "desc",
-            domain::TypeDefinitionKind::ValueObject {
+            TypeDefinitionKind::ValueObject {
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -1455,14 +837,14 @@ mod tests {
         .unwrap()
     }
 
-    fn empty_graph_for_test() -> domain::TypeGraph {
-        domain::TypeGraph::new(std::collections::HashMap::new(), std::collections::HashMap::new())
+    fn empty_graph_for_test() -> TypeGraph {
+        TypeGraph::new(std::collections::HashMap::new(), std::collections::HashMap::new())
     }
 
-    fn empty_baseline_for_test() -> domain::TypeBaseline {
-        domain::TypeBaseline::new(
+    fn empty_baseline_for_test() -> TypeBaseline {
+        TypeBaseline::new(
             1,
-            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
             std::collections::HashMap::new(),
             std::collections::HashMap::new(),
         )
@@ -1474,8 +856,8 @@ mod tests {
         // The domain layer also patches the forward signal to Red.
         // consistency_report_to_findings must emit exactly ONE finding (the specific
         // delete diagnostic) and suppress the duplicate generic Red finding.
-        let entry = make_entry_for_test("Ghost", domain::TypeAction::Delete);
-        let report = domain::check_consistency(
+        let entry = make_entry_for_test("Ghost", TypeAction::Delete);
+        let report = check_consistency(
             &[entry],
             &empty_graph_for_test(),
             &empty_baseline_for_test(),
@@ -1494,7 +876,7 @@ mod tests {
         );
         assert_eq!(
             findings[0].severity(),
-            domain::verify::Severity::Error,
+            Severity::Error,
             "delete error must be reported as error severity"
         );
     }
@@ -1502,7 +884,7 @@ mod tests {
     #[test]
     fn test_consistency_report_to_findings_with_empty_report_produces_no_findings() {
         // No entries at all — empty report must produce no findings.
-        let report = domain::check_consistency(
+        let report = check_consistency(
             &[],
             &empty_graph_for_test(),
             &empty_baseline_for_test(),
@@ -1517,17 +899,17 @@ mod tests {
         // action=add (default) when type is already in baseline → contradiction warning, not error.
         // This tests that contradiction findings are emitted as warnings (advisory).
         use std::collections::HashMap;
-        let entry = make_entry_for_test("Existing", domain::TypeAction::Add);
-        let baseline = domain::TypeBaseline::new(
+        let entry = make_entry_for_test("Existing", TypeAction::Add);
+        let baseline = TypeBaseline::new(
             1,
-            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
             HashMap::from([(
                 "Existing".to_string(),
-                domain::TypeBaselineEntry::new(domain::schema::TypeKind::Struct, vec![], vec![]),
+                TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
             )]),
             HashMap::new(),
         );
-        let report = domain::check_consistency(
+        let report = check_consistency(
             &[entry],
             &empty_graph_for_test(),
             &baseline,
@@ -1537,11 +919,10 @@ mod tests {
         let findings = consistency_report_to_findings(&report);
         // Contradiction should produce exactly one warning finding.
         let warnings: Vec<_> =
-            findings.iter().filter(|f| f.severity() == domain::verify::Severity::Warning).collect();
+            findings.iter().filter(|f| f.severity() == Severity::Warning).collect();
         assert!(!warnings.is_empty(), "contradiction must produce at least one warning");
         // Must not produce any errors for a contradiction-only report.
-        let errors: Vec<_> =
-            findings.iter().filter(|f| f.severity() == domain::verify::Severity::Error).collect();
+        let errors: Vec<_> = findings.iter().filter(|f| f.severity() == Severity::Error).collect();
         assert!(errors.is_empty(), "contradiction must not produce errors: {errors:?}");
     }
 
@@ -1551,17 +932,17 @@ mod tests {
         // This bridges consistency_report_to_findings (warning) → VerifyOutcome → print_outcome
         // → ExitCode::SUCCESS, proving the full chain executed by SpecCodeConsistency.
         use std::collections::HashMap;
-        let entry = make_entry_for_test("Existing", domain::TypeAction::Add);
-        let baseline = domain::TypeBaseline::new(
+        let entry = make_entry_for_test("Existing", TypeAction::Add);
+        let baseline = TypeBaseline::new(
             1,
-            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
             HashMap::from([(
                 "Existing".to_string(),
-                domain::TypeBaselineEntry::new(domain::schema::TypeKind::Struct, vec![], vec![]),
+                TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
             )]),
             HashMap::new(),
         );
-        let report = domain::check_consistency(
+        let report = check_consistency(
             &[entry],
             &empty_graph_for_test(),
             &baseline,
@@ -1574,9 +955,9 @@ mod tests {
 
         let findings = consistency_report_to_findings(&report);
         let outcome = if findings.is_empty() {
-            domain::verify::VerifyOutcome::pass()
+            VerifyOutcome::pass()
         } else {
-            domain::verify::VerifyOutcome::from_findings(findings)
+            VerifyOutcome::from_findings(findings)
         };
         // Contradiction-only report must NOT fail the CI gate (exit code 0).
         let exit = print_outcome("test", &outcome);
@@ -1592,8 +973,8 @@ mod tests {
         // End-to-end contract test: delete errors must fail the CI gate.
         // This bridges consistency_report_to_findings (error) → VerifyOutcome → print_outcome
         // → ExitCode::FAILURE, proving the full chain executed by SpecCodeConsistency.
-        let entry = make_entry_for_test("Ghost", domain::TypeAction::Delete);
-        let report = domain::check_consistency(
+        let entry = make_entry_for_test("Ghost", TypeAction::Delete);
+        let report = check_consistency(
             &[entry],
             &empty_graph_for_test(),
             &empty_baseline_for_test(),
@@ -1602,7 +983,7 @@ mod tests {
         assert!(!report.delete_errors().is_empty(), "precondition: must have delete errors");
 
         let findings = consistency_report_to_findings(&report);
-        let outcome = domain::verify::VerifyOutcome::from_findings(findings);
+        let outcome = VerifyOutcome::from_findings(findings);
         // Delete errors must fail the CI gate (exit code 1).
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::FAILURE, "delete error report must exit 1 (CI-blocking)");
@@ -1610,19 +991,19 @@ mod tests {
 
     // --- evaluate_consistency_from_components tests (core CLI wiring, no nightly needed) ---
 
-    fn make_doc_with_entry(entry: domain::TypeCatalogueEntry) -> domain::TypeCatalogueDocument {
-        domain::TypeCatalogueDocument::new(1, vec![entry])
+    fn make_doc_with_entry(entry: TypeCatalogueEntry) -> TypeCatalogueDocument {
+        TypeCatalogueDocument::new(1, vec![entry])
     }
 
-    fn empty_doc_for_test() -> domain::TypeCatalogueDocument {
-        domain::TypeCatalogueDocument::new(1, vec![])
+    fn empty_doc_for_test() -> TypeCatalogueDocument {
+        TypeCatalogueDocument::new(1, vec![])
     }
 
     #[test]
     fn test_evaluate_consistency_from_components_with_delete_error_returns_failure_outcome() {
         // Proves the wiring inside execute_spec_code_consistency: delete errors must
         // produce a VerifyOutcome with Error severity findings (which exits 1 via print_outcome).
-        let entry = make_entry_for_test("Ghost", domain::TypeAction::Delete);
+        let entry = make_entry_for_test("Ghost", TypeAction::Delete);
         let doc = make_doc_with_entry(entry);
         let outcome = evaluate_consistency_from_components(
             &doc,
@@ -1631,8 +1012,7 @@ mod tests {
             &std::collections::HashSet::new(),
         );
         // Must have error-severity findings so the CLI exits 1.
-        let has_errors =
-            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        let has_errors = outcome.findings().iter().any(|f| f.severity() == Severity::Error);
         assert!(has_errors, "delete error must produce error-severity findings in VerifyOutcome");
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::FAILURE, "delete error must cause exit 1");
@@ -1643,13 +1023,13 @@ mod tests {
         // Proves the wiring inside execute_spec_code_consistency: contradiction warnings
         // must produce a VerifyOutcome that exits 0 (advisory, not CI-blocking).
         use std::collections::HashMap;
-        let entry = make_entry_for_test("Existing", domain::TypeAction::Add);
-        let baseline = domain::TypeBaseline::new(
+        let entry = make_entry_for_test("Existing", TypeAction::Add);
+        let baseline = TypeBaseline::new(
             1,
-            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
             HashMap::from([(
                 "Existing".to_string(),
-                domain::TypeBaselineEntry::new(domain::schema::TypeKind::Struct, vec![], vec![]),
+                TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
             )]),
             HashMap::new(),
         );
@@ -1661,8 +1041,7 @@ mod tests {
             &std::collections::HashSet::new(),
         );
         // Must have only warning-severity findings (no errors) — exit code 0.
-        let has_errors =
-            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        let has_errors = outcome.findings().iter().any(|f| f.severity() == Severity::Error);
         assert!(!has_errors, "contradiction must not produce error-severity findings");
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::SUCCESS, "contradiction-only must exit 0");

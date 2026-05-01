@@ -7,19 +7,12 @@
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use domain::ImplPlanReader;
-use domain::TrackStatus;
-use domain::TypeSignalsDocument;
-use domain::schema::{SchemaExportError, SchemaExporter};
-use infrastructure::code_profile_builder::build_type_graph;
-use infrastructure::schema_export::RustdocSchemaExporter;
-use infrastructure::tddd::{catalogue_codec, type_signals_codec};
-use infrastructure::timestamp_now;
-use infrastructure::track::atomic_write::atomic_write_file;
-use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
-use infrastructure::track::symlink_guard::reject_symlinks_below;
+use infrastructure::tddd::type_signals_evaluator::{
+    EvaluateSignalsError, execute_type_signals_for_layer,
+};
+use infrastructure::track::fs_store::read_track_status_str;
 use infrastructure::verify::tddd_layers::{
-    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path, load_workspace_crate_names,
+    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
 };
 
 use crate::CliError;
@@ -66,26 +59,36 @@ pub(crate) fn resolve_layers(
 
 /// Fail-closed active-track guard: rejects `Done` / `Archived` tracks.
 ///
-/// Uses an exhaustive `match` on `TrackStatus` (6 variants) — adding a new variant
-/// triggers a compile error, forcing explicit classification (frozen vs active).
-/// This is the structural guarantee for fail-closed behavior; `matches!` would
-/// silently pass new variants through (fail-open).
+/// Accepts the track status as a string (from `read_track_status_str`) so
+/// the CLI layer never imports `domain::TrackStatus` directly (CN-01 / AC-03).
 ///
-/// Mirrors the intent of the existing `is_done_or_archived` guard in
-/// `libs/infrastructure/src/track/render.rs::sync_rendered_views` (which uses a
-/// string-based `matches!` and is scope-deferred per ADR
-/// `knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md` Consequences Neutral).
-pub(crate) fn ensure_active_track(status: TrackStatus, track_id: &str) -> Result<(), CliError> {
-    match status {
-        TrackStatus::Done | TrackStatus::Archived => Err(CliError::Message(format!(
-            "cannot run type-signals on '{track_id}' (status={status}). \
+/// Explicit exhaustive match over all six known `TrackStatus` variants
+/// (domain SSoT as of this writing):
+/// - `done` / `archived` → frozen (reject)
+/// - `planned` / `in_progress` / `blocked` / `cancelled` → active (allow)
+/// - any other string → unknown (fail-closed: reject with guidance to update CLI)
+///
+/// Fail-closed for unknowns: an unrecognised status signals that the domain
+/// added a new variant that the CLI has not classified yet. Blocking TDDD
+/// commands in that case is safer than silently allowing runs on a track
+/// that might be frozen.
+pub(crate) fn ensure_active_track(status_str: &str, track_id: &str) -> Result<(), CliError> {
+    match status_str {
+        "done" | "archived" => Err(CliError::Message(format!(
+            "cannot run type-signals on '{track_id}' (status={status_str}). \
              Completed tracks are frozen — run on an active track instead.",
         ))),
-        TrackStatus::Planned
-        | TrackStatus::InProgress
-        | TrackStatus::Blocked
-        | TrackStatus::Cancelled => Ok(()),
+        "planned" | "in_progress" | "blocked" | "cancelled" => Ok(()),
+        _ => Err(CliError::Message(format!(
+            "cannot run type-signals on '{track_id}': unrecognised track status '{status_str}'. \
+             Update the CLI frozen-track guard to classify the new status.",
+        ))),
     }
+}
+
+/// Map `EvaluateSignalsError` from infrastructure to `CliError`.
+fn map_eval_err(e: EvaluateSignalsError) -> CliError {
+    CliError::Message(e.to_string())
 }
 
 /// Evaluate type signals via rustdoc schema export and write back to `<layer>-types.json`.
@@ -107,24 +110,15 @@ pub fn execute_type_signals(
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id to prevent path traversal.
-    let valid_id = domain::TrackId::try_new(&track_id)
-        .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
+    // Validate track_id and derive status without importing domain::TrackId or
+    // domain::TrackStatus (CN-01 / AC-03). read_track_status_str validates the id
+    // and loads impl-plan fail-closed (corrupt impl-plan.json blocks the guard).
+    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
+        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
+    })?;
 
     // Active-track guard: reject type-signals on completed/archived tracks.
-    // Status is derived on demand from impl-plan + status_override.
-    // Use FsTrackStore::load_impl_plan (fail-closed) rather than the free
-    // load_impl_plan_for_track helper, which silently swallows I/O and decode
-    // errors. A corrupt impl-plan.json must block the guard (not pass it).
-    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let store = FsTrackStore::new(items_dir.clone());
-    let impl_plan = store
-        .load_impl_plan(&valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    let effective_status =
-        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-    ensure_active_track(effective_status, &track_id)?;
+    ensure_active_track(&status_str, &track_id)?;
 
     // Resolve the set of TDDD-enabled layers to process. When
     // `architecture-rules.json` is absent we fall back to the legacy
@@ -144,7 +138,8 @@ pub fn execute_type_signals(
     }
 
     for binding in &bindings {
-        execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
+        execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)
+            .map_err(map_eval_err)?;
     }
 
     Ok(ExitCode::SUCCESS)
@@ -199,20 +194,11 @@ pub fn execute_type_signals_lenient_with_bindings(
     workspace_root: PathBuf,
     bindings: &[TdddLayerBinding],
 ) -> Result<ExitCode, CliError> {
-    let valid_id = domain::TrackId::try_new(&track_id)
-        .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
-    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    // Status is derived on demand from impl-plan + status_override.
-    // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt impl-plan
-    // blocks the guard instead of being silently treated as absent.
-    let store = FsTrackStore::new(items_dir.clone());
-    let impl_plan = store
-        .load_impl_plan(&valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    let effective_status =
-        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-    ensure_active_track(effective_status, &track_id)?;
+    // Validate track_id and derive status without importing domain types (CN-01 / AC-03).
+    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
+        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
+    })?;
+    ensure_active_track(&status_str, &track_id)?;
 
     if bindings.is_empty() {
         return Err(CliError::Message(
@@ -252,14 +238,16 @@ pub fn execute_type_signals_lenient_with_bindings(
         // the "pre-commit passes, verification fails later" divergence.
         match std::fs::symlink_metadata(&catalogue_path) {
             Ok(meta) if meta.file_type().is_file() => {
-                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
+                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)
+                    .map_err(map_eval_err)?;
             }
             Ok(_) => {
                 // Regular-file check failed: symlink, directory, block
                 // device, etc. Delegate to the strict evaluator so the
                 // caller sees the same error as the CI / merge-gate path
                 // (`reject_symlinks_below` / non-regular-file rejection).
-                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)?;
+                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)
+                    .map_err(map_eval_err)?;
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                 // Declaration file is genuinely absent — layer not
@@ -278,419 +266,11 @@ pub fn execute_type_signals_lenient_with_bindings(
     Ok(ExitCode::SUCCESS)
 }
 
-/// Evaluate type signals for a single TDDD layer binding and write back to the
-/// configured catalogue file.
-///
-/// `binding` provides the configured catalogue / baseline filenames and the
-/// `schema_export.targets` crate name so that explicit `tddd.catalogue_file`
-/// and `tddd.schema_export.targets` overrides are honored consistently.
-fn execute_type_signals_for_layer(
-    items_dir: &std::path::Path,
-    track_id: &str,
-    workspace_root: &std::path::Path,
-    binding: &TdddLayerBinding,
-) -> Result<ExitCode, CliError> {
-    let layer_id = binding.layer_id();
-    let track_dir = items_dir.join(track_id);
-    let catalogue_file = binding.catalogue_file();
-    let catalogue_path = track_dir.join(catalogue_file);
-
-    // Read and decode the configured catalogue file.
-    // If not found, instruct the user to run /track:design first (TDDD requirement).
-    let json = std::fs::read_to_string(&catalogue_path).map_err(|e| {
-        if e.kind() == std::io::ErrorKind::NotFound {
-            CliError::Message(format!(
-                "{catalogue_file} not found for track '{track_id}'. \
-                 Run /track:design first to create it (TDDD: type definitions must be written before implementation)."
-            ))
-        } else {
-            CliError::Message(format!("cannot read {}: {e}", catalogue_path.display()))
-        }
-    })?;
-
-    let mut doc = catalogue_codec::decode(&json)
-        .map_err(|e| CliError::Message(format!("{catalogue_file} decode error: {e}")))?;
-
-    // Resolve the target crate for schema export from the binding. Multi-target
-    // layers are modeled in `architecture-rules.json` (`schema_export.targets`)
-    // but full merge of multiple per-crate schema exports is not yet
-    // implemented. Fail-closed when more than one target is configured so that
-    // the caller is not silently given baseline/signal data computed from only
-    // the first crate — that would drop types/traits from the remaining crates
-    // and produce false undeclared/Red results on later signal evaluation.
-    let target_crate = match binding.targets() {
-        [single] => single,
-        [] => {
-            return Err(CliError::Message(format!(
-                "schema_export.targets is empty for layer '{layer_id}'; check architecture-rules.json"
-            )));
-        }
-        multi => {
-            return Err(CliError::Message(format!(
-                "layer '{layer_id}' has {} schema_export.targets ({:?}), but multi-target export is not yet implemented. Use a single-target layer or wait for multi-target merge support.",
-                multi.len(),
-                multi
-            )));
-        }
-    };
-
-    // Export the target crate's public API via rustdoc JSON.
-    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    let schema = exporter.export(target_crate).map_err(|e| {
-        let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
-            " (install with: rustup toolchain install nightly)".to_owned()
-        } else {
-            String::new()
-        };
-        CliError::Message(format!("failed to export schema: {e}{hint}"))
-    })?;
-
-    // Collect typestate names for outgoing transition filtering in build_type_graph.
-    let typestate_names = doc.typestate_names();
-
-    // Build a pre-indexed TypeGraph from the flat schema export.
-    let profile = build_type_graph(&schema, &typestate_names);
-
-    // Load baseline for 4-group evaluation. The baseline filename is
-    // derived from the binding's catalogue stem (e.g.
-    // `domain-types-baseline.json` for the default `domain-types.json`),
-    // so an override via `tddd.catalogue_file` is honored automatically.
-    let baseline_filename = binding.baseline_file();
-    let baseline_path = track_dir.join(&baseline_filename);
-    let baseline = match std::fs::read_to_string(&baseline_path) {
-        Ok(bl_json) => infrastructure::tddd::baseline_codec::decode(&bl_json)
-            .map_err(|e| CliError::Message(format!("baseline decode error: {e}")))?,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            return Err(CliError::Message(format!(
-                "{baseline_filename} not found for track '{track_id}'. \
-                 Run `sotp track baseline-capture {track_id} --layer {layer_id}` first."
-            )));
-        }
-        Err(e) => {
-            return Err(CliError::Message(format!("cannot read {}: {e}", baseline_path.display())));
-        }
-    };
-
-    // Load workspace crate names from architecture-rules.json for IN-10 reverse checks.
-    let arch_rules_path = workspace_root.join("architecture-rules.json");
-    let workspace_crates = match load_workspace_crate_names(&arch_rules_path, workspace_root) {
-        Ok(names) => names,
-        Err(e) => {
-            return Err(CliError::Message(format!(
-                "cannot read architecture-rules.json for workspace_crates: {e}"
-            )));
-        }
-    };
-
-    // Delegate to the core evaluator (nightly-free, directly testable).
-    let signal_file_name = binding.signal_file();
-    evaluate_and_write_signals(
-        &mut doc,
-        &profile,
-        &baseline,
-        &catalogue_path,
-        &track_dir,
-        &signal_file_name,
-        &workspace_crates,
-    )
-}
-
-/// Core signal evaluation and catalogue write given pre-built domain components.
-///
-/// Separated from `execute_type_signals` so the abort-before-write ordering
-/// and signal assembly can be exercised in unit tests without requiring the nightly
-/// toolchain that `RustdocSchemaExporter` depends on.
-///
-/// # Errors
-///
-/// Returns `CliError` if action diagnostics fail (delete errors), encoding fails,
-/// either declaration-path / signal-path is a symlink (fail-closed per ADR §D7),
-/// or any atomic write fails.
-pub(crate) fn evaluate_and_write_signals(
-    doc: &mut domain::TypeCatalogueDocument,
-    profile: &domain::TypeGraph,
-    baseline: &domain::TypeBaseline,
-    domain_types_path: &std::path::Path,
-    track_dir: &std::path::Path,
-    signal_file_name: &str,
-    workspace_crates: &std::collections::HashSet<String>,
-) -> Result<ExitCode, CliError> {
-    // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
-    // workspace_crates enables IN-10 reverse checks for Interactor/SecondaryAdapter.
-    let report = domain::check_consistency(doc.entries(), profile, baseline, workspace_crates);
-
-    // Convert undeclared types/traits/functions (group 4) to Red TypeSignals.
-    // Capture the count before appending group-3 baseline reds so the summary
-    // WARN line only fires for truly new undeclared items (not baseline changes/deletions).
-    let undeclared_type_trait_signals =
-        domain::undeclared_to_signals(report.undeclared_types(), report.undeclared_traits());
-    let undeclared_function_signals =
-        domain::undeclared_functions_to_signals(report.undeclared_functions());
-    let undeclared_count = undeclared_type_trait_signals.len() + undeclared_function_signals.len();
-    let mut reverse_signals = undeclared_type_trait_signals;
-    reverse_signals.extend(undeclared_function_signals);
-
-    // Baseline Red: structural changes or deletions (group 3).
-    // `found_type` is true when the name still exists in the code (structural change),
-    // false when the name is absent from the type graph (deletion).
-    for name in report.baseline_red_types() {
-        let found_type = profile.get_type(name).is_some();
-        reverse_signals.push(domain::TypeSignal::new(
-            name.clone(),
-            "baseline_changed_type",
-            domain::ConfidenceSignal::Red,
-            found_type,
-            vec![],
-            vec![],
-            vec![],
-        ));
-    }
-    for name in report.baseline_red_traits() {
-        let found_type = profile.get_trait(name).is_some();
-        reverse_signals.push(domain::TypeSignal::new(
-            name.clone(),
-            "baseline_changed_trait",
-            domain::ConfidenceSignal::Red,
-            found_type,
-            vec![],
-            vec![],
-            vec![],
-        ));
-    }
-    for fq_name in report.baseline_red_functions() {
-        // Parse fq_name back to (short_name, module_path) for graph lookup.
-        // fq_name is "module_path::short_name" when module_path is Some, or just
-        // "short_name" otherwise. Use rfind so nested module paths split correctly.
-        let (short_name, module_path) = match fq_name.rfind("::") {
-            Some(idx) => (&fq_name[idx + 2..], Some(&fq_name[..idx])),
-            None => (fq_name.as_str(), None),
-        };
-        let found_type = profile.get_function(short_name, module_path).is_some();
-        reverse_signals.push(domain::TypeSignal::new(
-            fq_name.clone(),
-            "baseline_changed_function",
-            domain::ConfidenceSignal::Red,
-            found_type,
-            vec![],
-            vec![],
-            vec![],
-        ));
-    }
-
-    let mut all_signals: Vec<_> = report.forward_signals().to_vec();
-    all_signals.extend(reverse_signals);
-
-    doc.set_signals(all_signals.clone());
-
-    // Validate action diagnostics, then write only if validation succeeds.
-    // This ordering guarantees no files are mutated on delete-error failure.
-    //
-    // `validate_and_write_catalogue` returns the declaration-file bytes it just
-    // wrote to disk, so `declaration_hash` in the signal file matches the
-    // on-disk declaration bytes verbatim (ADR §D5: hash is pinned to post-encode
-    // disk bytes, not pre-encode in-memory state).
-    let declaration_bytes =
-        validate_and_write_catalogue(&report, doc, domain_types_path, track_dir)?;
-
-    // Write the signal file alongside the declaration file. Signals are stored
-    // separately in `<layer>-type-signals.json` per ADR Migration §2.
-    write_signal_file(&all_signals, &declaration_bytes, track_dir, signal_file_name)?;
-
-    let skipped = report.skipped_count();
-    // Extract the catalogue filename from the path so the WARN message names the
-    // correct file when running against a non-domain layer (e.g. usecase-types.json).
-    let catalogue_file =
-        domain_types_path.file_name().and_then(|n| n.to_str()).unwrap_or("types.json");
-    print_signal_summary(&all_signals, undeclared_count, skipped, catalogue_file);
-
-    Ok(ExitCode::SUCCESS)
-}
-
-/// Validate action-baseline contradiction warnings and delete validation errors,
-/// then encode and write back the catalogue.
-///
-/// Calls [`print_action_diagnostics`] first.  If that returns `Err` (delete-error
-/// abort), no files are written.  On success the catalogue JSON and the rendered
-/// Markdown view are atomically written to disk.
-///
-/// Extracted so that the validate-before-write ordering can be tested without
-/// requiring the nightly toolchain that `execute_type_signals` uses.
-///
-/// Returns the exact byte vector written to the declaration file (including the
-/// trailing newline). Callers computing `declaration_hash` for the signal file
-/// MUST use this return value so the hash is pinned to post-encode disk bytes
-/// (ADR §D5).
-///
-/// # Errors
-///
-/// Returns `CliError` if action diagnostics fail, encoding fails, the declaration
-/// file path is a symlink (ADR §D7 fail-closed write-path guard), or any atomic
-/// write fails.
-fn validate_and_write_catalogue(
-    report: &domain::ConsistencyReport,
-    doc: &domain::TypeCatalogueDocument,
-    domain_types_path: &std::path::Path,
-    track_dir: &std::path::Path,
-) -> Result<Vec<u8>, CliError> {
-    // Validate first: abort before any writes if delete errors are present.
-    print_action_diagnostics(report)?;
-
-    // Encode and write back.
-    let encoded = catalogue_codec::encode(doc)
-        .map_err(|e| CliError::Message(format!("catalogue encode error: {e}")))?;
-
-    let declaration_bytes = format!("{encoded}\n").into_bytes();
-
-    // ADR §D7 symlink guard on the write path: reject symlinks at the leaf or
-    // at any ancestor below `track_dir`. `reject_symlinks_below` returns
-    // `Ok(true)` when the target is a regular file, `Ok(false)` when the
-    // target is absent, and `Err(_)` for any symlink or I/O error — both
-    // `Ok` variants are safe to write to.
-    reject_symlinks_below(domain_types_path, track_dir).map_err(|e| {
-        CliError::Message(format!(
-            "refusing to write declaration file {}: {e}",
-            domain_types_path.display()
-        ))
-    })?;
-
-    atomic_write_file(domain_types_path, &declaration_bytes).map_err(|e| {
-        CliError::Message(format!("cannot write {}: {e}", domain_types_path.display()))
-    })?;
-
-    // NOTE: Markdown view rendering is intentionally NOT performed here. The
-    // `<layer>-types.md` view depends on both type-signals (this step) AND
-    // catalogue-spec-signals (pre-commit step 3). Rendering from this step
-    // would require a stale/fresh check against the catalogue-spec-signals
-    // JSON that has not yet been refreshed, creating a deadlock in the
-    // pre-commit chain. Instead, rendering is centralised in
-    // `sync_rendered_views` (pre-commit step 3.5 and track-transition /
-    // track-sync-views entrypoints), which runs once both signals are
-    // persisted. See ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
-    // §D2.5 (view content) / §D3.4 (pre-commit ordering).
-    Ok(declaration_bytes)
-}
-
-/// Encode and write the per-layer evaluation-result file
-/// (`<layer>-type-signals.json`, schema_version 1) alongside the declaration
-/// file.
-///
-/// `declaration_bytes` MUST be the exact byte sequence just written to the
-/// declaration file. The SHA-256 hash of these bytes is persisted as
-/// `declaration_hash` so that stale detection can compare against the current
-/// on-disk declaration file (ADR §D5).
-///
-/// # Errors
-///
-/// Returns `CliError` when the system timestamp cannot be derived, the signal
-/// file path is a symlink (ADR §D7 fail-closed write-path guard), signal
-/// encoding fails, or the atomic write fails.
-fn write_signal_file(
-    signals: &[domain::TypeSignal],
-    declaration_bytes: &[u8],
-    track_dir: &std::path::Path,
-    signal_file_name: &str,
-) -> Result<(), CliError> {
-    let generated_at = timestamp_now()
-        .map_err(|e| CliError::Message(format!("cannot derive generation timestamp: {e}")))?;
-    let declaration_hash = type_signals_codec::declaration_hash(declaration_bytes);
-    let signals_doc = TypeSignalsDocument::new(generated_at, declaration_hash, signals.to_vec());
-
-    let encoded = type_signals_codec::encode(&signals_doc)
-        .map_err(|e| CliError::Message(format!("signal file encode error: {e}")))?;
-
-    let signal_path = track_dir.join(signal_file_name);
-
-    // ADR §D7 symlink guard on the write path: same policy as the declaration
-    // file. `reject_symlinks_below` returns Ok(true | false) for regular files
-    // and absent paths; any symlink or unexpected I/O error is Err.
-    reject_symlinks_below(&signal_path, track_dir).map_err(|e| {
-        CliError::Message(format!("refusing to write signal file {}: {e}", signal_path.display()))
-    })?;
-
-    atomic_write_file(&signal_path, format!("{encoded}\n").as_bytes())
-        .map_err(|e| CliError::Message(format!("cannot write {}: {e}", signal_path.display())))?;
-
-    Ok(())
-}
-
-/// Print action-baseline contradiction warnings and delete validation errors.
-///
-/// Contradictions are printed as `[WARN]` to stderr. Delete errors cause an
-/// early return with `CliError`.
-fn print_action_diagnostics(report: &domain::ConsistencyReport) -> Result<(), CliError> {
-    for contradiction in report.contradictions() {
-        eprintln!(
-            "[WARN] {} (action={}): {:?}",
-            contradiction.name(),
-            contradiction.action().action_tag(),
-            contradiction.kind(),
-        );
-    }
-
-    if !report.delete_errors().is_empty() {
-        for name in report.delete_errors() {
-            eprintln!(
-                "[ERROR] action=delete for `{name}` but type not in baseline — \
-                 cannot delete non-existent type"
-            );
-        }
-        return Err(CliError::Message(
-            "delete action validation failed: one or more entries reference non-existent \
-             baseline types"
-                .to_owned(),
-        ));
-    }
-
-    Ok(())
-}
-
-/// Format the signal summary line with baseline-aware counts.
-///
-/// Returns a `String` containing the full output (newline-terminated lines) so the
-/// formatting logic is testable without requiring the nightly toolchain that the full
-/// `execute_type_signals` path needs.
-///
-/// `total` equals `signals.len()` — it counts every emitted signal (forward + reverse),
-/// not just the entries in `<layer>-types.json`, to keep `blue + yellow + red == total`.
-///
-/// `catalogue_file` is the filename (e.g. `domain-types.json` or `usecase-types.json`)
-/// reported in the undeclared-types WARN line so users see the correct file to update.
-fn format_signal_summary(
-    signals: &[domain::TypeSignal],
-    undeclared_count: usize,
-    skipped_count: usize,
-    catalogue_file: &str,
-) -> String {
-    let blue = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Blue).count();
-    let yellow = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Yellow).count();
-    let red = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Red).count();
-    let total = signals.len();
-    let mut out = format!(
-        "[OK] type-signals: blue={blue} yellow={yellow} red={red} (total={total}, undeclared={undeclared_count}, skipped={skipped_count})\n",
-    );
-
-    if undeclared_count > 0 {
-        out.push_str(&format!(
-            "[WARN] {undeclared_count} undeclared type(s)/trait(s) found. Run /track:design to update {catalogue_file}.\n"
-        ));
-    }
-
-    out
-}
-
-/// Print the signal summary produced by [`format_signal_summary`].
-fn print_signal_summary(
-    signals: &[domain::TypeSignal],
-    undeclared_count: usize,
-    skipped_count: usize,
-    catalogue_file: &str,
-) {
-    print!("{}", format_signal_summary(signals, undeclared_count, skipped_count, catalogue_file));
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::*;
 
     /// Minimal valid `metadata.json` (schema v5) with a branch set (activated track).
@@ -771,8 +351,6 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_with_unknown_layer_returns_error() {
-        // When --layer is specified with a layer that is not tddd.enabled in
-        // architecture-rules.json, the command must fail-closed with a clear error.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -800,10 +378,6 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_with_usecase_layer_dispatches_to_usecase_catalogue() {
-        // Regression guard: when --layer usecase is specified and usecase is enabled in
-        // architecture-rules.json, execute_type_signals must read usecase-types.json (not
-        // domain-types.json). The absence of usecase-types.json causes a NotFound error
-        // mentioning that file — proving the dispatch went to the usecase binding.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -812,7 +386,6 @@ mod tests {
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
 
-        // Write architecture-rules.json with usecase enabled.
         let rules_json = r#"{
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
@@ -828,8 +401,6 @@ mod tests {
         }"#;
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
 
-        // Do NOT write usecase-types.json — the error must mention it, proving
-        // that execute_type_signals dispatched to the usecase binding.
         let result = execute_type_signals(
             items_dir,
             "test-track".to_owned(),
@@ -839,8 +410,6 @@ mod tests {
 
         let err = result.unwrap_err();
         let msg = format!("{err}");
-        // The error must mention the usecase catalogue file (not domain-types.json),
-        // proving the multi-layer dispatch reached the usecase binding.
         assert!(
             msg.contains("usecase-types.json"),
             "error must mention usecase-types.json (not domain), got: {msg}"
@@ -849,569 +418,14 @@ mod tests {
             !msg.contains("domain-types.json"),
             "error must NOT mention domain-types.json for --layer usecase, got: {msg}"
         );
-        // Must not carry any Phase 1 rejection message.
         assert!(!msg.contains("not yet supported"), "Phase 1 rejection must be gone, got: {msg}");
     }
 
-    // --- format_signal_summary tests (pure, no nightly needed) ---
-
-    fn make_signal(signal: domain::ConfidenceSignal) -> domain::TypeSignal {
-        domain::TypeSignal::new("Foo", "value_object", signal, true, vec![], vec![], vec![])
-    }
-
-    #[test]
-    fn test_format_signal_summary_with_no_signals_prints_zero_counts() {
-        let out = format_signal_summary(&[], 0, 0, "domain-types.json");
-        assert!(
-            out.contains("blue=0 yellow=0 red=0 (total=0, undeclared=0, skipped=0)"),
-            "unexpected summary: {out}"
-        );
-        assert!(!out.contains("[WARN]"), "no WARN expected when undeclared=0");
-    }
-
-    #[test]
-    fn test_format_signal_summary_with_mixed_signals_counts_correctly() {
-        let signals = vec![
-            make_signal(domain::ConfidenceSignal::Blue),
-            make_signal(domain::ConfidenceSignal::Blue),
-            make_signal(domain::ConfidenceSignal::Yellow),
-            make_signal(domain::ConfidenceSignal::Red),
-        ];
-        let out = format_signal_summary(&signals, 0, 0, "domain-types.json");
-        assert!(
-            out.contains("blue=2 yellow=1 red=1 (total=4, undeclared=0, skipped=0)"),
-            "unexpected summary: {out}"
-        );
-        assert!(!out.contains("[WARN]"), "no WARN expected when undeclared=0");
-    }
-
-    #[test]
-    fn test_format_signal_summary_with_undeclared_shows_warn_and_track_design() {
-        let signals = vec![
-            make_signal(domain::ConfidenceSignal::Blue),
-            make_signal(domain::ConfidenceSignal::Red),
-            make_signal(domain::ConfidenceSignal::Red),
-        ];
-        // 2 undeclared signals are represented in the red count above; undeclared_count is passed
-        // separately to distinguish reverse-Red from forward-Red in the WARN line.
-        let out = format_signal_summary(&signals, 2, 0, "usecase-types.json");
-        assert!(
-            out.contains("blue=1 yellow=0 red=2 (total=3, undeclared=2, skipped=0)"),
-            "unexpected summary: {out}"
-        );
-        assert!(out.contains("[WARN]"), "WARN line expected when undeclared>0");
-        assert!(out.contains("/track:design"), "WARN must mention /track:design, got: {out}");
-        // Verify the catalogue_file parameter is reflected in the WARN message.
-        assert!(
-            out.contains("usecase-types.json"),
-            "WARN must mention the specific catalogue file, got: {out}"
-        );
-    }
-
-    #[test]
-    fn test_format_signal_summary_blue_plus_yellow_plus_red_equals_total() {
-        let signals = vec![
-            make_signal(domain::ConfidenceSignal::Blue),
-            make_signal(domain::ConfidenceSignal::Yellow),
-            make_signal(domain::ConfidenceSignal::Yellow),
-            make_signal(domain::ConfidenceSignal::Red),
-        ];
-        let out = format_signal_summary(&signals, 1, 0, "domain-types.json");
-        // invariant: blue + yellow + red == total
-        assert!(out.contains("blue=1 yellow=2 red=1 (total=4,"), "totals must sum: {out}");
-    }
-
-    // --- print_action_diagnostics tests (pure, no nightly needed) ---
-
-    fn make_entry_d(name: &str, action: domain::TypeAction) -> domain::TypeCatalogueEntry {
-        domain::TypeCatalogueEntry::new(
-            name,
-            "desc",
-            domain::TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
-            },
-            action,
-            true,
-        )
-        .unwrap()
-    }
-
-    fn empty_graph_d() -> domain::TypeGraph {
-        domain::TypeGraph::new(std::collections::HashMap::new(), std::collections::HashMap::new())
-    }
-
-    fn empty_baseline_d() -> domain::TypeBaseline {
-        domain::TypeBaseline::new(
-            1,
-            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
-            std::collections::HashMap::new(),
-            std::collections::HashMap::new(),
-        )
-    }
-
-    #[test]
-    fn test_print_action_diagnostics_with_clean_report_returns_ok() {
-        // A report with no contradictions and no delete errors must return Ok.
-        let report = domain::check_consistency(
-            &[],
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &std::collections::HashSet::new(),
-        );
-        let result = print_action_diagnostics(&report);
-        assert!(result.is_ok(), "clean report must return Ok: {result:?}");
-    }
-
-    #[test]
-    fn test_print_action_diagnostics_with_delete_error_returns_cli_error() {
-        // action=delete on a type not in baseline → delete_errors non-empty → Err.
-        let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
-        let report = domain::check_consistency(
-            &[entry],
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &std::collections::HashSet::new(),
-        );
-        assert!(!report.delete_errors().is_empty(), "delete_errors must be non-empty");
-        let result = print_action_diagnostics(&report);
-        assert!(result.is_err(), "delete error must return Err: {result:?}");
-        let err_msg = format!("{}", result.unwrap_err());
-        assert!(
-            err_msg.contains("delete action validation failed"),
-            "error must mention delete validation, got: {err_msg}"
-        );
-    }
-
-    #[test]
-    fn test_print_action_diagnostics_does_not_write_files_on_failure() {
-        // Verifies that print_action_diagnostics itself has no write side effects —
-        // it only prints to stderr and returns Err on delete errors.
-        // (File-write invariant for execute_type_signals is covered by the
-        // fact that print_action_diagnostics is called before atomic_write_file.)
-        let entry = make_entry_d("Phantom", domain::TypeAction::Delete);
-        let report = domain::check_consistency(
-            &[entry],
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &std::collections::HashSet::new(),
-        );
-        // Calling the function must not panic and must return Err.
-        let result = print_action_diagnostics(&report);
-        assert!(result.is_err(), "must return Err for delete_errors");
-    }
-
-    #[test]
-    fn test_validate_and_write_catalogue_does_not_write_on_delete_error() {
-        // Verifies the validate-before-write ordering in validate_and_write_catalogue:
-        // when delete errors are present, no files should be created or modified.
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_path = dir.path().join("domain-types.json");
-        let track_dir = dir.path().to_path_buf();
-
-        let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
-        let doc = domain::TypeCatalogueDocument::new(1, vec![entry.clone()]);
-        let report = domain::check_consistency(
-            &[entry],
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &std::collections::HashSet::new(),
-        );
-
-        assert!(
-            !report.delete_errors().is_empty(),
-            "precondition: delete_errors must be non-empty"
-        );
-
-        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
-
-        assert!(result.is_err(), "delete errors must cause validate_and_write_catalogue to fail");
-        assert!(
-            !domain_types_path.exists(),
-            "domain-types.json must NOT be written on delete-error abort"
-        );
-        assert!(
-            !dir.path().join("domain-types.md").exists(),
-            "domain-types.md must NOT be written on delete-error abort (md render is centralised \
-             in sync_rendered_views and is never invoked by this function)"
-        );
-    }
-
-    #[test]
-    fn test_validate_and_write_catalogue_writes_json_only_when_no_errors() {
-        // Verifies that validate_and_write_catalogue writes only the JSON catalogue
-        // when the report is clean. Markdown view rendering is centralised in
-        // `sync_rendered_views` (pre-commit step 3.5 / track-transition / track-sync-views)
-        // so the md file must NOT be produced by this function — a regression that
-        // reintroduces render here would recreate the pre-commit deadlock against a
-        // stale `<layer>-catalogue-spec-signals.json` (PR #111 P1 finding).
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_path = dir.path().join("domain-types.json");
-        let track_dir = dir.path().to_path_buf();
-
-        // A report with no errors: empty entries against empty baseline/graph.
-        let doc = domain::TypeCatalogueDocument::new(1, vec![]);
-        let report = domain::check_consistency(
-            &[],
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &std::collections::HashSet::new(),
-        );
-
-        assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
-
-        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
-
-        assert!(result.is_ok(), "no-error report must succeed: {result:?}");
-        assert!(domain_types_path.exists(), "domain-types.json must be written on success");
-        assert!(
-            !dir.path().join("domain-types.md").exists(),
-            "domain-types.md must NOT be written by this function (render is owned by \
-             sync_rendered_views)"
-        );
-    }
-
-    // --- evaluate_and_write_signals tests (core path, no nightly needed) ---
-
-    #[test]
-    fn test_evaluate_and_write_signals_with_delete_error_returns_err_and_leaves_files_untouched() {
-        // End-to-end test for the abort-before-write path via the public core evaluator.
-        // Proves that `execute_type_signals` cannot write files on delete errors
-        // regardless of where the `validate_and_write_catalogue` call is placed.
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_path = dir.path().join("domain-types.json");
-        let track_dir = dir.path().to_path_buf();
-
-        let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
-        let mut doc = domain::TypeCatalogueDocument::new(1, vec![entry.clone()]);
-
-        let result = evaluate_and_write_signals(
-            &mut doc,
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &domain_types_path,
-            &track_dir,
-            "domain-type-signals.json",
-            &std::collections::HashSet::new(),
-        );
-
-        assert!(result.is_err(), "delete error must cause evaluate_and_write_signals to fail");
-        assert!(
-            !domain_types_path.exists(),
-            "domain-types.json must NOT be written on delete-error abort"
-        );
-        assert!(
-            !dir.path().join("domain-types.md").exists(),
-            "domain-types.md must NOT be written on delete-error abort"
-        );
-        assert!(
-            !dir.path().join("domain-type-signals.json").exists(),
-            "domain-type-signals.json must NOT be written on delete-error abort"
-        );
-    }
-
-    #[test]
-    fn test_evaluate_and_write_signals_with_clean_report_returns_success_and_writes_files() {
-        // End-to-end test for the success path via the public core evaluator.
-        // Proves that `execute_type_signals` writes catalogue + rendered view + signal file
-        // on a clean report, and that the signal file declaration_hash matches the
-        // on-disk declaration bytes (ADR §D5 post-encode hash pin).
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_path = dir.path().join("domain-types.json");
-        let track_dir = dir.path().to_path_buf();
-
-        let mut doc = domain::TypeCatalogueDocument::new(1, vec![]);
-
-        let result = evaluate_and_write_signals(
-            &mut doc,
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &domain_types_path,
-            &track_dir,
-            "domain-type-signals.json",
-            &std::collections::HashSet::new(),
-        );
-
-        assert!(result.is_ok(), "clean report must succeed: {result:?}");
-        assert_eq!(result.unwrap(), ExitCode::SUCCESS, "must return EXIT_SUCCESS");
-        assert!(domain_types_path.exists(), "domain-types.json must be written on success");
-        assert!(
-            !dir.path().join("domain-types.md").exists(),
-            "domain-types.md must NOT be written by evaluate_and_write_signals — \
-             view rendering is centralised in sync_rendered_views"
-        );
-        // T004: dual-write — signal file must be written alongside the declaration file.
-        let signal_path = dir.path().join("domain-type-signals.json");
-        assert!(signal_path.exists(), "domain-type-signals.json must be written on success");
-
-        // declaration_hash in the signal file must equal SHA-256 of the on-disk
-        // declaration bytes (ADR §D5: hash pinned to post-encode disk bytes).
-        let declaration_bytes = std::fs::read(&domain_types_path).unwrap();
-        let expected_hash =
-            infrastructure::tddd::type_signals_codec::declaration_hash(&declaration_bytes);
-        let signal_json = std::fs::read_to_string(&signal_path).unwrap();
-        let signal_doc = infrastructure::tddd::type_signals_codec::decode(&signal_json).unwrap();
-        assert_eq!(
-            signal_doc.declaration_hash(),
-            expected_hash,
-            "declaration_hash in signal file must match SHA-256 of on-disk declaration bytes"
-        );
-        assert_eq!(signal_doc.schema_version(), 1, "signal file schema_version must be 1");
-        assert!(
-            signal_doc.signals().is_empty(),
-            "empty report must yield empty signals in the signal file"
-        );
-    }
-
-    #[test]
-    fn test_evaluate_and_write_signals_signal_file_includes_forward_signals() {
-        // The signal file must carry the forward-evaluation signals — not just
-        // undeclared/baseline reds. A non-empty declared entry with a Blue
-        // evaluation proves the forward signals are plumbed through.
-        use std::collections::HashMap;
-
-        use domain::schema::{TypeKind, TypeNode};
-
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_path = dir.path().join("domain-types.json");
-        let track_dir = dir.path().to_path_buf();
-
-        let entry = make_entry_d("TrackId", domain::TypeAction::Add);
-        let mut doc = domain::TypeCatalogueDocument::new(1, vec![entry]);
-
-        // Graph with TrackId present as a struct → Blue.
-        let mut types = HashMap::new();
-        types.insert(
-            "TrackId".to_owned(),
-            TypeNode::new(TypeKind::Struct, vec![], vec![], std::collections::HashSet::new()),
-        );
-        let profile = domain::TypeGraph::new(types, HashMap::new());
-
-        let result = evaluate_and_write_signals(
-            &mut doc,
-            &profile,
-            &empty_baseline_d(),
-            &domain_types_path,
-            &track_dir,
-            "domain-type-signals.json",
-            &std::collections::HashSet::new(),
-        );
-
-        assert!(result.is_ok(), "clean report must succeed: {result:?}");
-
-        let signal_path = dir.path().join("domain-type-signals.json");
-        let signal_json = std::fs::read_to_string(&signal_path).unwrap();
-        let signal_doc = infrastructure::tddd::type_signals_codec::decode(&signal_json).unwrap();
-        let signals = signal_doc.signals();
-        assert!(!signals.is_empty(), "signal file must carry forward signals, got empty");
-        let blue_track_id = signals
-            .iter()
-            .find(|s| s.type_name() == "TrackId" && s.signal() == domain::ConfidenceSignal::Blue);
-        assert!(blue_track_id.is_some(), "TrackId must appear as Blue in the signal file");
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_evaluate_and_write_signals_rejects_signal_file_symlink() {
-        // ADR §D7: writing the signal file to a symlink must fail-closed.
-        // Setup: create a symlink at the signal-file path before invocation.
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_path = dir.path().join("domain-types.json");
-        let signal_path = dir.path().join("domain-type-signals.json");
-        let track_dir = dir.path().to_path_buf();
-
-        // Create a symlink at the signal file path pointing at a non-existent target.
-        std::os::unix::fs::symlink(dir.path().join("nowhere.json"), &signal_path).unwrap();
-
-        let mut doc = domain::TypeCatalogueDocument::new(1, vec![]);
-
-        let result = evaluate_and_write_signals(
-            &mut doc,
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &domain_types_path,
-            &track_dir,
-            "domain-type-signals.json",
-            &std::collections::HashSet::new(),
-        );
-
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(
-            msg.contains("refusing to write signal file"),
-            "error must be from the signal-file symlink guard, got: {msg}"
-        );
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_evaluate_and_write_signals_rejects_declaration_file_symlink() {
-        // ADR §D7: writing the declaration file to a symlink must fail-closed.
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_path = dir.path().join("domain-types.json");
-        let track_dir = dir.path().to_path_buf();
-
-        // Create a symlink at the declaration file path pointing nowhere.
-        std::os::unix::fs::symlink(dir.path().join("nowhere.json"), &domain_types_path).unwrap();
-
-        let mut doc = domain::TypeCatalogueDocument::new(1, vec![]);
-
-        let result = evaluate_and_write_signals(
-            &mut doc,
-            &empty_graph_d(),
-            &empty_baseline_d(),
-            &domain_types_path,
-            &track_dir,
-            "domain-type-signals.json",
-            &std::collections::HashSet::new(),
-        );
-
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(
-            msg.contains("refusing to write declaration file"),
-            "error must be from the declaration-file symlink guard, got: {msg}"
-        );
-        assert!(
-            !dir.path().join("domain-type-signals.json").exists(),
-            "signal file must NOT be written when declaration-file guard aborts"
-        );
-    }
-
-    #[test]
-    fn test_execute_type_signals_no_layer_filter_iterates_all_enabled_bindings() {
-        // Regression guard: when --layer is omitted, the loop iterates enabled bindings
-        // in layers[] order. This test proves the domain binding is entered FIRST by
-        // asserting the error comes from a step that is LATER in domain's execution
-        // than where usecase would fail.
-        //
-        // Execution order for `execute_type_signals_for_layer`:
-        //   1. catalogue read  (fail → "/track:design" message)
-        //   2. export (nightly required; fail → "failed to export schema: … nightly")
-        //   3. baseline read   (fail → "run baseline-capture first")
-        //   4. evaluate + write
-        //
-        // Setup:
-        //   - domain: catalogue present + valid → step 1 OK, step 2 fails (nightly).
-        //   - usecase: catalogue absent → step 1 fails ("/track:design").
-        //
-        // Expected error: from domain's step 2 (nightly export), which mentions
-        // "failed to export schema" or "nightly". It does NOT mention usecase-types.json.
-        //
-        // If the loop processed usecase FIRST (regression), it would fail at step 1
-        // ("/track:design" + "usecase-types.json"), so the assertion `!msg.contains(
-        // "usecase-types.json")` would fail — catching the bug.
-        //
-        // Note: because `execute_type_signals_for_layer` always reaches the nightly
-        // export call before the baseline read (step 3), the first binding can never
-        // return `Ok` in a unit test environment. A full "first succeeds, loop
-        // continues to second" integration is covered by the `#[ignore]` test below
-        // (requires nightly).
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
-            .unwrap();
-        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
-
-        let rules_json = r#"{
-          "layers": [
-            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
-            {
-              "crate": "usecase",
-              "tddd": {
-                "enabled": true,
-                "catalogue_file": "usecase-types.json",
-                "schema_export": { "method": "rustdoc", "targets": ["usecase"] }
-              }
-            }
-          ]
-        }"#;
-        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
-
-        // domain-types.json present + valid → domain binding passes catalogue read and
-        // fails at rustdoc export (nightly unavailable in test env).
-        // usecase-types.json absent → usecase would fail at catalogue read (step 1).
-        // Domain fails LATER than usecase would, so the error distinguishes which
-        // binding the loop entered first.
-        let domain_types_json = r#"{"schema_version":2,"type_definitions":[]}"#;
-        std::fs::write(track_dir.join("domain-types.json"), domain_types_json).unwrap();
-        // do NOT write usecase-types.json
-
-        let result = execute_type_signals(
-            items_dir,
-            "test-track".to_owned(),
-            dir.path().to_path_buf(),
-            None,
-        );
-
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        // Domain fails at rustdoc export (step 2), which does NOT mention usecase-types.json.
-        // If a regression caused the loop to process usecase first (step 1 fail), the
-        // error would mention "usecase-types.json" — caught by this assertion.
-        assert!(
-            !msg.contains("usecase-types.json"),
-            "error must NOT mention usecase-types.json; domain binding must be processed first \
-             (its export error comes from a later step than usecase's catalogue-not-found); \
-             got: {msg}"
-        );
-        // Confirm the error is from domain's export step, not some unrelated path.
-        assert!(
-            msg.contains("export schema") || msg.contains("nightly") || msg.contains("failed"),
-            "error must be from domain's rustdoc export step, got: {msg}"
-        );
-    }
-
-    /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.
-    /// Run with: `cargo test --package cli -- --ignored`
-    #[test]
-    #[ignore]
-    fn test_execute_type_signals_success_path_writes_signals() {
-        let dir = tempfile::tempdir().unwrap();
-        let domain_types_json = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_methods": [] }
-  ]
-}"#;
-        let (items_dir, track_id) = setup_track(dir.path(), domain_types_json);
-        // Write an empty baseline so the baseline-required code path succeeds.
-        let baseline_json = r#"{
-  "schema_version": 2,
-  "captured_at": "2026-01-01T00:00:00Z",
-  "types": {},
-  "traits": {}
-}"#;
-        std::fs::write(items_dir.join(&track_id).join("domain-types-baseline.json"), baseline_json)
-            .unwrap();
-        // workspace_root must point to the real workspace so rustdoc can find the domain crate.
-        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(|p| p.parent())
-            .expect("workspace root")
-            .to_path_buf();
-
-        let result =
-            execute_type_signals(items_dir.clone(), track_id.clone(), workspace_root, None);
-        assert!(result.is_ok(), "success path must return Ok: {result:?}");
-
-        // Verify signals were written back
-        let updated =
-            std::fs::read_to_string(items_dir.join(&track_id).join("domain-types.json")).unwrap();
-        assert!(updated.contains("\"signals\""), "signals must be written to domain-types.json");
-
-        // Verify domain-types.md was generated
-        let md_path = items_dir.join(&track_id).join("domain-types.md");
-        assert!(md_path.exists(), "domain-types.md must be generated");
-    }
-
-    // --- ensure_active_track unit tests (exhaustive TrackStatus variant coverage) ---
+    // --- ensure_active_track tests ---
 
     #[test]
     fn test_ensure_active_track_rejects_done() {
-        let result = ensure_active_track(TrackStatus::Done, "test-track");
+        let result = ensure_active_track("done", "test-track");
         let err = result.unwrap_err();
         let msg = format!("{err}");
         assert!(msg.contains("status=done"), "msg should mention status=done: {msg}");
@@ -1421,7 +435,7 @@ mod tests {
 
     #[test]
     fn test_ensure_active_track_rejects_archived() {
-        let result = ensure_active_track(TrackStatus::Archived, "test-track");
+        let result = ensure_active_track("archived", "test-track");
         let err = result.unwrap_err();
         let msg = format!("{err}");
         assert!(msg.contains("status=archived"), "msg should mention status=archived: {msg}");
@@ -1430,33 +444,28 @@ mod tests {
 
     #[test]
     fn test_ensure_active_track_allows_planned() {
-        assert!(ensure_active_track(TrackStatus::Planned, "test-track").is_ok());
+        assert!(ensure_active_track("planned", "test-track").is_ok());
     }
 
     #[test]
     fn test_ensure_active_track_allows_in_progress() {
-        assert!(ensure_active_track(TrackStatus::InProgress, "test-track").is_ok());
+        assert!(ensure_active_track("in_progress", "test-track").is_ok());
     }
 
     #[test]
     fn test_ensure_active_track_allows_blocked() {
-        assert!(ensure_active_track(TrackStatus::Blocked, "test-track").is_ok());
+        assert!(ensure_active_track("blocked", "test-track").is_ok());
     }
 
     #[test]
     fn test_ensure_active_track_allows_cancelled() {
-        assert!(ensure_active_track(TrackStatus::Cancelled, "test-track").is_ok());
+        assert!(ensure_active_track("cancelled", "test-track").is_ok());
     }
 
     // --- Integration test: execute_type_signals rejects done track via full path ---
 
     #[test]
     fn test_execute_type_signals_rejects_done_track() {
-        // Integration: a track whose derived TrackStatus is Done (all tasks done/skipped)
-        // must be rejected by execute_type_signals before reaching catalogue read,
-        // protecting merged-track data immutability.
-        //
-        // Schema v5: status is derived from impl-plan.json. All tasks done → Done.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-done-track");
@@ -1520,9 +529,8 @@ mod tests {
         // legacy archived tracks (stored under v3) cannot have type-signals run on them,
         // because the metadata load fails before the active-track guard is reached.
         //
-        // The `ensure_active_track` unit tests (`test_ensure_active_track_rejects_archived`)
-        // cover the TrackStatus::Archived → rejection path directly. This integration test
-        // verifies the full path: v3 metadata decode failure → error propagation.
+        // The `ensure_active_track` unit tests cover the archived → rejection path.
+        // This integration test verifies the full path: v3 metadata decode failure → error propagation.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-archived-track");
@@ -1551,9 +559,93 @@ mod tests {
 
         let err = result.unwrap_err();
         let msg = format!("{err}");
-        // The codec rejects v3 with a schema_version error; the active-track guard is
-        // never reached. Either message form is acceptable — what matters is the call
-        // returns an error (verified by `unwrap_err()` above which panics on Ok).
         assert!(msg.contains("test-archived-track"), "error must mention the track_id, got: {msg}");
+    }
+
+    #[test]
+    fn test_execute_type_signals_no_layer_filter_iterates_all_enabled_bindings() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+
+        let rules_json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
+            {
+              "crate": "usecase",
+              "tddd": {
+                "enabled": true,
+                "catalogue_file": "usecase-types.json",
+                "schema_export": { "method": "rustdoc", "targets": ["usecase"] }
+              }
+            }
+          ]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        let domain_types_json = r#"{"schema_version":2,"type_definitions":[]}"#;
+        std::fs::write(track_dir.join("domain-types.json"), domain_types_json).unwrap();
+
+        let result = execute_type_signals(
+            items_dir,
+            "test-track".to_owned(),
+            dir.path().to_path_buf(),
+            None,
+        );
+
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(
+            !msg.contains("usecase-types.json"),
+            "error must NOT mention usecase-types.json; domain binding must be processed first; \
+             got: {msg}"
+        );
+        assert!(
+            msg.contains("export schema") || msg.contains("nightly") || msg.contains("failed"),
+            "error must be from domain's rustdoc export step, got: {msg}"
+        );
+    }
+
+    /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.
+    /// Run with: `cargo test --package cli -- --ignored`
+    #[test]
+    #[ignore]
+    fn test_execute_type_signals_success_path_writes_signals() {
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_methods": [] }
+  ]
+}"#;
+        let (items_dir, track_id) = setup_track(dir.path(), domain_types_json);
+        let baseline_json = r#"{
+  "schema_version": 2,
+  "captured_at": "2026-01-01T00:00:00Z",
+  "types": {},
+  "traits": {}
+}"#;
+        std::fs::write(items_dir.join(&track_id).join("domain-types-baseline.json"), baseline_json)
+            .unwrap();
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(|p| p.parent())
+            .expect("workspace root")
+            .to_path_buf();
+
+        let result =
+            execute_type_signals(items_dir.clone(), track_id.clone(), workspace_root, None);
+        assert!(result.is_ok(), "success path must return Ok: {result:?}");
+
+        let updated =
+            std::fs::read_to_string(items_dir.join(&track_id).join("domain-types.json")).unwrap();
+        assert!(updated.contains("\"signals\""), "signals must be written to domain-types.json");
+
+        let md_path = items_dir.join(&track_id).join("domain-types.md");
+        assert!(md_path.exists(), "domain-types.md must be generated");
     }
 }
