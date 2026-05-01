@@ -1,4 +1,43 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # enum variant の payload 型を schema レベルで宣言可能にする — catalogue / TypeGraph / baseline / serde codec の 4 点同時拡張
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Tasks (0/4 resolved)
+
+### S1 — Schema 4-point simultaneous change + rustdoc payload extraction
+
+> The Core invariant from ADR 2026-04-26-0855 requires catalogue schema, TypeGraph schema, baseline schema, and serde codec to be changed simultaneously. This section collapses all four into a single task-commit so that the codebase never exists in a half-migrated state.
+> domain catalogue.rs gains the new EnumVariantDeclaration value object and MemberDeclaration::Variant is widened from a bare String to EnumVariantDeclaration. TypeDefinitionKind::Enum and ErrorType expected_variants fields follow. This is IN-01 and IN-02.
+> catalogue_codec.rs and baseline_codec.rs adopt the { name, payload_types } object form for the Variant discriminant arm. No serde(default) is placed on payload_types — per CN-02 the codec is new-schema-only and rejects the old bare-String form. This is IN-03 and IN-04.
+> schema_export_codec.rs similarly widens its MemberDeclarationDto::Variant to carry payload_types. schema_export.rs extract_enum_variants() is extended to walk each variant's rustdoc ItemEnum::Variant kind and extract payload field types. This is IN-07, which must land in the same commit so that build_type_graph receives payload-aware MemberDeclaration values from the first integration.
+> T001 is a prerequisite for T002 and T003 because both renderers read the new payload_types field.
+
+- [ ] **T001**: Schema 4-point simultaneous change + rustdoc payload extraction (Core invariant, ADR 2026-04-26-0855): (a) add EnumVariantDeclaration struct (name: String, payload_types: Vec<String>) to domain catalogue.rs and update MemberDeclaration::Variant(String) to MemberDeclaration::Variant(EnumVariantDeclaration); add variant() constructor that takes name + payload_types and a unit_variant() convenience constructor; update MemberDeclaration::name() to delegate to evd.name; (b) update TypeDefinitionKind::Enum and ErrorType to use Vec<EnumVariantDeclaration> for expected_variants; (c) update catalogue_codec.rs MemberDeclarationDto::Variant to carry payload_types: Vec<String> in the { name, payload_types } object form — no serde(default) on payload_types (new-schema-only codec per CN-02); update TypeDefinitionKindDto::Enum and ErrorType to use Vec<EnumVariantDeclarationDto>; (d) update baseline_codec.rs MemberDto::Variant to carry payload_types: Vec<String>; (e) update schema_export_codec.rs MemberDeclarationDto::Variant to carry payload_types: Vec<String>; (f) update schema_export.rs extract_enum_variants() to look up each variant id in krate.index, match ItemEnum::Variant, and extract payload field types via the variant's kind (Tuple / Struct / Plain) into payload_types using format_type(); unit variants produce empty Vec
+
+### S2 — Contract Map renderer — variant payload edge emission
+
+> Extends the domain-layer render_contract_map() pure function to emit enum → payload type edges derived from the catalogue's expected_variants[].payload_types declarations.
+> The edge label format is ::VariantName (double-colon prefix) to distinguish variant-selection relationships from field containment edges (.field_name). Both Enum and ErrorType kinds are handled.
+> Payload type tokens are resolved through the existing type_index (same mechanism as method-call edges) so that tokens referencing unregistered external types are silently skipped, keeping the diagram stable even with partial catalogues.
+> Unit tests in contract_map_render_tests.rs cover the happy path (payload variant → edge), unit variant (no edge), unresolved payload type (no edge), and ErrorType kind symmetry.
+> T002 depends on T001 (the EnumVariantDeclaration type must exist before the renderer can read payload_types).
+
+- [ ] **T002**: Contract Map renderer: add variant payload edge emission to render_contract_map() in domain contract_map_render.rs: (a) for each entry whose kind is TypeDefinitionKind::Enum or TypeDefinitionKind::ErrorType, iterate expected_variants and for each EnumVariantDeclaration, iterate payload_types; (b) for each payload type string, call extract_type_names() to tokenize and look up tokens in type_index; (c) emit an edge with label ::VariantName (format: "::{}" escaped via escape_edge_label) from the enum src_id to each resolved dst_id; (d) add unit tests in contract_map_render_tests.rs covering: enum entry with payload variant emits ::VariantName edge, unit variant (empty payload_types) emits no edge, payload type not in type_index emits no edge, error_type kind also emits variant payload edges
+
+### S3 — Reality View renderer — variant payload edge emission
+
+> Extends the infrastructure-layer collect_edges() function to emit variant payload edges from TypeGraph data. The TypeGraph is populated by build_type_graph (using the schema_export path extended in T001), so T003 depends on T001.
+> A new edge kind tag 'variant_payload' is introduced and dispatched by render_edge_symbol() to the '-->|label|' directed-arrow form (distinct from field edges which use '---|label|' no-arrow), keeping variant-payload relationships visually distinguishable from containment edges.
+> The existing module-level comment noting 'enum variant payloads are not extracted at L1' is updated to reflect the new capability introduced by this ADR.
+> Both render_type_graph_flat and render_type_graph_clustered node-collection paths must include variant_payload edge endpoints in type_set (not trait_set) so that payload type nodes are rendered with the correct shape.
+> ADR 2026-04-16-2200 D2(b) 'variant name only' constraint is overridden here per CN-05.
+
+- [ ] **T003**: Reality View renderer: extend collect_edges() in infrastructure type_graph_render.rs to emit variant payload edges from TypeGraph data: (a) inside the EdgeSet::Fields | EdgeSet::All guard (or a new dedicated guard for variant edges), for each type node, iterate node.members() and match MemberDeclaration::Variant(evd) arms; (b) for each token in extract_type_names() over each payload_type string in evd.payload_types, emit an edge (source = type_name, label = ::variant_name, target = token) if token is present in the graph (exists as a type node key); edge kind tag = "variant_payload"; (c) extend render_edge_symbol() with a "variant_payload" arm mapping to "-->|label|" (directed arrow, distinct from field edges which use "---|label|"); (d) the existing comment noting 'enum variant payloads are not extracted at L1' is updated to reflect the new capability; (e) update render_type_graph_flat and render_type_graph_clustered node collection to include variant_payload edge sources/targets in type_set (not trait_set); (f) add unit tests covering: variant with payload type in graph emits edge with ::VariantName label, unit variant (empty payload_types) emits no edge, payload type absent from graph emits no edge
+
+### S4 — Test updates and CI gate
+
+> All existing tests touching MemberDeclaration::Variant or the catalogue/baseline/schema_export codec Variant arm must be updated to use the EnumVariantDeclaration form. Tests that relied on the old bare-String JSON are updated to the { name, payload_types } form.
+> A serde round-trip test for EnumVariantDeclaration is added to confirm that the AC-04 JSON shape is correct and that the old String form is rejected.
+> The CI gate cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) is the final enforcement: it must pass with zero regressions from the 4-point schema change introduced in T001-T003.
+> T004 depends on T001-T003 and is the final task in the track.
+
+- [ ] **T004**: Test update and CI gate: (a) update any existing snapshot fixtures or unit tests in catalogue.rs, catalogue_codec.rs, baseline_codec.rs, schema_export_codec.rs, schema_export_tests.rs that reference MemberDeclaration::Variant(String) to use the new EnumVariantDeclaration form; update decode round-trip tests to use { "kind": "variant", "name": "...", "payload_types": [...] } JSON form and verify that the old String-only form is rejected by the codec (CN-02 no-backward-compat); (b) add a serde round-trip test for EnumVariantDeclaration serializing to { "name": "...", "payload_types": [...] }; (c) verify cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes with zero regressions from the 4-point schema change

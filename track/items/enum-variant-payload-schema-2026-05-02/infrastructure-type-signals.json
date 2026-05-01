@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-01T19:24:45Z",
+  "declaration_hash": "cf3e9179de0d390144bba43749afba0f5efe5ca005d891e8ec93332a10f35f95",
+  "signals": [
+    {
+      "type_name": "build_type_graph",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn build_type_graph(schema: SchemaExport, typestate_names: HashSet<String>) -> TypeGraph"
+      ]
+    },
+    {
+      "type_name": "render_type_graph_flat",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn render_type_graph_flat(graph: TypeGraph, layer_name: str, opts: TypeGraphRenderOptions) -> String"
+      ]
+    },
+    {
+      "type_name": "render_type_graph_clustered",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn render_type_graph_clustered(graph: TypeGraph, cluster_key: str, plan: ClusterPlan, opts: TypeGraphRenderOptions) -> String"
+      ]
+    }
+  ]
+}

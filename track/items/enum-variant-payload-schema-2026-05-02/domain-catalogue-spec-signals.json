@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0b9c2247bec419858fbe5fb0d546b000e59c5bde147d56413facad0d32704923",
+  "signals": [
+    {
+      "type_name": "EnumVariantDeclaration",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "signal": "blue"
+    },
+    {
+      "type_name": "render_contract_map",
+      "signal": "blue"
+    }
+  ]
+}

@@ -31,6 +31,130 @@
           "findings": [],
           "hash": "rvw1:sha256:4e90c121db0a0870af6ba801c11cfb988afde6eeddba36e14f192695c14b3cc7",
           "at": "2026-05-01T18:27:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6961fbe8eae4b8a493c31704174acf1f622344f7e5988215db632d022d85be58",
+          "at": "2026-05-01T18:53:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6961fbe8eae4b8a493c31704174acf1f622344f7e5988215db632d022d85be58",
+          "at": "2026-05-01T18:55:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` and `T003` both suppress `dst_id == src_id` / self-loops for variant payload edges. That drops legitimate recursive enum payloads, so cases like `enum Node { Next(Node) }` or `Box<Node>` will lose a real enum→payload edge in both Contract Map and Reality View. The new feature therefore cannot represent one of the most important payload shapes it is supposed to expose.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/plan.md",
+              "line": 24,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1827485f7380358c5de752235231c081200c338dba399d30de824ab70ee39cd5",
+          "at": "2026-05-01T19:01:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1827485f7380358c5de752235231c081200c338dba399d30de824ab70ee39cd5",
+          "at": "2026-05-01T19:03:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` and `T003` suppress variant-payload self-loops, but the spec requires enum -> payload type edges for resolved payload types. Recursive payloads such as `enum Node { Next(Box<Node>) }` resolve back to the enum itself, so the plan would drop a legitimate payload edge in both renderers and fail the stated representation semantics. Remove that suppression for variant-payload edges or explicitly exclude recursive payloads from the spec.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "`OS-03` cites `knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md#OS-04`, but the referenced ADR does not define an `OS-04` design decision/section for this rationale. The out-of-scope boundary is therefore not traceable from the SSoT citation.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+              "line": 153,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:1827485f7380358c5de752235231c081200c338dba399d30de824ab70ee39cd5",
+          "at": "2026-05-01T19:06:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`EnumVariantDeclaration` is described by the spec and implementation plan as a new value object to add, but its catalogue entry has no `action` field, so the generated view renders the action as `—` instead of `add`. That contradicts T001/IN-01 and weakens the plan's signal semantics for this new type; declare it with `\"action\": \"add\"` to match the rest of the plan-artifact intent.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/domain-types.json",
+              "line": 5,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:773a9872b0356a9c4e76fd76c96e6202ff0b0e67fc0d6524e1b4bb075d80301d",
+          "at": "2026-05-01T19:11:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_type_graph` is described as both consuming a `SchemaExport` and extracting payload data from rustdoc JSON. The implementation plan assigns the actual rustdoc extraction to `schema_export.rs::extract_enum_variants()`, so this catalogue entry/spec reference puts the responsibility on the wrong component and leaves IN-07/AC-02 semantically inconsistent for implementers.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/infrastructure-types.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan says `variant_payload` should render with `\"-->\"` as the same arrowhead as a field edge, and CN-04 also documents field edges as `-->|.field_name|`. Existing TypeGraph field-edge semantics are solid no-arrow containment (`---|field_name|`), so following this plan would make the new Reality View variant edge inconsistent with the stated field-edge comparison and likely change the intended visual semantics.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/impl-plan.json",
+              "line": 18,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:773a9872b0356a9c4e76fd76c96e6202ff0b0e67fc0d6524e1b4bb075d80301d",
+          "at": "2026-05-01T19:15:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-07 assigns rustdoc JSON payload extraction to `build_type_graph`, but the implementation plan assigns that extraction to `schema_export.rs::extract_enum_variants()` and says `build_type_graph` merely receives payload-aware declarations; `infrastructure-types.json` likewise says `build_type_graph` propagates `SchemaExport` values without re-parsing rustdoc JSON. This leaves the responsibility boundary contradictory for T001/AC-02/CN-06.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+              "line": 117,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-04 describes the normal field edge as directed (`-->|.field_name|`), and the S3 narrative says `variant_payload` should use the same `-->` arrowhead as field edges, but T003 then says the new arm is `-->|label|` “distinct from field edges which use `---|label|`”. The plan is internally inconsistent about whether Reality View field edges are directed or undirected, so an implementer cannot tell which edge semantics to preserve.",
+              "severity": "P1",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:abe87ad2f24fe37bd658559d85e77733626b6fb7e4ae9f56f3fc9adb16694e1d",
+          "at": "2026-05-01T19:18:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35404f7344b7f11b7fada07960c665461bec9a2f4e99dfd27f8a76644dc4982b",
+          "at": "2026-05-01T19:23:25Z"
         }
       ]
     }

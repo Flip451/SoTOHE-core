@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-01T19:24:43Z",
+  "declaration_hash": "0b9c2247bec419858fbe5fb0d546b000e59c5bde147d56413facad0d32704923",
+  "signals": [
+    {
+      "type_name": "EnumVariantDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
+    },
+    {
+      "type_name": "render_contract_map",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn render_contract_map(catalogues: BTreeMap<LayerId, TypeCatalogueDocument>, layer_order: Vec<LayerId>, opts: ContractMapRenderOptions) -> ContractMapContent"
+      ]
+    }
+  ]
+}
