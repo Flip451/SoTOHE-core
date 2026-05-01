@@ -1,0 +1,326 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5d270a4754d127de5efb2c9a5900edd95ddf847916e6a718702c8d723477762",
+          "at": "2026-05-01T12:11:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5d270a4754d127de5efb2c9a5900edd95ddf847916e6a718702c8d723477762",
+          "at": "2026-05-01T12:14:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d3e12b4f4a5502343d245c03ae2e575dc4d32dab4a7fc5aeeaa3df3b80d591b",
+          "at": "2026-05-01T12:23:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d3e12b4f4a5502343d245c03ae2e575dc4d32dab4a7fc5aeeaa3df3b80d591b",
+          "at": "2026-05-01T12:25:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d3e12b4f4a5502343d245c03ae2e575dc4d32dab4a7fc5aeeaa3df3b80d591b",
+          "at": "2026-05-01T12:30:13Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e644a8ac485c862ecfb8b39a98996034cefeff2176f315f16807dfc6a3d906f",
+          "at": "2026-05-01T11:59:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e644a8ac485c862ecfb8b39a98996034cefeff2176f315f16807dfc6a3d906f",
+          "at": "2026-05-01T12:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e644a8ac485c862ecfb8b39a98996034cefeff2176f315f16807dfc6a3d906f",
+          "at": "2026-05-01T12:04:37Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The precedent citation is wrong: the field-edge-renderer discussion in ADR `2026-04-26-0855` is in `S2`, not `D2`. `D2` is the `expected_members` decision, so this reference sends readers to the wrong design rationale.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-0241-typestate-transition-edge-rendering.md",
+              "line": 29,
+              "category": "broken_reference"
+            },
+            {
+              "message": "This rule is internally inconsistent: the renderer lookup is described here as limited to `secondary_port`-indexed entries, but the decision later requires the same path to cover `application_service` too. That cannot work as written, and it also conflicts with the kind-selection convention where `application_service` is usecase-only and `secondary_adapter` is infrastructure-only.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:180262f544aff227c33393b9dc6e999102553a7f37ae61cc0f0cf282f8d094f8",
+          "at": "2026-05-01T10:31:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This references `R7 (Cross-Track Port Reference)` as if it already exists in `knowledge/conventions/type-designer-kind-selection.md`, but that convention currently only defines R1-R6. The ADR should frame this as a new rule to be added, not an existing SSoT entry.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "line": 73,
+              "category": "broken reference"
+            },
+            {
+              "message": "The context treats `application_service` as a valid declaration target for a `secondary_adapter` implementation, but the kind-selection convention makes `application_service` usecase-only and `secondary_adapter` infrastructure-only. That failure case should be limited to `secondary_port`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "line": 13,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:146087f3a07a93e485486bf41d10994612cc0f1376bad49441863dc7482472c7",
+          "at": "2026-05-01T10:36:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:38:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:40:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:42:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:47:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is assigned only to T001, but T001 is explicitly documentation-only ('Rust コード変更なし') and does not touch any type catalogue or the contract-map renderer. As written, the plan has no task that can produce the required `secondary_port` registration / `-.impl.->` edge behavior, so this acceptance criterion is not physically realizable from the scheduled work.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/task-coverage.json",
+              "line": 33,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:847d9ebd515b89ceab8505da3c41d5e542bd0c0398000d2a84ed470db1b8d4cd",
+          "at": "2026-05-01T11:19:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is enforced as completed by T001/T002/T003, but it requires a `reference` secondary_port to be registered and a concrete `FsReviewStore -.impl.-> ReviewReader`-style edge gap to be resolved. The same spec explicitly puts retrofitting past-track catalogues out of scope (OS-06), and the planned tasks are only convention docs, typestate-edge rendering, and tests. As written, this acceptance criterion is not executable within the stated scope.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.md",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "The S2 section describes generating a Mermaid edge as `==>=|transitions_to|`, which contradicts the spec/T002 requirement to use the `==>` edge with a `transitions_to` label (`==>|\"transitions_to\"|`). This malformed notation can send implementers toward the wrong renderer output; fix the impl-plan source and regenerate `plan.md`.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/impl-plan.json",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5077aec5129fbe598d97f7f5abd805c7ca90c00a3496b06358f5a5ff4344af1e",
+          "at": "2026-05-01T11:24:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 requires a unit test (or new test catalogue) proving an `action: \"reference\"` secondary_port is indexed and produces a `-.impl.->` edge from a secondary_adapter, but the plan's only test task adds five typestate transition tests and never exercises reference-port impl-edge behavior. The plan can therefore complete T001-T003 while leaving AC-05 unsatisfied, despite the coverage artifact assigning AC-05 to those tasks.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/plan.md",
+              "line": 29,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:83ad133d21ae81cce93366f2cbc217d4fe33ece6d1cc4a3cc91e8d669cd33815",
+          "at": "2026-05-01T11:33:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-05` is covered here by `T001`, `T002`, and `T003`, but the plan text only assigns the reference-port impl-edge verification to `T003`; `T001` is convention-only and `T002` is limited to typestate transition rendering. This makes the coverage artifact semantically disagree with the implementation plan about which tasks actually satisfy `AC-05`, so progress/gate readers can believe the acceptance criterion is enforced by tasks that never exercise it.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/task-coverage.json",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dd7abf62698e8bb131d6b73b470083004b830e09d69ec59e83c0fc5f7e6bbd35",
+          "at": "2026-05-01T11:38:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 references `CN-08 ノイズ抑制`, but this plan artifact defines only CN-01 through CN-07 and does not provide any file/anchor for CN-08. The generated `spec.md` mirrors the same unresolved reference, so readers cannot resolve the constraint being invoked. Either remove the parenthetical or replace it with a resolvable reference.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+              "line": 218,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:54cc21465b2a493202217e3ba3de59b9806a5c435e2ee2cfc870dd009ed37aab",
+          "at": "2026-05-01T11:41:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 says `methods_of()` will read `TypestateTransitions::To(names)` and generate transition edges, but the implementation plan later directs T002 to add a separate `render_contract_map` edge-loop block that emits `==>|\"transitions_to\"|` edges. Those are different design loci, and `methods_of()` is otherwise described as feeding method-call edges, so this top-level goal can send implementers toward the wrong mechanism. Align GO-02/spec.md with the T002 edge-generation path.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:035a41b4ba3720c291505f6d15d5610e8cf3e8067e0bf7d29dc48161de8bbaf3",
+          "at": "2026-05-01T11:44:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8266fb8dbbce5bcedaab07981fc493701da0ba446855ef8bf49d539fce2812f0",
+          "at": "2026-05-01T11:46:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f03d56753ec11e53b4a01fad387fa6e34575c418c97615bebe5c1c4036e5d1d8",
+          "at": "2026-05-01T11:58:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f03d56753ec11e53b4a01fad387fa6e34575c418c97615bebe5c1c4036e5d1d8",
+          "at": "2026-05-01T11:59:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f03d56753ec11e53b4a01fad387fa6e34575c418c97615bebe5c1c4036e5d1d8",
+          "at": "2026-05-01T12:04:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65ba0c15682b3fcdaad59c9066f624a50c48a0750d0e0049c534ed70e94171c4",
+          "at": "2026-05-01T12:11:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65ba0c15682b3fcdaad59c9066f624a50c48a0750d0e0049c534ed70e94171c4",
+          "at": "2026-05-01T12:13:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d85b113c76a0690ee08c043a21ad95cb85e4b52d49a55e1a7d1ac5d42cbf42e",
+          "at": "2026-05-01T12:22:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d85b113c76a0690ee08c043a21ad95cb85e4b52d49a55e1a7d1ac5d42cbf42e",
+          "at": "2026-05-01T12:23:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d85b113c76a0690ee08c043a21ad95cb85e4b52d49a55e1a7d1ac5d42cbf42e",
+          "at": "2026-05-01T12:28:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d85b113c76a0690ee08c043a21ad95cb85e4b52d49a55e1a7d1ac5d42cbf42e",
+          "at": "2026-05-01T12:29:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e01b013aca727202acd5b5fa4a9cf36dbb3d96b5a98a466fee9e64307c8d578a",
+          "at": "2026-05-01T12:32:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e01b013aca727202acd5b5fa4a9cf36dbb3d96b5a98a466fee9e64307c8d578a",
+          "at": "2026-05-01T12:33:20Z"
+        }
+      ]
+    }
+  }
+}

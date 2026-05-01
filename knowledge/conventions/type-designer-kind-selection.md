@@ -53,6 +53,8 @@
 
 `✗` または **ONLY** を破る kind 選択は、`bin/sotp track type-signals` の signal 評価以前に **kind 違反** として draft 段階で却下する。
 
+R7 (Cross-Track Port Reference) も参照すること: `secondary_adapter` の `implements[]` が参照する port が当該 track の catalogue に未 declare の場合、`-.impl.->` edge が silently skip される。
+
 ### R2. Free Function Preference (stateless behavior は free_function)
 
 以下の条件をすべて満たす型は `kind: free_function` で起草する。zero-field struct + 1 method を `kind: value_object` / `kind: use_case` に matching するのは禁止する。
@@ -141,6 +143,51 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 - `parse_yaml(input: &str) -> Result<...>` → `free_function` (R2: state なし、依存なし)
 - `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `interactor` (R1: 依存あり、usecase 層)
 
+### R7. Cross-Track Port Reference (secondary_adapter が参照する port は当該 track catalogue に declare する)
+
+`secondary_adapter::implements[]` で参照する trait は、当該 track の `<layer>-types.json` のいずれかに `secondary_port` として entry が必須である。
+
+当該 track で改変しない baseline 由来の port は `action: "reference"` で declare する。declare 漏れは contract-map renderer の `port_index` lookup が unmatched となり、`secondary_adapter -.impl.-> port` edge が silently skip される。
+
+#### declare 義務
+
+- `secondary_adapter::implements[]` に `trait_name` を書いた以上、対応する `secondary_port` entry を当該 track の catalogue に作成する責任は type-designer に帰属する
+- 当該 track で変更しない baseline 由来の port は `action: "reference"` で declare し catalogue への exposure を確保する
+
+#### `action: "reference"` の semantics
+
+- 当該 track では対象 port を変更しない (新規メソッド追加・既存メソッド変更なし)
+- catalogue への exposure (contract-map / graph 描画) を成立させるための declare
+- type-signal evaluator は `reference` action に対して「完全一致のみ Blue、不一致はすべて Red」として評価する (modify の Yellow 吸収は適用されない)
+- baseline port の `expected_methods` は baseline 当時の全 method を列挙する (method 型宣言の完全形規範 R8 は `reference` action でも同様に要求される)
+
+#### declare 漏れの影響
+
+`port_index: BTreeMap<String, Vec<String>>` は当該 track の `secondary_port` entry のみを登録する。当該 track の catalogue に `secondary_port` entry が存在しない trait 名は lookup で unmatched となり、`-.impl.->` edge が生成されない。graph 上の接合点が可視化されず、設計の空白が表面化しにくくなる。
+
+**関連 ADR**: `knowledge/adr/2026-04-29-0243-cross-track-port-reference.md#D1`
+
+### R8. Method Type Full Declaration (method / param 型フィールドは generic 引数を含む完全型文字列で宣言する)
+
+以下のフィールドでは、generic 引数を省略した bare wrapper 名のみの宣言を禁止する:
+
+- `expected_methods[].returns`
+- `expected_methods[].params[].ty`
+- `FreeFunction.expected_params[].ty`
+- `FreeFunction.expected_returns`
+
+#### 禁止対象 wrapper 名 (generic 引数なし単独宣言)
+
+`Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`
+
+これらが具象型を伴わず単独で宣言された場合、contract-map renderer の `extract_type_names()` は wrapper 名 token しか返さず、内部具象型への edge が生まれない。
+
+#### lint ゲート
+
+bare wrapper 名のみの宣言を catalogue の codec / verify CLI が schema validation で reject する lint を後続作業として組み込む。実装前は設計レビューで確認する (過渡期間)。
+
+**関連 ADR**: `knowledge/adr/2026-04-29-0240-method-type-full-generic-declaration.md#D1`
+
 ## Examples
 
 ### Good
@@ -150,6 +197,8 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 - `AdrDecisionCommon { id, user_decision_ref, ... }` を `kind: value_object` で domain に置く (R3: 検証済み shared payload で behavior なし)
 - `ProposedDecision` / `AcceptedDecision` / ... を `kind: typestate` で domain に置き、`AdrDecisionEntry` を `kind: enum` の wrapper として並置 (decision tree: state machine + heterogeneous Vec)
 - `FsAdrFileAdapter` を `kind: secondary_adapter` で infrastructure に置く (R1: secondary_adapter は infrastructure ONLY)
+- baseline 由来の `ReviewReader` port を当該 track の `domain-types.json` に `action: "reference"` で `secondary_port` として declare する (R7: declare により `FsReviewStore -.impl.-> ReviewReader` edge が contract-map に出る)
+- `expected_methods` の returns フィールドに `"Result<AdrFrontMatter, AdrFrontMatterCodecError>"` と完全型文字列を書く (R8: `extract_type_names()` が `AdrFrontMatter` / `AdrFrontMatterCodecError` への edge を生成できる)
 
 ### Bad
 
@@ -161,6 +210,11 @@ behavior を持つ struct は以下のいずれかに振り分ける:
   - 正しい修正: typestate cluster + enum wrapper (各 state を `kind: typestate` で起草し、heterogeneous Vec 用の enum wrapper を `kind: enum` で追加)
 - 「他の kind が fit しないので」という理由で `kind: value_object` を選ぶ (R5 違反)
   - 正しい修正: 決定木を再適用 → `free_function` 候補を検討 → それでも確定しないなら `## Open Questions` に escalation
+- `FsReviewStore` (baseline 由来の `ReviewReader` / `ReviewWriter` port を implement する adapter) を `infrastructure-types.json` に `kind: secondary_adapter` で起草したが、当該 track の catalogue に `ReviewReader` / `ReviewWriter` の `secondary_port` entry を declare しない (R7 違反: declare 漏れによる `-.impl.->` edge の silently skip)
+  - 正しい修正: `ReviewReader` / `ReviewWriter` を `action: "reference"` で `domain-types.json` に `secondary_port` として declare する
+- `expected_methods` の returns / params[].ty を bare wrapper 名のみで宣言する (R8 違反: edge 漏れの原因)
+  - 悪い例: `returns: "Result"` / `ty: "Arc"` / `ty: "Vec"`
+  - 正しい修正: `returns: "Result<AdrFrontMatter, AdrFrontMatterCodecError>"` / `ty: "Arc<dyn AdrFilePort>"` / `ty: "Vec<AdrDecisionEntry>"`
 
 ## Review Checklist
 
@@ -172,12 +226,14 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 - [ ] field + behavior を持つ domain struct が `domain_service` (R6) で起草されているか (`value_object` / `interactor` への誤分類がないか)
 - [ ] kind 起草前に偵察 (R4) を実施したか (近接 track の kind 分布を確認したか)
 - [ ] catch-all として `value_object` / `use_case` を選んでいないか (R5)
-- [ ] R1〜R6 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
+- [ ] `secondary_adapter::implements[]` で参照するすべての trait が当該 track の catalogue に `secondary_port` として declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
+- [ ] `expected_methods[].returns` / `expected_methods[].params[].ty` / `FreeFunction.expected_params[].ty` / `FreeFunction.expected_returns` に bare wrapper 名のみの宣言 (`Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`) がないか (R8)
+- [ ] R1〜R8 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
 
 ## Enforcement
 
 - 第一線: catalogue を起草する agent の定義で本 convention の reading + compliance を義務付ける
-- 第二線: reviewer briefing template (将来 `track/review-prompts/<scope>.md` 配下に追加可能) に R1〜R6 の checklist を埋め込む
+- 第二線: reviewer briefing template (将来 `track/review-prompts/<scope>.md` 配下に追加可能) に R1〜R8 の checklist を埋め込む
 - 第三線: `bin/sotp track type-signals` の signal 評価 (catalogue → spec の trace integrity)。kind 違反は signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
 
 将来の自動化候補: catalogue codec (`libs/infrastructure/src/tddd/catalogue_codec.rs`) で R1 layer-kind マトリクスを machine-readable に表現し、`bin/sotp` の codec validation で reject する (`forbidden` 組合せ → codec error)。
@@ -190,3 +246,5 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 - `architecture-rules.json` — TDDD 対応層の SSoT (R1 layer 列挙の根拠)
 - `libs/domain/src/tddd/catalogue.rs` — `TypeDefinitionKind` enum 定義 (kind variant の正本)
 - `libs/infrastructure/src/tddd/catalogue_codec.rs` — catalogue serde codec (将来の R1 自動化候補)
+- `knowledge/adr/2026-04-29-0243-cross-track-port-reference.md` — R7 の決定記録 (cross-track port reference の意味論・declare 義務)
+- `knowledge/adr/2026-04-29-0240-method-type-full-generic-declaration.md` — R8 の決定記録 (method / param 型フィールドの完全型宣言規範)
