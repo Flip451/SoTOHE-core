@@ -1,0 +1,2632 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackStatusOutput",
+      "description": "DTO returned by usecase operations that derive and expose track status. Replaces direct cli→domain calls to derive_track_status so that the CLI need not import domain::TrackStatus or domain::derive_track_status. The string representation (e.g. 'planned', 'in_progress', 'done') is stable across domain enum changes.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "GuardDecision",
+      "description": "Usecase-layer enum mirroring domain::Decision (Allow/Block) without exposing the domain type in the usecase public API. CLI consumes this enum instead of domain::Decision directly, satisfying CN-01.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Allow",
+        "Block"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "GuardCheckOutput",
+      "description": "DTO returned by the guard check service. Wraps GuardDecision and the reason string so that the CLI never imports domain::Decision or domain::GuardVerdict directly. The decision field uses the usecase-owned GuardDecision enum.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "decision",
+          "ty": "GuardDecision"
+        },
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "GuardCheckService",
+      "description": "Application service trait for the guard shell-command check use case. Driven by the CLI layer. The implementation (GuardCheckInteractor) delegates to the domain guard policy via the ShellParser secondary port. Exposes only usecase-owned types (GuardCheckOutput) in its public API so CLI never imports domain::Decision or domain::GuardVerdict.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "check",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "command",
+              "ty": "String"
+            }
+          ],
+          "returns": "GuardCheckOutput",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "GuardCheckInteractor",
+      "description": "Concrete struct implementing GuardCheckService. Uses a ShellParserPort secondary port (Arc<dyn ShellParserPort>) for shell command parsing. A usecase-internal ShellParserPortAdapter wraps the ShellParserPort and implements domain::guard::ShellParser by delegation, so the domain guard policy can be called inside the interactor without the CLI importing domain::guard::ShellParser. The domain::GuardVerdict + domain::Decision result is converted into GuardCheckOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait, not the struct fields.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "GuardCheckService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "ShellParserPort",
+      "description": "Usecase-owned secondary port (driven port) trait for shell command parsing. Mirrors domain::guard::ShellParser (same split_shell method signature using primitive String types for the parsed commands). CLI composition root injects ConchShellParser (infrastructure) into GuardCheckInteractor without importing domain::guard::ShellParser directly. Inside the usecase layer, a ShellParserPortAdapter struct implements domain::guard::ShellParser by delegating to a ShellParserPort reference, bridging the usecase port to the domain port; this adapter is internal to the usecase crate and invisible to the CLI.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "split_shell",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Vec<String>, String>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        }
+      ]
+    },
+    {
+      "name": "SchemaExporterPort",
+      "description": "Usecase-owned secondary port (driven port) trait for schema export. The single method accepts a crate name and returns the serialized JSON schema string, using only primitive types so the CLI never imports domain::schema::SchemaExporter or domain::schema::SchemaExport directly. Infrastructure (RustdocSchemaExporter) implements both domain::schema::SchemaExporter and usecase::SchemaExporterPort; its SchemaExporterPort impl calls the domain export method internally and serializes the result before returning. CLI composition root injects RustdocSchemaExporter into ExportSchemaInteractor as Arc<dyn SchemaExporterPort> without importing the domain trait.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "export_as_json",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, String>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        }
+      ]
+    },
+    {
+      "name": "ExportSchemaService",
+      "description": "Application service trait for the domain schema export use case (sotp domain export-schema). Driven by the CLI layer. Wraps domain::schema::SchemaExporter so the CLI never imports the domain port trait directly. Returns the serialized JSON schema as a String rather than exposing internal domain types.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "export",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "command",
+              "ty": "ExportSchemaCommand"
+            }
+          ],
+          "returns": "Result<String, ExportSchemaError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "ExportSchemaCommand",
+      "description": "CQRS command object for the schema export use case. Carries the crate name to export. Owned by usecase so the CLI does not import domain::schema::SchemaExporter.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "crate_name",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "ExportSchemaError",
+      "description": "Error type for the ExportSchemaService. Wraps failures from the rustdoc schema export and JSON serialization steps without leaking domain::schema::SchemaExportError directly across the usecase boundary.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "ExportFailed",
+        "SerializationFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "ExportSchemaInteractor",
+      "description": "Concrete struct implementing ExportSchemaService. Uses a SchemaExporterPort secondary port (Arc<dyn SchemaExporterPort>) for schema export. Calls SchemaExporterPort::export_as_json, which returns an already-serialized JSON string, so the interactor never imports domain::schema::SchemaExporter or domain::schema::SchemaExport directly. Returns ExportSchemaError on failure. The CLI sees only ExportSchemaService and ExportSchemaCommand; domain::schema::SchemaExporter is an implementation detail of the infrastructure adapter. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "ExportSchemaService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "TaskOperationOutput",
+      "description": "DTO returned by track task operations (transition, add-task, set-override, clear-override). Contains the derived track status string so the CLI can print status without calling domain::derive_track_status directly. The task_id field is present for add-task; optional for others.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "task_id",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "derived_status",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "ReviewApprovalOutput",
+      "description": "DTO returned by the review check-approved operation. Carries decision (Approved/ApprovedWithBypass/Blocked), optional bypass scope count, and the list of required scopes when blocked. Replaces direct cli→domain::review_v2::ReviewApprovalVerdict usage so the CLI never imports domain review types directly.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "decision",
+          "ty": "ReviewApprovalDecision"
+        },
+        {
+          "kind": "field",
+          "name": "bypass_scope_count",
+          "ty": "Option<usize>"
+        },
+        {
+          "kind": "field",
+          "name": "blocked_scopes",
+          "ty": "Vec<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "ReviewApprovalDecision",
+      "description": "Enum representing the possible review approval outcomes exposed by the usecase boundary. Mirrors domain::review_v2::ReviewApprovalVerdict without exposing the domain type. Used by ReviewApprovalOutput.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Approved",
+        "ApprovedWithBypass",
+        "Blocked"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "ReviewCheckApprovedService",
+      "description": "Application service trait for the review check-approved use case. Driven by the CLI. Takes string track_id and items_dir to avoid importing domain::TrackId in the CLI. Returns ReviewApprovalOutput which is a usecase-owned DTO.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "check_approved",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<ReviewApprovalOutput, ReviewCheckApprovedError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "ReviewCheckApprovedError",
+      "description": "Error type for ReviewCheckApprovedService. Wraps invalid track ID, review store failures, and approval evaluation failures without leaking domain error types across the usecase boundary.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidTrackId",
+        "ReviewStoreError",
+        "EvaluationFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "ReviewCheckApprovedInteractor",
+      "description": "Concrete struct implementing ReviewCheckApprovedService. Constructs domain types internally and converts results to ReviewApprovalOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "ReviewCheckApprovedService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "HookDispatchCommand",
+      "description": "CQRS command object for the hook dispatch use case. Carries the raw tool_name, optional command string, optional file_path, and optional content string from the Claude Code hook JSON envelope. The CLI parses the envelope into this command so that the hook dispatcher (usecase) never requires domain::hook::HookInput to be constructed at the CLI boundary.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "tool_name",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "command",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "file_path",
+          "ty": "Option<PathBuf>"
+        },
+        {
+          "kind": "field",
+          "name": "content",
+          "ty": "Option<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "HookVerdictOutput",
+      "description": "DTO returned by the hook dispatch service to the CLI. Wraps the verdict outcome (Allow/Block) and a reason string without exposing domain::hook::HookVerdict across the usecase boundary. The CLI maps HookVerdictDecision::Block to exit 2, Allow to exit 0.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "decision",
+          "ty": "HookVerdictDecision"
+        },
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "Option<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "HookVerdictDecision",
+      "description": "Enum representing the hook verdict outcome at the usecase boundary. Mirrors domain::hook::HookVerdict (Allow/Block) without exposing the domain type. Used by HookVerdictOutput.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Allow",
+        "Block"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "HookDispatchService",
+      "description": "Application service trait for the hook dispatch use case (sotp hook dispatch). Driven by the CLI layer. Takes a HookDispatchCommand (raw CLI input) and a hook name string, dispatches to the appropriate HookHandler, and returns HookVerdictOutput so the CLI never imports domain::hook::HookContext, domain::hook::HookInput, or domain::hook::HookVerdict directly.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "dispatch",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "hook_name",
+              "ty": "String"
+            },
+            {
+              "name": "command",
+              "ty": "HookDispatchCommand"
+            }
+          ],
+          "returns": "Result<HookVerdictOutput, HookDispatchError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "HookDispatchError",
+      "description": "Error type for HookDispatchService. Wraps unknown hook name and handler execution failures without leaking domain::hook::HookError across the usecase boundary. Fail-closed: any error maps to block (exit 2) at the CLI.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "UnknownHookName",
+        "HandlerFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "HookDispatchInteractor",
+      "description": "Struct implementing HookDispatchService. Wires GuardHookHandler, TestFileDeletionGuardHandler, and skill compliance handler at construction. Converts HookDispatchCommand into the domain HookInput internally, calls the appropriate handler via usecase::hook::dispatch, and converts the domain HookVerdict into HookVerdictOutput. The CLI never sees domain::hook::* types.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "HookDispatchService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "ReviewRoundType",
+      "description": "Usecase-layer enum mirroring domain::RoundType (Fast/Final). Used internally by RunReviewService and its interactor when converting the string round_type field from RunReviewCommand to the domain type. The CLI passes round_type as a plain String in RunReviewCommand so it never needs to import ReviewRoundType or domain::RoundType directly; the interactor converts the string to ReviewRoundType internally.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Fast",
+        "Final"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "TrackPhaseOutput",
+      "description": "DTO returned by the track resolve (phase resolution) use case. Wraps the current phase name, reason, recommended next command, and optional blocker string so that the CLI never imports domain::track_phase::TrackPhaseInfo or domain::ImplPlanReader directly.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "phase",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "next_command",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "blocker",
+          "ty": "Option<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "TrackPhaseService",
+      "description": "Application service trait for the track phase resolution use case (sotp track resolve). Driven by the CLI layer. Takes string track_id so the CLI does not need to construct domain::TrackId. Returns TrackPhaseOutput which contains all display information for the resolve command.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<TrackPhaseOutput, TrackPhaseError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "TrackPhaseError",
+      "description": "Error type for TrackPhaseService. Wraps invalid track ID, missing track, and implementation plan load failures without leaking domain::RepositoryError across the usecase boundary.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidTrackId",
+        "TrackNotFound",
+        "ImplPlanLoadFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "TrackPhaseInteractor",
+      "description": "Concrete struct implementing TrackPhaseService. Follows the same internal generic-storage pattern as the existing TransitionTaskUseCase: the struct holds a private Arc<S> field where S satisfies domain storage traits (TrackReader + ImplPlanReader) as an implementation detail. CLI composition root wires FsTrackStore as S and injects the result as Arc<dyn TrackPhaseService>, so the generic bound never crosses the usecase→CLI boundary; CLI commands only see the dyn TrackPhaseService trait object (CN-01 satisfied). Constructs domain::TrackId internally, calls domain::track_phase::resolve_phase, and returns TrackPhaseOutput. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "TrackPhaseService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "VerifyAdrSignals",
+      "description": "Application service trait for the verify-ADR-signals use case, defined in usecase::verify_adr_signals. The verify method returns AdrVerifyReport (the actual type in code, confirmed OS-05 — no implementation change). VerifyAdrSignalsCommand and VerifyAdrSignalsError remain as the existing usecase-layer types (no change to those types).",
+      "approved": true,
+      "action": "modify",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "verify",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "command",
+              "ty": "VerifyAdrSignalsCommand"
+            }
+          ],
+          "returns": "Result<AdrVerifyReport, VerifyAdrSignalsError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "VerifyAdrSignalsInteractor",
+      "description": "Concrete struct implementing VerifyAdrSignals. The impl VerifyAdrSignals::verify returns AdrVerifyReport (the actual type in code, confirmed OS-05 — no implementation change). DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "action": "modify",
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "VerifyAdrSignals"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "ScopeQueryService",
+      "description": "Application service trait for scope query (classify/files) use cases, defined in usecase::review_v2::scope_query. The trait exposes four methods: two domain-typed methods (classify / files, using FilePath and ScopeName) that exist as internal building blocks called by the default trait method implementations, and two string-accepting methods (classify_by_strings / files_by_string) that are the only methods the CLI calls directly. CLI review subcommands (classify.rs, files.rs) import only ScopeClassificationOutput, ScopeQueryService, and ScopeQueryError from usecase — they never import domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName. The FilePath and ScopeName construction from raw strings happens inside the classify_by_strings / files_by_string implementations in the interactor, keeping domain types hidden from CLI callers per CN-01 and AC-03.",
+      "approved": true,
+      "action": "modify",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "classify",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<FilePath>"
+            }
+          ],
+          "returns": "Result<Vec<PathClassification>, ScopeQueryError>",
+          "is_async": false
+        },
+        {
+          "name": "files",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ScopeName"
+            }
+          ],
+          "returns": "Result<Vec<FilePath>, ScopeQueryError>",
+          "is_async": false
+        },
+        {
+          "name": "classify_by_strings",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<String>"
+            }
+          ],
+          "returns": "Result<Vec<ScopeClassificationOutput>, ScopeQueryError>",
+          "is_async": false
+        },
+        {
+          "name": "files_by_string",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Vec<String>, ScopeQueryError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "PathClassification",
+      "description": "Usecase value object pairing a file path with its scope classification. Returned by ScopeQueryService::classify in input-argument order (CN-04: order preserved). Contains FilePath (domain type) and ScopeClassification. This type is in the usecase layer (usecase::review_v2::scope_query). No implementation change in this track (OS-05); listed here so the contract-map renderer can draw the edge from ScopeQueryService::classify to this type.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "path",
+          "ty": "FilePath"
+        },
+        {
+          "kind": "field",
+          "name": "classification",
+          "ty": "ScopeClassification"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        }
+      ]
+    },
+    {
+      "name": "ScopeClassificationOutput",
+      "description": "DTO returned by ScopeQueryService::classify_by_strings. Contains the string path and the classification encoded in `scopes`: a Vec<String> where each entry is either a named scope name (for Named classification), 'other' (for the implicit Other scope), or '<excluded>' (for paths filtered by operational/other-track patterns). This single-field encoding avoids a separate classification_kind field while keeping the struct free of domain types (CN-01 / AC-03). CLI uses entry.scopes.join(',') for display.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "path",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "scopes",
+          "ty": "Vec<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "ScopeQueryInteractor",
+      "description": "Struct implementing ScopeQueryService. This track modifies ScopeQueryInteractor to add the two new string-accepting methods (classify_by_strings, files_by_string) alongside the existing domain-typed methods (classify, files). The interactor constructs domain::review_v2::FilePath and domain::review_v2::ScopeName from the input strings internally, performs the domain classification, and converts results to ScopeClassificationOutput DTOs before returning. The CLI sees only ScopeQueryService and string/primitive types; domain::review_v2::FilePath, domain::review_v2::ScopeName, and domain::review_v2::MainScopeName remain invisible across the usecase boundary.",
+      "approved": true,
+      "action": "modify",
+      "kind": "interactor",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "scope_config",
+          "ty": "ReviewScopeConfig"
+        },
+        {
+          "kind": "field",
+          "name": "diff_getter",
+          "ty": "D"
+        },
+        {
+          "kind": "field",
+          "name": "base",
+          "ty": "CommitHash"
+        }
+      ],
+      "declares_application_service": [
+        "ScopeQueryService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "TaskOperationError",
+      "description": "Error type for track task operation use cases (transition, add-task, set-override, clear-override, next-task, task-counts). Wraps domain::DomainError, domain::TrackReadError, domain::TrackWriteError, domain::RepositoryError, and domain::WorktreeError so that cli/src/error.rs can remove the five #[from] domain error variants from CliError. The CLI converts TaskOperationError to CliError::Message, eliminating the direct domain error coupling at the cli boundary.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidTrackId",
+        "InvalidTaskId",
+        "InvalidCommitHash",
+        "TrackNotFound",
+        "TaskNotFound",
+        "TransitionFailed",
+        "StoreFailed",
+        "BranchGuardFailed",
+        "BranchlessGuardFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "TaskOperationInteractor",
+      "description": "Concrete struct implementing TaskOperationService. Follows the same internal generic-storage pattern as the existing TransitionTaskUseCase: the struct holds a private Arc<S> field where S satisfies domain storage traits (TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter) as an implementation detail. CLI composition root wires FsTrackStore as S and injects the result as Arc<dyn TaskOperationService>, so the generic bound never crosses the usecase→CLI boundary; CLI commands only see the dyn TaskOperationService trait object (CN-01 satisfied). Constructs domain::TrackId, domain::TaskId, domain::CommitHash internally. Returns TaskOperationOutput to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "TaskOperationService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "TaskTransitionCommand",
+      "description": "CQRS command object for the task transition use case. Carries standard-library-typed fields only (String, PathBuf, bool — no domain types): items_dir (PathBuf, file-system root), track_id, task_id, target_status, optional commit_hash, and skip_branch_check. PathBuf is a std library path type, not a domain type. The interactor constructs domain::TrackId, domain::TaskId, domain::CommitHash internally.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "items_dir",
+          "ty": "PathBuf"
+        },
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "task_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "target_status",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "commit_hash",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "skip_branch_check",
+          "ty": "bool"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "AddTaskCommand",
+      "description": "CQRS command object for the add-task use case. Carries standard-library-typed fields only (String, PathBuf — no domain types): items_dir (PathBuf, file-system root), track_id, description, optional section, optional after_task_id. PathBuf is a std library path type, not a domain type. The interactor constructs domain::TrackId and domain::TaskId internally.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "items_dir",
+          "ty": "PathBuf"
+        },
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "description",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "section",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "after_task_id",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "skip_branch_check",
+          "ty": "bool"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "SetOverrideCommand",
+      "description": "CQRS command object for the set-override use case. Carries standard-library-typed fields only (String, PathBuf, bool — no domain types): items_dir (PathBuf, file-system root), track_id, status ('blocked' | 'cancelled'), reason, and skip_branch_check. PathBuf is a std library path type, not a domain type. The interactor constructs domain::TrackId and domain::StatusOverride internally.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "items_dir",
+          "ty": "PathBuf"
+        },
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "status",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "skip_branch_check",
+          "ty": "bool"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "ClearOverrideCommand",
+      "description": "CQRS command object for the clear-override use case. Carries standard-library-typed fields only (String, PathBuf, bool — no domain types): items_dir (PathBuf, file-system root), track_id, and skip_branch_check. PathBuf is a std library path type, not a domain type. The interactor constructs domain::TrackId internally.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "items_dir",
+          "ty": "PathBuf"
+        },
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "skip_branch_check",
+          "ty": "bool"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "TaskOperationService",
+      "description": "Application service trait for track task mutation operations. Driven by the CLI. Accepts command objects (TaskTransitionCommand, AddTaskCommand, SetOverrideCommand, ClearOverrideCommand) that carry only string/primitive fields, so the CLI never imports domain::TrackId, domain::TaskId, domain::CommitHash, domain::StatusOverride, or domain::DomainError directly. Each method returns TaskOperationOutput on success. The interactor implementation constructs domain types internally and persists changes via domain storage trait bounds (TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter); the CLI composition root injects FsTrackStore (a secondary_adapter that implements those domain traits).",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "transition_task",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "TaskTransitionCommand"
+            }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false
+        },
+        {
+          "name": "add_task",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "AddTaskCommand"
+            }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false
+        },
+        {
+          "name": "set_override",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "SetOverrideCommand"
+            }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false
+        },
+        {
+          "name": "clear_override",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "ClearOverrideCommand"
+            }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "TaskQueryService",
+      "description": "Application service trait for next-task and task-counts queries. Driven by the CLI. Accepts string track_id and items_dir so the CLI never imports domain::TrackId, domain::ImplPlanReader, or domain::TaskStatusKind directly. Returns simple serialisable DTOs that the CLI formats for stdout.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "next_task",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<Option<NextTaskOutput>, TaskOperationError>",
+          "is_async": false
+        },
+        {
+          "name": "task_counts",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<TaskCountsOutput, TaskOperationError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "TaskQueryInteractor",
+      "description": "Concrete struct implementing TaskQueryService. Constructs domain types internally and converts results to NextTaskOutput or TaskCountsOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "TaskQueryService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "NextTaskOutput",
+      "description": "DTO returned by TaskQueryService::next_task. Contains the task_id and description of the next open task so the CLI can print them without importing domain task types.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "task_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "description",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "TaskCountsOutput",
+      "description": "DTO returned by TaskQueryService::task_counts. Contains per-status counts (todo, in_progress, done, skipped) so the CLI can print counts without importing domain::TaskStatusKind.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "todo",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "in_progress",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "done",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "skipped",
+          "ty": "usize"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "PreCommitTypeSignalsService",
+      "description": "Application service trait for the pre-commit type-signal recomputation use case (sotp make track-commit-message pre-commit step). Driven by the CLI layer. Wraps the ConfidenceSignal classification logic so that commands/make.rs never imports domain::ConfidenceSignal directly. Returns PreCommitTypeSignalsOutput containing the signal verdict and optional layer bindings for downstream catalogue-spec steps.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "PreCommitTypeSignalsOutput",
+      "description": "DTO returned by PreCommitTypeSignalsService::run. Contains the overall verdict (pass/blocked), list of red signal names, list of yellow signal names, and whether the track is frozen (Done/Archived). The frozen flag lets the caller skip downstream catalogue-spec steps without re-reading domain state. CLI uses this DTO to produce actionable pre-commit messages without importing domain::ConfidenceSignal.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "blocked",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "frozen",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "red_signals",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "yellow_signals",
+          "ty": "Vec<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "PreCommitTypeSignalsError",
+      "description": "Error type for PreCommitTypeSignalsService. Wraps git discover failures, architecture-rules.json parse errors, symlink guard rejections, and track metadata load failures without leaking domain error types across the usecase boundary.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "GitDiscoverFailed",
+        "RulesFileMissing",
+        "RulesParseError",
+        "SymlinkRejected",
+        "MetadataLoadFailed",
+        "ImplPlanLoadFailed",
+        "TypeSignalsRecomputeFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "PreCommitTypeSignalsInteractor",
+      "description": "Concrete struct implementing PreCommitTypeSignalsService. Constructs domain types internally and converts results to PreCommitTypeSignalsOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "PreCommitTypeSignalsService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunReviewCommand",
+      "description": "CQRS command object for the run-review use case (sotp review codex-local). Carries standard-library-typed fields only (String, PathBuf, u64 — no domain types): track_id, round_type ('fast' | 'final' as String), group name, model, timeout_seconds (u64), base_prompt, optional briefing_file (PathBuf), and items_dir (PathBuf, file-system root). PathBuf is a std library path type, not a domain type. The CLI never imports domain::TrackId, domain::RoundType, domain::ReviewGroupName, or the usecase ReviewRoundType enum directly. The interactor converts round_type string to ReviewRoundType internally.",
+      "approved": true,
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "round_type",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "group",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "model",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "timeout_seconds",
+          "ty": "u64"
+        },
+        {
+          "kind": "field",
+          "name": "base_prompt",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "briefing_file",
+          "ty": "Option<PathBuf>"
+        },
+        {
+          "kind": "field",
+          "name": "items_dir",
+          "ty": "PathBuf"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunReviewOutput",
+      "description": "DTO returned by RunReviewService. Contains verdict_kind ('approved' | 'rejected' | 'skipped'), finding count, and an optional human-readable summary. Replaces direct cli consumption of domain::review_v2::Verdict, domain::review_v2::FastVerdict, and domain::review_v2::ReviewOutcome so the CLI display layer never imports domain review types.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "verdict_kind",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "skipped",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "finding_count",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "summary",
+          "ty": "Option<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunReviewError",
+      "description": "Error type for RunReviewService. Wraps invalid track ID, invalid group name, composition root failures, and reviewer execution failures without leaking domain::review_v2::ReviewCycleError or domain review types across the usecase boundary.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidTrackId",
+        "InvalidGroupName",
+        "CompositionFailed",
+        "ReviewerFailed"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunReviewInteractor",
+      "description": "Concrete struct implementing RunReviewService. Builds the ReviewCycle composition root internally from string-typed command fields, executes the review, and converts domain types to RunReviewOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RunReviewService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "RunReviewService",
+      "description": "Application service trait for the run-review use case (sotp review codex-local). Driven by the CLI layer. Accepts RunReviewCommand containing string-typed fields so the CLI never imports domain::TrackId, domain::RoundType, domain::ReviewGroupName, domain::review_v2::Verdict, domain::review_v2::FastVerdict, or domain::review_v2::ReviewOutcome. The interactor builds the ReviewCycle composition root internally and converts domain types to RunReviewOutput.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "command",
+              "ty": "RunReviewCommand"
+            }
+          ],
+          "returns": "Result<RunReviewOutput, RunReviewError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "CommitHashPersistenceService",
+      "description": "Application service trait for persisting the HEAD SHA to .commit_hash after a successful commit (sotp make track-commit-message post-commit step). Driven by the CLI layer. Wraps domain::CommitHash and domain::review_v2::CommitHashWriter so that commands/make.rs never imports these domain types directly.",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "persist",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<String, CommitHashPersistenceError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "CommitHashPersistenceError",
+      "description": "Error type for CommitHashPersistenceService. Wraps invalid track ID, git discover failures, branch mismatch, git rev-parse failures, invalid SHA, and store write failures without leaking domain::CommitHash or domain::review_v2::CommitHashWriter across the usecase boundary.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "InvalidTrackId",
+        "GitDiscoverFailed",
+        "BranchMismatch",
+        "RevParseFailed",
+        "InvalidSha",
+        "StoreWriteFailed",
+        "TrackDirMissing"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "CommitHashPersistenceInteractor",
+      "description": "Concrete struct implementing CommitHashPersistenceService. Constructs domain types (CommitHash) internally and invokes CommitHashWriter to persist the HEAD SHA without leaking domain types to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "CommitHashPersistenceService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "HookShellParserPort",
+      "description": "Usecase-owned secondary port (driven port) trait for full-fidelity shell command parsing used by hook dispatch. Returns Result<Vec<SimpleCommand>, ParseError> — preserving redirect_texts and has_output_redirect fields from domain::guard::SimpleCommand — so that hook guard policy can enforce block-direct-git-ops and block-test-file-deletion without security regression. Unlike ShellParserPort (lossy Vec<String>), this port exposes domain::guard::SimpleCommand and domain::guard::ParseError in its signature; HookDispatchInteractor receives the full struct rather than raw strings. The infrastructure adapter ConchShellParser implements this port. CLI composition root injects ConchShellParser as Arc<dyn HookShellParserPort> into the hook dispatch interactor, so cli/hook_dispatch.rs never needs to import domain::guard::ShellParser directly. NOTE: this port is an intentional exception to CN-01 (no domain types in usecase public API) for security reasons — the full SimpleCommand struct is required to enforce redirect-based guard rules; the exception is recorded in ADR D1 subsection 'Security-first port design (hook dispatch CN-01 exception)'.",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "split_shell",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Vec<SimpleCommand>, ParseError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "ScopeQueryError",
+      "description": "Error type for ScopeQueryService operations. The T010-T013 migration added two new variants (InvalidPath, InvalidScopeName) to support the new string-accepting classify_by_strings and files_by_string methods, which construct domain::review_v2::FilePath and domain::review_v2::ScopeName internally and surface parse failures as usecase-layer errors.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "DiffGet",
+        "UnknownScope",
+        "InvalidPath",
+        "InvalidScopeName"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "ActivateTrackUseCase",
+      "description": "Use case struct for activating a planning-only track (assigning a branch and materializing it). The T010-T013 migration added execute_by_strings, a string-accepting wrapper around execute, so that the CLI (commands/track/activate.rs) no longer needs to construct domain::TrackId or domain::TrackBranch directly (CN-01 / AC-03). NOTE: execute_by_strings returns Result<ActivateTrackOutcome, TrackWriteError> where TrackWriteError is a domain error type — this is an intentional accepted CN-01 exception recorded in spec.json IN-10 (parallel to IN-08/IN-09). CLI callers pattern-match Err(err) without any `use domain::...TrackWriteError` import; cargo make check-layers passes.",
+      "approved": true,
+      "action": "modify",
+      "kind": "use_case",
+      "expected_members": [],
+      "expected_methods": [
+        {
+          "name": "execute_by_strings",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "branch_name",
+              "ty": "&str"
+            },
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            }
+          ],
+          "returns": "Result<ActivateTrackOutcome, TrackWriteError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-10",
+          "hash": "6f6f4e3f7efb47acf2c40f0d93814434ed5635387f77cf6af8db9daf62572682"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapCommand",
+      "description": "Command object for RenderContractMap::execute. The T010-T013 migration migrated the fields from domain types (TrackId, LayerId, TypeDefinitionKind) to plain Rust types (String, Vec<String>) so that CLI callers (commands/track/contract_map.rs) never import domain types directly (CN-01 / AC-03). The interactor converts these strings to domain types internally.",
+      "approved": true,
+      "action": "modify",
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "kind_filter",
+          "ty": "Option<Vec<String>>"
+        },
+        {
+          "kind": "field",
+          "name": "layer_filter",
+          "ty": "Option<Vec<String>>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapError",
+      "description": "Error type for RenderContractMap::execute. The T010-T013 migration added the InvalidTrackId variant (emitted when the track_id string fails TrackId::try_new validation) to account for the new string-accepting command fields.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound",
+        "UnknownKindFilter",
+        "InvalidTrackId"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapOutput",
+      "description": "Output DTO returned by RenderContractMap::execute on success. Carries lightweight metrics (rendered_layer_count, total_entry_count) so CLI callers can report a post-write summary without re-reading the generated markdown. Pre-existing type; no field changes in this track.",
+      "approved": true,
+      "action": "reference",
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "rendered_layer_count",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "total_entry_count",
+          "ty": "usize"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMap",
+      "description": "Application service trait (primary port) for the Contract Map render workflow. CLI composition root injects RenderContractMapInteractor and dispatches through this trait so the CLI stays substitutable. This track modifies RenderContractMapCommand fields (String-typed track_id / kind_filter / layer_filter instead of domain TrackId / TypeDefinitionKind / LayerId), so the execute signature indirectly changes: cmd is now &RenderContractMapCommand with String fields. The trait method signature itself is unchanged.",
+      "approved": true,
+      "action": "modify",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RenderContractMapCommand"
+            }
+          ],
+          "returns": "Result<RenderContractMapOutput, RenderContractMapError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapInteractor",
+      "description": "Concrete struct implementing RenderContractMap (primary port). Composes a CatalogueLoader and a ContractMapWriter. This track modifies its execute implementation to accept the updated RenderContractMapCommand (String-typed fields) and convert them to domain types internally (TrackId::try_new, TypeDefinitionKind lookup, LayerId). DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "approved": true,
+      "action": "modify",
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RenderContractMap"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "LintRuleKind",
+      "description": "Usecase-owned mirror enum of domain::tddd::catalogue_linter::CatalogueLinterRuleKind. Allows CLI callers to specify lint rule types (FieldEmpty, FieldNonEmpty, KindLayerConstraint) without importing the domain type directly (CN-01 / AC-03). The interactor converts LintRuleSpec values containing LintRuleKind to domain CatalogueLinterRule internally.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "FieldEmpty",
+        "FieldNonEmpty",
+        "KindLayerConstraint"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "LintRuleSpec",
+      "description": "Usecase-owned string-only description of a single catalogue lint rule. Replaces direct domain::tddd::catalogue_linter::CatalogueLinterRule usage in RunCatalogueLintCommand.rules so that CLI callers (commands/track/lint.rs) never import domain lint types directly (CN-01 / AC-03). The interactor converts each LintRuleSpec to a CatalogueLinterRule internally, failing with RunCatalogueLintError::InvalidRuleSpec on unrecognised values.",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "kind",
+          "ty": "LintRuleKind"
+        },
+        {
+          "kind": "field",
+          "name": "target_kind",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "target_field",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "permitted_layers",
+          "ty": "Vec<String>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLintCommand",
+      "description": "Command input for RunCatalogueLint::execute. The T010-T013 migration changed the rules field from Vec<CatalogueLinterRule> (domain type) to Vec<LintRuleSpec> (usecase-owned DTO) so that CLI callers never import domain lint types directly (CN-01 / AC-03). The interactor converts each LintRuleSpec to a domain CatalogueLinterRule internally.",
+      "approved": true,
+      "action": "modify",
+      "kind": "command",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "layer_id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "rules",
+          "ty": "Vec<LintRuleSpec>"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLintError",
+      "description": "Error type for RunCatalogueLint::execute. The T010-T013 migration added the InvalidRuleSpec variant (emitted when a LintRuleSpec cannot be converted to a domain CatalogueLinterRule) to account for the new string-based rule input.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueLoad",
+        "LintExecution",
+        "InvalidLayer",
+        "InvalidRuleSpec"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLintInteractor",
+      "description": "Concrete struct implementing RunCatalogueLint. Generic over CatalogueLoader and CatalogueLinter secondary ports. The CLI composition root wires FsCatalogueLoader and DomainCatalogueLinter as concrete types without importing the domain port traits directly. DI fields are private; expected_members is empty because the public type contract is captured by the RunCatalogueLint application service trait.",
+      "approved": true,
+      "action": "modify",
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "RunCatalogueLint"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "RunCatalogueLint",
+      "description": "Primary port (application service trait) for running catalogue lint rules against a single layer. Implemented by RunCatalogueLintInteractor. Driven by CLI callers (commands/track/lint.rs) which wire the interactor generics at the composition root. NOTE: execute returns Vec<CatalogueLintViolation> where CatalogueLintViolation is a domain value object — this is an intentional accepted CN-01 exception recorded in spec.json IN-08 (parallel to HookShellParserPort / IN-07). A usecase-owned DTO was deferred; CLI callers access violations via type inference without any `use domain::...CatalogueLintViolation` import, so cargo make check-layers passes.",
+      "approved": true,
+      "action": "modify",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "RunCatalogueLintCommand"
+            }
+          ],
+          "returns": "Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-08",
+          "hash": "a79f533d3a3c8ad49a1a86b5932653aee262651fb99bd9e633128834bea18e70"
+        }
+      ]
+    },
+    {
+      "name": "check_compliance_render",
+      "description": "Top-level pub fn in usecase::skill_compliance. Runs a skill compliance check and returns the rendered additionalContext string if any compliance guidance should be injected, or None otherwise. Wraps domain::skill_compliance::check_compliance so that CLI hook handlers (commands/hook.rs) never import domain skill-compliance types directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "usecase::skill_compliance",
+      "expected_params": [
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "Option<String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "has_skill_command",
+      "description": "Top-level pub fn in usecase::skill_compliance. Returns true when the given prompt contains a recognized /track:* command. Wraps domain::skill_compliance::detect_skill_command for early-exit guards so that CLI hook handlers (commands/hook.rs) never import domain::skill_compliance::SkillMatch or domain::skill_compliance::ComplianceContext directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "usecase::skill_compliance",
+      "expected_params": [
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "bool"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "reject_branchless_guard_by_str",
+      "description": "Top-level pub fn in usecase::track_resolution. String-based wrapper around reject_branchless_guard for use by the CLI layer. Validates track_id_str via TrackId::try_new internally and delegates to reject_branchless_guard. NOTE: the reader parameter is `&impl TrackReader` (a domain trait) — this is an intentional accepted CN-01 exception recorded in spec.json IN-09 (parallel to IN-08 / HookShellParserPort). CLI callers pass a concrete FsTrackStore by type inference with no `use domain::...TrackReader` import in apps/cli/src/; cargo make check-layers passes. A usecase-owned TrackReader port was deferred.",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "usecase::track_resolution",
+      "expected_params": [
+        {
+          "name": "reader",
+          "ty": "&impl TrackReader"
+        },
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "target_status",
+          "ty": "&str"
+        },
+        {
+          "name": "schema_version",
+          "ty": "u32"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), TrackResolutionError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-09",
+          "hash": "e4ae5983c9953ed7106f9feb48cb487f524aa5e642db30a9997e8016bc2024b3"
+        }
+      ]
+    },
+    {
+      "name": "reject_branchless_implementation_transition_by_str",
+      "description": "Top-level pub fn in usecase::track_resolution. String-based wrapper around reject_branchless_implementation_transition for use by the CLI layer (CN-01 / AC-03: no domain types in apps/cli/src/). Validates track_id_str via TrackId::try_new internally. The CLI passes a raw string and never imports domain::TrackId directly.",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "usecase::track_resolution",
+      "expected_params": [
+        {
+          "name": "schema_version",
+          "ty": "u32"
+        },
+        {
+          "name": "branch",
+          "ty": "Option<&str>"
+        },
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "target_status",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), TrackResolutionError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    }
+  ]
+}

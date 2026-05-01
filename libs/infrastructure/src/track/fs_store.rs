@@ -13,6 +13,7 @@ use domain::{
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
+use super::symlink_guard::reject_symlinks_below;
 
 /// File-system backed TrackReader + TrackWriter.
 /// Uses `atomic_write_file` for crash-safe persistence.
@@ -318,6 +319,68 @@ pub fn read_track_metadata(
     })?;
     codec::decode(&json)
         .map_err(|err| RepositoryError::Message(format!("cannot parse {}: {err}", path.display())))
+}
+
+/// Loads the effective track status as a string for the given track ID string.
+///
+/// Returns `Ok(status_str)` where `status_str` is one of `"planned"`, `"in_progress"`,
+/// `"done"`, `"blocked"`, or `"cancelled"`.
+///
+/// Constructs `domain::TrackId` internally so that callers in the CLI layer do not
+/// need to import domain types (CN-01 / AC-03).
+///
+/// # Errors
+///
+/// Returns an error string on metadata read failure, codec failure, or impl-plan
+/// load failure.
+pub fn read_track_status_str(items_dir: &Path, track_id_str: &str) -> Result<String, String> {
+    // Security: guard `items_dir` itself before using it as the symlink-guard trusted root.
+    // `reject_symlinks_below` only inspects descendants — a symlinked root would bypass it.
+    match items_dir.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return Err(format!(
+                "symlink guard: refusing to use symlinked items_dir: {}",
+                items_dir.display()
+            ));
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return Err(format!(
+                "symlink guard: cannot stat items_dir {}: {e}",
+                items_dir.display()
+            ));
+        }
+    }
+
+    // Containment: canonicalize items_dir to catch `..` traversal bypasses.
+    // Without this, a caller passing `track/items/../../../etc` as items_dir would
+    // resolve outside the intended directory tree.
+    let items_dir = items_dir
+        .canonicalize()
+        .map_err(|e| format!("items_dir '{}' cannot be resolved: {e}", items_dir.display()))?;
+    let items_dir = items_dir.as_path();
+
+    let valid_id =
+        domain::TrackId::try_new(track_id_str).map_err(|e| format!("invalid track id: {e}"))?;
+
+    // Symlink guard on the metadata read path: reject symlinks at the track directory or
+    // any ancestor below `items_dir` before reading (fail-closed per ADR §D7).
+    let metadata_path = items_dir.join(valid_id.as_ref()).join("metadata.json");
+    reject_symlinks_below(&metadata_path, items_dir)
+        .map_err(|e| format!("refusing to read metadata: {e}"))?;
+
+    let (metadata, _doc_meta) =
+        read_track_metadata(items_dir, &valid_id).map_err(|e| format!("{e}"))?;
+
+    // Symlink guard on the impl-plan read path (fail-closed per ADR §D7).
+    let impl_plan_path = items_dir.join(valid_id.as_ref()).join("impl-plan.json");
+    reject_symlinks_below(&impl_plan_path, items_dir)
+        .map_err(|e| format!("refusing to read impl-plan: {e}"))?;
+
+    let store = FsTrackStore::new(items_dir);
+    let impl_plan = store.load_impl_plan(&valid_id).map_err(|e| format!("{e}"))?;
+    let status = domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
+    Ok(status.to_string())
 }
 
 /// Load `impl-plan.json` for a track, returning `None` when the file is absent.

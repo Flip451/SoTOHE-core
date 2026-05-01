@@ -15,8 +15,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use domain::AdrFilePort;
-use infrastructure::adr_decision::FsAdrFileAdapter;
+use infrastructure::adr_decision::{AdrFilePort, FsAdrFileAdapter};
 use usecase::verify_adr_signals::{
     VerifyAdrSignals, VerifyAdrSignalsCommand, VerifyAdrSignalsInteractor,
 };

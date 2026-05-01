@@ -13,15 +13,8 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use domain::ImplPlanReader;
-use domain::schema::{SchemaExportError, SchemaExporter};
-use infrastructure::code_profile_builder::build_type_graph;
-use infrastructure::schema_export::RustdocSchemaExporter;
-use infrastructure::tddd::type_graph_render::{
-    EdgeSet, TypeGraphRenderOptions, write_type_graph_dir, write_type_graph_file,
-};
-use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
-use infrastructure::verify::tddd_layers::TdddLayerBinding;
+use infrastructure::tddd::type_graph_render::EdgeSet;
+use infrastructure::track::fs_store::read_track_status_str;
 
 use crate::CliError;
 
@@ -63,23 +56,11 @@ pub fn execute_type_graph(
     cluster_depth: usize,
     edges: String,
 ) -> Result<ExitCode, CliError> {
-    let valid_id = domain::TrackId::try_new(&track_id)
-        .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
-
-    // Active-track guard (mirrors type-signals).
-    // Symlink protection for metadata read is handled inside `read_track_metadata`.
-    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    // Status is derived on demand from impl-plan + status_override.
-    // Use FsTrackStore::load_impl_plan (fail-closed) so a corrupt impl-plan.json
-    // blocks the guard instead of being silently treated as absent.
-    let store = FsTrackStore::new(items_dir.clone());
-    let impl_plan = store
-        .load_impl_plan(&valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    let effective_status =
-        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-    ensure_active_track(effective_status, &track_id)?;
+    // Validate track_id and derive status without importing domain types (CN-01 / AC-03).
+    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
+        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
+    })?;
+    ensure_active_track(&status_str, &track_id)?;
 
     let edge_set = parse_edge_set(&edges)?;
     let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
@@ -91,100 +72,18 @@ pub fn execute_type_graph(
     }
 
     for binding in &bindings {
-        execute_type_graph_for_layer(
+        infrastructure::tddd::type_graph_export::execute_type_graph_for_layer(
             &items_dir,
             &track_id,
             &workspace_root,
             binding,
             cluster_depth,
             edge_set,
-        )?;
+        )
+        .map_err(|e| CliError::Message(e.0))?;
     }
 
     Ok(ExitCode::SUCCESS)
-}
-
-fn execute_type_graph_for_layer(
-    items_dir: &std::path::Path,
-    track_id: &str,
-    workspace_root: &std::path::Path,
-    binding: &TdddLayerBinding,
-    cluster_depth: usize,
-    edge_set: EdgeSet,
-) -> Result<ExitCode, CliError> {
-    let layer_id = binding.layer_id();
-    let track_dir = items_dir.join(track_id);
-
-    let target_crate = match binding.targets() {
-        [single] => single,
-        [] => {
-            return Err(CliError::Message(format!(
-                "schema_export.targets is empty for layer '{layer_id}'; check architecture-rules.json"
-            )));
-        }
-        multi => {
-            return Err(CliError::Message(format!(
-                "layer '{layer_id}' has {} schema_export.targets ({:?}), but multi-target export \
-                 is not yet implemented",
-                multi.len(),
-                multi
-            )));
-        }
-    };
-
-    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    let schema = exporter.export(target_crate).map_err(|e| {
-        let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
-            " (install with: rustup toolchain install nightly)"
-        } else {
-            ""
-        };
-        CliError::Message(format!("failed to export schema: {e}{hint}"))
-    })?;
-
-    let typestate_names = std::collections::HashSet::new();
-    let profile = build_type_graph(&schema, &typestate_names);
-
-    // Render + symlink-checked write (infrastructure layer handles the guard).
-    let opts =
-        TypeGraphRenderOptions { cluster_depth, edge_set, ..TypeGraphRenderOptions::default() };
-
-    match select_write_mode(cluster_depth) {
-        WriteMode::Flat => {
-            let graph_filename =
-                write_type_graph_file(&profile, layer_id, &track_dir, items_dir, &opts)
-                    .map_err(|e| CliError::Message(format!("cannot write type graph: {e}")))?;
-            println!("[OK] type-graph: wrote {graph_filename} ({layer_id})");
-        }
-        WriteMode::Cluster => {
-            let written = write_type_graph_dir(&profile, layer_id, &track_dir, items_dir, &opts)
-                .map_err(|e| CliError::Message(format!("cannot write type graph dir: {e}")))?;
-            for path in &written {
-                println!("[OK] type-graph: wrote {path} ({layer_id})");
-            }
-        }
-    }
-
-    Ok(ExitCode::SUCCESS)
-}
-
-/// Output mode selected by the `--cluster-depth` flag.
-///
-/// Extracted from `execute_type_graph_for_layer` so the dispatch predicate can
-/// be unit-tested without spinning up rustdoc.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum WriteMode {
-    Flat,
-    Cluster,
-}
-
-/// Selects the write mode for a given `cluster_depth`.
-///
-/// - `cluster_depth == 0` → [`WriteMode::Flat`] (single `<layer>-graph.md` file)
-/// - `cluster_depth >= 1` → [`WriteMode::Cluster`] (`<layer>-graph-d<depth>/` directory)
-#[must_use]
-fn select_write_mode(cluster_depth: usize) -> WriteMode {
-    if cluster_depth == 0 { WriteMode::Flat } else { WriteMode::Cluster }
 }
 
 #[cfg(test)]
@@ -249,32 +148,6 @@ mod tests {
         let err = result.unwrap_err();
         let msg = format!("{err}");
         assert!(msg.contains("nonexistent"), "error must mention the unknown layer: {msg}");
-    }
-
-    // --- select_write_mode (pure dispatch predicate) ---
-
-    #[test]
-    fn test_select_write_mode_zero_selects_flat() {
-        assert_eq!(select_write_mode(0), WriteMode::Flat);
-    }
-
-    #[test]
-    fn test_select_write_mode_one_selects_cluster() {
-        assert_eq!(select_write_mode(1), WriteMode::Cluster);
-    }
-
-    #[test]
-    fn test_select_write_mode_default_depth_two_selects_cluster() {
-        // Guards against a regression where the default cluster mode
-        // (TypeGraphRenderOptions::default().cluster_depth == 2) would fall
-        // into the flat branch. The `--cluster-depth` CLI flag defaults to 2.
-        assert_eq!(select_write_mode(2), WriteMode::Cluster);
-    }
-
-    #[test]
-    fn test_select_write_mode_large_depth_selects_cluster() {
-        // Any non-zero depth selects cluster mode.
-        assert_eq!(select_write_mode(10), WriteMode::Cluster);
     }
 
     /// Integration test for the cluster_depth dispatch (flat vs directory mode).

@@ -1,0 +1,780 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-01T08:56:45Z",
+  "declaration_hash": "678baaadf5c52ea1b5ed321f94897d453d415bb7bd3019311486dd3f8f41f325",
+  "signals": [
+    {
+      "type_name": "TrackStatusOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "status: String"
+      ]
+    },
+    {
+      "type_name": "GuardDecision",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Allow",
+        "Block"
+      ]
+    },
+    {
+      "type_name": "GuardCheckOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "decision: GuardDecision",
+        "reason: String"
+      ]
+    },
+    {
+      "type_name": "GuardCheckService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn check(&self, command: String) -> GuardCheckOutput"
+      ]
+    },
+    {
+      "type_name": "GuardCheckInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl GuardCheckService"
+      ]
+    },
+    {
+      "type_name": "ShellParserPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn split_shell(&self, input: &str) -> Result<Vec<String>, String>"
+      ]
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn export_as_json(&self, crate_name: &str) -> Result<String, String>"
+      ]
+    },
+    {
+      "type_name": "ExportSchemaService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn export(&self, command: ExportSchemaCommand) -> Result<String, ExportSchemaError>"
+      ]
+    },
+    {
+      "type_name": "ExportSchemaCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "crate_name: String"
+      ]
+    },
+    {
+      "type_name": "ExportSchemaError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ExportFailed",
+        "SerializationFailed"
+      ]
+    },
+    {
+      "type_name": "ExportSchemaInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl ExportSchemaService"
+      ]
+    },
+    {
+      "type_name": "TaskOperationOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "task_id: Option<String>",
+        "derived_status: String"
+      ]
+    },
+    {
+      "type_name": "ReviewApprovalOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "decision: ReviewApprovalDecision",
+        "bypass_scope_count: Option<usize>",
+        "blocked_scopes: Vec<String>"
+      ]
+    },
+    {
+      "type_name": "ReviewApprovalDecision",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Approved",
+        "ApprovedWithBypass",
+        "Blocked"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckApprovedService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn check_approved(&self, track_id: String, items_dir: PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckApprovedError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidTrackId",
+        "ReviewStoreError",
+        "EvaluationFailed"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl ReviewCheckApprovedService"
+      ]
+    },
+    {
+      "type_name": "HookDispatchCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "tool_name: String",
+        "command: Option<String>",
+        "file_path: Option<PathBuf>",
+        "content: Option<String>"
+      ]
+    },
+    {
+      "type_name": "HookVerdictOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "decision: HookVerdictDecision",
+        "reason: Option<String>"
+      ]
+    },
+    {
+      "type_name": "HookVerdictDecision",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Allow",
+        "Block"
+      ]
+    },
+    {
+      "type_name": "HookDispatchService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn dispatch(&self, hook_name: String, command: HookDispatchCommand) -> Result<HookVerdictOutput, HookDispatchError>"
+      ]
+    },
+    {
+      "type_name": "HookDispatchError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "UnknownHookName",
+        "HandlerFailed"
+      ]
+    },
+    {
+      "type_name": "HookDispatchInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl HookDispatchService"
+      ]
+    },
+    {
+      "type_name": "ReviewRoundType",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Fast",
+        "Final"
+      ]
+    },
+    {
+      "type_name": "TrackPhaseOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "phase: String",
+        "reason: String",
+        "next_command: String",
+        "blocker: Option<String>"
+      ]
+    },
+    {
+      "type_name": "TrackPhaseService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn resolve(&self, track_id: String, items_dir: PathBuf) -> Result<TrackPhaseOutput, TrackPhaseError>"
+      ]
+    },
+    {
+      "type_name": "TrackPhaseError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidTrackId",
+        "TrackNotFound",
+        "ImplPlanLoadFailed"
+      ]
+    },
+    {
+      "type_name": "TrackPhaseInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl TrackPhaseService"
+      ]
+    },
+    {
+      "type_name": "VerifyAdrSignals",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyReport, VerifyAdrSignalsError>"
+      ]
+    },
+    {
+      "type_name": "VerifyAdrSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl VerifyAdrSignals"
+      ]
+    },
+    {
+      "type_name": "ScopeQueryService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn classify(&self, paths: Vec<FilePath>) -> Result<Vec<PathClassification>, ScopeQueryError>",
+        "fn files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError>",
+        "fn classify_by_strings(&self, paths: Vec<String>) -> Result<Vec<ScopeClassificationOutput>, ScopeQueryError>",
+        "fn files_by_string(&self, scope: String) -> Result<Vec<String>, ScopeQueryError>"
+      ]
+    },
+    {
+      "type_name": "PathClassification",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "path: FilePath",
+        "classification: ScopeClassification"
+      ]
+    },
+    {
+      "type_name": "ScopeClassificationOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "path: String",
+        "scopes: Vec<String>"
+      ]
+    },
+    {
+      "type_name": "ScopeQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "scope_config: ReviewScopeConfig",
+        "diff_getter: D",
+        "base: CommitHash",
+        "impl ScopeQueryService"
+      ]
+    },
+    {
+      "type_name": "TaskOperationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidTrackId",
+        "InvalidTaskId",
+        "InvalidCommitHash",
+        "TrackNotFound",
+        "TaskNotFound",
+        "TransitionFailed",
+        "StoreFailed",
+        "BranchGuardFailed",
+        "BranchlessGuardFailed"
+      ]
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl TaskOperationService"
+      ]
+    },
+    {
+      "type_name": "TaskTransitionCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "items_dir: PathBuf",
+        "track_id: String",
+        "task_id: String",
+        "target_status: String",
+        "commit_hash: Option<String>",
+        "skip_branch_check: bool"
+      ]
+    },
+    {
+      "type_name": "AddTaskCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "items_dir: PathBuf",
+        "track_id: String",
+        "description: String",
+        "section: Option<String>",
+        "after_task_id: Option<String>",
+        "skip_branch_check: bool"
+      ]
+    },
+    {
+      "type_name": "SetOverrideCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "items_dir: PathBuf",
+        "track_id: String",
+        "status: String",
+        "reason: String",
+        "skip_branch_check: bool"
+      ]
+    },
+    {
+      "type_name": "ClearOverrideCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "items_dir: PathBuf",
+        "track_id: String",
+        "skip_branch_check: bool"
+      ]
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn transition_task(&self, cmd: TaskTransitionCommand) -> Result<TaskOperationOutput, TaskOperationError>",
+        "fn add_task(&self, cmd: AddTaskCommand) -> Result<TaskOperationOutput, TaskOperationError>",
+        "fn set_override(&self, cmd: SetOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError>",
+        "fn clear_override(&self, cmd: ClearOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError>"
+      ]
+    },
+    {
+      "type_name": "TaskQueryService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn next_task(&self, track_id: String, items_dir: PathBuf) -> Result<Option<NextTaskOutput>, TaskOperationError>",
+        "fn task_counts(&self, track_id: String, items_dir: PathBuf) -> Result<TaskCountsOutput, TaskOperationError>"
+      ]
+    },
+    {
+      "type_name": "TaskQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl TaskQueryService"
+      ]
+    },
+    {
+      "type_name": "NextTaskOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "task_id: String",
+        "description: String"
+      ]
+    },
+    {
+      "type_name": "TaskCountsOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "todo: usize",
+        "in_progress: usize",
+        "done: usize",
+        "skipped: usize"
+      ]
+    },
+    {
+      "type_name": "PreCommitTypeSignalsService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn run(&self, track_id: String, workspace_root: PathBuf) -> Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError>"
+      ]
+    },
+    {
+      "type_name": "PreCommitTypeSignalsOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "blocked: bool",
+        "frozen: bool",
+        "red_signals: Vec<String>",
+        "yellow_signals: Vec<String>"
+      ]
+    },
+    {
+      "type_name": "PreCommitTypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "GitDiscoverFailed",
+        "RulesFileMissing",
+        "RulesParseError",
+        "SymlinkRejected",
+        "MetadataLoadFailed",
+        "ImplPlanLoadFailed",
+        "TypeSignalsRecomputeFailed"
+      ]
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl PreCommitTypeSignalsService"
+      ]
+    },
+    {
+      "type_name": "RunReviewCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "round_type: String",
+        "group: String",
+        "model: String",
+        "timeout_seconds: u64",
+        "base_prompt: String",
+        "briefing_file: Option<PathBuf>",
+        "items_dir: PathBuf"
+      ]
+    },
+    {
+      "type_name": "RunReviewOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "verdict_kind: String",
+        "skipped: bool",
+        "finding_count: usize",
+        "summary: Option<String>"
+      ]
+    },
+    {
+      "type_name": "RunReviewError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidTrackId",
+        "InvalidGroupName",
+        "CompositionFailed",
+        "ReviewerFailed"
+      ]
+    },
+    {
+      "type_name": "RunReviewInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RunReviewService"
+      ]
+    },
+    {
+      "type_name": "RunReviewService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn run(&self, command: RunReviewCommand) -> Result<RunReviewOutput, RunReviewError>"
+      ]
+    },
+    {
+      "type_name": "CommitHashPersistenceService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn persist(&self, track_id: String, workspace_root: PathBuf) -> Result<String, CommitHashPersistenceError>"
+      ]
+    },
+    {
+      "type_name": "CommitHashPersistenceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidTrackId",
+        "GitDiscoverFailed",
+        "BranchMismatch",
+        "RevParseFailed",
+        "InvalidSha",
+        "StoreWriteFailed",
+        "TrackDirMissing"
+      ]
+    },
+    {
+      "type_name": "CommitHashPersistenceInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl CommitHashPersistenceService"
+      ]
+    },
+    {
+      "type_name": "HookShellParserPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn split_shell(&self, input: &str) -> Result<Vec<SimpleCommand>, ParseError>"
+      ]
+    },
+    {
+      "type_name": "ScopeQueryError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiffGet",
+        "UnknownScope",
+        "InvalidPath",
+        "InvalidScopeName"
+      ]
+    },
+    {
+      "type_name": "ActivateTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "kind_filter: Option<Vec<String>>",
+        "layer_filter: Option<Vec<String>>"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound",
+        "UnknownKindFilter",
+        "InvalidTrackId"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "rendered_layer_count: usize",
+        "total_entry_count: usize"
+      ]
+    },
+    {
+      "type_name": "RenderContractMap",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RenderContractMap"
+      ]
+    },
+    {
+      "type_name": "LintRuleKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FieldEmpty",
+        "FieldNonEmpty",
+        "KindLayerConstraint"
+      ]
+    },
+    {
+      "type_name": "LintRuleSpec",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "kind: LintRuleKind",
+        "target_kind: String",
+        "target_field: Option<String>",
+        "permitted_layers: Vec<String>"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "track_id: String",
+        "layer_id: String",
+        "rules: Vec<LintRuleSpec>"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoad",
+        "LintExecution",
+        "InvalidLayer",
+        "InvalidRuleSpec"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl RunCatalogueLint"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: RunCatalogueLintCommand) -> Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>"
+      ]
+    },
+    {
+      "type_name": "check_compliance_render",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "has_skill_command",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "reject_branchless_guard_by_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "reject_branchless_implementation_transition_by_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

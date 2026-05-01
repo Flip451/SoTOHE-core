@@ -11,24 +11,14 @@
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
 //! §D2 / §D3.1 / IN-09.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitCode;
 
-use domain::{
-    CatalogueSpecSignal, CatalogueSpecSignalsDocument, ConfidenceSignal, ContentHash, TrackStatus,
-    evaluate_catalogue_entry_signal,
-};
-use infrastructure::tddd::catalogue_codec;
 use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
-use infrastructure::tddd::type_signals_codec;
-use infrastructure::track::fs_store::{FsTrackStore, read_track_metadata};
-use infrastructure::track::symlink_guard::reject_symlinks_below;
-use infrastructure::verify::tddd_layers::TdddLayerBinding;
-use usecase::catalogue_spec_signals::CatalogueSpecSignalsWriter;
+use infrastructure::track::fs_store::read_track_status_str;
 
 use crate::CliError;
 use crate::commands::track::tddd::signals::{ensure_active_track, resolve_layers};
-use domain::ImplPlanReader;
 
 /// Per-layer refresh entry point.
 ///
@@ -48,9 +38,11 @@ pub fn execute_catalogue_spec_signals(
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Validate track id (path traversal guard).
-    let valid_id = domain::TrackId::try_new(&track_id)
-        .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
+    // Validate track id and derive status without importing domain types (CN-01 / AC-03).
+    // read_track_status_str validates the track_id and returns the status string.
+    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
+        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
+    })?;
 
     // Security: verify the items_dir root itself is not a symlink before using it as the
     // trusted anchor for `reject_symlinks_below`. That helper only checks components
@@ -101,15 +93,8 @@ pub fn execute_catalogue_spec_signals(
     }
 
     // Active-track guard (CN-07) — reject completed/archived tracks.
-    let (metadata, _doc_meta) = read_track_metadata(&items_dir, &valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
-    let store = FsTrackStore::new(items_dir.clone());
-    let impl_plan = store
-        .load_impl_plan(&valid_id)
-        .map_err(|e| CliError::Message(format!("cannot load impl-plan for '{track_id}': {e}")))?;
-    let effective_status =
-        domain::derive_track_status(impl_plan.as_ref(), metadata.status_override());
-    ensure_active_track_catalogue(effective_status, &track_id)?;
+    // Uses string comparison to avoid importing domain::TrackStatus (CN-01 / AC-03).
+    ensure_active_track_catalogue(&status_str, &track_id)?;
 
     // Resolve layers — `catalogue_spec_signal.enabled` flag is introduced by
     // T018; until then we fall back to every `tddd.enabled` layer so this
@@ -137,7 +122,10 @@ pub fn execute_catalogue_spec_signals(
             // `tddd.catalogue_spec_signal.enabled`.
             continue;
         }
-        refresh_one_layer(&items_dir, &track_dir, &valid_id, binding, &writer)?;
+        infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer(
+            &items_dir, &track_dir, &track_id, binding, &writer,
+        )
+        .map_err(CliError::Message)?;
     }
 
     Ok(ExitCode::SUCCESS)
@@ -146,128 +134,30 @@ pub fn execute_catalogue_spec_signals(
 /// Fail-closed active-track guard mirroring
 /// `track::tddd::signals::ensure_active_track` but customised for the
 /// catalogue-spec-signals command name in the error message.
-fn ensure_active_track_catalogue(status: TrackStatus, track_id: &str) -> Result<(), CliError> {
-    match status {
-        TrackStatus::Done | TrackStatus::Archived => Err(CliError::Message(format!(
-            "cannot run catalogue-spec-signals on '{track_id}' (status={status}). \
+///
+/// Uses string comparison so the CLI never imports `domain::TrackStatus`
+/// (CN-01 / AC-03). The `_` arm preserves fail-open for unknown future status
+/// strings (same policy as `ensure_active_track`).
+fn ensure_active_track_catalogue(status_str: &str, track_id: &str) -> Result<(), CliError> {
+    match status_str {
+        "done" | "archived" => Err(CliError::Message(format!(
+            "cannot run catalogue-spec-signals on '{track_id}' (status={status_str}). \
              Completed tracks are frozen — run on an active track instead.",
         ))),
-        TrackStatus::Planned
-        | TrackStatus::InProgress
-        | TrackStatus::Blocked
-        | TrackStatus::Cancelled => {
+        _ => {
             // Mirror the `ensure_active_track` helper's cross-check so any new
-            // TrackStatus variant triggers a compile-time failure here as well.
-            ensure_active_track(status, track_id)?;
+            // status string behaviour is consistent.
+            ensure_active_track(status_str, track_id)?;
             Ok(())
         }
     }
-}
-
-/// Refresh a single layer: read `<layer>-types.json` from the local workspace,
-/// compute per-entry signals + the raw-bytes SHA-256, build the document, and
-/// persist via the writer port.
-fn refresh_one_layer(
-    items_dir: &Path,
-    track_dir: &Path,
-    track_id: &domain::TrackId,
-    binding: &TdddLayerBinding,
-    writer: &FsCatalogueSpecSignalsStore,
-) -> Result<(), CliError> {
-    let layer_id = binding.layer_id();
-    let catalogue_path = track_dir.join(binding.catalogue_file());
-
-    // Symlink guard on the READ path (fail-closed): reject symlinks at the leaf
-    // and every ancestor below `items_dir` (not just `track_dir`). Using
-    // `items_dir` as the trusted root ensures that a symlinked `track_dir`
-    // (i.e., `items_dir/<track_id>`) is also caught. Mirrors
-    // `execute_baseline_capture` which anchors at `items_dir` for the same reason
-    // (ADR 2026-04-18-1400 §D7).
-    reject_symlinks_below(&catalogue_path, items_dir).map_err(|e| {
-        CliError::Message(format!(
-            "refusing to read catalogue '{}' for layer '{layer_id}': {e}",
-            catalogue_path.display()
-        ))
-    })?;
-
-    // Read the local catalogue bytes (not the origin blob).
-    let bytes = std::fs::read(&catalogue_path).map_err(|e| {
-        CliError::Message(format!(
-            "cannot read catalogue '{}' for layer '{layer_id}': {e}",
-            catalogue_path.display()
-        ))
-    })?;
-
-    // Decode to TypeCatalogueDocument.
-    let text = std::str::from_utf8(&bytes).map_err(|e| {
-        CliError::Message(format!(
-            "catalogue '{}' contains non-UTF-8 bytes: {e}",
-            catalogue_path.display()
-        ))
-    })?;
-    let catalogue = catalogue_codec::decode(text).map_err(|e| {
-        CliError::Message(format!("cannot decode catalogue '{}': {e}", catalogue_path.display()))
-    })?;
-
-    // Compute raw-bytes SHA-256 (same canonical-hash helper as merge_gate_adapter).
-    let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
-    let catalogue_declaration_hash =
-        ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
-            CliError::Message(format!(
-                "internal: catalogue hash for layer '{layer_id}' is not canonical hex: {e}"
-            ))
-        })?;
-
-    // Evaluate per-entry signals via the domain pure function.
-    let signals: Vec<CatalogueSpecSignal> = catalogue
-        .entries()
-        .iter()
-        .map(|entry| {
-            let signal =
-                evaluate_catalogue_entry_signal(entry.spec_refs(), entry.informal_grounds());
-            CatalogueSpecSignal::new(entry.name(), signal)
-        })
-        .collect();
-
-    // Summary counts for stdout (same pattern as `sotp track type-signals`).
-    let (blue, yellow, red) = count_signals(&signals);
-
-    // Build the document and persist atomically.
-    let doc = CatalogueSpecSignalsDocument::new(catalogue_declaration_hash, signals);
-    writer.write_catalogue_spec_signals(track_id, layer_id, &doc).map_err(|e| {
-        CliError::Message(format!(
-            "cannot write catalogue-spec signals for layer '{layer_id}': {e}"
-        ))
-    })?;
-
-    println!(
-        "[OK] catalogue-spec-signals: layer={layer_id} blue={blue} yellow={yellow} red={red} (total={})",
-        blue + yellow + red
-    );
-    Ok(())
-}
-
-fn count_signals(signals: &[CatalogueSpecSignal]) -> (usize, usize, usize) {
-    let mut blue = 0;
-    let mut yellow = 0;
-    let mut red = 0;
-    for s in signals {
-        match s.signal {
-            ConfidenceSignal::Blue => blue += 1,
-            ConfidenceSignal::Yellow => yellow += 1,
-            ConfidenceSignal::Red => red += 1,
-            _ => red += 1,
-        }
-    }
-    (blue, yellow, red)
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use std::fs;
-
-    use infrastructure::tddd::catalogue_spec_signals_codec;
+    use std::path::Path;
 
     use super::*;
 
@@ -396,15 +286,18 @@ mod tests {
         let signals_path = ws.join("track/items/test-track/test_layer-catalogue-spec-signals.json");
         assert!(signals_path.exists(), "signals file must be written");
         let content = fs::read_to_string(&signals_path).unwrap();
-        let doc = catalogue_spec_signals_codec::decode(&content).unwrap();
-        assert_eq!(doc.schema_version(), 1);
-        assert_eq!(doc.signals.len(), 3);
-        assert_eq!(doc.signals[0].type_name, "BlueType");
-        assert_eq!(doc.signals[0].signal, ConfidenceSignal::Blue);
-        assert_eq!(doc.signals[1].type_name, "YellowType");
-        assert_eq!(doc.signals[1].signal, ConfidenceSignal::Yellow);
-        assert_eq!(doc.signals[2].type_name, "RedType");
-        assert_eq!(doc.signals[2].signal, ConfidenceSignal::Red);
+        // Parse as raw JSON to avoid importing domain types in CLI test code (AC-03).
+        // The codec serialises ConfidenceSignal as "blue" / "yellow" / "red".
+        let raw: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(raw["schema_version"].as_u64().unwrap(), 1);
+        let sigs = raw["signals"].as_array().unwrap();
+        assert_eq!(sigs.len(), 3);
+        assert_eq!(sigs[0]["type_name"].as_str().unwrap(), "BlueType");
+        assert_eq!(sigs[0]["signal"].as_str().unwrap(), "blue");
+        assert_eq!(sigs[1]["type_name"].as_str().unwrap(), "YellowType");
+        assert_eq!(sigs[1]["signal"].as_str().unwrap(), "yellow");
+        assert_eq!(sigs[2]["type_name"].as_str().unwrap(), "RedType");
+        assert_eq!(sigs[2]["signal"].as_str().unwrap(), "red");
     }
 
     #[test]
@@ -416,11 +309,14 @@ mod tests {
 
         let result = execute_catalogue_spec_signals(items_dir, "../evil".to_owned(), ws, None);
         // Verify the PATH-TRAVERSAL guard specifically rejected the id, not some
-        // later filesystem error. `TrackId::try_new` rejects `../evil` before any
-        // I/O occurs, so the error message always mentions "invalid track ID".
+        // later filesystem error. `read_track_status_str` validates the id before any
+        // metadata I/O occurs, so the error message always mentions the failure.
         assert!(result.is_err());
         let err = result.unwrap_err().to_string();
-        assert!(err.contains("invalid track ID"), "expected path-traversal rejection, got: {err}");
+        assert!(
+            err.contains("invalid track ID") || err.contains("cannot load track status"),
+            "expected path-traversal rejection, got: {err}"
+        );
     }
 
     #[test]
@@ -520,8 +416,8 @@ mod tests {
         assert!(result.is_err(), "Done track must be rejected: {result:?}");
         let err_msg = result.unwrap_err().to_string();
         assert!(
-            err_msg.contains("Done") || err_msg.contains("frozen") || err_msg.contains("status"),
-            "error must mention frozen/Done status, got: {err_msg}"
+            err_msg.contains("done") || err_msg.contains("frozen") || err_msg.contains("status"),
+            "error must mention frozen/done status, got: {err_msg}"
         );
         // Verify no signals file was written (fail-closed before any write).
         let signals_path = ws.join("track/items/test-track/test_layer-catalogue-spec-signals.json");

@@ -8,7 +8,7 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use clap::{ArgGroup, Args, Subcommand};
-use domain::review_v2::ReviewExistsPort;
+use usecase::review_v2::{ReviewApprovalDecision, ReviewApprovalOutput};
 #[cfg(test)]
 use usecase::review_workflow::ReviewVerdict;
 
@@ -111,39 +111,56 @@ pub struct CodexLocalArgs {
 }
 
 /// Validated auto-record arguments ready for use after Codex completes.
+///
+/// Stores all fields as plain strings / standard types so the CLI module
+/// never needs to import domain types (CN-01 / AC-03). The conversion to
+/// `domain::TrackId`, `domain::RoundType`, and `domain::ReviewGroupName`
+/// happens inside `infrastructure::review_v2::run_codex_review_str` when
+/// the review cycle is actually executed.
 #[derive(Debug)]
-#[allow(dead_code)] // expected_groups used by v1 test stubs (pending cleanup)
+#[allow(dead_code)] // expected_groups preserved for API compatibility
 pub(super) struct ValidatedAutoRecordArgs {
-    pub(super) track_id: domain::TrackId,
-    pub(super) round_type: domain::RoundType,
-    pub(super) group_name: domain::ReviewGroupName,
-    pub(super) expected_groups: Vec<domain::ReviewGroupName>,
+    pub(super) track_id: String,
+    pub(super) round_type_str: String, // "fast" | "final"
+    pub(super) group_name: String,
+    pub(super) expected_groups: Vec<String>,
     pub(super) items_dir: PathBuf,
     pub(super) diff_base: String,
 }
 
 /// Validates and parses auto-record arguments from `CodexLocalArgs`.
 ///
-/// All record fields are now required (auto-record is always on).
+/// All record fields are now required (auto-record is always on). Validation
+/// is performed using the infrastructure crate's string-based parsing helpers
+/// so that no domain types appear in the CLI module (CN-01 / AC-03).
 ///
 /// # Errors
 /// Returns a human-readable error string if args are invalid.
 pub(super) fn validate_auto_record_args(
     args: &CodexLocalArgs,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    let track_id =
-        domain::TrackId::try_new(&args.track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
-    let group_name = domain::ReviewGroupName::try_new(&args.group)
+    // Validate track ID format via infrastructure helper (no domain import needed).
+    infrastructure::review_v2::validate_track_id_str(&args.track_id)
+        .map_err(|e| format!("invalid --track-id: {e}"))?;
+    // Validate group name format via infrastructure helper.
+    infrastructure::review_v2::validate_review_group_name_str(&args.group)
         .map_err(|e| format!("invalid --group: {e}"))?;
 
-    let round_type = match args.round_type {
-        CodexRoundTypeArg::Fast => domain::RoundType::Fast,
-        CodexRoundTypeArg::Final => domain::RoundType::Final,
+    let round_type_str = match args.round_type {
+        CodexRoundTypeArg::Fast => "fast",
+        CodexRoundTypeArg::Final => "final",
     };
 
+    // `validate_review_group_name_str` accepts inputs with leading/trailing
+    // whitespace because `domain::ReviewGroupName::try_new` trims before
+    // validation. Propagate the trimmed value so downstream scope lookup uses
+    // the canonical form (otherwise " domain " would pass validation but then
+    // fail unknown-scope on lookup).
+    let group_name = args.group.trim().to_owned();
+
     Ok(ValidatedAutoRecordArgs {
-        track_id,
-        round_type,
+        track_id: args.track_id.clone(),
+        round_type_str: round_type_str.to_owned(),
         group_name,
         expected_groups: Vec::new(),
         items_dir: args.items_dir.clone(),
@@ -276,7 +293,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
 // check-approved: Verify review.status == approved with current code hash
 // ---------------------------------------------------------------------------
 
-/// Formats an `ReviewApprovalVerdict` into the human-readable message and exit
+/// Formats a `ReviewApprovalOutput` into the human-readable message and exit
 /// code for the `check-approved` command.
 ///
 /// Extracted as a pure function so that tests can assert on the *exact* message
@@ -286,24 +303,23 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
 /// - `Approved`            → `[OK] …`   + `ExitCode::SUCCESS`
 /// - `ApprovedWithBypass`  → `[WARN] …` + `ExitCode::SUCCESS`
 /// - `Blocked`             → `[BLOCKED] …` + `ExitCode::FAILURE`
-#[cfg_attr(not(test), allow(dead_code))]
-pub(super) fn format_approval_verdict(
-    verdict: domain::review_v2::ReviewApprovalVerdict,
-) -> (String, ExitCode) {
-    use domain::review_v2::ReviewApprovalVerdict;
-    match verdict {
-        ReviewApprovalVerdict::Approved => {
+pub(super) fn format_approval_verdict(output: ReviewApprovalOutput) -> (String, ExitCode) {
+    match output.decision {
+        ReviewApprovalDecision::Approved => {
             ("[OK] Review is approved and code hash is current".to_owned(), ExitCode::SUCCESS)
         }
-        ReviewApprovalVerdict::ApprovedWithBypass { not_started_count } => (
-            format!(
-                "[WARN] No review.json found. Allowing commit for PR-based review ({not_started_count} scope(s))."
-            ),
-            ExitCode::SUCCESS,
-        ),
-        ReviewApprovalVerdict::Blocked { required_scopes } => {
+        ReviewApprovalDecision::ApprovedWithBypass => {
+            let count = output.bypass_scope_count.unwrap_or(0);
+            (
+                format!(
+                    "[WARN] No review.json found. Allowing commit for PR-based review ({count} scope(s))."
+                ),
+                ExitCode::SUCCESS,
+            )
+        }
+        ReviewApprovalDecision::Blocked => {
             let mut display: Vec<_> =
-                required_scopes.iter().map(|scope| format!("  {scope}")).collect();
+                output.blocked_scopes.iter().map(|scope| format!("  {scope}")).collect();
             display.sort();
             (
                 format!("[BLOCKED] Review not approved. Required scopes:\n{}", display.join("\n")),
@@ -315,8 +331,8 @@ pub(super) fn format_approval_verdict(
 
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     match run_check_approved(args) {
-        Ok(verdict) => {
-            let (msg, code) = format_approval_verdict(verdict);
+        Ok(output) => {
+            let (msg, code) = format_approval_verdict(output);
             eprintln!("{msg}");
             code
         }
@@ -327,19 +343,7 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     }
 }
 
-fn run_check_approved(
-    args: &CheckApprovedArgs,
-) -> Result<domain::review_v2::ReviewApprovalVerdict, String> {
-    let track_id = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
-
-    let comp = compose_v2::build_review_v2(&track_id, &args.items_dir)?;
-
-    let review_json_exists = comp
-        .review_store
-        .review_json_exists()
-        .map_err(|e| format!("failed to check review.json existence: {e}"))?;
-
-    comp.cycle
-        .evaluate_approval(&comp.review_store, review_json_exists)
-        .map_err(|e| format!("failed to evaluate approval: {e}"))
+fn run_check_approved(args: &CheckApprovedArgs) -> Result<ReviewApprovalOutput, String> {
+    infrastructure::review_v2::check_approved_str(&args.track_id, &args.items_dir)
+        .map_err(|e| format!("{e}"))
 }

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-01T08:56:44Z",
+  "declaration_hash": "98ba1be0a941248be43c74af41c1f6159f99799c3617f4b212afe05ea0fe8532",
+  "signals": [
+    {
+      "type_name": "TrackId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitHash",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLintViolation",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError>"
+      ]
+    },
+    {
+      "type_name": "TrackWriteError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Domain",
+        "Repository"
+      ]
+    },
+    {
+      "type_name": "TypeSignal",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Decision",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Allow",
+        "Block"
+      ]
+    },
+    {
+      "type_name": "AdrVerifyReport",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

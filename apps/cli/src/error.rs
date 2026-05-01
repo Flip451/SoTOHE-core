@@ -12,25 +12,10 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum CliError {
     #[error("{0}")]
-    Domain(#[from] domain::DomainError),
-
-    #[error("{0}")]
-    TrackRead(#[from] domain::TrackReadError),
-
-    #[error("{0}")]
-    TrackWrite(#[from] domain::TrackWriteError),
-
-    #[error("{0}")]
-    Repository(#[from] domain::RepositoryError),
-
-    #[error("{0}")]
     Git(#[from] infrastructure::git_cli::GitError),
 
     #[error("{0}")]
     Gh(#[from] infrastructure::gh_cli::GhError),
-
-    #[error("{0}")]
-    Worktree(#[from] domain::WorktreeError),
 
     #[error("{0}")]
     TrackResolution(#[from] usecase::track_resolution::TrackResolutionError),

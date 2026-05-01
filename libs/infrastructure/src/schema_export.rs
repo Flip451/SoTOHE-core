@@ -42,6 +42,14 @@ impl SchemaExporter for RustdocSchemaExporter {
     }
 }
 
+impl usecase::export_schema::SchemaExporterPort for RustdocSchemaExporter {
+    fn export_as_json(&self, crate_name: &str) -> Result<String, String> {
+        let export =
+            <Self as SchemaExporter>::export(self, crate_name).map_err(|err| err.to_string())?;
+        crate::schema_export_codec::encode(&export, true).map_err(|err| err.to_string())
+    }
+}
+
 fn check_nightly_available() -> Result<(), SchemaExportError> {
     let output = Command::new("rustup")
         .args(["run", "nightly", "rustc", "--version"])

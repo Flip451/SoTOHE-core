@@ -1,12 +1,13 @@
 //! Subprocess management for the local Codex-backed reviewer.
+//!
+//! Production code never imports `domain::` types directly (CN-01 / AC-03).
+//! All domain conversions happen inside `infrastructure::review_v2`.
 
 use std::io::{self, Write};
 use std::process::ExitCode;
 use std::time::Duration;
 
-use domain::review_v2::{ReviewOutcome, ReviewScopeConfig, ReviewWriter, ScopeName};
-use infrastructure::review_v2::CodexReviewer;
-use usecase::review_workflow::{ReviewFinalPayload, ReviewPayloadVerdict, render_review_payload};
+use infrastructure::review_v2::{CodexReviewOutcome, CodexReviewer};
 
 use super::{CodexLocalArgs, validate_auto_record_args};
 
@@ -24,79 +25,61 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
     // Step 1: Validate record args before building composition (fail fast).
     let validated = validate_auto_record_args(args)?;
 
-    // Step 2: Resolve track id and map --group to ScopeName (both needed early so
-    // the scope config can be loaded and the base prompt augmented before the
-    // reviewer is constructed).
-    let track_id = domain::TrackId::try_new(validated.track_id.as_ref())
-        .map_err(|e| format!("[ERROR] invalid track id: {e}"))?;
-    let scope = map_group_to_scope(validated.group_name.as_ref())?;
-
-    // Step 3: Pre-load the scope config so we can inject a scope-specific
-    // briefing reference into the base prompt (ADR 2026-04-18-1354 §D4).
-    // build_review_v2_with_reviewer reloads the same config later; that
-    // second pass is pure (no side effects beyond glob compilation).
-    let scope_config = super::compose_v2::load_scope_config_only(&track_id, &validated.items_dir)?;
-
-    // Step 4: Build base prompt and append the scope-specific severity policy
-    // reference (a no-op when the scope has no briefing_file configured or is
-    // ScopeName::Other). The scope file list is appended later by
-    // CodexReviewer::build_full_prompt when it receives the ReviewTarget.
-    //
-    // Prompt injection guard: if the configured briefing_file path is unsafe
-    // (contains control characters or backticks), log a warning here at the CLI
-    // boundary before calling the pure `append_scope_briefing_reference` helper.
-    // The helper itself performs no I/O — it simply skips injection on unsafe paths.
-    if let Some(path) = scope_config.briefing_file_for_scope(&scope) {
+    // Step 2: Check whether the scope has a configured briefing file.
+    // Log a warning if the path is unsafe (prompt injection guard) but do not
+    // fail — `append_scope_briefing_reference_str` skips injection on unsafe paths.
+    let maybe_briefing = infrastructure::review_v2::get_briefing_for_scope_str(
+        &validated.group_name,
+        &validated.track_id,
+        &validated.items_dir,
+    )?;
+    if let Some(path) = &maybe_briefing {
         if !is_safe_briefing_path(path) {
             eprintln!(
                 "[WARN] briefing_file for scope '{}' contains unsafe characters — \
                  scope-specific severity policy injection skipped",
-                scope
+                validated.group_name
             );
         }
     }
-    let mut base_prompt = build_base_prompt(args)?;
-    append_scope_briefing_reference(&mut base_prompt, &scope, &scope_config);
 
-    // Step 5: Build v2 composition with real CodexReviewer.
+    // Step 3: Build base prompt and append the scope-specific severity policy reference.
+    let mut base_prompt = build_base_prompt(args)?;
+    infrastructure::review_v2::append_scope_briefing_reference_str(
+        &mut base_prompt,
+        &validated.group_name,
+        &validated.track_id,
+        &validated.items_dir,
+        is_safe_briefing_path,
+    )?;
+
+    // Step 4: Build v2 composition with real CodexReviewer.
     let timeout = Duration::from_secs(args.timeout_seconds);
     let reviewer = CodexReviewer::new(&args.model, timeout, base_prompt)
-        .with_scope_label(validated.group_name.as_ref());
-    let comp =
-        super::compose_v2::build_review_v2_with_reviewer(&track_id, &validated.items_dir, reviewer)
-            .map_err(|e| format!("[ERROR] v2 composition failed: {e}"))?;
+        .with_scope_label(&validated.group_name);
 
-    // Step 6: Run review via ReviewCycle (hash_before → Codex → hash_after).
-    // Note: v2 writes verdicts directly to review.json via ReviewWriter.
-    // v1 escalation (record_round → concerns → metadata.json) is intentionally
-    // NOT preserved — it will be re-designed in v2 terms in a future track.
-    match validated.round_type {
-        domain::RoundType::Final => match comp.cycle.review(&scope) {
-            Ok(ReviewOutcome::Skipped) => {
-                emit_skip_output(validated.group_name.as_ref())?;
-                Ok(0)
-            }
-            Ok(ReviewOutcome::Reviewed { verdict, hash, .. }) => {
-                comp.review_store
-                    .write_verdict(&scope, &verdict, &hash)
-                    .map_err(|e| format!("[ERROR] record failed: {e}"))?;
-                emit_verdict_output_final(&verdict)
-            }
-            Err(e) => Err(format!("[ERROR] {e}")),
-        },
-        domain::RoundType::Fast => match comp.cycle.fast_review(&scope) {
-            Ok(ReviewOutcome::Skipped) => {
-                emit_skip_output(validated.group_name.as_ref())?;
-                Ok(0)
-            }
-            Ok(ReviewOutcome::Reviewed { verdict, hash, .. }) => {
-                comp.review_store
-                    .write_fast_verdict(&scope, &verdict, &hash)
-                    .map_err(|e| format!("[ERROR] record failed: {e}"))?;
-                emit_verdict_output_fast(&verdict)
-            }
-            Err(e) => Err(format!("[ERROR] {e}")),
-        },
+    // Step 5: Run the review cycle via infrastructure (handles all domain types internally).
+    let outcome = infrastructure::review_v2::run_codex_review_str(
+        &validated.track_id,
+        &validated.items_dir,
+        &validated.group_name,
+        &validated.round_type_str,
+        reviewer,
+    )?;
+
+    match outcome {
+        CodexReviewOutcome::Skipped { scope_label } => {
+            emit_skip_output(&scope_label)?;
+            Ok(0)
+        }
+        CodexReviewOutcome::FinalCompleted { verdict_json, exit_code } => {
+            emit_stdout_line(&verdict_json)?;
+            Ok(exit_code)
+        }
+        CodexReviewOutcome::FastCompleted { verdict_json, exit_code } => {
+            emit_stdout_line(&verdict_json)?;
+            Ok(exit_code)
+        }
     }
 }
 
@@ -128,44 +111,26 @@ pub(super) use build_base_prompt as build_prompt;
 /// when the given scope has a `briefing_file` configured and the path is safe
 /// to inject.
 ///
-/// The reference instructs the reviewer to Read the file via its own Read
-/// tool. No file I/O is performed here — only string manipulation. This
-/// implements ADR 2026-04-18-1354 §D4 (path-only injection; the reviewer
-/// sandbox fetches the content).
+/// No domain types involved — uses string-based lookup via infrastructure.
+/// Becomes a no-op when the scope has no briefing configured, the scope is
+/// "other", or the configured path fails `is_safe_briefing_path`.
 ///
-/// Becomes a no-op when:
-/// - the scope has no briefing configured, or
-/// - `scope` is `ScopeName::Other` (the reserved scope is intentionally
-///   exempt — ADR D5), or
-/// - the configured path fails `is_safe_briefing_path` (prompt injection guard).
-///
-/// **Pure function**: no I/O, no logging, no side effects beyond mutating `prompt`.
-/// Callers that need to warn on unsafe paths should call `is_safe_briefing_path`
-/// against `scope_config.briefing_file_for_scope(scope)` before (or after) this
-/// call and emit diagnostics at the CLI boundary.
+/// # Errors
+/// Returns an error if scope config cannot be loaded.
+#[cfg(test)]
 pub(super) fn append_scope_briefing_reference(
     prompt: &mut String,
-    scope: &ScopeName,
-    scope_config: &ReviewScopeConfig,
-) {
-    let Some(briefing_path) = scope_config.briefing_file_for_scope(scope) else {
-        return;
-    };
-    // Prompt injection guard: reject paths that contain control characters
-    // (including newlines) or backtick characters that could break out of the
-    // markdown `` `path` `` context and inject arbitrary reviewer instructions.
-    // review-scope.json is loaded from the working tree under review, so a
-    // crafted briefing_file value must not be able to alter the prompt structure.
-    if !is_safe_briefing_path(briefing_path) {
-        return;
-    }
-    prompt.push_str("\n\n## Scope-specific severity policy\n\n");
-    prompt.push_str(&format!(
-        "このレビューの scope は `{scope}` である。\
-         以下の scope 固有 severity policy を **必ず先に Read ツールで読み込み**、\
-         その方針に従って findings を選別すること:\n\n\
-         - `{briefing_path}`",
-    ));
+    scope_name: &str,
+    track_id: &str,
+    items_dir: &std::path::Path,
+) -> Result<(), String> {
+    infrastructure::review_v2::append_scope_briefing_reference_str(
+        prompt,
+        scope_name,
+        track_id,
+        items_dir,
+        is_safe_briefing_path,
+    )
 }
 
 /// Returns `true` if `path` is safe to reference as a repo-relative briefing
@@ -182,21 +147,13 @@ pub(super) fn append_scope_briefing_reference(
 ///   Cc and therefore not caught by `is_control`, but both act as line breaks
 /// - Backtick (`` ` ``)
 ///
-/// Path-traversal class (would point the reviewer at arbitrary workspace-external
-/// or privileged files; the reviewer sandbox's `--sandbox read-only` constrains
-/// writes but does not restrict the paths that can be read):
+/// Path-traversal class:
 /// - Absolute paths starting with `/` or `\`
 /// - Windows UNC and drive-letter prefixes (e.g. `\\server\share`, `C:\...`)
 /// - Any `..` component (e.g. `track/../../etc/passwd`), split on either
 ///   `/` or `\`
 ///
-/// Empty paths are also rejected (a misconfigured empty `briefing_file` field
-/// has no meaningful interpretation).
-///
-/// The check is pure string — no filesystem access — so it does not resolve
-/// symlinks. The current threat model (attacker controls `review-scope.json`
-/// in a reviewed working tree) is satisfied by rejecting absolute and
-/// `..`-containing paths at the composer boundary.
+/// Empty paths are also rejected.
 pub(super) fn is_safe_briefing_path(path: &str) -> bool {
     if path.is_empty() {
         return false;
@@ -222,68 +179,10 @@ pub(super) fn is_safe_briefing_path(path: &str) -> bool {
     true
 }
 
-/// Maps a group name string to a `ScopeName`.
-fn map_group_to_scope(group: &str) -> Result<domain::review_v2::ScopeName, String> {
-    if group == "other" {
-        Ok(domain::review_v2::ScopeName::Other)
-    } else {
-        domain::review_v2::MainScopeName::new(group)
-            .map(domain::review_v2::ScopeName::Main)
-            .map_err(|e| format!("[ERROR] invalid scope name: {e}"))
-    }
-}
-
 /// Prints the skip message and zero_findings JSON for an empty scope.
 fn emit_skip_output(scope: &str) -> Result<(), String> {
     eprintln!("[auto-record] Scope '{scope}' is empty, skipping");
     emit_stdout_line(r#"{"verdict":"zero_findings","findings":[]}"#)
-}
-
-/// Emits the final verdict JSON to stdout and returns the appropriate exit code.
-fn emit_verdict_output_final(verdict: &domain::review_v2::Verdict) -> Result<u8, String> {
-    let (payload, exit_code) = match verdict {
-        domain::review_v2::Verdict::ZeroFindings => (
-            ReviewFinalPayload { verdict: ReviewPayloadVerdict::ZeroFindings, findings: vec![] },
-            0u8,
-        ),
-        domain::review_v2::Verdict::FindingsRemain(nef) => {
-            let findings = nef.as_slice().iter().map(finding_to_review_finding).collect();
-            (ReviewFinalPayload { verdict: ReviewPayloadVerdict::FindingsRemain, findings }, 2u8)
-        }
-    };
-    let json = render_review_payload(&payload).map_err(|e| format!("[ERROR] {e}"))?;
-    emit_stdout_line(&json)?;
-    Ok(exit_code)
-}
-
-/// Emits the fast verdict JSON to stdout and returns the appropriate exit code.
-fn emit_verdict_output_fast(verdict: &domain::review_v2::FastVerdict) -> Result<u8, String> {
-    let (payload, exit_code) = match verdict {
-        domain::review_v2::FastVerdict::ZeroFindings => (
-            ReviewFinalPayload { verdict: ReviewPayloadVerdict::ZeroFindings, findings: vec![] },
-            0u8,
-        ),
-        domain::review_v2::FastVerdict::FindingsRemain(nef) => {
-            let findings = nef.as_slice().iter().map(finding_to_review_finding).collect();
-            (ReviewFinalPayload { verdict: ReviewPayloadVerdict::FindingsRemain, findings }, 2u8)
-        }
-    };
-    let json = render_review_payload(&payload).map_err(|e| format!("[ERROR] {e}"))?;
-    emit_stdout_line(&json)?;
-    Ok(exit_code)
-}
-
-/// Converts a domain `ReviewerFinding` to a `ReviewFinding` for JSON serialization.
-fn finding_to_review_finding(
-    f: &domain::review_v2::ReviewerFinding,
-) -> usecase::review_workflow::ReviewFinding {
-    usecase::review_workflow::ReviewFinding {
-        message: f.message().to_owned(),
-        severity: f.severity().map(str::to_owned),
-        file: f.file().map(str::to_owned),
-        line: f.line(),
-        category: f.category().map(str::to_owned),
-    }
 }
 
 fn emit_stdout_line(line: &str) -> Result<(), String> {

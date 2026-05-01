@@ -737,6 +737,20 @@ impl TypeSignal {
         self.signal
     }
 
+    /// Returns the confidence signal as a lowercase string (`"blue"`, `"yellow"`, or `"red"`).
+    ///
+    /// Callers that only need to branch on the signal level (e.g. CLI display
+    /// code under CN-01) should prefer this over `signal()` so they do not need
+    /// to import `domain::ConfidenceSignal` directly.
+    #[must_use]
+    pub fn signal_as_str(&self) -> &'static str {
+        match self.signal {
+            ConfidenceSignal::Blue => "blue",
+            ConfidenceSignal::Yellow => "yellow",
+            ConfidenceSignal::Red => "red",
+        }
+    }
+
     /// Returns `true` if the type was found during the code scan.
     #[must_use]
     pub fn found_type(&self) -> bool {

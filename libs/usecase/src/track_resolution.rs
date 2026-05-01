@@ -146,6 +146,36 @@ pub fn reject_branchless_implementation_transition(
     Ok(())
 }
 
+/// String-based variant of [`reject_branchless_implementation_transition`] for use by
+/// the CLI layer (CN-01 / AC-03: no domain types in `apps/cli/src/`).
+///
+/// Returns `Ok(())` immediately for non-implementation statuses (`"todo"`,
+/// `"blocked"`, etc.), matching the early-return semantics of the typed
+/// function.  `track_id_str` is validated only when the status is one of
+/// `"in_progress"`, `"done"`, or `"skipped"`.
+///
+/// # Errors
+/// Returns [`TrackResolutionError::InvalidTrackId`] when `track_id_str` is
+/// malformed and the transition would exercise the branchless guard.
+/// Returns an error if the transition itself is blocked.
+pub fn reject_branchless_implementation_transition_by_str(
+    schema_version: u32,
+    branch: Option<&str>,
+    track_id_str: &str,
+    target_status: &str,
+) -> Result<(), TrackResolutionError> {
+    // Mirror the early-return from the typed function so that a malformed
+    // track_id_str is only an error when the status would actually exercise
+    // the branchless guard.  For non-implementation statuses (e.g. "todo")
+    // the track_id is irrelevant, so we preserve the Ok(()) fast path.
+    if !matches!(target_status, "in_progress" | "done" | "skipped") {
+        return Ok(());
+    }
+    let track_id = TrackId::try_new(track_id_str)
+        .map_err(|e| TrackResolutionError::InvalidTrackId(track_id_str.to_owned(), e))?;
+    reject_branchless_implementation_transition(schema_version, branch, &track_id, target_status)
+}
+
 /// Autonomously checks the branchless activation guard using a `TrackReader` port.
 ///
 /// Reads the track branch state from the reader and delegates to
@@ -173,6 +203,36 @@ pub fn reject_branchless_guard(
         track_id,
         target_status,
     )
+}
+
+/// String-based variant of [`reject_branchless_guard`] for use by the CLI layer
+/// (CN-01 / AC-03: no domain types in `apps/cli/src/`).
+///
+/// Returns `Ok(())` immediately for non-implementation statuses (`"todo"`,
+/// `"blocked"`, etc.), matching the early-return semantics of the typed
+/// function.  `track_id_str` is validated only when the status is one of
+/// `"in_progress"`, `"done"`, or `"skipped"`.
+///
+/// # Errors
+/// Returns [`TrackResolutionError::InvalidTrackId`] when `track_id_str` is
+/// malformed and the transition would exercise the branchless guard.
+/// Returns an error if the track cannot be read or the transition is blocked.
+pub fn reject_branchless_guard_by_str(
+    reader: &impl TrackReader,
+    track_id_str: &str,
+    target_status: &str,
+    schema_version: u32,
+) -> Result<(), TrackResolutionError> {
+    // Mirror the early-return from the typed function so that a malformed
+    // track_id_str is only an error when the status would actually exercise
+    // the branchless guard.  For non-implementation statuses (e.g. "todo")
+    // the track_id is irrelevant, so we preserve the Ok(()) fast path.
+    if !matches!(target_status, "in_progress" | "done" | "skipped") {
+        return Ok(());
+    }
+    let track_id = TrackId::try_new(track_id_str)
+        .map_err(|e| TrackResolutionError::InvalidTrackId(track_id_str.to_owned(), e))?;
+    reject_branchless_guard(reader, &track_id, target_status, schema_version)
 }
 
 #[cfg(test)]

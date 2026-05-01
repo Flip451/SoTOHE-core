@@ -24,3 +24,5 @@ pub mod parse;
 pub use adapter::FsAdrFileAdapter;
 pub use error::AdrFrontMatterCodecError;
 pub use parse::parse_adr_frontmatter;
+// Re-export the port trait so callers don't need to import from `domain` directly.
+pub use domain::AdrFilePort;

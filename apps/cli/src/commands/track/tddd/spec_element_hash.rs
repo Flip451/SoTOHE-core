@@ -29,7 +29,8 @@ pub fn execute_spec_element_hash(
     track_id: String,
     anchor: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let _valid_id = domain::TrackId::try_new(&track_id)
+    // Validate the track_id without importing domain::TrackId (CN-01 / AC-03).
+    crate::commands::track::validate_track_id_str(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
     // Security: verify the items_dir root itself is not a symlink before using it as the

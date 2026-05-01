@@ -32,5 +32,5 @@ skip = [
 deny = [
     { crate = "infrastructure", wrappers = ["cli"], reason = "Infrastructure implements usecase ports and domain ports; wired at composition root." },
     { crate = "usecase", wrappers = ["infrastructure", "cli"], reason = "Usecase crate must only be consumed by the cli layer." },
-    { crate = "domain", wrappers = ["usecase", "infrastructure", "cli"], reason = "Domain dependencies are controlled by layer boundaries." },
+    { crate = "domain", wrappers = ["usecase", "infrastructure"], reason = "Domain dependencies are controlled by layer boundaries." },
 ]

@@ -352,13 +352,6 @@ where
     }
 }
 
-/// Prints every finding in the outcome with a `[BLOCKED] ` prefix.
-fn print_blocked_findings(outcome: &domain::verify::VerifyOutcome) {
-    for finding in outcome.findings() {
-        eprintln!("[BLOCKED] {}", finding.message());
-    }
-}
-
 fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCode {
     // Task completion + merge gate guards: validate against the PR's head
     // branch metadata, not the local checkout. Skips worktree dirty checks
@@ -402,7 +395,9 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
     let task_outcome =
         usecase::task_completion::check_tasks_resolved_from_git_ref(&branch, &reader);
     if task_outcome.has_errors() {
-        print_blocked_findings(&task_outcome);
+        for finding in task_outcome.findings() {
+            eprintln!("[BLOCKED] {}", finding.message());
+        }
         eprintln!("Run track-transition to mark tasks as done before merging.");
         return ExitCode::FAILURE;
     }
@@ -411,7 +406,9 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
     let gate_outcome = usecase::merge_gate::check_strict_merge_gate(&branch, &reader);
     if gate_outcome.has_errors() {
         eprintln!("[BLOCKED] strict spec signal gate failed:");
-        print_blocked_findings(&gate_outcome);
+        for finding in gate_outcome.findings() {
+            eprintln!("[BLOCKED] {}", finding.message());
+        }
         return ExitCode::FAILURE;
     }
 

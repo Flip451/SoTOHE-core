@@ -1,5 +1,4 @@
 use crate::CliError;
-use domain::ImplPlanReader;
 
 use super::*;
 
@@ -34,12 +33,12 @@ pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError>
 fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
     let BranchArgs { items_dir, track_id } = args;
 
-    let track_id = TrackId::try_new(&track_id)
+    validate_track_id_str(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let branch_name = format!("track/{track_id}");
 
-    TrackBranch::try_new(&branch_name)
+    validate_track_branch_str(&branch_name)
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
@@ -99,12 +98,12 @@ fn branch_create_execute(repo: &impl GitRepository, branch_name: &str) -> Result
 pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<ExitCode, CliError> {
     let ActivateArgs { items_dir, track_id } = args;
 
-    let track_id = TrackId::try_new(&track_id)
+    validate_track_id_str(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let branch_name = format!("track/{track_id}");
 
-    let branch = TrackBranch::try_new(&branch_name)
+    validate_track_branch_str(&branch_name)
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
 
     let project_root = resolve_project_root(&items_dir).map_err(CliError::Message)?;
@@ -138,22 +137,12 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     }
 
     let resume_allowed = if already_materialized && mode == BranchMode::Auto {
-        // Derive the track status on demand from impl-plan.json + status_override.
-        // v5 tracks no longer store a status field in metadata.json, so reading
-        // `track_record.status` (which is `None` for v5) and defaulting to "planned"
-        // would allow `activation_resume_allowed` to skip its early-return guard
-        // for done/blocked/cancelled tracks. Instead, derive the status properly.
-        let (track_meta, _) = super::resolve::read_track_metadata(&items_dir, &track_id)
-            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
-        let store = FsTrackStore::new(items_dir.clone());
-        let impl_plan_for_status = store
-            .load_impl_plan(&track_id)
-            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
-        let derived_status = domain::derive_track_status(
-            impl_plan_for_status.as_ref(),
-            track_meta.status_override(),
-        );
-        let status_str = derived_status.to_string();
+        // Derive the track status on demand from impl-plan.json + status_override as
+        // pure JSON — no domain types needed in the CLI (CN-01 / AC-03).
+        // v5 tracks no longer store a status field in metadata.json, so we read
+        // impl-plan.json directly. This mirrors the logic of domain::derive_track_status
+        // without importing domain types.
+        let status_str = derive_track_status_from_json(&items_dir, &track_id);
         activation_resume_allowed(
             &repo,
             &project_root,
@@ -194,20 +183,13 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
         preflight_branch_operation(&repo, &branch_name, mode, !already_materialized)
             .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
 
-    // Fail-closed: for a not-yet-materialized track, derive status from impl-plan +
-    // status_override. If the track already has a non-Planned status (e.g., someone
-    // added an impl-plan directly without going through the branch workflow), reject
-    // activation rather than allowing materialization of a non-planning track.
+    // Fail-closed: for a not-yet-materialized track, derive status from impl-plan JSON
+    // (no domain types needed). If the track already has a non-Planned status (e.g.,
+    // someone added an impl-plan directly without going through the branch workflow),
+    // reject activation rather than allowing materialization of a non-planning track.
     if !already_materialized {
-        let (track_meta, _) = super::resolve::read_track_metadata(&items_dir, &track_id)
-            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
-        let activation_store = FsTrackStore::new(items_dir.clone());
-        let preflight_plan = activation_store
-            .load_impl_plan(&track_id)
-            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
-        let preflight_status =
-            domain::derive_track_status(preflight_plan.as_ref(), track_meta.status_override());
-        if preflight_status != domain::TrackStatus::Planned {
+        let preflight_status = derive_track_status_from_json(&items_dir, &track_id);
+        if preflight_status != "planned" {
             return Err(CliError::Message(format!(
                 "activation preflight failed: track '{track_id}' has derived status \
                  '{preflight_status}' (not Planned); cannot activate a non-planning track"
@@ -218,7 +200,7 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     let materialized_now = if already_materialized {
         false
     } else {
-        match activation.execute(&track_id, &branch, track_record.schema_version) {
+        match activation.execute_by_strings(&track_id, &branch_name, track_record.schema_version) {
             Ok(ActivateTrackOutcome::Materialized(_)) => true,
             Err(err) => {
                 return Err(CliError::Message(format!("activation failed: {err}")));
@@ -227,7 +209,7 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     };
 
     let created_activation_commit = if should_persist_side_effects {
-        let rendered_paths = render::sync_rendered_views(&project_root, Some(track_id.as_ref()))
+        let rendered_paths = render::sync_rendered_views(&project_root, Some(track_id.as_str()))
             .map_err(|err| {
                 CliError::Message(format!("activation persisted but sync-views failed: {err}"))
             })?;
@@ -321,9 +303,9 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
 pub(super) fn load_track_branch_record(
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
 ) -> Result<TrackBranchRecord, String> {
-    let track_dir = items_dir.join(track_id.as_ref());
+    let track_dir = items_dir.join(track_id);
     load_explicit_track_branch_from_items_dir(project_root, items_dir, &track_dir)
 }
 
@@ -334,14 +316,14 @@ pub(super) fn load_track_branch_record(
 fn activation_commit_paths(
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
     rendered_paths: &[PathBuf],
 ) -> Vec<String> {
     let metadata_path = items_dir
-        .join(track_id.as_ref())
+        .join(track_id)
         .join("metadata.json")
         .strip_prefix(project_root)
-        .unwrap_or(&items_dir.join(track_id.as_ref()).join("metadata.json"))
+        .unwrap_or(&items_dir.join(track_id).join("metadata.json"))
         .display()
         .to_string();
 
@@ -360,7 +342,7 @@ fn persist_activation_commit(
     repo: &impl GitRepository,
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
     rendered_paths: &[PathBuf],
 ) -> Result<bool, String> {
     let staged_paths = activation_commit_paths(project_root, items_dir, track_id, rendered_paths);
@@ -397,18 +379,18 @@ fn persist_activation_commit(
 
 fn activation_resume_marker_path(
     project_root: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
 ) -> std::path::PathBuf {
-    project_root.join("tmp/track-activate").join(format!("{}.pending", track_id.as_ref()))
+    project_root.join("tmp/track-activate").join(format!("{track_id}.pending"))
 }
 
-fn activation_resume_marker_exists(project_root: &std::path::Path, track_id: &TrackId) -> bool {
+fn activation_resume_marker_exists(project_root: &std::path::Path, track_id: &str) -> bool {
     activation_resume_marker_path(project_root, track_id).is_file()
 }
 
 fn write_activation_resume_marker(
     project_root: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
 ) -> Result<(), String> {
     let marker_path = activation_resume_marker_path(project_root, track_id);
     if let Some(parent) = marker_path.parent() {
@@ -422,7 +404,7 @@ fn write_activation_resume_marker(
 
 fn clear_activation_resume_marker(
     project_root: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
 ) -> Result<(), String> {
     let marker_path = activation_resume_marker_path(project_root, track_id);
     match std::fs::remove_file(&marker_path) {
@@ -476,7 +458,7 @@ fn activation_git_commands(
 
 fn activation_branch_create_base(
     repo: &impl GitRepository,
-    track_id: &TrackId,
+    track_id: &str,
     branch_name: &str,
     mode: BranchMode,
     branch_exists: bool,
@@ -529,7 +511,7 @@ fn activation_resume_allowed(
     repo: &impl GitRepository,
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
     branch_name: &str,
     status: &str,
     current_branch: Option<&str>,
@@ -583,7 +565,7 @@ fn activation_requires_clean_worktree(
 fn allowed_activation_dirty_paths(
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
     mode: BranchMode,
     already_materialized: bool,
     resume_allowed: bool,
@@ -598,37 +580,43 @@ fn allowed_activation_dirty_paths(
 fn activation_artifact_paths(
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
 ) -> std::collections::BTreeSet<String> {
     let metadata_path = items_dir
-        .join(track_id.as_ref())
+        .join(track_id)
         .join("metadata.json")
         .strip_prefix(project_root)
-        .unwrap_or(&items_dir.join(track_id.as_ref()).join("metadata.json"))
+        .unwrap_or(&items_dir.join(track_id).join("metadata.json"))
         .display()
         .to_string();
     let plan_path = items_dir
-        .join(track_id.as_ref())
+        .join(track_id)
         .join("plan.md")
         .strip_prefix(project_root)
-        .unwrap_or(&items_dir.join(track_id.as_ref()).join("plan.md"))
+        .unwrap_or(&items_dir.join(track_id).join("plan.md"))
         .display()
         .to_string();
     let spec_path = items_dir
-        .join(track_id.as_ref())
+        .join(track_id)
         .join("spec.md")
         .strip_prefix(project_root)
-        .unwrap_or(&items_dir.join(track_id.as_ref()).join("spec.md"))
+        .unwrap_or(&items_dir.join(track_id).join("spec.md"))
         .display()
         .to_string();
     std::collections::BTreeSet::from([metadata_path, plan_path, spec_path])
 }
 
+/// Validates that the worktree is clean enough for activation.
+///
+/// Reads dirty paths via `git status --porcelain` (using `git_dirty_worktree_paths`)
+/// and delegates validation to `usecase::worktree_guard::validate_clean_worktree`.
+/// This avoids requiring `domain::WorktreeReader` in the CLI layer (CN-01 / AC-03).
 pub(super) fn ensure_clean_worktree(
-    repo: &(impl GitRepository + domain::WorktreeReader),
+    repo: &impl GitRepository,
     allowed_dirty_paths: &std::collections::BTreeSet<String>,
 ) -> Result<(), String> {
-    usecase::worktree_guard::ensure_clean_worktree(repo, allowed_dirty_paths)
+    let dirty_paths = git_dirty_worktree_paths(repo)?;
+    usecase::worktree_guard::validate_clean_worktree(&dirty_paths, allowed_dirty_paths)
         .map_err(|e| e.to_string())
 }
 
@@ -661,7 +649,7 @@ fn activation_artifacts_dirty(
     repo: &impl GitRepository,
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
-    track_id: &TrackId,
+    track_id: &str,
 ) -> Result<bool, String> {
     let artifact_paths = activation_artifact_paths(project_root, items_dir, track_id);
     let dirty_paths = git_dirty_worktree_paths(repo)?;
@@ -670,7 +658,7 @@ fn activation_artifacts_dirty(
 
 fn find_latest_activation_commit(
     repo: &impl GitRepository,
-    track_id: &TrackId,
+    track_id: &str,
 ) -> Result<Option<String>, String> {
     let message = format!("^track: activate {track_id}$");
     let output = repo
@@ -789,7 +777,6 @@ mod tests {
     use std::process::Output;
     use std::sync::Mutex;
 
-    use domain::TrackId;
     use infrastructure::git_cli::{GitError, GitRepository};
     use rstest::rstest;
 
@@ -837,16 +824,6 @@ mod tests {
         }
     }
 
-    impl domain::WorktreeReader for StubRepo {
-        fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
-            let key = vec!["status".to_owned(), "--porcelain".to_owned()];
-            match self.outputs.get(&key) {
-                Some(output) => Ok(String::from_utf8_lossy(&output.stdout).into_owned()),
-                None => Ok(String::new()),
-            }
-        }
-    }
-
     struct RecordingRepo {
         current_branch: Option<String>,
         outputs: HashMap<Vec<String>, Output>,
@@ -879,16 +856,6 @@ mod tests {
 
         fn current_branch(&self) -> Result<Option<String>, GitError> {
             Ok(self.current_branch.clone())
-        }
-    }
-
-    impl domain::WorktreeReader for RecordingRepo {
-        fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
-            let key = vec!["status".to_owned(), "--porcelain".to_owned()];
-            match self.outputs.get(&key) {
-                Some(output) => Ok(String::from_utf8_lossy(&output.stdout).into_owned()),
-                None => Ok(String::new()),
-            }
         }
     }
 
@@ -963,13 +930,15 @@ mod tests {
 
         let items_dir = dir.path().join("track/items");
         let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
-        let (_, meta) = store.find_with_meta(&TrackId::try_new("demo").unwrap()).unwrap().unwrap();
+        // Read schema_version from metadata.json as pure JSON (CN-01 / AC-03: no domain::TrackId).
+        let schema_version =
+            super::super::read_schema_version_from_json(&dir.path().join("track/items"), "demo");
 
-        let err = usecase::track_resolution::reject_branchless_guard(
+        let err = usecase::track_resolution::reject_branchless_guard_by_str(
             &store,
-            &TrackId::try_new("demo").unwrap(),
+            "demo",
             "in_progress",
-            meta.schema_version,
+            schema_version,
         )
         .unwrap_err();
 
@@ -983,13 +952,15 @@ mod tests {
 
         let items_dir = dir.path().join("track/items");
         let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
-        let (_, meta) = store.find_with_meta(&TrackId::try_new("demo").unwrap()).unwrap().unwrap();
+        // Read schema_version from metadata.json as pure JSON (CN-01 / AC-03: no domain::TrackId).
+        let schema_version =
+            super::super::read_schema_version_from_json(&dir.path().join("track/items"), "demo");
 
-        let result = usecase::track_resolution::reject_branchless_guard(
+        let result = usecase::track_resolution::reject_branchless_guard_by_str(
             &store,
-            &TrackId::try_new("demo").unwrap(),
+            "demo",
             "in_progress",
-            meta.schema_version,
+            schema_version,
         );
 
         assert!(result.is_ok());
@@ -999,13 +970,12 @@ mod tests {
     fn reject_branchless_guard_allows_legacy_v2_branchless_tracks_via_direct_call() {
         // v2 tracks cannot be read via FsTrackStore (codec now requires v5).
         // Test the underlying guard directly: schema_version 2 branchless tracks
-        // are allowed by `reject_branchless_implementation_transition` because
-        // the guard only fires for schema_version >= 3.
-        let id = TrackId::try_new("demo").unwrap();
-        let result = usecase::track_resolution::reject_branchless_implementation_transition(
+        // are allowed by `reject_branchless_implementation_transition_by_str` because
+        // the guard only fires for schema_version >= 3. (CN-01 / AC-03: no domain::TrackId).
+        let result = usecase::track_resolution::reject_branchless_implementation_transition_by_str(
             2,
             None, // branchless
-            &id,
+            "demo",
             "in_progress",
         );
         assert!(result.is_ok(), "v2 branchless tracks must not be blocked by the guard");
@@ -1050,8 +1020,7 @@ mod tests {
     #[test]
     fn activation_resume_allowed_only_for_planned_materialization_commit_on_non_track_branch() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::try_new("demo").unwrap();
-        write_activation_resume_marker(dir.path(), &track_id).unwrap();
+        write_activation_resume_marker(dir.path(), "demo").unwrap();
         let repo = StubRepo { current_branch: Some("main".to_owned()), outputs: HashMap::new() };
 
         assert!(
@@ -1059,7 +1028,7 @@ mod tests {
                 &repo,
                 dir.path(),
                 &dir.path().join("track/items"),
-                &track_id,
+                "demo",
                 "track/demo",
                 "planned",
                 Some("main"),
@@ -1071,7 +1040,7 @@ mod tests {
                 &repo,
                 dir.path(),
                 &dir.path().join("track/items"),
-                &track_id,
+                "demo",
                 "track/demo",
                 "in_progress",
                 Some("main"),
@@ -1083,7 +1052,7 @@ mod tests {
                 &repo,
                 dir.path(),
                 &dir.path().join("track/items"),
-                &track_id,
+                "demo",
                 "track/demo",
                 "planned",
                 Some("track/demo"),
@@ -1095,8 +1064,7 @@ mod tests {
     #[test]
     fn activation_resume_allowed_when_head_has_advanced_past_activation_commit() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::try_new("demo").unwrap();
-        write_activation_resume_marker(dir.path(), &track_id).unwrap();
+        write_activation_resume_marker(dir.path(), "demo").unwrap();
         let repo = StubRepo { current_branch: Some("main".to_owned()), outputs: HashMap::new() };
 
         assert!(
@@ -1104,7 +1072,7 @@ mod tests {
                 &repo,
                 dir.path(),
                 &dir.path().join("track/items"),
-                &track_id,
+                "demo",
                 "track/demo",
                 "planned",
                 Some("main"),
@@ -1116,7 +1084,6 @@ mod tests {
     #[test]
     fn activation_resume_allowed_rejects_clean_existing_branch_without_resume_marker() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::try_new("demo").unwrap();
         let repo = StubRepo {
             current_branch: Some("main".to_owned()),
             outputs: HashMap::from([
@@ -1139,7 +1106,7 @@ mod tests {
                 &repo,
                 dir.path(),
                 &dir.path().join("track/items"),
-                &track_id,
+                "demo",
                 "track/demo",
                 "planned",
                 Some("main"),
@@ -1177,7 +1144,7 @@ mod tests {
                 &repo,
                 dir.path(),
                 &dir.path().join("track/items"),
-                &TrackId::try_new("demo").unwrap(),
+                "demo",
                 "track/demo",
                 "planned",
                 Some("main"),
@@ -1189,13 +1156,12 @@ mod tests {
     #[test]
     fn activation_resume_marker_round_trips() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::try_new("demo").unwrap();
 
-        assert!(!activation_resume_marker_path(dir.path(), &track_id).exists());
-        write_activation_resume_marker(dir.path(), &track_id).unwrap();
-        assert!(activation_resume_marker_path(dir.path(), &track_id).is_file());
-        clear_activation_resume_marker(dir.path(), &track_id).unwrap();
-        assert!(!activation_resume_marker_path(dir.path(), &track_id).exists());
+        assert!(!activation_resume_marker_path(dir.path(), "demo").exists());
+        write_activation_resume_marker(dir.path(), "demo").unwrap();
+        assert!(activation_resume_marker_path(dir.path(), "demo").is_file());
+        clear_activation_resume_marker(dir.path(), "demo").unwrap();
+        assert!(!activation_resume_marker_path(dir.path(), "demo").exists());
     }
 
     #[rstest]
@@ -1281,12 +1247,11 @@ mod tests {
 
     #[test]
     fn allowed_activation_dirty_paths_only_open_for_auto_resume() {
-        let track_id = TrackId::try_new("demo").unwrap();
         assert_eq!(
             allowed_activation_dirty_paths(
                 Path::new("."),
                 Path::new("track/items"),
-                &track_id,
+                "demo",
                 BranchMode::Auto,
                 true,
                 true
@@ -1301,7 +1266,7 @@ mod tests {
             allowed_activation_dirty_paths(
                 Path::new("."),
                 Path::new("track/items"),
-                &track_id,
+                "demo",
                 BranchMode::Auto,
                 false,
                 false
@@ -1312,7 +1277,7 @@ mod tests {
             allowed_activation_dirty_paths(
                 Path::new("."),
                 Path::new("track/items"),
-                &track_id,
+                "demo",
                 BranchMode::Switch,
                 true,
                 true
@@ -1323,12 +1288,11 @@ mod tests {
 
     #[test]
     fn allowed_activation_dirty_paths_respects_items_dir() {
-        let track_id = TrackId::try_new("demo").unwrap();
         assert_eq!(
             allowed_activation_dirty_paths(
                 Path::new("."),
                 Path::new("custom/track/items"),
-                &track_id,
+                "demo",
                 BranchMode::Auto,
                 true,
                 true
@@ -1390,7 +1354,7 @@ mod tests {
         let paths = activation_commit_paths(
             Path::new("."),
             Path::new("track/items"),
-            &TrackId::try_new("demo").unwrap(),
+            "demo",
             &[registry_path, plan_path],
         );
 
@@ -1401,8 +1365,7 @@ mod tests {
 
     #[test]
     fn activation_artifact_paths_includes_spec_md_not_registry() {
-        let track_id = TrackId::try_new("demo").unwrap();
-        let paths = activation_artifact_paths(Path::new("."), Path::new("track/items"), &track_id);
+        let paths = activation_artifact_paths(Path::new("."), Path::new("track/items"), "demo");
 
         assert!(paths.contains("track/items/demo/metadata.json"), "metadata.json must be present");
         assert!(paths.contains("track/items/demo/plan.md"), "plan.md must be present");
@@ -1422,9 +1385,7 @@ mod tests {
         )
         .unwrap();
 
-        let record =
-            load_track_branch_record(dir.path(), &items_dir, &TrackId::try_new("demo").unwrap())
-                .unwrap();
+        let record = load_track_branch_record(dir.path(), &items_dir, "demo").unwrap();
 
         assert_eq!(record.display_path, "custom/track/items/demo");
     }
@@ -1752,7 +1713,7 @@ mod tests {
 
         let base = activation_branch_create_base(
             &repo,
-            &TrackId::try_new("demo").unwrap(),
+            "demo",
             "track/demo",
             BranchMode::Auto,
             false,
@@ -1802,7 +1763,7 @@ mod tests {
 
         let base = activation_branch_create_base(
             &repo,
-            &TrackId::try_new("demo").unwrap(),
+            "demo",
             "track/demo",
             BranchMode::Auto,
             true,
@@ -1861,7 +1822,7 @@ mod tests {
 
         let base = activation_branch_create_base(
             &repo,
-            &TrackId::try_new("demo").unwrap(),
+            "demo",
             "track/demo",
             BranchMode::Auto,
             true,
@@ -1888,14 +1849,9 @@ mod tests {
             status_calls: Mutex::new(Vec::new()),
         };
 
-        let created = persist_activation_commit(
-            &repo,
-            Path::new("."),
-            Path::new("track/items"),
-            &TrackId::try_new("demo").unwrap(),
-            &[],
-        )
-        .unwrap();
+        let created =
+            persist_activation_commit(&repo, Path::new("."), Path::new("track/items"), "demo", &[])
+                .unwrap();
 
         assert!(!created);
         assert!(repo.status_calls.lock().unwrap().is_empty());
@@ -1917,14 +1873,9 @@ mod tests {
             status_calls: Mutex::new(Vec::new()),
         };
 
-        let created = persist_activation_commit(
-            &repo,
-            Path::new("."),
-            Path::new("track/items"),
-            &TrackId::try_new("demo").unwrap(),
-            &[],
-        )
-        .unwrap();
+        let created =
+            persist_activation_commit(&repo, Path::new("."), Path::new("track/items"), "demo", &[])
+                .unwrap();
 
         assert!(created);
         assert_eq!(

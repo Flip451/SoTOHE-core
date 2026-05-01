@@ -65,6 +65,29 @@ pub enum ScopeQueryError {
     DiffGet(#[from] DiffGetError),
     #[error("unknown scope: {0}")]
     UnknownScope(ScopeName),
+    /// A path string could not be parsed into a valid `FilePath`.
+    #[error("invalid path '{path}': {reason}")]
+    InvalidPath { path: String, reason: String },
+    /// A scope name string could not be parsed into a valid `ScopeName`.
+    #[error("invalid scope name '{name}': {reason}")]
+    InvalidScopeName { name: String, reason: String },
+}
+
+// ── String-based output types (no domain imports for callers) ─────────
+
+/// String-only output produced by [`ScopeQueryService::classify_by_strings`].
+///
+/// Callers (e.g. CLI) never import `FilePath`, `MainScopeName`, or
+/// `ScopeClassification` directly (CN-01 / AC-03).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ScopeClassificationOutput {
+    /// The repo-relative path that was classified (as a raw string).
+    pub path: String,
+    /// The scope classification result:
+    /// - `vec!["scope1", "scope2", ...]` for named scopes (sorted alphabetically).
+    /// - `vec!["other"]` for the implicit `Other` scope.
+    /// - `vec!["<excluded>"]` for paths filtered by operational/other-track patterns.
+    pub scopes: Vec<String>,
 }
 
 // ── ScopeQueryService ─────────────────────────────────────────────────
@@ -96,6 +119,32 @@ pub trait ScopeQueryService {
     /// - `UnknownScope` when the scope is not configured.
     /// - `DiffGet` when `DiffGetter::list_diff_files` fails.
     fn files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError>;
+
+    /// String-accepting variant of [`Self::classify`] for callers that must not import
+    /// domain types (CN-01 / AC-03).
+    ///
+    /// Converts each raw string to a `FilePath`, delegates to `classify`, and
+    /// converts the result to `ScopeClassificationOutput`.
+    ///
+    /// # Errors
+    /// - `InvalidPath` when any path string is rejected by `FilePath::new`.
+    /// - Same as [`Self::classify`] otherwise (currently never).
+    fn classify_by_strings(
+        &self,
+        paths: Vec<String>,
+    ) -> Result<Vec<ScopeClassificationOutput>, ScopeQueryError>;
+
+    /// String-accepting variant of [`Self::files`] for callers that must not import
+    /// domain types (CN-01 / AC-03).
+    ///
+    /// Parses the scope name string, delegates to `files`, and converts the
+    /// result to `Vec<String>`.
+    ///
+    /// # Errors
+    /// - `InvalidScopeName` when the string is rejected by `ScopeName` parsing.
+    /// - `UnknownScope` when the scope is not configured.
+    /// - `DiffGet` when `DiffGetter::list_diff_files` fails.
+    fn files_by_string(&self, scope: String) -> Result<Vec<String>, ScopeQueryError>;
 }
 
 // ── ScopeQueryInteractor ──────────────────────────────────────────────
@@ -183,6 +232,69 @@ impl<D: DiffGetter> ScopeQueryService for ScopeQueryInteractor<D> {
         let diff_files = self.diff_getter.list_diff_files(&self.base)?;
         let classified = self.scope_config.classify(&diff_files);
         Ok(classified.get(&scope).cloned().unwrap_or_default())
+    }
+
+    fn classify_by_strings(
+        &self,
+        paths: Vec<String>,
+    ) -> Result<Vec<ScopeClassificationOutput>, ScopeQueryError> {
+        // Convert raw strings to FilePath values, collecting errors.
+        let file_paths: Vec<FilePath> = paths
+            .iter()
+            .map(|raw| {
+                FilePath::new(raw.as_str()).map_err(|e| ScopeQueryError::InvalidPath {
+                    path: raw.clone(),
+                    reason: e.to_string(),
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
+        // Delegate to the typed classify method.
+        let classified = self.classify(file_paths)?;
+
+        // Convert PathClassification → ScopeClassificationOutput.
+        Ok(classified
+            .into_iter()
+            .map(|pc| {
+                let scopes = match pc.classification {
+                    ScopeClassification::Named(head, tail) => {
+                        let mut names: Vec<String> = std::iter::once(head.as_str().to_owned())
+                            .chain(tail.iter().map(|n| n.as_str().to_owned()))
+                            .collect();
+                        names.sort();
+                        names
+                    }
+                    ScopeClassification::Other => vec!["other".to_owned()],
+                    ScopeClassification::Excluded => vec!["<excluded>".to_owned()],
+                };
+                ScopeClassificationOutput { path: pc.path.as_str().to_owned(), scopes }
+            })
+            .collect())
+    }
+
+    fn files_by_string(&self, scope: String) -> Result<Vec<String>, ScopeQueryError> {
+        // Parse the scope name string into a domain ScopeName. Mirror the
+        // case-insensitive `other` matching used by the `review files`
+        // pre-validation path in `infrastructure::review_v2::cli_composition`,
+        // otherwise inputs like "Other" pass validation and then fail here
+        // with InvalidScopeName.
+        let scope_name = if scope.eq_ignore_ascii_case("other") {
+            ScopeName::Other
+        } else {
+            match MainScopeName::new(&scope) {
+                Ok(main) => ScopeName::Main(main),
+                Err(e) => {
+                    return Err(ScopeQueryError::InvalidScopeName {
+                        name: scope,
+                        reason: e.to_string(),
+                    });
+                }
+            }
+        };
+
+        // Delegate to the typed files method and convert FilePath → String.
+        let file_paths = self.files(scope_name)?;
+        Ok(file_paths.into_iter().map(|fp| fp.as_str().to_owned()).collect())
     }
 }
 

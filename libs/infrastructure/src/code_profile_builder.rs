@@ -117,14 +117,22 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
         traits.insert(trait_info.name().to_string(), TraitNode::new(method_decls));
     }
 
-    // T006 (S4): Build FunctionNode map from SchemaExport::functions().
+    // Build FunctionNode map from SchemaExport::functions().
+    //
+    // `returns` carries the full source-form signature in a single-element Vec
+    // (e.g. `["Result<(), TrackResolutionError>"]`) so that catalogue
+    // declarations authored in natural Rust source form align with the L2
+    // forward check. The stripped form (used for typestate transition target
+    // detection) is still available via `fi.return_type_names()` (see
+    // `extract_typestate_names`). See ADR
+    // `2026-05-01-0702-free-function-l2-source-form-evaluator.md`.
     let functions: HashMap<(String, Option<String>), FunctionNode> = schema
         .functions()
         .iter()
         .map(|fi| {
             let key = (fi.name().to_string(), fi.module_path().map(str::to_string));
             let params: Vec<ParamDeclaration> = fi.params().to_vec();
-            let returns: Vec<String> = fi.return_type_names().to_vec();
+            let returns: Vec<String> = vec![fi.returns().to_string()];
             let node = FunctionNode::new(
                 params,
                 returns,

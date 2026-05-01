@@ -26,8 +26,9 @@ use crate::CliError;
 /// Returns `CliError` when the file cannot be read, the track cannot be loaded,
 /// or the write fails.
 pub fn execute_signals(items_dir: PathBuf, track_id: String) -> Result<ExitCode, CliError> {
-    // Validate track_id to prevent path traversal
-    let _valid_id = domain::TrackId::try_new(&track_id)
+    // Validate track_id to prevent path traversal (mirrors domain::TrackId::try_new without
+    // importing domain types — CN-01 / AC-03).
+    super::validate_track_id_str(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
     let track_dir = items_dir.join(&track_id);

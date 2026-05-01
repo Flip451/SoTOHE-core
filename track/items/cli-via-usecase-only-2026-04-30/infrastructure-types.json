@@ -1,0 +1,1758 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsTrackStore",
+      "description": "Filesystem-backed TrackStore adapter. Wired in CLI composition root. After migration, the CLI still wires FsTrackStore at the composition root (CN-04); no change to FsTrackStore itself (OS-05). Recorded as a reference to confirm the adapter remains infrastructure-layer (secondary_adapter).",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "TrackReader"
+        },
+        {
+          "trait_name": "TrackWriter"
+        },
+        {
+          "trait_name": "ImplPlanReader"
+        },
+        {
+          "trait_name": "ImplPlanWriter"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "RustdocSchemaExporter",
+      "description": "Infrastructure adapter implementing domain::schema::SchemaExporter and usecase::SchemaExporterPort. This track adds the SchemaExporterPort impl to RustdocSchemaExporter (action: modify, scoped by IN-06), which is an in-scope infrastructure change required so the CLI composition root can wire it as Arc<dyn usecase::SchemaExporterPort> into ExportSchemaInteractor without importing domain::schema::SchemaExporter directly. The existing domain::schema::SchemaExporter impl is unchanged (OS-05). The SchemaExporterPort::export_as_json impl calls the domain SchemaExporter::export method internally and serializes the SchemaExport result to JSON.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "SchemaExporter"
+        },
+        {
+          "trait_name": "SchemaExporterPort"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-06",
+          "hash": "5f6e4f21c13496a2e4e390883ddb33fe88a43776e773a5002db393e180dca9e3"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        }
+      ]
+    },
+    {
+      "name": "ConchShellParser",
+      "description": "Infrastructure adapter implementing domain::guard::ShellParser, usecase::ShellParserPort, and usecase::HookShellParserPort. This track adds the ShellParserPort impl to ConchShellParser (scoped by IN-06) and the HookShellParserPort impl (scoped by IN-07). Both are in-scope infrastructure changes required so the CLI composition root can wire it as Arc<dyn usecase::ShellParserPort> into GuardCheckInteractor and as Arc<dyn usecase::HookShellParserPort> into HookDispatchInteractor without importing domain::guard::ShellParser directly. The existing domain::guard::ShellParser impl is unchanged (OS-05 applies to that impl); only the new port impls are added. Composition-root DI wiring is permitted under CN-04.",
+      "approved": true,
+      "action": "modify",
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ShellParser"
+        },
+        {
+          "trait_name": "ShellParserPort"
+        },
+        {
+          "trait_name": "HookShellParserPort"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-06",
+          "hash": "5f6e4f21c13496a2e4e390883ddb33fe88a43776e773a5002db393e180dca9e3"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-07",
+          "hash": "4c298ae0f82322ca3a99efa7dd37725c9eb5263fdec5e34d2725a05edb2268a5"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-04",
+          "hash": "44afa4a6a1b26b0daa322e6edb346b5c5fe3b40335c113019977e682176314d4"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "NullDiffGetter",
+      "description": "Stub DiffGetter secondary adapter (implements usecase::review_v2::ports::DiffGetter) that always returns an empty file list. Used in the sotp review classify composition path that needs a DiffGetter port impl without actual diff I/O, so the CLI never imports domain types directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "DiffGetter"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "NullReviewer",
+      "description": "Stub Reviewer secondary adapter (implements usecase::review_v2::ports::Reviewer) that always returns an error when invoked. Used in composition paths that only need review state queries (status/check-approved) but must satisfy the Reviewer trait bound on ReviewCycle, without the CLI importing domain::review_v2::Reviewer (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "Reviewer"
+        }
+      ],
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "CodexReviewOutcome",
+      "description": "Enum returned by run_codex_review_str so the CLI can emit review output without importing domain::review_v2::Verdict, FastVerdict, or ReviewOutcome directly (CN-01 / AC-03). Variants: Skipped (no diff files), FinalCompleted (verdict JSON + exit code), FastCompleted (verdict JSON + exit code).",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Skipped",
+        "FinalCompleted",
+        "FastCompleted"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "ReviewV2Composition",
+      "description": "Infrastructure composition struct holding all v2 review adapters needed for status and check-approved operations (uses NullReviewer). Fields are intentionally private; CLI callers access behaviour through the string-accepting free functions in infrastructure::review_v2::cli_composition so concrete infrastructure types are not exposed to the CLI layer (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "ReviewV2CompositionWithCodex",
+      "description": "Infrastructure composition struct holding all v2 review adapters needed for actual review operations (uses CodexReviewer). Fields are intentionally private; CLI callers access behaviour through string-accepting free functions so concrete infrastructure types are not exposed to the CLI layer (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "CaptureBaselineError",
+      "description": "Error carrier returned by capture_baseline_for_layer so the CLI can map it to CliError::Message without importing domain types. Newtype struct wrapping a String error message; implements Display (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "0",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "EvaluateSignalsError",
+      "description": "Error carrier returned by evaluate_and_write_signals and execute_type_signals_for_layer so the CLI can map it to CliError::Message without importing domain types. Newtype struct wrapping a String error message; implements Display (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "0",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "TypeGraphExportError",
+      "description": "Error carrier returned by execute_type_graph_for_layer so the CLI can map it to CliError::Message without importing domain types. Newtype struct wrapping a String error message; implements Display (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "0",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "SignalSummary",
+      "description": "Signal count summary returned by evaluate_and_write_signals. Contains blue, yellow, red, total, undeclared_count, skipped_count, and catalogue_file fields so the CLI can print signal summaries without importing domain::ConfidenceSignal directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "dto",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "blue",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "yellow",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "red",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "total",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "undeclared_count",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "skipped_count",
+          "ty": "usize"
+        },
+        {
+          "kind": "field",
+          "name": "catalogue_file",
+          "ty": "String"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "run_example_demo",
+      "description": "Runs the example track state machine demo. Creates an in-memory track, persists it via SaveTrackUseCase, derives its status, and returns a display string. Moved to infrastructure so the CLI composition root never imports domain types directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::demo",
+      "expected_params": [],
+      "expected_returns": [
+        "Result<String, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "persist_commit_hash_for_track",
+      "description": "Persists the current HEAD SHA to .commit_hash for the given track (v2 incremental diff base). Encapsulates TrackId, CommitHash, and CommitHashWriter domain type construction so the CLI never imports them directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2",
+      "expected_params": [
+        {
+          "name": "track_id",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "Result<String, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "append_scope_briefing_reference_str",
+      "description": "Appends a scope-specific severity policy reference section to a prompt string. String-accepting variant of the CLI append_scope_briefing_reference helper; loads scope config without exposing domain::ScopeName or domain::ReviewScopeConfig to the CLI (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "prompt",
+          "ty": "&mut String"
+        },
+        {
+          "name": "scope_name",
+          "ty": "&str"
+        },
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "is_safe_path_fn",
+          "ty": "impl Fn"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_check_approved_service",
+      "description": "Constructs an Arc<dyn ReviewCheckApprovedService> that the CLI can call without importing infrastructure or domain types. Returns a ReviewCheckApprovedInteractor whose closure delegates to check_approved_str (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [],
+      "expected_returns": [
+        "Arc<dyn ReviewCheckApprovedService>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_review_v2",
+      "description": "Builds the v2 review composition (ReviewV2Composition) with NullReviewer for status/check-approved operations. Discovers git root, validates items_dir path, loads review-scope.json, reads .commit_hash, constructs FsReviewStore and FsCommitHashStore (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id",
+          "ty": "&TrackId"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<ReviewV2Composition, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_review_v2_str",
+      "description": "String-accepting variant of build_review_v2. Converts track_id_str to TrackId and delegates. Callers that must not import domain::TrackId use this entry point (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<ReviewV2Composition, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_review_v2_with_reviewer",
+      "description": "Builds the v2 review composition (ReviewV2CompositionWithCodex) with a real CodexReviewer for actual review operations (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id",
+          "ty": "&TrackId"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "reviewer",
+          "ty": "CodexReviewer"
+        }
+      ],
+      "expected_returns": [
+        "Result<ReviewV2CompositionWithCodex, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_review_v2_with_reviewer_str",
+      "description": "String-accepting variant of build_review_v2_with_reviewer. Converts track_id_str to TrackId and delegates. Callers that must not import domain::TrackId use this entry point (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "reviewer",
+          "ty": "CodexReviewer"
+        }
+      ],
+      "expected_returns": [
+        "Result<ReviewV2CompositionWithCodex, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_run_review_service",
+      "description": "Constructs an Arc<dyn RunReviewService> that the CLI can call without importing infrastructure or domain types. Returns a RunReviewInteractor whose closure builds a CodexReviewer and dispatches via run_codex_review_str (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [],
+      "expected_returns": [
+        "Arc<dyn RunReviewService>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_scope_query_interactor_no_diff_str",
+      "description": "Builds a ScopeQueryInteractor<NullDiffGetter> for pure-logic use (no diff I/O). Uses NullDiffGetter and a placeholder CommitHash. Suitable for sotp review classify which only calls ScopeQueryService::classify_by_strings (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<ScopeQueryInteractor<NullDiffGetter>, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "build_scope_query_interactor_str",
+      "description": "Builds a ScopeQueryInteractor<GitDiffGetter> from string track_id and items_dir. Callers that must not import domain::TrackId or domain::CommitHash use this entry point (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<ScopeQueryInteractor<GitDiffGetter>, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "check_approved_str",
+      "description": "Runs the full check-approved operation from string inputs and returns a ReviewApprovalOutput DTO. Encapsulates TrackId, ReviewExistsPort, and ReviewApprovalVerdict conversions so the CLI never imports domain review types directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<ReviewApprovalOutput, ReviewCheckApprovedError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "get_briefing_for_scope_str",
+      "description": "Returns the configured briefing file path (as Option<String>) for the given scope in the given track's scope configuration. Lets the CLI layer query scope briefing config without importing domain::review_v2::ScopeName or ReviewScopeConfig (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "scope_name",
+          "ty": "&str"
+        },
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<Option<String>, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "load_scope_config_only",
+      "description": "Loads just the ReviewScopeConfig for a given track/items_dir without initialising review/hash stores or resolving the diff base. Used by string-accepting wrappers and the CLI composition root (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id",
+          "ty": "&TrackId"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<ReviewScopeConfig, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "load_scope_config_only_str",
+      "description": "String-accepting variant of load_scope_config_only. Converts track_id_str to TrackId and delegates. Returns the scope config for use in the CLI composition root (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<ReviewScopeConfig, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "render_review_results_str",
+      "description": "Renders the sotp review results output as a string from string-typed parameters. Performs all domain operations internally so commands/review/results.rs never imports domain types directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "scope_filter",
+          "ty": "Option<&str>"
+        },
+        {
+          "name": "limit",
+          "ty": "Option<u32>"
+        },
+        {
+          "name": "round_type",
+          "ty": "&str"
+        },
+        {
+          "name": "no_hint",
+          "ty": "bool"
+        }
+      ],
+      "expected_returns": [
+        "Result<String, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "resolve_diff_base_and_getter",
+      "description": "Resolves the diff base commit hash and returns a (GitDiffGetter, CommitHash) pair for sotp review files. Encapsulates domain type construction so the CLI never imports CommitHash or TrackId directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id",
+          "ty": "&TrackId"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<(GitDiffGetter, CommitHash), String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "run_codex_review_str",
+      "description": "Runs the full Codex review cycle from string inputs. Encapsulates TrackId, ScopeName, RoundType, ReviewOutcome, Verdict, FastVerdict, ReviewWriter, and ReviewerFinding conversions so the CLI layer never imports these domain types directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "group_str",
+          "ty": "&str"
+        },
+        {
+          "name": "round_type_str",
+          "ty": "&str"
+        },
+        {
+          "name": "reviewer",
+          "ty": "CodexReviewer"
+        }
+      ],
+      "expected_returns": [
+        "Result<CodexReviewOutcome, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "validate_review_group_name_str",
+      "description": "Validates a review group name string without exposing domain types to the caller. Returns Ok(()) if valid, or Err(reason). Used by CLI to pre-validate --group arguments without importing domain::ReviewGroupName (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "group_name",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "validate_scope_for_track_str",
+      "description": "Validates that scope_name is a configured scope for the given track, without resolving the diff base. Used by sotp review files to enforce scope name validation before any diff I/O (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "scope_name",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "validate_track_id_str",
+      "description": "Validates a track ID string without exposing domain::TrackId to the caller. Returns Ok(()) if valid or Err(reason). Used by CLI to pre-validate --track-id arguments without importing domain::TrackId (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::review_v2::cli_composition",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "AC-03",
+          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
+        }
+      ]
+    },
+    {
+      "name": "capture_baseline_for_layer",
+      "description": "Captures the baseline for a single TDDD layer binding. Handles skip-if-exists logic, symlink guards, rustdoc export, TypeGraph build, and atomic write. Accepts track_id as &str so the CLI never imports domain types (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::baseline_capture",
+      "expected_params": [
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), CaptureBaselineError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "refresh_one_layer",
+      "description": "Refreshes a single layer: reads <layer>-types.json from the local workspace, computes per-entry signals + raw-bytes SHA-256, builds the document, and persists via the writer port. Accepts track_id as &str so the CLI never imports domain::TrackId (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::catalogue_spec_signals_refresher",
+      "expected_params": [
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "writer",
+          "ty": "&FsCatalogueSpecSignalsStore"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "execute_type_graph_for_layer",
+      "description": "Renders a mermaid type graph for a single TDDD-enabled layer binding. Accepts track_id as &str so the CLI never imports domain::schema::SchemaExporter or domain::schema::SchemaExportError directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_graph_export",
+      "expected_params": [
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "cluster_depth",
+          "ty": "usize"
+        },
+        {
+          "name": "edge_set",
+          "ty": "EdgeSet"
+        }
+      ],
+      "expected_returns": [
+        "Result<ExitCode, TypeGraphExportError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "evaluate_and_write_signals",
+      "description": "Evaluates type signals for a single TDDD layer binding catalogue and writes back to the configured file. Returns (ExitCode, SignalSummary). Moved from CLI so the CLI layer never imports domain::TypeCatalogueDocument, domain::TypeGraph, or domain::TypeBaseline directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_signals_evaluator",
+      "expected_params": [
+        {
+          "name": "doc",
+          "ty": "&mut TypeCatalogueDocument"
+        },
+        {
+          "name": "profile",
+          "ty": "&TypeGraph"
+        },
+        {
+          "name": "baseline",
+          "ty": "&TypeBaseline"
+        },
+        {
+          "name": "domain_types_path",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "signal_file_name",
+          "ty": "&str"
+        },
+        {
+          "name": "workspace_crates",
+          "ty": "&HashSet<String>"
+        }
+      ],
+      "expected_returns": [
+        "Result<(ExitCode, SignalSummary), EvaluateSignalsError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "execute_type_signals_for_layer",
+      "description": "Evaluates type signals for a single TDDD layer binding and writes back to the configured catalogue file. Moved from CLI so the CLI layer never imports domain::schema::SchemaExporter, domain::TypeCatalogueDocument, or domain::TypeGraph directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_signals_evaluator",
+      "expected_params": [
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&str"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        }
+      ],
+      "expected_returns": [
+        "Result<ExitCode, EvaluateSignalsError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "validate_action_diagnostics",
+      "description": "Prints action-baseline contradiction warnings and validates delete actions. Contradictions are printed as [WARN] to stderr; delete errors return EvaluateSignalsError. Moved from CLI so the CLI layer never imports domain::ConsistencyReport directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_signals_evaluator",
+      "expected_params": [
+        {
+          "name": "report",
+          "ty": "&ConsistencyReport"
+        }
+      ],
+      "expected_returns": [
+        "Result<(), EvaluateSignalsError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "validate_and_write_catalogue",
+      "description": "Encodes and writes the per-layer catalogue after consistency validation. Returns the encoded bytes for declaration_hash computation. Moved from CLI so the CLI layer never imports domain::ConsistencyReport or domain::TypeCatalogueDocument directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_signals_evaluator",
+      "expected_params": [
+        {
+          "name": "report",
+          "ty": "&ConsistencyReport"
+        },
+        {
+          "name": "doc",
+          "ty": "&TypeCatalogueDocument"
+        },
+        {
+          "name": "domain_types_path",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<Vec<u8>, EvaluateSignalsError>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "read_track_status_str",
+      "description": "Reads and renders the track status as a formatted string from string-typed arguments. Moved from CLI so the CLI composition root never imports domain::TrackId or domain::TrackMetadata directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::track::fs_store",
+      "expected_params": [
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        }
+      ],
+      "expected_returns": [
+        "Result<String, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "execute_verify_adr_signals",
+      "description": "Executes the verify adr-signals subcommand. Composes FsAdrFileAdapter with VerifyAdrSignalsInteractor at the composition root, runs verification, and translates the resulting AdrVerifyOutput (usecase-owned DTO, returned after T012 changed VerifyAdrSignals::verify from AdrVerifyReport to AdrVerifyOutput) into a VerifyOutcome. All domain type handling is internal to the usecase layer (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::adr_signals",
+      "expected_params": [
+        {
+          "name": "project_root",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "VerifyOutcome"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "any_enabled_catalogue_present",
+      "description": "Detects whether any TDDD-enabled layer with catalogue_spec_signal opt-in has its catalogue file present under track_dir. Used as the Phase 0/1 gate: when no enabled catalogue exists, verifier returns silent PASS without consulting spec.json (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::catalogue_spec_refs",
+      "expected_params": [
+        {
+          "name": "bindings",
+          "ty": "&[TdddLayerBinding]"
+        },
+        {
+          "name": "track_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<bool, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "format_finding",
+      "description": "Formats a SpecRefFinding into a human-readable string for CLI output. Encapsulates domain::SpecRefFinding and SpecRefFindingKind so the CLI never imports those types directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::catalogue_spec_refs",
+      "expected_params": [
+        {
+          "name": "finding",
+          "ty": "&SpecRefFinding"
+        }
+      ],
+      "expected_returns": [
+        "String"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "read_spec_element_hashes",
+      "description": "Reads spec.json and returns a BTreeMap<SpecElementId, ContentHash> for use in per-layer catalogue-spec-ref verification. All domain type handling is internal to this module (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::catalogue_spec_refs",
+      "expected_params": [
+        {
+          "name": "track_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "Result<BTreeMap<SpecElementId, ContentHash>, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "verify_one_layer_formatted",
+      "description": "Verifies one catalogue layer and returns formatted finding strings. Returns formatted strings instead of SpecRefFinding so the CLI never needs to import domain::SpecRefFinding or domain::SpecRefFindingKind (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::catalogue_spec_refs",
+      "expected_params": [
+        {
+          "name": "track_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "spec_element_hashes",
+          "ty": "&BTreeMap<SpecElementId, ContentHash>"
+        },
+        {
+          "name": "skip_stale",
+          "ty": "bool"
+        }
+      ],
+      "expected_returns": [
+        "Result<Vec<String>, String>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "execute_catalogue_spec_signals",
+      "description": "Core catalogue-spec-signals check logic with explicit, resolved parameters. All domain type handling is internal; the CLI calls this passing resolved PathBuf arguments and receives a VerifyOutcome (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::catalogue_spec_signals",
+      "expected_params": [
+        {
+          "name": "items_dir",
+          "ty": "PathBuf"
+        },
+        {
+          "name": "track_id",
+          "ty": "String"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "PathBuf"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "expected_returns": [
+        "VerifyOutcome"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "execute_catalogue_spec_signals_check",
+      "description": "Executes verify catalogue-spec-signals after git-based branch resolution. Resolves the active track branch, then delegates to execute_catalogue_spec_signals. Returns VerifyOutcome (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::catalogue_spec_signals",
+      "expected_params": [
+        {
+          "name": "items_dir",
+          "ty": "PathBuf"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "PathBuf"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "expected_returns": [
+        "VerifyOutcome"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "consistency_report_to_findings",
+      "description": "Converts a ConsistencyReport into a flat list of VerifyFindings for VerifyOutcome. Re-exported so CLI test code can call it without importing domain::ConsistencyReport directly (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::spec_code_consistency",
+      "expected_params": [
+        {
+          "name": "report",
+          "ty": "&ConsistencyReport"
+        }
+      ],
+      "expected_returns": [
+        "Vec<VerifyFinding>"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "evaluate_consistency_from_components",
+      "description": "Evaluates bidirectional spec-code consistency from pre-built components (TypeCatalogueDocument, TypeGraph, TypeBaseline). Separated from execute_spec_code_consistency_str so the wiring can be tested without requiring the nightly toolchain (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::spec_code_consistency",
+      "expected_params": [
+        {
+          "name": "doc",
+          "ty": "&TypeCatalogueDocument"
+        },
+        {
+          "name": "graph",
+          "ty": "&TypeGraph"
+        },
+        {
+          "name": "baseline",
+          "ty": "&TypeBaseline"
+        },
+        {
+          "name": "workspace_crates",
+          "ty": "&HashSet<String>"
+        }
+      ],
+      "expected_returns": [
+        "VerifyOutcome"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    },
+    {
+      "name": "execute_spec_code_consistency_str",
+      "description": "Executes the bidirectional spec-code consistency check from CLI string arguments. Returns a VerifyOutcome suitable for print_outcome. All domain type handling is internal (CN-01 / AC-03).",
+      "approved": true,
+      "kind": "free_function",
+      "module_path": "infrastructure::verify::spec_code_consistency",
+      "expected_params": [
+        {
+          "name": "track_id_str",
+          "ty": "&str"
+        },
+        {
+          "name": "crate_name",
+          "ty": "&str"
+        },
+        {
+          "name": "project_root",
+          "ty": "&Path"
+        }
+      ],
+      "expected_returns": [
+        "VerifyOutcome"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "CN-01",
+          "hash": "af7403ac56159eb35c17b88d046da45204b2d8da35fa0987f8265ef5091c237d"
+        }
+      ]
+    }
+  ]
+}

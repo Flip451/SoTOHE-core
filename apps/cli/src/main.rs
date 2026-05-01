@@ -1,12 +1,8 @@
 #![warn(clippy::too_many_lines)]
 
 use std::process::ExitCode;
-use std::sync::Arc;
 
 use clap::{Parser, Subcommand};
-use domain::{DomainError, TrackId, TrackMetadata, derive_track_status};
-use infrastructure::InMemoryTrackStore;
-use usecase::SaveTrackUseCase;
 
 mod commands;
 mod error;
@@ -94,57 +90,29 @@ fn main() -> ExitCode {
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
         Some(CliCommand::Make(args)) => commands::make::execute(args),
-        Some(CliCommand::Demo) | None => match run_demo() {
-            Ok(code) => code,
+        Some(CliCommand::Demo) | None => match infrastructure::demo::run_example_demo() {
+            Ok(msg) => {
+                println!("{msg}");
+                ExitCode::SUCCESS
+            }
             Err(err) => {
                 eprintln!("{err}");
-                err.exit_code()
+                ExitCode::FAILURE
             }
         },
     }
 }
 
-fn run_demo() -> Result<ExitCode, CliError> {
-    let store = Arc::new(InMemoryTrackStore::new());
-    let save = SaveTrackUseCase::new(Arc::clone(&store));
-
-    let track = example_track()
-        .map_err(|e| CliError::Message(format!("failed to build example track: {e}")))?;
-
-    save.execute(&track)
-        .map_err(|e| CliError::Message(format!("failed to save example track: {e}")))?;
-
-    let status = derive_track_status(None, track.status_override());
-    println!("SoTOHE-core CLI stub: '{}' is {status}", track.id());
-    Ok(ExitCode::SUCCESS)
-}
-
-fn example_track() -> Result<TrackMetadata, DomainError> {
-    // TrackMetadata is identity-only; status is derived on demand.
-    TrackMetadata::new(TrackId::try_new("track-state-machine")?, "Track state machine", None)
-}
-
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
-    use std::sync::Arc;
-
-    use domain::derive_track_status;
-    use infrastructure::InMemoryTrackStore;
-    use usecase::SaveTrackUseCase;
-
-    use super::example_track;
-
     #[test]
     fn example_cli_flow_saves_track_successfully() {
-        // Status is derived on demand from impl-plan + override.
-        // A freshly created track with no impl-plan and no override → Planned.
-        let store = Arc::new(InMemoryTrackStore::new());
-        let save = SaveTrackUseCase::new(Arc::clone(&store));
-        let track = example_track().unwrap();
-
-        save.execute(&track).unwrap();
-
-        assert_eq!(derive_track_status(None, track.status_override()).to_string(), "planned");
+        // Delegates to usecase::demo::run_example_demo which creates an in-memory
+        // track, persists it, derives status "planned", and returns the display string.
+        let result = infrastructure::demo::run_example_demo();
+        assert!(result.is_ok(), "demo failed: {:?}", result.err());
+        let msg = result.unwrap();
+        assert!(msg.contains("planned"), "expected 'planned' in output: {msg}");
     }
 }

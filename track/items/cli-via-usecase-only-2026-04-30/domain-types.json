@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackId",
+      "description": "Value object for a track identifier. Currently imported directly by CLI in 25 files. After migration, the CLI will pass raw strings to usecase boundaries; usecase constructs TrackId internally. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "CommitHash",
+      "description": "Value object for a git commit hash string. Currently constructed by CLI and passed to usecase. After migration, usecase accepts raw Option<String> commit hash and constructs CommitHash internally. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLintViolation",
+      "description": "Domain value object produced when a CatalogueLinter rule fires. Used as the element type in Vec<CatalogueLintViolation> returned by RunCatalogueLint::execute (usecase application service). This is an intentional CN-01 exception accepted in spec.json IN-08: the usecase public API surface exposes this domain type because CLI callers access violations via type inference without a direct `use domain::...CatalogueLintViolation` import. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-08",
+          "hash": "a79f533d3a3c8ad49a1a86b5932653aee262651fb99bd9e633128834bea18e70"
+        }
+      ]
+    },
+    {
+      "name": "TrackReader",
+      "description": "Domain trait for reading track data from persistent storage. Used as `&impl TrackReader` parameter type in the usecase function `reject_branchless_guard_by_str`. This is an intentional CN-01 exception accepted in spec.json IN-09: CLI callers pass a concrete `FsTrackStore` via type inference without any `use domain::...TrackReader` import; `cargo make check-layers` passes. A usecase-owned port abstraction was intentionally deferred. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "find",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<Option<TrackMetadata>, TrackReadError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-09",
+          "hash": "e4ae5983c9953ed7106f9feb48cb487f524aa5e642db30a9997e8016bc2024b3"
+        }
+      ]
+    },
+    {
+      "name": "TrackWriteError",
+      "description": "Domain error enum surfaced by track write operations. Used as the error type in `Result<ActivateTrackOutcome, TrackWriteError>` returned by `ActivateTrackUseCase::execute_by_strings`. This is an intentional CN-01 exception accepted in spec.json IN-10: CLI callers pattern-match on the result without a direct `use domain::...TrackWriteError` import; `cargo make check-layers` passes. A usecase-owned error type was intentionally deferred. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "Domain",
+        "Repository"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-10",
+          "hash": "6f6f4e3f7efb47acf2c40f0d93814434ed5635387f77cf6af8db9daf62572682"
+        }
+      ]
+    },
+    {
+      "name": "TypeSignal",
+      "description": "Per-type signal evaluation result produced by comparing a TypeCatalogueEntry against scanned code output. Modified during this track: a new `signal_as_str()` accessor was added so CLI display code can branch on signal level without importing domain::ConfidenceSignal (CN-01 compliance helper). No structural invariant change; all methods remain pure accessors. No change to domain implementation beyond this accessor addition.",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        }
+      ]
+    },
+    {
+      "name": "Decision",
+      "description": "Domain enum for guard/hook Allow/Block decisions. Currently imported by CLI guard and hook commands. After migration, CLI sees only usecase-owned GuardDecision enum; domain::Decision stays internal to usecase/infrastructure. No change to domain implementation (OS-05).",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "Allow",
+        "Block"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-04",
+          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
+        },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "AdrVerifyReport",
+      "description": "Domain value object (struct) returned by VerifyAdrSignals::verify. Aggregates signal counts computed by verifying ADR decision grounds. Fields are private; public API is four read-only accessors. Defined in domain::adr_decision. No implementation change in this track (OS-05); listed here so the contract-map renderer can draw the edge from VerifyAdrSignals::verify to this type.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [
+        {
+          "name": "blue_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "yellow_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "red_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "grandfathered_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    }
+  ]
+}

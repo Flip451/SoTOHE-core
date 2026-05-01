@@ -44,7 +44,7 @@ Translate the track's ADR (design decisions) and spec.json (behavioral contract)
 - Cite upstream SoT via structured refs (`spec_refs[]` for spec elements, `informal_grounds[]` for unpersisted grounds that still need promotion before merge)
 - Ensure names follow the catalogue codec's last-segment short-name rule: **no `::` in `ty` / `returns` values** — use the last segment only (e.g., `PathBuf`, not `std::path::PathBuf`). The codec rejects strings containing `::`.
 
-The type-designer **owns each `<layer>-types.json` and its derived views for this track**: it writes the catalogue files directly, captures baselines, regenerates the per-layer rendered views (type-graph via `bin/sotp track type-graph` → `<layer>-graph-d<depth>/` directory in cluster mode, or `<layer>-graph.md` in flat mode; contract-map md), evaluates the type → spec signal via `bin/sotp track type-signals`, and captures per-layer signal counts for the orchestrator. The `<layer>-types.md` catalogue view is rendered by `sync_rendered_views` after this pipeline completes — not within the 9-step pipeline. The orchestrator receives the per-layer signal counts and decides whether Phase 2 passes.
+The type-designer **owns each `<layer>-types.json` and its derived views for this track**: it writes the catalogue files directly, captures baselines, regenerates the per-layer rendered views (type-graph via `bin/sotp track type-graph` → `<layer>-graph-d<depth>/` directory in cluster mode, or `<layer>-graph.md` in flat mode; contract-map md; `<layer>-types.md` via `sync_rendered_views`), generates the catalogue → spec signal JSON via `bin/sotp track catalogue-spec-signals`, evaluates the type → spec signal via `bin/sotp track type-signals`, and captures per-layer signal counts for the orchestrator. The orchestrator receives the per-layer signal counts and decides whether Phase 2 passes.
 
 **Reconnaissance first**: every layer pass begins with the reconnaissance procedure defined in the Internal pipeline (baseline-capture → type-graph at depth=1 + depth=2 → Read both depth outputs) so the catalogue draft is grounded in the existing workspace inventory before any kind / action decision is made. This reconnaissance is **internal preparation only** — the inventory and intermediate outputs are NOT echoed back to the orchestrator's final message. The reconnaissance step **must not be skipped**: it is a precondition for sound kind selection and for distinguishing `add` (no pre-existing type) from `modify` / `reference` / `delete` (pre-existing type) actions.
 
@@ -84,7 +84,7 @@ Opus is chosen because kind selection and cross-partition migration decisions (e
 
 ### Internal pipeline (all executed by this agent, per layer in scope)
 
-The pipeline is fixed at **9 steps**. Steps 1–5 form the reconnaissance phase (defined by ADR `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md` D1) and absorb the existing workspace inventory **before** any catalogue draft. Steps 1–5 are internal preparation — do NOT surface their outputs in the final report. Skipping any step is forbidden.
+The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase (defined by ADR `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md` D1) and absorb the existing workspace inventory **before** any catalogue draft. Steps 1–5 are internal preparation — do NOT surface their outputs in the final report. Skipping any step is forbidden, including step 12 — emitting the final message before step 12 passes is a contract violation regardless of whether the agent believes the earlier steps succeeded.
 
 1. **Capture baseline** of the current code state:
    ```
@@ -122,11 +122,74 @@ The pipeline is fixed at **9 steps**. Steps 1–5 form the reconnaissance phase 
    bin/sotp track contract-map <id> [--layers <layer_id>]
    ```
 
-9. **Evaluate the type → spec signal** (signal counts only; `<layer>-types.md` is rendered later by `sync_rendered_views`):
+9. **Generate `<layer>-catalogue-spec-signals.json`** (catalogue → spec direction, SoT Chain ② pre-commit step):
    ```
-   bin/sotp track type-signals <id> [--layer <layer_id>]
+   bin/sotp track catalogue-spec-signals <id> [--layer <layer_id>]
    ```
-   Capture per-layer blue / yellow / red counts. The signal counts (blue / yellow / red) are the primary output surfaced to the orchestrator for phase gate decisions.
+   Reads the LOCAL `<layer>-types.json` (not the origin blob) so uncommitted catalogue edits are reflected. Emits per-entry signals computed via the informal-priority rule plus the raw-bytes SHA-256 `catalogue_declaration_hash` used by the stale-detection gate.
+
+10. **Evaluate the type → spec signal** (rustdoc-based reverse direction, signal counts only):
+    ```
+    bin/sotp track type-signals <id> [--layer <layer_id>]
+    ```
+    Capture per-layer blue / yellow / red counts. The signal counts (blue / yellow / red) are the primary output surfaced to the orchestrator for phase gate decisions.
+
+11. **Refresh tracked rendered views via `sync_rendered_views`**:
+    ```
+    cargo make track-sync-views
+    ```
+    Renders `plan.md` (from metadata.json), `contract-map.md` (re-render to absorb the latest catalogue), and per-layer `<layer>-types.md` so on-disk views match the catalogue files just written. Run last so all upstream JSON inputs are stable.
+
+12. **Self-verify expected outputs are present AND fresh** — before emitting the final message, the agent MUST run two checks. This step is non-optional: it catches cases where an earlier step (especially the `Bash`-driven steps 1–3, 8–11) silently failed, was elided by the agent, was run on a stale catalogue, or had its output overwritten.
+
+    **12a. Step completion receipt + file existence (Bash exit-code → Glob)** — before checking file existence, confirm that each Bash-driven step succeeded in the current session by verifying that its invocation returned exit code 0. If any step was skipped or its Bash call was not invoked in this session, re-run it now — do NOT rely on a pre-existing on-disk artifact from an earlier session as a substitute for actually running the step. File presence alone cannot distinguish a freshly generated output from a stale remnant; a pre-existing `<layer>-types.md`, `contract-map.md`, `plan.md`, `<layer>-type-signals.json`, or any graph file from an earlier run satisfies a Glob while still reflecting a stale catalogue or stale signal counts.
+
+    Steps that must have completed in the current session before 12a Glob checks proceed:
+
+    - Step 7 (Write/Edit tool call that wrote `<layer>-types.json`) — the catalogue file must have been written by this agent in this session; a pre-existing file from a prior session is NOT a valid receipt
+    - Step 1 (`bin/sotp track baseline-capture`) — produces `<layer>-types-baseline.json`; Bash exit 0 required
+    - Step 2 (`bin/sotp track type-graph ... --cluster-depth 1`) — produces `<layer>-graph-d1/`; Bash exit 0 required
+    - Step 3 (`bin/sotp track type-graph ... --cluster-depth 2`) — produces `<layer>-graph-d2/`; Bash exit 0 required
+    - Step 8 (`bin/sotp track contract-map`) — produces `contract-map.md`; Bash exit 0 required
+    - Step 9 (`bin/sotp track catalogue-spec-signals`) — produces `<layer>-catalogue-spec-signals.json`; Bash exit 0 required
+    - Step 10 (`bin/sotp track type-signals`) — produces `<layer>-type-signals.json`; Bash exit 0 required
+    - Step 11 (`cargo make track-sync-views`) — produces `plan.md`, refreshed `contract-map.md`, and `<layer>-types.md`; Bash exit 0 required
+
+    After confirming each step above completed in this session, for **each processed layer** verify the following 7 paths resolve via `Glob`:
+
+    - `track/items/<id>/<layer>-types.json` (step 7)
+    - `track/items/<id>/<layer>-types-baseline.json` (step 1)
+    - `track/items/<id>/<layer>-graph-d1/index.md` (step 2)
+    - `track/items/<id>/<layer>-graph-d2/index.md` (step 3)
+    - `track/items/<id>/<layer>-catalogue-spec-signals.json` (step 9)
+    - `track/items/<id>/<layer>-type-signals.json` (step 10)
+    - `track/items/<id>/<layer>-types.md` (step 11)
+
+    Plus once for the track:
+
+    - `track/items/<id>/contract-map.md` (step 8 / step 11)
+    - `track/items/<id>/plan.md` (step 11)
+
+    If **any** expected path is still missing after all required steps have run, identify which step was responsible (the parenthetical mapping above), re-run that step, and re-validate.
+
+    **12b. Signal freshness (count-match for catalogue-spec-signals)** — even with all steps run, a step-9 partial failure (e.g. only some layers processed) can leave a stale `<layer>-catalogue-spec-signals.json` for the remaining layers. To detect this, run:
+
+    ```
+    bin/sotp verify catalogue-spec-signals
+    ```
+
+    **Precondition**: this command resolves the track from the current git branch. It must be run from the `track/<id>` branch that matches the `<id>` being processed. If the current branch is not `track/<id>`, the command will either SKIP (pass without verifying anything) or verify a different track — both of which are verification failures. A SKIP result must be treated as a failure and the branch must be confirmed before proceeding.
+
+    This CLI gate compares the entry count in each `<layer>-types.json` against the signal entry count in `<layer>-catalogue-spec-signals.json` and emits `coverage mismatch — catalogue has N entry/entries, signals document has M signal(s)` when they diverge. Exit non-zero on mismatch.
+
+    On non-zero exit (**at most one retry** — if the mismatch persists after the retry, escalate to `## Open Questions` instead of looping again):
+
+    - Re-run step 9 (`bin/sotp track catalogue-spec-signals <id> [--layer <layer_id>]`) to regenerate the signals file against the current catalogue
+    - Re-run step 11 (`cargo make track-sync-views`) so `<layer>-types.md` reflects the current catalogue too
+    - Re-run step 12b to confirm the gate now passes
+    - If the gate still exits non-zero after this single retry, do NOT retry again. Record the persistent mismatch as an `## Open Questions` item (include the exact error message and the catalogue / signals entry counts) and surface it to the orchestrator — a repeated mismatch indicates a deeper inconsistency that requires human review, not another automated loop.
+
+    Do NOT compose the final output message until both 12a (all required steps confirmed exit 0 in this session and all 9 expected paths exist: 7 per-layer paths + `contract-map.md` + `plan.md`) and 12b (signal freshness via `verify catalogue-spec-signals` exit 0) pass. The orchestrator treats a final message without all 11 prior steps' outputs on disk and freshly regenerated as a pipeline failure — the next phase will fail the catalogue-spec gate or `cargo make ci` rather than masking the gap.
 
 ### Output (final message to orchestrator)
 
@@ -469,15 +532,15 @@ Before saving the catalogue, scan the draft and confirm:
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), type-graph output (`<layer>-graph-d<depth>/` directory in cluster mode, or `<layer>-graph.md` in flat mode), contract-map (`contract-map.md`), and type catalogue view (`<layer>-types.md`) are generated by `bin/sotp` CLI commands — do NOT write these directly via Write/Edit.
-- **Writes forbidden**: any other track's artifacts, other subagents' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), `plan.md`, any file under `knowledge/adr/` or `knowledge/conventions/`, any source code.
-- **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp track baseline-capture`, `bin/sotp track type-signals`, per-view render subcommands). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
+- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), type-graph output (`<layer>-graph-d<depth>/` directory in cluster mode, or `<layer>-graph.md` in flat mode), contract-map (`contract-map.md`), per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`), per-layer type → spec signal JSON (`<layer>-type-signals.json`), and per-layer catalogue view (`<layer>-types.md`) are generated by `bin/sotp` CLI commands or `cargo make track-sync-views` — do NOT write these directly via Write/Edit.
+- **Writes forbidden**: any other track's artifacts, other subagents' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `cargo make track-sync-views` (Step 11), which is required by this pipeline.
+- **Bash usage**: restricted to `bin/sotp` CLI invocations and `cargo make track-sync-views` required by the internal pipeline (`bin/sotp track baseline-capture`, `bin/sotp track type-graph`, `bin/sotp track contract-map`, `bin/sotp track catalogue-spec-signals`, `bin/sotp track type-signals`, `cargo make track-sync-views`, `bin/sotp verify catalogue-spec-signals`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).
 - If architectural clarification is needed (decisions not in the ADR), note it in `## Open Questions` and advise the orchestrator to consult the `adr-editor` agent rather than improvising.
 
 ## Rules
 
-- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; `Write` / `Edit` for `<layer>-types.json` only; `Bash` only for `bin/sotp` CLI (which generates baseline, graph, contract-map, and `<layer>-types.md` as side effects)
+- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; `Write` / `Edit` for `<layer>-types.json` only; `Bash` only for `bin/sotp` CLI (including `bin/sotp verify catalogue-spec-signals` for step 12b) and `cargo make track-sync-views` (which generate baseline, graph, contract-map, catalogue-spec-signals JSON, type-signals JSON, and `<layer>-types.md` as side effects)
 - Do not use `Bash(cat/grep/head/tail/sed/awk)` — dedicated tools only
 - Do not run `git` commands
-- Do not modify `spec.json`, `metadata.json`, `impl-plan.json`, `task-coverage.json`, or `plan.md`
+- Do not modify `spec.json`, `metadata.json`, `impl-plan.json`, `task-coverage.json` directly. Do not edit `plan.md` directly via Write/Edit — it is regenerated by the required `cargo make track-sync-views` (Step 11)

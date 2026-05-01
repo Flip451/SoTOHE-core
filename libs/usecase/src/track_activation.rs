@@ -35,6 +35,27 @@ where
         Self { store }
     }
 
+    /// String-based variant of [`Self::execute`] for use by the CLI layer.
+    ///
+    /// Constructs [`TrackId`] and [`TrackBranch`] from raw strings so that the
+    /// CLI never imports domain types directly (CN-01 / AC-03 constraint).
+    ///
+    /// # Errors
+    ///
+    /// Returns `TrackWriteError::Domain` when `track_id` or `branch_name` fail
+    /// validation. All other errors are the same as [`Self::execute`].
+    pub fn execute_by_strings(
+        &self,
+        track_id: &str,
+        branch_name: &str,
+        schema_version: u32,
+    ) -> Result<ActivateTrackOutcome, TrackWriteError> {
+        let track_id = TrackId::try_new(track_id).map_err(|e| TrackWriteError::Domain(e.into()))?;
+        let branch =
+            TrackBranch::try_new(branch_name).map_err(|e| TrackWriteError::Domain(e.into()))?;
+        self.execute(&track_id, &branch, schema_version)
+    }
+
     pub fn execute(
         &self,
         track_id: &TrackId,
