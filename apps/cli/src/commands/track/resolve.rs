@@ -26,6 +26,12 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
             .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?,
     };
 
+    // Validate the track ID before any filesystem probing — `read_schema_version_from_json`
+    // does `items_dir.join(track_id)` and would otherwise let a caller traverse outside
+    // `track/items` with values like `..` or absolute paths.
+    super::validate_track_id_str(&effective_track_id)
+        .map_err(|err| CliError::Message(format!("resolve failed: invalid track id: {err}")))?;
+
     // Read schema_version from metadata.json (pure JSON, no domain types needed).
     let schema_version = read_schema_version_from_json(&items_dir, &effective_track_id);
 

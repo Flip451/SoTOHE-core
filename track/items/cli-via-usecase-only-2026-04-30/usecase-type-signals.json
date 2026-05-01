@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-01T04:19:12Z",
-  "declaration_hash": "caa7063a3425470cf580442837c51f3106d352d7a70b6a04c2940ba3e7becfa4",
+  "generated_at": "2026-05-01T07:24:50Z",
+  "declaration_hash": "678baaadf5c52ea1b5ed321f94897d453d415bb7bd3019311486dd3f8f41f325",
   "signals": [
     {
       "type_name": "TrackStatusOutput",
@@ -280,134 +280,12 @@
       ]
     },
     {
-      "type_name": "VerifyCatalogueConsistencyService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "fn verify(&self, track_id: String, items_dir: PathBuf, workspace_root: PathBuf) -> Result<VerifyCatalogueConsistencyOutput, VerifyCatalogueConsistencyError>"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueConsistencyOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "passed: bool",
-        "findings: Vec<String>"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueConsistencyError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "InvalidTrackId",
-        "CatalogueLoadFailed",
-        "SchemaExportFailed",
-        "BaselineLoadFailed"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueConsistencyInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "impl VerifyCatalogueConsistencyService"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueSpecSignalsService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "fn verify(&self, track_id: String, items_dir: PathBuf, skip_stale: bool) -> Result<VerifySpecSignalsOutput, VerifySpecSignalsError>"
-      ]
-    },
-    {
-      "type_name": "VerifySpecSignalsOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "passed: bool",
-        "findings: Vec<String>"
-      ]
-    },
-    {
-      "type_name": "VerifySpecSignalsError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "InvalidTrackId",
-        "CatalogueLoadFailed",
-        "SignalEvaluationFailed"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueSpecSignalsInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "impl VerifyCatalogueSpecSignalsService"
-      ]
-    },
-    {
-      "type_name": "TypeSignalsService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "fn evaluate(&self, track_id: String, items_dir: PathBuf, workspace_root: PathBuf, layer_filter: Option<String>) -> Result<Vec<LayerSignalSummary>, TypeSignalsError>"
-      ]
-    },
-    {
-      "type_name": "LayerSignalSummary",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "layer_id: String",
-        "blue_count: usize",
-        "yellow_count: usize",
-        "red_count: usize"
-      ]
-    },
-    {
-      "type_name": "TypeSignalsError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "InvalidTrackId",
-        "InactiveTrack",
-        "UnknownLayer",
-        "CatalogueLoadFailed",
-        "SchemaExportFailed"
-      ]
-    },
-    {
-      "type_name": "TypeSignalsInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "impl TypeSignalsService"
-      ]
-    },
-    {
       "type_name": "VerifyAdrSignals",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
-        "fn verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyOutput, VerifyAdrSignalsError>"
+      "found_items": [
+        "fn verify(&self, command: VerifyAdrSignalsCommand) -> Result<AdrVerifyReport, VerifyAdrSignalsError>"
       ]
     },
     {
@@ -420,23 +298,25 @@
       ]
     },
     {
-      "type_name": "AdrVerifyOutput",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
       "type_name": "ScopeQueryService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
+        "fn classify(&self, paths: Vec<FilePath>) -> Result<Vec<PathClassification>, ScopeQueryError>",
+        "fn files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError>",
         "fn classify_by_strings(&self, paths: Vec<String>) -> Result<Vec<ScopeClassificationOutput>, ScopeQueryError>",
         "fn files_by_string(&self, scope: String) -> Result<Vec<String>, ScopeQueryError>"
-      ],
-      "extra_items": [
-        "fn classify(&self, paths: Vec<FilePath>) -> Result<Vec<PathClassification>, ScopeQueryError>",
-        "fn files(&self, scope: ScopeName) -> Result<Vec<FilePath>, ScopeQueryError>"
+      ]
+    },
+    {
+      "type_name": "PathClassification",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "path: FilePath",
+        "classification: ScopeClassification"
       ]
     },
     {
@@ -452,15 +332,13 @@
     {
       "type_name": "ScopeQueryInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
-        "impl ScopeQueryService"
-      ],
-      "extra_items": [
-        "base: CommitHash",
+        "scope_config: ReviewScopeConfig",
         "diff_getter: D",
-        "scope_config: ReviewScopeConfig"
+        "base: CommitHash",
+        "impl ScopeQueryService"
       ]
     },
     {
@@ -695,63 +573,6 @@
       "found_type": true,
       "found_items": [
         "fn run(&self, command: RunReviewCommand) -> Result<RunReviewOutput, RunReviewError>"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueSpecRefsService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "fn verify(&self, track_id: String, items_dir: PathBuf, workspace_root: PathBuf, skip_stale: bool) -> Result<VerifyCatalogueSpecRefsOutput, VerifyCatalogueSpecRefsError>"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueSpecRefsOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "passed: bool",
-        "findings: Vec<String>"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueSpecRefsError",
-      "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "InvalidTrackId",
-        "SymlinkRejected",
-        "RulesFileMissing",
-        "RulesParseError",
-        "TrackDirectoryMissing",
-        "SpecJsonMissing",
-        "CatalogueDecodeFailed",
-        "SignalDecodeFailed"
-      ],
-      "extra_items": [
-        "BranchTrackMismatch",
-        "CatalogueFetchError",
-        "CatalogueNotFound",
-        "InvalidCatalogueHash",
-        "NonActiveTrack",
-        "SignalsFetchError",
-        "SpecFetchError",
-        "SpecNotFound"
-      ]
-    },
-    {
-      "type_name": "VerifyCatalogueSpecRefsInteractor",
-      "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": true,
-      "found_items": [
-        "impl VerifyCatalogueSpecRefsService"
-      ],
-      "extra_items": [
-        "impl VerifyCatalogueSpecRefs (workspace trait not declared)"
       ]
     },
     {

@@ -13,7 +13,8 @@
 | TrackId | value_object | reference | — | 🔵 | 🔵 |
 | CommitHash | value_object | reference | — | 🔵 | 🔵 |
 | CatalogueLintViolation | value_object | reference | — | 🔵 | 🔵 |
-| TypeSignal | value_object | modify | — | 🔵 | 🟡 |
+| TypeSignal | value_object | modify | — | 🔵 | 🔵 |
+| AdrVerifyReport | value_object | reference | — | 🔵 | 🔵 |
 
 ## Error Types
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "08dcc2a68e63a4cd135ea3b4c23daa22d9ffd3468a7c2ca5aa575e159ec44bfd",
+  "catalogue_declaration_hash": "98ba1be0a941248be43c74af41c1f6159f99799c3617f4b212afe05ea0fe8532",
   "signals": [
     {
       "type_name": "TrackId",
@@ -24,10 +24,14 @@
     },
     {
       "type_name": "TypeSignal",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "Decision",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AdrVerifyReport",
       "signal": "blue"
     }
   ]

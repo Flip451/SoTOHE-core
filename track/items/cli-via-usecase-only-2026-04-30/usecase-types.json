@@ -905,391 +905,8 @@
       ]
     },
     {
-      "name": "VerifyCatalogueConsistencyService",
-      "description": "Application service trait for the verify catalogue-consistency use case (sotp verify catalogue-consistency). Driven by the CLI layer. Wraps domain::check_consistency so the CLI never imports domain::TypeCatalogueDocument, domain::TypeGraph, domain::TypeBaseline, or domain::ConsistencyReport directly.",
-      "approved": true,
-      "kind": "application_service",
-      "expected_methods": [
-        {
-          "name": "verify",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "String"
-            },
-            {
-              "name": "items_dir",
-              "ty": "PathBuf"
-            },
-            {
-              "name": "workspace_root",
-              "ty": "PathBuf"
-            }
-          ],
-          "returns": "Result<VerifyCatalogueConsistencyOutput, VerifyCatalogueConsistencyError>",
-          "is_async": false
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "AC-03",
-          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueConsistencyOutput",
-      "description": "DTO returned by VerifyCatalogueConsistencyService. Contains the pass/fail verdict and a list of finding strings so the CLI can print results without importing domain::ConsistencyReport or domain::verify::VerifyFinding directly.",
-      "approved": true,
-      "kind": "dto",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "passed",
-          "ty": "bool"
-        },
-        {
-          "kind": "field",
-          "name": "findings",
-          "ty": "Vec<String>"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueConsistencyError",
-      "description": "Error type for VerifyCatalogueConsistencyService. Wraps invalid track ID, catalogue decode failures, schema export failures, and baseline load failures without leaking domain error types or domain::schema::SchemaExportError across the usecase boundary.",
-      "approved": true,
-      "kind": "error_type",
-      "expected_variants": [
-        "InvalidTrackId",
-        "CatalogueLoadFailed",
-        "SchemaExportFailed",
-        "BaselineLoadFailed"
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueConsistencyInteractor",
-      "description": "Concrete struct implementing VerifyCatalogueConsistencyService. Constructs domain types internally and converts results to VerifyCatalogueConsistencyOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
-      "approved": true,
-      "kind": "interactor",
-      "expected_members": [],
-      "declares_application_service": [
-        "VerifyCatalogueConsistencyService"
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueSpecSignalsService",
-      "description": "Application service trait for the verify catalogue-spec-signals use case (sotp verify catalogue-spec-signals). Driven by the CLI layer. Wraps domain::check_catalogue_spec_signals so the CLI never imports domain::CatalogueSpecSignal, domain::evaluate_catalogue_entry_signal, or domain::ContentHash directly.",
-      "approved": true,
-      "kind": "application_service",
-      "expected_methods": [
-        {
-          "name": "verify",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "String"
-            },
-            {
-              "name": "items_dir",
-              "ty": "PathBuf"
-            },
-            {
-              "name": "skip_stale",
-              "ty": "bool"
-            }
-          ],
-          "returns": "Result<VerifySpecSignalsOutput, VerifySpecSignalsError>",
-          "is_async": false
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "AC-03",
-          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
-        }
-      ]
-    },
-    {
-      "name": "VerifySpecSignalsOutput",
-      "description": "DTO returned by VerifyCatalogueSpecSignalsService. Contains the pass/fail verdict and a list of finding strings for each layer, so the CLI can print results without importing domain signal types directly.",
-      "approved": true,
-      "kind": "dto",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "passed",
-          "ty": "bool"
-        },
-        {
-          "kind": "field",
-          "name": "findings",
-          "ty": "Vec<String>"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "VerifySpecSignalsError",
-      "description": "Error type for VerifyCatalogueSpecSignalsService. Wraps track ID validation, catalogue decode, and spec signal evaluation failures without leaking domain::ConfidenceSignal or domain::ContentHash across the usecase boundary.",
-      "approved": true,
-      "kind": "error_type",
-      "expected_variants": [
-        "InvalidTrackId",
-        "CatalogueLoadFailed",
-        "SignalEvaluationFailed"
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueSpecSignalsInteractor",
-      "description": "Concrete struct implementing VerifyCatalogueSpecSignalsService. Constructs domain types internally and converts results to VerifySpecSignalsOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
-      "approved": true,
-      "kind": "interactor",
-      "expected_members": [],
-      "declares_application_service": [
-        "VerifyCatalogueSpecSignalsService"
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "TypeSignalsService",
-      "description": "Application service trait for the track type-signals use case (sotp track type-signals). Driven by the CLI layer. Wraps domain::schema::SchemaExporter and domain::TypeSignalsDocument so the CLI never imports these domain types directly. Evaluates type signals for each TDDD-enabled layer catalogue and writes the updated signal document.",
-      "approved": true,
-      "kind": "application_service",
-      "expected_methods": [
-        {
-          "name": "evaluate",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "String"
-            },
-            {
-              "name": "items_dir",
-              "ty": "PathBuf"
-            },
-            {
-              "name": "workspace_root",
-              "ty": "PathBuf"
-            },
-            {
-              "name": "layer_filter",
-              "ty": "Option<String>"
-            }
-          ],
-          "returns": "Result<Vec<LayerSignalSummary>, TypeSignalsError>",
-          "is_async": false
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "AC-03",
-          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
-        }
-      ]
-    },
-    {
-      "name": "LayerSignalSummary",
-      "description": "DTO returned per layer by TypeSignalsService. Contains the layer_id, blue count, yellow count, and red count so the CLI can print signal summaries without importing domain::ConfidenceSignal or domain::TypeSignalsDocument directly.",
-      "approved": true,
-      "kind": "dto",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "layer_id",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "blue_count",
-          "ty": "usize"
-        },
-        {
-          "kind": "field",
-          "name": "yellow_count",
-          "ty": "usize"
-        },
-        {
-          "kind": "field",
-          "name": "red_count",
-          "ty": "usize"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "TypeSignalsError",
-      "description": "Error type for TypeSignalsService. Wraps invalid track ID, inactive track (done/archived), unknown layer, catalogue decode failures, and schema export failures without leaking domain::schema::SchemaExportError or domain::TrackStatus across the usecase boundary.",
-      "approved": true,
-      "kind": "error_type",
-      "expected_variants": [
-        "InvalidTrackId",
-        "InactiveTrack",
-        "UnknownLayer",
-        "CatalogueLoadFailed",
-        "SchemaExportFailed"
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "TypeSignalsInteractor",
-      "description": "Concrete struct implementing TypeSignalsService. Constructs domain types internally and converts results to Vec<LayerSignalSummary> before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
-      "approved": true,
-      "kind": "interactor",
-      "expected_members": [],
-      "declares_application_service": [
-        "TypeSignalsService"
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
       "name": "VerifyAdrSignals",
-      "description": "Application service trait for the verify-ADR-signals use case, defined in usecase::verify_adr_signals. This track modifies its verify method signature to return AdrVerifyOutput (a usecase-owned DTO) instead of the domain::AdrVerifyReport, so that CLI commands/verify.rs never imports domain::AdrVerifyReport directly after the T012 migration. VerifyAdrSignalsCommand and VerifyAdrSignalsError remain as the existing usecase-layer types (no change to those types).",
+      "description": "Application service trait for the verify-ADR-signals use case, defined in usecase::verify_adr_signals. The verify method returns AdrVerifyReport (the actual type in code, confirmed OS-05 — no implementation change). VerifyAdrSignalsCommand and VerifyAdrSignalsError remain as the existing usecase-layer types (no change to those types).",
       "approved": true,
       "action": "modify",
       "kind": "application_service",
@@ -1303,7 +920,7 @@
               "ty": "VerifyAdrSignalsCommand"
             }
           ],
-          "returns": "Result<AdrVerifyOutput, VerifyAdrSignalsError>",
+          "returns": "Result<AdrVerifyReport, VerifyAdrSignalsError>",
           "is_async": false
         }
       ],
@@ -1322,7 +939,7 @@
     },
     {
       "name": "VerifyAdrSignalsInteractor",
-      "description": "Concrete struct implementing VerifyAdrSignals. This track modifies its impl VerifyAdrSignals::verify to return AdrVerifyOutput (a usecase-owned DTO) instead of domain::AdrVerifyReport, mirroring the signature change declared on the VerifyAdrSignals application service trait. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
+      "description": "Concrete struct implementing VerifyAdrSignals. The impl VerifyAdrSignals::verify returns AdrVerifyReport (the actual type in code, confirmed OS-05 — no implementation change). DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
       "approved": true,
       "action": "modify",
       "kind": "interactor",
@@ -1345,53 +962,36 @@
       ]
     },
     {
-      "name": "AdrVerifyOutput",
-      "description": "Usecase-owned DTO returned by VerifyAdrSignals::verify. Wraps the four signal-band counts from domain::AdrVerifyReport (blue_count, yellow_count, red_count, grandfathered_count) so that CLI commands/verify.rs can read the counts without importing domain::AdrVerifyReport. The CLI uses red_count >= 1 to decide the non-zero exit code, preserving the existing external behavior per AC-10.",
-      "approved": true,
-      "kind": "dto",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "blue_count",
-          "ty": "usize"
-        },
-        {
-          "kind": "field",
-          "name": "yellow_count",
-          "ty": "usize"
-        },
-        {
-          "kind": "field",
-          "name": "red_count",
-          "ty": "usize"
-        },
-        {
-          "kind": "field",
-          "name": "grandfathered_count",
-          "ty": "usize"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "AC-03",
-          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
-        }
-      ]
-    },
-    {
       "name": "ScopeQueryService",
-      "description": "Application service trait for scope query (classify/files) use cases, defined in usecase::review_v2::scope_query. This track modifies it to replace the existing domain-typed methods with string-accepting methods (classify_by_strings, files_by_string) so that CLI review subcommands (classify.rs, files.rs) can pass Vec<String> paths and String scope names without importing domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName. The FilePath and ScopeName construction from strings happens inside the interactor implementation, keeping domain types hidden behind the usecase boundary per CN-01 and AC-03.",
+      "description": "Application service trait for scope query (classify/files) use cases, defined in usecase::review_v2::scope_query. The trait exposes four methods: two domain-typed methods (classify / files, using FilePath and ScopeName) that exist as internal building blocks called by the default trait method implementations, and two string-accepting methods (classify_by_strings / files_by_string) that are the only methods the CLI calls directly. CLI review subcommands (classify.rs, files.rs) import only ScopeClassificationOutput, ScopeQueryService, and ScopeQueryError from usecase — they never import domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName. The FilePath and ScopeName construction from raw strings happens inside the classify_by_strings / files_by_string implementations in the interactor, keeping domain types hidden from CLI callers per CN-01 and AC-03.",
       "approved": true,
       "action": "modify",
       "kind": "application_service",
       "expected_methods": [
+        {
+          "name": "classify",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<FilePath>"
+            }
+          ],
+          "returns": "Result<Vec<PathClassification>, ScopeQueryError>",
+          "is_async": false
+        },
+        {
+          "name": "files",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ScopeName"
+            }
+          ],
+          "returns": "Result<Vec<FilePath>, ScopeQueryError>",
+          "is_async": false
+        },
         {
           "name": "classify_by_strings",
           "receiver": "&self",
@@ -1436,6 +1036,33 @@
       ]
     },
     {
+      "name": "PathClassification",
+      "description": "Usecase value object pairing a file path with its scope classification. Returned by ScopeQueryService::classify in input-argument order (CN-04: order preserved). Contains FilePath (domain type) and ScopeClassification. This type is in the usecase layer (usecase::review_v2::scope_query). No implementation change in this track (OS-05); listed here so the contract-map renderer can draw the edge from ScopeQueryService::classify to this type.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "path",
+          "ty": "FilePath"
+        },
+        {
+          "kind": "field",
+          "name": "classification",
+          "ty": "ScopeClassification"
+        }
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "IN-03",
+          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
+        }
+      ]
+    },
+    {
       "name": "ScopeClassificationOutput",
       "description": "DTO returned by ScopeQueryService::classify_by_strings. Contains the string path and the classification encoded in `scopes`: a Vec<String> where each entry is either a named scope name (for Named classification), 'other' (for the implicit Other scope), or '<excluded>' (for paths filtered by operational/other-track patterns). This single-field encoding avoids a separate classification_kind field while keeping the struct free of domain types (CN-01 / AC-03). CLI uses entry.scopes.join(',') for display.",
       "approved": true,
@@ -1473,11 +1100,27 @@
     },
     {
       "name": "ScopeQueryInteractor",
-      "description": "Struct implementing ScopeQueryService. This track modifies ScopeQueryInteractor to add the two new string-accepting methods (classify_by_strings, files_by_string) that replace the old domain-typed methods. The interactor constructs domain::review_v2::FilePath and domain::review_v2::ScopeName from the input strings internally, performs the domain classification, and converts results to ScopeClassificationOutput DTOs before returning. The CLI sees only ScopeQueryService and string/primitive types; domain::review_v2::FilePath, domain::review_v2::ScopeName, and domain::review_v2::MainScopeName remain invisible across the usecase boundary.",
+      "description": "Struct implementing ScopeQueryService. This track modifies ScopeQueryInteractor to add the two new string-accepting methods (classify_by_strings, files_by_string) alongside the existing domain-typed methods (classify, files). The interactor constructs domain::review_v2::FilePath and domain::review_v2::ScopeName from the input strings internally, performs the domain classification, and converts results to ScopeClassificationOutput DTOs before returning. The CLI sees only ScopeQueryService and string/primitive types; domain::review_v2::FilePath, domain::review_v2::ScopeName, and domain::review_v2::MainScopeName remain invisible across the usecase boundary.",
       "approved": true,
       "action": "modify",
       "kind": "interactor",
-      "expected_members": [],
+      "expected_members": [
+        {
+          "kind": "field",
+          "name": "scope_config",
+          "ty": "ReviewScopeConfig"
+        },
+        {
+          "kind": "field",
+          "name": "diff_getter",
+          "ty": "D"
+        },
+        {
+          "kind": "field",
+          "name": "base",
+          "ty": "CommitHash"
+        }
+      ],
       "declares_application_service": [
         "ScopeQueryService"
       ],
@@ -2300,139 +1943,6 @@
       ]
     },
     {
-      "name": "VerifyCatalogueSpecRefsService",
-      "description": "Application service trait for the verify catalogue-spec-refs use case (sotp verify catalogue-spec-refs). Driven by the CLI layer. Encapsulates domain::check_catalogue_spec_ref_integrity, domain::ContentHash, domain::SpecRefFinding, and domain::SpecElementId so that commands/verify_catalogue_spec_refs.rs never imports these domain types directly. Returns a VerifyCatalogueSpecRefsOutput DTO that the CLI formats for stderr.",
-      "approved": true,
-      "kind": "application_service",
-      "expected_methods": [
-        {
-          "name": "verify",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "String"
-            },
-            {
-              "name": "items_dir",
-              "ty": "PathBuf"
-            },
-            {
-              "name": "workspace_root",
-              "ty": "PathBuf"
-            },
-            {
-              "name": "skip_stale",
-              "ty": "bool"
-            }
-          ],
-          "returns": "Result<VerifyCatalogueSpecRefsOutput, VerifyCatalogueSpecRefsError>",
-          "is_async": false
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "AC-03",
-          "hash": "c32e617fbb196231bc84bd7d4e4b5b1e8d5b48cd8c6c2fb62f03cd35d305aed0"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueSpecRefsOutput",
-      "description": "DTO returned by VerifyCatalogueSpecRefsService. Contains passed (true = no findings) and a list of pre-formatted finding strings ready for the CLI to emit to stderr, one per line. Pre-formatting in the interactor avoids the CLI needing to pattern-match on SpecRefFindingKind variants.",
-      "approved": true,
-      "kind": "dto",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "passed",
-          "ty": "bool"
-        },
-        {
-          "kind": "field",
-          "name": "findings",
-          "ty": "Vec<String>"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueSpecRefsError",
-      "description": "Error type for VerifyCatalogueSpecRefsService. Wraps symlink guard rejections, invalid track ID, missing architecture-rules.json, missing track directory, missing spec.json, catalogue decode failures, and signal decode failures without leaking domain::ContentHash, domain::SpecElementId, or domain::tddd::LayerId across the usecase boundary.",
-      "approved": true,
-      "action": "modify",
-      "kind": "error_type",
-      "expected_variants": [
-        "InvalidTrackId",
-        "SymlinkRejected",
-        "RulesFileMissing",
-        "RulesParseError",
-        "TrackDirectoryMissing",
-        "SpecJsonMissing",
-        "CatalogueDecodeFailed",
-        "SignalDecodeFailed"
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
-      "name": "VerifyCatalogueSpecRefsInteractor",
-      "description": "Concrete struct implementing VerifyCatalogueSpecRefsService. Constructs domain types internally and converts results to VerifyCatalogueSpecRefsOutput before returning to the CLI. DI fields are private implementation details; expected_members is empty because the public type contract is captured by the service trait.",
-      "approved": true,
-      "action": "modify",
-      "kind": "interactor",
-      "expected_members": [],
-      "declares_application_service": [
-        "VerifyCatalogueSpecRefsService"
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-03",
-          "hash": "cf26bf41358a3e8fb2f6400c3caac9a3727e7682cf6cd83cb43ba92023381c6a"
-        },
-        {
-          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
-          "anchor": "IN-04",
-          "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
-        }
-      ]
-    },
-    {
       "name": "CommitHashPersistenceService",
       "description": "Application service trait for persisting the HEAD SHA to .commit_hash after a successful commit (sotp make track-commit-message post-commit step). Driven by the CLI layer. Wraps domain::CommitHash and domain::review_v2::CommitHashWriter so that commands/make.rs never imports these domain types directly.",
       "approved": true,
@@ -2630,12 +2140,6 @@
           "anchor": "IN-10",
           "hash": "6f6f4e3f7efb47acf2c40f0d93814434ed5635387f77cf6af8db9daf62572682"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "execute_by_strings wraps execute; TrackWriteError re-used for ergonomics. Usecase-owned error type deferred. CLI callers do not import TrackWriteError directly; cargo make check-layers passes."
-        }
       ]
     },
     {
@@ -2706,6 +2210,7 @@
       "name": "RenderContractMapOutput",
       "description": "Output DTO returned by RenderContractMap::execute on success. Carries lightweight metrics (rendered_layer_count, total_entry_count) so CLI callers can report a post-write summary without re-reading the generated markdown. Pre-existing type; no field changes in this track.",
       "approved": true,
+      "action": "reference",
       "kind": "dto",
       "expected_members": [
         {
@@ -2852,12 +2357,6 @@
           "anchor": "IN-04",
           "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "dto placed in usecase layer: LintRuleSpec is a string-only boundary mirror of domain::tddd::catalogue_linter::CatalogueLinterRule; it does not cross a serde/persistence boundary but is required at the usecase boundary so CLI callers never import domain lint types (CN-01 / AC-03)."
-        }
       ]
     },
     {
@@ -2982,12 +2481,6 @@
           "anchor": "IN-08",
           "hash": "a79f533d3a3c8ad49a1a86b5932653aee262651fb99bd9e633128834bea18e70"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "CN-01 exception accepted: RunCatalogueLint::execute returns Vec<CatalogueLintViolation> (domain value object). A usecase-owned CatalogueLintViolation DTO was intentionally deferred; CLI callers access the result via type inference without a direct `use domain::...CatalogueLintViolation` import, so cargo make check-layers passes. This is the same pattern as HookShellParserPort (domain SimpleCommand crosses the boundary at the port level)."
-        }
       ]
     },
     {
@@ -3091,12 +2584,6 @@
           "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
           "anchor": "IN-09",
           "hash": "e4ae5983c9953ed7106f9feb48cb487f524aa5e642db30a9997e8016bc2024b3"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "CN-01 exception accepted: &impl TrackReader (domain trait) appears in the function signature. A usecase-owned port abstraction was intentionally deferred; CLI callers pass a concrete FsTrackStore via type inference without any `use domain::...TrackReader` import in apps/cli/src/, so cargo make check-layers passes. This pattern parallels HookShellParserPort where domain types cross the boundary at the port level."
         }
       ]
     },

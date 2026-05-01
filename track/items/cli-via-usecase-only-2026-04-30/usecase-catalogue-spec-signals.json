@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "caa7063a3425470cf580442837c51f3106d352d7a70b6a04c2940ba3e7becfa4",
+  "catalogue_declaration_hash": "678baaadf5c52ea1b5ed321f94897d453d415bb7bd3019311486dd3f8f41f325",
   "signals": [
     {
       "type_name": "TrackStatusOutput",
@@ -115,54 +115,6 @@
       "signal": "blue"
     },
     {
-      "type_name": "VerifyCatalogueConsistencyService",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueConsistencyOutput",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueConsistencyError",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueConsistencyInteractor",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueSpecSignalsService",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifySpecSignalsOutput",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifySpecSignalsError",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueSpecSignalsInteractor",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TypeSignalsService",
-      "signal": "blue"
-    },
-    {
-      "type_name": "LayerSignalSummary",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TypeSignalsError",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TypeSignalsInteractor",
-      "signal": "blue"
-    },
-    {
       "type_name": "VerifyAdrSignals",
       "signal": "blue"
     },
@@ -171,11 +123,11 @@
       "signal": "blue"
     },
     {
-      "type_name": "AdrVerifyOutput",
+      "type_name": "ScopeQueryService",
       "signal": "blue"
     },
     {
-      "type_name": "ScopeQueryService",
+      "type_name": "PathClassification",
       "signal": "blue"
     },
     {
@@ -267,22 +219,6 @@
       "signal": "blue"
     },
     {
-      "type_name": "VerifyCatalogueSpecRefsService",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueSpecRefsOutput",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueSpecRefsError",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VerifyCatalogueSpecRefsInteractor",
-      "signal": "blue"
-    },
-    {
       "type_name": "CommitHashPersistenceService",
       "signal": "blue"
     },
@@ -304,7 +240,7 @@
     },
     {
       "type_name": "ActivateTrackUseCase",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "RenderContractMapCommand",
@@ -332,7 +268,7 @@
     },
     {
       "type_name": "LintRuleSpec",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "RunCatalogueLintCommand",
@@ -348,7 +284,7 @@
     },
     {
       "type_name": "RunCatalogueLint",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "check_compliance_render",
@@ -360,7 +296,7 @@
     },
     {
       "type_name": "reject_branchless_guard_by_str",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "reject_branchless_implementation_transition_by_str",

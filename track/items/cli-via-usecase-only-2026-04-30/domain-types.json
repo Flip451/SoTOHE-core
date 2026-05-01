@@ -119,12 +119,6 @@
           "anchor": "IN-04",
           "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
         }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "discussion",
-          "summary": "signal_as_str() is a pure read-only accessor; value_object is the correct kind. action=modify because the method was added during this track (baseline predates the change, causing Group-3 red). Declaring it here moves it to Group-2 forward-check and suppresses the spurious baseline_changed_type red."
-        }
       ]
     },
     {
@@ -143,6 +137,51 @@
           "anchor": "IN-04",
           "hash": "4d57c6ff4816ef675036ac65307596be8ab591afa2717dffe381891e40918806"
         },
+        {
+          "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
+          "anchor": "OS-05",
+          "hash": "31e57c7087cd8a9d69c2d293968572914c31b3bd9c1827fd7ea6f16a7a283d46"
+        }
+      ]
+    },
+    {
+      "name": "AdrVerifyReport",
+      "description": "Domain value object (struct) returned by VerifyAdrSignals::verify. Aggregates signal counts computed by verifying ADR decision grounds. Fields are private; public API is four read-only accessors. Defined in domain::adr_decision. No implementation change in this track (OS-05); listed here so the contract-map renderer can draw the edge from VerifyAdrSignals::verify to this type.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object",
+      "expected_members": [],
+      "expected_methods": [
+        {
+          "name": "blue_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "yellow_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "red_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "grandfathered_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
         {
           "file": "track/items/cli-via-usecase-only-2026-04-30/spec.json",
           "anchor": "OS-05",

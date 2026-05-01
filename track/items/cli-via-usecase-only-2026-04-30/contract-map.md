@@ -15,6 +15,7 @@ flowchart LR
         L6_domain_TrackWriteError>TrackWriteError]
         L6_domain_TypeSignal(TypeSignal)
         L6_domain_Decision{{Decision}}
+        L6_domain_AdrVerifyReport(AdrVerifyReport)
     end
     subgraph usecase [usecase]
         L7_usecase_TrackStatusOutput[TrackStatusOutput]
@@ -45,22 +46,10 @@ flowchart LR
         L7_usecase_TrackPhaseService[/TrackPhaseService\]
         L7_usecase_TrackPhaseError>TrackPhaseError]
         L7_usecase_TrackPhaseInteractor[\TrackPhaseInteractor/]
-        L7_usecase_VerifyCatalogueConsistencyService[/VerifyCatalogueConsistencyService\]
-        L7_usecase_VerifyCatalogueConsistencyOutput[VerifyCatalogueConsistencyOutput]
-        L7_usecase_VerifyCatalogueConsistencyError>VerifyCatalogueConsistencyError]
-        L7_usecase_VerifyCatalogueConsistencyInteractor[\VerifyCatalogueConsistencyInteractor/]
-        L7_usecase_VerifyCatalogueSpecSignalsService[/VerifyCatalogueSpecSignalsService\]
-        L7_usecase_VerifySpecSignalsOutput[VerifySpecSignalsOutput]
-        L7_usecase_VerifySpecSignalsError>VerifySpecSignalsError]
-        L7_usecase_VerifyCatalogueSpecSignalsInteractor[\VerifyCatalogueSpecSignalsInteractor/]
-        L7_usecase_TypeSignalsService[/TypeSignalsService\]
-        L7_usecase_LayerSignalSummary[LayerSignalSummary]
-        L7_usecase_TypeSignalsError>TypeSignalsError]
-        L7_usecase_TypeSignalsInteractor[\TypeSignalsInteractor/]
         L7_usecase_VerifyAdrSignals[/VerifyAdrSignals\]
         L7_usecase_VerifyAdrSignalsInteractor[\VerifyAdrSignalsInteractor/]
-        L7_usecase_AdrVerifyOutput[AdrVerifyOutput]
         L7_usecase_ScopeQueryService[/ScopeQueryService\]
+        L7_usecase_PathClassification(PathClassification)
         L7_usecase_ScopeClassificationOutput[ScopeClassificationOutput]
         L7_usecase_ScopeQueryInteractor[\ScopeQueryInteractor/]
         L7_usecase_TaskOperationError>TaskOperationError]
@@ -83,10 +72,6 @@ flowchart LR
         L7_usecase_RunReviewError>RunReviewError]
         L7_usecase_RunReviewInteractor[\RunReviewInteractor/]
         L7_usecase_RunReviewService[/RunReviewService\]
-        L7_usecase_VerifyCatalogueSpecRefsService[/VerifyCatalogueSpecRefsService\]
-        L7_usecase_VerifyCatalogueSpecRefsOutput[VerifyCatalogueSpecRefsOutput]
-        L7_usecase_VerifyCatalogueSpecRefsError>VerifyCatalogueSpecRefsError]
-        L7_usecase_VerifyCatalogueSpecRefsInteractor[\VerifyCatalogueSpecRefsInteractor/]
         L7_usecase_CommitHashPersistenceService[/CommitHashPersistenceService\]
         L7_usecase_CommitHashPersistenceError>CommitHashPersistenceError]
         L7_usecase_CommitHashPersistenceInteractor[\CommitHashPersistenceInteractor/]
@@ -222,8 +207,11 @@ flowchart LR
     L7_usecase_RunReviewService -->|"run"| L7_usecase_RunReviewOutput
     L7_usecase_RunReviewService -->|"run(command)"| L7_usecase_RunReviewCommand
     L7_usecase_ScopeQueryInteractor -.impl.-> L7_usecase_ScopeQueryService
+    L7_usecase_ScopeQueryService -->|"classify"| L7_usecase_PathClassification
+    L7_usecase_ScopeQueryService -->|"classify"| L7_usecase_ScopeQueryError
     L7_usecase_ScopeQueryService -->|"classify_by_strings"| L7_usecase_ScopeClassificationOutput
     L7_usecase_ScopeQueryService -->|"classify_by_strings"| L7_usecase_ScopeQueryError
+    L7_usecase_ScopeQueryService -->|"files"| L7_usecase_ScopeQueryError
     L7_usecase_ScopeQueryService -->|"files_by_string"| L7_usecase_ScopeQueryError
     L7_usecase_TaskOperationInteractor -.impl.-> L7_usecase_TaskOperationService
     L7_usecase_TaskOperationService -->|"add_task"| L7_usecase_TaskOperationError
@@ -246,19 +234,7 @@ flowchart LR
     L7_usecase_TrackPhaseInteractor -.impl.-> L7_usecase_TrackPhaseService
     L7_usecase_TrackPhaseService -->|"resolve"| L7_usecase_TrackPhaseError
     L7_usecase_TrackPhaseService -->|"resolve"| L7_usecase_TrackPhaseOutput
-    L7_usecase_TypeSignalsInteractor -.impl.-> L7_usecase_TypeSignalsService
-    L7_usecase_TypeSignalsService -->|"evaluate"| L7_usecase_LayerSignalSummary
-    L7_usecase_TypeSignalsService -->|"evaluate"| L7_usecase_TypeSignalsError
-    L7_usecase_VerifyAdrSignals -->|"verify"| L7_usecase_AdrVerifyOutput
+    L7_usecase_VerifyAdrSignals -->|"verify"| L6_domain_AdrVerifyReport
     L7_usecase_VerifyAdrSignalsInteractor -.impl.-> L7_usecase_VerifyAdrSignals
-    L7_usecase_VerifyCatalogueConsistencyInteractor -.impl.-> L7_usecase_VerifyCatalogueConsistencyService
-    L7_usecase_VerifyCatalogueConsistencyService -->|"verify"| L7_usecase_VerifyCatalogueConsistencyError
-    L7_usecase_VerifyCatalogueConsistencyService -->|"verify"| L7_usecase_VerifyCatalogueConsistencyOutput
-    L7_usecase_VerifyCatalogueSpecRefsInteractor -.impl.-> L7_usecase_VerifyCatalogueSpecRefsService
-    L7_usecase_VerifyCatalogueSpecRefsService -->|"verify"| L7_usecase_VerifyCatalogueSpecRefsError
-    L7_usecase_VerifyCatalogueSpecRefsService -->|"verify"| L7_usecase_VerifyCatalogueSpecRefsOutput
-    L7_usecase_VerifyCatalogueSpecSignalsInteractor -.impl.-> L7_usecase_VerifyCatalogueSpecSignalsService
-    L7_usecase_VerifyCatalogueSpecSignalsService -->|"verify"| L7_usecase_VerifySpecSignalsError
-    L7_usecase_VerifyCatalogueSpecSignalsService -->|"verify"| L7_usecase_VerifySpecSignalsOutput
     L7_usecase_reject__branchless__guard__by__str -->|"reader"| L6_domain_TrackReader
 ```

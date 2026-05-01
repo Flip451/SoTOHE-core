@@ -4,7 +4,6 @@
 pub mod catalogue_lint_workflow;
 pub mod catalogue_spec_refs;
 pub mod catalogue_spec_signals;
-pub mod catalogue_verify;
 pub mod commit_hash_persistence;
 pub mod contract_map_workflow;
 pub mod export_schema;
