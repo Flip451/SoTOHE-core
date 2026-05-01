@@ -22,7 +22,8 @@ use std::fmt::Write as _;
 
 use crate::tddd::LayerId;
 use crate::tddd::catalogue::{
-    MethodDeclaration, TraitImplDecl, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+    MethodDeclaration, TraitImplDecl, TypeCatalogueDocument, TypeCatalogueEntry,
+    TypeDefinitionKind, TypestateTransitions,
 };
 use crate::tddd::contract_map_content::ContractMapContent;
 use crate::tddd::contract_map_options::ContractMapRenderOptions;
@@ -259,6 +260,30 @@ pub fn render_contract_map(
                             }
                             edges.insert(format!("    {src_id} -->|\"returns\"| {dst_id}"));
                         }
+                    }
+                }
+            }
+        }
+
+        // Typestate transition edges (ADR 2026-04-29-0241 §D1).
+        //
+        // For each `name` in `TypestateTransitions::To(names)`, resolve the
+        // name in `type_index` and draw a thick arrow `==>` labelled
+        // `transitions_to` to each matching target.  `Terminal` typestates
+        // produce no edge.  Catalogue-unregistered names resolve to `None` in
+        // `type_index` and are silently skipped.  Self-loops (dst_id == src_id)
+        // are suppressed with the same guard used for method-call edges.
+        if let TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::To(names), ..
+        } = entry.kind()
+        {
+            for name in names {
+                if let Some(dsts) = type_index.get(name.as_str()) {
+                    for (_dst_layer, dst_id) in dsts {
+                        if dst_id == &src_id {
+                            continue;
+                        }
+                        edges.insert(format!("    {src_id} ==>|\"transitions_to\"| {dst_id}"));
                     }
                 }
             }
