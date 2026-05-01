@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e90c121db0a0870af6ba801c11cfb988afde6eeddba36e14f192695c14b3cc7",
+          "at": "2026-05-01T18:23:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR requires `payload_types` entries to be complete type strings, including generic arguments, but both renderer sections describe resolving each `payload_types` value as a type token through `type_index`. For payloads like `Result<ProposedDecision, DomainError>` or `Vec<ProposedDecision>`, the declared value will not match a catalogue type name directly, so the planned edge generation would miss the inner payload types while still requiring authors to write the generic-complete form. Clarify that renderers must extract type-name tokens from each payload type string before resolving, or constrain `payload_types` to catalogue type names only.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+              "line": 56,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4e90c121db0a0870af6ba801c11cfb988afde6eeddba36e14f192695c14b3cc7",
+          "at": "2026-05-01T18:25:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e90c121db0a0870af6ba801c11cfb988afde6eeddba36e14f192695c14b3cc7",
+          "at": "2026-05-01T18:27:03Z"
+        }
+      ]
+    }
+  }
+}
