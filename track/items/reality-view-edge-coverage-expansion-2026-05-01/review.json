@@ -38,6 +38,124 @@
           "findings": [],
           "hash": "rvw1:sha256:94e00d23b9e1f1d277d9ea27fce20ba3db915df7add570fe5ffed3ac102d855a",
           "at": "2026-05-01T13:59:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` adds a distinct `EdgeSet::Methods`-without-`Impls` branch that explicitly inserts trait nodes into the cluster plan, but `T004` never schedules a test that exercises that edge case. The test list covers trait-method edges and linkStyle output, yet it does not verify the self-contained cluster behavior introduced here, so the plan does not actually cover all stated behavioral changes.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/impl-plan.json",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0c1307ea025a8c2edc7face82472da8048b226264258d6de006aa6d1df66e046",
+          "at": "2026-05-01T16:02:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c1307ea025a8c2edc7face82472da8048b226264258d6de006aa6d1df66e046",
+          "at": "2026-05-01T16:03:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` is catalogued as modified only by D1 and D3, but the same description says its output includes `trait_method_param` / `trait_method_return`, which are introduced by D2. Since the spec defines D2 as a `collect_edges()` change for `EdgeSet::Methods | EdgeSet::All`, flat rendering is affected too; omitting D2/IN-04 from this entry makes the type catalogue inconsistent and can leave flat-mode trait-method coverage out of the implementation/test mapping.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/infrastructure-types.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 is infeasible as written: it says the old catch-all arm is replaced by explicit named arms while the plan still treats `edge_kind` as string values. A Rust dispatch over `&str` cannot be exhaustive with only literal arms, so following this plan would either fail to compile or require an unplanned fallback/type change.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/plan.md",
+              "line": 29,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:0c1307ea025a8c2edc7face82472da8048b226264258d6de006aa6d1df66e046",
+          "at": "2026-05-01T16:07:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` is internally inconsistent: its description says flat output will include `trait_method_param` / `trait_method_return`, but the entry attributes the function only to D1/D3 and its `spec_refs` omit IN-04, the spec requirement that introduces trait method scanning. Since `collect_edges()` is shared by flat and clustered rendering, D2 either affects flat rendering and must be catalogued/tested there, or the description should not claim those trait edge kinds appear in flat output.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/infrastructure-types.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0c1307ea025a8c2edc7face82472da8048b226264258d6de006aa6d1df66e046",
+          "at": "2026-05-01T16:09:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` is described as also applying the EdgeSet::Methods-without-Impls trait-node cluster insertion and carries `IN-05` as a spec ref, but this entry is explicitly the non-clustered renderer and its signature has no `ClusterPlan`. That makes the catalogue assign a clustered-rendering concern to the flat renderer, conflicting with the spec’s cluster-only IN-05 behavior and potentially sending implementation work to the wrong surface.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/infrastructure-types.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:ae148ca12e52888cb2959fac5a1a6dab1c267fc0824ae3fce4fb552b694b2a87",
+          "at": "2026-05-01T16:12:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` is explicitly catalogued as the flat/non-clustered renderer, but its description says the `EdgeSet::Methods`-without-`Impls` trait-node cluster insertion also applies and its `spec_refs` include `IN-05`. `IN-05` is a cluster-plan concern for inserting trait nodes into clustered output, so assigning it to the flat renderer is semantically wrong and can send implementation work to the wrong surface.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/infrastructure-types.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "S4 says the new tests cover all behavioral changes from T001-T003, but the listed cases omit T002's distinct `EdgeSet::Methods`-without-`Impls` trait-node cluster insertion behavior. The plan therefore claims full behavioral test coverage while leaving one stated behavior without an explicit test case.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/impl-plan.json",
+              "line": 78,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ae148ca12e52888cb2959fac5a1a6dab1c267fc0824ae3fce4fb552b694b2a87",
+          "at": "2026-05-01T16:15:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_overview` is catalogued as `reference` with behavior stable across D1/D2/D3, but D1/D2 expand `collect_edges()` and overview builds its cross-cluster groups from those collected edges when needed. OS-03 only excludes D3 `linkStyle` coloring; it does not make overview edge content stable. This can misdirect implementation/tests to ignore overview count/group changes from receiver-less or trait-method edges. Mark overview as behavior-affected by D1/D2, or narrow the stability claim to signature/no linkStyle only.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/infrastructure-types.json",
+              "line": 141,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:198372dca20c08fdeb481a2df49c630c60ba031a5737f55df4b54f431a5478f8",
+          "at": "2026-05-01T16:19:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:041466d123b03ac4cea8a32d43b3c0cfdad161e067775b9e07b94fbbdc49a29d",
+          "at": "2026-05-01T16:23:31Z"
         }
       ]
     }

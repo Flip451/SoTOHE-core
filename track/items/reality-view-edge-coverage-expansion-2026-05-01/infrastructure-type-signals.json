@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-01T16:25:06Z",
+  "declaration_hash": "ad877e0916cd8b196a912bfa976a4ce51139bfca04a0fcd22b079f32cf0225e1",
+  "signals": [
+    {
+      "type_name": "render_type_graph_flat",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "render_type_graph_clustered",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "render_type_graph_overview",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "EdgeSet",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "All",
+        "Fields",
+        "Impls",
+        "Methods"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,362 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "Reality View (TypeGraph ベース mermaid 図) の collect_edges() が見落とす 3 種の edge 起源 — (1) receiver-less associated function の戻り値・引数型、(2) trait method の戻り値・引数型 — を新たに edge 化することで、これまで孤立していた error 型・factory 引数型などを関係グラフに接続し、実装状態の俯瞰精度を高める",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "edge 起源 (引数由来 / 戻り値由来) を mermaid 上で形状と色によって視覚的に区別することで、edge 数増加後も「入力依存 (argument)」と「出力依存 (return)」を即座に読み分けられる一貫した表記体系を確立する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "collect_edges() の EdgeSet::Methods 分岐における receiver-less 判定ガード (method.receiver().is_none() による early-continue) の撤廃。associated function (constructor / factory / parser) も edge 起源として走査する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "collect_edges() における method 引数型 (method.params() の各 ParamDeclaration::ty()) の走査追加。戻り値型 (method.returns()) と引数型の両方を extract_type_names にかけ、workspace 型名への edge を発生させる。self-loop 抑制 (target != source_name) は引数側にも適用する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "edge_kind タグの分離: 現行の単一値 \"method\" を \"method_return\" (戻り値由来) と \"method_param\" (引数由来) の 2 値に分割する。render_edge_symbol の dispatch と snapshot テスト fixture を新 2 値に対応させる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "collect_edges() への trait method 走査ブロック追加。EdgeSet::Methods | EdgeSet::All に対して graph.trait_names() をループし、各 trait の methods() の戻り値型・引数型から workspace 型への edge を発生させる。edge_kind は戻り値由来を \"trait_method_return\"、引数由来を \"trait_method_param\" とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "EdgeSet::Methods 単独で呼ばれた場合に D2 の trait edge source となる trait ノードがクラスタに存在しないケースの対処: trait ノードを edge target が属するクラスタかモジュールパス由来のクラスタへ明示的に追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "render_edge_symbol() の kind dispatch 拡張: \"method_return\" / \"trait_method_return\" を --> (実線・塗りつぶし矢印) に、\"method_param\" / \"trait_method_param\" を --o (実線・open circle 終端) にマップする新 match arm を追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "引数由来 edge のグレー着色: render_type_graph_clustered および render_type_graph_flat の各関数で、引数由来 edge (\"method_param\" / \"trait_method_param\") の出現順インデックスを収集し、mermaid ブロック末尾に linkStyle <i1>,<i2>,... stroke:#888; を 1 行で追記する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "snapshot テスト fixture の更新: edge_kind 分離 (IN-03) および render_edge_symbol 拡張 (IN-06) に伴い、既存の snapshot テストを新しい 4 値 kind と --o / linkStyle 出力に対応するよう更新する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "enum variant payload 型の edge 化: MemberDeclaration::Variant が抱える workspace 型を edge にする変更。variant payload を edge 化するには catalogue / TypeGraph / baseline 3 輪の同時拡張 (ADR 2026-04-26-0855 Core invariant) が必要であり、本トラックのスコープ外として別 ADR に切り出す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "trait impl の generic 引数 edge 化 (例: impl From<DomainError> for FooError の DomainError への edge): 本 ADR では「trait impl edge は trait short name のみ」という現行動作を維持し、generic 引数の edge 化は別 ADR 案件とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "render_type_graph_overview の linkStyle 着色: overview はクラスタ間 edge を集約出力するため個別 edge インデックスが存在せず、引数由来 / 戻り値由来の色分けは適用しない。overview の edge はすべて既定色のままとする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "凡例ブロック (legend) の追加: index.md 上部への凡例ブロックは本トラックでは導入しない。cluster ファイル先頭コメントで --o が引数由来であることを 1 行示すにとどめる。凡例の正式導入は別 ADR で扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "Contract Map (catalogue 入力ベース) への同一スキームの移植: D3 の引数由来 / 戻り値由来の視覚スキームを Contract Map side に将来移植する余地を残すが、本トラックは Reality View のみを対象とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "変更範囲は renderer 層 (libs/infrastructure/src/tddd/type_graph_render.rs) のみに限定する。catalogue schema / TypeGraph schema / baseline schema には一切変更を加えない。schema 変更を伴う拡張は別 ADR で扱う",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "self-loop 抑制ロジック (target != source_name) は引数側・戻り値側ともに適用する。D1 の associated function 追加分と D2 の trait method 追加分の両方でこの抑制を適用する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "edge dedup は現行の edges.sort(); edges.dedup(); で吸収する。同一 (source, label, target, kind) 組は自動マージされるため、専用の dedup ロジックを追加しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "D2 の trait 走査対象は workspace に存在する trait のみとする。graph.trait_names() がそもそも workspace 限定であり、外部クレート trait を走査する処理は追加しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "D3 の視覚区別は形状を主軸 (--o vs -->) とし色 (linkStyle グレー) を補強として与える。色のみによる区別は採用しない。field edge (---) と impl edge (-.impl.->) は本変更の影響範囲外とし現行表記を維持する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "Reality View は実装状態の検証ドリルダウン artifact として位置付けを維持する。本トラックの変更が ADR 2026-04-16-2200 §D10 が定める Reality View と Contract Map の役割分担 (Reality View = per-layer archaeology・Contract Map = 設計意図の俯瞰) を変更しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+          "anchor": "D10"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "直前トラック (cli-via-usecase-only-2026-04-30) の domain-graph で孤立していた 6 ノード (CatalogueLinterError / CatalogueLinterRuleError / CatalogueLoaderError / ContractMapWriterError / ContractMapContent / TypestateTransitions) のうち、associated function または trait method からの edge が存在する型は、本変更後の graph で 1 本以上の edge を持つ (孤立から脱する)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "fn try_new(rule_kind: CatalogueLinterRuleKind, ...) -> Result<Self, CatalogueLinterRuleError> のような receiver-less associated function から、CatalogueLinterRuleKind および CatalogueLinterRuleError の双方への edge が graph に出力される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "CatalogueLinter::run(rules: &[CatalogueLinterRule], catalogue: &TypeCatalogueDocument, ...) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> のような trait method から、CatalogueLinterRule / TypeCatalogueDocument / CatalogueLintViolation / CatalogueLinterError への 4 本の edge が graph に出力される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "戻り値由来 edge が mermaid の --> (実線・塗りつぶし矢印) で出力される。引数由来 edge が mermaid の --o (実線・open circle 終端) で出力される。render_type_graph_clustered / render_type_graph_flat の出力において形状の区別が確認できる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "引数由来 edge が存在する場合、mermaid ブロック末尾に linkStyle <idx>,... stroke:#888; が追記される。linkStyle の index が edge の出現順序と一致している",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "render_type_graph_overview の出力には linkStyle 着色が追加されない (overview は個別 edge インデックスを持たないため、着色は clustered / flat に限定される)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "field edge (---) と impl edge (-.impl.->) は変更前と同一の mermaid 表記で出力される (リグレッションなし)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass する。既存の snapshot テストが新しい edge_kind 4 値と --o / linkStyle 出力に対応するよう更新され、テストスイートが通る",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Source Tag Types"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 29,
+    "yellow": 0,
+    "red": 0
+  }
+}
