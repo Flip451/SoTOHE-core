@@ -154,7 +154,13 @@ pub(crate) fn derive_track_status_from_json(items_dir: &std::path::Path, track_i
     let mut all_resolved = true; // every task is done or skipped
 
     for task in tasks {
-        let status = task.get("status").and_then(|s| s.as_str()).unwrap_or("todo");
+        // Fail-closed: missing/non-string `status`, or an unrecognized status string,
+        // means the impl-plan.json cannot be classified deterministically. Returning
+        // "unknown" forces the caller (e.g., `/track:activate`) to reject the track
+        // instead of silently treating malformed data as `planned` / `in_progress`.
+        let Some(status) = task.get("status").and_then(|s| s.as_str()) else {
+            return "unknown".to_owned();
+        };
         match status {
             "in_progress" => {
                 has_in_progress = true;
@@ -166,9 +172,7 @@ pub(crate) fn derive_track_status_from_json(items_dir: &std::path::Path, track_i
             "done" | "skipped" => {
                 has_resolved = true;
             }
-            _ => {
-                all_resolved = false;
-            }
+            _ => return "unknown".to_owned(),
         }
     }
 
