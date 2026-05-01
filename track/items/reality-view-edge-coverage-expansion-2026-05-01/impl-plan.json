@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "Add trait method scanning block to collect_edges(): (a) add a graph.trait_names() loop inside the EdgeSet::Methods | EdgeSet::All guard, (b) for each trait node iterate trait_node.methods() extracting both returns() and params() via extract_type_names, (c) emit 'trait_method_return' / 'trait_method_param' edges with self-loop suppression (target != trait_name), (d) when EdgeSet::Methods is used without EdgeSet::Impls and a trait node that becomes an edge source is absent from the cluster, explicitly insert it into the cluster plan so the mermaid output remains self-contained",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "fc4c805f683c152f41b51077631ffec217b199f8"
     },
     {
       "id": "T003",
       "description": "Extend render_edge_symbol() dispatch to the 4-value edge_kind set and add linkStyle gray coloring for argument-derived edges in clustered and flat renderers: (a) add match arms for 'method_return' / 'trait_method_return' mapping to '-->' and 'method_param' / 'trait_method_param' mapping to '--o', (b) in render_type_graph_clustered and render_type_graph_flat collect the output-order indices of argument-derived edges and append 'linkStyle <i1>,<i2>,... stroke:#888;' to the mermaid block when any such indices exist, (c) confirm render_type_graph_overview is NOT modified (OS-03 exclusion), (d) update the cluster-file leading comment to note '--o = argument-derived edge'",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T004",

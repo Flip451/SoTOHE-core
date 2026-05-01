@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別
 
-## Tasks (2/4 resolved)
+## Tasks (3/4 resolved)
 
 ### S1 — collect_edges() — receiver-less method coverage + edge_kind split
 
@@ -21,7 +21,7 @@
 > The optional trait-node cluster insertion handles the edge case where EdgeSet::Methods is called without EdgeSet::Impls: if the trait node that becomes an edge source is not already in the cluster (because impl edges were not generated), it is explicitly inserted. This prevents dangling source nodes in the mermaid output.
 > This task depends on T001 (kind string convention) but is logically independent of T003 (rendering).
 
-- [x] **T002**: Add trait method scanning block to collect_edges(): (a) add a graph.trait_names() loop inside the EdgeSet::Methods | EdgeSet::All guard, (b) for each trait node iterate trait_node.methods() extracting both returns() and params() via extract_type_names, (c) emit 'trait_method_return' / 'trait_method_param' edges with self-loop suppression (target != trait_name), (d) when EdgeSet::Methods is used without EdgeSet::Impls and a trait node that becomes an edge source is absent from the cluster, explicitly insert it into the cluster plan so the mermaid output remains self-contained
+- [x] **T002**: Add trait method scanning block to collect_edges(): (a) add a graph.trait_names() loop inside the EdgeSet::Methods | EdgeSet::All guard, (b) for each trait node iterate trait_node.methods() extracting both returns() and params() via extract_type_names, (c) emit 'trait_method_return' / 'trait_method_param' edges with self-loop suppression (target != trait_name), (d) when EdgeSet::Methods is used without EdgeSet::Impls and a trait node that becomes an edge source is absent from the cluster, explicitly insert it into the cluster plan so the mermaid output remains self-contained (`fc4c805f683c152f41b51077631ffec217b199f8`)
 
 ### S3 — render_edge_symbol() dispatch + linkStyle gray coloring
 
@@ -31,7 +31,7 @@
 > render_type_graph_overview is explicitly not modified (OS-03): overview aggregates cross-cluster edges without per-edge indices, so individual coloring is inapplicable.
 > This task depends on T001 and T002 for the kind values it dispatches on.
 
-- [ ] **T003**: Extend render_edge_symbol() dispatch to the 4-value edge_kind set and add linkStyle gray coloring for argument-derived edges in clustered and flat renderers: (a) add match arms for 'method_return' / 'trait_method_return' mapping to '-->' and 'method_param' / 'trait_method_param' mapping to '--o', (b) in render_type_graph_clustered and render_type_graph_flat collect the output-order indices of argument-derived edges and append 'linkStyle <i1>,<i2>,... stroke:#888;' to the mermaid block when any such indices exist, (c) confirm render_type_graph_overview is NOT modified (OS-03 exclusion), (d) update the cluster-file leading comment to note '--o = argument-derived edge'
+- [x] **T003**: Extend render_edge_symbol() dispatch to the 4-value edge_kind set and add linkStyle gray coloring for argument-derived edges in clustered and flat renderers: (a) add match arms for 'method_return' / 'trait_method_return' mapping to '-->' and 'method_param' / 'trait_method_param' mapping to '--o', (b) in render_type_graph_clustered and render_type_graph_flat collect the output-order indices of argument-derived edges and append 'linkStyle <i1>,<i2>,... stroke:#888;' to the mermaid block when any such indices exist, (c) confirm render_type_graph_overview is NOT modified (OS-03 exclusion), (d) update the cluster-file leading comment to note '--o = argument-derived edge'
 
 ### S4 — Test updates and CI gate
 

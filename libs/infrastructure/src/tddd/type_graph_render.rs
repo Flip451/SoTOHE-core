@@ -237,6 +237,14 @@ pub fn render_type_graph_flat(
     out.push_str(&format!(
         "<!-- Generated from {layer_name} TypeGraph — DO NOT EDIT DIRECTLY -->\n"
     ));
+    // Edge-shape legend (D3): document the open-circle endpoint convention
+    // alongside the generated marker so readers of the rendered file can
+    // interpret `--o` without consulting external docs.
+    // Note: `-->` cannot appear in an HTML comment body (it closes the comment),
+    // so the filled-arrowhead symbol is spelled out in words.
+    out.push_str(
+        "<!-- Edge legend: filled-arrowhead = return-derived, --o = argument-derived (gray) -->\n",
+    );
     out.push_str(&format!("# {layer_name} Type Graph\n\n"));
 
     let total_types = graph.type_names().count();
@@ -285,12 +293,24 @@ pub fn render_type_graph_flat(
     }
 
     // Emit edges (only between nodes in the node_set), choosing the mermaid
-    // edge symbol based on the edge_kind.
+    // edge symbol based on the edge_kind. While emitting, collect the 0-based
+    // output-order indices of parameter-derived edges so that a single
+    // `linkStyle ... stroke:#888;` line can be appended (D3 gray reinforcement).
+    let mut param_edge_indices: Vec<usize> = Vec::new();
+    let mut emitted_count: usize = 0;
     for (src, label, tgt, kind) in &edges {
         if node_set.contains(src.as_str()) && node_set.contains(tgt.as_str()) {
             let edge_str = render_edge_symbol(src, label, tgt, kind);
             out.push_str(&format!("    {edge_str}\n"));
+            if is_param_derived_edge_kind(kind) {
+                param_edge_indices.push(emitted_count);
+            }
+            emitted_count += 1;
         }
+    }
+    if !param_edge_indices.is_empty() {
+        let joined = param_edge_indices.iter().map(usize::to_string).collect::<Vec<_>>().join(",");
+        out.push_str(&format!("    linkStyle {joined} stroke:#888;\n"));
     }
 
     out.push_str("```\n");
@@ -741,6 +761,14 @@ pub fn render_type_graph_clustered(
     out.push_str(&format!(
         "<!-- Generated from {display_label} cluster TypeGraph — DO NOT EDIT DIRECTLY -->\n"
     ));
+    // Edge-shape legend (D3): document the open-circle endpoint convention
+    // alongside the generated marker so readers of the rendered file can
+    // interpret `--o` without consulting external docs.
+    // Note: `-->` cannot appear in an HTML comment body (it closes the comment),
+    // so the filled-arrowhead symbol is spelled out in words.
+    out.push_str(
+        "<!-- Edge legend: filled-arrowhead = return-derived, --o = argument-derived (gray) -->\n",
+    );
     out.push_str(&format!("# {display_label} Type Graph\n\n"));
 
     let total_types = cluster_types.len();
@@ -798,15 +826,33 @@ pub fn render_type_graph_clustered(
     }
 
     // Emit intra-cluster edges using the correct mermaid symbol per edge_kind.
+    // Track 0-based output-order indices of parameter-derived edges so that
+    // a single `linkStyle ... stroke:#888;` line can be appended after all
+    // edges are emitted (D3 gray reinforcement). Ghost edges share the same
+    // index sequence because mermaid numbers edges in declaration order.
+    let mut param_edge_indices: Vec<usize> = Vec::new();
+    let mut emitted_count: usize = 0;
     for (src, label, tgt, kind) in &intra_edges {
         let edge_str = render_edge_symbol(src, label, tgt, kind);
         out.push_str(&format!("    {edge_str}\n"));
+        if is_param_derived_edge_kind(kind) {
+            param_edge_indices.push(emitted_count);
+        }
+        emitted_count += 1;
     }
 
     // Emit cross-cluster ghost edges.
     for (ghost_id, src, label, _tgt, _display, kind) in &cross_ghost_ids {
         let edge_str = render_edge_symbol(src, label, ghost_id, kind);
         out.push_str(&format!("    {edge_str}\n"));
+        if is_param_derived_edge_kind(kind) {
+            param_edge_indices.push(emitted_count);
+        }
+        emitted_count += 1;
+    }
+    if !param_edge_indices.is_empty() {
+        let joined = param_edge_indices.iter().map(usize::to_string).collect::<Vec<_>>().join(",");
+        out.push_str(&format!("    linkStyle {joined} stroke:#888;\n"));
     }
 
     out.push_str("```\n");
@@ -1188,15 +1234,20 @@ fn trait_node_id(name: &str) -> String {
 
 /// Selects the mermaid edge symbol for the given `edge_kind`.
 ///
-/// - `"method_return"` / `"method_param"` → `A -->|label| B` (solid arrow —
-///   method call relationship; T003 will distinguish param origin via `--o`)
-/// - `"trait_method_return"` / `"trait_method_param"` → `_trait_A -->|label| B`
-///   (solid arrow with `_trait_` prefix on the trait source so the edge endpoint
-///   matches the trait node ID rendered with stadium shape)
+/// - `"method_return"` → `A -->|label| B` (solid arrow with filled arrowhead —
+///   method return-value origin; T001 split from the legacy `"method"` tag)
+/// - `"method_param"` → `A --o|label| B` (solid arrow with open-circle endpoint —
+///   method parameter origin; visually distinguished from return-value edges)
+/// - `"trait_method_return"` → `_trait_A -->|label| B` (solid arrow with filled
+///   arrowhead, trait source uses `_trait_` prefix to match the stadium-shaped
+///   trait node ID; D2 trait method return-value edges)
+/// - `"trait_method_param"` → `_trait_A --o|label| B` (solid arrow with
+///   open-circle endpoint, trait source uses `_trait_` prefix; D2 trait method
+///   parameter edges)
 /// - `"field"` → `A ---|label| B` (solid, no arrowhead — containment/composition)
 /// - `"impl"` → `A -.->|label| _trait_B` (dashed arrow — interface implementation;
 ///   trait node ID uses `_trait_` prefix to avoid collision with type nodes)
-/// - any other kind falls back to the method (solid arrow) symbol.
+/// - any other kind falls back to the method-return (solid arrow) symbol.
 fn render_edge_symbol(src: &str, label: &str, tgt: &str, kind: &str) -> String {
     match kind {
         "field" => format!("{src} ---|{label}| {tgt}"),
@@ -1204,12 +1255,31 @@ fn render_edge_symbol(src: &str, label: &str, tgt: &str, kind: &str) -> String {
             let tgt_id = trait_node_id(tgt);
             format!("{src} -.->|{label}| {tgt_id}")
         }
-        "trait_method_return" | "trait_method_param" => {
+        "method_return" => format!("{src} -->|{label}| {tgt}"),
+        "method_param" => format!("{src} --o|{label}| {tgt}"),
+        "trait_method_return" => {
             let src_id = trait_node_id(src);
             format!("{src_id} -->|{label}| {tgt}")
         }
+        "trait_method_param" => {
+            let src_id = trait_node_id(src);
+            format!("{src_id} --o|{label}| {tgt}")
+        }
         _ => format!("{src} -->|{label}| {tgt}"),
     }
+}
+
+/// Returns true when the edge_kind is a parameter-derived edge that should
+/// receive the gray `linkStyle stroke:#888;` reinforcement (D3).
+///
+/// Used by `render_type_graph_flat` and `render_type_graph_clustered` to
+/// collect the 0-based output-order indices of parameter-derived edges so
+/// that a single `linkStyle <i1>,<i2>,... stroke:#888;` line can be appended
+/// to the mermaid block. `render_type_graph_overview` does not call this
+/// helper because OS-03 explicitly excludes the overview from per-edge
+/// coloring.
+fn is_param_derived_edge_kind(kind: &str) -> bool {
+    matches!(kind, "method_param" | "trait_method_param")
 }
 
 /// Extracts PascalCase type names from a type string.
