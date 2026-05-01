@@ -2210,4 +2210,261 @@ mod tests {
             "impl edge must appear in cluster rendering with _trait_ prefix, got: {output}"
         );
     }
+
+    // -----------------------------------------------------------------------
+    // T004 — Test integration for D1/D2/D3 (snapshot/test updates + CI gate)
+    // -----------------------------------------------------------------------
+
+    /// T004-1 (D1 / IN-02): inherent method with a workspace-type parameter
+    /// emits a `method_param` edge with the open-circle endpoint symbol.
+    #[test]
+    fn test_collect_edges_emits_method_param_edge() {
+        use domain::tddd::catalogue::ParamDeclaration;
+
+        let mut types = HashMap::new();
+        let processor = struct_node(vec![MethodDeclaration::new(
+            "process",
+            Some("&self".into()),
+            vec![ParamDeclaration::new("item", "Item")],
+            "()",
+            false,
+        )]);
+        types.insert("Processor".to_string(), processor);
+        types.insert("Item".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let edges = collect_edges(&graph, EdgeSet::Methods);
+
+        assert!(
+            edges.contains(&(
+                "Processor".to_owned(),
+                "process".to_owned(),
+                "Item".to_owned(),
+                "method_param"
+            )),
+            "method_param edge must be emitted for workspace-type param, got: {edges:?}"
+        );
+    }
+
+    /// T004-2 (D1): an associated function with both a parameter type and a
+    /// return type produces both a `method_param` edge and a `method_return`
+    /// edge.
+    #[test]
+    fn test_collect_edges_emits_associated_function_param_and_return_edges() {
+        use domain::tddd::catalogue::ParamDeclaration;
+
+        let mut types = HashMap::new();
+        let factory = struct_node(vec![MethodDeclaration::new(
+            "try_new",
+            None, // associated function (no self receiver)
+            vec![ParamDeclaration::new("kind", "Kind")],
+            "Result<Self, Error>",
+            false,
+        )]);
+        types.insert("Factory".to_string(), factory);
+        types.insert("Kind".to_string(), struct_node(vec![]));
+        types.insert("Error".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let edges = collect_edges(&graph, EdgeSet::Methods);
+
+        assert!(
+            edges.contains(&(
+                "Factory".to_owned(),
+                "try_new".to_owned(),
+                "Kind".to_owned(),
+                "method_param"
+            )),
+            "associated function param edge must be emitted, got: {edges:?}"
+        );
+        assert!(
+            edges.contains(&(
+                "Factory".to_owned(),
+                "try_new".to_owned(),
+                "Error".to_owned(),
+                "method_return"
+            )),
+            "associated function return edge must be emitted, got: {edges:?}"
+        );
+    }
+
+    /// T004-3 (CN-02): self-loop suppression applies to inherent method
+    /// parameters as well as return types — a method that takes `&Self` as a
+    /// parameter on a type whose short name is `Self` does not emit an edge to
+    /// itself.
+    #[test]
+    fn test_collect_edges_suppresses_method_param_self_loop() {
+        use domain::tddd::catalogue::ParamDeclaration;
+
+        let mut types = HashMap::new();
+        let merger = struct_node(vec![MethodDeclaration::new(
+            "merge",
+            Some("&self".into()),
+            vec![ParamDeclaration::new("other", "Merger")],
+            "()",
+            false,
+        )]);
+        types.insert("Merger".to_string(), merger);
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let edges = collect_edges(&graph, EdgeSet::Methods);
+
+        assert!(
+            !edges.iter().any(|(src, _, tgt, kind)| {
+                src == "Merger" && tgt == "Merger" && *kind == "method_param"
+            }),
+            "self-loop param edge must be suppressed (target == source), got: {edges:?}"
+        );
+    }
+
+    /// T004-4 (D3 / AC-04 / AC-05): when parameter-derived edges are present,
+    /// the mermaid output emits `--o` for those edges and appends a
+    /// `linkStyle <indices> stroke:#888;` line whose indices match the
+    /// 0-based output order of the param edges.
+    #[test]
+    fn test_render_flat_emits_link_style_for_param_edges_with_correct_indices() {
+        use domain::tddd::catalogue::ParamDeclaration;
+
+        let mut types = HashMap::new();
+        // Type A has a return-only method (index 0 — return) and a param-only
+        // method (index 1 — param). Edges are sort()ed by collect_edges, so
+        // alphabetical ordering of the tuples controls the index.
+        let type_a = struct_node(vec![
+            MethodDeclaration::new("call_a", Some("&self".into()), vec![], "B", false),
+            MethodDeclaration::new(
+                "call_b",
+                Some("&self".into()),
+                vec![ParamDeclaration::new("c", "C")],
+                "()",
+                false,
+            ),
+        ]);
+        types.insert("A".to_string(), type_a);
+        types.insert("B".to_string(), struct_node(vec![]));
+        types.insert("C".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let output = render_type_graph_flat(&graph, "domain", &TypeGraphRenderOptions::default());
+
+        // Param edge should use --o symbol.
+        assert!(
+            output.contains("A --o|call_b| C"),
+            "param edge must use --o symbol, got: {output}"
+        );
+        // Return edge keeps -->.
+        assert!(
+            output.contains("A -->|call_a| B"),
+            "return edge must use --> symbol, got: {output}"
+        );
+        // Edges are sorted alphabetically by (src, label, tgt, kind):
+        //   ("A", "call_a", "B", "method_return")  index 0
+        //   ("A", "call_b", "C", "method_param")   index 1
+        // So linkStyle should reference index 1.
+        assert!(
+            output.contains("linkStyle 1 stroke:#888;"),
+            "linkStyle line must reference index 1 for the single param edge, got: {output}"
+        );
+    }
+
+    /// T004-5 (D3 / AC-05 negative case): when no parameter-derived edges
+    /// exist, the renderer does not append a `linkStyle` line.
+    #[test]
+    fn test_render_flat_omits_link_style_when_no_param_edges() {
+        let mut types = HashMap::new();
+        types.insert(
+            "Draft".to_string(),
+            struct_node(vec![method_returning("publish", "Published")]),
+        );
+        types.insert("Published".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let output = render_type_graph_flat(&graph, "domain", &TypeGraphRenderOptions::default());
+
+        assert!(
+            !output.contains("linkStyle"),
+            "linkStyle must not appear when no param-derived edges exist, got: {output}"
+        );
+    }
+
+    /// T004-6 (OS-03 / AC-06): `render_type_graph_overview` never emits a
+    /// `linkStyle` line, even when the graph contains parameter-derived edges
+    /// — overview aggregates cross-cluster edges and does not have per-edge
+    /// indices to color.
+    #[test]
+    fn test_render_overview_never_emits_link_style() {
+        use domain::tddd::catalogue::ParamDeclaration;
+
+        let mut types = HashMap::new();
+        let mut a = struct_node(vec![MethodDeclaration::new(
+            "call",
+            Some("&self".into()),
+            vec![ParamDeclaration::new("b", "B")],
+            "()",
+            false,
+        )]);
+        a.set_module_path("domain::a".to_owned());
+        types.insert("A".to_string(), a);
+
+        let mut b = struct_node(vec![]);
+        b.set_module_path("domain::b".to_owned());
+        types.insert("B".to_string(), b);
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let opts = TypeGraphRenderOptions {
+            edge_set: EdgeSet::Methods,
+            cluster_depth: 2,
+            ..Default::default()
+        };
+        let edges = collect_edges(&graph, opts.edge_set);
+        let plan = crate::tddd::type_graph_cluster::classify_types(&graph, 2, &edges);
+        let output = render_type_graph_overview(&graph, &plan, &opts);
+
+        assert!(
+            !output.contains("linkStyle"),
+            "overview must never contain linkStyle (OS-03), got: {output}"
+        );
+    }
+
+    /// T004-7 (D3 / AC-04): clustered renderer emits the open-circle endpoint
+    /// `--o` for parameter-derived edges and appends a `linkStyle` line.
+    #[test]
+    fn test_render_clustered_emits_link_style_for_param_edges() {
+        use domain::tddd::catalogue::ParamDeclaration;
+
+        let mut types = HashMap::new();
+        let mut producer = struct_node(vec![MethodDeclaration::new(
+            "make",
+            Some("&self".into()),
+            vec![ParamDeclaration::new("input", "Input")],
+            "()",
+            false,
+        )]);
+        producer.set_module_path("domain::pipeline".to_owned());
+        types.insert("Producer".to_string(), producer);
+
+        let mut input = struct_node(vec![]);
+        input.set_module_path("domain::pipeline".to_owned());
+        types.insert("Input".to_string(), input);
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let opts = TypeGraphRenderOptions {
+            edge_set: EdgeSet::Methods,
+            cluster_depth: 2,
+            ..Default::default()
+        };
+        let edges = collect_edges(&graph, opts.edge_set);
+        let plan = crate::tddd::type_graph_cluster::classify_types(&graph, 2, &edges);
+        let output = render_type_graph_clustered(&graph, "domain::pipeline", &plan, &opts);
+
+        // The intra-cluster param edge must use --o.
+        assert!(
+            output.contains("Producer --o|make| Input"),
+            "clustered param edge must use --o, got: {output}"
+        );
+        // linkStyle line must be present (single param edge at index 0).
+        assert!(
+            output.contains("linkStyle 0 stroke:#888;"),
+            "clustered linkStyle line must appear for param edge, got: {output}"
+        );
+    }
 }

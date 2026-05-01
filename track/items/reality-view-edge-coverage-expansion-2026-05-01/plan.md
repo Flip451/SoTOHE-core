@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別
 
-## Tasks (3/4 resolved)
+## Tasks (4/4 resolved)
 
 ### S1 — collect_edges() — receiver-less method coverage + edge_kind split
 
@@ -31,7 +31,7 @@
 > render_type_graph_overview is explicitly not modified (OS-03): overview aggregates cross-cluster edges without per-edge indices, so individual coloring is inapplicable.
 > This task depends on T001 and T002 for the kind values it dispatches on.
 
-- [x] **T003**: Extend render_edge_symbol() dispatch to the 4-value edge_kind set and add linkStyle gray coloring for argument-derived edges in clustered and flat renderers: (a) add match arms for 'method_return' / 'trait_method_return' mapping to '-->' and 'method_param' / 'trait_method_param' mapping to '--o', (b) in render_type_graph_clustered and render_type_graph_flat collect the output-order indices of argument-derived edges and append 'linkStyle <i1>,<i2>,... stroke:#888;' to the mermaid block when any such indices exist, (c) confirm render_type_graph_overview is NOT modified (OS-03 exclusion), (d) update the cluster-file leading comment to note '--o = argument-derived edge'
+- [x] **T003**: Extend render_edge_symbol() dispatch to the 4-value edge_kind set and add linkStyle gray coloring for argument-derived edges in clustered and flat renderers: (a) add match arms for 'method_return' / 'trait_method_return' mapping to '-->' and 'method_param' / 'trait_method_param' mapping to '--o', (b) in render_type_graph_clustered and render_type_graph_flat collect the output-order indices of argument-derived edges and append 'linkStyle <i1>,<i2>,... stroke:#888;' to the mermaid block when any such indices exist, (c) confirm render_type_graph_overview is NOT modified (OS-03 exclusion), (d) update the cluster-file leading comment to note '--o = argument-derived edge' (`6d9a0624657664938b39d0b9185adf9ddd1554f2`)
 
 ### S4 — Test updates and CI gate
 
@@ -41,4 +41,4 @@
 > All snapshot fixtures that reference the old 'method' kind string or a '-->' -only mermaid output are updated to match the new 4-value kind set.
 > The CI gate (cargo make ci) is the final enforcement: fmt-check, clippy, nextest, deny, check-layers, and verify-* must all pass.
 
-- [ ] **T004**: Update snapshot and unit tests to match the new 4-value edge_kind and '--o' / 'linkStyle' output, and run the full CI gate: (a) update or replace the existing test_render_skips_associated_functions_without_self test — it should now assert that associated functions DO create edges, (b) add new unit tests for method_param edge emission, associated-function-to-param and associated-function-to-return coverage, trait method return and param edges, self-loop suppression on both sides, and linkStyle index correctness, (c) update any snapshot fixtures that contain the old 'method' kind or '-->' -only output, (d) verify cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes
+- [x] **T004**: Update snapshot and unit tests to match the new 4-value edge_kind and '--o' / 'linkStyle' output, and run the full CI gate: (a) update or replace the existing test_render_skips_associated_functions_without_self test — it should now assert that associated functions DO create edges, (b) add new unit tests for method_param edge emission, associated-function-to-param and associated-function-to-return coverage, trait method return and param edges, self-loop suppression on both sides, and linkStyle index correctness, (c) update any snapshot fixtures that contain the old 'method' kind or '-->' -only output, (d) verify cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes
