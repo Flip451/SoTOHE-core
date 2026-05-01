@@ -5,25 +5,22 @@
       "id": "T001",
       "description": "Remove receiver-less guard from collect_edges() Methods branch and split edge_kind from 'method' into 'method_return' (return-value origin) and 'method_param' (argument origin): (a) delete the is_none() early-continue so associated functions become edge sources, (b) add method.params() scan alongside the existing method.returns() scan, (c) emit 'method_return' for return-value edges and 'method_param' for argument edges, (d) apply self-loop suppression (target != source_name) on the argument side as well",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "1303aa67dd60ae46f5c15e738839dd7dbe351e59"
     },
     {
       "id": "T002",
       "description": "Add trait method scanning block to collect_edges(): (a) add a graph.trait_names() loop inside the EdgeSet::Methods | EdgeSet::All guard, (b) for each trait node iterate trait_node.methods() extracting both returns() and params() via extract_type_names, (c) emit 'trait_method_return' / 'trait_method_param' edges with self-loop suppression (target != trait_name), (d) when EdgeSet::Methods is used without EdgeSet::Impls and a trait node that becomes an edge source is absent from the cluster, explicitly insert it into the cluster plan so the mermaid output remains self-contained",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "Extend render_edge_symbol() dispatch to the 4-value edge_kind set and add linkStyle gray coloring for argument-derived edges in clustered and flat renderers: (a) add match arms for 'method_return' / 'trait_method_return' mapping to '-->' and 'method_param' / 'trait_method_param' mapping to '--o', (b) in render_type_graph_clustered and render_type_graph_flat collect the output-order indices of argument-derived edges and append 'linkStyle <i1>,<i2>,... stroke:#888;' to the mermaid block when any such indices exist, (c) confirm render_type_graph_overview is NOT modified (OS-03 exclusion), (d) update the cluster-file leading comment to note '--o = argument-derived edge'",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "Update snapshot and unit tests to match the new 4-value edge_kind and '--o' / 'linkStyle' output, and run the full CI gate: (a) update or replace the existing test_render_skips_associated_functions_without_self test — it should now assert that associated functions DO create edges, (b) add new unit tests for method_param edge emission, associated-function-to-param and associated-function-to-return coverage, trait method return and param edges, self-loop suppression on both sides, and linkStyle index correctness, (c) update any snapshot fixtures that contain the old 'method' kind or '-->' -only output, (d) verify cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {

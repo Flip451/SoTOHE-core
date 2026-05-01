@@ -1,6 +1,113 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5ab3d02b8ef1d3f0ad6fe66796645f7b9366f1ea25d983569d94843e6af4d93",
+          "at": "2026-05-01T16:32:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5ab3d02b8ef1d3f0ad6fe66796645f7b9366f1ea25d983569d94843e6af4d93",
+          "at": "2026-05-01T16:36:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `trait_method_*` branches in `collect_edges`, `render_type_graph_clustered`, and `render_type_graph_overview` do not have matching tests in this change set. Existing tests still cover only the pre-existing `method`/`impl` paths, so regressions in the new trait-method scan, trait-node insertion, or overview filtering can slip through unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 382,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:08a6f441f9968b8b8f34568967620fe0ecf157812bcd7f0e303202adce64642d",
+          "at": "2026-05-01T16:52:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `collect_edges()` drops valid trait-method edges when a trait and a workspace type share the same short name, because the new trait scan uses `target != trait_name.as_str()` as if this were a self-loop. That comparison is namespace-blind, so a trait `Foo` returning/accepting a type `Foo` is silently omitted even though the renderer already disambiguates the nodes with `_trait_foo`. This loses real edges in both flat and clustered diagrams.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 423,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:08a6f441f9968b8b8f34568967620fe0ecf157812bcd7f0e303202adce64642d",
+          "at": "2026-05-01T16:55:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new trait-method scan emits edges without the same `target != trait_name` self-loop guard used for inherent methods. If a workspace trait and type share a short name, `collect_edges()` will now produce a spurious `_trait_Foo --> Foo` edge in both flat and clustered renders, which contradicts the intended D2 behavior and can pollute diagrams.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 427,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bf71fe903581d9f4203c9901378f40a796425d39f40fc065c08d6f1ff062e386",
+          "at": "2026-05-01T16:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_clustered` now short-circuits every `trait_method_*` edge before the existing cross-target path, so a trait that has both in-cluster and out-of-cluster method references only shows the in-cluster subset. The out-of-cluster dependencies disappear entirely once the trait node is inserted, which makes the cluster diagram incomplete for multi-cluster traits and diverges from the edge set collected in `collect_edges`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 560,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:75fac6a7c4d9fb11eade96a4cbebedcb0f9224659dea1bb5e35f3a222e0dac48",
+          "at": "2026-05-01T17:01:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `trait_method_*` paths in `collect_edges`, `render_type_graph_flat`, `render_type_graph_clustered`, and `render_type_graph_overview` are not covered by any regression tests here. Because this change also adds truncation and cluster-filtering logic around those branches, a regression could silently drop or misrender trait edges without being caught.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 374,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:04beac2918bf25a368c83f82eb5a3ef0ae6f68de96b03176b3d07cf3aec36b34",
+          "at": "2026-05-01T17:06:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cae749ef070d6669ecca9e93b4b6e0f5e3b7986913be4086488573ea02144dc1",
+          "at": "2026-05-01T17:11:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cae749ef070d6669ecca9e93b4b6e0f5e3b7986913be4086488573ea02144dc1",
+          "at": "2026-05-01T17:15:02Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -185,24 +292,35 @@
           "findings": [],
           "hash": "rvw1:sha256:23ae411c222de6846a380b00d05b2775a45c8c29cb32ee301b0cb8ed5e5f152b",
           "at": "2026-05-01T16:37:28Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d5ab3d02b8ef1d3f0ad6fe66796645f7b9366f1ea25d983569d94843e6af4d93",
-          "at": "2026-05-01T16:32:57Z"
+          "hash": "rvw1:sha256:36e4c88a1274e618a52763676a419bfbc9864189dfa1823d7e33eed2b011eb61",
+          "at": "2026-05-01T16:51:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` now records a `commit_hash` for T001, and the rendered plan exposes it, while the accepted tracking lifecycle for this T002 status-only update says task hashes remain unrecorded until the finalization commit. This creates a mixed state where T001 is hash-recorded but T002 is merely marked done, contradicting the stated plan-artifact update semantics.",
+              "severity": "P1",
+              "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/impl-plan.json",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:36e4c88a1274e618a52763676a419bfbc9864189dfa1823d7e33eed2b011eb61",
+          "at": "2026-05-01T16:53:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d5ab3d02b8ef1d3f0ad6fe66796645f7b9366f1ea25d983569d94843e6af4d93",
-          "at": "2026-05-01T16:36:22Z"
+          "hash": "rvw1:sha256:36e4c88a1274e618a52763676a419bfbc9864189dfa1823d7e33eed2b011eb61",
+          "at": "2026-05-01T16:55:06Z"
         }
       ]
     }

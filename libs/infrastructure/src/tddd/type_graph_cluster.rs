@@ -64,10 +64,13 @@ pub struct ClusterPlan {
 
 /// A directed edge spanning cluster boundaries.
 ///
-/// `edge_kind` is a `&'static str` tag (`"method"` / `"field"` / `"impl"`)
-/// matching the edge-set taxonomy in `type_graph_render::EdgeSet`. Keeping
-/// the tag static-string rather than an enum lets the renderer pass edge
-/// data through without borrowing a full mermaid-specific enum.
+/// `edge_kind` is a `&'static str` tag matching the edge-set taxonomy in
+/// `type_graph_render::EdgeSet`. Possible values:
+/// `"method_return"` / `"method_param"` (inherent or associated method, return /
+/// parameter origin), `"trait_method_return"` / `"trait_method_param"` (trait
+/// method, return / parameter origin; source is a trait), `"field"`,
+/// `"impl"`. Keeping the tag static-string rather than an enum lets the renderer
+/// pass edge data through without borrowing a full mermaid-specific enum.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CrossEdge {
     pub source_type: String,
@@ -76,7 +79,7 @@ pub struct CrossEdge {
     pub target_cluster: ClusterKey,
     /// Edge label (method name, field name, or trait name).
     pub label: String,
-    /// Edge kind tag: `"method"` | `"field"` | `"impl"`.
+    /// Edge kind tag (see struct doc for the full list of values).
     pub edge_kind: &'static str,
 }
 

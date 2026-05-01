@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別
 
-## Tasks (1/4 resolved)
+## Tasks (2/4 resolved)
 
 ### S1 — collect_edges() — receiver-less method coverage + edge_kind split
 
@@ -11,7 +11,7 @@
 > This task touches only the collect_edges() function body and the doc-comment for the edge_kind values. No change to the public function signature or the EdgeSet enum (CN-01).
 > T001 is a prerequisite for T003 because the new kind tags must exist before render_edge_symbol() dispatch can be extended.
 
-- [x] **T001**: Remove receiver-less guard from collect_edges() Methods branch and split edge_kind from 'method' into 'method_return' (return-value origin) and 'method_param' (argument origin): (a) delete the is_none() early-continue so associated functions become edge sources, (b) add method.params() scan alongside the existing method.returns() scan, (c) emit 'method_return' for return-value edges and 'method_param' for argument edges, (d) apply self-loop suppression (target != source_name) on the argument side as well
+- [x] **T001**: Remove receiver-less guard from collect_edges() Methods branch and split edge_kind from 'method' into 'method_return' (return-value origin) and 'method_param' (argument origin): (a) delete the is_none() early-continue so associated functions become edge sources, (b) add method.params() scan alongside the existing method.returns() scan, (c) emit 'method_return' for return-value edges and 'method_param' for argument edges, (d) apply self-loop suppression (target != source_name) on the argument side as well (`1303aa67dd60ae46f5c15e738839dd7dbe351e59`)
 
 ### S2 — collect_edges() — trait method scanning
 
@@ -21,7 +21,7 @@
 > The optional trait-node cluster insertion handles the edge case where EdgeSet::Methods is called without EdgeSet::Impls: if the trait node that becomes an edge source is not already in the cluster (because impl edges were not generated), it is explicitly inserted. This prevents dangling source nodes in the mermaid output.
 > This task depends on T001 (kind string convention) but is logically independent of T003 (rendering).
 
-- [ ] **T002**: Add trait method scanning block to collect_edges(): (a) add a graph.trait_names() loop inside the EdgeSet::Methods | EdgeSet::All guard, (b) for each trait node iterate trait_node.methods() extracting both returns() and params() via extract_type_names, (c) emit 'trait_method_return' / 'trait_method_param' edges with self-loop suppression (target != trait_name), (d) when EdgeSet::Methods is used without EdgeSet::Impls and a trait node that becomes an edge source is absent from the cluster, explicitly insert it into the cluster plan so the mermaid output remains self-contained
+- [x] **T002**: Add trait method scanning block to collect_edges(): (a) add a graph.trait_names() loop inside the EdgeSet::Methods | EdgeSet::All guard, (b) for each trait node iterate trait_node.methods() extracting both returns() and params() via extract_type_names, (c) emit 'trait_method_return' / 'trait_method_param' edges with self-loop suppression (target != trait_name), (d) when EdgeSet::Methods is used without EdgeSet::Impls and a trait node that becomes an edge source is absent from the cluster, explicitly insert it into the cluster plan so the mermaid output remains self-contained
 
 ### S3 — render_edge_symbol() dispatch + linkStyle gray coloring
 
