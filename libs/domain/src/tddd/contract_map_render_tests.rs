@@ -1347,3 +1347,231 @@ fn test_render_contract_map_secondary_adapter_top_level_method_produces_edge() {
         "SecondaryAdapter top-level method edge must appear; output was:\n{text}"
     );
 }
+
+// --- T003: Typestate transition edges + reference port impl edge ---------
+
+#[test]
+fn test_render_contract_map_with_typestate_to_generates_transition_edge() {
+    // ADR 2026-04-29-0241 §D1: `Typestate { transitions: To(names) }` produces
+    // a thick `==>|"transitions_to"|` edge to each resolved target.
+    let domain = layer("domain");
+    let a = entry(
+        "A",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::To(vec!["B".to_owned()]),
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let b = entry(
+        "B",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::Terminal,
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![a, b]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        text.contains("L6_domain_A ==>|\"transitions_to\"| L6_domain_B"),
+        "Typestate To([\"B\"]) must produce a transitions_to edge; output was:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_with_typestate_terminal_generates_no_edge() {
+    // ADR 2026-04-29-0241 §D1: `TypestateTransitions::Terminal` must not
+    // produce any transition edge.
+    let domain = layer("domain");
+    let terminal = entry(
+        "A",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::Terminal,
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![terminal]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        !text.contains("==>"),
+        "Terminal typestate must not emit any thick transition arrow; output was:\n{text}"
+    );
+    assert!(
+        !text.contains("transitions_to"),
+        "Terminal typestate must not emit a transitions_to label; output was:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_with_typestate_unregistered_target_silently_skipped() {
+    // ADR 2026-04-29-0241 §D1: targets not present in the catalogue are
+    // silently skipped via `type_index.get() == None`.
+    let domain = layer("domain");
+    let a = entry(
+        "A",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::To(vec!["UnknownState".to_owned()]),
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![a]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        !text.contains("==>"),
+        "Unregistered transition target must be silently skipped; output was:\n{text}"
+    );
+    assert!(
+        !text.contains("UnknownState"),
+        "Unregistered name must not surface in the rendered output; output was:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_with_typestate_self_loop_suppressed() {
+    // CN-04: self-loops (dst_id == src_id) are suppressed with the same
+    // guard used for method-call edges.
+    let domain = layer("domain");
+    let a = entry(
+        "A",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::To(vec!["A".to_owned()]),
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![a]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        !text.contains("L6_domain_A ==>|\"transitions_to\"| L6_domain_A"),
+        "Self-loop transition edge must be suppressed; output was:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_with_typestate_to_multiple_targets() {
+    // AC-03 reinforcement: `To([B, C])` with both B and C present in the
+    // catalogue produces two distinct transition edges.
+    let domain = layer("domain");
+    let a = entry(
+        "A",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::To(vec!["B".to_owned(), "C".to_owned()]),
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let b = entry(
+        "B",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::Terminal,
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let c = entry(
+        "C",
+        TypeDefinitionKind::Typestate {
+            transitions: TypestateTransitions::Terminal,
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![a, b, c]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        text.contains("L6_domain_A ==>|\"transitions_to\"| L6_domain_B"),
+        "Transition edge A → B must appear; output was:\n{text}"
+    );
+    assert!(
+        text.contains("L6_domain_A ==>|\"transitions_to\"| L6_domain_C"),
+        "Transition edge A → C must appear; output was:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_with_reference_port_produces_impl_edge() {
+    // AC-05 / ADR 2026-04-29-0243: a SecondaryPort declared with
+    // `action: "reference"` is registered in the port_index and accepts
+    // `-.impl.->` edges from a SecondaryAdapter that lists it in
+    // `implements[]`.
+    let domain = layer("domain");
+    let infra = layer("infrastructure");
+
+    let port_methods = vec![MethodDeclaration::new(
+        "save",
+        Some("&self".to_owned()),
+        vec![ParamDeclaration::new("user", "User")],
+        "Result<(), DomainError>",
+        false,
+    )];
+    let referenced_port = TypeCatalogueEntry::new(
+        "UserRepository",
+        "Referenced port from another track",
+        TypeDefinitionKind::SecondaryPort { expected_methods: port_methods },
+        TypeAction::Reference,
+        true,
+    )
+    .unwrap();
+
+    let postgres_impl = TraitImplDecl::new("UserRepository", Vec::new());
+    let adapter = entry(
+        "PostgresUserRepository",
+        TypeDefinitionKind::SecondaryAdapter {
+            implements: vec![postgres_impl],
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![referenced_port]));
+    catalogues.insert(infra.clone(), doc(vec![adapter]));
+    let order = vec![domain, infra];
+
+    let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+    let text = content.as_ref();
+    assert!(
+        text.contains(
+            "L14_infrastructure_PostgresUserRepository -.impl.-> L6_domain_UserRepository"
+        ),
+        "Reference port must accept impl edge from SecondaryAdapter; output was:\n{text}"
+    );
+}
