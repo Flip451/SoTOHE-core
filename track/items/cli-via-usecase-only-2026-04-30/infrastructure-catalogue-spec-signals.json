@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3b998760898fe5b052d3d5aeff1ec7b4f91d629d4bd1134b28c5121ffc50f1cc",
+  "catalogue_declaration_hash": "97f46f88e64973ea73285a3e1cae249d4327ac5499e1d8e85005b080097bddc0",
   "signals": [
     {
       "type_name": "FsTrackStore",

@@ -387,7 +387,7 @@
       "expected_params": [
         {
           "name": "track_id",
-          "ty": "str"
+          "ty": "&str"
         }
       ],
       "expected_returns": [
@@ -416,23 +416,23 @@
       "expected_params": [
         {
           "name": "prompt",
-          "ty": "String"
+          "ty": "&mut String"
         },
         {
           "name": "scope_name",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "is_safe_path_fn",
-          "ty": "Fn"
+          "ty": "impl Fn"
         }
       ],
       "expected_returns": [
@@ -485,11 +485,11 @@
       "expected_params": [
         {
           "name": "track_id",
-          "ty": "TrackId"
+          "ty": "&TrackId"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -518,11 +518,11 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -551,11 +551,11 @@
       "expected_params": [
         {
           "name": "track_id",
-          "ty": "TrackId"
+          "ty": "&TrackId"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "reviewer",
@@ -588,11 +588,11 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "reviewer",
@@ -649,11 +649,11 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -682,11 +682,11 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -715,11 +715,11 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -748,15 +748,15 @@
       "expected_params": [
         {
           "name": "scope_name",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -785,11 +785,11 @@
       "expected_params": [
         {
           "name": "track_id",
-          "ty": "TrackId"
+          "ty": "&TrackId"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -818,11 +818,11 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -851,11 +851,11 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "scope_filter",
@@ -867,7 +867,7 @@
         },
         {
           "name": "round_type",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "no_hint",
@@ -900,11 +900,11 @@
       "expected_params": [
         {
           "name": "track_id",
-          "ty": "TrackId"
+          "ty": "&TrackId"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -933,19 +933,19 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "group_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "round_type_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "reviewer",
@@ -978,7 +978,7 @@
       "expected_params": [
         {
           "name": "group_name",
-          "ty": "str"
+          "ty": "&str"
         }
       ],
       "expected_returns": [
@@ -1007,15 +1007,15 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "scope_name",
-          "ty": "str"
+          "ty": "&str"
         }
       ],
       "expected_returns": [
@@ -1044,7 +1044,7 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         }
       ],
       "expected_returns": [
@@ -1073,19 +1073,19 @@
       "expected_params": [
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_id",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "workspace_root",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "binding",
-          "ty": "TdddLayerBinding"
+          "ty": "&TdddLayerBinding"
         }
       ],
       "expected_returns": [
@@ -1114,23 +1114,23 @@
       "expected_params": [
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_id",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "binding",
-          "ty": "TdddLayerBinding"
+          "ty": "&TdddLayerBinding"
         },
         {
           "name": "writer",
-          "ty": "FsCatalogueSpecSignalsStore"
+          "ty": "&FsCatalogueSpecSignalsStore"
         }
       ],
       "expected_returns": [
@@ -1159,19 +1159,19 @@
       "expected_params": [
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_id",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "workspace_root",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "binding",
-          "ty": "TdddLayerBinding"
+          "ty": "&TdddLayerBinding"
         },
         {
           "name": "cluster_depth",
@@ -1208,31 +1208,31 @@
       "expected_params": [
         {
           "name": "doc",
-          "ty": "TypeCatalogueDocument"
+          "ty": "&mut TypeCatalogueDocument"
         },
         {
           "name": "profile",
-          "ty": "TypeGraph"
+          "ty": "&TypeGraph"
         },
         {
           "name": "baseline",
-          "ty": "TypeBaseline"
+          "ty": "&TypeBaseline"
         },
         {
           "name": "domain_types_path",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "signal_file_name",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "workspace_crates",
-          "ty": "HashSet<String>"
+          "ty": "&HashSet<String>"
         }
       ],
       "expected_returns": [
@@ -1261,19 +1261,19 @@
       "expected_params": [
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_id",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "workspace_root",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "binding",
-          "ty": "TdddLayerBinding"
+          "ty": "&TdddLayerBinding"
         }
       ],
       "expected_returns": [
@@ -1302,7 +1302,7 @@
       "expected_params": [
         {
           "name": "report",
-          "ty": "ConsistencyReport"
+          "ty": "&ConsistencyReport"
         }
       ],
       "expected_returns": [
@@ -1331,19 +1331,19 @@
       "expected_params": [
         {
           "name": "report",
-          "ty": "ConsistencyReport"
+          "ty": "&ConsistencyReport"
         },
         {
           "name": "doc",
-          "ty": "TypeCatalogueDocument"
+          "ty": "&TypeCatalogueDocument"
         },
         {
           "name": "domain_types_path",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -1372,11 +1372,11 @@
       "expected_params": [
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         }
       ],
       "expected_returns": [
@@ -1405,7 +1405,7 @@
       "expected_params": [
         {
           "name": "project_root",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -1434,15 +1434,15 @@
       "expected_params": [
         {
           "name": "bindings",
-          "ty": "TdddLayerBinding"
+          "ty": "&[TdddLayerBinding]"
         },
         {
           "name": "track_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -1471,7 +1471,7 @@
       "expected_params": [
         {
           "name": "finding",
-          "ty": "SpecRefFinding"
+          "ty": "&SpecRefFinding"
         }
       ],
       "expected_returns": [
@@ -1500,11 +1500,11 @@
       "expected_params": [
         {
           "name": "track_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [
@@ -1533,19 +1533,19 @@
       "expected_params": [
         {
           "name": "track_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "items_dir",
-          "ty": "Path"
+          "ty": "&Path"
         },
         {
           "name": "binding",
-          "ty": "TdddLayerBinding"
+          "ty": "&TdddLayerBinding"
         },
         {
           "name": "spec_element_hashes",
-          "ty": "BTreeMap<SpecElementId, ContentHash>"
+          "ty": "&BTreeMap<SpecElementId, ContentHash>"
         },
         {
           "name": "skip_stale",
@@ -1656,7 +1656,7 @@
       "expected_params": [
         {
           "name": "report",
-          "ty": "ConsistencyReport"
+          "ty": "&ConsistencyReport"
         }
       ],
       "expected_returns": [
@@ -1685,19 +1685,19 @@
       "expected_params": [
         {
           "name": "doc",
-          "ty": "TypeCatalogueDocument"
+          "ty": "&TypeCatalogueDocument"
         },
         {
           "name": "graph",
-          "ty": "TypeGraph"
+          "ty": "&TypeGraph"
         },
         {
           "name": "baseline",
-          "ty": "TypeBaseline"
+          "ty": "&TypeBaseline"
         },
         {
           "name": "workspace_crates",
-          "ty": "HashSet<String>"
+          "ty": "&HashSet<String>"
         }
       ],
       "expected_returns": [
@@ -1726,15 +1726,15 @@
       "expected_params": [
         {
           "name": "track_id_str",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "crate_name",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "project_root",
-          "ty": "Path"
+          "ty": "&Path"
         }
       ],
       "expected_returns": [

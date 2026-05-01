@@ -120,8 +120,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| check_compliance_render | free_function | — | — | 🟡 | 🔵 |
-| has_skill_command | free_function | — | — | 🟡 | 🔵 |
-| reject_branchless_guard_by_str | free_function | — | — | 🟡 | 🔵 |
-| reject_branchless_implementation_transition_by_str | free_function | — | — | 🟡 | 🔵 |
+| check_compliance_render | free_function | — | — | 🔵 | 🔵 |
+| has_skill_command | free_function | — | — | 🔵 | 🔵 |
+| reject_branchless_guard_by_str | free_function | — | — | 🔵 | 🔵 |
+| reject_branchless_implementation_transition_by_str | free_function | — | — | 🔵 | 🔵 |
 

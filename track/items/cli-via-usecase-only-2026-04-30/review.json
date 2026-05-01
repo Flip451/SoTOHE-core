@@ -189,6 +189,852 @@
         }
       ]
     },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ShellParserPortAdapter` reconstructs `SimpleCommand` with `redirect_texts: Vec::new()` and `has_output_redirect: false`, so the downstream guard policy can no longer see or block output redirects or heredoc-based git references. Once commands cross this new boundary, inputs like `> /tmp/file` are treated as allowed instead of blocked.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs",
+              "line": 108,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a7aaa3da5b86b932e201295050020948652a3379158440c9d26601990311f779",
+          "at": "2026-04-30T17:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ShellParserPortAdapter` discards the parser's error string and rewrites every failure to `ParseError::UnmatchedQuote`, so `GuardCheckInteractor::check` will always surface the unmatched-quote block reason even when the underlying parser failed for a different cause. That misreports parser failures and defeats the domain's distinction between nesting-depth and syntax failures.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs",
+              "line": 123,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:91199bc4de28941861138020ab93ccdf8a40d0fa356b778db368a2addf845069",
+          "at": "2026-04-30T17:19:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: [libs/usecase/src/guard.rs:131](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs#L131) reconstructs argv with `split_whitespace()` after the port has already flattened each command into a single string. That destroys shell quoting/escaping, so a command like `git -C \"repo dir\" commit` is re-tokenized as `git`, `-C`, `repo`, `dir`, `commit`; `extract_git_subcommand()` then skips only one `-C` argument and can misidentify the effective subcommand, allowing guarded git operations to bypass the policy. This is a security-relevant false negative in the new guard boundary.",
+              "severity": "P0",
+              "file": "libs/usecase/src/guard.rs",
+              "line": 131,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:4fb8645a04b55690599bbe61c1da559a54442a75d011f7c7f1eafb9fff1a217e",
+          "at": "2026-04-30T17:22:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63636dc4e9df57e3844ceb8fdce7526225985208b8117802af4c8ce0d283dd67",
+          "at": "2026-04-30T17:25:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63636dc4e9df57e3844ceb8fdce7526225985208b8117802af4c8ce0d283dd67",
+          "at": "2026-04-30T17:30:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bef487c7a652da9978ad37efc54d1a5c9649700ec70d8e9ee0d099dd89905655",
+          "at": "2026-04-30T17:33:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bef487c7a652da9978ad37efc54d1a5c9649700ec70d8e9ee0d099dd89905655",
+          "at": "2026-04-30T17:35:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ae0f67954c14f6decc82d7b9c0aca2d374f11ddcd62bdade93cac360da0d3c8",
+          "at": "2026-04-30T17:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`block-test-file-deletion` is wired through `ShellParserPortToDomainAdapter`, which reconstructs argv with `split_whitespace()` from the port's lossy `argv.join(\" \")` strings. For a guarded command such as `bash -c 'rm tests/foo.rs'`, the parsed shell payload becomes tokens like `bash`, `-c`, `rm`, `tests/foo.rs`; the existing handler then takes only `rm` as the `-c` inner command and sees no test-file argument, so it allows the deletion. This regresses the security-critical test deletion guard once CLI dispatch moves through this service.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook_dispatch.rs",
+              "line": 132,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae0f67954c14f6decc82d7b9c0aca2d374f11ddcd62bdade93cac360da0d3c8",
+          "at": "2026-04-30T17:47:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`block-direct-git-ops` is routed through the lossy `ShellParserPortToDomainAdapter`, which reconstructs `SimpleCommand` with `redirect_texts: Vec::new()` and `has_output_redirect: false`. When T010 wires CLI dispatch through this service, commands that the existing hook blocks via the full domain parser, such as `echo x > src/lib.rs` or other Bash output redirects, will be seen as plain argv and allowed, bypassing the file-write guard policy.",
+              "severity": "P0",
+              "file": "libs/usecase/src/hook_dispatch.rs",
+              "line": 227,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a90d8398f5ecb72b607d5588d01f83588aaa6867b9689a9af2b2aec93b088be5",
+          "at": "2026-04-30T17:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`HookDispatchInteractor::new` exposes `domain::guard::ShellParser` in the public usecase API instead of the T002 usecase-owned `ShellParserPort` described in the briefing. That means the CLI wiring for this service will still have to depend on the domain parser trait rather than staying behind the usecase boundary; add an internal adapter (or usecase-owned faithful parser port) and keep the constructor typed to the usecase port.",
+              "severity": "P1",
+              "file": "libs/usecase/src/hook_dispatch.rs",
+              "line": 175,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:542fce5f253504bc71832db1e0bab7248dd578cc85e55b6a64bc4138343a0589",
+          "at": "2026-04-30T17:56:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` now declares `pub mod hook_dispatch;`, but `libs/usecase/src/hook_dispatch.rs` is untracked and absent from the git diff. If this change is committed as-is, consumers will get a module-not-found compile failure for `hook_dispatch`. Add the new module file to version control with the `lib.rs` change.",
+              "severity": "P0",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 11,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:2fadbd40b23b692e2253e009b45e660315cbd0bceb33b5aea0c130e9ad562e37",
+          "at": "2026-04-30T18:01:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fadbd40b23b692e2253e009b45e660315cbd0bceb33b5aea0c130e9ad562e37",
+          "at": "2026-04-30T18:05:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NextTaskOutput` and `TaskCountsOutput` are missing fields that the current track CLI output already relies on: next-task prints the task `status`, and task-counts prints `total`. As written, this service cannot faithfully replace the existing behavior without recomputing those values outside the usecase boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 39,
+              "category": "api-contract"
+            },
+            {
+              "message": "`schema_version` is hard-coded to `3`, so `resolve_phase` will misclassify older v1/v2 tracks where branchless planning should still resolve to `Planning` instead of `Ready to Activate`. This wrapper needs the real schema version from metadata rather than assuming the current one.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "Every port failure is mapped to `ExportFailed`, so the public `SerializationFailed` variant is never reachable even though the error type and docs promise it. The infrastructure adapter already distinguishes export vs serialization in its error strings, so the interactor should preserve that distinction.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/export_schema.rs",
+              "line": 103,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:35a318d70b8388a8474ef62dc0f9d49d1fcaced9116c276ae4d9b69333f5546e",
+          "at": "2026-04-30T19:25:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `TaskOperationInteractor` never enforces the branch guard that these commands advertise. `skip_branch_check` is ignored in all four mutation methods, and the dedicated `BranchGuardFailed` / `BranchlessGuardFailed` variants are never emitted, so task mutations can still run on non-track branches instead of being rejected. See [task_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs#L118) and [task_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs#L240).",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 118,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `TrackPhaseInteractor::resolve` hardcodes `schema_version = 3` and ignores `items_dir`, but `resolve_phase` uses the real schema version to decide between `Planning` and `ReadyToActivate`. Any track whose stored schema version is not 3 will be reported with the wrong phase and next command. See [track_phase.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs#L145).",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_phase.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:22d2c9e2726e2530b7adee0293ddf932c6dbe73be434900f726c1fb8d290ac24",
+          "at": "2026-04-30T19:31:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackPhaseInteractor::resolve` always passes `schema_version = 3` into `resolve_phase`. That collapses the schema-version branch in `domain::track_phase`, so a branchless v2 track is reported as `Ready to Activate` instead of `Planning` (the domain layer still exercises the v2 case).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "line": 160,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:abdd8ea8fe6c6bd295289b02f4b41322ba4133947eae2f25d1ec7382c9d9f7b9",
+          "at": "2026-04-30T19:42:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `read_schema_version_from_metadata` silently converts any missing or malformed `metadata.json` into schema version `5`, so a corrupt track can be reported as a valid v5 track instead of failing. That can change the resolved phase output and hide filesystem/data corruption. This should propagate an error through `TrackPhaseError` instead of defaulting.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "line": 122,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Branch validation now shells out to `git` directly from usecase code. That makes `TaskOperationService` depend on the host Git installation and checkout state, and it cannot be mocked in unit tests. This violates the repo's boundary/testability rules; the branch source should be injected behind a port or resolved in the composition root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 242,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e381c687fa40a93341573f8d4982e80b5b71f519a1c7b2b449c63615ae5bef6f",
+          "at": "2026-04-30T19:47:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `TrackPhaseInteractor` now reaches straight into `metadata.json` with `std::fs::read_to_string`/`serde_json` instead of going through the existing store/port boundary. That adds a hidden filesystem dependency to the usecase layer, makes the service impossible to exercise with only mocked `TrackReader`/`ImplPlanReader`, and breaks the hexagonal rule that infrastructure access stays behind traits.",
+              "severity": "P1",
+              "file": "\n/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "line": 133,
+              "category": "architecture"
+            },
+            {
+              "message": "P1: `verdict_to_output` is `pub` and its signature exposes `domain::review_v2::ReviewApprovalVerdict`. That leaks a domain type into the public usecase API, which defeats the boundary the rest of this bundle is trying to establish and lets downstream code depend on domain review types through the usecase crate.",
+              "severity": "P1",
+              "file": "\n/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/check_approved.rs",
+              "line": 133,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:f2c9ab2ba4535d77ceed391913686462cf4d1522b44067cf55391bbe610e5ebb",
+          "at": "2026-04-30T19:56:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`transition_task`, `add_task`, `set_override`, and `clear_override` all persist the mutation and then call `load_impl_plan()` only to compute `derived_status`. If that second read fails, the method returns `StoreFailed(...)` after the write has already succeeded, so callers observe a failure for a committed change and may retry into a duplicate or inconsistent state. Make the status lookup non-fatal, or perform it before the write if you need it to gate the operation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 367,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9aeb547717b1e927dd99f6088ddef41b76616be04adefbcb51ad170997038e48",
+          "at": "2026-04-30T20:07:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskOperationInteractor` swallows `load_impl_plan` errors after a successful write (`ok().flatten()`), so `transition_task`/`add_task`/`set_override`/`clear_override` can return `Ok` with a derived status computed as if the plan were missing. A transient repository read failure is hidden and the CLI can report the wrong post-mutation status. Propagate the error or derive status from the mutation result instead.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 376,
+              "category": "error-handling"
+            },
+            {
+              "message": "`TrackPhaseInteractor::new` hardcodes `schema_version = 5` when no reader is injected. That makes phase resolution wrong for existing schema v2/v3/v4 tracks; for example, a branchless v2 planned track will be reported as `Ready to Activate` instead of `Planning`. The interactor should require the real schema version or fail closed when it cannot read it.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_phase.rs",
+              "line": 192,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9f68be265b97c10193c06556a7deb73b4d973b613bd446b1bad3727782835195",
+          "at": "2026-04-30T20:12:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After each successful mutation, `transition_task`/`add_task`/`set_override`/`clear_override` does a second `load_impl_plan()` and turns any read failure into `StoreFailed`. That lets the method return `Err` after the write has already committed, so a transient read error can prompt a duplicate retry against an already-mutated track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 372,
+              "category": "correctness"
+            },
+            {
+              "message": "`BranchReaderFn` is exported as a new public boundary type, but the approved usecase catalogue does not include it. That leaks an undocumented dependency past the usecase boundary and means branch-guard enforcement depends on hidden wiring instead of the published `TaskOperationService` contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 217,
+              "category": "architecture"
+            },
+            {
+              "message": "`SchemaVersionReaderFn` is exported as a new public boundary type, but the approved catalogue only models `TrackPhaseOutput`, `TrackPhaseError`, `TrackPhaseService`, and `TrackPhaseInteractor`. A CLI wired from the documented contract cannot supply this extra reader without undocumented glue, so the public API no longer matches the catalogue.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "line": 102,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e27cf7e47f921a184f3180921da899248869b9b3388647fa56bac67c632fdbba",
+          "at": "2026-04-30T20:18:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `TaskOperationInteractor::new` always stores `branch_reader: None`, and the only constructor that can inject a reader is `#[cfg(test)]`. In real builds that makes `skip_branch_check = false` a no-op, so branch mismatches are never rejected and mutations can run on the wrong checkout.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 248,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `TrackPhaseInteractor` has the same production-only gap: `with_schema_version_reader` is test-only, so the only runtime path falls back to `schema_version = 5`. That will misclassify older tracks, which the code itself notes can change the phase/next-command result.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "line": 196,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:41df6bddd535db1a519eeb084cd5d7935c5f6eabeb3e62c06ad445ecd9dd5446",
+          "at": "2026-04-30T20:29:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackPhaseInteractor` falls back to a hard-coded `schema_version = 5` here, so any legacy branchless track that is still on an older schema will be classified with the wrong phase (`Ready to Activate` instead of `Planning`). The public API therefore returns incorrect results unless every caller remembers to inject a reader via `with_schema_version_reader`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_phase.rs",
+              "line": 197,
+              "category": "logic"
+            },
+            {
+              "message": "The post-write `load_impl_plan` result is discarded with `.ok().flatten()` here, which converts repository/read failures into a successful response with a fabricated \"no impl plan\" status. That means callers can get a committed mutation back with a stale or wrong `derived_status` and no signal that the projection refresh failed; the same pattern repeats in the other mutation methods.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 379,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:aaa26f1c404bc6910c68d1efe15037f56d6f725f2cd7407d295ef653d91b17e7",
+          "at": "2026-04-30T20:33:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91dd34662cdfed738c51cb02ec382c3737fb60ccada6b2b0c5d7733de16d1bfa",
+          "at": "2026-04-30T20:39:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Public constructors expose less-visible function type aliases in their primary API. `ReviewCheckApprovedInteractor::new` takes the private `CheckApprovedBuildFn` alias here, and the same pattern appears for `VerifySpecRefsRunFn`, `TypeSignalsRunFn`, `BranchReaderFn`, and `SchemaVersionReaderFn` in the new scoped files. Because the `usecase` crate opts into workspace lints with `warnings = \"deny\"`, rustc's `private_interfaces` warning will be promoted to a compile error when the crate is checked. Make these aliases public API types or inline the `Arc<dyn Fn...>` signatures / use public wrapper traits so the constructors no longer mention private aliases.",
+              "severity": "P0",
+              "file": "libs/usecase/src/review_v2/check_approved.rs",
+              "line": 108,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:91dd34662cdfed738c51cb02ec382c3737fb60ccada6b2b0c5d7733de16d1bfa",
+          "at": "2026-04-30T20:44:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`enforce_branch_guard` explicitly returns `Ok(())` for branchless tracks, and `transition_task` then mutates via `execute_by_status` without the existing `reject_branchless_guard`/schema-version activation check. A CLI migrated to this service can transition schema v3+ planning-only tracks to implementation statuses before activation; activation later rejects branchless tracks with in-progress plans, leaving the workflow in an invalid state. Enforce the branchless activation guard before the mutation, with a real schema version source in the usecase boundary.",
+              "severity": "P0",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 312,
+              "category": "logic"
+            },
+            {
+              "message": "This new public wiring alias exposes `domain::TrackId` in the usecase API even though the boundary contract for `ReviewCheckApprovedService` takes a `String` specifically so CLI code does not import domain IDs. Since the CLI composition root must construct this interactor, the constructor signature leaks the domain type across CN-01 and is not part of the approved usecase catalogue. Keep the domain conversion inside usecase or make the injected closure use only standard/usecase-owned types.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/check_approved.rs",
+              "line": 83,
+              "category": "architecture"
+            },
+            {
+              "message": "`SchemaVersionReaderFn` is a public usecase API that takes `&TrackId`, adding an undocumented public boundary type and leaking `domain::TrackId` through `TrackPhaseInteractor::with_schema_version_reader`. This contradicts the catalogued `TrackPhaseService` boundary, whose inputs are `String`/`PathBuf`, and forces external wiring to depend on domain types to get correct schema-version-aware phase resolution.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_phase.rs",
+              "line": 100,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ec88fe0a6ddae6b06fbd1d5f6ba368abc2a3b9e03f10e3c908426737fd77b3b6",
+          "at": "2026-04-30T20:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NextTaskOutput` only carries `task_id` and `description`, but the current `track next-task` CLI response also includes the selected task's `status`. Once the CLI is migrated to this service, it cannot preserve the existing JSON contract without either dropping `status` or re-reading domain task state outside the usecase boundary. Include the task status in this DTO and populate it from `t.status().kind()` in `next_task`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 39,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:729d06cdc633d0f1ad2d3ddc3947c6799709eccae01f72d930275c16cbe9c2a8",
+          "at": "2026-04-30T20:59:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NextTaskOutput` exposes a public `status` field even though the approved usecase catalogue declares only `task_id` and `description` for this DTO. The briefing requires `expected_members` to match strictly, so this changes the published boundary contract for `TaskQueryService::next_task`. Remove the extra member or update the catalogue before wiring CLI consumers against it.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 45,
+              "category": "api_contract"
+            },
+            {
+              "message": "Missing task transitions are never converted to `TaskOperationError::TaskNotFound`. `TransitionTaskUseCase::execute_by_status` returns `TrackWriteError::Domain(DomainError::Transition(TransitionError::TaskNotFound { .. }))`, but this conversion collapses every domain error into `TransitionFailed`, leaving the declared `TaskNotFound` boundary variant unused for the actual missing-task case. Match that domain error explicitly and return `TaskNotFound`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 100,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ae692fdfc45ae97e1718b084d9cc70bb217c30d0de7db0536b214e62e92c58fd",
+          "at": "2026-04-30T21:03:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set_override` persists the override and then reads `impl-plan.json` only to compute the display status. The existing CLI path deliberately derives this status from the override alone, so an unreadable/corrupt impl plan now returns `StoreFailed` after metadata was already mutated, making the caller see a failed operation even though the override was applied. Keep the old behavior here, or read before mutating if the plan is truly required.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 533,
+              "category": "behavioral_regression"
+            },
+            {
+              "message": "`add_task` now rejects an invalid optional `after_task_id` by returning `InvalidTaskId`. The current CLI behavior explicitly treats an invalid `--after` as `None` and appends the task, so wiring this usecase service would turn previously successful add-task commands into failures. Preserve the fallback before delegating to `AddTaskUseCase`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 467,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:4566c7ef2f6a2f34f1d28c5536874c03a68ef43adcb93251944c0df1d78602be",
+          "at": "2026-04-30T21:07:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`add_task` silently discards an invalid `after_task_id` by converting `TaskId::try_new(a)` with `.ok()` and then proceeds to append the new task. That violates the no-silent-error-swallowing rule and can mutate `impl-plan.json` in the wrong order when a caller mistypes `--after`; this should return `TaskOperationError::InvalidTaskId` instead of treating the input as absent.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 470,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:fd301b7afde797ae0255d20dba10f903b9ba20075b9b3cccb96806ebb73fdc97",
+          "at": "2026-04-30T21:11:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackPhaseInteractor::new` installs a schema-version reader that always returns `5`, so this valid `TrackPhaseService` instance misclassifies legacy branchless tracks whose stored schema version is not 3..=5. For example, a schema v2 planned track should resolve to `Planning`, but the default interactor reports `Ready to Activate`; require an injected real schema-version source or fail closed instead of guessing.",
+              "severity": "P1",
+              "file": "libs/usecase/src/track_phase.rs",
+              "line": 143,
+              "category": "correctness"
+            },
+            {
+              "message": "The public task-operation constructors make guard enforcement optional: `TaskOperationInteractor::new` sets both guard readers to `None`, so a normal service instance ignores `skip_branch_check = false` and allows branch mismatches and branchless planning-track implementation transitions. Since the catalogued mutation commands expose guard errors, the interactor should require the guard ports needed to enforce them rather than silently disabling them in the default constructor.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 278,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b1670fb6f85682741b21d5de3f0b0b4b663ce43c6d1126f46d586f71280ebe2b",
+          "at": "2026-04-30T21:15:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e21d806eb4882e45f1e083977605e2def7db491840cd66416c1f61a1307c4c4",
+          "at": "2026-04-30T21:24:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `transition_task` calls `reject_branchless_guard` before the explicit not-found path, then maps every failure from that guard to `BranchGuardFailed`. If the track does not exist, callers get the wrong error variant instead of `TrackNotFound`, which breaks downstream error handling and makes a missing track indistinguishable from a real branch-policy failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 381,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: the only constructor that can inject a branch reader is `#[cfg(test)] pub(crate) fn with_branch_reader`, while `TaskOperationInteractor::new` always stores `branch_reader: None`. In non-test builds that makes `skip_branch_check = false` a no-op, so branch mismatches are never rejected by this service.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 273,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9c0c5e59479f69bd41c9787bdd9377d5897acbe4eec5fdfb9a67d5612e64eac1",
+          "at": "2026-04-30T21:38:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskOperationInteractor::new()` now hard-codes `branch_reader: None`, and the only constructor that can inject a branch reader is `#[cfg(test)]`. In non-test builds `enforce_branch_guard()` therefore takes the no-op path, so `skip_branch_check = false` no longer rejects branch mismatches or detached HEAD state and task mutations can run on the wrong checkout.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 273,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9c0c5e59479f69bd41c9787bdd9377d5897acbe4eec5fdfb9a67d5612e64eac1",
+          "at": "2026-04-30T21:40:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Forwarding `git`'s raw stderr into the user-facing error leaks checkout/path details on every branch-reader failure. This should be normalized to a generic message or sanitized before crossing the usecase boundary.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 243,
+              "category": "security"
+            },
+            {
+              "message": "`TaskOperationInteractor::new()` now hardcodes a `git` subprocess and `with_branch_reader()` is only compiled for tests, so non-test callers can no longer inject a branch source. That breaks the trait-boundary design and makes branch-guarded mutations fail at runtime outside a real git checkout or without `git` installed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 293,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:adf32a4c0972f4689dfe993562206cf17688e4e6f0394e6c7be46592edb359b3",
+          "at": "2026-04-30T21:45:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [task_ops.rs](./libs/usecase/src/task_ops.rs:230) / [task_ops.rs](./libs/usecase/src/task_ops.rs:295) now hardwires `read_current_branch()` into the default constructor, and that helper shells out to `git` via `std::process::Command` inside the usecase layer. This reintroduces an infrastructure dependency behind the usecase boundary instead of keeping branch detection behind the injected port, and the happy-path test was changed to `skip_branch_check = true`, so the new production path is no longer exercised in tests.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 230,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:486e239f80d892e408e9c8df9bb1bf7b8412e03e7329307b698e54f338f5ca2e",
+          "at": "2026-04-30T21:49:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskOperationInteractor::new()` still leaves `branch_reader` unset, so `enforce_branch_guard()` returns early and every mutation on that instance silently skips the branch check. Because this constructor remains public, any production caller that uses it can mutate a track on the wrong checkout with `skip_branch_check = false` and no error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 277,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:7f8662cd70f885a1976a691608b0d20d49bdf7e3a2980e60d804c0ffd903538d",
+          "at": "2026-04-30T21:53:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ReviewCheckApprovedInteractor::check_approved` has no behavior test covering its public path. The current tests only exercise `verdict_to_output` and error-variant construction, so the new track-id validation and closure delegation here can regress without a failing test.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/check_approved.rs",
+              "line": 123,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fe5eb7a27acf91fe10c93efd0bc016e95acb21b98887cbe8563157e11a9a7f96",
+          "at": "2026-04-30T21:59:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The branchless-track coverage here no longer exercises the production constructor: this test uses `with_branch_reader`, which is `#[cfg(test)]` and sets `schema_version_reader: None`, so it bypasses the new `TaskOperationInteractor::new(..., schema_version, ...)` wiring that actually enforces the planning-only guard. A regression in `new` could therefore silently stop rejecting schema v3..=5 branchless transitions without failing any test. Add a test that uses `new` on a branchless track and asserts the guard outcome.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 957,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:15627c4eec0030607d913e0fe7f34a25bac9474d8caa7cca9a521fa30873bb33",
+          "at": "2026-04-30T22:03:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new production path in `TaskOperationInteractor::new` is only exercised for the branchless-activation case. All branch-mismatch and detached-HEAD assertions still go through the test-only `with_branch_reader`, so a regression in `new` that drops or miswires the injected branch reader would not be caught by the suite. Add a `new`-based branch-guard failure test.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "line": 286,
+              "category": "testing"
+            },
+            {
+              "message": "`TrackPhaseInteractor::new` is only tested with schema version 5. The legacy v1/v2 path described in the constructor docs is still only exercised via the test-only `with_schema_version_reader`, so a regression that ignores the caller-provided schema version or hardcodes 5 would slip through. Add a `new`-based test for a non-5 legacy track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "line": 141,
+              "category": "testing"
+            },
+            {
+              "message": "Both [spec_refs.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/spec_refs.rs#L169) and [type_signals.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/type_signals.rs#L150) only cover the happy path for their new public wrappers. There is no test that an `Err` returned by the injected closure is propagated unchanged, which leaves the public error contract unverified. Add one failure-path test for each wrapper.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/spec_refs.rs",
+              "line": 169,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1115f7b7931cf3fb36231b466ff5fe4e14fb8dfc2627f814d9a6089e850b30fd",
+          "at": "2026-04-30T22:08:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c083b1bdf340e3890c6d2c3a9a672a94a93d3595d0789d770714056c1c15baf1",
+          "at": "2026-04-30T22:14:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c083b1bdf340e3890c6d2c3a9a672a94a93d3595d0789d770714056c1c15baf1",
+          "at": "2026-04-30T22:18:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:984bb2df836e71c1b505220b167287c0ac0cdaa4dce9d90d46bd0c0c7f0408b2",
+          "at": "2026-04-30T22:33:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:984bb2df836e71c1b505220b167287c0ac0cdaa4dce9d90d46bd0c0c7f0408b2",
+          "at": "2026-04-30T22:34:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `files_by_string` signature does not match the catalogue contract: `usecase-types.json` expects the parameter name `scope`, but this method is declared as `scope_name`. That leaves the API shape out of sync with the authoritative usecase declaration even though the Rust types are otherwise correct.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/scope_query.rs",
+              "line": 147,
+              "category": "contract-mismatch"
+            },
+            {
+              "message": "`LayerId::try_new` failures are being converted into `RenderContractMapError::LayerNotFound` before `load_all` runs, so a syntactically invalid `--layers` token is reported as 'not enabled' rather than invalid input. That collapses two distinct failure modes and contradicts the documented meaning of `LayerNotFound`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
+              "line": 184,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:1effb4bd94cc97d8782871643b29b1322b61ab7b787ea19a3855820132924b68",
+          "at": "2026-05-01T01:34:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Invalid `layer_filter` syntax is being converted into `RenderContractMapError::LayerNotFound` here (`format!(\"{name}: {e}\")`). That makes a malformed layer name look like a missing enabled layer, so callers cannot distinguish bad input from a real absence in the catalogue and will get a misleading remediation hint.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
+              "line": 184,
+              "category": "error handling"
+            },
+            {
+              "message": "A malformed `track_id` is turned into `CatalogueLoaderError::LayerDiscoveryFailed` before the loader runs, which then surfaces as `RunCatalogueLintError::CatalogueLoad`. That reclassifies a user validation error as an infrastructure failure, so the string-based lint API cannot tell callers that the input itself was invalid.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 156,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:1effb4bd94cc97d8782871643b29b1322b61ab7b787ea19a3855820132924b68",
+          "at": "2026-05-01T01:38:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both string-based guard helpers validate `track_id_str` before the underlying early-return path. The typed `reject_branchless_implementation_transition` / `reject_branchless_guard` functions return `Ok(())` immediately for non-implementation statuses, so these wrappers now fail on no-op inputs (for example `todo`) whenever the track id is malformed. That changes the semantics of the API and can break callers that invoke the helper unconditionally.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_resolution.rs",
+              "line": 156,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:054acb2386b8e2e7b80d863dcc36a2262689f2a55b227e734553fa68896d9412",
+          "at": "2026-05-01T01:43:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunCatalogueLintError` adds a public `InvalidTrackId` variant here, but the authoritative declaration in `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json` still lists only `CatalogueLoad`, `LintExecution`, `InvalidLayer`, and `InvalidRuleSpec` for this type. That leaves the usecase API and the generated contract/schema out of sync.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 98,
+              "category": "contract"
+            },
+            {
+              "message": "`RenderContractMapError` adds `InvalidLayerFilter`, but `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json` still declares only the six older variants and does not include a layer-filter parse error. The public Rust API therefore no longer matches the contract the rest of the pipeline is checking.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
+              "line": 109,
+              "category": "contract"
+            },
+            {
+              "message": "`files_by_string` is declared with `scope_name: String`, but the authoritative `ScopeQueryService` contract names that parameter `scope` in `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json`. Parameter names are part of the tracked public signature here, so this will fail the declaration comparison even though the Rust types are otherwise correct.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/scope_query.rs",
+              "line": 147,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:0e71d17ceac40cfd245abba306800726dbacb30e46e3c5fccc758fc548bc2f80",
+          "at": "2026-05-01T01:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05a60f4ea20fc9f17fc5d787acbf9f4a2a07b821b871b9ea34b96efbfb1281a3",
+          "at": "2026-05-01T01:56:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lint_rule_spec_to_domain` matches on `spec.kind` while `spec` is a shared reference and `LintRuleKind` is not `Copy`. This attempts to move the enum out of a borrowed `LintRuleSpec`, so the usecase crate will fail to compile as soon as this helper is checked. Match on `&spec.kind` or derive `Copy` for `LintRuleKind` before converting to the domain rule kind.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
+              "line": 212,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:05a60f4ea20fc9f17fc5d787acbf9f4a2a07b821b871b9ea34b96efbfb1281a3",
+          "at": "2026-05-01T02:00:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2329bbcea77d5c4b2c475685b08fa7e7ac5c34e92c43066f0a5454f94ed5015",
+          "at": "2026-05-01T02:05:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c969d064aabc683aa2bace27d3dcf4600f170ed516ab4666ec28c174554f3467",
+          "at": "2026-05-01T07:09:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c969d064aabc683aa2bace27d3dcf4600f170ed516ab4666ec28c174554f3467",
+          "at": "2026-05-01T07:19:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5e93bbb9fd57209d3dcff43198e1bba475aff828c73607d98333da32ef3a6f",
+          "at": "2026-05-01T07:42:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5e93bbb9fd57209d3dcff43198e1bba475aff828c73607d98333da32ef3a6f",
+          "at": "2026-05-01T07:44:40Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -458,6 +1304,42 @@
           "findings": [],
           "hash": "rvw1:sha256:dade659ed7ccf2d8733f475373246fb9c07e64d0e24d3aeb36d9e5e539882fa2",
           "at": "2026-05-01T07:44:42Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
+          "at": "2026-05-01T01:31:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
+          "at": "2026-05-01T01:32:58Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e382181931e672c51dc48c6e5f15e023dfd18048e9f0507941592e7667911c1",
+          "at": "2026-05-01T01:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e382181931e672c51dc48c6e5f15e023dfd18048e9f0507941592e7667911c1",
+          "at": "2026-05-01T01:32:32Z"
         }
       ]
     },
@@ -939,24 +1821,20 @@
           "findings": [],
           "hash": "rvw1:sha256:a6477fb4178ab9f29b41bae3bc6050edf27020ec95963b92c3d37da9f83158bd",
           "at": "2026-05-01T03:42:24Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8e382181931e672c51dc48c6e5f15e023dfd18048e9f0507941592e7667911c1",
-          "at": "2026-05-01T01:31:41Z"
+          "hash": "rvw1:sha256:fe60929755dcc196f7355048281bdb13ecd1fca37bfaf0da9a7a86cd707232f7",
+          "at": "2026-05-01T09:01:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8e382181931e672c51dc48c6e5f15e023dfd18048e9f0507941592e7667911c1",
-          "at": "2026-05-01T01:32:32Z"
+          "hash": "rvw1:sha256:fe60929755dcc196f7355048281bdb13ecd1fca37bfaf0da9a7a86cd707232f7",
+          "at": "2026-05-01T09:03:48Z"
         }
       ]
     },
@@ -2543,870 +3421,20 @@
           "findings": [],
           "hash": "rvw1:sha256:189c107b2651e8291048f76524afc510c33e3d9b1c56d4f9ea2b6e7b4fd07aa1",
           "at": "2026-05-01T07:24:07Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ShellParserPortAdapter` reconstructs `SimpleCommand` with `redirect_texts: Vec::new()` and `has_output_redirect: false`, so the downstream guard policy can no longer see or block output redirects or heredoc-based git references. Once commands cross this new boundary, inputs like `> /tmp/file` are treated as allowed instead of blocked.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs",
-              "line": 108,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:a7aaa3da5b86b932e201295050020948652a3379158440c9d26601990311f779",
-          "at": "2026-04-30T17:15:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `ShellParserPortAdapter` discards the parser's error string and rewrites every failure to `ParseError::UnmatchedQuote`, so `GuardCheckInteractor::check` will always surface the unmatched-quote block reason even when the underlying parser failed for a different cause. That misreports parser failures and defeats the domain's distinction between nesting-depth and syntax failures.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs",
-              "line": 123,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:91199bc4de28941861138020ab93ccdf8a40d0fa356b778db368a2addf845069",
-          "at": "2026-04-30T17:19:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P0: [libs/usecase/src/guard.rs:131](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs#L131) reconstructs argv with `split_whitespace()` after the port has already flattened each command into a single string. That destroys shell quoting/escaping, so a command like `git -C \"repo dir\" commit` is re-tokenized as `git`, `-C`, `repo`, `dir`, `commit`; `extract_git_subcommand()` then skips only one `-C` argument and can misidentify the effective subcommand, allowing guarded git operations to bypass the policy. This is a security-relevant false negative in the new guard boundary.",
-              "severity": "P0",
-              "file": "libs/usecase/src/guard.rs",
-              "line": 131,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:4fb8645a04b55690599bbe61c1da559a54442a75d011f7c7f1eafb9fff1a217e",
-          "at": "2026-04-30T17:22:59Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:63636dc4e9df57e3844ceb8fdce7526225985208b8117802af4c8ce0d283dd67",
-          "at": "2026-04-30T17:25:25Z"
+          "hash": "rvw1:sha256:cfb58ae8582a151bf26fc4497d0b0ebf1daa4bff1aed6b7c5b37d144ab4b8f9a",
+          "at": "2026-05-01T09:01:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:63636dc4e9df57e3844ceb8fdce7526225985208b8117802af4c8ce0d283dd67",
-          "at": "2026-04-30T17:30:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bef487c7a652da9978ad37efc54d1a5c9649700ec70d8e9ee0d099dd89905655",
-          "at": "2026-04-30T17:33:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bef487c7a652da9978ad37efc54d1a5c9649700ec70d8e9ee0d099dd89905655",
-          "at": "2026-04-30T17:35:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ae0f67954c14f6decc82d7b9c0aca2d374f11ddcd62bdade93cac360da0d3c8",
-          "at": "2026-04-30T17:45:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`block-test-file-deletion` is wired through `ShellParserPortToDomainAdapter`, which reconstructs argv with `split_whitespace()` from the port's lossy `argv.join(\" \")` strings. For a guarded command such as `bash -c 'rm tests/foo.rs'`, the parsed shell payload becomes tokens like `bash`, `-c`, `rm`, `tests/foo.rs`; the existing handler then takes only `rm` as the `-c` inner command and sees no test-file argument, so it allows the deletion. This regresses the security-critical test deletion guard once CLI dispatch moves through this service.",
-              "severity": "P0",
-              "file": "libs/usecase/src/hook_dispatch.rs",
-              "line": 132,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:8ae0f67954c14f6decc82d7b9c0aca2d374f11ddcd62bdade93cac360da0d3c8",
-          "at": "2026-04-30T17:47:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`block-direct-git-ops` is routed through the lossy `ShellParserPortToDomainAdapter`, which reconstructs `SimpleCommand` with `redirect_texts: Vec::new()` and `has_output_redirect: false`. When T010 wires CLI dispatch through this service, commands that the existing hook blocks via the full domain parser, such as `echo x > src/lib.rs` or other Bash output redirects, will be seen as plain argv and allowed, bypassing the file-write guard policy.",
-              "severity": "P0",
-              "file": "libs/usecase/src/hook_dispatch.rs",
-              "line": 227,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:a90d8398f5ecb72b607d5588d01f83588aaa6867b9689a9af2b2aec93b088be5",
-          "at": "2026-04-30T17:52:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`HookDispatchInteractor::new` exposes `domain::guard::ShellParser` in the public usecase API instead of the T002 usecase-owned `ShellParserPort` described in the briefing. That means the CLI wiring for this service will still have to depend on the domain parser trait rather than staying behind the usecase boundary; add an internal adapter (or usecase-owned faithful parser port) and keep the constructor typed to the usecase port.",
-              "severity": "P1",
-              "file": "libs/usecase/src/hook_dispatch.rs",
-              "line": 175,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:542fce5f253504bc71832db1e0bab7248dd578cc85e55b6a64bc4138343a0589",
-          "at": "2026-04-30T17:56:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` now declares `pub mod hook_dispatch;`, but `libs/usecase/src/hook_dispatch.rs` is untracked and absent from the git diff. If this change is committed as-is, consumers will get a module-not-found compile failure for `hook_dispatch`. Add the new module file to version control with the `lib.rs` change.",
-              "severity": "P0",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 11,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:2fadbd40b23b692e2253e009b45e660315cbd0bceb33b5aea0c130e9ad562e37",
-          "at": "2026-04-30T18:01:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2fadbd40b23b692e2253e009b45e660315cbd0bceb33b5aea0c130e9ad562e37",
-          "at": "2026-04-30T18:05:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`NextTaskOutput` and `TaskCountsOutput` are missing fields that the current track CLI output already relies on: next-task prints the task `status`, and task-counts prints `total`. As written, this service cannot faithfully replace the existing behavior without recomputing those values outside the usecase boundary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 39,
-              "category": "api-contract"
-            },
-            {
-              "message": "`schema_version` is hard-coded to `3`, so `resolve_phase` will misclassify older v1/v2 tracks where branchless planning should still resolve to `Planning` instead of `Ready to Activate`. This wrapper needs the real schema version from metadata rather than assuming the current one.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
-              "line": 145,
-              "category": "correctness"
-            },
-            {
-              "message": "Every port failure is mapped to `ExportFailed`, so the public `SerializationFailed` variant is never reachable even though the error type and docs promise it. The infrastructure adapter already distinguishes export vs serialization in its error strings, so the interactor should preserve that distinction.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/export_schema.rs",
-              "line": 103,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:35a318d70b8388a8474ef62dc0f9d49d1fcaced9116c276ae4d9b69333f5546e",
-          "at": "2026-04-30T19:25:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `TaskOperationInteractor` never enforces the branch guard that these commands advertise. `skip_branch_check` is ignored in all four mutation methods, and the dedicated `BranchGuardFailed` / `BranchlessGuardFailed` variants are never emitted, so task mutations can still run on non-track branches instead of being rejected. See [task_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs#L118) and [task_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs#L240).",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 118,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `TrackPhaseInteractor::resolve` hardcodes `schema_version = 3` and ignores `items_dir`, but `resolve_phase` uses the real schema version to decide between `Planning` and `ReadyToActivate`. Any track whose stored schema version is not 3 will be reported with the wrong phase and next command. See [track_phase.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs#L145).",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_phase.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:22d2c9e2726e2530b7adee0293ddf932c6dbe73be434900f726c1fb8d290ac24",
-          "at": "2026-04-30T19:31:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackPhaseInteractor::resolve` always passes `schema_version = 3` into `resolve_phase`. That collapses the schema-version branch in `domain::track_phase`, so a branchless v2 track is reported as `Ready to Activate` instead of `Planning` (the domain layer still exercises the v2 case).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
-              "line": 160,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:abdd8ea8fe6c6bd295289b02f4b41322ba4133947eae2f25d1ec7382c9d9f7b9",
-          "at": "2026-04-30T19:42:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `read_schema_version_from_metadata` silently converts any missing or malformed `metadata.json` into schema version `5`, so a corrupt track can be reported as a valid v5 track instead of failing. That can change the resolved phase output and hide filesystem/data corruption. This should propagate an error through `TrackPhaseError` instead of defaulting.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
-              "line": 122,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: Branch validation now shells out to `git` directly from usecase code. That makes `TaskOperationService` depend on the host Git installation and checkout state, and it cannot be mocked in unit tests. This violates the repo's boundary/testability rules; the branch source should be injected behind a port or resolved in the composition root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 242,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:e381c687fa40a93341573f8d4982e80b5b71f519a1c7b2b449c63615ae5bef6f",
-          "at": "2026-04-30T19:47:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `TrackPhaseInteractor` now reaches straight into `metadata.json` with `std::fs::read_to_string`/`serde_json` instead of going through the existing store/port boundary. That adds a hidden filesystem dependency to the usecase layer, makes the service impossible to exercise with only mocked `TrackReader`/`ImplPlanReader`, and breaks the hexagonal rule that infrastructure access stays behind traits.",
-              "severity": "P1",
-              "file": "\n/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
-              "line": 133,
-              "category": "architecture"
-            },
-            {
-              "message": "P1: `verdict_to_output` is `pub` and its signature exposes `domain::review_v2::ReviewApprovalVerdict`. That leaks a domain type into the public usecase API, which defeats the boundary the rest of this bundle is trying to establish and lets downstream code depend on domain review types through the usecase crate.",
-              "severity": "P1",
-              "file": "\n/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/check_approved.rs",
-              "line": 133,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:f2c9ab2ba4535d77ceed391913686462cf4d1522b44067cf55391bbe610e5ebb",
-          "at": "2026-04-30T19:56:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`transition_task`, `add_task`, `set_override`, and `clear_override` all persist the mutation and then call `load_impl_plan()` only to compute `derived_status`. If that second read fails, the method returns `StoreFailed(...)` after the write has already succeeded, so callers observe a failure for a committed change and may retry into a duplicate or inconsistent state. Make the status lookup non-fatal, or perform it before the write if you need it to gate the operation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 367,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9aeb547717b1e927dd99f6088ddef41b76616be04adefbcb51ad170997038e48",
-          "at": "2026-04-30T20:07:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TaskOperationInteractor` swallows `load_impl_plan` errors after a successful write (`ok().flatten()`), so `transition_task`/`add_task`/`set_override`/`clear_override` can return `Ok` with a derived status computed as if the plan were missing. A transient repository read failure is hidden and the CLI can report the wrong post-mutation status. Propagate the error or derive status from the mutation result instead.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 376,
-              "category": "error-handling"
-            },
-            {
-              "message": "`TrackPhaseInteractor::new` hardcodes `schema_version = 5` when no reader is injected. That makes phase resolution wrong for existing schema v2/v3/v4 tracks; for example, a branchless v2 planned track will be reported as `Ready to Activate` instead of `Planning`. The interactor should require the real schema version or fail closed when it cannot read it.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_phase.rs",
-              "line": 192,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9f68be265b97c10193c06556a7deb73b4d973b613bd446b1bad3727782835195",
-          "at": "2026-04-30T20:12:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "After each successful mutation, `transition_task`/`add_task`/`set_override`/`clear_override` does a second `load_impl_plan()` and turns any read failure into `StoreFailed`. That lets the method return `Err` after the write has already committed, so a transient read error can prompt a duplicate retry against an already-mutated track.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 372,
-              "category": "correctness"
-            },
-            {
-              "message": "`BranchReaderFn` is exported as a new public boundary type, but the approved usecase catalogue does not include it. That leaks an undocumented dependency past the usecase boundary and means branch-guard enforcement depends on hidden wiring instead of the published `TaskOperationService` contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 217,
-              "category": "architecture"
-            },
-            {
-              "message": "`SchemaVersionReaderFn` is exported as a new public boundary type, but the approved catalogue only models `TrackPhaseOutput`, `TrackPhaseError`, `TrackPhaseService`, and `TrackPhaseInteractor`. A CLI wired from the documented contract cannot supply this extra reader without undocumented glue, so the public API no longer matches the catalogue.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
-              "line": 102,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:e27cf7e47f921a184f3180921da899248869b9b3388647fa56bac67c632fdbba",
-          "at": "2026-04-30T20:18:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `TaskOperationInteractor::new` always stores `branch_reader: None`, and the only constructor that can inject a reader is `#[cfg(test)]`. In real builds that makes `skip_branch_check = false` a no-op, so branch mismatches are never rejected and mutations can run on the wrong checkout.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 248,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `TrackPhaseInteractor` has the same production-only gap: `with_schema_version_reader` is test-only, so the only runtime path falls back to `schema_version = 5`. That will misclassify older tracks, which the code itself notes can change the phase/next-command result.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
-              "line": 196,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:41df6bddd535db1a519eeb084cd5d7935c5f6eabeb3e62c06ad445ecd9dd5446",
-          "at": "2026-04-30T20:29:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackPhaseInteractor` falls back to a hard-coded `schema_version = 5` here, so any legacy branchless track that is still on an older schema will be classified with the wrong phase (`Ready to Activate` instead of `Planning`). The public API therefore returns incorrect results unless every caller remembers to inject a reader via `with_schema_version_reader`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_phase.rs",
-              "line": 197,
-              "category": "logic"
-            },
-            {
-              "message": "The post-write `load_impl_plan` result is discarded with `.ok().flatten()` here, which converts repository/read failures into a successful response with a fabricated \"no impl plan\" status. That means callers can get a committed mutation back with a stale or wrong `derived_status` and no signal that the projection refresh failed; the same pattern repeats in the other mutation methods.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 379,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:aaa26f1c404bc6910c68d1efe15037f56d6f725f2cd7407d295ef653d91b17e7",
-          "at": "2026-04-30T20:33:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91dd34662cdfed738c51cb02ec382c3737fb60ccada6b2b0c5d7733de16d1bfa",
-          "at": "2026-04-30T20:39:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Public constructors expose less-visible function type aliases in their primary API. `ReviewCheckApprovedInteractor::new` takes the private `CheckApprovedBuildFn` alias here, and the same pattern appears for `VerifySpecRefsRunFn`, `TypeSignalsRunFn`, `BranchReaderFn`, and `SchemaVersionReaderFn` in the new scoped files. Because the `usecase` crate opts into workspace lints with `warnings = \"deny\"`, rustc's `private_interfaces` warning will be promoted to a compile error when the crate is checked. Make these aliases public API types or inline the `Arc<dyn Fn...>` signatures / use public wrapper traits so the constructors no longer mention private aliases.",
-              "severity": "P0",
-              "file": "libs/usecase/src/review_v2/check_approved.rs",
-              "line": 108,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:91dd34662cdfed738c51cb02ec382c3737fb60ccada6b2b0c5d7733de16d1bfa",
-          "at": "2026-04-30T20:44:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`enforce_branch_guard` explicitly returns `Ok(())` for branchless tracks, and `transition_task` then mutates via `execute_by_status` without the existing `reject_branchless_guard`/schema-version activation check. A CLI migrated to this service can transition schema v3+ planning-only tracks to implementation statuses before activation; activation later rejects branchless tracks with in-progress plans, leaving the workflow in an invalid state. Enforce the branchless activation guard before the mutation, with a real schema version source in the usecase boundary.",
-              "severity": "P0",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 312,
-              "category": "logic"
-            },
-            {
-              "message": "This new public wiring alias exposes `domain::TrackId` in the usecase API even though the boundary contract for `ReviewCheckApprovedService` takes a `String` specifically so CLI code does not import domain IDs. Since the CLI composition root must construct this interactor, the constructor signature leaks the domain type across CN-01 and is not part of the approved usecase catalogue. Keep the domain conversion inside usecase or make the injected closure use only standard/usecase-owned types.",
-              "severity": "P1",
-              "file": "libs/usecase/src/review_v2/check_approved.rs",
-              "line": 83,
-              "category": "architecture"
-            },
-            {
-              "message": "`SchemaVersionReaderFn` is a public usecase API that takes `&TrackId`, adding an undocumented public boundary type and leaking `domain::TrackId` through `TrackPhaseInteractor::with_schema_version_reader`. This contradicts the catalogued `TrackPhaseService` boundary, whose inputs are `String`/`PathBuf`, and forces external wiring to depend on domain types to get correct schema-version-aware phase resolution.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_phase.rs",
-              "line": 100,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:ec88fe0a6ddae6b06fbd1d5f6ba368abc2a3b9e03f10e3c908426737fd77b3b6",
-          "at": "2026-04-30T20:51:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`NextTaskOutput` only carries `task_id` and `description`, but the current `track next-task` CLI response also includes the selected task's `status`. Once the CLI is migrated to this service, it cannot preserve the existing JSON contract without either dropping `status` or re-reading domain task state outside the usecase boundary. Include the task status in this DTO and populate it from `t.status().kind()` in `next_task`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 39,
-              "category": "behavioral_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:729d06cdc633d0f1ad2d3ddc3947c6799709eccae01f72d930275c16cbe9c2a8",
-          "at": "2026-04-30T20:59:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`NextTaskOutput` exposes a public `status` field even though the approved usecase catalogue declares only `task_id` and `description` for this DTO. The briefing requires `expected_members` to match strictly, so this changes the published boundary contract for `TaskQueryService::next_task`. Remove the extra member or update the catalogue before wiring CLI consumers against it.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 45,
-              "category": "api_contract"
-            },
-            {
-              "message": "Missing task transitions are never converted to `TaskOperationError::TaskNotFound`. `TransitionTaskUseCase::execute_by_status` returns `TrackWriteError::Domain(DomainError::Transition(TransitionError::TaskNotFound { .. }))`, but this conversion collapses every domain error into `TransitionFailed`, leaving the declared `TaskNotFound` boundary variant unused for the actual missing-task case. Match that domain error explicitly and return `TaskNotFound`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 100,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:ae692fdfc45ae97e1718b084d9cc70bb217c30d0de7db0536b214e62e92c58fd",
-          "at": "2026-04-30T21:03:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`set_override` persists the override and then reads `impl-plan.json` only to compute the display status. The existing CLI path deliberately derives this status from the override alone, so an unreadable/corrupt impl plan now returns `StoreFailed` after metadata was already mutated, making the caller see a failed operation even though the override was applied. Keep the old behavior here, or read before mutating if the plan is truly required.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 533,
-              "category": "behavioral_regression"
-            },
-            {
-              "message": "`add_task` now rejects an invalid optional `after_task_id` by returning `InvalidTaskId`. The current CLI behavior explicitly treats an invalid `--after` as `None` and appends the task, so wiring this usecase service would turn previously successful add-task commands into failures. Preserve the fallback before delegating to `AddTaskUseCase`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 467,
-              "category": "behavioral_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:4566c7ef2f6a2f34f1d28c5536874c03a68ef43adcb93251944c0df1d78602be",
-          "at": "2026-04-30T21:07:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`add_task` silently discards an invalid `after_task_id` by converting `TaskId::try_new(a)` with `.ok()` and then proceeds to append the new task. That violates the no-silent-error-swallowing rule and can mutate `impl-plan.json` in the wrong order when a caller mistypes `--after`; this should return `TaskOperationError::InvalidTaskId` instead of treating the input as absent.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 470,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:fd301b7afde797ae0255d20dba10f903b9ba20075b9b3cccb96806ebb73fdc97",
-          "at": "2026-04-30T21:11:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackPhaseInteractor::new` installs a schema-version reader that always returns `5`, so this valid `TrackPhaseService` instance misclassifies legacy branchless tracks whose stored schema version is not 3..=5. For example, a schema v2 planned track should resolve to `Planning`, but the default interactor reports `Ready to Activate`; require an injected real schema-version source or fail closed instead of guessing.",
-              "severity": "P1",
-              "file": "libs/usecase/src/track_phase.rs",
-              "line": 143,
-              "category": "correctness"
-            },
-            {
-              "message": "The public task-operation constructors make guard enforcement optional: `TaskOperationInteractor::new` sets both guard readers to `None`, so a normal service instance ignores `skip_branch_check = false` and allows branch mismatches and branchless planning-track implementation transitions. Since the catalogued mutation commands expose guard errors, the interactor should require the guard ports needed to enforce them rather than silently disabling them in the default constructor.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 278,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b1670fb6f85682741b21d5de3f0b0b4b663ce43c6d1126f46d586f71280ebe2b",
-          "at": "2026-04-30T21:15:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3e21d806eb4882e45f1e083977605e2def7db491840cd66416c1f61a1307c4c4",
-          "at": "2026-04-30T21:24:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `transition_task` calls `reject_branchless_guard` before the explicit not-found path, then maps every failure from that guard to `BranchGuardFailed`. If the track does not exist, callers get the wrong error variant instead of `TrackNotFound`, which breaks downstream error handling and makes a missing track indistinguishable from a real branch-policy failure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 381,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: the only constructor that can inject a branch reader is `#[cfg(test)] pub(crate) fn with_branch_reader`, while `TaskOperationInteractor::new` always stores `branch_reader: None`. In non-test builds that makes `skip_branch_check = false` a no-op, so branch mismatches are never rejected by this service.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 273,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9c0c5e59479f69bd41c9787bdd9377d5897acbe4eec5fdfb9a67d5612e64eac1",
-          "at": "2026-04-30T21:38:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TaskOperationInteractor::new()` now hard-codes `branch_reader: None`, and the only constructor that can inject a branch reader is `#[cfg(test)]`. In non-test builds `enforce_branch_guard()` therefore takes the no-op path, so `skip_branch_check = false` no longer rejects branch mismatches or detached HEAD state and task mutations can run on the wrong checkout.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 273,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9c0c5e59479f69bd41c9787bdd9377d5897acbe4eec5fdfb9a67d5612e64eac1",
-          "at": "2026-04-30T21:40:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Forwarding `git`'s raw stderr into the user-facing error leaks checkout/path details on every branch-reader failure. This should be normalized to a generic message or sanitized before crossing the usecase boundary.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 243,
-              "category": "security"
-            },
-            {
-              "message": "`TaskOperationInteractor::new()` now hardcodes a `git` subprocess and `with_branch_reader()` is only compiled for tests, so non-test callers can no longer inject a branch source. That breaks the trait-boundary design and makes branch-guarded mutations fail at runtime outside a real git checkout or without `git` installed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 293,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:adf32a4c0972f4689dfe993562206cf17688e4e6f0394e6c7be46592edb359b3",
-          "at": "2026-04-30T21:45:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: [task_ops.rs](./libs/usecase/src/task_ops.rs:230) / [task_ops.rs](./libs/usecase/src/task_ops.rs:295) now hardwires `read_current_branch()` into the default constructor, and that helper shells out to `git` via `std::process::Command` inside the usecase layer. This reintroduces an infrastructure dependency behind the usecase boundary instead of keeping branch detection behind the injected port, and the happy-path test was changed to `skip_branch_check = true`, so the new production path is no longer exercised in tests.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 230,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:486e239f80d892e408e9c8df9bb1bf7b8412e03e7329307b698e54f338f5ca2e",
-          "at": "2026-04-30T21:49:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TaskOperationInteractor::new()` still leaves `branch_reader` unset, so `enforce_branch_guard()` returns early and every mutation on that instance silently skips the branch check. Because this constructor remains public, any production caller that uses it can mutate a track on the wrong checkout with `skip_branch_check = false` and no error.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 277,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:7f8662cd70f885a1976a691608b0d20d49bdf7e3a2980e60d804c0ffd903538d",
-          "at": "2026-04-30T21:53:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ReviewCheckApprovedInteractor::check_approved` has no behavior test covering its public path. The current tests only exercise `verdict_to_output` and error-variant construction, so the new track-id validation and closure delegation here can regress without a failing test.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/check_approved.rs",
-              "line": 123,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:fe5eb7a27acf91fe10c93efd0bc016e95acb21b98887cbe8563157e11a9a7f96",
-          "at": "2026-04-30T21:59:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The branchless-track coverage here no longer exercises the production constructor: this test uses `with_branch_reader`, which is `#[cfg(test)]` and sets `schema_version_reader: None`, so it bypasses the new `TaskOperationInteractor::new(..., schema_version, ...)` wiring that actually enforces the planning-only guard. A regression in `new` could therefore silently stop rejecting schema v3..=5 branchless transitions without failing any test. Add a test that uses `new` on a branchless track and asserts the guard outcome.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 957,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:15627c4eec0030607d913e0fe7f34a25bac9474d8caa7cca9a521fa30873bb33",
-          "at": "2026-04-30T22:03:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new production path in `TaskOperationInteractor::new` is only exercised for the branchless-activation case. All branch-mismatch and detached-HEAD assertions still go through the test-only `with_branch_reader`, so a regression in `new` that drops or miswires the injected branch reader would not be caught by the suite. Add a `new`-based branch-guard failure test.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
-              "line": 286,
-              "category": "testing"
-            },
-            {
-              "message": "`TrackPhaseInteractor::new` is only tested with schema version 5. The legacy v1/v2 path described in the constructor docs is still only exercised via the test-only `with_schema_version_reader`, so a regression that ignores the caller-provided schema version or hardcodes 5 would slip through. Add a `new`-based test for a non-5 legacy track.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
-              "line": 141,
-              "category": "testing"
-            },
-            {
-              "message": "Both [spec_refs.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/spec_refs.rs#L169) and [type_signals.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/type_signals.rs#L150) only cover the happy path for their new public wrappers. There is no test that an `Err` returned by the injected closure is propagated unchanged, which leaves the public error contract unverified. Add one failure-path test for each wrapper.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/spec_refs.rs",
-              "line": 169,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1115f7b7931cf3fb36231b466ff5fe4e14fb8dfc2627f814d9a6089e850b30fd",
-          "at": "2026-04-30T22:08:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c083b1bdf340e3890c6d2c3a9a672a94a93d3595d0789d770714056c1c15baf1",
-          "at": "2026-04-30T22:14:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c083b1bdf340e3890c6d2c3a9a672a94a93d3595d0789d770714056c1c15baf1",
-          "at": "2026-04-30T22:18:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:984bb2df836e71c1b505220b167287c0ac0cdaa4dce9d90d46bd0c0c7f0408b2",
-          "at": "2026-04-30T22:33:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:984bb2df836e71c1b505220b167287c0ac0cdaa4dce9d90d46bd0c0c7f0408b2",
-          "at": "2026-04-30T22:34:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public `files_by_string` signature does not match the catalogue contract: `usecase-types.json` expects the parameter name `scope`, but this method is declared as `scope_name`. That leaves the API shape out of sync with the authoritative usecase declaration even though the Rust types are otherwise correct.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/scope_query.rs",
-              "line": 147,
-              "category": "contract-mismatch"
-            },
-            {
-              "message": "`LayerId::try_new` failures are being converted into `RenderContractMapError::LayerNotFound` before `load_all` runs, so a syntactically invalid `--layers` token is reported as 'not enabled' rather than invalid input. That collapses two distinct failure modes and contradicts the documented meaning of `LayerNotFound`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
-              "line": 184,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:1effb4bd94cc97d8782871643b29b1322b61ab7b787ea19a3855820132924b68",
-          "at": "2026-05-01T01:34:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Invalid `layer_filter` syntax is being converted into `RenderContractMapError::LayerNotFound` here (`format!(\"{name}: {e}\")`). That makes a malformed layer name look like a missing enabled layer, so callers cannot distinguish bad input from a real absence in the catalogue and will get a misleading remediation hint.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
-              "line": 184,
-              "category": "error handling"
-            },
-            {
-              "message": "A malformed `track_id` is turned into `CatalogueLoaderError::LayerDiscoveryFailed` before the loader runs, which then surfaces as `RunCatalogueLintError::CatalogueLoad`. That reclassifies a user validation error as an infrastructure failure, so the string-based lint API cannot tell callers that the input itself was invalid.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
-              "line": 156,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:1effb4bd94cc97d8782871643b29b1322b61ab7b787ea19a3855820132924b68",
-          "at": "2026-05-01T01:38:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Both string-based guard helpers validate `track_id_str` before the underlying early-return path. The typed `reject_branchless_implementation_transition` / `reject_branchless_guard` functions return `Ok(())` immediately for non-implementation statuses, so these wrappers now fail on no-op inputs (for example `todo`) whenever the track id is malformed. That changes the semantics of the API and can break callers that invoke the helper unconditionally.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_resolution.rs",
-              "line": 156,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:054acb2386b8e2e7b80d863dcc36a2262689f2a55b227e734553fa68896d9412",
-          "at": "2026-05-01T01:43:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RunCatalogueLintError` adds a public `InvalidTrackId` variant here, but the authoritative declaration in `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json` still lists only `CatalogueLoad`, `LintExecution`, `InvalidLayer`, and `InvalidRuleSpec` for this type. That leaves the usecase API and the generated contract/schema out of sync.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
-              "line": 98,
-              "category": "contract"
-            },
-            {
-              "message": "`RenderContractMapError` adds `InvalidLayerFilter`, but `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json` still declares only the six older variants and does not include a layer-filter parse error. The public Rust API therefore no longer matches the contract the rest of the pipeline is checking.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
-              "line": 109,
-              "category": "contract"
-            },
-            {
-              "message": "`files_by_string` is declared with `scope_name: String`, but the authoritative `ScopeQueryService` contract names that parameter `scope` in `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json`. Parameter names are part of the tracked public signature here, so this will fail the declaration comparison even though the Rust types are otherwise correct.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/scope_query.rs",
-              "line": 147,
-              "category": "contract"
-            }
-          ],
-          "hash": "rvw1:sha256:0e71d17ceac40cfd245abba306800726dbacb30e46e3c5fccc758fc548bc2f80",
-          "at": "2026-05-01T01:48:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05a60f4ea20fc9f17fc5d787acbf9f4a2a07b821b871b9ea34b96efbfb1281a3",
-          "at": "2026-05-01T01:56:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lint_rule_spec_to_domain` matches on `spec.kind` while `spec` is a shared reference and `LintRuleKind` is not `Copy`. This attempts to move the enum out of a borrowed `LintRuleSpec`, so the usecase crate will fail to compile as soon as this helper is checked. Match on `&spec.kind` or derive `Copy` for `LintRuleKind` before converting to the domain rule kind.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
-              "line": 212,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:05a60f4ea20fc9f17fc5d787acbf9f4a2a07b821b871b9ea34b96efbfb1281a3",
-          "at": "2026-05-01T02:00:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2329bbcea77d5c4b2c475685b08fa7e7ac5c34e92c43066f0a5454f94ed5015",
-          "at": "2026-05-01T02:05:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c969d064aabc683aa2bace27d3dcf4600f170ed516ab4666ec28c174554f3467",
-          "at": "2026-05-01T07:09:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c969d064aabc683aa2bace27d3dcf4600f170ed516ab4666ec28c174554f3467",
-          "at": "2026-05-01T07:19:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f5e93bbb9fd57209d3dcff43198e1bba475aff828c73607d98333da32ef3a6f",
-          "at": "2026-05-01T07:42:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f5e93bbb9fd57209d3dcff43198e1bba475aff828c73607d98333da32ef3a6f",
-          "at": "2026-05-01T07:44:40Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
-          "at": "2026-05-01T01:31:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
-          "at": "2026-05-01T01:32:58Z"
+          "hash": "rvw1:sha256:cfb58ae8582a151bf26fc4497d0b0ebf1daa4bff1aed6b7c5b37d144ab4b8f9a",
+          "at": "2026-05-01T09:04:45Z"
         }
       ]
     }

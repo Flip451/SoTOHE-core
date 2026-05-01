@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-01T07:24:50Z",
+  "generated_at": "2026-05-01T08:56:45Z",
   "declaration_hash": "678baaadf5c52ea1b5ed321f94897d453d415bb7bd3019311486dd3f8f41f325",
   "signals": [
     {
@@ -755,38 +755,26 @@
     {
       "type_name": "check_compliance_render",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn check_compliance_render(prompt: &str) -> Option<String>"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "has_skill_command",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn has_skill_command(prompt: &str) -> bool"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "reject_branchless_guard_by_str",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn reject_branchless_guard_by_str(reader: &impl TrackReader, track_id_str: &str, target_status: &str, schema_version: u32) -> Result<(), TrackResolutionError>"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "reject_branchless_implementation_transition_by_str",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn reject_branchless_implementation_transition_by_str(schema_version: u32, branch: Option<&str>, track_id_str: &str, target_status: &str) -> Result<(), TrackResolutionError>"
-      ]
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }
