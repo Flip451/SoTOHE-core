@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "Update architecture-rules.json to remove domain from apps/cli may_depend_on, and delete domain dependency from apps/cli/Cargo.toml",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc"
     },
     {
       "id": "T002",
@@ -57,27 +58,31 @@
     {
       "id": "T010",
       "description": "Migrate CLI guard, hook, and domain-export commands to usecase API: commands/guard.rs, commands/hook.rs, commands/domain.rs — replace all use domain:: imports with usecase boundary types",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc"
     },
     {
       "id": "T011",
       "description": "Migrate CLI track and make commands to usecase API: commands/track/ (activate, resolve, signals, state_ops, transition, views, tddd/), commands/make.rs — replace all use domain:: imports with usecase boundary types",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc"
     },
     {
       "id": "T012",
       "description": "Migrate CLI review and verify commands to usecase API: commands/review/ (codex_local, classify, files, results), commands/verify.rs, commands/verify_catalogue_spec_refs.rs, commands/plan/ — replace all use domain:: imports with usecase boundary types. Includes: (a) replacing the domain-typed ScopeQueryService::classify and ::files methods with string-accepting ScopeQueryService::classify_by_strings (accepting Vec<String>, returning Result<Vec<ScopeClassificationOutput>, ScopeQueryError>) and ScopeQueryService::files_by_string (accepting String scope name, returning Result<Vec<String>, ScopeQueryError>) in the ScopeQueryInteractor, so commands/review/classify.rs and commands/review/files.rs never import domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName; (b) adding AdrVerifyOutput DTO (new usecase-owned struct wrapping blue_count, yellow_count, red_count, grandfathered_count as usize) to the usecase layer; (c) modifying VerifyAdrSignals::verify return type from Result<domain::AdrVerifyReport, VerifyAdrSignalsError> to Result<AdrVerifyOutput, VerifyAdrSignalsError> and updating VerifyAdrSignalsInteractor::verify implementation accordingly, so that commands/verify.rs can use AdrVerifyOutput instead of importing domain::AdrVerifyReport.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc"
     },
     {
       "id": "T013",
       "description": "Remove domain error #[from] variants from cli/src/error.rs CliError, replacing them with CliError::Message conversions from usecase error types; confirm no remaining domain type reference in error.rs",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc"
     },
     {
       "id": "T014",
-      "description": "Final integration gate: run cargo make check-layers, cargo make deny, bin/sotp verify check-layers, and cargo make ci — verify all pass with zero cli→domain direct references",
-      "status": "todo"
+      "description": "Final integration gate: run cargo make check-layers, cargo make deny, bin/sotp verify layers, and cargo make ci — verify all pass with zero cli→domain direct references",
+      "status": "done"
     }
   ],
   "plan": {
@@ -215,7 +220,7 @@
         "id": "S13",
         "title": "Final Integration Gate",
         "description": [
-          "Run the full CI suite to confirm all enforcement gates pass: cargo make check-layers (no cli→domain dependency detected), cargo make deny (no disallowed crate dependency), bin/sotp verify check-layers, and cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*). Confirm AC-01 through AC-10 are met."
+          "Run the full CI suite to confirm all enforcement gates pass: cargo make check-layers (no cli→domain dependency detected), cargo make deny (no disallowed crate dependency), bin/sotp verify layers, and cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*). Confirm AC-01 through AC-10 are met."
         ],
         "task_ids": [
           "T014"

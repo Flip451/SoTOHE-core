@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # CLI→domain 直接参照禁止と usecase 経由への一本化
 
-## Tasks (8/14 resolved)
+## Tasks (14/14 resolved)
 
 ### S1 — Usecase Boundary — Guard and Hook
 
@@ -57,34 +57,34 @@
 
 > Replace all use domain:: imports in commands/guard.rs, commands/hook.rs, and commands/domain.rs with the usecase boundary types introduced in S1 and S2. Wire the new interactors into the composition root for each subcommand.
 
-- [~] **T010**: Migrate CLI guard, hook, and domain-export commands to usecase API: commands/guard.rs, commands/hook.rs, commands/domain.rs — replace all use domain:: imports with usecase boundary types
+- [x] **T010**: Migrate CLI guard, hook, and domain-export commands to usecase API: commands/guard.rs, commands/hook.rs, commands/domain.rs — replace all use domain:: imports with usecase boundary types (`3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc`)
 
 ### S9 — CLI Migration — Track and Make Commands
 
 > Replace all use domain:: imports in commands/track/ (activate.rs, resolve.rs, signals.rs, state_ops.rs, transition.rs, views.rs, tddd/) and commands/make.rs with the usecase boundary types introduced in S4, S5, and S6. Wire new interactors into the composition root.
 
-- [~] **T011**: Migrate CLI track and make commands to usecase API: commands/track/ (activate, resolve, signals, state_ops, transition, views, tddd/), commands/make.rs — replace all use domain:: imports with usecase boundary types
+- [x] **T011**: Migrate CLI track and make commands to usecase API: commands/track/ (activate, resolve, signals, state_ops, transition, views, tddd/), commands/make.rs — replace all use domain:: imports with usecase boundary types (`3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc`)
 
 ### S10 — CLI Migration — Review and Verify Commands
 
 > Replace all use domain:: imports in commands/review/ (codex_local.rs, classify.rs, files.rs, results.rs), commands/verify.rs, commands/verify_catalogue_spec_refs.rs, and commands/plan/ with the usecase boundary types introduced in S3 and S5. For classify.rs and files.rs: replace the domain-typed ScopeQueryService methods with string-accepting classify_by_strings (returning Result<Vec<ScopeClassificationOutput>, ScopeQueryError>) and files_by_string (returning Result<Vec<String>, ScopeQueryError>), so CLI command handlers never import domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName directly. For verify.rs: add AdrVerifyOutput DTO to the usecase layer and modify VerifyAdrSignals::verify (service trait and VerifyAdrSignalsInteractor impl) to return Result<AdrVerifyOutput, VerifyAdrSignalsError> instead of Result<domain::AdrVerifyReport, VerifyAdrSignalsError>, so commands/verify.rs never imports domain::AdrVerifyReport. Wire new interactors and updated VerifyAdrSignals service.
 
-- [~] **T012**: Migrate CLI review and verify commands to usecase API: commands/review/ (codex_local, classify, files, results), commands/verify.rs, commands/verify_catalogue_spec_refs.rs, commands/plan/ — replace all use domain:: imports with usecase boundary types. Includes: (a) replacing the domain-typed ScopeQueryService::classify and ::files methods with string-accepting ScopeQueryService::classify_by_strings (accepting Vec<String>, returning Result<Vec<ScopeClassificationOutput>, ScopeQueryError>) and ScopeQueryService::files_by_string (accepting String scope name, returning Result<Vec<String>, ScopeQueryError>) in the ScopeQueryInteractor, so commands/review/classify.rs and commands/review/files.rs never import domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName; (b) adding AdrVerifyOutput DTO (new usecase-owned struct wrapping blue_count, yellow_count, red_count, grandfathered_count as usize) to the usecase layer; (c) modifying VerifyAdrSignals::verify return type from Result<domain::AdrVerifyReport, VerifyAdrSignalsError> to Result<AdrVerifyOutput, VerifyAdrSignalsError> and updating VerifyAdrSignalsInteractor::verify implementation accordingly, so that commands/verify.rs can use AdrVerifyOutput instead of importing domain::AdrVerifyReport.
+- [x] **T012**: Migrate CLI review and verify commands to usecase API: commands/review/ (codex_local, classify, files, results), commands/verify.rs, commands/verify_catalogue_spec_refs.rs, commands/plan/ — replace all use domain:: imports with usecase boundary types. Includes: (a) replacing the domain-typed ScopeQueryService::classify and ::files methods with string-accepting ScopeQueryService::classify_by_strings (accepting Vec<String>, returning Result<Vec<ScopeClassificationOutput>, ScopeQueryError>) and ScopeQueryService::files_by_string (accepting String scope name, returning Result<Vec<String>, ScopeQueryError>) in the ScopeQueryInteractor, so commands/review/classify.rs and commands/review/files.rs never import domain::review_v2::FilePath, domain::review_v2::ScopeName, or domain::review_v2::MainScopeName; (b) adding AdrVerifyOutput DTO (new usecase-owned struct wrapping blue_count, yellow_count, red_count, grandfathered_count as usize) to the usecase layer; (c) modifying VerifyAdrSignals::verify return type from Result<domain::AdrVerifyReport, VerifyAdrSignalsError> to Result<AdrVerifyOutput, VerifyAdrSignalsError> and updating VerifyAdrSignalsInteractor::verify implementation accordingly, so that commands/verify.rs can use AdrVerifyOutput instead of importing domain::AdrVerifyReport. (`3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc`)
 
 ### S11 — CLI Error Type Cleanup
 
 > Remove the five domain error #[from] conversion variants from CliError in cli/src/error.rs and replace them with CliError::Message conversions from usecase error types. Confirm no domain type reference remains anywhere in error.rs.
 
-- [~] **T013**: Remove domain error #[from] variants from cli/src/error.rs CliError, replacing them with CliError::Message conversions from usecase error types; confirm no remaining domain type reference in error.rs
+- [x] **T013**: Remove domain error #[from] variants from cli/src/error.rs CliError, replacing them with CliError::Message conversions from usecase error types; confirm no remaining domain type reference in error.rs (`3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc`)
 
 ### S12 — Layer Policy Enforcement
 
 > Update the architecture-rules.json SSoT and apps/cli/Cargo.toml to remove the domain dependency from the cli layer. Originally planned last (S12), T001 was bundled with T010-T013 because removing `use domain::` from CLI source before deleting the Cargo.toml domain dependency caused `cargo make deny` wrapper-match failures (CI required atomic removal). Once T001 is applied, the cargo make check-layers and cargo make deny gates are live and the build is clean because T002-T013 have replaced all domain imports.
 
-- [~] **T001**: Update architecture-rules.json to remove domain from apps/cli may_depend_on, and delete domain dependency from apps/cli/Cargo.toml
+- [x] **T001**: Update architecture-rules.json to remove domain from apps/cli may_depend_on, and delete domain dependency from apps/cli/Cargo.toml (`3ec50dd3f4c9d8a7a5611c37219e5c794f2975dc`)
 
 ### S13 — Final Integration Gate
 
-> Run the full CI suite to confirm all enforcement gates pass: cargo make check-layers (no cli→domain dependency detected), cargo make deny (no disallowed crate dependency), bin/sotp verify check-layers, and cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*). Confirm AC-01 through AC-10 are met.
+> Run the full CI suite to confirm all enforcement gates pass: cargo make check-layers (no cli→domain dependency detected), cargo make deny (no disallowed crate dependency), bin/sotp verify layers, and cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*). Confirm AC-01 through AC-10 are met.
 
-- [ ] **T014**: Final integration gate: run cargo make check-layers, cargo make deny, bin/sotp verify check-layers, and cargo make ci — verify all pass with zero cli→domain direct references
+- [x] **T014**: Final integration gate: run cargo make check-layers, cargo make deny, bin/sotp verify layers, and cargo make ci — verify all pass with zero cli→domain direct references
