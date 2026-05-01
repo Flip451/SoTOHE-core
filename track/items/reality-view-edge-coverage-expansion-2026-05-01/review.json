@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1f41f1b35c4d54bc0197cb78bcc2c10d703fac256767117d7cb761e293bcddc",
+          "at": "2026-05-01T13:53:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says trait method edges are added for `EdgeSet::Methods | EdgeSet::All`, but the rendering note relies on trait nodes already appearing via `EdgeSet::Impls`. That leaves method-only/default outputs without an explicit way to render trait sources, and the clustered pipeline classifies clusters from type nodes only, so trait-source edges are not guaranteed to appear. The plan needs to specify trait-node assignment/rendering independent of impl edges for D2 to be executable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+              "line": 79,
+              "category": "infeasibility"
+            },
+            {
+              "message": "D3 requires `render_type_graph_overview` to collect parameter-edge indices and apply `linkStyle`, but the overview collapses multiple cross-cluster edges into one `(source_cluster, target_cluster)` count. A single overview edge can represent a mix of return-derived and parameter-derived edges, so there is no unambiguous parameter edge index to style unless the plan splits overview groups by origin/kind or excludes overview from this styling rule.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-01-1226-reality-view-edge-coverage-expansion.md",
+              "line": 127,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c1f41f1b35c4d54bc0197cb78bcc2c10d703fac256767117d7cb761e293bcddc",
+          "at": "2026-05-01T13:56:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94e00d23b9e1f1d277d9ea27fce20ba3db915df7add570fe5ffed3ac102d855a",
+          "at": "2026-05-01T13:59:13Z"
+        }
+      ]
+    }
+  }
+}
