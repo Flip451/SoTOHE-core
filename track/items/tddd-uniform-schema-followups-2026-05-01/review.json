@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The precedent citation is wrong: the field-edge-renderer discussion in ADR `2026-04-26-0855` is in `S2`, not `D2`. `D2` is the `expected_members` decision, so this reference sends readers to the wrong design rationale.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-0241-typestate-transition-edge-rendering.md",
+              "line": 29,
+              "category": "broken_reference"
+            },
+            {
+              "message": "This rule is internally inconsistent: the renderer lookup is described here as limited to `secondary_port`-indexed entries, but the decision later requires the same path to cover `application_service` too. That cannot work as written, and it also conflicts with the kind-selection convention where `application_service` is usecase-only and `secondary_adapter` is infrastructure-only.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:180262f544aff227c33393b9dc6e999102553a7f37ae61cc0f0cf282f8d094f8",
+          "at": "2026-05-01T10:31:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This references `R7 (Cross-Track Port Reference)` as if it already exists in `knowledge/conventions/type-designer-kind-selection.md`, but that convention currently only defines R1-R6. The ADR should frame this as a new rule to be added, not an existing SSoT entry.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "line": 73,
+              "category": "broken reference"
+            },
+            {
+              "message": "The context treats `application_service` as a valid declaration target for a `secondary_adapter` implementation, but the kind-selection convention makes `application_service` usecase-only and `secondary_adapter` infrastructure-only. That failure case should be limited to `secondary_port`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "line": 13,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:146087f3a07a93e485486bf41d10994612cc0f1376bad49441863dc7482472c7",
+          "at": "2026-05-01T10:36:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:38:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:40:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:42:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
+          "at": "2026-05-01T10:47:23Z"
+        }
+      ]
+    }
+  }
+}

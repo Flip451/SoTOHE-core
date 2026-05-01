@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "tddd-uniform-schema-followups-2026-05-01",
+  "title": "TDDD uniform-schema 派生 ADR bundle (#1 method 完全型宣言 / #2 typestate transition edge / #4 cross-track port reference)",
+  "branch": "track/tddd-uniform-schema-followups-2026-05-01",
+  "created_at": "2026-05-01T10:20:34Z",
+  "updated_at": "2026-05-01T10:20:34Z"
+}

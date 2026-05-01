@@ -96,6 +96,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [type-designer Phase 2 reconnaissance step — 設計開始前に baseline + type-graph で既存型インベントリを把握する](2026-04-25-0353-type-designer-reconnaissance-step.md) | — | 2026-04-25 |
 | [type-designer reconnaissance のレンダリングオプション既定値 — depth=1+2 + edges=all](2026-04-25-0530-type-designer-recon-options-defaults.md) | — | 2026-04-25 |
 | [TDDD struct kind taxonomy の field/method 均質化と type catalogue linter 機構の導入](2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md) | Proposed | 2026-04-28 |
+| [method / param 型宣言で generic 引数を含む完全な型文字列を強制する](2026-04-29-0240-method-type-full-generic-declaration.md) | Proposed | 2026-04-29 |
+| [typestate 遷移を contract-map に描画する renderer 拡張](2026-04-29-0241-typestate-transition-edge-rendering.md) | Proposed | 2026-04-29 |
+| [secondary_adapter が参照する port は当該 track の catalogue に必ず declare する](2026-04-29-0243-cross-track-port-reference.md) | Proposed | 2026-04-29 |
 | [Free Function L2 Evaluator: returns 比較を source form に統一する](2026-05-01-0702-free-function-l2-source-form-evaluator.md) | Proposed | 2026-05-01 |
 
 ### トラック・ワークフロー
