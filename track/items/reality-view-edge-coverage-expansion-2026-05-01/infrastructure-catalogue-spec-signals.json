@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ad877e0916cd8b196a912bfa976a4ce51139bfca04a0fcd22b079f32cf0225e1",
+  "signals": [
+    {
+      "type_name": "render_type_graph_flat",
+      "signal": "blue"
+    },
+    {
+      "type_name": "render_type_graph_clustered",
+      "signal": "blue"
+    },
+    {
+      "type_name": "render_type_graph_overview",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EdgeSet",
+      "signal": "blue"
+    }
+  ]
+}

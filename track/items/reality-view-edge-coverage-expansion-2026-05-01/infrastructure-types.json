@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "render_type_graph_flat",
+      "description": "Renderer function for a flat (non-clustered) mermaid type graph from a TypeGraph. Modified by D1 (receiver-less method edge coverage: params + returns), D2 (trait method scanning: collect_edges() is shared between flat and clustered renderers, so D2's graph.trait_names() loop affects flat output as well — trait_method_return / trait_method_param edges appear in flat output; the trait-node cluster insertion (IN-05) is a cluster-plan concern specific to the clustered renderer and does not apply to flat mode), and D3 (linkStyle gray coloring for argument-derived edges plus render_edge_symbol dispatch for new 4-value edge_kind). The function signature is unchanged; only the mermaid output content changes.",
+      "approved": true,
+      "action": "modify",
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_graph_render",
+      "expected_params": [
+        {
+          "name": "graph",
+          "ty": "&TypeGraph"
+        },
+        {
+          "name": "layer_name",
+          "ty": "&str"
+        },
+        {
+          "name": "opts",
+          "ty": "&TypeGraphRenderOptions"
+        }
+      ],
+      "expected_returns": [
+        "String"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-01",
+          "hash": "015f7378a14addd003f7bab789cd23d54be6a09e775b069a7535bf95c6e61200"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-02",
+          "hash": "e7690dbef95efab5ad38f4800d84847c005499a4921b8a079f8bc2846b76ed86"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-03",
+          "hash": "05f7673722ce2f9eb343facbb6e2338b36471e546d83d1e72a124c0ec57fdb97"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-04",
+          "hash": "63db4cd10dcd5869217f49a77d6feb66b0360ff9a11db6fbae7ae63739ab1576"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-06",
+          "hash": "12976a0e46c7c6228b59e1d8b410531d2c4148f3ada206fe002d3eb5481a2f2c"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-07",
+          "hash": "39feb16cc2c6923beaf68d2ef7fef256615344cbf8730afc1f5b429101ab528d"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-08",
+          "hash": "2b00578a10e807a31904301a723bc94092746040b4da26dbbb06eb84d33d701e"
+        }
+      ]
+    },
+    {
+      "name": "render_type_graph_clustered",
+      "description": "Renderer function for a per-cluster mermaid block from a TypeGraph. Modified by D1 (receiver-less associated function edge coverage: both params and returns sides), D2 (trait method scanning: adds graph.trait_names() loop so trait methods' params and returns generate edges; also handles the case where EdgeSet::Methods alone is called without Impls so trait nodes are explicitly inserted into the cluster), and D3 (render_edge_symbol dispatch extended to 4-value edge_kind; linkStyle <idx>,... stroke:#888; appended for argument-derived edges). Signature unchanged; output mermaid content changes.",
+      "approved": true,
+      "action": "modify",
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_graph_render",
+      "expected_params": [
+        {
+          "name": "graph",
+          "ty": "&TypeGraph"
+        },
+        {
+          "name": "cluster_key",
+          "ty": "&str"
+        },
+        {
+          "name": "plan",
+          "ty": "&ClusterPlan"
+        },
+        {
+          "name": "opts",
+          "ty": "&TypeGraphRenderOptions"
+        }
+      ],
+      "expected_returns": [
+        "String"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-01",
+          "hash": "015f7378a14addd003f7bab789cd23d54be6a09e775b069a7535bf95c6e61200"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-02",
+          "hash": "e7690dbef95efab5ad38f4800d84847c005499a4921b8a079f8bc2846b76ed86"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-03",
+          "hash": "05f7673722ce2f9eb343facbb6e2338b36471e546d83d1e72a124c0ec57fdb97"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-04",
+          "hash": "63db4cd10dcd5869217f49a77d6feb66b0360ff9a11db6fbae7ae63739ab1576"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-05",
+          "hash": "bcadd246d1d9a50b963db458efc06719cb679fcf2ba2d5e0aec426679992f739"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-06",
+          "hash": "12976a0e46c7c6228b59e1d8b410531d2c4148f3ada206fe002d3eb5481a2f2c"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-07",
+          "hash": "39feb16cc2c6923beaf68d2ef7fef256615344cbf8730afc1f5b429101ab528d"
+        },
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "IN-08",
+          "hash": "2b00578a10e807a31904301a723bc94092746040b4da26dbbb06eb84d33d701e"
+        }
+      ]
+    },
+    {
+      "name": "render_type_graph_overview",
+      "description": "Renderer function for the cluster overview mermaid diagram. The function code itself is not directly modified by D1/D2/D3 (hence action=reference); only collect_edges() and render_edge_symbol() change. However, D1/D2 expand collect_edges() so the edge content produced by the rendering pipeline — including overview — will reflect the additional receiver-less-method and trait-method edges introduced by D1/D2. OS-03 explicitly restricts D3 linkStyle coloring to clustered and flat only: overview aggregates cross-cluster edges without per-edge indices, so the argument-derived edge color distinction (--o / linkStyle) is not applied to overview. The overview signature and call site are unchanged.",
+      "approved": true,
+      "action": "reference",
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_graph_render",
+      "expected_params": [
+        {
+          "name": "graph",
+          "ty": "&TypeGraph"
+        },
+        {
+          "name": "plan",
+          "ty": "&ClusterPlan"
+        },
+        {
+          "name": "opts",
+          "ty": "&TypeGraphRenderOptions"
+        }
+      ],
+      "expected_returns": [
+        "String"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "OS-03",
+          "hash": "142ceab384cdde98a996fe860ccca5f6d75694bf9df4fdabde1d7f924a488e5d"
+        }
+      ]
+    },
+    {
+      "name": "EdgeSet",
+      "description": "Enum selecting which edge types to include in a mermaid type graph render (Methods / Fields / Impls / All). Not structurally changed by this track: no new enum variants are added. The behavioral expansion (receiver-less methods + trait methods + argument-derived edges) is a change to collect_edges() internals, not to the EdgeSet variant set. Docstrings for the Methods variant will be updated to reflect the expanded edge coverage, but the variant names and count are stable.",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "All",
+        "Fields",
+        "Impls",
+        "Methods"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-edge-coverage-expansion-2026-05-01/spec.json",
+          "anchor": "CN-01",
+          "hash": "c2d8acca885fef18e1fbbb557fbf602243e61b71c843b173fddcdbc4732ce114"
+        }
+      ]
+    }
+  ]
+}
