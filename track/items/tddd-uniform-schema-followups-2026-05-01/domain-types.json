@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "render_contract_map",
+      "description": "Pure top-level function that converts per-layer type catalogues into a single-file mermaid flowchart (ADR 2026-04-17-1528 §D1). This track extends the function to generate typestate transition edges (==>) by reading TypestateTransitions::To(names) and resolving each name through type_index. Terminal typestates emit no edge; unresolved names and self-loops are silently skipped.",
+      "approved": true,
+      "action": "modify",
+      "kind": "free_function",
+      "module_path": "domain::tddd::contract_map_render",
+      "expected_params": [
+        {
+          "name": "catalogues",
+          "ty": "&BTreeMap<LayerId, TypeCatalogueDocument>"
+        },
+        {
+          "name": "layer_order",
+          "ty": "&[LayerId]"
+        },
+        {
+          "name": "opts",
+          "ty": "&ContractMapRenderOptions"
+        }
+      ],
+      "expected_returns": [
+        "ContractMapContent"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+          "anchor": "AC-02",
+          "hash": "2f761c83c978fde380a69da7d2c5dd6874492d331818f58f7d4bfdf46bc7a9be"
+        },
+        {
+          "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+          "anchor": "AC-03",
+          "hash": "ec1bb58571497b044954bceab4f3680436de2b36e2ea33e86de344298712547a"
+        },
+        {
+          "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+          "anchor": "AC-06",
+          "hash": "2998038554e50cc96770e6390143940bb048b84b21f4e6f84df542543e16cc33"
+        }
+      ]
+    },
+    {
+      "name": "TypestateTransitions",
+      "description": "Existing domain enum representing typestate lifecycle transitions. To(Vec<String>) carries the list of target typestate names; Terminal marks an end state with no outgoing transitions. This track's renderer extension reads the To variant to generate transition edges (==>).",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "To",
+        "Terminal"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+          "anchor": "AC-02",
+          "hash": "2f761c83c978fde380a69da7d2c5dd6874492d331818f58f7d4bfdf46bc7a9be"
+        },
+        {
+          "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+          "anchor": "AC-03",
+          "hash": "ec1bb58571497b044954bceab4f3680436de2b36e2ea33e86de344298712547a"
+        }
+      ]
+    }
+  ]
+}

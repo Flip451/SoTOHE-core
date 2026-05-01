@@ -1,4 +1,29 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD uniform-schema 派生 ADR bundle (#1 method 完全型宣言 / #2 typestate transition edge / #4 cross-track port reference)
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Tasks (0/3 resolved)
+
+### S1 — Convention Update — method 型宣言完全形規範 + R7 Cross-Track Port Reference 正式化 (T001)
+
+> knowledge/conventions/type-designer-kind-selection.md に 2 つの追記を行う。
+> ADR #1 (method 完全型宣言): bare wrapper 名のみの宣言禁止リスト (Result / Option / Vec / Box / Arc / Rc / Cow / BTreeMap / HashMap / HashSet / BTreeSet) を catalogue authoring ルールとして追記し、良い例 / 悪い例を Examples セクションに示す (AC-01 / CN-01 / IN-01 / IN-02)。
+> ADR #4 (cross-track port reference): R7 を draft から運用ルールに昇格させ、secondary_adapter implements[] の参照先 port の declare 義務 / action: "reference" の意味論 / declare 漏れの影響 (-.impl.-> edge の silently skip) を明示する (AC-04 / CN-05 / CN-06 / CN-07 / IN-05 / IN-06)。
+> Rust コード変更なし。convention ドキュメントの追記のみで完結する。
+
+- [ ] **T001**: knowledge/conventions/type-designer-kind-selection.md に 2 つの規範を追加する。(1) method / param 型宣言の完全形規範 (ADR #1): expected_methods[].returns / expected_methods[].params[].ty / FreeFunction.expected_params[].ty / FreeFunction.expected_returns において、Result / Option / Vec / Box / Arc / Rc / Cow / BTreeMap / HashMap / HashSet / BTreeSet を bare wrapper 名のみで宣言することを禁止するルールを追記する。良い例 (returns: "Result<AdrFrontMatter, AdrFrontMatterCodecError>") と悪い例 (returns: "Result") を Examples セクションに示す (AC-01 / IN-01 / IN-02 / CN-01)。(2) R7 Cross-Track Port Reference の正式化 (ADR #4): draft 段階の R7 を運用ルールとして昇格させ、secondary_adapter implements[] の参照先 port を当該 track catalogue に declare する義務 / action: "reference" の意味論 (修正なし baseline port の catalogue exposure 用途 / type-signal evaluator の完全一致のみ Blue 評価) / declare 漏れが -.impl.-> edge を silently skip する旨を Rules セクションに追記する。R1 マトリクスの注釈への参照 / Review Checklist への R7 チェック項目追加も行う (AC-04 / IN-05 / IN-06 / CN-05 / CN-06 / CN-07)。convention ファイルのみの変更で Rust コード変更は不要。前提: なし (最初のタスク)。
+
+### S2 — Domain Layer — contract_map_render.rs Typestate Transition Edge 生成拡張 (T002)
+
+> libs/domain/src/tddd/contract_map_render.rs の render_contract_map 関数の edges 収集ループに、Typestate の TypestateTransitions::To(names) から ==>|transitions_to| 太線 edge を生成するブロックを追加する (AC-02 / IN-03 / IN-04 / CN-02 / CN-03)。
+> Terminal の場合は edge を生成しない。catalogue 未登録の遷移先は silently skip。self-loop は抑制する (AC-03 / CN-04)。
+> schema / codec / baseline 拡張は一切行わない (CN-02)。renderer のみの変更 (<200 行追加)。
+
+- [ ] **T002**: libs/domain/src/tddd/contract_map_render.rs の render_contract_map 関数の edge 生成経路を拡張し、TypestateTransitions::To(names) から typestate transition edge (==>) を生成する (AC-02 / AC-03 / IN-03 / IN-04 / CN-02 / CN-03 / CN-04)。実装箇所: entries ループの中で entry.kind() が TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(names), .. } にマッチする場合、各 name を type_index で lookup し、resolve できた (layer, dst_id) ごとに self-loop でなければ edges に "    {src_id} ==>|\"transitions_to\"| {dst_id}" を挿入する。TypestateTransitions::Terminal はこのブロックに入らず edge は生成しない。catalogue 未登録の name は type_index.get() が None を返すので silently skip される。self-loop は dst_id == src_id のガードで抑制する — 既存 method edge と同じロジックを踏襲する (CN-04)。schema / codec / baseline 拡張は一切行わない (CN-02)。renderer 出力は既存の "<!-- Generated ... — DO NOT EDIT DIRECTLY -->" marker を保持する。変更行数は <200 行程度であり 500 行以下の task サイズ target に収まる。前提: なし (T001 と独立して実施可能)。
+
+### S3 — Test Coverage + CI Gate Verification (T003)
+
+> libs/domain/src/tddd/contract_map_render_tests.rs に typestate transition edge 生成の新規ユニットテスト 5 件 + reference port impl edge 検証テスト 1 件を追加する (AC-05 / AC-06)。
+> テスト対象: To([targets]) 正常 edge 生成 / Terminal での edge 非生成 / 未登録遷移先 silently skip / self-loop 抑制 / 複数遷移先 (AC-03 補強) / reference port が port_index に登録され secondary_adapter から -.impl.-> edge が生成されること (AC-05)。
+> cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する。
+
+- [ ] **T003**: libs/domain/src/tddd/contract_map_render_tests.rs に typestate transition edge 生成および reference port impl edge 生成の新規ユニットテストを追加し、cargo make ci が pass することを確認する (AC-05 / AC-06 / AC-03 / CN-03 / CN-04)。追加するテスト (命名: test_{target}_{condition}_{expected_result}): (a) test_render_contract_map_with_typestate_to_generates_transition_edge — To(["B"]) を持つ Typestate A と Typestate B が同 catalogue に存在する場合、"==>|\"transitions_to\"| " を含む edge が出力に含まれること。(b) test_render_contract_map_with_typestate_terminal_generates_no_edge — Terminal の Typestate は transition edge を生成しないこと。(c) test_render_contract_map_with_typestate_unregistered_target_silently_skipped — To(["UnknownState"]) で UnknownState が catalogue 未登録の場合、transition edge が出力に含まれないこと (silently skip)。(d) test_render_contract_map_with_typestate_self_loop_suppressed — To(["A"]) のような self-loop は edge が生成されないこと。(e) test_render_contract_map_with_typestate_to_multiple_targets — To(["B", "C"]) で B と C が両方 catalogue に存在する場合、2 本の transition edge が出力に含まれること。(f) test_render_contract_map_with_reference_port_produces_impl_edge — action: "reference" で declare した secondary_port entry と、それを implements[] に持つ secondary_adapter が同 catalogue に存在する場合、"-.impl.->" を含む edge が出力に含まれること (AC-05: reference port が port_index に登録され secondary_adapter から -.impl.-> edge が生成される検証)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する。前提: T002 完了 (renderer 拡張が存在すること)。

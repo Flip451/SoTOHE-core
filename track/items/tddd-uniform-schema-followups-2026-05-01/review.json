@@ -74,6 +74,110 @@
           "findings": [],
           "hash": "rvw1:sha256:80e67d89c92dffc3ddde2bc46fbf3309116b5b46fbe37ac11d1a2c55752dff7d",
           "at": "2026-05-01T10:47:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is assigned only to T001, but T001 is explicitly documentation-only ('Rust コード変更なし') and does not touch any type catalogue or the contract-map renderer. As written, the plan has no task that can produce the required `secondary_port` registration / `-.impl.->` edge behavior, so this acceptance criterion is not physically realizable from the scheduled work.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/task-coverage.json",
+              "line": 33,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:847d9ebd515b89ceab8505da3c41d5e542bd0c0398000d2a84ed470db1b8d4cd",
+          "at": "2026-05-01T11:19:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is enforced as completed by T001/T002/T003, but it requires a `reference` secondary_port to be registered and a concrete `FsReviewStore -.impl.-> ReviewReader`-style edge gap to be resolved. The same spec explicitly puts retrofitting past-track catalogues out of scope (OS-06), and the planned tasks are only convention docs, typestate-edge rendering, and tests. As written, this acceptance criterion is not executable within the stated scope.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.md",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "The S2 section describes generating a Mermaid edge as `==>=|transitions_to|`, which contradicts the spec/T002 requirement to use the `==>` edge with a `transitions_to` label (`==>|\"transitions_to\"|`). This malformed notation can send implementers toward the wrong renderer output; fix the impl-plan source and regenerate `plan.md`.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/impl-plan.json",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5077aec5129fbe598d97f7f5abd805c7ca90c00a3496b06358f5a5ff4344af1e",
+          "at": "2026-05-01T11:24:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 requires a unit test (or new test catalogue) proving an `action: \"reference\"` secondary_port is indexed and produces a `-.impl.->` edge from a secondary_adapter, but the plan's only test task adds five typestate transition tests and never exercises reference-port impl-edge behavior. The plan can therefore complete T001-T003 while leaving AC-05 unsatisfied, despite the coverage artifact assigning AC-05 to those tasks.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/plan.md",
+              "line": 29,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:83ad133d21ae81cce93366f2cbc217d4fe33ece6d1cc4a3cc91e8d669cd33815",
+          "at": "2026-05-01T11:33:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-05` is covered here by `T001`, `T002`, and `T003`, but the plan text only assigns the reference-port impl-edge verification to `T003`; `T001` is convention-only and `T002` is limited to typestate transition rendering. This makes the coverage artifact semantically disagree with the implementation plan about which tasks actually satisfy `AC-05`, so progress/gate readers can believe the acceptance criterion is enforced by tasks that never exercise it.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/task-coverage.json",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dd7abf62698e8bb131d6b73b470083004b830e09d69ec59e83c0fc5f7e6bbd35",
+          "at": "2026-05-01T11:38:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 references `CN-08 ノイズ抑制`, but this plan artifact defines only CN-01 through CN-07 and does not provide any file/anchor for CN-08. The generated `spec.md` mirrors the same unresolved reference, so readers cannot resolve the constraint being invoked. Either remove the parenthetical or replace it with a resolvable reference.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+              "line": 218,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:54cc21465b2a493202217e3ba3de59b9806a5c435e2ee2cfc870dd009ed37aab",
+          "at": "2026-05-01T11:41:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 says `methods_of()` will read `TypestateTransitions::To(names)` and generate transition edges, but the implementation plan later directs T002 to add a separate `render_contract_map` edge-loop block that emits `==>|\"transitions_to\"|` edges. Those are different design loci, and `methods_of()` is otherwise described as feeding method-call edges, so this top-level goal can send implementers toward the wrong mechanism. Align GO-02/spec.md with the T002 edge-generation path.",
+              "severity": "P1",
+              "file": "track/items/tddd-uniform-schema-followups-2026-05-01/spec.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:035a41b4ba3720c291505f6d15d5610e8cf3e8067e0bf7d29dc48161de8bbaf3",
+          "at": "2026-05-01T11:44:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8266fb8dbbce5bcedaab07981fc493701da0ba446855ef8bf49d539fce2812f0",
+          "at": "2026-05-01T11:46:57Z"
         }
       ]
     }

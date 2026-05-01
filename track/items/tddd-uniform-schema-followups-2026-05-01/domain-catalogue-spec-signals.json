@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "605d1d088b23eb3860763c83a8f56c339574f20c9a43181e5d5f365066204ca6",
+  "signals": [
+    {
+      "type_name": "render_contract_map",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypestateTransitions",
+      "signal": "blue"
+    }
+  ]
+}
