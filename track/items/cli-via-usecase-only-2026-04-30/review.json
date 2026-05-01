@@ -1,21 +1,463 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "harness-policy": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12a only checks that `plan.md`, `contract-map.md`, and `<layer>-types.md` exist, so an old `cargo make track-sync-views` result can still satisfy the gate. That means skipping step 11 can leave stale rendered views on disk while the final post-condition still claims the outputs are “freshly regenerated”.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "The recovery path on `verify catalogue-spec-signals` failure is an unconditional `step 9 -> step 11 -> step 12b` retry with no attempt cap or escalation. If the coverage mismatch persists, the agent can loop indefinitely, which is the failure mode the briefing explicitly asked to avoid.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 169,
+              "category": "reliability"
+            }
+          ],
+          "hash": "rvw1:sha256:24aa9b49db2db459e916dbfcabdc240045a42dd974453535d24aa36ae93685a4",
+          "at": "2026-04-30T13:27:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now explicitly regenerates `plan.md`, but the new 12a glob check never verifies it. That leaves one of the `cargo make track-sync-views` outputs able to stay missing or stale without tripping the final gate, so the stated \"all outputs are freshly regenerated\" post-condition is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "The freshness gate only re-validates `catalogue-spec-signals`; it never checks the `type-signals` artifact from step 10. By inference, a skipped or stale `type-signals` run can still leave `<layer>-types.md` incomplete while 12a/12b both pass, so the new self-verify does not cover all pipeline outputs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d514692a6ad2ce88aff872a40dc5a9f50178c53fe1bf4d974faa7dee58b74840",
+          "at": "2026-04-30T13:31:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new mandatory 12b gate (`bin/sotp verify catalogue-spec-signals`) is not reflected in the Bash allowlist. The Scope Ownership/Bash usage section still lists only the `track ...` subcommands plus `track-sync-views`, so an agent following the whitelist literally can treat the freshness check as out of scope and skip it. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526) and [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 526,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Step 12a is internally inconsistent about how many paths it verifies. The block enumerates 9 paths total (7 per-layer paths plus `contract-map.md` and `plan.md`), but the closing sentence says “all 8 expected paths.” That mismatch makes the final self-check contract ambiguous and easy to misapply. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 181,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:eb689ce58f489c14c67f0126f3c5f467b87aa0d48439261ced3e05b8d24e8db3",
+          "at": "2026-04-30T13:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12 still only proves freshness for `catalogue-spec-signals.json`; the graph outputs, `plan.md`, `contract-map.md`, and `<layer>-type-signals.json` are only checked for existence. A stale artifact from an earlier run can still satisfy 12a/12b, so the new post-condition that all prior outputs are “freshly regenerated” is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:61d40f7066291e652c2e21106fc7c7622a167c6fec9f6d0dde2f9288467e0d48",
+          "at": "2026-04-30T13:36:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Step 12a still does not prove `<layer>-types.json` was freshly produced in this session. The only source-of-truth artefact in the existence check is globbed, so a stale catalogue file left over from a prior run will satisfy the guard even if step 7 was skipped. That leaves the exact skipped-step/stale-artifact failure mode this change is meant to block. Consider requiring a same-session write receipt for step 7, or a content/freshness check on `<layer>-types.json`, not just existence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 157,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9aeb2ba69044dfa151bc37694b937c96fbb72c990b969c37dcbc8011d0d393bf",
+          "at": "2026-04-30T13:39:15Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
-          "at": "2026-05-01T01:31:53Z"
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:41:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now requires `cargo make track-sync-views`, and the step explicitly says it renders `plan.md`, but Scope Ownership still lists `plan.md` under writes forbidden and Rules still say not to modify it. An agent following the lower section can either skip the new required sync step or treat its required `plan.md` update as a policy violation, leaving rendered views stale.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 534,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The Step 9 command is documented as `bin/sotp track catalogue-spec-signals <id>` without the supported `--layer <layer_id>` filter, even though this pipeline is per layer in scope. For a single-layer run, this command processes every catalogue-spec-enabled layer and can fail on unrelated missing/stale catalogues outside the assigned layer, blocking the scoped Phase 2 pass.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 127,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:44:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 9 is documented as `bin/sotp track catalogue-spec-signals <id>` with no `[--layer <layer_id>]`, unlike the surrounding per-layer pipeline commands. The CLI supports `--layer`; without documenting it, a type-design run scoped to a single layer will regenerate all catalogue-spec signal files and can fail on or modify out-of-scope layers. This breaks the layer scope contract and can block otherwise valid single-layer Phase 2 runs.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 127,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
+          "at": "2026-04-30T13:45:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11 now requires `cargo make track-sync-views`, and the new self-check requires `track/items/<id>/plan.md` to exist, but the Scope Ownership/Rules section still forbids modifying `plan.md`. Since `track-sync-views` renders `plan.md`, the agent instructions are contradictory: a compliant agent can treat the required Step 11 write as forbidden and skip or fail the refreshed-view step the policy is trying to enforce. Clarify that `plan.md` must not be edited directly, but may be regenerated by the required `cargo make track-sync-views` command.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 534,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:7357e084d9164706d3abc6925100f10272e1b5eceee17fedad6b329261bf71f1",
+          "at": "2026-04-30T13:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12b is meant to verify freshness for the explicit track `<id>`, but the documented command has no track argument and relies on the current git branch to choose what to verify. The existing `verify catalogue-spec-signals` command skips successfully on non-`track/*` branches and would verify a different track if the checkout is on a different track branch, so this policy can let the agent emit a final message without checking the `<id>` it just processed. Require a precondition that the current branch resolves to the same `<id>` and treat a SKIP/mismatch as failure, or use a track-bound verification command.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3202d9fc93296b607ae303cc6e18b1f537b75d4d6c080f3f2d24ef96ad748047",
+          "at": "2026-04-30T13:50:04Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
-          "at": "2026-05-01T01:32:58Z"
+          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
+          "at": "2026-04-30T13:52:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
+          "at": "2026-04-30T13:53:49Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Guard now routes commands through `ShellParserPort`, whose adapter discards `has_output_redirect` and `redirect_texts` before policy evaluation. That means redirect-only commands and redirect/heredoc-based git references are no longer blocked, weakening a security-critical guard.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/guard.rs",
+              "line": 28,
+              "category": "security"
+            },
+            {
+              "message": "`derive_track_status_from_json()` returns `planned` when every task is `skipped`, but the real track-status logic treats a fully resolved plan as `done`. `/track:activate` uses this helper for both the planned-track preflight and auto-resume checks, so a completed all-skipped track can be activated or resumed as if it were still planning.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 162,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:b377da33913a63fec787eef5bbe2441c7048c43d009fff9f95fa766893a375d5",
+          "at": "2026-05-01T01:34:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The schema-version reader is now used on the raw CLI `track_id` before any validation in `transition.rs`, `state_ops.rs`, and `resolve.rs`, and it returns `2` on any read/parse failure. That means a malformed or missing `metadata.json` turns a branchless track into a legacy v2 track and bypasses the branchless guard, while an invalid `--track-id` is joined into a filesystem path before the later usecase check.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 104,
+              "category": "security"
+            },
+            {
+              "message": "The status-derivation helper also fails open: unreadable or malformed `impl-plan.json` is treated as `planned`. `activate.rs` only blocks when the derived status is not `planned`, so a corrupt track can now be activated instead of failing closed like the old `load_impl_plan` path.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 104,
+              "category": "correctness"
+            },
+            {
+              "message": "`run_files` builds the scope-query interactor before checking whether `--scope` exists in the track config. That resolves git/root state before the AC-08 validation step, so invalid scopes can now surface repo/git errors first; the same helper is also used in `classify.rs`, so the pure classification path inherited the extra git dependency.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/files.rs",
+              "line": 45,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e08483d588f291c8ad57a7051d9aa916d0d611c1a4ca5349c03604150cd19da8",
+          "at": "2026-05-01T01:43:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_schema_version_from_json(&items_dir, &track_id)` now runs before any `TrackId` validation, so a malformed `track_id` is joined into the filesystem path and probed first. That reintroduces a path-traversal read on the metadata preflight; the same pattern appears again in `execute_set_override`, `execute_clear_override`, and `transition.rs:19`. Validate the slug before touching the filesystem, or move the schema-version lookup behind the usecase boundary.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 19,
+              "category": "security"
+            },
+            {
+              "message": "`--after` used to be lenient: invalid task IDs were ignored and the new task was appended to the end. This patch forwards the raw string into `TaskOperationInteractor`, which validates `TaskId` and now turns those cases into an error instead of preserving the previous fallback behavior. Existing callers relying on the documented append-on-invalid semantics will start failing.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6726366a082891b70773edafb3ef1ad214cbadb832209e96cd4fdb58112ada19",
+          "at": "2026-05-01T01:54:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `run_classify` now delegates path validation to `classify_by_strings`, which short-circuits on the first invalid path. The previous CLI behavior collected every bad path and returned a joined error, so a single run can now hide additional invalid inputs and the command no longer matches its documented contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs",
+              "line": 47,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `derive_track_status_from_json` treats a missing or malformed `impl-plan.json` task list as `planned`/`unknown`, and `execute_activate` uses that value for the auto-resume preflight. That means a corrupted materialized track can now pass the resume check and continue through `/track:activate --auto` instead of failing closed the way the old `load_impl_plan` path did.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "line": 96,
+              "category": "safety"
+            },
+            {
+              "message": "P1: the frozen-track guard is now fail-open for any unrecognized status string: only `done` and `archived` are rejected, and everything else is treated as active. If the status reader ever produces a new or malformed `TrackStatus` value, `type-signals` will run on a track that should have been frozen.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 65,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a09100bec3344cc90fccc49e34504eb6fb514bb30dfdbe672820c1fa57ec191b",
+          "at": "2026-05-01T02:01:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_json` treats a missing or गैर-array `tasks` field as `planned`, and `execute_activate` later accepts only `planned` preflight states. A corrupted `impl-plan.json` can therefore be activated instead of being rejected fail-closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "line": 139,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `--after` filter no longer mirrors `TaskId::try_new`: it accepts any `T<digits>` string, but the domain validator also requires the suffix to fit in `u64`. An oversized value will now reach `AddTaskCommand` and fail instead of being ignored and appended to the end as the command comment promises.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "line": 45,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a3a93b6c830e03965896804b5987f028a2d34c81c21aed4ba4d521dc4c08de8d",
+          "at": "2026-05-01T02:09:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `review classify` now builds its interactor through `build_scope_query_interactor_str`, which goes through `build_v2_shared` and requires a materialized `track/items/<track_id>` directory plus diff-base resolution. That means the command no longer behaves like the old pure classifier for tracks that only have `review-scope.json`; it can now fail before any classification happens. See [apps/cli/src/commands/review/classify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs#L47), [libs/infrastructure/src/review_v2/cli_composition.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs#L139), and [libs/infrastructure/src/review_v2/cli_composition.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs#L261).",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/classify.rs",
+              "line": 47,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `validate_all_paths` only rejects `/`-prefixed absolutes and `/`-separated `..` traversal. Windows-style invalid paths (`C:\\...`, `..\\...`, UNC paths) slip past this pre-check and only fail later in `classify_by_strings`, so the intended multi-error validation is incomplete. See [apps/cli/src/commands/review/classify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs#L73).",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/classify.rs",
+              "line": 73,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `next-task` now hardcodes `\"status\": \"todo\"` in the JSON payload. The command can no longer reflect the actual status of the task returned by the query service, so any non-todo next task will be misreported. See [apps/cli/src/commands/track/state_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs#L180).",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
+              "line": 180,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9abab1f5e4b150e92b12801e90d2fcd62c73f4a1967ababbbc3cd54a5e640cee",
+          "at": "2026-05-01T02:13:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review classify` now goes through `build_scope_query_interactor_str`, which resolves the diff base (`.commit_hash` / `git rev-parse main`) before any classification work. That regresses the command from the documented pure-logic path: in a repo without `main` or a readable commit-hash file, `sotp review classify` now fails even though path classification itself does not need diff I/O.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs",
+              "line": 54,
+              "category": "behavior"
+            },
+            {
+              "message": "`review files` now constructs the scope-query interactor before validating the requested scope. Because the shared builder resolves the diff base first, an unknown `--scope` can now fail with git/base-read errors before the intended `Unknown scope` check and before any diff I/O. That breaks the command’s AC-08 ordering guarantee.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/files.rs",
+              "line": 46,
+              "category": "behavior"
+            }
+          ],
+          "hash": "rvw1:sha256:a7b04bbe3d11d947f3a3cc5e4b85ea8ac4fc03b0aadb143031ce1bb8ffc3c57f",
+          "at": "2026-05-01T02:21:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `--pretty` is now ignored. This code always requests JSON from `ExportSchemaInteractor`, and the infrastructure adapter currently serializes with pretty formatting unconditionally, so `sotp domain export-schema --pretty=false` no longer produces the compact form the CLI flag advertises.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/domain.rs",
+              "line": 56,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `execute_next_task` no longer reports the track's derived status. It infers `status` from task counts and collapses everything to `\"todo\"` or `\"in_progress\"`, so mixed todo/done plans and any blocked/cancelled override are serialized incorrectly in the JSON output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "line": 180,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8d5d16d5e7b2ee7845d2124b046ee4facd41477abc0ddd633537f5f6172194fa",
+          "at": "2026-05-01T02:30:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0b0b4d5e0911dd684b52710641b54b83fd907b0b15291ef323ddf70f1c5dcf5",
+          "at": "2026-05-01T02:39:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_track_status_from_json` looks for `status_override.kind`, but metadata is encoded with `status_override.status` (`blocked`/`cancelled`). As a result, activation preflight treats blocked or cancelled planning tracks with no impl-plan as `planned`, allowing `/track:activate` to materialize or resume tracks that should be rejected as non-planning.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 113,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:a0b0b4d5e0911dd684b52710641b54b83fd907b0b15291ef323ddf70f1c5dcf5",
+          "at": "2026-05-01T02:44:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44fb5f1adfcbb29b5472547a5c0933d1d06d89a29ba367d7265f36b16b985e52",
+          "at": "2026-05-01T02:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff76a42ce4f91448b2a269f108cf6292d8578c4b41f0d5aa120d7c0defbabb60",
+          "at": "2026-05-01T04:39:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff76a42ce4f91448b2a269f108cf6292d8578c4b41f0d5aa120d7c0defbabb60",
+          "at": "2026-05-01T04:41:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67f62d66ec2d07631b9b5fb9cc82e0f4fbab77db96fe9f6b2462a99677edd9ee",
+          "at": "2026-05-01T05:12:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67f62d66ec2d07631b9b5fb9cc82e0f4fbab77db96fe9f6b2462a99677edd9ee",
+          "at": "2026-05-01T05:13:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dade659ed7ccf2d8733f475373246fb9c07e64d0e24d3aeb36d9e5e539882fa2",
+          "at": "2026-05-01T07:42:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dade659ed7ccf2d8733f475373246fb9c07e64d0e24d3aeb36d9e5e539882fa2",
+          "at": "2026-05-01T07:44:42Z"
         }
       ]
     },
@@ -500,194 +942,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 12a only checks that `plan.md`, `contract-map.md`, and `<layer>-types.md` exist, so an old `cargo make track-sync-views` result can still satisfy the gate. That means skipping step 11 can leave stale rendered views on disk while the final post-condition still claims the outputs are “freshly regenerated”.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 145,
-              "category": "correctness"
-            },
-            {
-              "message": "The recovery path on `verify catalogue-spec-signals` failure is an unconditional `step 9 -> step 11 -> step 12b` retry with no attempt cap or escalation. If the coverage mismatch persists, the agent can loop indefinitely, which is the failure mode the briefing explicitly asked to avoid.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 169,
-              "category": "reliability"
-            }
-          ],
-          "hash": "rvw1:sha256:24aa9b49db2db459e916dbfcabdc240045a42dd974453535d24aa36ae93685a4",
-          "at": "2026-04-30T13:27:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 11 now explicitly regenerates `plan.md`, but the new 12a glob check never verifies it. That leaves one of the `cargo make track-sync-views` outputs able to stay missing or stale without tripping the final gate, so the stated \"all outputs are freshly regenerated\" post-condition is not actually enforced.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 145,
-              "category": "correctness"
-            },
-            {
-              "message": "The freshness gate only re-validates `catalogue-spec-signals`; it never checks the `type-signals` artifact from step 10. By inference, a skipped or stale `type-signals` run can still leave `<layer>-types.md` incomplete while 12a/12b both pass, so the new self-verify does not cover all pipeline outputs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 166,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d514692a6ad2ce88aff872a40dc5a9f50178c53fe1bf4d974faa7dee58b74840",
-          "at": "2026-04-30T13:31:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new mandatory 12b gate (`bin/sotp verify catalogue-spec-signals`) is not reflected in the Bash allowlist. The Scope Ownership/Bash usage section still lists only the `track ...` subcommands plus `track-sync-views`, so an agent following the whitelist literally can treat the freshness check as out of scope and skip it. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526) and [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 526,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: Step 12a is internally inconsistent about how many paths it verifies. The block enumerates 9 paths total (7 per-layer paths plus `contract-map.md` and `plan.md`), but the closing sentence says “all 8 expected paths.” That mismatch makes the final self-check contract ambiguous and easy to misapply. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 181,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:eb689ce58f489c14c67f0126f3c5f467b87aa0d48439261ced3e05b8d24e8db3",
-          "at": "2026-04-30T13:34:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 12 still only proves freshness for `catalogue-spec-signals.json`; the graph outputs, `plan.md`, `contract-map.md`, and `<layer>-type-signals.json` are only checked for existence. A stale artifact from an earlier run can still satisfy 12a/12b, so the new post-condition that all prior outputs are “freshly regenerated” is not actually enforced.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:61d40f7066291e652c2e21106fc7c7622a167c6fec9f6d0dde2f9288467e0d48",
-          "at": "2026-04-30T13:36:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: Step 12a still does not prove `<layer>-types.json` was freshly produced in this session. The only source-of-truth artefact in the existence check is globbed, so a stale catalogue file left over from a prior run will satisfy the guard even if step 7 was skipped. That leaves the exact skipped-step/stale-artifact failure mode this change is meant to block. Consider requiring a same-session write receipt for step 7, or a content/freshness check on `<layer>-types.json`, not just existence.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 157,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9aeb2ba69044dfa151bc37694b937c96fbb72c990b969c37dcbc8011d0d393bf",
-          "at": "2026-04-30T13:39:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
-          "at": "2026-04-30T13:41:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 11 now requires `cargo make track-sync-views`, and the step explicitly says it renders `plan.md`, but Scope Ownership still lists `plan.md` under writes forbidden and Rules still say not to modify it. An agent following the lower section can either skip the new required sync step or treat its required `plan.md` update as a policy violation, leaving rendered views stale.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 534,
-              "category": "architecture violation"
-            },
-            {
-              "message": "The Step 9 command is documented as `bin/sotp track catalogue-spec-signals <id>` without the supported `--layer <layer_id>` filter, even though this pipeline is per layer in scope. For a single-layer run, this command processes every catalogue-spec-enabled layer and can fail on unrelated missing/stale catalogues outside the assigned layer, blocking the scoped Phase 2 pass.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 127,
-              "category": "architecture violation"
-            }
-          ],
-          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
-          "at": "2026-04-30T13:44:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 9 is documented as `bin/sotp track catalogue-spec-signals <id>` with no `[--layer <layer_id>]`, unlike the surrounding per-layer pipeline commands. The CLI supports `--layer`; without documenting it, a type-design run scoped to a single layer will regenerate all catalogue-spec signal files and can fail on or modify out-of-scope layers. This breaks the layer scope contract and can block otherwise valid single-layer Phase 2 runs.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 127,
-              "category": "scope"
-            }
-          ],
-          "hash": "rvw1:sha256:6415b12e253e9729dc3e95d10912c15a21d732bd0adf3d15c43872c005744c08",
-          "at": "2026-04-30T13:45:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 11 now requires `cargo make track-sync-views`, and the new self-check requires `track/items/<id>/plan.md` to exist, but the Scope Ownership/Rules section still forbids modifying `plan.md`. Since `track-sync-views` renders `plan.md`, the agent instructions are contradictory: a compliant agent can treat the required Step 11 write as forbidden and skip or fail the refreshed-view step the policy is trying to enforce. Clarify that `plan.md` must not be edited directly, but may be regenerated by the required `cargo make track-sync-views` command.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 534,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:7357e084d9164706d3abc6925100f10272e1b5eceee17fedad6b329261bf71f1",
-          "at": "2026-04-30T13:47:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 12b is meant to verify freshness for the explicit track `<id>`, but the documented command has no track argument and relies on the current git branch to choose what to verify. The existing `verify catalogue-spec-signals` command skips successfully on non-`track/*` branches and would verify a different track if the checkout is on a different track branch, so this policy can let the agent emit a final message without checking the `<id>` it just processed. Require a precondition that the current branch resolves to the same `<id>` and treat a SKIP/mismatch as failure, or use a track-bound verification command.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 178,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3202d9fc93296b607ae303cc6e18b1f537b75d4d6c080f3f2d24ef96ad748047",
-          "at": "2026-04-30T13:50:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
-          "at": "2026-04-30T13:52:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:593b1a06984394fa514b9edcded4a8ebdea09abe964bb3bec87a33fba3ac1401",
-          "at": "2026-04-30T13:53:49Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -703,264 +957,6 @@
           "findings": [],
           "hash": "rvw1:sha256:8e382181931e672c51dc48c6e5f15e023dfd18048e9f0507941592e7667911c1",
           "at": "2026-05-01T01:32:32Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Guard now routes commands through `ShellParserPort`, whose adapter discards `has_output_redirect` and `redirect_texts` before policy evaluation. That means redirect-only commands and redirect/heredoc-based git references are no longer blocked, weakening a security-critical guard.",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/guard.rs",
-              "line": 28,
-              "category": "security"
-            },
-            {
-              "message": "`derive_track_status_from_json()` returns `planned` when every task is `skipped`, but the real track-status logic treats a fully resolved plan as `done`. `/track:activate` uses this helper for both the planned-track preflight and auto-resume checks, so a completed all-skipped track can be activated or resumed as if it were still planning.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 162,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:b377da33913a63fec787eef5bbe2441c7048c43d009fff9f95fa766893a375d5",
-          "at": "2026-05-01T01:34:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The schema-version reader is now used on the raw CLI `track_id` before any validation in `transition.rs`, `state_ops.rs`, and `resolve.rs`, and it returns `2` on any read/parse failure. That means a malformed or missing `metadata.json` turns a branchless track into a legacy v2 track and bypasses the branchless guard, while an invalid `--track-id` is joined into a filesystem path before the later usecase check.",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 104,
-              "category": "security"
-            },
-            {
-              "message": "The status-derivation helper also fails open: unreadable or malformed `impl-plan.json` is treated as `planned`. `activate.rs` only blocks when the derived status is not `planned`, so a corrupt track can now be activated instead of failing closed like the old `load_impl_plan` path.",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 104,
-              "category": "correctness"
-            },
-            {
-              "message": "`run_files` builds the scope-query interactor before checking whether `--scope` exists in the track config. That resolves git/root state before the AC-08 validation step, so invalid scopes can now surface repo/git errors first; the same helper is also used in `classify.rs`, so the pure classification path inherited the extra git dependency.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/files.rs",
-              "line": 45,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:e08483d588f291c8ad57a7051d9aa916d0d611c1a4ca5349c03604150cd19da8",
-          "at": "2026-05-01T01:43:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_schema_version_from_json(&items_dir, &track_id)` now runs before any `TrackId` validation, so a malformed `track_id` is joined into the filesystem path and probed first. That reintroduces a path-traversal read on the metadata preflight; the same pattern appears again in `execute_set_override`, `execute_clear_override`, and `transition.rs:19`. Validate the slug before touching the filesystem, or move the schema-version lookup behind the usecase boundary.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/state_ops.rs",
-              "line": 19,
-              "category": "security"
-            },
-            {
-              "message": "`--after` used to be lenient: invalid task IDs were ignored and the new task was appended to the end. This patch forwards the raw string into `TaskOperationInteractor`, which validates `TaskId` and now turns those cases into an error instead of preserving the previous fallback behavior. Existing callers relying on the documented append-on-invalid semantics will start failing.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/state_ops.rs",
-              "line": 44,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6726366a082891b70773edafb3ef1ad214cbadb832209e96cd4fdb58112ada19",
-          "at": "2026-05-01T01:54:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `run_classify` now delegates path validation to `classify_by_strings`, which short-circuits on the first invalid path. The previous CLI behavior collected every bad path and returned a joined error, so a single run can now hide additional invalid inputs and the command no longer matches its documented contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs",
-              "line": 47,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `derive_track_status_from_json` treats a missing or malformed `impl-plan.json` task list as `planned`/`unknown`, and `execute_activate` uses that value for the auto-resume preflight. That means a corrupted materialized track can now pass the resume check and continue through `/track:activate --auto` instead of failing closed the way the old `load_impl_plan` path did.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
-              "line": 96,
-              "category": "safety"
-            },
-            {
-              "message": "P1: the frozen-track guard is now fail-open for any unrecognized status string: only `done` and `archived` are rejected, and everything else is treated as active. If the status reader ever produces a new or malformed `TrackStatus` value, `type-signals` will run on a track that should have been frozen.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 65,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:a09100bec3344cc90fccc49e34504eb6fb514bb30dfdbe672820c1fa57ec191b",
-          "at": "2026-05-01T02:01:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_track_status_from_json` treats a missing or गैर-array `tasks` field as `planned`, and `execute_activate` later accepts only `planned` preflight states. A corrupted `impl-plan.json` can therefore be activated instead of being rejected fail-closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
-              "line": 139,
-              "category": "correctness"
-            },
-            {
-              "message": "The new `--after` filter no longer mirrors `TaskId::try_new`: it accepts any `T<digits>` string, but the domain validator also requires the suffix to fit in `u64`. An oversized value will now reach `AddTaskCommand` and fail instead of being ignored and appended to the end as the command comment promises.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
-              "line": 45,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:a3a93b6c830e03965896804b5987f028a2d34c81c21aed4ba4d521dc4c08de8d",
-          "at": "2026-05-01T02:09:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `review classify` now builds its interactor through `build_scope_query_interactor_str`, which goes through `build_v2_shared` and requires a materialized `track/items/<track_id>` directory plus diff-base resolution. That means the command no longer behaves like the old pure classifier for tracks that only have `review-scope.json`; it can now fail before any classification happens. See [apps/cli/src/commands/review/classify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs#L47), [libs/infrastructure/src/review_v2/cli_composition.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs#L139), and [libs/infrastructure/src/review_v2/cli_composition.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs#L261).",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/classify.rs",
-              "line": 47,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `validate_all_paths` only rejects `/`-prefixed absolutes and `/`-separated `..` traversal. Windows-style invalid paths (`C:\\...`, `..\\...`, UNC paths) slip past this pre-check and only fail later in `classify_by_strings`, so the intended multi-error validation is incomplete. See [apps/cli/src/commands/review/classify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs#L73).",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/classify.rs",
-              "line": 73,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `next-task` now hardcodes `\"status\": \"todo\"` in the JSON payload. The command can no longer reflect the actual status of the task returned by the query service, so any non-todo next task will be misreported. See [apps/cli/src/commands/track/state_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs#L180).",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/state_ops.rs",
-              "line": 180,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9abab1f5e4b150e92b12801e90d2fcd62c73f4a1967ababbbc3cd54a5e640cee",
-          "at": "2026-05-01T02:13:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review classify` now goes through `build_scope_query_interactor_str`, which resolves the diff base (`.commit_hash` / `git rev-parse main`) before any classification work. That regresses the command from the documented pure-logic path: in a repo without `main` or a readable commit-hash file, `sotp review classify` now fails even though path classification itself does not need diff I/O.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs",
-              "line": 54,
-              "category": "behavior"
-            },
-            {
-              "message": "`review files` now constructs the scope-query interactor before validating the requested scope. Because the shared builder resolves the diff base first, an unknown `--scope` can now fail with git/base-read errors before the intended `Unknown scope` check and before any diff I/O. That breaks the command’s AC-08 ordering guarantee.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/files.rs",
-              "line": 46,
-              "category": "behavior"
-            }
-          ],
-          "hash": "rvw1:sha256:a7b04bbe3d11d947f3a3cc5e4b85ea8ac4fc03b0aadb143031ce1bb8ffc3c57f",
-          "at": "2026-05-01T02:21:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `--pretty` is now ignored. This code always requests JSON from `ExportSchemaInteractor`, and the infrastructure adapter currently serializes with pretty formatting unconditionally, so `sotp domain export-schema --pretty=false` no longer produces the compact form the CLI flag advertises.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/domain.rs",
-              "line": 56,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `execute_next_task` no longer reports the track's derived status. It infers `status` from task counts and collapses everything to `\"todo\"` or `\"in_progress\"`, so mixed todo/done plans and any blocked/cancelled override are serialized incorrectly in the JSON output.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
-              "line": 180,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8d5d16d5e7b2ee7845d2124b046ee4facd41477abc0ddd633537f5f6172194fa",
-          "at": "2026-05-01T02:30:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0b0b4d5e0911dd684b52710641b54b83fd907b0b15291ef323ddf70f1c5dcf5",
-          "at": "2026-05-01T02:39:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_track_status_from_json` looks for `status_override.kind`, but metadata is encoded with `status_override.status` (`blocked`/`cancelled`). As a result, activation preflight treats blocked or cancelled planning tracks with no impl-plan as `planned`, allowing `/track:activate` to materialize or resume tracks that should be rejected as non-planning.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 113,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:a0b0b4d5e0911dd684b52710641b54b83fd907b0b15291ef323ddf70f1c5dcf5",
-          "at": "2026-05-01T02:44:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:44fb5f1adfcbb29b5472547a5c0933d1d06d89a29ba367d7265f36b16b985e52",
-          "at": "2026-05-01T02:50:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff76a42ce4f91448b2a269f108cf6292d8578c4b41f0d5aa120d7c0defbabb60",
-          "at": "2026-05-01T04:39:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff76a42ce4f91448b2a269f108cf6292d8578c4b41f0d5aa120d7c0defbabb60",
-          "at": "2026-05-01T04:41:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67f62d66ec2d07631b9b5fb9cc82e0f4fbab77db96fe9f6b2462a99677edd9ee",
-          "at": "2026-05-01T05:12:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67f62d66ec2d07631b9b5fb9cc82e0f4fbab77db96fe9f6b2462a99677edd9ee",
-          "at": "2026-05-01T05:13:29Z"
         }
       ]
     },
@@ -3379,6 +3375,38 @@
           "findings": [],
           "hash": "rvw1:sha256:c969d064aabc683aa2bace27d3dcf4600f170ed516ab4666ec28c174554f3467",
           "at": "2026-05-01T07:19:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5e93bbb9fd57209d3dcff43198e1bba475aff828c73607d98333da32ef3a6f",
+          "at": "2026-05-01T07:42:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5e93bbb9fd57209d3dcff43198e1bba475aff828c73607d98333da32ef3a6f",
+          "at": "2026-05-01T07:44:40Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
+          "at": "2026-05-01T01:31:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:891de67e313ea6b55079159fb154fe6fdf5c564b7ef2ffc61ab9963e025ae264",
+          "at": "2026-05-01T01:32:58Z"
         }
       ]
     }

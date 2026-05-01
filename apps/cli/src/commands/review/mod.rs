@@ -151,10 +151,17 @@ pub(super) fn validate_auto_record_args(
         CodexRoundTypeArg::Final => "final",
     };
 
+    // `validate_review_group_name_str` accepts inputs with leading/trailing
+    // whitespace because `domain::ReviewGroupName::try_new` trims before
+    // validation. Propagate the trimmed value so downstream scope lookup uses
+    // the canonical form (otherwise " domain " would pass validation but then
+    // fail unknown-scope on lookup).
+    let group_name = args.group.trim().to_owned();
+
     Ok(ValidatedAutoRecordArgs {
         track_id: args.track_id.clone(),
         round_type_str: round_type_str.to_owned(),
-        group_name: args.group.clone(),
+        group_name,
         expected_groups: Vec::new(),
         items_dir: args.items_dir.clone(),
         diff_base: String::new(),
