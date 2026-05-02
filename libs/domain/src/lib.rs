@@ -61,8 +61,9 @@ pub use tddd::baseline::{
     TypeBaselineEntry,
 };
 pub use tddd::catalogue::{
-    MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
-    TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
+    EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction,
+    TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
+    TypestateTransitions,
 };
 pub use tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,

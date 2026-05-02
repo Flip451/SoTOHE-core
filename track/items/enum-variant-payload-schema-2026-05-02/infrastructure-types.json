@@ -1,0 +1,215 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "BaselineCodecError",
+      "description": "Codec error for domain-types-baseline.json. Extended with InvalidEntry variant (returned when a baseline entry's member/method declarations are malformed).",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        {
+          "name": "InvalidEntry",
+          "payload_types": [
+            "String",
+            "String"
+          ]
+        },
+        {
+          "name": "InvalidTimestamp",
+          "payload_types": [
+            "ValidationError"
+          ]
+        },
+        {
+          "name": "Json",
+          "payload_types": [
+            "Error"
+          ]
+        },
+        {
+          "name": "UnsupportedSchemaVersion",
+          "payload_types": [
+            "u32"
+          ]
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "IN-01",
+          "hash": "077cbdaafaa740ebe9586bada32b191146d39600f72c356ba84142b604bb9ca8"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "AC-03",
+          "hash": "f68884181f663d068035ff43bf512813e0814c960f68074f9fdc9420991e1a87"
+        }
+      ]
+    },
+    {
+      "name": "MemberDeclarationDto",
+      "description": "Serde DTO for a single MemberDeclaration (enum variant or struct field). The Variant arm changed from Variant(String) (old bare-name) to Variant { name: String, payload_types: Vec<String> } (structured EnumVariantDeclarationDto-compatible shape, IN-04/AC-04).",
+      "approved": true,
+      "action": "modify",
+      "kind": "enum",
+      "expected_variants": [
+        {
+          "name": "Field",
+          "payload_types": [
+            "String",
+            "String"
+          ]
+        },
+        {
+          "name": "Variant",
+          "payload_types": [
+            "String",
+            "Vec<String>"
+          ]
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "IN-04",
+          "hash": "ebfe09b9804b954850280d4dfa75515626d4a72483e0bf1b32ca1c62c507a82e"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "AC-04",
+          "hash": "e271ecf8b52b985cf5a705d45db140f136b248a6a89e4aae76f8ca37861477ff"
+        }
+      ]
+    },
+    {
+      "name": "build_type_graph",
+      "description": "Builds a TypeGraph from a SchemaExport. The SchemaExport is produced by schema_export.rs::extract_enum_variants() (extended in T001/IN-07) which already carries payload_types per variant; build_type_graph propagates those payload_types into the resulting TypeGraph nodes without re-parsing rustdoc JSON itself.",
+      "approved": true,
+      "action": "modify",
+      "kind": "free_function",
+      "module_path": "infrastructure::code_profile_builder",
+      "expected_params": [
+        {
+          "name": "schema",
+          "ty": "&SchemaExport"
+        },
+        {
+          "name": "typestate_names",
+          "ty": "&HashSet<String>"
+        }
+      ],
+      "expected_returns": [
+        "TypeGraph"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "d843d31efdbaf69e460de232ccfbf1a29975d7e95282c2f50afe736becd79223"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "AC-02",
+          "hash": "e40a62a56b5b5080d1cec373a25470559649baf885b35a46bbff1e4c2cc675f7"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "CN-06",
+          "hash": "2a68953af5b9c418422aa55b43f197623c6dc41b05a09012f071fc4fa4619621"
+        }
+      ]
+    },
+    {
+      "name": "render_type_graph_flat",
+      "description": "Renders a flat (non-clustered) mermaid type graph from a TypeGraph. Extended (IN-06) to emit enum -> payload type edges with ::VariantName labels by walking MemberDeclaration::Variant.payload_types in collect_edges.",
+      "approved": true,
+      "action": "modify",
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_graph_render",
+      "expected_params": [
+        {
+          "name": "graph",
+          "ty": "&TypeGraph"
+        },
+        {
+          "name": "layer_name",
+          "ty": "&str"
+        },
+        {
+          "name": "opts",
+          "ty": "&TypeGraphRenderOptions"
+        }
+      ],
+      "expected_returns": [
+        "String"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "e0e2d9f08162a2e4ef9c9fa1f445303e481a066b38a6f5d7773a00d392a0d667"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "AC-06",
+          "hash": "a415ffc6857c142f9ec667ca8ecd52bab6ecf5042043071506dd66adda496c2a"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "CN-04",
+          "hash": "d4103fba3b83e74aaca296bf8d45d07fa8b2151f75de346a15c6dc3dd653cd7b"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "CN-05",
+          "hash": "7cd0c3dd20cb868c35478747655020855047b8e896551d5d581e61797805b2e9"
+        }
+      ]
+    },
+    {
+      "name": "render_type_graph_clustered",
+      "description": "Renders a per-cluster mermaid type graph block. Extended (IN-06) to emit enum -> payload type edges with ::VariantName labels consistent with the flat renderer.",
+      "approved": true,
+      "action": "modify",
+      "kind": "free_function",
+      "module_path": "infrastructure::tddd::type_graph_render",
+      "expected_params": [
+        {
+          "name": "graph",
+          "ty": "&TypeGraph"
+        },
+        {
+          "name": "cluster_key",
+          "ty": "&str"
+        },
+        {
+          "name": "plan",
+          "ty": "&ClusterPlan"
+        },
+        {
+          "name": "opts",
+          "ty": "&TypeGraphRenderOptions"
+        }
+      ],
+      "expected_returns": [
+        "String"
+      ],
+      "expected_is_async": false,
+      "spec_refs": [
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "e0e2d9f08162a2e4ef9c9fa1f445303e481a066b38a6f5d7773a00d392a0d667"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "AC-06",
+          "hash": "a415ffc6857c142f9ec667ca8ecd52bab6ecf5042043071506dd66adda496c2a"
+        }
+      ]
+    }
+  ]
+}

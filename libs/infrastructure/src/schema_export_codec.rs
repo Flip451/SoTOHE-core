@@ -83,11 +83,11 @@ pub struct TypeInfoDto {
 ///
 /// Uses serde default (externally-tagged) for wire format preservation:
 ///
-/// - `Variant("Name")` → `{"Variant": "Name"}`
+/// - `Variant { name, payload_types }` → `{"Variant": {"name": "...", "payload_types": [...]}}`
 /// - `Field { name, ty }` → `{"Field": {"name": "...", "ty": "..."}}`
 #[derive(Debug, Serialize)]
 pub enum MemberDeclarationDto {
-    Variant(String),
+    Variant { name: String, payload_types: Vec<String> },
     Field { name: String, ty: String },
 }
 
@@ -197,7 +197,10 @@ impl From<&TypeInfo> for TypeInfoDto {
 impl From<&MemberDeclaration> for MemberDeclarationDto {
     fn from(m: &MemberDeclaration) -> Self {
         match m {
-            MemberDeclaration::Variant(name) => Self::Variant(name.clone()),
+            MemberDeclaration::Variant(evd) => Self::Variant {
+                name: evd.name().to_owned(),
+                payload_types: evd.payload_types().to_vec(),
+            },
             MemberDeclaration::Field { name, ty } => {
                 Self::Field { name: name.clone(), ty: ty.clone() }
             }
@@ -345,15 +348,24 @@ mod tests {
             "MyEnum".to_string(),
             TypeKind::Enum,
             None,
-            vec![MemberDeclaration::variant("First"), MemberDeclaration::field("x", "u8")],
+            vec![
+                MemberDeclaration::unit_variant("First"),
+                MemberDeclaration::variant("Tuple", vec!["u32".to_string()]),
+                MemberDeclaration::field("x", "u8"),
+            ],
         );
         let schema = SchemaExport::new("x".to_string(), vec![type_info], vec![], vec![], vec![]);
         let json = encode(&schema, false).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         let members = &parsed["types"][0]["members"];
-        assert_eq!(members[0]["Variant"], "First");
-        assert_eq!(members[1]["Field"]["name"], "x");
-        assert_eq!(members[1]["Field"]["ty"], "u8");
+        // Unit variant: payload_types is empty array
+        assert_eq!(members[0]["Variant"]["name"], "First");
+        assert_eq!(members[0]["Variant"]["payload_types"], serde_json::json!([]));
+        // Tuple variant: payload_types carries type strings
+        assert_eq!(members[1]["Variant"]["name"], "Tuple");
+        assert_eq!(members[1]["Variant"]["payload_types"], serde_json::json!(["u32"]));
+        assert_eq!(members[2]["Field"]["name"], "x");
+        assert_eq!(members[2]["Field"]["ty"], "u8");
     }
 
     #[test]

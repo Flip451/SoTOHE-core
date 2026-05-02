@@ -22,8 +22,8 @@ use std::fmt::Write as _;
 
 use crate::tddd::LayerId;
 use crate::tddd::catalogue::{
-    MethodDeclaration, TraitImplDecl, TypeCatalogueDocument, TypeCatalogueEntry,
-    TypeDefinitionKind, TypestateTransitions,
+    EnumVariantDeclaration, MethodDeclaration, TraitImplDecl, TypeCatalogueDocument,
+    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
 };
 use crate::tddd::contract_map_content::ContractMapContent;
 use crate::tddd::contract_map_options::ContractMapRenderOptions;
@@ -284,6 +284,38 @@ pub fn render_contract_map(
                             continue;
                         }
                         edges.insert(format!("    {src_id} ==>|\"transitions_to\"| {dst_id}"));
+                    }
+                }
+            }
+        }
+
+        // Enum / ErrorType variant payload edges (ADR 2026-05-02-0316).
+        //
+        // For each `EnumVariantDeclaration` in `expected_variants`, iterate
+        // `payload_types`, tokenize each type string via `extract_type_names()`,
+        // and look up each token in `type_index`.  Resolved targets produce a
+        // solid edge labelled `::VariantName` so the Contract Map reader can see
+        // which variant introduced the dependency.  Unit variants (empty
+        // `payload_types`) and payload types whose tokens are all absent from
+        // `type_index` produce no edge.  Self-loops are suppressed.
+        let variant_payload_sources: Option<&Vec<EnumVariantDeclaration>> = match entry.kind() {
+            TypeDefinitionKind::Enum { expected_variants }
+            | TypeDefinitionKind::ErrorType { expected_variants } => Some(expected_variants),
+            _ => None,
+        };
+        if let Some(variants) = variant_payload_sources {
+            for variant in variants {
+                let label = escape_edge_label(&format!("::{}", variant.name()));
+                for payload_ty in variant.payload_types() {
+                    for token in extract_type_names(payload_ty.as_str()) {
+                        if let Some(dsts) = type_index.get(token) {
+                            for (_dst_layer, dst_id) in dsts {
+                                if dst_id == &src_id {
+                                    continue;
+                                }
+                                edges.insert(format!("    {src_id} -->|{label}| {dst_id}"));
+                            }
+                        }
                     }
                 }
             }

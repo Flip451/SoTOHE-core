@@ -196,10 +196,11 @@ pub fn contract_map_path(track_root: &Path, track_id: &TrackId) -> PathBuf {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
     use domain::tddd::catalogue::TypeCatalogueDocument;
+    use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
 
     const RULES_JSON: &str = r#"{
       "version": 2,
@@ -415,6 +416,118 @@ mod tests {
         assert!(
             matches!(err, ContractMapWriterError::IoError { .. }),
             "expected IoError, got {err:?}"
+        );
+    }
+
+    /// E2E: load a catalogue that declares `MemberDeclaration` (kind=enum) with
+    /// a `Variant` arm carrying `payload_types: ["EnumVariantDeclaration"]`, and
+    /// `EnumVariantDeclaration` (kind=value_object) in the same layer.
+    ///
+    /// After loading via `FsCatalogueLoader` and rendering via
+    /// `render_contract_map`, the output must contain the variant payload edge
+    /// `MemberDeclaration -->|"::Variant"| EnumVariantDeclaration`.
+    ///
+    /// This test proves that:
+    /// 1. `decode_enum_variant_list` correctly round-trips `expected_variants`
+    ///    from the JSON into `Vec<EnumVariantDeclaration>`.
+    /// 2. `render_contract_map` emits the edge for the `Variant` arm's payload
+    ///    type when the target (`EnumVariantDeclaration`) is present in the
+    ///    `type_index` built from the same catalogue.
+    ///
+    /// Reproduces the "0 edges" regression described in the PR follow-up for
+    /// track `enum-variant-payload-schema-2026-05-02`.
+    #[test]
+    fn test_e2e_member_declaration_variant_payload_edge_roundtrip() {
+        const RULES: &str = r#"{
+          "version": 2,
+          "layers": [
+            {
+              "crate": "domain",
+              "path": "libs/domain",
+              "may_depend_on": [],
+              "deny_reason": "no reverse dep",
+              "tddd": {
+                "enabled": true,
+                "catalogue_file": "domain-types.json",
+                "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+              }
+            }
+          ]
+        }"#;
+
+        // Minimal catalogue reflecting the actual `domain-types.json` for the
+        // `enum-variant-payload-schema-2026-05-02` track:
+        //   - EnumVariantDeclaration  (value_object)
+        //   - MemberDeclaration       (enum, Variant arm with payload_types: ["EnumVariantDeclaration"])
+        const CATALOGUE: &str = r#"{
+          "schema_version": 2,
+          "type_definitions": [
+            {
+              "name": "EnumVariantDeclaration",
+              "description": "Holds variant name and payload types.",
+              "approved": true,
+              "kind": "value_object",
+              "expected_members": [],
+              "expected_methods": []
+            },
+            {
+              "name": "MemberDeclaration",
+              "description": "Enum variant or struct field.",
+              "approved": true,
+              "kind": "enum",
+              "expected_variants": [
+                {"name": "Variant", "payload_types": ["EnumVariantDeclaration"]},
+                {"name": "Field",   "payload_types": ["String", "String"]}
+              ]
+            }
+          ]
+        }"#;
+
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let rules_path = root.join("architecture-rules.json");
+        write(&rules_path, RULES);
+
+        let track_root = root.join("track-items");
+        let id = track_id("t-e2e");
+        let track_dir = track_root.join(id.as_ref());
+        write(&track_dir.join("domain-types.json"), CATALOGUE);
+
+        let loader = FsCatalogueLoader::new(track_root, rules_path, root.to_path_buf());
+        let (layer_order, catalogues) = loader.load_all(&id).unwrap();
+
+        assert_eq!(layer_order.len(), 1, "expected 1 layer");
+        let domain_doc = catalogues.get(&layer_order[0]).unwrap();
+        // Verify the codec decoded expected_variants correctly (pre-render
+        // assertion so a codec failure surfaces before the render assertion).
+        let member_entry = domain_doc
+            .entries()
+            .iter()
+            .find(|e| e.name() == "MemberDeclaration")
+            .expect("MemberDeclaration must be present in decoded catalogue");
+        let domain::tddd::catalogue::TypeDefinitionKind::Enum { expected_variants } =
+            member_entry.kind()
+        else {
+            panic!("MemberDeclaration must decode as TypeDefinitionKind::Enum");
+        };
+        assert_eq!(expected_variants.len(), 2, "expected 2 variants (Variant, Field)");
+        let variant_arm =
+            expected_variants.iter().find(|v| v.name() == "Variant").expect("Variant arm missing");
+        assert_eq!(
+            variant_arm.payload_types(),
+            &["EnumVariantDeclaration"],
+            "Variant arm payload_types must survive codec round-trip"
+        );
+
+        // Render and assert edge is present.
+        let opts = ContractMapRenderOptions::default();
+        let content = render_contract_map(&catalogues, &layer_order, &opts);
+        let text = content.as_ref();
+        assert!(
+            text.contains(
+                "L6_domain_MemberDeclaration -->|\"::Variant\"| L6_domain_EnumVariantDeclaration"
+            ),
+            "render_contract_map must emit variant payload edge; output was:\n{text}"
         );
     }
 }

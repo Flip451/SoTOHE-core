@@ -809,8 +809,8 @@ mod tests {
                 TypeKind::Enum,
                 Some("Status of a track".to_string()),
                 vec![
-                    MemberDeclaration::variant("Planned"),
-                    MemberDeclaration::variant("InProgress"),
+                    MemberDeclaration::unit_variant("Planned"),
+                    MemberDeclaration::unit_variant("InProgress"),
                 ],
             )],
             vec![],

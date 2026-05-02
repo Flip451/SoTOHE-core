@@ -29,7 +29,16 @@
 //! - Stdlib wrapper names (`Result`, `Option`, `Vec` …) are NOT explicitly
 //!   filtered — they are naturally excluded because `TypeGraph` only contains
 //!   types from the workspace crate's rustdoc export, not stdlib re-exports.
-//! - Enum variant payloads are not extracted at L1 (variant members carry name only).
+//!
+//! Enum variant payload edges (T003, ADR `2026-05-02-0316-enum-variant-payload-schema.md`):
+//! When `EdgeSet::Fields` or `EdgeSet::All` is used, `collect_edges()` also emits
+//! `"variant_payload"` edges from enum type nodes.  For each `MemberDeclaration::Variant`
+//! whose `payload_types` is non-empty, each in-graph PascalCase token extracted from the
+//! payload type strings produces an edge labelled `::VariantName`.  Unit variants (empty
+//! `payload_types`) and tokens absent from the graph produce no edge.
+//!
+//! Edge type added in T003:
+//! - Variant payload: `A -->|::VariantName| B`  directed arrow (distinct from field `---|`)
 
 use std::collections::HashSet;
 use std::path::Path;
@@ -51,13 +60,16 @@ pub enum EdgeSet {
     ///
     /// Mermaid symbol: `A -->|method_name| B` (solid arrow).
     Methods,
-    /// Only struct field edges.
+    /// Struct field edges and enum variant payload edges.
     ///
     /// Each `MemberDeclaration::Field` whose type string contains a PascalCase
-    /// token that exists in the graph produces an edge. Enum variant members
-    /// carry no payload type at L1 and are skipped.
+    /// token that exists in the graph produces a field edge
+    /// (`A ---|field_name| B`, solid, no arrowhead).
     ///
-    /// Mermaid symbol: `A ---|field_name| B` (solid, no arrowhead).
+    /// Each `MemberDeclaration::Variant` with non-empty `payload_types` produces
+    /// a directed variant payload edge for each in-graph PascalCase token:
+    /// (`A -->|::VariantName| B`, solid arrow).  Unit variants (empty
+    /// `payload_types`) and tokens absent from the graph produce no edge.
     Fields,
     /// Only trait impl edges.
     ///
@@ -293,24 +305,12 @@ pub fn render_type_graph_flat(
     }
 
     // Emit edges (only between nodes in the node_set), choosing the mermaid
-    // edge symbol based on the edge_kind. While emitting, collect the 0-based
-    // output-order indices of parameter-derived edges so that a single
-    // `linkStyle ... stroke:#888;` line can be appended (D3 gray reinforcement).
-    let mut param_edge_indices: Vec<usize> = Vec::new();
-    let mut emitted_count: usize = 0;
+    // edge symbol based on the edge_kind.
     for (src, label, tgt, kind) in &edges {
         if node_set.contains(src.as_str()) && node_set.contains(tgt.as_str()) {
             let edge_str = render_edge_symbol(src, label, tgt, kind);
             out.push_str(&format!("    {edge_str}\n"));
-            if is_param_derived_edge_kind(kind) {
-                param_edge_indices.push(emitted_count);
-            }
-            emitted_count += 1;
         }
-    }
-    if !param_edge_indices.is_empty() {
-        let joined = param_edge_indices.iter().map(usize::to_string).collect::<Vec<_>>().join(",");
-        out.push_str(&format!("    linkStyle {joined} stroke:#888;\n"));
     }
 
     out.push_str("```\n");
@@ -391,6 +391,8 @@ pub fn write_type_graph_file(
 ///   a trait node (open-circle endpoint `--o|label|`)
 /// - `"field"`: struct field whose type is a workspace type (solid no-arrow `---|label|`)
 /// - `"impl"`: trait implementation (dashed arrow `-.->|impl|`)
+/// - `"variant_payload"`: enum variant payload type edge (directed arrow `-->|::VariantName|`);
+///   emitted when `EdgeSet::Fields` or `EdgeSet::All` is active
 fn collect_edges(
     graph: &TypeGraph,
     edge_set: EdgeSet,
@@ -499,8 +501,31 @@ fn collect_edges(
                                 }
                             }
                         }
-                        // Variants carry no payload type at L1 — skip them.
-                        MemberDeclaration::Variant(_) => {}
+                        // Enum variant payload edges (T003, ADR 2026-05-02-0316):
+                        // For each variant with non-empty payload_types, extract PascalCase
+                        // tokens from each payload type string and emit a directed edge
+                        // `source_name -->|::VariantName| token` when the token exists in
+                        // the graph.  Unit variants (empty payload_types) produce no edge.
+                        // Self-loops (payload type resolves to the same type as the source)
+                        // are suppressed to avoid noise in the diagram.
+                        MemberDeclaration::Variant(evd) => {
+                            let label = format!("::{}", evd.name());
+                            for payload_ty in evd.payload_types() {
+                                let targets = extract_type_names(payload_ty.as_str());
+                                for target in targets {
+                                    if graph_type_names.contains(target)
+                                        && target != source_name.as_str()
+                                    {
+                                        edges.push((
+                                            source_name.clone(),
+                                            label.clone(),
+                                            target.to_string(),
+                                            "variant_payload",
+                                        ));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -826,33 +851,15 @@ pub fn render_type_graph_clustered(
     }
 
     // Emit intra-cluster edges using the correct mermaid symbol per edge_kind.
-    // Track 0-based output-order indices of parameter-derived edges so that
-    // a single `linkStyle ... stroke:#888;` line can be appended after all
-    // edges are emitted (D3 gray reinforcement). Ghost edges share the same
-    // index sequence because mermaid numbers edges in declaration order.
-    let mut param_edge_indices: Vec<usize> = Vec::new();
-    let mut emitted_count: usize = 0;
     for (src, label, tgt, kind) in &intra_edges {
         let edge_str = render_edge_symbol(src, label, tgt, kind);
         out.push_str(&format!("    {edge_str}\n"));
-        if is_param_derived_edge_kind(kind) {
-            param_edge_indices.push(emitted_count);
-        }
-        emitted_count += 1;
     }
 
     // Emit cross-cluster ghost edges.
     for (ghost_id, src, label, _tgt, _display, kind) in &cross_ghost_ids {
         let edge_str = render_edge_symbol(src, label, ghost_id, kind);
         out.push_str(&format!("    {edge_str}\n"));
-        if is_param_derived_edge_kind(kind) {
-            param_edge_indices.push(emitted_count);
-        }
-        emitted_count += 1;
-    }
-    if !param_edge_indices.is_empty() {
-        let joined = param_edge_indices.iter().map(usize::to_string).collect::<Vec<_>>().join(",");
-        out.push_str(&format!("    linkStyle {joined} stroke:#888;\n"));
     }
 
     out.push_str("```\n");
@@ -1247,6 +1254,9 @@ fn trait_node_id(name: &str) -> String {
 /// - `"field"` → `A ---|label| B` (solid, no arrowhead — containment/composition)
 /// - `"impl"` → `A -.->|label| _trait_B` (dashed arrow — interface implementation;
 ///   trait node ID uses `_trait_` prefix to avoid collision with type nodes)
+/// - `"variant_payload"` → `A -->|label| B` (solid directed arrow — enum variant
+///   payload type dependency; label is `::VariantName`; distinct from field edges
+///   which use `---` without arrowhead; T003, ADR 2026-05-02-0316)
 /// - any other kind falls back to the method-return (solid arrow) symbol.
 fn render_edge_symbol(src: &str, label: &str, tgt: &str, kind: &str) -> String {
     match kind {
@@ -1265,21 +1275,9 @@ fn render_edge_symbol(src: &str, label: &str, tgt: &str, kind: &str) -> String {
             let src_id = trait_node_id(src);
             format!("{src_id} --o|{label}| {tgt}")
         }
+        "variant_payload" => format!("{src} -->|{label}| {tgt}"),
         _ => format!("{src} -->|{label}| {tgt}"),
     }
-}
-
-/// Returns true when the edge_kind is a parameter-derived edge that should
-/// receive the gray `linkStyle stroke:#888;` reinforcement (D3).
-///
-/// Used by `render_type_graph_flat` and `render_type_graph_clustered` to
-/// collect the 0-based output-order indices of parameter-derived edges so
-/// that a single `linkStyle <i1>,<i2>,... stroke:#888;` line can be appended
-/// to the mermaid block. `render_type_graph_overview` does not call this
-/// helper because OS-03 explicitly excludes the overview from per-edge
-/// coloring.
-fn is_param_derived_edge_kind(kind: &str) -> bool {
-    matches!(kind, "method_param" | "trait_method_param")
 }
 
 /// Extracts PascalCase type names from a type string.
@@ -1326,7 +1324,7 @@ mod tests {
     fn enum_node() -> TypeNode {
         TypeNode::new(
             TypeKind::Enum,
-            vec![MemberDeclaration::variant("A"), MemberDeclaration::variant("B")],
+            vec![MemberDeclaration::unit_variant("A"), MemberDeclaration::unit_variant("B")],
             vec![],
             HashSet::new(),
         )
@@ -2317,18 +2315,15 @@ mod tests {
         );
     }
 
-    /// T004-4 (D3 / AC-04 / AC-05): when parameter-derived edges are present,
-    /// the mermaid output emits `--o` for those edges and appends a
-    /// `linkStyle <indices> stroke:#888;` line whose indices match the
-    /// 0-based output order of the param edges.
+    /// AC-04 / AC-05: when parameter-derived edges are present, the mermaid
+    /// output emits `--o` for those edges and `-->` for return edges. The
+    /// renderer no longer emits a `linkStyle stroke:#888;` line (long number
+    /// lists previously broke the VS Code mermaid parser).
     #[test]
-    fn test_render_flat_emits_link_style_for_param_edges_with_correct_indices() {
+    fn test_render_flat_emits_param_edge_symbol_without_link_style() {
         use domain::tddd::catalogue::ParamDeclaration;
 
         let mut types = HashMap::new();
-        // Type A has a return-only method (index 0 — return) and a param-only
-        // method (index 1 — param). Edges are sort()ed by collect_edges, so
-        // alphabetical ordering of the tuples controls the index.
         let type_a = struct_node(vec![
             MethodDeclaration::new("call_a", Some("&self".into()), vec![], "B", false),
             MethodDeclaration::new(
@@ -2346,23 +2341,17 @@ mod tests {
 
         let output = render_type_graph_flat(&graph, "domain", &TypeGraphRenderOptions::default());
 
-        // Param edge should use --o symbol.
         assert!(
             output.contains("A --o|call_b| C"),
             "param edge must use --o symbol, got: {output}"
         );
-        // Return edge keeps -->.
         assert!(
             output.contains("A -->|call_a| B"),
             "return edge must use --> symbol, got: {output}"
         );
-        // Edges are sorted alphabetically by (src, label, tgt, kind):
-        //   ("A", "call_a", "B", "method_return")  index 0
-        //   ("A", "call_b", "C", "method_param")   index 1
-        // So linkStyle should reference index 1.
         assert!(
-            output.contains("linkStyle 1 stroke:#888;"),
-            "linkStyle line must reference index 1 for the single param edge, got: {output}"
+            !output.contains("linkStyle"),
+            "linkStyle line must not appear (suppressed for parser compat), got: {output}"
         );
     }
 
@@ -2425,10 +2414,11 @@ mod tests {
         );
     }
 
-    /// T004-7 (D3 / AC-04): clustered renderer emits the open-circle endpoint
-    /// `--o` for parameter-derived edges and appends a `linkStyle` line.
+    /// AC-04: clustered renderer emits the open-circle endpoint `--o` for
+    /// parameter-derived edges. The `linkStyle` line is suppressed (parser
+    /// compat).
     #[test]
-    fn test_render_clustered_emits_link_style_for_param_edges() {
+    fn test_render_clustered_emits_param_edge_symbol_without_link_style() {
         use domain::tddd::catalogue::ParamDeclaration;
 
         let mut types = HashMap::new();
@@ -2456,15 +2446,179 @@ mod tests {
         let plan = crate::tddd::type_graph_cluster::classify_types(&graph, 2, &edges);
         let output = render_type_graph_clustered(&graph, "domain::pipeline", &plan, &opts);
 
-        // The intra-cluster param edge must use --o.
         assert!(
             output.contains("Producer --o|make| Input"),
             "clustered param edge must use --o, got: {output}"
         );
-        // linkStyle line must be present (single param edge at index 0).
         assert!(
-            output.contains("linkStyle 0 stroke:#888;"),
-            "clustered linkStyle line must appear for param edge, got: {output}"
+            !output.contains("linkStyle"),
+            "linkStyle line must not appear (suppressed for parser compat), got: {output}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // T003: enum variant payload edges in collect_edges / render_type_graph_flat
+    // -----------------------------------------------------------------------
+
+    /// Helper: builds an enum node with the given variant members.
+    fn enum_node_with_variants(variants: Vec<MemberDeclaration>) -> TypeNode {
+        TypeNode::new(TypeKind::Enum, variants, vec![], HashSet::new())
+    }
+
+    /// T003-1 (happy path): a variant with a payload type that exists in the graph
+    /// emits a `variant_payload` edge with label `::VariantName`.
+    #[test]
+    fn test_collect_edges_emits_variant_payload_edge_when_payload_type_in_graph() {
+        let mut types = HashMap::new();
+        // Enum `Result_` has a variant `Ok_(Value)` where `Value` is in the graph.
+        types.insert(
+            "Result_".to_string(),
+            enum_node_with_variants(vec![MemberDeclaration::variant(
+                "Ok_",
+                vec!["Value".to_string()],
+            )]),
+        );
+        types.insert("Value".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let edges = collect_edges(&graph, EdgeSet::Fields);
+
+        assert!(
+            edges.contains(&(
+                "Result_".to_owned(),
+                "::Ok_".to_owned(),
+                "Value".to_owned(),
+                "variant_payload"
+            )),
+            "variant_payload edge must be emitted for in-graph payload type, got: {edges:?}"
+        );
+    }
+
+    /// T003-2 (unit variant): a unit variant (empty `payload_types`) produces no edge.
+    #[test]
+    fn test_collect_edges_emits_no_edge_for_unit_variant() {
+        let mut types = HashMap::new();
+        // Enum `Status` has unit variants only.
+        types.insert(
+            "Status".to_string(),
+            enum_node_with_variants(vec![
+                MemberDeclaration::unit_variant("Active"),
+                MemberDeclaration::unit_variant("Inactive"),
+            ]),
+        );
+        types.insert("Other".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let edges = collect_edges(&graph, EdgeSet::Fields);
+
+        assert!(
+            !edges.iter().any(|(src, _, _, kind)| src == "Status" && *kind == "variant_payload"),
+            "unit variant must produce no variant_payload edge, got: {edges:?}"
+        );
+    }
+
+    /// T003-3 (unresolved payload type): a variant whose payload type is absent
+    /// from the graph produces no edge.
+    #[test]
+    fn test_collect_edges_emits_no_edge_when_payload_type_absent_from_graph() {
+        let mut types = HashMap::new();
+        // Enum `Wrapper` has variant `Inner(External)` where `External` is NOT in graph.
+        types.insert(
+            "Wrapper".to_string(),
+            enum_node_with_variants(vec![MemberDeclaration::variant(
+                "Inner",
+                vec!["External".to_string()],
+            )]),
+        );
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let edges = collect_edges(&graph, EdgeSet::Fields);
+
+        assert!(
+            edges.is_empty(),
+            "variant with unresolved payload type must produce no edge, got: {edges:?}"
+        );
+    }
+
+    /// T003-4: `render_type_graph_flat` with `EdgeSet::Fields` renders variant
+    /// payload edges using `-->` (directed arrow), distinct from field edges `---`.
+    #[test]
+    fn test_render_flat_variant_payload_edge_uses_directed_arrow() {
+        let mut types = HashMap::new();
+        types.insert(
+            "Event".to_string(),
+            enum_node_with_variants(vec![MemberDeclaration::variant(
+                "Created",
+                vec!["Payload".to_string()],
+            )]),
+        );
+        types.insert("Payload".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let opts = TypeGraphRenderOptions {
+            edge_set: EdgeSet::Fields,
+            cluster_depth: 0,
+            ..Default::default()
+        };
+        let output = render_type_graph_flat(&graph, "domain", &opts);
+
+        // Must use directed arrow (-->), not field no-arrow (---).
+        assert!(
+            output.contains("Event -->|::Created| Payload"),
+            "variant_payload edge must use directed arrow with ::VariantName label, got: {output}"
+        );
+        assert!(
+            !output.contains("Event ---|::Created| Payload"),
+            "variant_payload edge must NOT use field (no-arrow) syntax, got: {output}"
+        );
+    }
+
+    /// T003-5: `EdgeSet::All` includes variant_payload edges alongside field, method,
+    /// and impl edges.
+    #[test]
+    fn test_edge_set_all_includes_variant_payload_edges() {
+        let mut types = HashMap::new();
+        // Enum `Outcome` has a method edge (→ Result_) and a variant payload edge (→ Data).
+        let mut outcome = TypeNode::new(
+            TypeKind::Enum,
+            vec![MemberDeclaration::variant("Success", vec!["Data".to_string()])],
+            vec![method_returning("into_result", "Result_")],
+            HashSet::new(),
+        );
+        outcome.set_module_path("domain::core".to_owned());
+        types.insert("Outcome".to_string(), outcome);
+
+        let mut result = struct_node(vec![]);
+        result.set_module_path("domain::core".to_owned());
+        types.insert("Result_".to_string(), result);
+
+        let mut data = struct_node(vec![]);
+        data.set_module_path("domain::core".to_owned());
+        types.insert("Data".to_string(), data);
+
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let edges = collect_edges(&graph, EdgeSet::All);
+
+        // Method return edge must be present.
+        assert!(
+            edges.contains(&(
+                "Outcome".to_owned(),
+                "into_result".to_owned(),
+                "Result_".to_owned(),
+                "method_return"
+            )),
+            "method_return edge must appear in EdgeSet::All, got: {edges:?}"
+        );
+        // Variant payload edge must be present.
+        assert!(
+            edges.contains(&(
+                "Outcome".to_owned(),
+                "::Success".to_owned(),
+                "Data".to_owned(),
+                "variant_payload"
+            )),
+            "variant_payload edge must appear in EdgeSet::All, got: {edges:?}"
         );
     }
 }

@@ -13,7 +13,9 @@ use std::fmt;
 use std::marker::PhantomData;
 
 use domain::schema::TypeKind;
-use domain::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
+use domain::tddd::catalogue::{
+    EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration,
+};
 use domain::{
     FunctionBaselineEntry, Timestamp, TraitBaselineEntry, TraitImplBaselineEntry, TypeBaseline,
     TypeBaselineEntry, ValidationError,
@@ -81,6 +83,9 @@ pub enum BaselineCodecError {
 
     #[error("invalid timestamp: {0}")]
     InvalidTimestamp(#[from] ValidationError),
+
+    #[error("invalid baseline entry '{name}': {reason}")]
+    InvalidEntry { name: String, reason: String },
 }
 
 // ---------------------------------------------------------------------------
@@ -146,10 +151,15 @@ struct FunctionEntryDto {
 }
 
 /// Member DTO — discriminator `kind` selects `variant` vs `field`.
+///
+/// For `variant`, `payload_types` carries the L1 type strings of the variant's
+/// payload fields. Unit variants carry an empty `payload_types` array.
+///
+/// No `#[serde(default)]` on `payload_types` — new-schema-only codec per CN-02.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 enum MemberDto {
-    Variant { name: String },
+    Variant { name: String, payload_types: Vec<String> },
     Field { name: String, ty: String },
 }
 
@@ -200,8 +210,11 @@ pub fn decode(json: &str) -> Result<TypeBaseline, BaselineCodecError> {
                 entry_dto.kind
             )))
         })?;
-        let members: Vec<MemberDeclaration> =
-            entry_dto.members.into_iter().map(member_from_dto).collect();
+        let members: Vec<MemberDeclaration> = entry_dto
+            .members
+            .into_iter()
+            .map(|dto| member_from_dto(dto, &name))
+            .collect::<Result<Vec<_>, _>>()?;
         let methods: Vec<MethodDeclaration> =
             entry_dto.methods.into_iter().map(method_from_dto).collect();
         // T007 (S4): decode trait_impls.
@@ -261,16 +274,50 @@ fn type_kind_to_str(kind: &TypeKind) -> &'static str {
     }
 }
 
-fn member_from_dto(dto: MemberDto) -> MemberDeclaration {
+fn member_from_dto(
+    dto: MemberDto,
+    entry_name: &str,
+) -> Result<MemberDeclaration, BaselineCodecError> {
     match dto {
-        MemberDto::Variant { name } => MemberDeclaration::variant(name),
-        MemberDto::Field { name, ty } => MemberDeclaration::field(name, ty),
+        MemberDto::Variant { name, payload_types } => {
+            // L1 enforcement: reject module-qualified names before constructing the domain type.
+            if name.contains("::") {
+                return Err(BaselineCodecError::InvalidEntry {
+                    name: entry_name.to_owned(),
+                    reason: format!(
+                        "variant name contains '::' — L1 baseline entries must use \
+                         last-segment short names: '{name}'"
+                    ),
+                });
+            }
+            for pt in &payload_types {
+                if pt.contains("::") {
+                    return Err(BaselineCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!(
+                            "variant '{name}' payload_type contains '::' — L1 baseline \
+                             entries must use last-segment short names: '{pt}'"
+                        ),
+                    });
+                }
+            }
+            EnumVariantDeclaration::try_new(name.clone(), payload_types)
+                .map(MemberDeclaration::Variant)
+                .map_err(|e| BaselineCodecError::InvalidEntry {
+                    name: entry_name.to_owned(),
+                    reason: format!("variant '{}': {}", name, e),
+                })
+        }
+        MemberDto::Field { name, ty } => Ok(MemberDeclaration::field(name, ty)),
     }
 }
 
 fn member_to_dto(member: &MemberDeclaration) -> MemberDto {
     match member {
-        MemberDeclaration::Variant(name) => MemberDto::Variant { name: name.clone() },
+        MemberDeclaration::Variant(evd) => MemberDto::Variant {
+            name: evd.name().to_owned(),
+            payload_types: evd.payload_types().to_vec(),
+        },
         MemberDeclaration::Field { name, ty } => {
             MemberDto::Field { name: name.clone(), ty: ty.clone() }
         }
@@ -396,10 +443,10 @@ mod tests {
     "TaskStatus": {
       "kind": "enum",
       "members": [
-        { "kind": "variant", "name": "Todo" },
-        { "kind": "variant", "name": "InProgress" },
-        { "kind": "variant", "name": "Done" },
-        { "kind": "variant", "name": "Skipped" }
+        { "kind": "variant", "name": "Todo", "payload_types": [] },
+        { "kind": "variant", "name": "InProgress", "payload_types": [] },
+        { "kind": "variant", "name": "Done", "payload_types": [] },
+        { "kind": "variant", "name": "Skipped", "payload_types": [] }
       ],
       "methods": [
         { "name": "kind", "receiver": "&self", "params": [], "returns": "TaskStatusKind", "is_async": false }

@@ -21,7 +21,7 @@
 use std::path::PathBuf;
 
 use domain::tddd::catalogue::{
-    MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl,
+    EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl,
 };
 use domain::{
     ConfidenceSignal, ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
@@ -147,18 +147,36 @@ fn is_add_action(action: &TypeActionDto) -> bool {
     matches!(action, TypeActionDto::Add)
 }
 
+/// DTO for an enum variant declaration (used inside `MemberDeclarationDto::Variant`
+/// and in `TypeDefinitionKindDto::Enum` / `ErrorType`).
+///
+/// JSON shape: `{ "name": "SomeName", "payload_types": ["TypeA", "TypeB"] }`
+/// Unit variants carry an empty `payload_types` array.
+///
+/// No `#[serde(default)]` on `payload_types` — per CN-02 the codec is
+/// new-schema-only and rejects inputs that omit the field.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct EnumVariantDeclarationDto {
+    name: String,
+    payload_types: Vec<String>,
+}
+
 /// DTO for a single `MemberDeclaration` (enum variant or struct field).
 ///
 /// T003: Added to support `expected_members` in struct-based 9 kinds.
 /// Internally-tagged on `"kind"` to distinguish `"variant"` from `"field"`.
 ///
 /// JSON shapes:
-/// - variant: `{ "kind": "variant", "name": "SomeName" }`
+/// - variant: `{ "kind": "variant", "name": "SomeName", "payload_types": [] }`
 /// - field:   `{ "kind": "field", "name": "some_field", "ty": "SomeType" }`
+///
+/// No `#[serde(default)]` on `payload_types` — per CN-02 the codec is
+/// new-schema-only and rejects the old bare-name String form.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 enum MemberDeclarationDto {
-    Variant { name: String },
+    Variant { name: String, payload_types: Vec<String> },
     Field { name: String, ty: String },
 }
 
@@ -191,7 +209,7 @@ enum TypeDefinitionKindDto {
     },
     #[serde(rename = "enum")]
     Enum {
-        expected_variants: Vec<String>,
+        expected_variants: Vec<EnumVariantDeclarationDto>,
     },
     ValueObject {
         #[serde(default)]
@@ -199,7 +217,7 @@ enum TypeDefinitionKindDto {
         expected_methods: Vec<MethodDto>,
     },
     ErrorType {
-        expected_variants: Vec<String>,
+        expected_variants: Vec<EnumVariantDeclarationDto>,
     },
     /// Hexagonal secondary (driven) port — replaces `TraitPort`.
     SecondaryPort {
@@ -895,7 +913,8 @@ fn type_definition_kind_from_dto(
             })
         }
         TypeDefinitionKindDto::Enum { expected_variants } => {
-            Ok(TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() })
+            let evds = decode_enum_variant_list(entry_name, expected_variants)?;
+            Ok(TypeDefinitionKind::Enum { expected_variants: evds })
         }
         TypeDefinitionKindDto::ValueObject { expected_members, expected_methods } => {
             let members = decode_member_list(entry_name, expected_members)?;
@@ -906,7 +925,8 @@ fn type_definition_kind_from_dto(
             })
         }
         TypeDefinitionKindDto::ErrorType { expected_variants } => {
-            Ok(TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() })
+            let evds = decode_enum_variant_list(entry_name, expected_variants)?;
+            Ok(TypeDefinitionKind::ErrorType { expected_variants: evds })
         }
         TypeDefinitionKindDto::SecondaryPort { expected_methods } => {
             let decls = decode_method_list(entry_name, expected_methods)?;
@@ -1021,9 +1041,91 @@ fn decode_method_list(
     Ok(decls)
 }
 
+/// Decode a `Vec<EnumVariantDeclarationDto>` into `Vec<EnumVariantDeclaration>`.
+///
+/// L1 enforcement: variant names and `payload_types` strings must not contain `::`.
+fn decode_enum_variant_list(
+    entry_name: &str,
+    dtos: &[EnumVariantDeclarationDto],
+) -> Result<Vec<EnumVariantDeclaration>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(dtos.len());
+    for dto in dtos {
+        if dto.name.contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "expected_variants variant name contains '::' — L1 catalogue \
+                     entries must use last-segment short names: '{}'",
+                    dto.name
+                ),
+            });
+        }
+        for pt in &dto.payload_types {
+            if pt.contains("::") {
+                return Err(TypeCatalogueCodecError::InvalidEntry {
+                    name: entry_name.to_owned(),
+                    reason: format!(
+                        "expected_variants variant '{}' payload_type contains '::' — \
+                         L1 catalogue entries must use last-segment short names: '{pt}'",
+                        dto.name
+                    ),
+                });
+            }
+        }
+        out.push(
+            EnumVariantDeclaration::try_new(dto.name.clone(), dto.payload_types.clone()).map_err(
+                |e| TypeCatalogueCodecError::InvalidEntry {
+                    name: entry_name.to_owned(),
+                    reason: format!("expected_variants variant '{}': {}", dto.name, e),
+                },
+            )?,
+        );
+    }
+    Ok(out)
+}
+
+/// Encode a `Vec<EnumVariantDeclaration>` into `Vec<EnumVariantDeclarationDto>`.
+///
+/// L1 enforcement at encode time: mirrors `decode_enum_variant_list`.
+fn encode_enum_variant_list(
+    entry_name: &str,
+    evds: &[EnumVariantDeclaration],
+) -> Result<Vec<EnumVariantDeclarationDto>, TypeCatalogueCodecError> {
+    let mut out = Vec::with_capacity(evds.len());
+    for evd in evds {
+        let name = evd.name();
+        if name.contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "expected_variants variant name contains '::' — L1 catalogue \
+                     entries must use last-segment short names: '{name}'"
+                ),
+            });
+        }
+        for pt in evd.payload_types() {
+            if pt.contains("::") {
+                return Err(TypeCatalogueCodecError::InvalidEntry {
+                    name: entry_name.to_owned(),
+                    reason: format!(
+                        "expected_variants variant '{name}' payload_type contains '::' — \
+                         L1 catalogue entries must use last-segment short names: '{pt}'"
+                    ),
+                });
+            }
+        }
+        out.push(EnumVariantDeclarationDto {
+            name: name.to_owned(),
+            payload_types: evd.payload_types().to_vec(),
+        });
+    }
+    Ok(out)
+}
+
 /// Decode a `Vec<MemberDeclarationDto>` into `Vec<MemberDeclaration>`.
 ///
-/// L1 enforcement: member names and `Field.ty` must not contain `::` (last-segment only).
+/// L1 enforcement: member names, `Field.ty`, and `Variant.payload_types` strings
+/// must not contain `::` (last-segment only).
 fn decode_member_list(
     entry_name: &str,
     dtos: &[MemberDeclarationDto],
@@ -1031,7 +1133,7 @@ fn decode_member_list(
     let mut out = Vec::with_capacity(dtos.len());
     for m in dtos {
         match m {
-            MemberDeclarationDto::Variant { name } => {
+            MemberDeclarationDto::Variant { name, payload_types } => {
                 if name.contains("::") {
                     return Err(TypeCatalogueCodecError::InvalidEntry {
                         name: entry_name.to_owned(),
@@ -1041,7 +1143,23 @@ fn decode_member_list(
                         ),
                     });
                 }
-                out.push(MemberDeclaration::variant(name.clone()));
+                for pt in payload_types {
+                    if pt.contains("::") {
+                        return Err(TypeCatalogueCodecError::InvalidEntry {
+                            name: entry_name.to_owned(),
+                            reason: format!(
+                                "expected_members variant '{name}' payload_type contains '::' — \
+                                 L1 catalogue entries must use last-segment short names: '{pt}'"
+                            ),
+                        });
+                    }
+                }
+                let evd = EnumVariantDeclaration::try_new(name.clone(), payload_types.clone())
+                    .map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+                        name: entry_name.to_owned(),
+                        reason: format!("expected_members variant '{name}': {e}"),
+                    })?;
+                out.push(MemberDeclaration::Variant(evd));
             }
             MemberDeclarationDto::Field { name, ty } => {
                 if name.contains("::") {
@@ -1215,7 +1333,8 @@ fn type_catalogue_entry_to_dto(
                         .to_owned(),
                 });
             }
-            TypeDefinitionKindDto::Enum { expected_variants: expected_variants.clone() }
+            let dtos = encode_enum_variant_list(entry.name(), expected_variants)?;
+            TypeDefinitionKindDto::Enum { expected_variants: dtos }
         }
         TypeDefinitionKind::ValueObject { expected_members, expected_methods } => {
             let members = encode_member_list(entry.name(), expected_members)?;
@@ -1235,7 +1354,8 @@ fn type_catalogue_entry_to_dto(
                             .to_owned(),
                 });
             }
-            TypeDefinitionKindDto::ErrorType { expected_variants: expected_variants.clone() }
+            let dtos = encode_enum_variant_list(entry.name(), expected_variants)?;
+            TypeDefinitionKindDto::ErrorType { expected_variants: dtos }
         }
         TypeDefinitionKind::SecondaryPort { expected_methods } => {
             let dtos = encode_method_list(entry.name(), expected_methods)?;
@@ -1404,8 +1524,8 @@ fn encode_trait_impl_list(
 
 /// Encode a `Vec<MemberDeclaration>` into `Vec<MemberDeclarationDto>`.
 ///
-/// L1 enforcement at encode time: member names and `Field.ty` must not contain `::`
-/// (mirrors `decode_member_list`).
+/// L1 enforcement at encode time: member names, `Field.ty`, and
+/// `Variant.payload_types` strings must not contain `::` (mirrors `decode_member_list`).
 fn encode_member_list(
     entry_name: &str,
     members: &[MemberDeclaration],
@@ -1413,7 +1533,8 @@ fn encode_member_list(
     let mut out = Vec::with_capacity(members.len());
     for m in members {
         match m {
-            MemberDeclaration::Variant(name) => {
+            MemberDeclaration::Variant(evd) => {
+                let name = evd.name();
                 if name.contains("::") {
                     return Err(TypeCatalogueCodecError::InvalidEntry {
                         name: entry_name.to_owned(),
@@ -1423,7 +1544,21 @@ fn encode_member_list(
                         ),
                     });
                 }
-                out.push(MemberDeclarationDto::Variant { name: name.clone() });
+                for pt in evd.payload_types() {
+                    if pt.contains("::") {
+                        return Err(TypeCatalogueCodecError::InvalidEntry {
+                            name: entry_name.to_owned(),
+                            reason: format!(
+                                "expected_members variant '{name}' payload_type contains '::' — \
+                                 L1 catalogue entries must use last-segment short names: '{pt}'"
+                            ),
+                        });
+                    }
+                }
+                out.push(MemberDeclarationDto::Variant {
+                    name: name.to_owned(),
+                    payload_types: evd.payload_types().to_vec(),
+                });
             }
             MemberDeclaration::Field { name, ty } => {
                 if name.contains("::") {
@@ -1537,9 +1672,9 @@ mod tests {
   "type_definitions": [
     { "name": "Draft", "kind": "typestate", "description": "Draft state", "transitions_to": ["Published"], "expected_members": [], "expected_methods": [], "approved": true },
     { "name": "Published", "kind": "typestate", "description": "Published state", "transitions_to": [], "expected_members": [], "expected_methods": [], "approved": true },
-    { "name": "TrackStatus", "kind": "enum", "description": "Track status", "expected_variants": ["Planned", "Done"], "approved": true },
+    { "name": "TrackStatus", "kind": "enum", "description": "Track status", "expected_variants": [{"name": "Planned", "payload_types": []}, {"name": "Done", "payload_types": []}], "approved": true },
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "expected_members": [], "expected_methods": [], "approved": true },
-    { "name": "SchemaExportError", "kind": "error_type", "description": "Export error", "expected_variants": ["NightlyNotFound"], "approved": true },
+    { "name": "SchemaExportError", "kind": "error_type", "description": "Export error", "expected_variants": [{"name": "NightlyNotFound", "payload_types": []}], "approved": true },
     {
       "name": "SchemaExporter",
       "kind": "secondary_port",
@@ -1576,10 +1711,12 @@ mod tests {
     #[test]
     fn test_decode_enum_kind() {
         let doc = decode(FULL_JSON).unwrap();
-        assert!(matches!(
-            doc.entries()[2].kind(),
-            TypeDefinitionKind::Enum { expected_variants } if expected_variants == &["Planned", "Done"]
-        ));
+        let TypeDefinitionKind::Enum { expected_variants } = doc.entries()[2].kind() else {
+            panic!("expected Enum kind");
+        };
+        let names: Vec<&str> = expected_variants.iter().map(|v| v.name()).collect();
+        assert_eq!(names, vec!["Planned", "Done"]);
+        assert!(expected_variants.iter().all(|v| v.payload_types().is_empty()));
     }
 
     #[test]
@@ -1591,10 +1728,12 @@ mod tests {
     #[test]
     fn test_decode_error_type_kind() {
         let doc = decode(FULL_JSON).unwrap();
-        assert!(matches!(
-            doc.entries()[4].kind(),
-            TypeDefinitionKind::ErrorType { expected_variants } if expected_variants == &["NightlyNotFound"]
-        ));
+        let TypeDefinitionKind::ErrorType { expected_variants } = doc.entries()[4].kind() else {
+            panic!("expected ErrorType kind");
+        };
+        let names: Vec<&str> = expected_variants.iter().map(|v| v.name()).collect();
+        assert_eq!(names, vec!["NightlyNotFound"]);
+        assert!(expected_variants.iter().all(|v| v.payload_types().is_empty()));
     }
 
     #[test]
@@ -2275,9 +2414,9 @@ mod tests {
   "type_definitions": [
     { "name": "Draft", "kind": "typestate", "description": "typestate", "transitions_to": ["Published"], "expected_methods": [] },
     { "name": "Published", "kind": "typestate", "description": "typestate terminal", "transitions_to": [], "expected_methods": [] },
-    { "name": "TrackStatus", "kind": "enum", "description": "enum", "expected_variants": ["Planned", "Done"] },
+    { "name": "TrackStatus", "kind": "enum", "description": "enum", "expected_variants": [{"name": "Planned", "payload_types": []}, {"name": "Done", "payload_types": []}] },
     { "name": "TrackId", "kind": "value_object", "description": "value object", "expected_methods": [] },
-    { "name": "AppError", "kind": "error_type", "description": "error type", "expected_variants": ["NotFound"] },
+    { "name": "AppError", "kind": "error_type", "description": "error type", "expected_variants": [{"name": "NotFound", "payload_types": []}] },
     {
       "name": "TrackRepo",
       "kind": "secondary_port",
@@ -2361,7 +2500,34 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_enum_with_old_string_variant_format_rejected() {
+        // CN-02 / AC-04: the old `expected_variants: ["A", "B"]` (plain String array)
+        // must be rejected. The new schema requires structured objects
+        // `[{"name": "A", "payload_types": []}]`; serde fails with a Json error when
+        // it encounters a plain string where an `EnumVariantDeclarationDto` object is expected.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackStatus",
+      "kind": "enum",
+      "description": "enum with old string variant format",
+      "expected_variants": ["Planned", "Done"]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::Json(_)),
+            "expected Json error for old string-array expected_variants on enum, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
     fn test_decode_dto_with_stale_expected_variants_rejected() {
+        // Phase 1.5 guard rejects `expected_variants` on struct-based kinds
+        // (e.g. `dto`) before serde deserialization.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -2369,14 +2535,14 @@ mod tests {
       "name": "CreateUserDto",
       "kind": "dto",
       "description": "dto with stale field",
-      "expected_variants": ["A", "B"]
+      "expected_variants": [{"name": "A", "payload_types": []}]
     }
   ]
 }"#;
         let err = decode(json).unwrap_err();
         assert!(
             matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
-            "expected InvalidEntry for stale expected_variants on dto, got: {:?}",
+            "expected InvalidEntry for expected_variants on dto, got: {:?}",
             err
         );
     }
@@ -2645,7 +2811,7 @@ mod tests {
       "name": "TrackStatus",
       "kind": "enum",
       "description": "enum with stale implements field",
-      "expected_variants": ["Planned", "Done"],
+      "expected_variants": [{"name": "Planned", "payload_types": []}, {"name": "Done", "payload_types": []}],
       "implements": [{ "trait_name": "SomePort" }]
     }
   ]
@@ -3465,8 +3631,8 @@ mod tests {
 
     #[test]
     fn test_m1_struct_kinds_still_reject_expected_variants() {
-        // M1: struct-based kinds now allow expected_methods but must still NOT
-        // allow expected_variants (which belongs to enum/error_type only).
+        // M1: struct-based kinds (e.g. `dto`) must NOT allow `expected_variants`.
+        // Phase 1.5 guard fires before serde deserialization and returns InvalidEntry.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -3475,14 +3641,14 @@ mod tests {
       "kind": "dto",
       "description": "dto with stale expected_variants",
       "expected_methods": [],
-      "expected_variants": ["A", "B"]
+      "expected_variants": [{"name": "A", "payload_types": []}]
     }
   ]
 }"#;
         let err = decode(json).unwrap_err();
         assert!(
             matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
-            "expected InvalidEntry for stale expected_variants on dto, got: {err:?}"
+            "expected InvalidEntry for expected_variants on dto, got: {err:?}"
         );
     }
 
@@ -3523,6 +3689,129 @@ mod tests {
         assert!(
             matches!(err, TypeCatalogueCodecError::Json(_)),
             "expected Json error for missing expected_methods on dto, got: {err:?}"
+        );
+    }
+
+    // --- T004 (AC-04): EnumVariantDeclaration serde round-trip ---
+
+    #[test]
+    fn test_ac04_round_trip_enum_variant_with_payload_types_serializes_correct_shape() {
+        // AC-04: serde codec must serialize EnumVariantDeclaration to
+        // { "name": "...", "payload_types": [...] } form and round-trip back.
+        // Verifies both the expected_variants path (EnumVariantDeclarationDto) and
+        // that the encoded JSON contains the payload_types key explicitly.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Decision",
+      "kind": "enum",
+      "description": "ADR decision state enum",
+      "expected_variants": [
+        { "name": "Proposed",  "payload_types": ["ProposedDecision"] },
+        { "name": "Accepted",  "payload_types": ["AcceptedDecision", "AdrMetadata"] },
+        { "name": "Withdrawn", "payload_types": [] }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let TypeDefinitionKind::Enum { expected_variants } = doc.entries()[0].kind() else {
+            panic!("expected Enum kind");
+        };
+        assert_eq!(expected_variants.len(), 3);
+        assert_eq!(expected_variants[0].name(), "Proposed");
+        assert_eq!(expected_variants[0].payload_types(), &["ProposedDecision"]);
+        assert_eq!(expected_variants[1].name(), "Accepted");
+        assert_eq!(expected_variants[1].payload_types(), &["AcceptedDecision", "AdrMetadata"]);
+        assert_eq!(expected_variants[2].name(), "Withdrawn");
+        assert!(expected_variants[2].payload_types().is_empty());
+
+        let encoded = encode(&doc).unwrap();
+        // AC-04: the encoded JSON must carry the payload_types key.
+        assert!(
+            encoded.contains("\"payload_types\""),
+            "encoded JSON must contain \"payload_types\" key, got:\n{encoded}"
+        );
+        assert!(
+            encoded.contains("\"ProposedDecision\""),
+            "encoded JSON must preserve payload type string, got:\n{encoded}"
+        );
+
+        // Round-trip: decode the encoded JSON again and verify structural equality.
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_ac04_round_trip_member_declaration_variant_in_expected_members() {
+        // AC-04 / MemberDeclarationDto::Variant path: a struct-based kind carrying
+        // an expected_members entry with "kind": "variant" and payload_types must
+        // round-trip correctly through the MemberDeclarationDto serde codec.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "StatusWrapper",
+      "kind": "value_object",
+      "description": "wrapper that embeds a Variant member for codec coverage",
+      "expected_members": [
+        { "kind": "variant", "name": "Active", "payload_types": ["UserId"] },
+        { "kind": "field",   "name": "label", "ty": "String" }
+      ],
+      "expected_methods": []
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let TypeDefinitionKind::ValueObject { expected_members, .. } = doc.entries()[0].kind()
+        else {
+            panic!("expected ValueObject kind");
+        };
+        assert_eq!(expected_members.len(), 2);
+        // First member is a Variant with payload_types.
+        let MemberDeclaration::Variant(evd) = &expected_members[0] else {
+            panic!("expected MemberDeclaration::Variant");
+        };
+        assert_eq!(evd.name(), "Active");
+        assert_eq!(evd.payload_types(), &["UserId"]);
+
+        let encoded = encode(&doc).unwrap();
+        assert!(
+            encoded.contains("\"payload_types\""),
+            "encoded JSON must contain \"payload_types\" key, got:\n{encoded}"
+        );
+        assert!(
+            encoded.contains("\"UserId\""),
+            "encoded JSON must preserve payload type string, got:\n{encoded}"
+        );
+
+        // Round-trip stability.
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_ac04_enum_variant_missing_payload_types_field_rejected() {
+        // AC-04 / CN-02: no `#[serde(default)]` on `payload_types` — an enum variant
+        // object that omits the field must be rejected by the codec (new-schema-only).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Status",
+      "kind": "enum",
+      "description": "enum with variant missing payload_types",
+      "expected_variants": [
+        { "name": "Active" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::Json(_)),
+            "expected Json error for variant missing payload_types field, got: {err:?}"
         );
     }
 }

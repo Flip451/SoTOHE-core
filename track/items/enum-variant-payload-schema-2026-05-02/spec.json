@@ -1,0 +1,368 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "enum variant の payload 型を schema レベルで宣言可能にする — catalogue / TypeGraph / baseline / serde codec の 4 点同時拡張",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "MemberDeclaration::Variant を名前文字列のみの保持から EnumVariantDeclaration 構造体 (name + payload_types) への変更によって、Enum / ErrorType の各 variant が保持する payload 型を catalogue schema で宣言できるようにし、enum 型と payload 型がグラフ上で孤立する問題を解消する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "ADR 2026-04-26-0855 の Core invariant (catalogue schema 拡張 / TypeGraph schema 拡張 / baseline schema 拡張 / serde codec は同時に決め、同時に実装する) を発動させ、MemberDeclaration::Variant の schema 変更を 4 点同時に完結させることで照合可能性を構造的に保証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant"
+        },
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "Contract Map renderer と Reality View renderer の両方が enum variant の payload_types を参照して enum → payload type edge を描画できるようにし、設計意図の俯瞰 (Contract Map) と実装検証 (Reality View) の双方で variant 選択肢関係を可視化する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "catalogue schema 変更: libs/domain/src/tddd/catalogue.rs の MemberDeclaration::Variant(String) を MemberDeclaration::Variant(EnumVariantDeclaration) に変更する。EnumVariantDeclaration は name: String と payload_types: Vec<String> を持つ。unit variant は payload_types: [] で表現する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "TypeGraph schema 変更: TypeNode::members の MemberDeclaration::Variant が payload_types を保持できるよう TypeGraph 側の schema を拡張する。IN-01 の catalogue 変更と 1:1 対応させる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "Core invariant"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "baseline schema 変更: TypeBaselineEntry::members が変更後の MemberDeclaration::Variant (payload_types 付き) を capture できるよう baseline schema を拡張する。modify / delete action での diff 比較が成立することを確保する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+            "anchor": "Core invariant"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "serde codec 変更: MemberDeclaration::Variant の serde 表現を { \"name\": \"...\", \"payload_types\": [...] } 形式に変更する。新 schema 専用の codec とし、旧 schema (String 形式) を読む経路は持たない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "Contract Map renderer 拡張: catalogue の expected_variants[].payload_types の各 type token を type_index で resolve し、enum → payload type への edge を描画する。edge label は ::VariantName 形式とし、通常の field edge (.field_name) と区別する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "Reality View renderer 拡張: TypeNode::members の MemberDeclaration::Variant を走査し、payload_types に列挙された各 type token を resolve して enum → payload type への edge を描画する。ADR 2026-04-16-2200 D2 (b) の「variant 名のみ」制約はこの拡張によって上書きされる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "rustdoc JSON 解析の拡張: schema_export.rs::extract_enum_variants() (infrastructure 層) が rustdoc JSON から enum variant の payload 型情報を抽出し、MemberDeclarationDto::Variant の payload_types に格納するよう拡張する。build_type_graph はこの拡張済み SchemaExport を受け取り TypeGraph に payload_types を伝播させる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "過去 track の既存 catalogue の一括変換: 本 ADR 適用後に authored される新規 track の catalogue に新 schema を採用すれば足りる。旧 catalogue (expected_variants: [\"Variant\", ...] 形式) の retroactive 書き換えは行わない。プロジェクト方針として backward compat を持たない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "旧 schema を読む移行 codec の導入: 新 schema serde codec は旧 schema (String 形式) を読む経路を持たない。旧 catalogue を参照する場合は手動での読み替えが必要",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "struct 系 kind の expected_members / expected_methods に関する schema 変更: 本 ADR は MemberDeclaration::Variant の payload_types 拡張に限定する。struct フィールド宣言の変更は別 track (tddd-struct-kind-uniformization) の対象",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+            "anchor": "M1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "TypeDefinitionKind taxonomy の新規 variant 追加: Enum / ErrorType の expected_variants 構造変更に留まる。新 kind variant の追加は別 ADR の対象",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "struct variant (フィールド付き enum variant) の個別フィールド名宣言: payload_types は型文字列のリストのみを保持し、struct variant のフィールド名 (field_a: TypeA, field_b: TypeB) は本 ADR では宣言の対象外とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "catalogue schema / TypeGraph schema / baseline schema / serde codec の 4 点は同時に変更し、同時に完結させる。段階分離 (catalogue のみ先行など) は採らない。Core invariant (ADR 2026-04-26-0855) に従う",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "新 schema serde codec は旧 schema (MemberDeclaration::Variant(String)) を読む経路を持たない。後方互換を維持する移行 layer は導入しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "payload_types は Vec<String> とし、generic 引数を含む完全な型文字列のリストで宣言する。unit variant は payload_types: [] で表現する。単一 payload のみに制限しない (tuple variant の複数 payload に対応するため)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "両 renderer (Contract Map / Reality View) の edge label は ::VariantName 形式とし、通常の field edge (---|.field_name|) と意味論上区別できるようにする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "Reality View renderer の variant payload edge 描画は ADR 2026-04-16-2200 D2 (b) の「variant 名のみ」制約を上書きする。両 renderer は同じ意味論 (enum → payload type edge) を生成する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "rustdoc JSON から variant の payload 型情報を抽出する責務は infrastructure 層 (schema_export.rs::extract_enum_variants()) が持つ。domain 層は抽出ロジックを持たない (hexagonal architecture の layer 依存方向に従う)。build_type_graph は SchemaExport 経由でこの情報を受け取り TypeGraph に伝播させる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "libs/domain/src/tddd/catalogue.rs の MemberDeclaration::Variant が EnumVariantDeclaration 型の値を保持し、Enum { expected_variants: Vec<EnumVariantDeclaration> } および ErrorType { expected_variants: Vec<EnumVariantDeclaration> } がコンパイルを通る",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "TypeGraph schema (TypeNode::members) が変更後の MemberDeclaration::Variant (payload_types: Vec<String> を持つ) を保持できる。schema_export.rs::extract_enum_variants() が rustdoc JSON から variant payload 情報を抽出し、build_type_graph が SchemaExport 経由でそれを受け取り TypeGraph に格納する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "baseline schema (TypeBaselineEntry::members) が変更後の MemberDeclaration::Variant を capture できる。baseline capture コマンドが payload_types 情報を含む baseline JSON を書き出す",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "serde codec が EnumVariantDeclaration を { \"name\": \"...\", \"payload_types\": [...] } 形式で serialize / deserialize するラウンドトリップテストが通る。旧形式 (String のみ) を読む経路が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "Contract Map renderer が expected_variants[].payload_types を参照して enum → payload type edge を描画する。edge label が ::VariantName 形式で出力される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "Reality View renderer が TypeNode::members の MemberDeclaration::Variant の payload_types を走査して enum → payload type edge を描画する。edge label が ::VariantName 形式で出力される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass する。4 点同時変更 (catalogue / TypeGraph / baseline / serde codec) による既存テストへのリグレッションが存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-02-0316-enum-variant-payload-schema.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+          "anchor": "Core invariant"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Source Tag Types"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/type-designer-kind-selection.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 28,
+    "yellow": 0,
+    "red": 0
+  }
+}

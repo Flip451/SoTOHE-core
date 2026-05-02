@@ -139,9 +139,9 @@ mod tests {
             TypeNode::new(
                 TypeKind::Enum,
                 vec![
-                    MemberDeclaration::variant("Todo"),
-                    MemberDeclaration::variant("InProgress"),
-                    MemberDeclaration::variant("Done"),
+                    MemberDeclaration::unit_variant("Todo"),
+                    MemberDeclaration::unit_variant("InProgress"),
+                    MemberDeclaration::unit_variant("Done"),
                 ],
                 vec![unit_method("kind")],
                 HashSet::new(),
@@ -221,7 +221,7 @@ mod tests {
             "B".to_string(),
             TypeNode::new(
                 TypeKind::Enum,
-                vec![MemberDeclaration::variant("X")],
+                vec![MemberDeclaration::unit_variant("X")],
                 vec![],
                 HashSet::new(),
             ),

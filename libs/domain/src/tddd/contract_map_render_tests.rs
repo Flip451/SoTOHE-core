@@ -19,8 +19,8 @@ use std::collections::BTreeMap;
 use super::*;
 use crate::tddd::LayerId;
 use crate::tddd::catalogue::{
-    MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction, TypeCatalogueDocument,
-    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
+    EnumVariantDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction,
+    TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
 };
 use crate::tddd::contract_map_options::ContractMapRenderOptions;
 
@@ -1178,13 +1178,17 @@ fn test_methods_of_secondary_adapter_with_empty_implements_returns_top_level_onl
 
 #[test]
 fn test_methods_of_enum_returns_empty_vec() {
-    let kind = TypeDefinitionKind::Enum { expected_variants: vec!["A".to_owned()] };
+    let kind = TypeDefinitionKind::Enum {
+        expected_variants: vec![EnumVariantDeclaration::new("A", vec![])],
+    };
     assert_methods_of(&kind, &[]);
 }
 
 #[test]
 fn test_methods_of_error_type_returns_empty_vec() {
-    let kind = TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".to_owned()] };
+    let kind = TypeDefinitionKind::ErrorType {
+        expected_variants: vec![EnumVariantDeclaration::new("NotFound", vec![])],
+    };
     assert_methods_of(&kind, &[]);
 }
 
@@ -1573,5 +1577,138 @@ fn test_render_contract_map_with_reference_port_produces_impl_edge() {
             "L14_infrastructure_PostgresUserRepository -.impl.-> L6_domain_UserRepository"
         ),
         "Reference port must accept impl edge from SecondaryAdapter; output was:\n{text}"
+    );
+}
+
+// --- T002: Enum variant payload edges (ADR 2026-05-02-0316) ---
+
+#[test]
+fn test_render_contract_map_enum_payload_variant_emits_variant_name_edge() {
+    // Happy path: Enum entry with a payload variant whose payload type is
+    // declared in the catalogue → edge from the Enum node to the payload
+    // type node, labelled `::VariantName`.
+    let domain = layer("domain");
+
+    let enum_entry = entry(
+        "AppEvent",
+        TypeDefinitionKind::Enum {
+            expected_variants: vec![EnumVariantDeclaration::new(
+                "UserCreated",
+                vec!["UserId".to_owned()],
+            )],
+        },
+    );
+    let vo_entry = entry(
+        "UserId",
+        TypeDefinitionKind::ValueObject {
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![enum_entry, vo_entry]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        text.contains("L6_domain_AppEvent -->|\"::UserCreated\"| L6_domain_UserId"),
+        "Enum payload variant must emit ::VariantName edge to UserId; output was:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_unit_variant_emits_no_edge() {
+    // Unit variant (empty payload_types) must NOT produce any edge.
+    let domain = layer("domain");
+
+    let enum_entry = entry(
+        "Status",
+        TypeDefinitionKind::Enum {
+            expected_variants: vec![EnumVariantDeclaration::new("Active", vec![])],
+        },
+    );
+
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![enum_entry]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(!text.contains("-->|"), "Unit variant must emit no edge; output was:\n{text}");
+}
+
+#[test]
+fn test_render_contract_map_payload_type_not_in_type_index_emits_no_edge() {
+    // Payload type not declared in the catalogue must produce no edge
+    // (external / undeclared types are silently ignored).
+    let domain = layer("domain");
+
+    let enum_entry = entry(
+        "Result",
+        TypeDefinitionKind::Enum {
+            expected_variants: vec![EnumVariantDeclaration::new(
+                "Ok",
+                vec!["ExternalType".to_owned()],
+            )],
+        },
+    );
+
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![enum_entry]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        !text.contains("-->|"),
+        "Unresolved payload type must emit no edge; output was:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_error_type_variant_payload_emits_variant_name_edge() {
+    // ErrorType kind also emits variant payload edges (same treatment as Enum).
+    let domain = layer("domain");
+
+    let error_entry = entry(
+        "DomainError",
+        TypeDefinitionKind::ErrorType {
+            expected_variants: vec![EnumVariantDeclaration::new(
+                "NotFound",
+                vec!["UserId".to_owned()],
+            )],
+        },
+    );
+    let vo_entry = entry(
+        "UserId",
+        TypeDefinitionKind::ValueObject {
+            expected_members: Vec::new(),
+            expected_methods: Vec::new(),
+        },
+    );
+
+    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc(vec![error_entry, vo_entry]));
+
+    let content = render_contract_map(
+        &catalogues,
+        std::slice::from_ref(&domain),
+        &ContractMapRenderOptions::empty(),
+    );
+    let text = content.as_ref();
+    assert!(
+        text.contains("L6_domain_DomainError -->|\"::NotFound\"| L6_domain_UserId"),
+        "ErrorType payload variant must emit ::VariantName edge to UserId; output was:\n{text}"
     );
 }

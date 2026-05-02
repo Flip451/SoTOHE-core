@@ -19,7 +19,7 @@ use domain::schema::{
     TypeKind,
 };
 use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
-use rustdoc_types::{GenericArg, GenericArgs, ItemEnum, Type, Visibility};
+use rustdoc_types::{GenericArg, GenericArgs, ItemEnum, Type, Variant, VariantKind, Visibility};
 
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
 pub struct RustdocSchemaExporter {
@@ -38,7 +38,7 @@ impl SchemaExporter for RustdocSchemaExporter {
         check_nightly_available()?;
         let json_path = run_rustdoc(&self.workspace_root, crate_name)?;
         let krate = parse_rustdoc_json(&json_path)?;
-        Ok(build_schema_export(crate_name, &krate))
+        build_schema_export(crate_name, &krate)
     }
 }
 
@@ -140,7 +140,10 @@ fn parse_rustdoc_json(path: &Path) -> Result<rustdoc_types::Crate, SchemaExportE
         .map_err(|e| SchemaExportError::ParseFailed(format!("JSON parse error: {e}")))
 }
 
-fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> SchemaExport {
+fn build_schema_export(
+    crate_name: &str,
+    krate: &rustdoc_types::Crate,
+) -> Result<SchemaExport, SchemaExportError> {
     let mut types = Vec::new();
     let mut functions = Vec::new();
     let mut traits = Vec::new();
@@ -226,7 +229,12 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
                 types.push(ti);
             }
             ItemEnum::Enum(e) => {
-                let variants = extract_enum_variants(e, krate);
+                let variants = extract_enum_variants(e, krate).map_err(|msg| {
+                    SchemaExportError::ParseFailed(format!(
+                        "enum '{}' variant payload extraction failed: {}",
+                        name, msg
+                    ))
+                })?;
                 let ti = if let Some(mp) = module_path {
                     TypeInfo::with_module_path(
                         name,
@@ -287,14 +295,14 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
         a.target_type().cmp(b.target_type()).then_with(|| a.trait_name().cmp(&b.trait_name()))
     });
 
-    SchemaExport::with_trait_origins(
+    Ok(SchemaExport::with_trait_origins(
         crate_name.to_owned(),
         types,
         functions,
         traits,
         impls,
         trait_origins,
-    )
+    ))
 }
 
 /// Builds a map of trait def_path → defining crate name from rustdoc metadata.
@@ -407,16 +415,123 @@ fn extract_struct_fields(
 }
 
 /// Extract enum variants as `MemberDeclaration::Variant`.
+///
+/// Each variant's payload types are extracted from its `VariantKind`:
+/// - `Plain` → unit variant, empty payload
+/// - `Tuple(fields)` → tuple variant, payload types from struct-field items
+/// - `Struct { fields, .. }` → struct variant, payload types from struct-field items
+///
+/// # Errors
+/// Returns `Err(String)` when a variant has stripped (private/hidden) payload fields,
+/// since the resulting `payload_types` would be silently incomplete.
 fn extract_enum_variants(
     e: &rustdoc_types::Enum,
     krate: &rustdoc_types::Crate,
-) -> Vec<MemberDeclaration> {
-    e.variants
-        .iter()
-        .filter_map(|id| krate.index.get(id))
-        .filter_map(|item| item.name.clone())
-        .map(MemberDeclaration::variant)
-        .collect()
+) -> Result<Vec<MemberDeclaration>, String> {
+    let mut out = Vec::new();
+    for id in &e.variants {
+        let item = krate.index.get(id).ok_or_else(|| {
+            format!(
+                "enum variant id {id:?} not found in rustdoc index; \
+                 the exported JSON may be partial or stripped"
+            )
+        })?;
+        let name = item.name.clone().ok_or_else(|| {
+            format!(
+                "enum variant id {id:?} has no name in rustdoc index; \
+                 the exported JSON may be partial or stripped"
+            )
+        })?;
+        if let ItemEnum::Variant(v) = &item.inner {
+            let payload_types = extract_variant_payload_types(v, krate, &name)?;
+            out.push(MemberDeclaration::variant(name, payload_types));
+        } else {
+            return Err(format!(
+                "enum variant id {id:?} (name '{name}') resolves to non-Variant item; \
+                 the exported JSON may be malformed or partial — \
+                 payload extraction must be fail-closed (T001 ADR 2026-05-02-0316)"
+            ));
+        }
+    }
+    Ok(out)
+}
+
+/// Extract the payload type list from a single enum variant.
+///
+/// Unit variants (`Plain`) produce an empty `Vec`. Tuple and struct variants
+/// produce a `Vec` of L1 short-name type strings by looking up each field id
+/// in `krate.index` and formatting its `StructField` type via `format_type`.
+///
+/// # Errors
+/// Returns `Err(String)` (fail-closed) when:
+/// - A `Tuple` variant has a `None` slot — the corresponding field was stripped
+///   from the rustdoc JSON (private or `#[doc(hidden)]`), so the payload list
+///   would be silently shorter than the actual tuple arity.
+/// - A `Struct` variant has `has_stripped_fields == true` — one or more fields
+///   are hidden, so the field list is incomplete.
+fn extract_variant_payload_types(
+    v: &Variant,
+    krate: &rustdoc_types::Crate,
+    variant_name: &str,
+) -> Result<Vec<String>, String> {
+    match &v.kind {
+        VariantKind::Plain => Ok(vec![]),
+        VariantKind::Tuple(fields) => {
+            let mut out = Vec::with_capacity(fields.len());
+            for (i, opt_id) in fields.iter().enumerate() {
+                let id = opt_id.as_ref().ok_or_else(|| {
+                    format!(
+                        "variant '{}' tuple field at index {} is stripped (private/hidden); \
+                         payload_types would be incomplete",
+                        variant_name, i
+                    )
+                })?;
+                let item = krate.index.get(id).ok_or_else(|| {
+                    format!(
+                        "variant '{}' tuple field at index {} id not found in rustdoc index",
+                        variant_name, i
+                    )
+                })?;
+                if let ItemEnum::StructField(ty) = &item.inner {
+                    out.push(format_type(ty));
+                } else {
+                    return Err(format!(
+                        "variant '{}' tuple field at index {} is not a StructField in rustdoc \
+                         index",
+                        variant_name, i
+                    ));
+                }
+            }
+            Ok(out)
+        }
+        VariantKind::Struct { fields, has_stripped_fields } => {
+            if *has_stripped_fields {
+                return Err(format!(
+                    "variant '{}' struct has stripped fields; payload_types would be incomplete",
+                    variant_name
+                ));
+            }
+            let mut out = Vec::with_capacity(fields.len());
+            for (i, id) in fields.iter().enumerate() {
+                let item = krate.index.get(id).ok_or_else(|| {
+                    format!(
+                        "variant '{}' struct field at index {} id not found in rustdoc index",
+                        variant_name, i
+                    )
+                })?;
+                if let ItemEnum::StructField(ty) = &item.inner {
+                    out.push(format_type(ty));
+                } else {
+                    return Err(format!(
+                        "variant '{}' struct field at index {} is not a StructField in rustdoc \
+                         index",
+                        variant_name, i
+                    ));
+                }
+            }
+            Ok(out)
+        }
+    }
 }
 
 /// Extract the module path for a type from the rustdoc `paths` table.
@@ -986,6 +1101,54 @@ mod tests {
         let origins = build_trait_origins("my_crate", &krate);
         // Key is def_path "std::fmt::Display", not the short name "Display".
         assert_eq!(origins.get("std::fmt::Display"), Some(&"std".to_string()));
+    }
+
+    // --- T001 P0 fix (follow-up): extract_enum_variants fail-closed test ---
+
+    /// Verify `extract_enum_variants` returns `Err` (fail-closed) when an
+    /// entry in `krate.index` that is referenced as a variant id resolves to
+    /// a non-`ItemEnum::Variant` item (e.g. `ItemEnum::Impl`).
+    ///
+    /// The fix added an `else { return Err(...) }` branch to the match in
+    /// `extract_enum_variants`. This test proves the branch is in place and
+    /// fires before silently pushing garbage into the `out` vec.
+    #[test]
+    fn test_extract_enum_variants_fail_closed_on_non_variant_item() {
+        let variant_id = rustdoc_types::Id(1);
+
+        // Build a non-Variant item (an Impl) and override its id and name so
+        // `extract_enum_variants` can reach the inner-kind check rather than
+        // failing earlier on a missing name.
+        let (_impl_id, mut non_variant_item) = make_impl_item(1, "some::Trait", 99);
+        non_variant_item.id = variant_id;
+        non_variant_item.name = Some("FakeVariantName".to_owned());
+
+        let mut index = std::collections::HashMap::new();
+        index.insert(variant_id, non_variant_item);
+
+        let krate = minimal_krate(
+            index,
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        );
+
+        let fake_enum = rustdoc_types::Enum {
+            generics: rustdoc_types::Generics { params: vec![], where_predicates: vec![] },
+            has_stripped_variants: false,
+            variants: vec![variant_id],
+            impls: vec![],
+        };
+
+        let result = extract_enum_variants(&fake_enum, &krate);
+        assert!(
+            result.is_err(),
+            "extract_enum_variants must fail-closed when a variant id resolves to a non-Variant item"
+        );
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("non-Variant"),
+            "error message must mention 'non-Variant'; got: {msg}"
+        );
     }
 
     /// T006b: when two traits share the same short name both get separate entries keyed

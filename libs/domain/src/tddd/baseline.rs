@@ -383,9 +383,9 @@ mod tests {
         let entry = TypeBaselineEntry::new(
             TypeKind::Enum,
             vec![
-                MemberDeclaration::variant("Zebra"),
-                MemberDeclaration::variant("Alpha"),
-                MemberDeclaration::variant("Middle"),
+                MemberDeclaration::unit_variant("Zebra"),
+                MemberDeclaration::unit_variant("Alpha"),
+                MemberDeclaration::unit_variant("Middle"),
             ],
             vec![],
         );
@@ -408,12 +408,12 @@ mod tests {
     fn test_type_baseline_entry_structurally_equal_with_same_fields() {
         let a = TypeBaselineEntry::new(
             TypeKind::Enum,
-            vec![MemberDeclaration::variant("B"), MemberDeclaration::variant("A")],
+            vec![MemberDeclaration::unit_variant("B"), MemberDeclaration::unit_variant("A")],
             vec![unit_method("y"), unit_method("x")],
         );
         let b = TypeBaselineEntry::new(
             TypeKind::Enum,
-            vec![MemberDeclaration::variant("A"), MemberDeclaration::variant("B")],
+            vec![MemberDeclaration::unit_variant("A"), MemberDeclaration::unit_variant("B")],
             vec![unit_method("x"), unit_method("y")],
         );
         assert!(a.structurally_equal(&b));
@@ -428,10 +428,16 @@ mod tests {
 
     #[test]
     fn test_type_baseline_entry_not_equal_with_different_members() {
-        let a =
-            TypeBaselineEntry::new(TypeKind::Enum, vec![MemberDeclaration::variant("A")], vec![]);
-        let b =
-            TypeBaselineEntry::new(TypeKind::Enum, vec![MemberDeclaration::variant("B")], vec![]);
+        let a = TypeBaselineEntry::new(
+            TypeKind::Enum,
+            vec![MemberDeclaration::unit_variant("A")],
+            vec![],
+        );
+        let b = TypeBaselineEntry::new(
+            TypeKind::Enum,
+            vec![MemberDeclaration::unit_variant("B")],
+            vec![],
+        );
         assert!(!a.structurally_equal(&b));
     }
 
@@ -514,9 +520,9 @@ mod tests {
             TypeBaselineEntry::new(
                 TypeKind::Enum,
                 vec![
-                    MemberDeclaration::variant("Todo"),
-                    MemberDeclaration::variant("InProgress"),
-                    MemberDeclaration::variant("Done"),
+                    MemberDeclaration::unit_variant("Todo"),
+                    MemberDeclaration::unit_variant("InProgress"),
+                    MemberDeclaration::unit_variant("Done"),
                 ],
                 vec![MethodDeclaration::new(
                     "kind",
@@ -653,7 +659,7 @@ mod tests {
     fn test_type_baseline_entry_with_trait_impls_sorts_members() {
         let entry = TypeBaselineEntry::with_trait_impls(
             TypeKind::Enum,
-            vec![MemberDeclaration::variant("Z"), MemberDeclaration::variant("A")],
+            vec![MemberDeclaration::unit_variant("Z"), MemberDeclaration::unit_variant("A")],
             vec![],
             vec![],
         );

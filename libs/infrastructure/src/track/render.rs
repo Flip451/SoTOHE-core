@@ -1087,20 +1087,23 @@ pub fn sync_rendered_views(
                     }
                 }
             }
-
-            // Render `contract-map.md` alongside the per-layer views so it
-            // stays fresh on every track-transition / sync-views / pre-commit
-            // run — callers (especially reviewers) never see a stale
-            // declaration relationship diagram.
-            //
-            // Failure modes (loader error, empty catalogues, unknown layer)
-            // are non-fatal for this view: log to stderr and continue without
-            // aborting the wider sync. The authoritative fail-closed path for
-            // TDDD semantic correctness lives in
-            // `spec_states::evaluate_layer_catalogue` and the merge-gate
-            // adapter.
-            render_contract_map_view(root, &track_dir, track_id, &mut changed);
         } // end if !is_done_or_archived
+
+        // Render `contract-map.md` unconditionally (outside the done/archived
+        // guard) so the declaration relationship diagram stays fresh even after
+        // a track reaches `done`.  The `!is_done_or_archived` block protects
+        // frozen views whose content is strictly derived from the phase-2 type
+        // design artefacts (`spec.md`, `<layer>-types.md`).  `contract-map.md`
+        // is a *rendered graph* derived from all catalogue data and the
+        // implementation renderer — it must reflect the final post-implementation
+        // state, which may differ from the state captured while the track was
+        // still `in_progress`.
+        //
+        // Failure modes (loader error, empty catalogues, unknown layer)
+        // are non-fatal: log to stderr and leave the existing file untouched.
+        // The authoritative fail-closed gate lives in
+        // `spec_states::evaluate_layer_catalogue` and the merge-gate adapter.
+        render_contract_map_view(root, &track_dir, track_id, &mut changed);
     }
 
     if let Some(parent) = registry_path.parent() {
@@ -3518,5 +3521,113 @@ mod tests {
         let msg = err.to_string();
         assert!(msg.contains("not found"), "not-found error expected, got: {msg}");
         assert!(msg.contains("sotp track catalogue-spec-signals"), "remediation missing: {msg}");
+    }
+
+    // ---------------------------------------------------------------------------
+    // PR follow-up: contract-map.md renders for done tracks
+    // (Issue 2: orphan-node regression — render_contract_map_view was inside
+    // the !is_done_or_archived guard, so a done track never got its contract-map
+    // refreshed after the T002 variant-payload edge renderer was committed)
+    // ---------------------------------------------------------------------------
+
+    /// Minimal arch rules with only domain layer (sufficient for the contract-map E2E path).
+    const ARCH_RULES_DOMAIN_ONLY: &str = r#"{
+      "layers": [
+        {
+          "crate": "domain",
+          "path": "libs/domain",
+          "may_depend_on": [],
+          "deny_reason": "no reverse dep",
+          "tddd": {
+            "enabled": true,
+            "catalogue_file": "domain-types.json",
+            "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+          }
+        }
+      ]
+    }"#;
+
+    /// Catalogue containing `MemberDeclaration` (enum with `Variant` arm → payload
+    /// `EnumVariantDeclaration`) and `EnumVariantDeclaration` (value_object).
+    /// Mirrors the production data that produced the "0 edges" bug in the track.
+    const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
+      "schema_version": 2,
+      "type_definitions": [
+        {
+          "name": "EnumVariantDeclaration",
+          "description": "Holds variant name and payload types.",
+          "approved": true,
+          "kind": "value_object",
+          "expected_members": [],
+          "expected_methods": []
+        },
+        {
+          "name": "MemberDeclaration",
+          "description": "Enum variant or struct field.",
+          "approved": true,
+          "kind": "enum",
+          "expected_variants": [
+            {"name": "Variant", "payload_types": ["EnumVariantDeclaration"]},
+            {"name": "Field",   "payload_types": ["String", "String"]}
+          ]
+        }
+      ]
+    }"#;
+
+    #[test]
+    fn sync_rendered_views_renders_contract_map_for_done_track() {
+        // Regression guard for the "0-edge orphan" bug:
+        // `render_contract_map_view` was inside the `!is_done_or_archived`
+        // block, so a track that reached `done` status never had its
+        // contract-map regenerated after the T002 variant-payload edge
+        // renderer was committed.  The fix moves the call outside the guard.
+        //
+        // This test proves that:
+        // 1. `sync_rendered_views` produces a `contract-map.md` even when the
+        //    track status is `done` (all tasks in impl-plan.json are done).
+        // 2. The rendered contract-map contains the variant payload edge
+        //    `MemberDeclaration -->|"::Variant"| EnumVariantDeclaration`.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-done-cmap");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // architecture-rules.json — required by FsCatalogueLoader inside
+        // `render_contract_map_view`.
+        std::fs::write(dir.path().join("architecture-rules.json"), ARCH_RULES_DOMAIN_ONLY).unwrap();
+
+        // v5 metadata (no status field — status derived from impl-plan.json).
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json("track-done-cmap", "done", "2026-03-10T00:00:00Z", "[]"),
+        )
+        .unwrap();
+
+        // impl-plan.json: single done task → derive_track_status() == Done.
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{"schema_version":1,"tasks":[{"id":"T001","description":"Done","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"All","task_ids":["T001"]}]}}"#,
+        )
+        .unwrap();
+
+        // domain-types.json with enum entries carrying variant payload edges.
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_WITH_ENUM_VARIANTS)
+            .unwrap();
+
+        let changed = sync_rendered_views(dir.path(), Some("track-done-cmap")).unwrap();
+
+        // contract-map.md must appear in the changed set (first-time generation).
+        assert!(
+            changed.iter().any(|p| p.ends_with("contract-map.md")),
+            "contract-map.md must be rendered for done tracks; changed: {changed:?}"
+        );
+
+        // The rendered contract-map must contain the variant payload edge.
+        let cmap = std::fs::read_to_string(track_dir.join("contract-map.md")).unwrap();
+        assert!(
+            cmap.contains(
+                "L6_domain_MemberDeclaration -->|\"::Variant\"| L6_domain_EnumVariantDeclaration"
+            ),
+            "variant payload edge must appear in contract-map.md for done track; got:\n{cmap}"
+        );
     }
 }
