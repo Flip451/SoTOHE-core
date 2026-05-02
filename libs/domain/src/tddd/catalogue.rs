@@ -180,39 +180,21 @@ impl MethodDeclaration {
 // Identifier validation helpers (module-private)
 // ---------------------------------------------------------------------------
 
-/// Rust strict and reserved keywords that are illegal as enum variant names.
-///
-/// Source: The Rust Reference § "Keywords" (strict + reserved keyword lists).
-/// Raw identifiers (`r#fn`, etc.) are not used in L1 catalogue names, so we
-/// only reject the bare keyword form.
-const RUST_KEYWORDS: &[&str] = &[
-    // Strict keywords
-    "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
-    "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
-    "self", "Self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where",
-    "while", // 2018+ strict keywords
-    "async", "await", "dyn", // Reserved keywords
-    "abstract", "become", "box", "do", "final", "macro", "override", "priv", "typeof", "unsized",
-    "virtual", "yield", // 2018+ reserved
-    "try",   // Contextual / weak keywords that are reserved in enum-variant position
-    "union",
-];
-
 /// Returns `true` if `s` is a syntactically valid Rust enum-variant identifier.
 ///
 /// Rules applied:
 /// - Matches `[a-zA-Z_][a-zA-Z0-9_]*` (ASCII-only subset of the Rust identifier grammar).
 /// - Rejects the bare wildcard `"_"` which is a placeholder in Rust and cannot serve as a
 ///   meaningful enum-variant name.
-/// - Rejects Rust strict and reserved keywords which cannot be used as identifiers.
+///
+/// Keyword names are accepted because rustdoc strips the `r#` prefix from raw identifiers
+/// (e.g. `r#type` is exported as `"type"`), so rejecting keywords would create false
+/// contract mismatches against valid Rust enums that use raw identifiers as variant names.
 ///
 /// Rust also permits XID_Continue Unicode characters in identifiers, but catalogue entries
 /// always use ASCII-only L1 names so ASCII-only checking is the correct invariant here.
 fn is_valid_rust_identifier(s: &str) -> bool {
     if s == "_" {
-        return false;
-    }
-    if RUST_KEYWORDS.contains(&s) {
         return false;
     }
     let mut chars = s.chars();
@@ -1216,22 +1198,17 @@ mod tests {
         assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
     }
 
+    /// rustdoc strips `r#` from raw-identifier variant names (e.g. `r#type` → `"type"`),
+    /// so keyword strings must be accepted as valid variant names. Otherwise valid
+    /// Rust enums using raw identifiers would create false contract mismatches.
     #[test]
-    fn test_enum_variant_declaration_try_new_with_keyword_fn_returns_invalid_error() {
-        let result = EnumVariantDeclaration::try_new("fn", vec![]);
-        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
-    }
-
-    #[test]
-    fn test_enum_variant_declaration_try_new_with_keyword_type_returns_invalid_error() {
-        let result = EnumVariantDeclaration::try_new("type", vec![]);
-        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
-    }
-
-    #[test]
-    fn test_enum_variant_declaration_try_new_with_keyword_union_returns_invalid_error() {
-        let result = EnumVariantDeclaration::try_new("union", vec![]);
-        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
+    fn test_enum_variant_declaration_try_new_with_rust_keyword_succeeds() {
+        for kw in ["fn", "type", "union", "match", "where"] {
+            let evd = EnumVariantDeclaration::try_new(kw, vec![]).unwrap_or_else(|e| {
+                panic!("keyword '{kw}' must be accepted (raw-identifier): {e}")
+            });
+            assert_eq!(evd.name(), kw);
+        }
     }
 
     #[test]
