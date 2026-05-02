@@ -19,7 +19,7 @@
     {
       "id": "T004",
       "description": "Test update and CI gate: (a) update any existing snapshot fixtures or unit tests in catalogue.rs, catalogue_codec.rs, baseline_codec.rs, schema_export_codec.rs, schema_export_tests.rs that reference MemberDeclaration::Variant(String) to use the new EnumVariantDeclaration form; update decode round-trip tests to use { \"kind\": \"variant\", \"name\": \"...\", \"payload_types\": [...] } JSON form and verify that the old String-only form is rejected by the codec (CN-02 no-backward-compat); (b) add a serde round-trip test for EnumVariantDeclaration serializing to { \"name\": \"...\", \"payload_types\": [...] }; (c) verify cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes with zero regressions from the 4-point schema change",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {

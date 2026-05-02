@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # enum variant の payload 型を schema レベルで宣言可能にする — catalogue / TypeGraph / baseline / serde codec の 4 点同時拡張
 
-## Tasks (3/4 resolved)
+## Tasks (4/4 resolved)
 
 ### S1 — Schema 4-point simultaneous change + rustdoc payload extraction
 
@@ -40,4 +40,4 @@
 > The CI gate cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) is the final enforcement: it must pass with zero regressions from the 4-point schema change introduced in T001-T003.
 > T004 depends on T001-T003 and is the final task in the track.
 
-- [ ] **T004**: Test update and CI gate: (a) update any existing snapshot fixtures or unit tests in catalogue.rs, catalogue_codec.rs, baseline_codec.rs, schema_export_codec.rs, schema_export_tests.rs that reference MemberDeclaration::Variant(String) to use the new EnumVariantDeclaration form; update decode round-trip tests to use { "kind": "variant", "name": "...", "payload_types": [...] } JSON form and verify that the old String-only form is rejected by the codec (CN-02 no-backward-compat); (b) add a serde round-trip test for EnumVariantDeclaration serializing to { "name": "...", "payload_types": [...] }; (c) verify cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes with zero regressions from the 4-point schema change
+- [x] **T004**: Test update and CI gate: (a) update any existing snapshot fixtures or unit tests in catalogue.rs, catalogue_codec.rs, baseline_codec.rs, schema_export_codec.rs, schema_export_tests.rs that reference MemberDeclaration::Variant(String) to use the new EnumVariantDeclaration form; update decode round-trip tests to use { "kind": "variant", "name": "...", "payload_types": [...] } JSON form and verify that the old String-only form is rejected by the codec (CN-02 no-backward-compat); (b) add a serde round-trip test for EnumVariantDeclaration serializing to { "name": "...", "payload_types": [...] }; (c) verify cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) passes with zero regressions from the 4-point schema change

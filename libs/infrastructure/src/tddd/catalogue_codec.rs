@@ -3691,4 +3691,127 @@ mod tests {
             "expected Json error for missing expected_methods on dto, got: {err:?}"
         );
     }
+
+    // --- T004 (AC-04): EnumVariantDeclaration serde round-trip ---
+
+    #[test]
+    fn test_ac04_round_trip_enum_variant_with_payload_types_serializes_correct_shape() {
+        // AC-04: serde codec must serialize EnumVariantDeclaration to
+        // { "name": "...", "payload_types": [...] } form and round-trip back.
+        // Verifies both the expected_variants path (EnumVariantDeclarationDto) and
+        // that the encoded JSON contains the payload_types key explicitly.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Decision",
+      "kind": "enum",
+      "description": "ADR decision state enum",
+      "expected_variants": [
+        { "name": "Proposed",  "payload_types": ["ProposedDecision"] },
+        { "name": "Accepted",  "payload_types": ["AcceptedDecision", "AdrMetadata"] },
+        { "name": "Withdrawn", "payload_types": [] }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let TypeDefinitionKind::Enum { expected_variants } = doc.entries()[0].kind() else {
+            panic!("expected Enum kind");
+        };
+        assert_eq!(expected_variants.len(), 3);
+        assert_eq!(expected_variants[0].name(), "Proposed");
+        assert_eq!(expected_variants[0].payload_types(), &["ProposedDecision"]);
+        assert_eq!(expected_variants[1].name(), "Accepted");
+        assert_eq!(expected_variants[1].payload_types(), &["AcceptedDecision", "AdrMetadata"]);
+        assert_eq!(expected_variants[2].name(), "Withdrawn");
+        assert!(expected_variants[2].payload_types().is_empty());
+
+        let encoded = encode(&doc).unwrap();
+        // AC-04: the encoded JSON must carry the payload_types key.
+        assert!(
+            encoded.contains("\"payload_types\""),
+            "encoded JSON must contain \"payload_types\" key, got:\n{encoded}"
+        );
+        assert!(
+            encoded.contains("\"ProposedDecision\""),
+            "encoded JSON must preserve payload type string, got:\n{encoded}"
+        );
+
+        // Round-trip: decode the encoded JSON again and verify structural equality.
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_ac04_round_trip_member_declaration_variant_in_expected_members() {
+        // AC-04 / MemberDeclarationDto::Variant path: a struct-based kind carrying
+        // an expected_members entry with "kind": "variant" and payload_types must
+        // round-trip correctly through the MemberDeclarationDto serde codec.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "StatusWrapper",
+      "kind": "value_object",
+      "description": "wrapper that embeds a Variant member for codec coverage",
+      "expected_members": [
+        { "kind": "variant", "name": "Active", "payload_types": ["UserId"] },
+        { "kind": "field",   "name": "label", "ty": "String" }
+      ],
+      "expected_methods": []
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let TypeDefinitionKind::ValueObject { expected_members, .. } = doc.entries()[0].kind()
+        else {
+            panic!("expected ValueObject kind");
+        };
+        assert_eq!(expected_members.len(), 2);
+        // First member is a Variant with payload_types.
+        let MemberDeclaration::Variant(evd) = &expected_members[0] else {
+            panic!("expected MemberDeclaration::Variant");
+        };
+        assert_eq!(evd.name(), "Active");
+        assert_eq!(evd.payload_types(), &["UserId"]);
+
+        let encoded = encode(&doc).unwrap();
+        assert!(
+            encoded.contains("\"payload_types\""),
+            "encoded JSON must contain \"payload_types\" key, got:\n{encoded}"
+        );
+        assert!(
+            encoded.contains("\"UserId\""),
+            "encoded JSON must preserve payload type string, got:\n{encoded}"
+        );
+
+        // Round-trip stability.
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+    }
+
+    #[test]
+    fn test_ac04_enum_variant_missing_payload_types_field_rejected() {
+        // AC-04 / CN-02: no `#[serde(default)]` on `payload_types` — an enum variant
+        // object that omits the field must be rejected by the codec (new-schema-only).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Status",
+      "kind": "enum",
+      "description": "enum with variant missing payload_types",
+      "expected_variants": [
+        { "name": "Active" }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::Json(_)),
+            "expected Json error for variant missing payload_types field, got: {err:?}"
+        );
+    }
 }
