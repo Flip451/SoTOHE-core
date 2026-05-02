@@ -344,7 +344,7 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
             if expected_variants.is_empty() {
                 "\u{2014}".to_owned()
             } else {
-                expected_variants.join(", ")
+                expected_variants.iter().map(|v| v.name()).collect::<Vec<_>>().join(", ")
             }
         }
         TypeDefinitionKind::SecondaryPort { expected_methods }
@@ -391,7 +391,8 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
     use domain::{
-        ConfidenceSignal, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
+        ConfidenceSignal, EnumVariantDeclaration, TypeCatalogueDocument, TypeCatalogueEntry,
+        TypeDefinitionKind, TypeSignal,
     };
 
     use super::*;
@@ -578,7 +579,12 @@ mod tests {
     fn test_render_enum_entry_row() {
         let entry = make_entry(
             "TrackStatus",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Planned".into(), "Done".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![
+                    EnumVariantDeclaration::new("Planned", vec![]),
+                    EnumVariantDeclaration::new("Done", vec![]),
+                ],
+            },
         );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
@@ -604,7 +610,9 @@ mod tests {
     fn test_render_error_type_entry_row() {
         let entry = make_entry(
             "SchemaExportError",
-            TypeDefinitionKind::ErrorType { expected_variants: vec!["NightlyNotFound".into()] },
+            TypeDefinitionKind::ErrorType {
+                expected_variants: vec![EnumVariantDeclaration::new("NightlyNotFound", vec![])],
+            },
         );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc, "domain-types.json", None);
@@ -755,7 +763,10 @@ mod tests {
             make_entry(
                 "TrackStatus",
                 TypeDefinitionKind::Enum {
-                    expected_variants: vec!["Planned".into(), "Done".into()],
+                    expected_variants: vec![
+                        EnumVariantDeclaration::new("Planned", vec![]),
+                        EnumVariantDeclaration::new("Done", vec![]),
+                    ],
                 },
             ),
             make_entry(
@@ -767,7 +778,9 @@ mod tests {
             ),
             make_entry(
                 "AppError",
-                TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+                TypeDefinitionKind::ErrorType {
+                    expected_variants: vec![EnumVariantDeclaration::new("NotFound", vec![])],
+                },
             ),
             make_entry(
                 "TrackRepo",
@@ -966,7 +979,9 @@ mod tests {
             ),
             make_entry(
                 "TrackStatus",
-                TypeDefinitionKind::Enum { expected_variants: vec!["Planned".into()] },
+                TypeDefinitionKind::Enum {
+                    expected_variants: vec![EnumVariantDeclaration::new("Planned", vec![])],
+                },
             ),
             make_entry(
                 "TrackId",
@@ -1226,7 +1241,12 @@ mod tests {
         let enum_entry = TypeCatalogueEntry::new(
             "SameName",
             "enum entry",
-            TypeDefinitionKind::Enum { expected_variants: vec!["A".into(), "B".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![
+                    EnumVariantDeclaration::new("A", vec![]),
+                    EnumVariantDeclaration::new("B", vec![]),
+                ],
+            },
             TypeAction::Add,
             true,
         )

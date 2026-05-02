@@ -19,8 +19,8 @@ use std::collections::BTreeMap;
 use super::*;
 use crate::tddd::LayerId;
 use crate::tddd::catalogue::{
-    MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction, TypeCatalogueDocument,
-    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
+    EnumVariantDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction,
+    TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
 };
 use crate::tddd::contract_map_options::ContractMapRenderOptions;
 
@@ -1178,13 +1178,17 @@ fn test_methods_of_secondary_adapter_with_empty_implements_returns_top_level_onl
 
 #[test]
 fn test_methods_of_enum_returns_empty_vec() {
-    let kind = TypeDefinitionKind::Enum { expected_variants: vec!["A".to_owned()] };
+    let kind = TypeDefinitionKind::Enum {
+        expected_variants: vec![EnumVariantDeclaration::new("A", vec![])],
+    };
     assert_methods_of(&kind, &[]);
 }
 
 #[test]
 fn test_methods_of_error_type_returns_empty_vec() {
-    let kind = TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".to_owned()] };
+    let kind = TypeDefinitionKind::ErrorType {
+        expected_variants: vec![EnumVariantDeclaration::new("NotFound", vec![])],
+    };
     assert_methods_of(&kind, &[]);
 }
 

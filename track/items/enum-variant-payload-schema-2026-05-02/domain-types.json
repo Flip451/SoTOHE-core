@@ -34,13 +34,24 @@
     },
     {
       "name": "MemberDeclaration",
-      "description": "A member of a composite type: either an enum variant (name + payload_types via EnumVariantDeclaration) or a struct field (name + type string). The Variant arm is changed from Variant(String) to Variant(EnumVariantDeclaration) to support payload_types. NOTE: expected_variants listed in pre-migration string form; after IN-04 codec migration these will be EnumVariantDeclaration objects.",
+      "description": "A member of a composite type: either an enum variant (name + payload_types via EnumVariantDeclaration) or a struct field (name + type string). The Variant arm is changed from Variant(String) to Variant(EnumVariantDeclaration) to support payload_types.",
       "approved": true,
       "action": "modify",
       "kind": "enum",
       "expected_variants": [
-        "Variant",
-        "Field"
+        {
+          "name": "Variant",
+          "payload_types": [
+            "EnumVariantDeclaration"
+          ]
+        },
+        {
+          "name": "Field",
+          "payload_types": [
+            "String",
+            "String"
+          ]
+        }
       ],
       "spec_refs": [
         {
@@ -52,6 +63,188 @@
           "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
           "anchor": "CN-03",
           "hash": "254e028a9cc8cb5c9f84a640b27627f01e86197614eab10890a47cee8390311f"
+        }
+      ]
+    },
+    {
+      "name": "SpecValidationError",
+      "description": "Validation error type for spec document construction. Extended with EmptyVariantName (returned by EnumVariantDeclaration::try_new when the variant name is empty or whitespace-only).",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        {
+          "name": "DuplicateElementId",
+          "payload_types": [
+            "String"
+          ]
+        },
+        {
+          "name": "EmptyDomainStateName",
+          "payload_types": []
+        },
+        {
+          "name": "EmptyRequirementText",
+          "payload_types": []
+        },
+        {
+          "name": "EmptySectionTitle",
+          "payload_types": []
+        },
+        {
+          "name": "EmptyTitle",
+          "payload_types": []
+        },
+        {
+          "name": "EmptyVariantName",
+          "payload_types": []
+        },
+        {
+          "name": "EmptyVersion",
+          "payload_types": []
+        },
+        {
+          "name": "MissingElementId",
+          "payload_types": []
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "IN-01",
+          "hash": "077cbdaafaa740ebe9586bada32b191146d39600f72c356ba84142b604bb9ca8"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "AC-01",
+          "hash": "27ec43f202c31f7fcd8b31f528b1942414dd2e725c63132367037a2c1604afd1"
+        }
+      ]
+    },
+    {
+      "name": "TypeDefinitionKind",
+      "description": "Enum classifying a type-catalogue entry by structural role. Enum and ErrorType variants changed from Vec<String> (old string-form) to Vec<EnumVariantDeclaration> (structured payload schema, IN-01/AC-01).",
+      "approved": true,
+      "action": "modify",
+      "kind": "enum",
+      "expected_variants": [
+        {
+          "name": "ApplicationService",
+          "payload_types": [
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "Command",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "DomainService",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "Dto",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "Enum",
+          "payload_types": [
+            "Vec<EnumVariantDeclaration>"
+          ]
+        },
+        {
+          "name": "ErrorType",
+          "payload_types": [
+            "Vec<EnumVariantDeclaration>"
+          ]
+        },
+        {
+          "name": "Factory",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "FreeFunction",
+          "payload_types": [
+            "Option<String>",
+            "Vec<ParamDeclaration>",
+            "Vec<String>",
+            "bool"
+          ]
+        },
+        {
+          "name": "Interactor",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<String>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "Query",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "SecondaryAdapter",
+          "payload_types": [
+            "Vec<TraitImplDecl>",
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "SecondaryPort",
+          "payload_types": [
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "Typestate",
+          "payload_types": [
+            "TypestateTransitions",
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "UseCase",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        },
+        {
+          "name": "ValueObject",
+          "payload_types": [
+            "Vec<MemberDeclaration>",
+            "Vec<MethodDeclaration>"
+          ]
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "IN-01",
+          "hash": "077cbdaafaa740ebe9586bada32b191146d39600f72c356ba84142b604bb9ca8"
+        },
+        {
+          "file": "track/items/enum-variant-payload-schema-2026-05-02/spec.json",
+          "anchor": "AC-01",
+          "hash": "27ec43f202c31f7fcd8b31f528b1942414dd2e725c63132367037a2c1604afd1"
         }
       ]
     },

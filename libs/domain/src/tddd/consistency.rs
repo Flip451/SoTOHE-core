@@ -692,7 +692,7 @@ mod tests {
     /// by treating each as an enum variant (field/variant name is the only
     /// thing the tests below inspect).
     fn variants(names: &[&str]) -> Vec<MemberDeclaration> {
-        names.iter().copied().map(MemberDeclaration::variant).collect()
+        names.iter().copied().map(MemberDeclaration::unit_variant).collect()
     }
 
     fn empty_baseline() -> TypeBaseline {

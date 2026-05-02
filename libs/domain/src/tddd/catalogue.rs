@@ -177,35 +177,181 @@ impl MethodDeclaration {
 }
 
 // ---------------------------------------------------------------------------
+// Identifier validation helpers (module-private)
+// ---------------------------------------------------------------------------
+
+/// Rust strict and reserved keywords that are illegal as enum variant names.
+///
+/// Source: The Rust Reference § "Keywords" (strict + reserved keyword lists).
+/// Raw identifiers (`r#fn`, etc.) are not used in L1 catalogue names, so we
+/// only reject the bare keyword form.
+const RUST_KEYWORDS: &[&str] = &[
+    // Strict keywords
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
+    "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
+    "self", "Self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where",
+    "while", // 2018+ strict keywords
+    "async", "await", "dyn", // Reserved keywords
+    "abstract", "become", "box", "do", "final", "macro", "override", "priv", "typeof", "unsized",
+    "virtual", "yield", // 2018+ reserved
+    "try",   // Contextual / weak keywords that are reserved in enum-variant position
+    "union",
+];
+
+/// Returns `true` if `s` is a syntactically valid Rust enum-variant identifier.
+///
+/// Rules applied:
+/// - Matches `[a-zA-Z_][a-zA-Z0-9_]*` (ASCII-only subset of the Rust identifier grammar).
+/// - Rejects the bare wildcard `"_"` which is a placeholder in Rust and cannot serve as a
+///   meaningful enum-variant name.
+/// - Rejects Rust strict and reserved keywords which cannot be used as identifiers.
+///
+/// Rust also permits XID_Continue Unicode characters in identifiers, but catalogue entries
+/// always use ASCII-only L1 names so ASCII-only checking is the correct invariant here.
+fn is_valid_rust_identifier(s: &str) -> bool {
+    if s == "_" {
+        return false;
+    }
+    if RUST_KEYWORDS.contains(&s) {
+        return false;
+    }
+    let mut chars = s.chars();
+    match chars.next() {
+        None => false,
+        Some(first) => {
+            (first.is_ascii_alphabetic() || first == '_')
+                && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// EnumVariantDeclaration — enum variant with optional payload types
+// ---------------------------------------------------------------------------
+
+/// An enum variant declaration capturing the variant name and its payload
+/// type strings at L1 resolution.
+///
+/// `payload_types` holds the complete type strings (generic arguments included)
+/// for each field in the variant payload:
+/// - Tuple variant `Foo(Bar, Baz)` → `payload_types: ["Bar", "Baz"]`
+/// - Struct variant `Foo { x: Bar }` → `payload_types: ["Bar"]`
+/// - Unit variant `Foo` → `payload_types: []`
+///
+/// Type strings use last-segment short names; module paths containing `::`
+/// are rejected by codec validation (L1 invariant, CN-03).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnumVariantDeclaration {
+    name: String,
+    payload_types: Vec<String>,
+}
+
+impl EnumVariantDeclaration {
+    /// Creates a new `EnumVariantDeclaration`, validating that `name` is a
+    /// syntactically valid Rust identifier and that each entry in `payload_types`
+    /// follows the L1 short-name convention (no `::` module path separators).
+    ///
+    /// A valid variant name matches `[a-zA-Z_][a-zA-Z0-9_]*` — no spaces,
+    /// no path separators (`::`) and no other punctuation that cannot appear
+    /// in a real Rust enum variant.
+    ///
+    /// Prefer this constructor in application / test code to enforce the domain
+    /// invariants that a variant name must identify a real Rust variant and that
+    /// type strings must use L1 last-segment short names (CN-03).
+    ///
+    /// # Errors
+    ///
+    /// Returns `SpecValidationError::EmptyVariantName` if `name` is empty or
+    /// contains only whitespace.
+    ///
+    /// Returns `SpecValidationError::InvalidVariantName` if `name` is non-empty
+    /// but fails the Rust-identifier character rules.
+    ///
+    /// Returns `SpecValidationError::InvalidPayloadType` if any `payload_types` entry
+    /// is empty, contains only whitespace, or contains `::` (module path separator,
+    /// violates CN-03 L1 invariant).
+    pub fn try_new(
+        name: impl Into<String>,
+        payload_types: Vec<String>,
+    ) -> Result<Self, SpecValidationError> {
+        let name = name.into();
+        if name.trim().is_empty() {
+            return Err(SpecValidationError::EmptyVariantName);
+        }
+        if !is_valid_rust_identifier(&name) {
+            return Err(SpecValidationError::InvalidVariantName(name));
+        }
+        for pt in &payload_types {
+            // Reject empty, whitespace-only, strings with leading/trailing whitespace, and
+            // strings with '::' module path separators (CN-03 L1 invariant).
+            if pt.trim().is_empty() || pt.as_str() != pt.trim() || pt.contains("::") {
+                return Err(SpecValidationError::InvalidPayloadType(pt.clone()));
+            }
+        }
+        Ok(Self { name, payload_types })
+    }
+
+    /// Creates a new `EnumVariantDeclaration` without name validation.
+    ///
+    /// **Prefer `try_new` in new call sites.** This infallible variant exists
+    /// for codec and render paths that have already validated the name upstream
+    /// (e.g. `catalogue_codec` rejects empty names at the JSON boundary).
+    /// Passing an empty or whitespace-only name produces a value that violates
+    /// the domain invariant.
+    #[must_use]
+    pub fn new(name: impl Into<String>, payload_types: Vec<String>) -> Self {
+        Self { name: name.into(), payload_types }
+    }
+
+    /// Returns the variant name.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Returns the payload type strings (empty for unit variants).
+    #[must_use]
+    pub fn payload_types(&self) -> &[String] {
+        &self.payload_types
+    }
+}
+
+// ---------------------------------------------------------------------------
 // MemberDeclaration — composite type member (enum variant or struct field)
 // ---------------------------------------------------------------------------
 
-/// A member of a composite type: either an enum variant (name only) or a
-/// struct field (name + type string).
+/// A member of a composite type: either an enum variant (name + payload types)
+/// or a struct field (name + type string).
 ///
 /// **Enum-first design** (see `.claude/rules/04-coding-principles.md` § Enum-first):
-/// the two states carry structurally distinct data — a variant has only a name
-/// while a field has a name and a type string. A `struct { name, ty: Option<String> }`
-/// shape would allow the illegal `Field { ty: None }` state; the enum shape
-/// prevents it at compile time.
+/// the two states carry structurally distinct data — a variant has a name and
+/// payload types while a field has a name and a type string. A
+/// `struct { name, ty: Option<String> }` shape would allow the illegal
+/// `Field { ty: None }` state; the enum shape prevents it at compile time.
 ///
-/// Type strings (on `Field`) follow the same L1 convention as
-/// `MethodDeclaration`: last-segment short names, generics preserved verbatim.
-/// Module paths containing `::` are rejected by codec validation.
+/// Type strings (on `Field` and in `Variant.payload_types`) follow the same L1
+/// convention as `MethodDeclaration`: last-segment short names, generics preserved
+/// verbatim. Module paths containing `::` are rejected by codec validation.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MemberDeclaration {
-    /// An enum variant: only a name is tracked at L1 (payload types are
-    /// out of scope until L2).
-    Variant(String),
+    /// An enum variant: name + payload type strings at L1 resolution.
+    /// Unit variants carry an empty `payload_types` vec.
+    Variant(EnumVariantDeclaration),
     /// A struct field with its type string.
     Field { name: String, ty: String },
 }
 
 impl MemberDeclaration {
-    /// Creates a new enum-variant member.
+    /// Creates a new enum-variant member with the given payload types.
     #[must_use]
-    pub fn variant(name: impl Into<String>) -> Self {
-        Self::Variant(name.into())
+    pub fn variant(name: impl Into<String>, payload_types: Vec<String>) -> Self {
+        Self::Variant(EnumVariantDeclaration::new(name, payload_types))
+    }
+
+    /// Creates a new unit enum-variant member (no payload).
+    #[must_use]
+    pub fn unit_variant(name: impl Into<String>) -> Self {
+        Self::Variant(EnumVariantDeclaration::new(name, Vec::new()))
     }
 
     /// Creates a new struct-field member.
@@ -218,7 +364,7 @@ impl MemberDeclaration {
     #[must_use]
     pub fn name(&self) -> &str {
         match self {
-            Self::Variant(name) => name,
+            Self::Variant(evd) => evd.name(),
             Self::Field { name, .. } => name,
         }
     }
@@ -367,8 +513,8 @@ pub enum TypeDefinitionKind {
         expected_methods: Vec<MethodDeclaration>,
     },
     /// A `pub enum` with a fixed set of variants.
-    /// `expected_variants` lists the names that must appear.
-    Enum { expected_variants: Vec<String> },
+    /// `expected_variants` lists the variant declarations that must appear.
+    Enum { expected_variants: Vec<EnumVariantDeclaration> },
     /// A newtype or small struct used solely as a validated value.
     ///
     /// `expected_members` lists the struct fields. `expected_methods` is
@@ -380,8 +526,8 @@ pub enum TypeDefinitionKind {
         expected_methods: Vec<MethodDeclaration>,
     },
     /// An `enum` used exclusively as an error type.
-    /// `expected_variants` lists the variants that must appear.
-    ErrorType { expected_variants: Vec<String> },
+    /// `expected_variants` lists the variant declarations that must appear.
+    ErrorType { expected_variants: Vec<EnumVariantDeclaration> },
     /// A `pub trait` that defines a hexagonal secondary (driven/infrastructure) port boundary.
     ///
     /// `expected_methods` holds the full L1 method signatures that the trait
@@ -1017,10 +1163,146 @@ mod tests {
         assert_eq!(entry.kind().kind_tag(), "value_object");
     }
 
+    // --- EnumVariantDeclaration ---
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_valid_name_succeeds() {
+        let evd = EnumVariantDeclaration::try_new("Active", vec![]).unwrap();
+        assert_eq!(evd.name(), "Active");
+        assert!(evd.payload_types().is_empty());
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_payload_types_succeeds() {
+        let evd =
+            EnumVariantDeclaration::try_new("Wrap", vec!["String".into(), "u32".into()]).unwrap();
+        assert_eq!(evd.name(), "Wrap");
+        assert_eq!(evd.payload_types(), &["String", "u32"]);
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_empty_name_returns_error() {
+        let result = EnumVariantDeclaration::try_new("", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::EmptyVariantName)));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_whitespace_name_returns_error() {
+        let result = EnumVariantDeclaration::try_new("   ", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::EmptyVariantName)));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_space_in_name_returns_invalid_error() {
+        let result = EnumVariantDeclaration::try_new("Foo Bar", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_path_separator_returns_invalid_error() {
+        let result = EnumVariantDeclaration::try_new("Foo::Bar", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_underscore_prefix_succeeds() {
+        let evd = EnumVariantDeclaration::try_new("_Private", vec![]).unwrap();
+        assert_eq!(evd.name(), "_Private");
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_bare_underscore_returns_invalid_error() {
+        let result = EnumVariantDeclaration::try_new("_", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_keyword_fn_returns_invalid_error() {
+        let result = EnumVariantDeclaration::try_new("fn", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_keyword_type_returns_invalid_error() {
+        let result = EnumVariantDeclaration::try_new("type", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_keyword_union_returns_invalid_error() {
+        let result = EnumVariantDeclaration::try_new("union", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidVariantName(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_module_path_payload_type_returns_error() {
+        let result = EnumVariantDeclaration::try_new("Wrap", vec!["domain::UserId".into()]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidPayloadType(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_valid_payload_type_succeeds() {
+        let evd = EnumVariantDeclaration::try_new("Wrap", vec!["UserId".into()]).unwrap();
+        assert_eq!(evd.payload_types(), &["UserId"]);
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_empty_payload_type_returns_error() {
+        let result = EnumVariantDeclaration::try_new("Wrap", vec!["".into()]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidPayloadType(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_whitespace_payload_type_returns_error() {
+        let result = EnumVariantDeclaration::try_new("Wrap", vec!["  ".into()]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidPayloadType(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_leading_whitespace_payload_type_returns_error() {
+        let result = EnumVariantDeclaration::try_new("Wrap", vec![" UserId".into()]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidPayloadType(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_trailing_whitespace_payload_type_returns_error() {
+        let result = EnumVariantDeclaration::try_new("Wrap", vec!["UserId ".into()]);
+        assert!(matches!(result, Err(SpecValidationError::InvalidPayloadType(_))));
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_generic_payload_type_succeeds() {
+        // Generic payload types like "Vec<String>" or "Result<User, DomainError>" are valid.
+        let evd = EnumVariantDeclaration::try_new("Wrap", vec!["Result<User, DomainError>".into()])
+            .unwrap();
+        assert_eq!(evd.payload_types(), &["Result<User, DomainError>"]);
+    }
+
+    #[test]
+    fn test_enum_variant_declaration_try_new_with_alphanumeric_name_succeeds() {
+        let evd = EnumVariantDeclaration::try_new("State1", vec![]).unwrap();
+        assert_eq!(evd.name(), "State1");
+    }
+
+    #[test]
+    fn test_member_declaration_variant_constructor_with_payload_types() {
+        let m = MemberDeclaration::variant("Wrap", vec!["i64".into()]);
+        assert_eq!(m.name(), "Wrap");
+        assert!(m.ty().is_none());
+        if let MemberDeclaration::Variant(evd) = &m {
+            assert_eq!(evd.payload_types(), &["i64"]);
+        } else {
+            panic!("expected Variant");
+        }
+    }
+
     #[test]
     fn test_type_catalogue_entry_enum_kind_with_variants() {
         let kind = TypeDefinitionKind::Enum {
-            expected_variants: vec!["Active".into(), "Inactive".into()],
+            expected_variants: vec![
+                EnumVariantDeclaration::new("Active", vec![]),
+                EnumVariantDeclaration::new("Inactive", vec![]),
+            ],
         };
         let entry = TypeCatalogueEntry::new(
             "Status",
@@ -1037,7 +1319,10 @@ mod tests {
     #[test]
     fn test_type_catalogue_entry_error_type_kind() {
         let kind = TypeDefinitionKind::ErrorType {
-            expected_variants: vec!["NotFound".into(), "InvalidInput".into()],
+            expected_variants: vec![
+                EnumVariantDeclaration::new("NotFound", vec![]),
+                EnumVariantDeclaration::new("InvalidInput", vec![]),
+            ],
         };
         let entry = TypeCatalogueEntry::new(
             "DomainError",
@@ -1249,13 +1534,13 @@ mod tests {
                 expected_methods: Vec::new(),
             }
             .kind_tag(),
-            TypeDefinitionKind::Enum { expected_variants: vec![] }.kind_tag(),
+            TypeDefinitionKind::Enum { expected_variants: Vec::new() }.kind_tag(),
             TypeDefinitionKind::ValueObject {
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             }
             .kind_tag(),
-            TypeDefinitionKind::ErrorType { expected_variants: vec![] }.kind_tag(),
+            TypeDefinitionKind::ErrorType { expected_variants: Vec::new() }.kind_tag(),
             TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }.kind_tag(),
             TypeDefinitionKind::ApplicationService { expected_methods: vec![] }.kind_tag(),
             TypeDefinitionKind::UseCase {
@@ -1484,7 +1769,9 @@ mod tests {
         let enum_entry = TypeCatalogueEntry::new(
             "Status",
             "Status enum",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![EnumVariantDeclaration::new("Active", vec![])],
+            },
             TypeAction::Add,
             true,
         )

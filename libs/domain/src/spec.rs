@@ -586,6 +586,19 @@ pub enum SpecValidationError {
     MissingElementId,
     #[error("duplicate element id '{0}' — ids must be unique across all requirement sections")]
     DuplicateElementId(String),
+    #[error("enum variant name must not be empty or whitespace")]
+    EmptyVariantName,
+    #[error(
+        "enum variant name '{0}' is not a valid Rust identifier \
+         (must match [a-zA-Z_][a-zA-Z0-9_]*)"
+    )]
+    InvalidVariantName(String),
+    #[error(
+        "enum variant payload type '{0}' is invalid — \
+         it must be a non-empty type string without '::' module paths \
+         (L1 catalogue entries use last-segment short names, e.g. 'UserId' not 'domain::UserId')"
+    )]
+    InvalidPayloadType(String),
 }
 
 // ---------------------------------------------------------------------------

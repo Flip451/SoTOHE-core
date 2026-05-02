@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cf3e9179de0d390144bba43749afba0f5efe5ca005d891e8ec93332a10f35f95",
+  "catalogue_declaration_hash": "9585a4480e9dc9784d390cb42b24267418c900012dfe1b1d8772655a98a58bf6",
   "signals": [
+    {
+      "type_name": "BaselineCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MemberDeclarationDto",
+      "signal": "blue"
+    },
     {
       "type_name": "build_type_graph",
       "signal": "blue"

@@ -1,13 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-01T19:24:43Z",
-  "declaration_hash": "0b9c2247bec419858fbe5fb0d546b000e59c5bde147d56413facad0d32704923",
+  "generated_at": "2026-05-02T01:24:42Z",
+  "declaration_hash": "8087539edc3a7e82bfaf4e0be09bedaa5cbe51278d12193aaac84cc9276f50f1",
   "signals": [
     {
       "type_name": "EnumVariantDeclaration",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "name: String",
+        "payload_types: Vec<String>"
+      ]
     },
     {
       "type_name": "MemberDeclaration",
@@ -17,6 +21,49 @@
       "found_items": [
         "Field",
         "Variant"
+      ]
+    },
+    {
+      "type_name": "SpecValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "DuplicateElementId",
+        "EmptyDomainStateName",
+        "EmptyRequirementText",
+        "EmptySectionTitle",
+        "EmptyTitle",
+        "EmptyVariantName",
+        "EmptyVersion",
+        "MissingElementId"
+      ],
+      "extra_items": [
+        "InvalidPayloadType",
+        "InvalidVariantName"
+      ]
+    },
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ApplicationService",
+        "Command",
+        "DomainService",
+        "Dto",
+        "Enum",
+        "ErrorType",
+        "Factory",
+        "FreeFunction",
+        "Interactor",
+        "Query",
+        "SecondaryAdapter",
+        "SecondaryPort",
+        "Typestate",
+        "UseCase",
+        "ValueObject"
       ]
     },
     {

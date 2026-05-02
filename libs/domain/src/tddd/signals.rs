@@ -27,8 +27,8 @@ use std::collections::{HashMap, HashSet};
 use crate::ConfidenceSignal;
 use crate::schema::{FunctionNode, TypeGraph, TypeKind};
 use crate::tddd::catalogue::{
-    MemberDeclaration, ParamDeclaration, TraitImplDecl, TypeAction, TypeCatalogueEntry,
-    TypeDefinitionKind, TypeSignal, TypestateTransitions,
+    EnumVariantDeclaration, MemberDeclaration, ParamDeclaration, TraitImplDecl, TypeAction,
+    TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
 };
 
 // ---------------------------------------------------------------------------
@@ -439,7 +439,7 @@ fn evaluate_typestate(
 fn evaluate_enum(
     name: &str,
     kind_tag: &str,
-    expected_variants: &[String],
+    expected_variants: &[EnumVariantDeclaration],
     profile: &TypeGraph,
     action: TypeAction,
 ) -> TypeSignal {
@@ -449,26 +449,49 @@ fn evaluate_enum(
     };
     if *code_type.kind() != TypeKind::Enum {
         // Type exists but wrong kind — always Red (structural contract violation).
+        let missing: Vec<String> = expected_variants.iter().map(|v| v.name().to_string()).collect();
         return TypeSignal::new(
             name,
             kind_tag,
             ConfidenceSignal::Red,
             true,
             vec![],
-            expected_variants.to_vec(),
+            missing,
             vec![],
         );
     }
 
-    let code_variants: HashSet<&str> = code_type.members().iter().map(|m| m.name()).collect();
-    let spec_variants: HashSet<&str> = expected_variants.iter().map(|s| s.as_str()).collect();
+    // Build a name→payload_types map from code members so we can compare payloads.
+    let code_variant_map: std::collections::HashMap<&str, &[String]> = code_type
+        .members()
+        .iter()
+        .filter_map(|m| match m {
+            MemberDeclaration::Variant(evd) => Some((evd.name(), evd.payload_types())),
+            MemberDeclaration::Field { .. } => None,
+        })
+        .collect();
 
-    let mut missing: Vec<String> =
-        spec_variants.difference(&code_variants).map(|s| s.to_string()).collect();
+    let code_variant_names: HashSet<&str> = code_variant_map.keys().copied().collect();
+    let spec_variant_names: HashSet<&str> = expected_variants.iter().map(|v| v.name()).collect();
+
+    let mut found = Vec::new();
+    let mut missing = Vec::new();
+
+    for spec_v in expected_variants {
+        if let Some(&code_payloads) = code_variant_map.get(spec_v.name()) {
+            if spec_v.payload_types() == code_payloads {
+                found.push(spec_v.name().to_string());
+            } else {
+                // Name matches but payload types differ — forward miss.
+                missing.push(format!("{}({})", spec_v.name(), spec_v.payload_types().join(", ")));
+            }
+        } else {
+            missing.push(spec_v.name().to_string());
+        }
+    }
+
     let mut extra: Vec<String> =
-        code_variants.difference(&spec_variants).map(|s| s.to_string()).collect();
-    let mut found: Vec<String> =
-        spec_variants.intersection(&code_variants).map(|s| s.to_string()).collect();
+        code_variant_names.difference(&spec_variant_names).map(|s| s.to_string()).collect();
     missing.sort();
     extra.sort();
     found.sort();
@@ -533,7 +556,7 @@ fn evaluate_struct_with_members(
 fn evaluate_error_type(
     name: &str,
     kind_tag: &str,
-    expected_variants: &[String],
+    expected_variants: &[EnumVariantDeclaration],
     profile: &TypeGraph,
     action: TypeAction,
 ) -> TypeSignal {
@@ -543,35 +566,53 @@ fn evaluate_error_type(
     };
     if *code_type.kind() != TypeKind::Enum {
         // Type exists but wrong kind — always Red (structural contract violation).
+        let missing: Vec<String> = expected_variants.iter().map(|v| v.name().to_string()).collect();
         return TypeSignal::new(
             name,
             kind_tag,
             ConfidenceSignal::Red,
             true,
             vec![],
-            expected_variants.to_vec(),
+            missing,
             vec![],
         );
     }
 
-    let code_variants: HashSet<&str> = code_type.members().iter().map(|m| m.name()).collect();
-    let spec_variants: HashSet<&str> = expected_variants.iter().map(|s| s.as_str()).collect();
+    // Build a name→payload_types map from code members so we can compare payloads.
+    let code_variant_map: std::collections::HashMap<&str, &[String]> = code_type
+        .members()
+        .iter()
+        .filter_map(|m| match m {
+            MemberDeclaration::Variant(evd) => Some((evd.name(), evd.payload_types())),
+            MemberDeclaration::Field { .. } => None,
+        })
+        .collect();
+
+    let code_variant_names: HashSet<&str> = code_variant_map.keys().copied().collect();
+    let spec_variant_names: HashSet<&str> = expected_variants.iter().map(|v| v.name()).collect();
 
     let mut found = Vec::new();
     let mut missing = Vec::new();
-    for v in expected_variants {
-        if code_variants.contains(v.as_str()) {
-            found.push(v.clone());
+    for spec_v in expected_variants {
+        if let Some(&code_payloads) = code_variant_map.get(spec_v.name()) {
+            if spec_v.payload_types() == code_payloads {
+                found.push(spec_v.name().to_string());
+            } else {
+                // Name matches but payload types differ — forward miss.
+                missing.push(format!("{}({})", spec_v.name(), spec_v.payload_types().join(", ")));
+            }
         } else {
-            missing.push(v.clone());
+            missing.push(spec_v.name().to_string());
         }
     }
 
     // Reverse check — any code variant not declared in spec is extra.
     // Note: when expected_variants is empty, all code variants are extra.
     let mut extra: Vec<String> =
-        code_variants.difference(&spec_variants).map(|s| s.to_string()).collect();
+        code_variant_names.difference(&spec_variant_names).map(|s| s.to_string()).collect();
     extra.sort();
+    missing.sort();
+    found.sort();
 
     let signal = if missing.is_empty() && extra.is_empty() {
         ConfidenceSignal::Blue
@@ -862,9 +903,18 @@ fn evaluate_members_check(
         let decl_name = decl.name();
         let matched = code_members.iter().find(|c| c.name() == decl_name);
         match (decl, matched) {
-            // Variant: only name must match.
-            (MemberDeclaration::Variant(_), Some(_)) => {
-                found.push(decl_name.to_string());
+            // Variant: name + payload_types must match.
+            (MemberDeclaration::Variant(spec_evd), Some(MemberDeclaration::Variant(code_evd))) => {
+                if spec_evd.payload_types() == code_evd.payload_types() {
+                    found.push(decl_name.to_string());
+                } else {
+                    // Name matches but payload types differ — forward miss.
+                    missing.push(format!("{}({})", decl_name, spec_evd.payload_types().join(", ")));
+                }
+            }
+            // Variant declared in spec but code has non-Variant member with that name.
+            (MemberDeclaration::Variant(spec_evd), Some(_)) => {
+                missing.push(format!("{}({})", decl_name, spec_evd.payload_types().join(", ")));
             }
             // Field: name + ty must match.
             (MemberDeclaration::Field { ty: decl_ty, .. }, Some(code_m)) => {
@@ -878,7 +928,14 @@ fn evaluate_members_check(
             // Not found in code.
             _ => {
                 let label = match decl {
-                    MemberDeclaration::Variant(_) => decl_name.to_string(),
+                    MemberDeclaration::Variant(evd) => {
+                        let pts = evd.payload_types();
+                        if pts.is_empty() {
+                            decl_name.to_string()
+                        } else {
+                            format!("{}({})", decl_name, pts.join(", "))
+                        }
+                    }
                     MemberDeclaration::Field { ty, .. } => format!("{}: {}", decl_name, ty),
                 };
                 missing.push(label);
@@ -892,7 +949,7 @@ fn evaluate_members_check(
         .iter()
         .filter(|c| !declared_names.contains(c.name()))
         .map(|c| match c {
-            MemberDeclaration::Variant(n) => n.clone(),
+            MemberDeclaration::Variant(evd) => evd.name().to_string(),
             MemberDeclaration::Field { name, ty } => format!("{}: {}", name, ty),
         })
         .collect();
@@ -1232,7 +1289,25 @@ mod tests {
             name.to_string(),
             TypeNode::new(
                 TypeKind::Enum,
-                variants.iter().copied().map(MemberDeclaration::variant).collect(),
+                variants.iter().copied().map(MemberDeclaration::unit_variant).collect(),
+                vec![],
+                HashSet::new(),
+            ),
+        );
+        TypeGraph::new(types, HashMap::new())
+    }
+
+    /// Build a `TypeGraph` with a single enum type and given full `EnumVariantDeclaration`s.
+    fn make_profile_with_enum_variants(
+        name: &str,
+        variants: Vec<EnumVariantDeclaration>,
+    ) -> TypeGraph {
+        let mut types = HashMap::new();
+        types.insert(
+            name.to_string(),
+            TypeNode::new(
+                TypeKind::Enum,
+                variants.into_iter().map(MemberDeclaration::Variant).collect(),
                 vec![],
                 HashSet::new(),
             ),
@@ -1478,7 +1553,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Status",
             "desc",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![EnumVariantDeclaration::new("Active", vec![])],
+            },
             TypeAction::Add,
             true,
         )
@@ -1495,7 +1572,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "DomainError",
             "desc",
-            TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeDefinitionKind::ErrorType {
+                expected_variants: vec![EnumVariantDeclaration::new("NotFound", vec![])],
+            },
             TypeAction::Add,
             true,
         )
@@ -1513,7 +1592,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "DomainError",
             "desc",
-            TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeDefinitionKind::ErrorType {
+                expected_variants: vec![EnumVariantDeclaration::new("NotFound", vec![])],
+            },
             TypeAction::Add,
             true,
         )
@@ -1531,7 +1612,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "DomainError",
             "desc",
-            TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeDefinitionKind::ErrorType {
+                expected_variants: vec![EnumVariantDeclaration::new("NotFound", vec![])],
+            },
             TypeAction::Modify,
             true,
         )
@@ -1549,7 +1632,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "DomainError",
             "desc",
-            TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeDefinitionKind::ErrorType {
+                expected_variants: vec![EnumVariantDeclaration::new("NotFound", vec![])],
+            },
             TypeAction::Reference,
             true,
         )
@@ -1566,7 +1651,12 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Status",
             "desc",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into(), "Done".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![
+                    EnumVariantDeclaration::new("Active", vec![]),
+                    EnumVariantDeclaration::new("Done", vec![]),
+                ],
+            },
             TypeAction::Add,
             true,
         )
@@ -1574,6 +1664,68 @@ mod tests {
         let profile = make_profile_with_enum("Status", &["Active", "Done"]);
         let results = evaluate_type_signals(&[entry], &profile, &HashSet::new());
         assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_enum_blue_when_payload_types_match() {
+        // Spec declares Wrap(String) — code has the same Wrap(String).
+        let spec_variant = EnumVariantDeclaration::new("Wrap", vec!["String".into()]);
+        let entry = TypeCatalogueEntry::new(
+            "Wrapper",
+            "desc",
+            TypeDefinitionKind::Enum { expected_variants: vec![spec_variant] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let code_variant = EnumVariantDeclaration::new("Wrap", vec!["String".into()]);
+        let profile = make_profile_with_enum_variants("Wrapper", vec![code_variant]);
+        let results = evaluate_type_signals(&[entry], &profile, &HashSet::new());
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_enum_yellow_when_payload_types_differ() {
+        // Spec declares Wrap(String) but code has Wrap(u32) — payload mismatch → forward miss → Yellow.
+        let spec_variant = EnumVariantDeclaration::new("Wrap", vec!["String".into()]);
+        let entry = TypeCatalogueEntry::new(
+            "Wrapper",
+            "desc",
+            TypeDefinitionKind::Enum { expected_variants: vec![spec_variant] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let code_variant = EnumVariantDeclaration::new("Wrap", vec!["u32".into()]);
+        let profile = make_profile_with_enum_variants("Wrapper", vec![code_variant]);
+        let results = evaluate_type_signals(&[entry], &profile, &HashSet::new());
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(
+            results.first().unwrap().missing_items().iter().any(|m| m.contains("Wrap")),
+            "payload mismatch should appear in missing items"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_error_type_yellow_when_payload_types_differ() {
+        // Spec declares InvalidInput(String) but code has InvalidInput(u32) → forward miss → Yellow.
+        let spec_variant = EnumVariantDeclaration::new("InvalidInput", vec!["String".into()]);
+        let entry = TypeCatalogueEntry::new(
+            "DomainError",
+            "desc",
+            TypeDefinitionKind::ErrorType { expected_variants: vec![spec_variant] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let code_variant = EnumVariantDeclaration::new("InvalidInput", vec!["u32".into()]);
+        let profile = make_profile_with_enum_variants("DomainError", vec![code_variant]);
+        let results = evaluate_type_signals(&[entry], &profile, &HashSet::new());
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(
+            results.first().unwrap().missing_items().iter().any(|m| m.contains("InvalidInput")),
+            "payload mismatch should appear in missing items"
+        );
     }
 
     #[test]
@@ -2514,7 +2666,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Status",
             "desc",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![EnumVariantDeclaration::new("Active", vec![])],
+            },
             TypeAction::Add,
             true,
         )
@@ -2530,7 +2684,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Status",
             "desc",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![EnumVariantDeclaration::new("Active", vec![])],
+            },
             TypeAction::Add,
             true,
         )
@@ -2546,7 +2702,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Status",
             "desc",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![EnumVariantDeclaration::new("Active", vec![])],
+            },
             TypeAction::Modify,
             true,
         )
@@ -2566,7 +2724,12 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Status",
             "desc",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into(), "Done".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![
+                    EnumVariantDeclaration::new("Active", vec![]),
+                    EnumVariantDeclaration::new("Done", vec![]),
+                ],
+            },
             TypeAction::Reference,
             true,
         )
@@ -2582,7 +2745,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Status",
             "desc",
-            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeDefinitionKind::Enum {
+                expected_variants: vec![EnumVariantDeclaration::new("Active", vec![])],
+            },
             TypeAction::Reference,
             true,
         )

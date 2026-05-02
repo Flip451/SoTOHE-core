@@ -1,8 +1,30 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-01T19:24:45Z",
-  "declaration_hash": "cf3e9179de0d390144bba43749afba0f5efe5ca005d891e8ec93332a10f35f95",
+  "generated_at": "2026-05-02T01:24:43Z",
+  "declaration_hash": "9585a4480e9dc9784d390cb42b24267418c900012dfe1b1d8772655a98a58bf6",
   "signals": [
+    {
+      "type_name": "BaselineCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "InvalidEntry",
+        "InvalidTimestamp",
+        "Json",
+        "UnsupportedSchemaVersion"
+      ]
+    },
+    {
+      "type_name": "MemberDeclarationDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
+    },
     {
       "type_name": "build_type_graph",
       "kind_tag": "free_function",

@@ -10,11 +10,15 @@ flowchart LR
     subgraph domain [domain]
         L6_domain_EnumVariantDeclaration(EnumVariantDeclaration)
         L6_domain_MemberDeclaration{{MemberDeclaration}}
+        L6_domain_SpecValidationError>SpecValidationError]
+        L6_domain_TypeDefinitionKind{{TypeDefinitionKind}}
         L6_domain_render__contract__map[render_contract_map]:::free_function
     end
     subgraph usecase [usecase]
     end
     subgraph infrastructure [infrastructure]
+        L14_infrastructure_BaselineCodecError>BaselineCodecError]
+        L14_infrastructure_MemberDeclarationDto{{MemberDeclarationDto}}
         L14_infrastructure_build__type__graph[build_type_graph]:::free_function
         L14_infrastructure_render__type__graph__flat[render_type_graph_flat]:::free_function
         L14_infrastructure_render__type__graph__clustered[render_type_graph_clustered]:::free_function

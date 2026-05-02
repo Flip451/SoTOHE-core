@@ -1326,7 +1326,7 @@ mod tests {
     fn enum_node() -> TypeNode {
         TypeNode::new(
             TypeKind::Enum,
-            vec![MemberDeclaration::variant("A"), MemberDeclaration::variant("B")],
+            vec![MemberDeclaration::unit_variant("A"), MemberDeclaration::unit_variant("B")],
             vec![],
             HashSet::new(),
         )

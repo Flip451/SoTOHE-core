@@ -233,7 +233,10 @@ mod tests {
                 "Status".to_string(),
                 TypeKind::Enum,
                 None,
-                vec![MemberDeclaration::variant("Active"), MemberDeclaration::variant("Done")],
+                vec![
+                    MemberDeclaration::unit_variant("Active"),
+                    MemberDeclaration::unit_variant("Done"),
+                ],
             )],
             vec![],
             vec![],
