@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-02T01:49:36Z",
-  "declaration_hash": "9585a4480e9dc9784d390cb42b24267418c900012dfe1b1d8772655a98a58bf6",
+  "generated_at": "2026-05-02T03:17:28Z",
+  "declaration_hash": "339417f469eab87ece127bd1899f824fe66bc4c20619f1f776d517f1c51e22df",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -28,29 +28,20 @@
     {
       "type_name": "build_type_graph",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn build_type_graph(schema: SchemaExport, typestate_names: HashSet<String>) -> TypeGraph"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "render_type_graph_flat",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn render_type_graph_flat(graph: TypeGraph, layer_name: str, opts: TypeGraphRenderOptions) -> String"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "render_type_graph_clustered",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn render_type_graph_clustered(graph: TypeGraph, cluster_key: str, plan: ClusterPlan, opts: TypeGraphRenderOptions) -> String"
-      ]
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

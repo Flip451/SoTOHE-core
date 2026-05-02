@@ -222,10 +222,26 @@ fn is_valid_rust_identifier(s: &str) -> bool {
 ///
 /// Type strings use last-segment short names; module paths containing `::`
 /// are rejected by codec validation (L1 invariant, CN-03).
+///
+/// # Field visibility and invariant contract
+///
+/// `name` and `payload_types` are declared `pub` so that they appear in the
+/// rustdoc-derived schema export, allowing the TDDD L2 member-visibility check
+/// to verify that these fields match the catalogue declaration
+/// (`expected_members: ["name", "payload_types"]`). Without `pub` visibility,
+/// the fields are invisible to rustdoc and the L2 check reports a yellow signal.
+///
+/// **Accepted encapsulation tradeoff**: direct field assignment (e.g.
+/// `evd.name = "invalid::name".to_string()`) bypasses the validation enforced
+/// by [`try_new`](EnumVariantDeclaration::try_new). This is the same category of
+/// known bypass as the infallible [`new`](EnumVariantDeclaration::new) constructor
+/// documented below. All application and codec paths use `try_new` or `new` for
+/// construction; callers that require validated invariants must go through one of
+/// those constructors and must not mutate fields directly afterwards.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumVariantDeclaration {
-    name: String,
-    payload_types: Vec<String>,
+    pub name: String,
+    pub payload_types: Vec<String>,
 }
 
 impl EnumVariantDeclaration {

@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-02T01:49:35Z",
-  "declaration_hash": "8087539edc3a7e82bfaf4e0be09bedaa5cbe51278d12193aaac84cc9276f50f1",
+  "generated_at": "2026-05-02T03:17:26Z",
+  "declaration_hash": "a22a9ec3b1ed5fc6f0de4feeb723ed737c289a86b4bd05b58413f172a0ffe044",
   "signals": [
     {
       "type_name": "EnumVariantDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
+      "found_items": [
         "name: String",
         "payload_types: Vec<String>"
       ]
@@ -26,7 +26,7 @@
     {
       "type_name": "SpecValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "DuplicateElementId",
@@ -36,11 +36,9 @@
         "EmptyTitle",
         "EmptyVariantName",
         "EmptyVersion",
-        "MissingElementId"
-      ],
-      "extra_items": [
         "InvalidPayloadType",
-        "InvalidVariantName"
+        "InvalidVariantName",
+        "MissingElementId"
       ]
     },
     {
@@ -69,11 +67,8 @@
     {
       "type_name": "render_contract_map",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "fn render_contract_map(catalogues: BTreeMap<LayerId, TypeCatalogueDocument>, layer_order: Vec<LayerId>, opts: ContractMapRenderOptions) -> ContractMapContent"
-      ]
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

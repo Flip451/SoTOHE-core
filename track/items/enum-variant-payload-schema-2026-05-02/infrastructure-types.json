@@ -92,11 +92,11 @@
       "expected_params": [
         {
           "name": "schema",
-          "ty": "SchemaExport"
+          "ty": "&SchemaExport"
         },
         {
           "name": "typestate_names",
-          "ty": "HashSet<String>"
+          "ty": "&HashSet<String>"
         }
       ],
       "expected_returns": [
@@ -131,15 +131,15 @@
       "expected_params": [
         {
           "name": "graph",
-          "ty": "TypeGraph"
+          "ty": "&TypeGraph"
         },
         {
           "name": "layer_name",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "opts",
-          "ty": "TypeGraphRenderOptions"
+          "ty": "&TypeGraphRenderOptions"
         }
       ],
       "expected_returns": [
@@ -179,19 +179,19 @@
       "expected_params": [
         {
           "name": "graph",
-          "ty": "TypeGraph"
+          "ty": "&TypeGraph"
         },
         {
           "name": "cluster_key",
-          "ty": "str"
+          "ty": "&str"
         },
         {
           "name": "plan",
-          "ty": "ClusterPlan"
+          "ty": "&ClusterPlan"
         },
         {
           "name": "opts",
-          "ty": "TypeGraphRenderOptions"
+          "ty": "&TypeGraphRenderOptions"
         }
       ],
       "expected_returns": [

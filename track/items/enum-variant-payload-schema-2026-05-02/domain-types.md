@@ -11,17 +11,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| EnumVariantDeclaration | value_object | — | — | 🟡 | 🔵 |
+| EnumVariantDeclaration | value_object | — | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SpecValidationError | error_type | modify | DuplicateElementId, EmptyDomainStateName, EmptyRequirementText, EmptySectionTitle, EmptyTitle, EmptyVariantName, EmptyVersion, MissingElementId | 🟡 | 🔵 |
+| SpecValidationError | error_type | modify | DuplicateElementId, EmptyDomainStateName, EmptyRequirementText, EmptySectionTitle, EmptyTitle, EmptyVariantName, EmptyVersion, MissingElementId, InvalidVariantName, InvalidPayloadType | 🔵 | 🔵 |
 
 ## Free Functions
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| render_contract_map | free_function | modify | — | 🟡 | 🔵 |
+| render_contract_map | free_function | modify | — | 🔵 | 🔵 |
 

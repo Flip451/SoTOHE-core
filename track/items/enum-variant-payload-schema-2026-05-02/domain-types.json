@@ -106,6 +106,18 @@
         {
           "name": "MissingElementId",
           "payload_types": []
+        },
+        {
+          "name": "InvalidVariantName",
+          "payload_types": [
+            "String"
+          ]
+        },
+        {
+          "name": "InvalidPayloadType",
+          "payload_types": [
+            "String"
+          ]
         }
       ],
       "spec_refs": [
@@ -258,15 +270,15 @@
       "expected_params": [
         {
           "name": "catalogues",
-          "ty": "BTreeMap<LayerId, TypeCatalogueDocument>"
+          "ty": "&BTreeMap<LayerId, TypeCatalogueDocument>"
         },
         {
           "name": "layer_order",
-          "ty": "Vec<LayerId>"
+          "ty": "&[LayerId]"
         },
         {
           "name": "opts",
-          "ty": "ContractMapRenderOptions"
+          "ty": "&ContractMapRenderOptions"
         }
       ],
       "expected_returns": [
