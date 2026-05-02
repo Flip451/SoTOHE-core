@@ -305,24 +305,12 @@ pub fn render_type_graph_flat(
     }
 
     // Emit edges (only between nodes in the node_set), choosing the mermaid
-    // edge symbol based on the edge_kind. While emitting, collect the 0-based
-    // output-order indices of parameter-derived edges so that a single
-    // `linkStyle ... stroke:#888;` line can be appended (D3 gray reinforcement).
-    let mut param_edge_indices: Vec<usize> = Vec::new();
-    let mut emitted_count: usize = 0;
+    // edge symbol based on the edge_kind.
     for (src, label, tgt, kind) in &edges {
         if node_set.contains(src.as_str()) && node_set.contains(tgt.as_str()) {
             let edge_str = render_edge_symbol(src, label, tgt, kind);
             out.push_str(&format!("    {edge_str}\n"));
-            if is_param_derived_edge_kind(kind) {
-                param_edge_indices.push(emitted_count);
-            }
-            emitted_count += 1;
         }
-    }
-    if !param_edge_indices.is_empty() {
-        let joined = param_edge_indices.iter().map(usize::to_string).collect::<Vec<_>>().join(",");
-        out.push_str(&format!("    linkStyle {joined} stroke:#888;\n"));
     }
 
     out.push_str("```\n");
@@ -863,33 +851,15 @@ pub fn render_type_graph_clustered(
     }
 
     // Emit intra-cluster edges using the correct mermaid symbol per edge_kind.
-    // Track 0-based output-order indices of parameter-derived edges so that
-    // a single `linkStyle ... stroke:#888;` line can be appended after all
-    // edges are emitted (D3 gray reinforcement). Ghost edges share the same
-    // index sequence because mermaid numbers edges in declaration order.
-    let mut param_edge_indices: Vec<usize> = Vec::new();
-    let mut emitted_count: usize = 0;
     for (src, label, tgt, kind) in &intra_edges {
         let edge_str = render_edge_symbol(src, label, tgt, kind);
         out.push_str(&format!("    {edge_str}\n"));
-        if is_param_derived_edge_kind(kind) {
-            param_edge_indices.push(emitted_count);
-        }
-        emitted_count += 1;
     }
 
     // Emit cross-cluster ghost edges.
     for (ghost_id, src, label, _tgt, _display, kind) in &cross_ghost_ids {
         let edge_str = render_edge_symbol(src, label, ghost_id, kind);
         out.push_str(&format!("    {edge_str}\n"));
-        if is_param_derived_edge_kind(kind) {
-            param_edge_indices.push(emitted_count);
-        }
-        emitted_count += 1;
-    }
-    if !param_edge_indices.is_empty() {
-        let joined = param_edge_indices.iter().map(usize::to_string).collect::<Vec<_>>().join(",");
-        out.push_str(&format!("    linkStyle {joined} stroke:#888;\n"));
     }
 
     out.push_str("```\n");
@@ -1308,19 +1278,6 @@ fn render_edge_symbol(src: &str, label: &str, tgt: &str, kind: &str) -> String {
         "variant_payload" => format!("{src} -->|{label}| {tgt}"),
         _ => format!("{src} -->|{label}| {tgt}"),
     }
-}
-
-/// Returns true when the edge_kind is a parameter-derived edge that should
-/// receive the gray `linkStyle stroke:#888;` reinforcement (D3).
-///
-/// Used by `render_type_graph_flat` and `render_type_graph_clustered` to
-/// collect the 0-based output-order indices of parameter-derived edges so
-/// that a single `linkStyle <i1>,<i2>,... stroke:#888;` line can be appended
-/// to the mermaid block. `render_type_graph_overview` does not call this
-/// helper because OS-03 explicitly excludes the overview from per-edge
-/// coloring.
-fn is_param_derived_edge_kind(kind: &str) -> bool {
-    matches!(kind, "method_param" | "trait_method_param")
 }
 
 /// Extracts PascalCase type names from a type string.
@@ -2358,18 +2315,15 @@ mod tests {
         );
     }
 
-    /// T004-4 (D3 / AC-04 / AC-05): when parameter-derived edges are present,
-    /// the mermaid output emits `--o` for those edges and appends a
-    /// `linkStyle <indices> stroke:#888;` line whose indices match the
-    /// 0-based output order of the param edges.
+    /// AC-04 / AC-05: when parameter-derived edges are present, the mermaid
+    /// output emits `--o` for those edges and `-->` for return edges. The
+    /// renderer no longer emits a `linkStyle stroke:#888;` line (long number
+    /// lists previously broke the VS Code mermaid parser).
     #[test]
-    fn test_render_flat_emits_link_style_for_param_edges_with_correct_indices() {
+    fn test_render_flat_emits_param_edge_symbol_without_link_style() {
         use domain::tddd::catalogue::ParamDeclaration;
 
         let mut types = HashMap::new();
-        // Type A has a return-only method (index 0 — return) and a param-only
-        // method (index 1 — param). Edges are sort()ed by collect_edges, so
-        // alphabetical ordering of the tuples controls the index.
         let type_a = struct_node(vec![
             MethodDeclaration::new("call_a", Some("&self".into()), vec![], "B", false),
             MethodDeclaration::new(
@@ -2387,23 +2341,17 @@ mod tests {
 
         let output = render_type_graph_flat(&graph, "domain", &TypeGraphRenderOptions::default());
 
-        // Param edge should use --o symbol.
         assert!(
             output.contains("A --o|call_b| C"),
             "param edge must use --o symbol, got: {output}"
         );
-        // Return edge keeps -->.
         assert!(
             output.contains("A -->|call_a| B"),
             "return edge must use --> symbol, got: {output}"
         );
-        // Edges are sorted alphabetically by (src, label, tgt, kind):
-        //   ("A", "call_a", "B", "method_return")  index 0
-        //   ("A", "call_b", "C", "method_param")   index 1
-        // So linkStyle should reference index 1.
         assert!(
-            output.contains("linkStyle 1 stroke:#888;"),
-            "linkStyle line must reference index 1 for the single param edge, got: {output}"
+            !output.contains("linkStyle"),
+            "linkStyle line must not appear (suppressed for parser compat), got: {output}"
         );
     }
 
@@ -2466,10 +2414,11 @@ mod tests {
         );
     }
 
-    /// T004-7 (D3 / AC-04): clustered renderer emits the open-circle endpoint
-    /// `--o` for parameter-derived edges and appends a `linkStyle` line.
+    /// AC-04: clustered renderer emits the open-circle endpoint `--o` for
+    /// parameter-derived edges. The `linkStyle` line is suppressed (parser
+    /// compat).
     #[test]
-    fn test_render_clustered_emits_link_style_for_param_edges() {
+    fn test_render_clustered_emits_param_edge_symbol_without_link_style() {
         use domain::tddd::catalogue::ParamDeclaration;
 
         let mut types = HashMap::new();
@@ -2497,15 +2446,13 @@ mod tests {
         let plan = crate::tddd::type_graph_cluster::classify_types(&graph, 2, &edges);
         let output = render_type_graph_clustered(&graph, "domain::pipeline", &plan, &opts);
 
-        // The intra-cluster param edge must use --o.
         assert!(
             output.contains("Producer --o|make| Input"),
             "clustered param edge must use --o, got: {output}"
         );
-        // linkStyle line must be present (single param edge at index 0).
         assert!(
-            output.contains("linkStyle 0 stroke:#888;"),
-            "clustered linkStyle line must appear for param edge, got: {output}"
+            !output.contains("linkStyle"),
+            "linkStyle line must not appear (suppressed for parser compat), got: {output}"
         );
     }
 

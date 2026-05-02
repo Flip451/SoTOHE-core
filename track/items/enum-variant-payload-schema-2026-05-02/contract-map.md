@@ -23,4 +23,17 @@ flowchart LR
         L14_infrastructure_render__type__graph__flat[render_type_graph_flat]:::free_function
         L14_infrastructure_render__type__graph__clustered[render_type_graph_clustered]:::free_function
     end
+    L6_domain_MemberDeclaration -->|"::Variant"| L6_domain_EnumVariantDeclaration
+    L6_domain_TypeDefinitionKind -->|"::Command"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::DomainService"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::Dto"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::Enum"| L6_domain_EnumVariantDeclaration
+    L6_domain_TypeDefinitionKind -->|"::ErrorType"| L6_domain_EnumVariantDeclaration
+    L6_domain_TypeDefinitionKind -->|"::Factory"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::Interactor"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::Query"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::SecondaryAdapter"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::Typestate"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::UseCase"| L6_domain_MemberDeclaration
+    L6_domain_TypeDefinitionKind -->|"::ValueObject"| L6_domain_MemberDeclaration
 ```
