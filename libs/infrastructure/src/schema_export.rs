@@ -445,6 +445,12 @@ fn extract_enum_variants(
         if let ItemEnum::Variant(v) = &item.inner {
             let payload_types = extract_variant_payload_types(v, krate, &name)?;
             out.push(MemberDeclaration::variant(name, payload_types));
+        } else {
+            return Err(format!(
+                "enum variant id {id:?} (name '{name}') resolves to non-Variant item; \
+                 the exported JSON may be malformed or partial — \
+                 payload extraction must be fail-closed (T001 ADR 2026-05-02-0316)"
+            ));
         }
     }
     Ok(out)
@@ -1095,6 +1101,54 @@ mod tests {
         let origins = build_trait_origins("my_crate", &krate);
         // Key is def_path "std::fmt::Display", not the short name "Display".
         assert_eq!(origins.get("std::fmt::Display"), Some(&"std".to_string()));
+    }
+
+    // --- T001 P0 fix (follow-up): extract_enum_variants fail-closed test ---
+
+    /// Verify `extract_enum_variants` returns `Err` (fail-closed) when an
+    /// entry in `krate.index` that is referenced as a variant id resolves to
+    /// a non-`ItemEnum::Variant` item (e.g. `ItemEnum::Impl`).
+    ///
+    /// The fix added an `else { return Err(...) }` branch to the match in
+    /// `extract_enum_variants`. This test proves the branch is in place and
+    /// fires before silently pushing garbage into the `out` vec.
+    #[test]
+    fn test_extract_enum_variants_fail_closed_on_non_variant_item() {
+        let variant_id = rustdoc_types::Id(1);
+
+        // Build a non-Variant item (an Impl) and override its id and name so
+        // `extract_enum_variants` can reach the inner-kind check rather than
+        // failing earlier on a missing name.
+        let (_impl_id, mut non_variant_item) = make_impl_item(1, "some::Trait", 99);
+        non_variant_item.id = variant_id;
+        non_variant_item.name = Some("FakeVariantName".to_owned());
+
+        let mut index = std::collections::HashMap::new();
+        index.insert(variant_id, non_variant_item);
+
+        let krate = minimal_krate(
+            index,
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        );
+
+        let fake_enum = rustdoc_types::Enum {
+            generics: rustdoc_types::Generics { params: vec![], where_predicates: vec![] },
+            has_stripped_variants: false,
+            variants: vec![variant_id],
+            impls: vec![],
+        };
+
+        let result = extract_enum_variants(&fake_enum, &krate);
+        assert!(
+            result.is_err(),
+            "extract_enum_variants must fail-closed when a variant id resolves to a non-Variant item"
+        );
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("non-Variant"),
+            "error message must mention 'non-Variant'; got: {msg}"
+        );
     }
 
     /// T006b: when two traits share the same short name both get separate entries keyed
