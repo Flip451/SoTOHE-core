@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # enum variant の payload 型を schema レベルで宣言可能にする — catalogue / TypeGraph / baseline / serde codec の 4 点同時拡張
 
-## Tasks (2/4 resolved)
+## Tasks (3/4 resolved)
 
 ### S1 — Schema 4-point simultaneous change + rustdoc payload extraction
 
@@ -31,7 +31,7 @@
 > Both render_type_graph_flat and render_type_graph_clustered node-collection paths must include variant_payload edge endpoints in type_set (not trait_set) so that payload type nodes are rendered with the correct shape.
 > ADR 2026-04-16-2200 D2(b) 'variant name only' constraint is overridden here per CN-05.
 
-- [ ] **T003**: Reality View renderer: extend collect_edges() in infrastructure type_graph_render.rs to emit variant payload edges from TypeGraph data: (a) inside the EdgeSet::Fields | EdgeSet::All guard (or a new dedicated guard for variant edges), for each type node, iterate node.members() and match MemberDeclaration::Variant(evd) arms; (b) for each token in extract_type_names() over each payload_type string in evd.payload_types, emit an edge (source = type_name, label = ::variant_name, target = token) if token is present in the graph (exists as a type node key); edge kind tag = "variant_payload"; (c) extend render_edge_symbol() with a "variant_payload" arm mapping to "-->|label|" (directed arrow, distinct from field edges which use "---|label|"); (d) the existing comment noting 'enum variant payloads are not extracted at L1' is updated to reflect the new capability; (e) update render_type_graph_flat and render_type_graph_clustered node collection to include variant_payload edge sources/targets in type_set (not trait_set); (f) add unit tests covering: variant with payload type in graph emits edge with ::VariantName label, unit variant (empty payload_types) emits no edge, payload type absent from graph emits no edge
+- [x] **T003**: Reality View renderer: extend collect_edges() in infrastructure type_graph_render.rs to emit variant payload edges from TypeGraph data: (a) inside the EdgeSet::Fields | EdgeSet::All guard (or a new dedicated guard for variant edges), for each type node, iterate node.members() and match MemberDeclaration::Variant(evd) arms; (b) for each token in extract_type_names() over each payload_type string in evd.payload_types, emit an edge (source = type_name, label = ::variant_name, target = token) if token is present in the graph (exists as a type node key); edge kind tag = "variant_payload"; (c) extend render_edge_symbol() with a "variant_payload" arm mapping to "-->|label|" (directed arrow, distinct from field edges which use "---|label|"); (d) the existing comment noting 'enum variant payloads are not extracted at L1' is updated to reflect the new capability; (e) update render_type_graph_flat and render_type_graph_clustered node collection to include variant_payload edge sources/targets in type_set (not trait_set); (f) add unit tests covering: variant with payload type in graph emits edge with ::VariantName label, unit variant (empty payload_types) emits no edge, payload type absent from graph emits no edge
 
 ### S4 — Test updates and CI gate
 
