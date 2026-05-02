@@ -9,7 +9,7 @@
     {
       "id": "T002",
       "description": "Contract Map renderer: add variant payload edge emission to render_contract_map() in domain contract_map_render.rs: (a) for each entry whose kind is TypeDefinitionKind::Enum or TypeDefinitionKind::ErrorType, iterate expected_variants and for each EnumVariantDeclaration, iterate payload_types; (b) for each payload type string, call extract_type_names() to tokenize and look up tokens in type_index; (c) emit an edge with label ::VariantName (format: \"::{}\" escaped via escape_edge_label) from the enum src_id to each resolved dst_id; (d) add unit tests in contract_map_render_tests.rs covering: enum entry with payload variant emits ::VariantName edge, unit variant (empty payload_types) emits no edge, payload type not in type_index emits no edge, error_type kind also emits variant payload edges",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T003",

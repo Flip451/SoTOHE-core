@@ -216,6 +216,134 @@
           "findings": [],
           "hash": "rvw1:sha256:256117c8e860cb398eca9acdb27773a0210349b997b4573d513041b18a451d34",
           "at": "2026-05-02T01:18:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:632901cd6618fb68a81329dc979c705c7ac5ce4c62145608bced569b76f2a3e0",
+          "at": "2026-05-02T01:30:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:632901cd6618fb68a81329dc979c705c7ac5ce4c62145608bced569b76f2a3e0",
+          "at": "2026-05-02T01:33:37Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_variant_payload_types()` is lossy for rustdoc variants with stripped payload fields: `Tuple(Vec<Option<Id>>)` drops `None` entries via `filter_map`, and `Struct { has_stripped_fields: true }` is ignored entirely. That means a variant with hidden/stripped fields is exported with a shorter `payload_types` list than the source actually has, silently corrupting the schema instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 442,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:da7b0c3efe4a53b19e2b960072fce9b7cc1e8a25b1b031aee38f1f541b7dfa82",
+          "at": "2026-05-01T19:50:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The struct-variant branch in `extract_variant_payload_types()` still silently skips missing or non-`StructField` ids (`continue` at the end of the loop), so a malformed or unexpectedly pruned rustdoc entry can produce a truncated `payload_types` list without surfacing an error. That breaks the fail-closed behavior described in the comment and can export incomplete enum metadata. See [libs/infrastructure/src/schema_export.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs#L491).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 491,
+              "category": "correctness"
+            },
+            {
+              "message": "The new variant DTOs still build `EnumVariantDeclaration` through infallible constructors on decode, so JSON can supply `\"name\": \"\"` and the codecs will accept it as an invalid domain value. The domain type already exposes `try_new()` for the non-empty-name invariant, so the boundary should reject empty variant names instead of normalizing them into the domain. See [libs/infrastructure/src/tddd/catalogue_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs#L1047) and [libs/infrastructure/src/tddd/baseline_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs#L269).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 1047,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e379754e644f943292cb9d663685c19dd5862f66a70166cb5064a53dad732e1f",
+          "at": "2026-05-01T19:57:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These fixtures still use the old `expected_variants: [\"A\", \"B\"]` shape. With the new `EnumVariantDeclarationDto` schema, serde fails before the custom `InvalidEntry` path, so `decode()` now returns `Json` and these assertions fail. The same issue appears again at lines 2782 and 3612.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 2506,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:cce1dd61455043b5fc0881471d0986d7c210cfadeaea4fedd2069293bb085988",
+          "at": "2026-05-01T20:02:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01c1fcbdde79699d291e92f04a1a3ef51892706127ce04a1e13c57eb17365cf6",
+          "at": "2026-05-01T20:07:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_enum_variants()` silently skips enum variant entries when `krate.index` has no item or the item has no name. That turns a malformed/partial rustdoc export into an incomplete `SchemaExport` instead of failing closed, even though this helper already treats stripped payload fields as fatal. Public enums should not lose variants silently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 433,
+              "category": "correctness"
+            },
+            {
+              "message": "`member_from_dto()` accepts `Variant { name, payload_types }` but never validates `payload_types` the way the other codecs do. A baseline JSON entry can therefore contain module-qualified payload types like `domain::Foo`, decode successfully, and then round-trip into an L1 baseline even though the rest of the infrastructure rejects `::` in type strings. Add the same validation before constructing `EnumVariantDeclaration`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 282,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:01c1fcbdde79699d291e92f04a1a3ef51892706127ce04a1e13c57eb17365cf6",
+          "at": "2026-05-02T00:33:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a1a5673b41c1527b4bec62ba5f4dc9a7d4dc34dea861979ecc35595c14bed7f",
+          "at": "2026-05-02T00:38:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`expected_members` variant decoding still constructs `MemberDeclaration::variant` after only checking for `::`, bypassing the new `EnumVariantDeclaration::try_new` validation that rejects empty, whitespace, and non-identifier variant names. A catalogue JSON entry with `{\"kind\":\"variant\",\"name\":\" \",\"payload_types\":[]}` is accepted into an invalid domain value, while the `expected_variants` path in this same file correctly fails closed. Route this branch through `EnumVariantDeclaration::try_new` and map the error to `InvalidEntry`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 1157,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:8a1a5673b41c1527b4bec62ba5f4dc9a7d4dc34dea861979ecc35595c14bed7f",
+          "at": "2026-05-02T00:42:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69220b87bb65872036c01e299c8be46b927d23675d15420c50eac7edb16bf0e7",
+          "at": "2026-05-02T00:47:00Z"
         }
       ]
     },
@@ -496,120 +624,34 @@
           "findings": [],
           "hash": "rvw1:sha256:66cd3132c7bf506638cb1c0abf8659993dbbaae957baeda33ce8f77a06c658c8",
           "at": "2026-05-02T01:24:15Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`extract_variant_payload_types()` is lossy for rustdoc variants with stripped payload fields: `Tuple(Vec<Option<Id>>)` drops `None` entries via `filter_map`, and `Struct { has_stripped_fields: true }` is ignored entirely. That means a variant with hidden/stripped fields is exported with a shorter `payload_types` list than the source actually has, silently corrupting the schema instead of failing closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 442,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:da7b0c3efe4a53b19e2b960072fce9b7cc1e8a25b1b031aee38f1f541b7dfa82",
-          "at": "2026-05-01T19:50:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The struct-variant branch in `extract_variant_payload_types()` still silently skips missing or non-`StructField` ids (`continue` at the end of the loop), so a malformed or unexpectedly pruned rustdoc entry can produce a truncated `payload_types` list without surfacing an error. That breaks the fail-closed behavior described in the comment and can export incomplete enum metadata. See [libs/infrastructure/src/schema_export.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs#L491).",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export.rs",
-              "line": 491,
-              "category": "correctness"
-            },
-            {
-              "message": "The new variant DTOs still build `EnumVariantDeclaration` through infallible constructors on decode, so JSON can supply `\"name\": \"\"` and the codecs will accept it as an invalid domain value. The domain type already exposes `try_new()` for the non-empty-name invariant, so the boundary should reject empty variant names instead of normalizing them into the domain. See [libs/infrastructure/src/tddd/catalogue_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs#L1047) and [libs/infrastructure/src/tddd/baseline_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs#L269).",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 1047,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e379754e644f943292cb9d663685c19dd5862f66a70166cb5064a53dad732e1f",
-          "at": "2026-05-01T19:57:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "These fixtures still use the old `expected_variants: [\"A\", \"B\"]` shape. With the new `EnumVariantDeclarationDto` schema, serde fails before the custom `InvalidEntry` path, so `decode()` now returns `Json` and these assertions fail. The same issue appears again at lines 2782 and 3612.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 2506,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:cce1dd61455043b5fc0881471d0986d7c210cfadeaea4fedd2069293bb085988",
-          "at": "2026-05-01T20:02:13Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:01c1fcbdde79699d291e92f04a1a3ef51892706127ce04a1e13c57eb17365cf6",
-          "at": "2026-05-01T20:07:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`extract_enum_variants()` silently skips enum variant entries when `krate.index` has no item or the item has no name. That turns a malformed/partial rustdoc export into an incomplete `SchemaExport` instead of failing closed, even though this helper already treats stripped payload fields as fatal. Public enums should not lose variants silently.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 433,
-              "category": "correctness"
-            },
-            {
-              "message": "`member_from_dto()` accepts `Variant { name, payload_types }` but never validates `payload_types` the way the other codecs do. A baseline JSON entry can therefore contain module-qualified payload types like `domain::Foo`, decode successfully, and then round-trip into an L1 baseline even though the rest of the infrastructure rejects `::` in type strings. Add the same validation before constructing `EnumVariantDeclaration`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 282,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:01c1fcbdde79699d291e92f04a1a3ef51892706127ce04a1e13c57eb17365cf6",
-          "at": "2026-05-02T00:33:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a1a5673b41c1527b4bec62ba5f4dc9a7d4dc34dea861979ecc35595c14bed7f",
-          "at": "2026-05-02T00:38:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`expected_members` variant decoding still constructs `MemberDeclaration::variant` after only checking for `::`, bypassing the new `EnumVariantDeclaration::try_new` validation that rejects empty, whitespace, and non-identifier variant names. A catalogue JSON entry with `{\"kind\":\"variant\",\"name\":\" \",\"payload_types\":[]}` is accepted into an invalid domain value, while the `expected_variants` path in this same file correctly fails closed. Route this branch through `EnumVariantDeclaration::try_new` and map the error to `InvalidEntry`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 1157,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:8a1a5673b41c1527b4bec62ba5f4dc9a7d4dc34dea861979ecc35595c14bed7f",
-          "at": "2026-05-02T00:42:26Z"
+          "hash": "rvw1:sha256:7b4a1c08a7259386a9fb5b6f2e043b1b84615431677a9c0855cdaf177ab8027d",
+          "at": "2026-05-02T01:29:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69220b87bb65872036c01e299c8be46b927d23675d15420c50eac7edb16bf0e7",
-          "at": "2026-05-02T00:47:00Z"
+          "hash": "rvw1:sha256:7b4a1c08a7259386a9fb5b6f2e043b1b84615431677a9c0855cdaf177ab8027d",
+          "at": "2026-05-02T01:30:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d13b24a87c7fc4a3dcafd03c91f0ddd3f51c640e31f53d82c33e41d1eafc865d",
+          "at": "2026-05-02T01:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d13b24a87c7fc4a3dcafd03c91f0ddd3f51c640e31f53d82c33e41d1eafc865d",
+          "at": "2026-05-02T01:36:53Z"
         }
       ]
     }

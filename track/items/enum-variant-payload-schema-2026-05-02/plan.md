@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # enum variant の payload 型を schema レベルで宣言可能にする — catalogue / TypeGraph / baseline / serde codec の 4 点同時拡張
 
-## Tasks (1/4 resolved)
+## Tasks (2/4 resolved)
 
 ### S1 — Schema 4-point simultaneous change + rustdoc payload extraction
 
@@ -21,7 +21,7 @@
 > Unit tests in contract_map_render_tests.rs cover the happy path (payload variant → edge), unit variant (no edge), unresolved payload type (no edge), and ErrorType kind symmetry.
 > T002 depends on T001 (the EnumVariantDeclaration type must exist before the renderer can read payload_types).
 
-- [ ] **T002**: Contract Map renderer: add variant payload edge emission to render_contract_map() in domain contract_map_render.rs: (a) for each entry whose kind is TypeDefinitionKind::Enum or TypeDefinitionKind::ErrorType, iterate expected_variants and for each EnumVariantDeclaration, iterate payload_types; (b) for each payload type string, call extract_type_names() to tokenize and look up tokens in type_index; (c) emit an edge with label ::VariantName (format: "::{}" escaped via escape_edge_label) from the enum src_id to each resolved dst_id; (d) add unit tests in contract_map_render_tests.rs covering: enum entry with payload variant emits ::VariantName edge, unit variant (empty payload_types) emits no edge, payload type not in type_index emits no edge, error_type kind also emits variant payload edges
+- [x] **T002**: Contract Map renderer: add variant payload edge emission to render_contract_map() in domain contract_map_render.rs: (a) for each entry whose kind is TypeDefinitionKind::Enum or TypeDefinitionKind::ErrorType, iterate expected_variants and for each EnumVariantDeclaration, iterate payload_types; (b) for each payload type string, call extract_type_names() to tokenize and look up tokens in type_index; (c) emit an edge with label ::VariantName (format: "::{}" escaped via escape_edge_label) from the enum src_id to each resolved dst_id; (d) add unit tests in contract_map_render_tests.rs covering: enum entry with payload variant emits ::VariantName edge, unit variant (empty payload_types) emits no edge, payload type not in type_index emits no edge, error_type kind also emits variant payload edges
 
 ### S3 — Reality View renderer — variant payload edge emission
 
