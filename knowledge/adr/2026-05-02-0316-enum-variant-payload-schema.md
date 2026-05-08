@@ -185,3 +185,5 @@ struct variant (`Foo { a: A, b: B }`) で複数の型を payload に持てる。
   Reality View renderer も variant payload に基づく edge 描画が可能になる。
 - `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` —
   `TypeDefinitionKind` taxonomy の ADR。`Enum` / `ErrorType` の元定義。
+- `knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md` (D12) —
+  本 ADR を supersede する ADR。D12 で `VariantDecl { name, payload: VariantPayload }` (Unit / Tuple / Struct の 3 variant) 構造を採用し、struct variant の field 名 declare を可能にした。本 ADR の `EnumVariantDeclaration { name, payload_types: Vec<String> }` は ADR D12 の新 schema に置き換えられる。rustdoc → catalogue codec で `payload_types` を抽出していた logic は、新 schema では `VariantPayload` の Unit / Tuple / Struct 別に分岐する形に再設計される (詳細は上記 ADR D7 / D12 を参照)。本 ADR の決定は ADR 1 起草前の schema を反映するが、ADR 1 D12 以降は `VariantPayload` 構造に基づく codec / 突合が正となる。

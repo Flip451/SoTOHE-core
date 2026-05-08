@@ -1,0 +1,373 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 2 classification for `S ∩ C` conflicts with the skip rule below it: the table marks structural matches as `🔵`, but the later `skip` rule says `action=Reference` + structural equality should be suppressed instead of reported. As written, the same case is both a blue signal and a skip.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 117,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cb2b7748c5ccdf2d71056d59cb252878d7caae256fa71114ed2af8237ff21cc8",
+          "at": "2026-05-08T18:14:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D3` says this is a `10 領域` table, but the table itself enumerates 11 distinct conditions, and the consequence note repeats the same `10 領域` claim. The count is internally inconsistent; either the heading/bullets need to say 11 or one row needs to be merged.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 113,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6a9ab18d7f671bdbc97a55ac202830d8b37c032d9d70ade4a8db6ec9e35985fb",
+          "at": "2026-05-08T18:17:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`transition_methods` is allowed to reference `trait_impls`内の `MethodDeclaration` here, but D10 later removes `methods` from `TraitImplDecl` entirely. That leaves no schema location for the referenced method declarations, so the typestate transition path is internally inconsistent as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+              "line": 152,
+              "category": "contradiction"
+            },
+            {
+              "message": "The Phase 1 `Delete` step removes an item from `S` but never rewrites or rejects surviving references to that item. For any deletion of a still-referenced baseline item, `S` will end up with dangling `Id`s, so the stated fully-resolved `S` cannot actually be constructed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 102,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6e2a98ec51cf2731f50a51bbda52dacf25eca710a59be7de82570173e508aa45",
+          "at": "2026-05-08T18:20:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8f68336e6cc97df8b7f2b982c29463c3897942cc625d8678669b09524f5e958",
+          "at": "2026-05-08T18:23:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 1 says the signal evaluator refines action semantics into a \"10-region\" table, but the referenced ADR 3 D3 defines an 11-region table and repeats that count later. Because ADR 1 explicitly points readers to ADR 3 D3 as the canonical region definition, this cross-reference leaves implementers with conflicting signal-table cardinality.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+              "line": 164,
+              "category": "contradiction"
+            },
+            {
+              "message": "This assigns implicit Reference resolution for undeclared baseline-derived items to the codec, but ADR 2 D10 keeps the A codec open-world and defers resolution to S construction, while ADR 3 D4 says the signal evaluator dynamically attaches Reference to B. That is a component-boundary contradiction and can lead to implementing baseline-dependent behavior in the catalogue codec.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+              "line": 161,
+              "category": "contradiction"
+            },
+            {
+              "message": "D is defined as the set of B-derived items declared for deletion, but the pseudocode adds the A/catalogue element to D (`D.add(elt rebuild_id)`) rather than the removed baseline item from S/B. Following this literally makes D contain the delete declaration shape instead of the baseline item, which contradicts the D definition and can corrupt delete progress evaluation and D-specific external_crates rebuilding.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 102,
+              "category": "contradiction"
+            },
+            {
+              "message": "The signal distribution summary omits `S \\ C + action=Add`, even though the table immediately above classifies that region as Yellow. This makes the summary inconsistent with the canonical table and risks dropping the new-declare-not-yet-implemented case from implementations that follow the summary.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 132,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b8f68336e6cc97df8b7f2b982c29463c3897942cc625d8678669b09524f5e958",
+          "at": "2026-05-08T18:25:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 3 defines the Phase 2 table as 11 regions, but ADR 1 still references a '10-region' signal table. That leaves the catalogue ADR pointing at the wrong evaluator contract for action semantics; update the ADR 1 D4/Related text to match ADR 3's 11-region table, or adjust ADR 3 if 10 was intended.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+              "line": 164,
+              "category": "contradiction"
+            },
+            {
+              "message": "The canonical schema prose introduces `ItemAction`, and ADR 2/3 consume `ItemAction`, but the ADR 1 schema snippets declare `action: TypeAction` for TypeEntry/TraitEntry/FunctionEntry. This is a semantic type-name mismatch in the plan artifacts and will send implementers toward a non-selected action type.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+              "line": 220,
+              "category": "contradiction"
+            },
+            {
+              "message": "This states `S.external_crates` is the full union of B and A, but the same paragraph says deletes can remove dependencies from S and leave them only in D. A full B∪A union cannot drop a baseline-only dependency used solely by a deleted item, so the S/D construction contract is internally inconsistent and may make Phase 2 compare against the wrong target graph.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 81,
+              "category": "contradiction"
+            },
+            {
+              "message": "D is defined as the set of B-derived items being deleted, but the Delete branch iterates over A and adds `elt` to D. That contradicts the definition and can lose the baseline item's actual structure/references; the branch should make clear that D receives the matched baseline/S item removed by the delete operation, not the catalogue delete declaration itself.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 102,
+              "category": "contradiction"
+            },
+            {
+              "message": "ADR 2 cites its own D6 as the decision establishing '1 catalogue = 1 crate', but D6 is about fixed values for rustdoc fields; the crate-per-catalogue decision is ADR 1 D6. This broken decision reference appears in the codec rationale and rejected alternative text, so readers are directed to the wrong design decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 215,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:b8f68336e6cc97df8b7f2b982c29463c3897942cc625d8678669b09524f5e958",
+          "at": "2026-05-08T18:27:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 says the Layer axis is determined implicitly from catalogue file placement, but D6 defines an explicit `layer: Layer` field inside `CatalogueDocument` and says the document declares its layer. This leaves the schema contract ambiguous: implementers cannot tell whether layer is derived from path/layout or parsed from the JSON field.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+              "line": 102,
+              "category": "contradiction"
+            },
+            {
+              "message": "D1 states that A/S extend `rustdoc_types::Crate` with action only and that role/pattern/docs remain on the Catalogue side, but D7 later says catalogue `docs` are encoded into rustdoc `Item.docs`. Those two rules conflict over whether docs are part of the TypeGraph produced by the codec.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 87,
+              "category": "contradiction"
+            },
+            {
+              "message": "The Related section still describes the signal evaluator ADR as a future planned ADR, while this ADR already references the concrete ADR 3 decisions earlier and the scoped change includes that ADR. This makes the cross-document relationship stale and self-contradictory; it should point to `2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md` as the sibling/follow-up ADR already present.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 301,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:a2bf6a0b1af9e64204ff755a5fc801f856813281242df340e5531258cd25459f",
+          "at": "2026-05-08T18:32:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 1 D11 explicitly uses `FunctionPath` because function short names such as `new`/`build` commonly collide, but ADR 2 makes graph identity `name`-only. That means two allowed catalogue functions with the same short name in different modules collapse during matching/Id rebuild, so the plan cannot correctly evaluate a catalogue shape that ADR 1 says is valid.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 125,
+              "category": "contradiction"
+            },
+            {
+              "message": "The external-crate construction rule contradicts itself: this passage says `S.external_crates` is rebuilt only from items remaining after Delete, so delete-only dependencies disappear from S, but the same ADR's pseudocode and Reassess section describe `S.external_crates = B ∪ A`, and ADR 2 D5 says to union B and A external crates. Those two rules produce different S graphs whenever a deleted baseline item was the only user of an external crate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 81,
+              "category": "contradiction"
+            },
+            {
+              "message": "ADR 1 says undeclared baseline-derived entries are auto-resolved as implicit References by the codec, but ADR 2/3 place that responsibility in the signal evaluator: A codec is open-world and independent of B, while Phase 1 builds S from B with dynamic `Reference` attachment. Leaving this as-is gives conflicting ownership for whether the codec may read/resolve baseline items.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+              "line": 161,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c340cb8cf3e1373bb782426adcf66d66e829b7a3abc6d2f92f129b3885d890fb",
+          "at": "2026-05-08T18:35:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 2 now defines identity as short name for types/traits but full FunctionPath for functions, while ADR 3 Phase 1 still says all identity matching and Id rebuilds are by name. That makes functions like different `new`/`build` entries collide or be matched incorrectly in S/D/C construction, contradicting ADR 1 D11 and ADR 2 D3.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 79,
+              "category": "contradiction"
+            },
+            {
+              "message": "The signal table classifies `S \\ C + action=Add` as Yellow, but the immediately following Yellow distribution omits that region. If implementers use the distribution summary, declared-but-unimplemented adds can be dropped from Yellow reporting despite being part of the canonical table.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 132,
+              "category": "contradiction"
+            },
+            {
+              "message": "D1/D7 state that catalogue docs are encoded into `rustdoc Item.docs`, but D2 says `role / pattern / docs` remain only on `CatalogueDocument`. This leaves the TypeGraph/codec contract ambiguous about whether docs are present in A/S at all, despite render/documentation being listed as a consumer.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 91,
+              "category": "contradiction"
+            },
+            {
+              "message": "D11 says unprefixed TypeRef identifiers always mean same-catalogue declarations, but the ADR examples rely on unprefixed standard/prelude types such as `Result`, `Option`, `Vec`, and `String`. With the stated open-world/closed-world flow, those become unresolved markers and then Phase 1 errors unless the catalogue/baseline declares them, so common declared TypeRefs are physically unexecutable without an additional std/prelude resolution rule or prefix requirement.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 206,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:0f26b52d94aabdd6918031d504450aa24db7a5386e4c45c0642cceda8364b0f1",
+          "at": "2026-05-08T18:39:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bool` is listed with `Vec`/`Option`/`String` as a prefix-less std item that the codec should resolve as a `\"std\"` external-crate reference. That contradicts the `rustdoc_types` mapping described in D9, where Rust primitives should become `Type::Primitive`; encoding `bool` as a resolved external path will make catalogue-derived A structurally differ from rustdoc-derived B/C for valid fields such as `active: bool`. Split primitive handling from std-prelude path handling.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 206,
+              "category": "contradiction"
+            },
+            {
+              "message": "D2 states immediately above that functions are identified by `FunctionPath`, but the action branches still do `assert elt in S (by name)` / `get_by_name`. If implemented literally, duplicate function names in different modules, which ADR 1 D11 explicitly supports via `FunctionPath`, become ambiguous during Add/Modify/Reference/Delete processing. The pseudocode needs to use the same identity key as the surrounding text: short name for types/traits, full FunctionPath for functions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 99,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:70dd45c91b2d7132ae5d7ef0055337196ef1655c00b44fcc5041695bc7084ebf",
+          "at": "2026-05-08T18:42:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 3 narrows function identity to `FunctionPath (module_path + name)`, but ADR 2 D3 defines `FunctionPath = crate_name + module_path + name` and says all segments are used. If the signal evaluator follows ADR 3, it can build identity keys that do not match the catalogue key shape from ADR 1/2, and same-module/name functions from different crates would collapse whenever graphs are aggregated. Keep the crate_name segment in the ADR 3 identity rule or explicitly state why this evaluator is strictly single-crate and how the full catalogue key is normalized.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 79,
+              "category": "contradiction"
+            },
+            {
+              "message": "The Delete branch rejects as soon as the deleted item is still referenced by any current S item, but the same Phase 1 loop also allows Modify to replace items. A valid change that deletes `OldType` and modifies `User` to remove its `OldType` field can be rejected if Delete is processed before Modify, making the algorithm order-dependent and contradicting the stated goal that S is the final result of applying A to B. The plan needs to apply Add/Modify replacements before dangling-reference validation, or run that validation after final S construction.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 102,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7f68943f16694cff69b12d72ef10fb56e791c77a33193702ec4a04485292bcd8",
+          "at": "2026-05-08T18:45:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D11 now says prefixless prelude types like `Vec`, `Option`, `Result`, `String`, and `Box` are resolved as a `std` external crate, but D5 still defines `external_crates` extraction as only `TraitImplDecl.origin_crate` plus crate-prefixed `TypeRef`s. A catalogue using `Vec<UserId>` would therefore create a `ResolvedPath` to `std` without the corresponding `external_crates` entry/crate_id, making the codec rules internally inconsistent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 206,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0c0fef69d0892362694859b9895f086a98dd58428837f1865ad9751461e7e632",
+          "at": "2026-05-08T18:48:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 checks for dangling IDs before resolving A's unresolved TypeRef markers, then resolves those markers against raw B. If a catalogue Add/Modify references a baseline item that is also Delete-declared, the pre-resolution dangling check cannot see that reference, and `B.find_by_name` can still resolve it after the item has been moved to D. That either leaves S referencing a deleted item or reintroduces it, contradicting the stated requirement that references to deleted items be rejected as a Phase 1 Error. The marker resolution needs to run before the dangling-reference validation, or resolve only against the post-delete S universe.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 111,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6b5dfe8ff8f2a5de8cbf7d41a0a994f2b5a397157e6a0dfab65c9f8cb9678c24",
+          "at": "2026-05-08T18:50:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 3 says Delete処理後の S is the closed-world universe used to reject references to deleted types, but the same paragraph also resolves against `A.index`. Since A still contains catalogue items including Delete declarations, a reference to a deleted item can resolve through A after it was removed from S, accepting the exact case this section says must become a Phase 1 Error. Remove the A fallback or restrict it to non-delete items already retained in S.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 83,
+              "category": "contradiction"
+            },
+            {
+              "message": "ADR 2 still defines unresolved marker resolution as `B (Baseline) + A` and says the universe is `B + A`, while ADR 3 now defines the closed-world universe as post-delete S. Following ADR 2 would allow deleted baseline items from B to resolve unresolved TypeRefs, contradicting ADR 3's delete-after-S invariant and defeating deleted-reference rejection. Update D10 and the matching consequence text to use the post-delete S rule.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 201,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:de8af13d00a808088843402f2cba5d83a0b7fe5d4e04291370f6e739aa018c38",
+          "at": "2026-05-08T18:53:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.5 says unresolved markers must resolve only against the post-Delete S universe so references to deleted types are rejected, but the pseudocode still falls back to `A.find_by_name(...)`. Because `A` still contains Delete declarations, this branch can resolve a marker to an item that was intentionally removed from S, contradicting the stated closed-world rule and allowing the exact deleted-type reference the plan says must fail.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+              "line": 109,
+              "category": "contradiction"
+            },
+            {
+              "message": "This consequence still says Phase 1 rejects markers that cannot resolve in `B + A`, while D10 now defines the resolver as post-Delete S only. That stale universe definition conflicts with the updated Delete handling and would preserve deleted declarations as valid resolution targets if implemented from this summary.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 273,
+              "category": "contradiction"
+            },
+            {
+              "message": "Rejected alternative H claims ADR 1 D10 adopted optional trait impl methods, but ADR 1 D10 actually removes `TraitImplDecl.methods` entirely and the next sentence says the same. This self-contradiction leaves the rejected-alternative rationale pointing at a decision state that no longer exists.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+              "line": 251,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:fcbaa4f2514861fca199c27f3ddc66d905e8ad0d2d456e30808ff747edf8f617",
+          "at": "2026-05-08T18:57:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f03bb174f84bc9b6333a159d271b23d4d454a5dd106515761a2b88e0445aad2a",
+          "at": "2026-05-08T19:00:40Z"
+        }
+      ]
+    }
+  }
+}
