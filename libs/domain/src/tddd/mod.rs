@@ -24,6 +24,7 @@ pub mod contract_map_render;
 pub mod extended_crate;
 pub mod layer_id;
 pub mod new_typegraph_codec_error;
+pub mod signal_evaluator;
 pub mod signals;
 pub mod type_signals_doc;
 
@@ -37,3 +38,8 @@ pub use contract_map_render::render_contract_map;
 pub use extended_crate::ExtendedCrate;
 pub use layer_id::LayerId;
 pub use new_typegraph_codec_error::NewTypeGraphCodecError;
+pub use signal_evaluator::{
+    Phase1Error, SignalEvaluatorPort, SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal,
+    ThreeWaySignalKind,
+};
+// Note: `signal_for_region` is pub(crate) — use ThreeWaySignal::new() for public API.

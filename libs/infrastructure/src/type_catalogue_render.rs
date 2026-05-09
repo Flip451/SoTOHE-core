@@ -390,6 +390,8 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
+    use domain::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use domain::tddd::catalogue_v2::roles::SelfReceiver;
     use domain::{
         ConfidenceSignal, EnumVariantDeclaration, TypeCatalogueDocument, TypeCatalogueEntry,
         TypeDefinitionKind, TypeSignal,
@@ -626,11 +628,15 @@ mod tests {
             "SchemaExporter",
             TypeDefinitionKind::SecondaryPort {
                 expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
-                    "export",
-                    Some("&self".into()),
-                    vec![domain::tddd::catalogue::ParamDeclaration::new("crate_name", "str")],
-                    "Result<SchemaExport, SchemaExportError>",
+                    MethodName::new("export").unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![domain::tddd::catalogue::ParamDeclaration::new(
+                        ParamName::new("crate_name").unwrap(),
+                        TypeRef::new("str").unwrap(),
+                    )],
+                    TypeRef::new("Result<SchemaExport, SchemaExportError>").unwrap(),
                     false,
+                    None,
                 )],
             },
         );
@@ -649,11 +655,12 @@ mod tests {
             "HookHandler",
             TypeDefinitionKind::ApplicationService {
                 expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
-                    "handle",
-                    Some("&self".into()),
+                    MethodName::new("handle").unwrap(),
+                    Some(SelfReceiver::SharedRef),
                     vec![],
-                    "Result<HookVerdict, HookError>",
+                    TypeRef::new("Result<HookVerdict, HookError>").unwrap(),
                     false,
+                    None,
                 )],
             },
         );
@@ -786,11 +793,12 @@ mod tests {
                 "TrackRepo",
                 TypeDefinitionKind::SecondaryPort {
                     expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
-                        "save",
-                        Some("&self".into()),
+                        MethodName::new("save").unwrap(),
+                        Some(SelfReceiver::SharedRef),
                         vec![],
-                        "()",
+                        TypeRef::new("()").unwrap(),
                         false,
+                        None,
                     )],
                 },
             ),
@@ -798,11 +806,12 @@ mod tests {
                 "UseHandler",
                 TypeDefinitionKind::ApplicationService {
                     expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
-                        "execute",
-                        Some("&self".into()),
+                        MethodName::new("execute").unwrap(),
+                        Some(SelfReceiver::SharedRef),
                         vec![],
-                        "()",
+                        TypeRef::new("()").unwrap(),
                         false,
+                        None,
                     )],
                 },
             ),

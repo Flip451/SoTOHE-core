@@ -405,24 +405,24 @@ fn collect_edges(
         for source_name in graph.type_names() {
             if let Some(node) = graph.get_type(source_name) {
                 for method in node.methods() {
-                    let return_targets = extract_type_names(method.returns());
+                    let return_targets = extract_type_names(method.returns.as_str());
                     for target in return_targets {
                         if graph_type_names.contains(target) && target != source_name.as_str() {
                             edges.push((
                                 source_name.clone(),
-                                method.name().to_string(),
+                                method.name.as_str().to_string(),
                                 target.to_string(),
                                 "method_return",
                             ));
                         }
                     }
-                    for param in method.params() {
-                        let param_targets = extract_type_names(param.ty());
+                    for param in &method.params {
+                        let param_targets = extract_type_names(param.ty.as_str());
                         for target in param_targets {
                             if graph_type_names.contains(target) && target != source_name.as_str() {
                                 edges.push((
                                     source_name.clone(),
-                                    method.name().to_string(),
+                                    method.name.as_str().to_string(),
                                     target.to_string(),
                                     "method_param",
                                 ));
@@ -447,24 +447,24 @@ fn collect_edges(
         for trait_name in graph.trait_names() {
             if let Some(trait_node) = graph.get_trait(trait_name) {
                 for method in trait_node.methods() {
-                    let return_targets = extract_type_names(method.returns());
+                    let return_targets = extract_type_names(method.returns.as_str());
                     for target in return_targets {
                         if graph_type_names.contains(target) && target != trait_name.as_str() {
                             edges.push((
                                 trait_name.clone(),
-                                method.name().to_string(),
+                                method.name.as_str().to_string(),
                                 target.to_string(),
                                 "trait_method_return",
                             ));
                         }
                     }
-                    for param in method.params() {
-                        let param_targets = extract_type_names(param.ty());
+                    for param in &method.params {
+                        let param_targets = extract_type_names(param.ty.as_str());
                         for target in param_targets {
                             if graph_type_names.contains(target) && target != trait_name.as_str() {
                                 edges.push((
                                     trait_name.clone(),
-                                    method.name().to_string(),
+                                    method.name.as_str().to_string(),
                                     target.to_string(),
                                     "trait_method_param",
                                 ));
@@ -1309,12 +1309,21 @@ mod tests {
 
     use domain::schema::{TypeGraph, TypeKind, TypeNode};
     use domain::tddd::catalogue::{MemberDeclaration, MethodDeclaration};
+    use domain::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use domain::tddd::catalogue_v2::roles::SelfReceiver;
     use tempfile::TempDir;
 
     use super::*;
 
     fn method_returning(name: &str, returns: &str) -> MethodDeclaration {
-        MethodDeclaration::new(name, Some("&self".into()), vec![], returns, false)
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new(returns).unwrap(),
+            false,
+            None,
+        )
     }
 
     fn struct_node(methods: Vec<MethodDeclaration>) -> TypeNode {
@@ -1483,7 +1492,14 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "Factory".to_string(),
-            struct_node(vec![MethodDeclaration::new("create", None, vec![], "Product", false)]),
+            struct_node(vec![MethodDeclaration::new(
+                MethodName::new("create").unwrap(),
+                None,
+                vec![],
+                TypeRef::new("Product").unwrap(),
+                false,
+                None,
+            )]),
         );
         types.insert("Product".to_string(), struct_node(vec![]));
         let graph = TypeGraph::new(types, HashMap::new());
@@ -1981,7 +1997,14 @@ mod tests {
         let decls: Vec<MethodDeclaration> = methods
             .iter()
             .map(|(name, ret)| {
-                MethodDeclaration::new(*name, Some("&self".into()), vec![], *ret, false)
+                MethodDeclaration::new(
+                    MethodName::new(*name).unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    TypeRef::new(*ret).unwrap(),
+                    false,
+                    None,
+                )
             })
             .collect();
         domain::schema::TraitNode::new(decls)
@@ -2024,11 +2047,15 @@ mod tests {
         traits.insert(
             "Writer".to_string(),
             domain::schema::TraitNode::new(vec![MethodDeclaration::new(
-                "write",
-                Some("&self".into()),
-                vec![ParamDeclaration::new("cmd", "Command")],
-                "()",
+                MethodName::new("write").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![ParamDeclaration::new(
+                    ParamName::new("cmd").unwrap(),
+                    TypeRef::new("Command").unwrap(),
+                )],
+                TypeRef::new("()").unwrap(),
                 false,
+                None,
             )]),
         );
         let graph = TypeGraph::new(types, traits);
@@ -2221,11 +2248,15 @@ mod tests {
 
         let mut types = HashMap::new();
         let processor = struct_node(vec![MethodDeclaration::new(
-            "process",
-            Some("&self".into()),
-            vec![ParamDeclaration::new("item", "Item")],
-            "()",
+            MethodName::new("process").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![ParamDeclaration::new(
+                ParamName::new("item").unwrap(),
+                TypeRef::new("Item").unwrap(),
+            )],
+            TypeRef::new("()").unwrap(),
             false,
+            None,
         )]);
         types.insert("Processor".to_string(), processor);
         types.insert("Item".to_string(), struct_node(vec![]));
@@ -2253,11 +2284,15 @@ mod tests {
 
         let mut types = HashMap::new();
         let factory = struct_node(vec![MethodDeclaration::new(
-            "try_new",
+            MethodName::new("try_new").unwrap(),
             None, // associated function (no self receiver)
-            vec![ParamDeclaration::new("kind", "Kind")],
-            "Result<Self, Error>",
+            vec![ParamDeclaration::new(
+                ParamName::new("kind").unwrap(),
+                TypeRef::new("Kind").unwrap(),
+            )],
+            TypeRef::new("Result<Self, Error>").unwrap(),
             false,
+            None,
         )]);
         types.insert("Factory".to_string(), factory);
         types.insert("Kind".to_string(), struct_node(vec![]));
@@ -2296,11 +2331,15 @@ mod tests {
 
         let mut types = HashMap::new();
         let merger = struct_node(vec![MethodDeclaration::new(
-            "merge",
-            Some("&self".into()),
-            vec![ParamDeclaration::new("other", "Merger")],
-            "()",
+            MethodName::new("merge").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![ParamDeclaration::new(
+                ParamName::new("other").unwrap(),
+                TypeRef::new("Merger").unwrap(),
+            )],
+            TypeRef::new("()").unwrap(),
             false,
+            None,
         )]);
         types.insert("Merger".to_string(), merger);
         let graph = TypeGraph::new(types, HashMap::new());
@@ -2325,13 +2364,24 @@ mod tests {
 
         let mut types = HashMap::new();
         let type_a = struct_node(vec![
-            MethodDeclaration::new("call_a", Some("&self".into()), vec![], "B", false),
             MethodDeclaration::new(
-                "call_b",
-                Some("&self".into()),
-                vec![ParamDeclaration::new("c", "C")],
-                "()",
+                MethodName::new("call_a").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("B").unwrap(),
                 false,
+                None,
+            ),
+            MethodDeclaration::new(
+                MethodName::new("call_b").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![ParamDeclaration::new(
+                    ParamName::new("c").unwrap(),
+                    TypeRef::new("C").unwrap(),
+                )],
+                TypeRef::new("()").unwrap(),
+                false,
+                None,
             ),
         ]);
         types.insert("A".to_string(), type_a);
@@ -2385,11 +2435,12 @@ mod tests {
 
         let mut types = HashMap::new();
         let mut a = struct_node(vec![MethodDeclaration::new(
-            "call",
-            Some("&self".into()),
-            vec![ParamDeclaration::new("b", "B")],
-            "()",
+            MethodName::new("call").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![ParamDeclaration::new(ParamName::new("b").unwrap(), TypeRef::new("B").unwrap())],
+            TypeRef::new("()").unwrap(),
             false,
+            None,
         )]);
         a.set_module_path("domain::a".to_owned());
         types.insert("A".to_string(), a);
@@ -2423,11 +2474,15 @@ mod tests {
 
         let mut types = HashMap::new();
         let mut producer = struct_node(vec![MethodDeclaration::new(
-            "make",
-            Some("&self".into()),
-            vec![ParamDeclaration::new("input", "Input")],
-            "()",
+            MethodName::new("make").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![ParamDeclaration::new(
+                ParamName::new("input").unwrap(),
+                TypeRef::new("Input").unwrap(),
+            )],
+            TypeRef::new("()").unwrap(),
             false,
+            None,
         )]);
         producer.set_module_path("domain::pipeline".to_owned());
         types.insert("Producer".to_string(), producer);

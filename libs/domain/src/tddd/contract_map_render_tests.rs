@@ -12,7 +12,7 @@
 //! All items in this file are part of the `tests` module and can reference
 //! private helpers in `contract_map_render` via `use super::*`.
 
-#![allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
 
 use std::collections::BTreeMap;
 
@@ -22,7 +22,29 @@ use crate::tddd::catalogue::{
     EnumVariantDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction,
     TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
 };
+use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+use crate::tddd::catalogue_v2::roles::SelfReceiver;
 use crate::tddd::contract_map_options::ContractMapRenderOptions;
+
+/// Build a [`ParamDeclaration`] from plain `&str` values (test helper).
+fn mk_param(name: &str, ty: &str) -> ParamDeclaration {
+    ParamDeclaration::new(
+        ParamName::new(name).expect("test param name"),
+        TypeRef::new(ty).expect("test param ty"),
+    )
+}
+
+/// Build a [`MethodDeclaration`] (with `&self` receiver) from plain `&str` values (test helper).
+fn mk_method(name: &str, receiver: Option<SelfReceiver>, returns: &str) -> MethodDeclaration {
+    MethodDeclaration::new(
+        MethodName::new(name).expect("test method name"),
+        receiver,
+        Vec::new(),
+        TypeRef::new(returns).expect("test return type"),
+        false,
+        None,
+    )
+}
 
 fn layer(name: &str) -> LayerId {
     LayerId::try_new(name.to_owned()).unwrap()
@@ -43,19 +65,21 @@ fn simple_3layer_catalogues() -> (BTreeMap<LayerId, TypeCatalogueDocument>, Vec<
     let infra = layer("infrastructure");
 
     let user_repository_methods = vec![MethodDeclaration::new(
-        "save",
-        Some("&self".to_owned()),
-        vec![ParamDeclaration::new("user", "User")],
-        "Result<(), DomainError>",
+        MethodName::new("save").expect("test method name"),
+        Some(SelfReceiver::SharedRef),
+        vec![mk_param("user", "User")],
+        TypeRef::new("Result<(), DomainError>").expect("test return type"),
         false,
+        None,
     )];
 
     let register_user_methods = vec![MethodDeclaration::new(
-        "execute",
-        Some("&self".to_owned()),
+        MethodName::new("execute").expect("test method name"),
+        Some(SelfReceiver::SharedRef),
         vec![],
-        "Result<User, DomainError>",
+        TypeRef::new("Result<User, DomainError>").expect("test return type"),
         false,
+        None,
     )];
 
     let postgres_impl = TraitImplDecl::new("UserRepository", Vec::new());
@@ -477,11 +501,12 @@ fn test_render_contract_map_emits_param_edge_across_layers() {
     let usecase = layer("usecase");
 
     let exec_method = vec![MethodDeclaration::new(
-        "execute",
-        Some("&self".to_owned()),
-        vec![ParamDeclaration::new("subject", "Subject")],
-        "()",
+        MethodName::new("execute").expect("test method name"),
+        Some(SelfReceiver::SharedRef),
+        vec![mk_param("subject", "Subject")],
+        TypeRef::new("()").expect("test return type"),
         false,
+        None,
     )];
 
     let domain_doc = doc(vec![entry(
@@ -515,11 +540,12 @@ fn test_render_contract_map_ignores_param_referencing_undeclared_type() {
     // produce an edge (external type is absent from the type_index).
     let domain = layer("domain");
     let exec_method = vec![MethodDeclaration::new(
-        "take",
-        Some("&self".to_owned()),
-        vec![ParamDeclaration::new("path", "std::path::PathBuf")],
-        "()",
+        MethodName::new("take").expect("test method name"),
+        Some(SelfReceiver::SharedRef),
+        vec![mk_param("path", "std::path::PathBuf")],
+        TypeRef::new("()").expect("test return type"),
         false,
+        None,
     )];
     let domain_doc = doc(vec![entry(
         "Service",
@@ -547,11 +573,12 @@ fn test_render_contract_map_param_edge_label_format_is_method_arg() {
     let domain = layer("domain");
 
     let ctor = vec![MethodDeclaration::new(
-        "configure",
-        Some("&self".to_owned()),
-        vec![ParamDeclaration::new("settings", "Settings")],
-        "()",
+        MethodName::new("configure").expect("test method name"),
+        Some(SelfReceiver::SharedRef),
+        vec![mk_param("settings", "Settings")],
+        TypeRef::new("()").expect("test return type"),
         false,
+        None,
     )];
     let domain_doc = doc(vec![
         entry("App", TypeDefinitionKind::ApplicationService { expected_methods: ctor }),
@@ -598,11 +625,12 @@ fn test_render_contract_map_fans_out_edges_when_short_name_shadowed_across_layer
     let infra = layer("infrastructure");
 
     let caller_methods = vec![MethodDeclaration::new(
-        "run",
-        Some("&self".to_owned()),
+        MethodName::new("run").expect("test method name"),
+        Some(SelfReceiver::SharedRef),
         vec![],
-        "Result<(), Error>",
+        TypeRef::new("Result<(), Error>").expect("test return type"),
         false,
+        None,
     )];
 
     let domain_doc = doc(vec![
@@ -828,7 +856,7 @@ fn test_render_contract_map_free_function_param_edge_to_declared_type() {
         "find_user",
         TypeDefinitionKind::FreeFunction {
             module_path: None,
-            expected_params: vec![ParamDeclaration::new("id", "UserId")],
+            expected_params: vec![mk_param("id", "UserId")],
             expected_returns: Vec::new(),
             expected_is_async: false,
         },
@@ -911,7 +939,7 @@ fn test_render_contract_map_free_function_both_param_and_return_edges() {
         "transform",
         TypeDefinitionKind::FreeFunction {
             module_path: None,
-            expected_params: vec![ParamDeclaration::new("input", "InputDto")],
+            expected_params: vec![mk_param("input", "InputDto")],
             expected_returns: vec!["OutputDto".to_owned()],
             expected_is_async: false,
         },
@@ -955,7 +983,7 @@ fn test_render_contract_map_free_function_undeclared_param_type_emits_no_edge() 
         "read_file",
         TypeDefinitionKind::FreeFunction {
             module_path: None,
-            expected_params: vec![ParamDeclaration::new("path", "std::path::PathBuf")],
+            expected_params: vec![mk_param("path", "std::path::PathBuf")],
             expected_returns: Vec::new(),
             expected_is_async: false,
         },
@@ -1024,13 +1052,13 @@ fn test_render_contract_map_free_function_node_is_rendered_in_subgraph() {
 
 /// Builds a `MethodDeclaration` with a single param for test fixtures.
 fn method_with_return(name: &str, returns: &str) -> MethodDeclaration {
-    MethodDeclaration::new(name, Some("&self".to_owned()), Vec::new(), returns, false)
+    mk_method(name, Some(SelfReceiver::SharedRef), returns)
 }
 
 // Helper: assert `methods_of` returns exactly the supplied method names.
 fn assert_methods_of(kind: &TypeDefinitionKind, expected_names: &[&str]) {
     let methods = methods_of(kind);
-    let got: Vec<&str> = methods.iter().map(|m| m.name()).collect();
+    let got: Vec<&str> = methods.iter().map(|m| m.name.as_str()).collect();
     assert_eq!(got, expected_names, "methods_of({}) returned unexpected methods", kind.kind_tag());
 }
 
@@ -1148,7 +1176,7 @@ fn test_methods_of_secondary_adapter_merges_top_level_and_implements_methods() {
     };
 
     let methods = methods_of(&kind);
-    let names: Vec<&str> = methods.iter().map(|m| m.name()).collect();
+    let names: Vec<&str> = methods.iter().map(|m| m.name.as_str()).collect();
     // Top-level first, then implements (chain order).
     assert_eq!(names, vec!["new", "save"], "SecondaryAdapter must merge both sources in order");
 }
@@ -1238,12 +1266,10 @@ fn test_render_contract_map_struct_kind_with_methods_produces_method_edge() {
         TypeDefinitionKind::Typestate {
             transitions: TypestateTransitions::To(vec!["NextState".to_owned()]),
             expected_members: Vec::new(),
-            expected_methods: vec![MethodDeclaration::new(
+            expected_methods: vec![mk_method(
                 "advance",
-                Some("&self".to_owned()),
-                Vec::new(),
+                Some(SelfReceiver::SharedRef),
                 "NextState",
-                false,
             )],
         },
     );
@@ -1281,13 +1307,7 @@ fn test_render_contract_map_domain_service_with_methods_produces_method_edge() {
         "PricingService",
         TypeDefinitionKind::DomainService {
             expected_members: Vec::new(),
-            expected_methods: vec![MethodDeclaration::new(
-                "calculate",
-                Some("&self".to_owned()),
-                Vec::new(),
-                "Order",
-                false,
-            )],
+            expected_methods: vec![mk_method("calculate", Some(SelfReceiver::SharedRef), "Order")],
         },
     );
 
@@ -1327,13 +1347,7 @@ fn test_render_contract_map_secondary_adapter_top_level_method_produces_edge() {
             implements: Vec::new(),
             expected_members: Vec::new(),
             // Direct struct method on the adapter (not a trait impl method).
-            expected_methods: vec![MethodDeclaration::new(
-                "build",
-                None,
-                Vec::new(),
-                "User",
-                false,
-            )],
+            expected_methods: vec![mk_method("build", None, "User")],
         },
     );
 
@@ -1540,11 +1554,12 @@ fn test_render_contract_map_with_reference_port_produces_impl_edge() {
     let infra = layer("infrastructure");
 
     let port_methods = vec![MethodDeclaration::new(
-        "save",
-        Some("&self".to_owned()),
-        vec![ParamDeclaration::new("user", "User")],
-        "Result<(), DomainError>",
+        MethodName::new("save").expect("test method name"),
+        Some(SelfReceiver::SharedRef),
+        vec![mk_param("user", "User")],
+        TypeRef::new("Result<(), DomainError>").expect("test return type"),
         false,
+        None,
     )];
     let referenced_port = TypeCatalogueEntry::new(
         "UserRepository",

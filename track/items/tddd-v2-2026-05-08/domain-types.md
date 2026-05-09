@@ -13,8 +13,8 @@
 | CompositePattern | enum | — | Plain, TypestateState, Newtype | 🔵 | 🔵 |
 | VariantPayload | enum | — | Unit, Tuple, Struct | 🔵 | 🔵 |
 | TypeKindV2 | enum | — | Struct, Enum, TypeAlias | 🔵 | 🟡 |
-| SignalRegion | enum | — | SIntersectC_Match_Add, SIntersectC_Match_Modify, SIntersectC_Match_Reference, SIntersectC_Mismatch_Reference, SIntersectC_Mismatch_Add, SIntersectC_Mismatch_Modify, SMinusC_Reference, SMinusC_Add, SMinusC_Modify, DIntersectC, DMinusC, CMinusSUnionD | 🟡 | 🔵 |
-| ThreeWaySignalKind | enum | — | Skip, Blue, Yellow, Red | 🟡 | 🔵 |
+| SignalRegion | enum | — | SIntersectC_Match_Add, SIntersectC_Match_Modify, SIntersectC_Match_Reference, SIntersectC_Mismatch_Reference, SIntersectC_Mismatch_Add, SIntersectC_Mismatch_Modify, SMinusC_Reference, SMinusC_Add, SMinusC_Modify, DIntersectC, DMinusC, CMinusSUnionD | 🔵 | 🔵 |
+| ThreeWaySignalKind | enum | — | Skip, Blue, Yellow, Red | 🔵 | 🔵 |
 | TypeDefinitionKind | enum | delete | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, DomainService, FreeFunction | 🟡 | 🔵 |
 | MemberDeclaration | enum | delete | Variant, Field | 🟡 | 🔵 |
 | TypeAction | enum | delete | Add, Modify, Reference, Delete | 🟡 | 🔵 |
@@ -43,8 +43,8 @@
 | TraitEntry | value_object | — | — | 🔵 | 🔵 |
 | FunctionEntry | value_object | — | — | 🔵 | 🔵 |
 | CatalogueDocument | value_object | — | — | 🔵 | 🔵 |
-| ThreeWaySignal | value_object | — | — | 🟡 | 🔵 |
-| ThreeWayEvaluationReport | value_object | — | — | 🟡 | 🔵 |
+| ThreeWaySignal | value_object | — | — | 🔵 | 🔵 |
+| ThreeWayEvaluationReport | value_object | — | — | 🔵 | 🔵 |
 | TypeCatalogueDocument | value_object | delete | — | 🟡 | 🔵 |
 | TypeCatalogueEntry | value_object | delete | — | 🟡 | 🔵 |
 | TypeBaseline | value_object | delete | — | 🟡 | 🔵 |
@@ -68,7 +68,7 @@
 |------|------|--------|---------|--------|----------|
 | IdentifierError | error_type | — | Empty, InvalidCharacters, InvalidSegment, InvalidFunctionPath | 🔵 | 🔵 |
 | CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🔵 | 🔵 |
-| Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🟡 | 🔵 |
+| Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🔵 | 🔵 |
 | NewTypeGraphCodecError | error_type | modify | InvalidTypeRef, AmbiguousTypeName | 🔵 | 🔵 |
 
 ## Secondary Ports
@@ -76,7 +76,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueToExtendedCratePort | secondary_port | — | fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError> | 🔵 | 🔵 |
-| SignalEvaluatorPort | secondary_port | — | fn evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error> | 🟡 | 🔵 |
+| SignalEvaluatorPort | secondary_port | — | fn evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error> | 🔵 | 🔵 |
 | ContractMapWriter | secondary_port | reference | fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError> | 🔵 | 🟡 |
 | CatalogueLinter | secondary_port | modify | fn run(&self, rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🟡 | 🟡 |
 | SchemaExporter | secondary_port | reference | fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> | 🔵 | 🟡 |

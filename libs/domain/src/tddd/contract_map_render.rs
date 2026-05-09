@@ -159,7 +159,7 @@ pub fn render_contract_map(
 
         for method in methods_of(entry.kind()) {
             // Returns-derived edges (Phase 1 baseline).
-            for token in extract_type_names(method.returns()) {
+            for token in extract_type_names(method.returns.as_str()) {
                 if let Some(dsts) = type_index.get(token) {
                     for (_dst_layer, dst_id) in dsts {
                         if dst_id == &src_id {
@@ -167,15 +167,15 @@ pub fn render_contract_map(
                         }
                         edges.insert(format!(
                             "    {src_id} -->|{label}| {dst_id}",
-                            label = escape_edge_label(method.name()),
+                            label = escape_edge_label(method.name.as_str()),
                         ));
                     }
                 }
             }
 
             // Params-derived edges (Phase 1.5 extension, ADR §D4 (1)).
-            for param in method.params() {
-                for token in extract_type_names(param.ty()) {
+            for param in &method.params {
+                for token in extract_type_names(param.ty.as_str()) {
                     if let Some(dsts) = type_index.get(token) {
                         for (_dst_layer, dst_id) in dsts {
                             if dst_id == &src_id {
@@ -185,8 +185,8 @@ pub fn render_contract_map(
                                 "    {src_id} -->|{label}| {dst_id}",
                                 label = escape_edge_label(&format!(
                                     "{}({})",
-                                    method.name(),
-                                    param.name()
+                                    method.name.as_str(),
+                                    param.name.as_str()
                                 )),
                             ));
                         }
@@ -237,7 +237,7 @@ pub fn render_contract_map(
             entry.kind()
         {
             for param in expected_params {
-                for token in extract_type_names(param.ty()) {
+                for token in extract_type_names(param.ty.as_str()) {
                     if let Some(dsts) = type_index.get(token) {
                         for (_dst_layer, dst_id) in dsts {
                             if dst_id == &src_id {
@@ -245,7 +245,7 @@ pub fn render_contract_map(
                             }
                             edges.insert(format!(
                                 "    {src_id} -->|{label}| {dst_id}",
-                                label = escape_edge_label(param.name()),
+                                label = escape_edge_label(param.name.as_str()),
                             ));
                         }
                     }

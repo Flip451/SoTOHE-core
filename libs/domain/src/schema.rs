@@ -16,7 +16,8 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
+use crate::tddd::catalogue::MemberDeclaration;
+use crate::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
 
 /// Top-level export result containing all public API elements of a crate.
 ///
@@ -768,6 +769,9 @@ impl TraitNode {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
+    use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use crate::tddd::catalogue_v2::roles::SelfReceiver;
+
     use super::*;
 
     #[test]
@@ -864,16 +868,20 @@ mod tests {
     #[test]
     fn test_trait_impl_entry_accessors() {
         let methods = vec![MethodDeclaration::new(
-            "find",
-            Some("&self".into()),
-            vec![ParamDeclaration::new("id", "ReviewId")],
-            "Option<Review>",
+            MethodName::new("find").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![ParamDeclaration::new(
+                ParamName::new("id").unwrap(),
+                TypeRef::new("ReviewId").unwrap(),
+            )],
+            TypeRef::new("Option<Review>").unwrap(),
             false,
+            None,
         )];
         let entry = TraitImplEntry::new("ReviewReader", methods);
         assert_eq!(entry.trait_name(), "ReviewReader");
         assert_eq!(entry.methods().len(), 1);
-        assert_eq!(entry.methods()[0].name(), "find");
+        assert_eq!(entry.methods()[0].name.as_str(), "find");
     }
 
     #[test]
@@ -914,22 +922,27 @@ mod tests {
     fn trait_node_exposes_structured_methods() {
         let methods = vec![
             MethodDeclaration::new(
-                "save",
-                Some("&self".into()),
+                MethodName::new("save").unwrap(),
+                Some(SelfReceiver::SharedRef),
                 vec![],
-                "Result<(), Error>",
+                TypeRef::new("Result<(), Error>").unwrap(),
                 false,
+                None,
             ),
             MethodDeclaration::new(
-                "find",
-                Some("&self".into()),
-                vec![ParamDeclaration::new("id", "UserId")],
-                "Option<User>",
+                MethodName::new("find").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![ParamDeclaration::new(
+                    ParamName::new("id").unwrap(),
+                    TypeRef::new("UserId").unwrap(),
+                )],
+                TypeRef::new("Option<User>").unwrap(),
                 false,
+                None,
             ),
         ];
         let node = TraitNode::new(methods);
-        let names: Vec<&str> = node.methods().iter().map(MethodDeclaration::name).collect();
+        let names: Vec<&str> = node.methods().iter().map(|m| m.name.as_str()).collect();
         assert_eq!(names, vec!["save", "find"]);
         assert_eq!(node.methods().len(), 2);
     }
@@ -960,7 +973,10 @@ mod tests {
 
     #[test]
     fn test_function_node_accessors() {
-        let params = vec![ParamDeclaration::new("id", "TrackId")];
+        let params = vec![ParamDeclaration::new(
+            ParamName::new("id").unwrap(),
+            TypeRef::new("TrackId").unwrap(),
+        )];
         let returns = vec!["Option<Track>".to_string()];
         let node = FunctionNode::new(
             params.clone(),
@@ -969,7 +985,7 @@ mod tests {
             Some("domain::track".to_string()),
         );
         assert_eq!(node.params().len(), 1);
-        assert_eq!(node.params()[0].name(), "id");
+        assert_eq!(node.params()[0].name.as_str(), "id");
         assert_eq!(node.returns(), &["Option<Track>"]);
         assert!(!node.is_async());
         assert_eq!(node.module_path(), Some("domain::track"));
@@ -1012,7 +1028,7 @@ mod tests {
     fn test_type_graph_get_function_returns_correct_node() {
         let mut functions = HashMap::new();
         let node = FunctionNode::new(
-            vec![ParamDeclaration::new("x", "u32")],
+            vec![ParamDeclaration::new(ParamName::new("x").unwrap(), TypeRef::new("u32").unwrap())],
             vec!["String".to_string()],
             false,
             None,

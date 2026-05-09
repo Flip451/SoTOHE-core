@@ -108,6 +108,36 @@ impl MethodDeclaration {
     ) -> Self {
         Self { name, receiver: None, params, returns, is_async: false, docs: None }
     }
+
+    /// Reconstructs a human-readable signature string from the structured fields
+    /// for rendering / debugging.
+    ///
+    /// Layout:
+    ///
+    /// ```text
+    /// [async ]fn name(receiver[, param1: ty1, param2: ty2]) -> returns
+    /// ```
+    ///
+    /// The unit return type is rendered as `"()"` when the returns field is `"()"`.
+    #[must_use]
+    pub fn signature_string(&self) -> String {
+        let async_prefix = if self.is_async { "async " } else { "" };
+        let receiver_string = self.receiver.map(|r| r.to_string());
+        let receiver_str = receiver_string.as_deref().unwrap_or("");
+        let params_str = self
+            .params
+            .iter()
+            .map(|p| format!("{}: {}", p.name.as_str(), p.ty.as_str()))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let args = match (receiver_str.is_empty(), params_str.is_empty()) {
+            (true, true) => String::new(),
+            (true, false) => params_str,
+            (false, true) => receiver_str.to_string(),
+            (false, false) => format!("{receiver_str}, {params_str}"),
+        };
+        format!("{async_prefix}fn {}({}) -> {}", self.name.as_str(), args, self.returns.as_str())
+    }
 }
 
 // ---------------------------------------------------------------------------

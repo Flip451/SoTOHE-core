@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T05:18:38Z",
-  "declaration_hash": "52ed9f8cb7ae52ed09c5d950013a187072ba49a27c284176fd12d663d042540a",
+  "generated_at": "2026-05-09T07:14:05Z",
+  "declaration_hash": "b9a8f40c85e46aab25bf36dd654beecd3a00456927bae5028d299de3935fa7a8",
   "signals": [
     {
       "type_name": "Identifier",
@@ -309,32 +309,57 @@
     {
       "type_name": "Phase1Error",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ActionContradiction",
+        "DanglingId",
+        "UnresolvedTypeRef"
+      ]
     },
     {
       "type_name": "SignalRegion",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CMinusSUnionD",
+        "DIntersectC",
+        "DMinusC",
+        "SIntersectC_Match_Add",
+        "SIntersectC_Match_Modify",
+        "SIntersectC_Match_Reference",
+        "SIntersectC_Mismatch_Add",
+        "SIntersectC_Mismatch_Modify",
+        "SIntersectC_Mismatch_Reference",
+        "SMinusC_Add",
+        "SMinusC_Modify",
+        "SMinusC_Reference"
+      ]
     },
     {
       "type_name": "ThreeWaySignalKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Blue",
+        "Red",
+        "Skip",
+        "Yellow"
+      ]
     },
     {
       "type_name": "ThreeWaySignal",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ThreeWayEvaluationReport",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "NewTypeGraphCodecError",
@@ -358,8 +383,11 @@
     {
       "type_name": "SignalEvaluatorPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error>"
+      ]
     },
     {
       "type_name": "TypeDefinitionKind",

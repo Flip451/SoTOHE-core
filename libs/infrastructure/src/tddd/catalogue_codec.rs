@@ -23,6 +23,8 @@ use std::path::PathBuf;
 use domain::tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl,
 };
+use domain::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+use domain::tddd::catalogue_v2::roles::SelfReceiver;
 use domain::{
     ConfidenceSignal, ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
     SpecElementId, SpecRef, SpecValidationError, TypeAction, TypeCatalogueDocument,
@@ -1207,7 +1209,16 @@ fn decode_free_function_param_list(
                 ),
             });
         }
-        out.push(ParamDeclaration::new(p.name.clone(), p.ty.clone()));
+        let param_name =
+            ParamName::new(&p.name).map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!("param name '{}' is not valid: {e}", p.name),
+            })?;
+        let param_ty = TypeRef::new(&p.ty).map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+            name: entry_name.to_owned(),
+            reason: format!("param '{}' type '{}' is not valid: {e}", p.name, p.ty),
+        })?;
+        out.push(ParamDeclaration::new(param_name, param_ty));
     }
     Ok(out)
 }
@@ -1251,6 +1262,24 @@ fn method_from_dto(
             ),
         });
     }
+    let method_name =
+        MethodName::new(&dto.name).map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+            name: entry_name.to_owned(),
+            reason: format!("method name '{}' is not a valid identifier: {e}", dto.name),
+        })?;
+    let receiver = if let Some(r) = &dto.receiver {
+        Some(r.parse::<SelfReceiver>().map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+            name: entry_name.to_owned(),
+            reason: format!("method '{}' receiver '{r}' is not valid: {e}", dto.name),
+        })?)
+    } else {
+        None
+    };
+    let returns =
+        TypeRef::new(&dto.returns).map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+            name: entry_name.to_owned(),
+            reason: format!("method '{}' returns '{}' is not valid: {e}", dto.name, dto.returns),
+        })?;
     let mut params = Vec::with_capacity(dto.params.len());
     for p in &dto.params {
         if p.ty.contains("::") {
@@ -1263,15 +1292,21 @@ fn method_from_dto(
                 ),
             });
         }
-        params.push(ParamDeclaration::new(p.name.clone(), p.ty.clone()));
+        let param_name =
+            ParamName::new(&p.name).map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!("method '{}' param name '{}' is not valid: {e}", dto.name, p.name),
+            })?;
+        let param_ty = TypeRef::new(&p.ty).map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+            name: entry_name.to_owned(),
+            reason: format!(
+                "method '{}' param '{}' type '{}' is not valid: {e}",
+                dto.name, p.name, p.ty
+            ),
+        })?;
+        params.push(ParamDeclaration::new(param_name, param_ty));
     }
-    Ok(MethodDeclaration::new(
-        dto.name.clone(),
-        dto.receiver.clone(),
-        params,
-        dto.returns.clone(),
-        dto.is_async,
-    ))
+    Ok(MethodDeclaration::new(method_name, receiver, params, returns, dto.is_async, None))
 }
 
 #[allow(dead_code)] // retained behind `#[allow]` for potential legacy-decode hook restoration.
@@ -1595,18 +1630,18 @@ fn encode_free_function_param_list(
 ) -> Result<Vec<ParamDto>, TypeCatalogueCodecError> {
     let mut out = Vec::with_capacity(params.len());
     for p in params {
-        if p.ty().contains("::") {
+        if p.ty.as_str().contains("::") {
             return Err(TypeCatalogueCodecError::InvalidEntry {
                 name: entry_name.to_owned(),
                 reason: format!(
                     "expected_params param '{}' ty contains '::' — L1 catalogue entries \
                      must use last-segment short names: '{}'",
-                    p.name(),
-                    p.ty()
+                    p.name.as_str(),
+                    p.ty.as_str()
                 ),
             });
         }
-        out.push(ParamDto { name: p.name().to_owned(), ty: p.ty().to_owned() });
+        out.push(ParamDto { name: p.name.as_str().to_owned(), ty: p.ty.as_str().to_owned() });
     }
     Ok(out)
 }
@@ -1617,39 +1652,39 @@ fn method_to_dto(
 ) -> Result<MethodDto, TypeCatalogueCodecError> {
     // L1 enforcement at encode time: mirror the same check as `method_from_dto` so that
     // `encode(doc)` never produces JSON that `decode` would immediately reject.
-    if method.returns().contains("::") {
+    if method.returns.as_str().contains("::") {
         return Err(TypeCatalogueCodecError::InvalidEntry {
             name: entry_name.to_owned(),
             reason: format!(
                 "method '{}' returns contains '::' — L1 catalogue entries must use \
                  last-segment short names: '{}'",
-                method.name(),
-                method.returns()
+                method.name.as_str(),
+                method.returns.as_str()
             ),
         });
     }
-    let mut params = Vec::with_capacity(method.params().len());
-    for p in method.params() {
-        if p.ty().contains("::") {
+    let mut params = Vec::with_capacity(method.params.len());
+    for p in &method.params {
+        if p.ty.as_str().contains("::") {
             return Err(TypeCatalogueCodecError::InvalidEntry {
                 name: entry_name.to_owned(),
                 reason: format!(
                     "method '{}' param '{}' ty contains '::' — L1 catalogue entries \
                      must use last-segment short names: '{}'",
-                    method.name(),
-                    p.name(),
-                    p.ty()
+                    method.name.as_str(),
+                    p.name.as_str(),
+                    p.ty.as_str()
                 ),
             });
         }
-        params.push(ParamDto { name: p.name().to_owned(), ty: p.ty().to_owned() });
+        params.push(ParamDto { name: p.name.as_str().to_owned(), ty: p.ty.as_str().to_owned() });
     }
     Ok(MethodDto {
-        name: method.name().to_owned(),
-        receiver: method.receiver().map(str::to_owned),
+        name: method.name.as_str().to_owned(),
+        receiver: method.receiver.map(|r| r.to_string()),
         params,
-        returns: method.returns().to_owned(),
-        is_async: method.is_async(),
+        returns: method.returns.as_str().to_owned(),
+        is_async: method.is_async,
     })
 }
 
@@ -1745,13 +1780,13 @@ mod tests {
         };
         assert_eq!(expected_methods.len(), 1);
         let method = &expected_methods[0];
-        assert_eq!(method.name(), "export");
-        assert_eq!(method.receiver(), Some("&self"));
-        assert_eq!(method.params().len(), 1);
-        assert_eq!(method.params()[0].name(), "crate_name");
-        assert_eq!(method.params()[0].ty(), "str");
-        assert_eq!(method.returns(), "Result<SchemaExport, SchemaExportError>");
-        assert!(!method.is_async());
+        assert_eq!(method.name.as_str(), "export");
+        assert_eq!(method.receiver.map(|r| r.to_string()), Some("&self".to_string()));
+        assert_eq!(method.params.len(), 1);
+        assert_eq!(method.params[0].name.as_str(), "crate_name");
+        assert_eq!(method.params[0].ty.as_str(), "str");
+        assert_eq!(method.returns.as_str(), "Result<SchemaExport, SchemaExportError>");
+        assert!(!method.is_async);
     }
 
     #[test]
@@ -2215,7 +2250,7 @@ mod tests {
             panic!("expected ApplicationService kind, got {:?}", kind);
         };
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "handle");
+        assert_eq!(expected_methods[0].name.as_str(), "handle");
     }
 
     #[test]
@@ -2496,7 +2531,7 @@ mod tests {
             panic!("expected UseCase kind, got {kind:?}");
         };
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "execute");
+        assert_eq!(expected_methods[0].name.as_str(), "execute");
     }
 
     #[test]
@@ -2630,7 +2665,7 @@ mod tests {
         assert_eq!(implements.len(), 2);
         assert_eq!(implements[0].trait_name(), "WorktreeReader");
         assert_eq!(implements[0].expected_methods().len(), 1);
-        assert_eq!(implements[0].expected_methods()[0].name(), "read_worktree");
+        assert_eq!(implements[0].expected_methods()[0].name.as_str(), "read_worktree");
         assert_eq!(implements[1].trait_name(), "TrackWriter");
         assert!(implements[1].expected_methods().is_empty());
     }
@@ -2794,7 +2829,7 @@ mod tests {
             panic!("expected SecondaryAdapter kind, got {kind:?}");
         };
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "find");
+        assert_eq!(expected_methods[0].name.as_str(), "find");
     }
 
     #[test]
@@ -3296,8 +3331,8 @@ mod tests {
         };
         assert_eq!(module_path.as_deref(), Some("render"));
         assert_eq!(expected_params.len(), 1);
-        assert_eq!(expected_params[0].name(), "options");
-        assert_eq!(expected_params[0].ty(), "ContractMapRenderOptions");
+        assert_eq!(expected_params[0].name.as_str(), "options");
+        assert_eq!(expected_params[0].ty.as_str(), "ContractMapRenderOptions");
         assert_eq!(expected_returns, &["Result<ContractMap, RenderError>"]);
         assert!(!expected_is_async);
     }
@@ -3446,7 +3481,7 @@ mod tests {
             panic!("expected Typestate kind, got {kind:?}");
         };
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "validate");
+        assert_eq!(expected_methods[0].name.as_str(), "validate");
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
         assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
@@ -3477,7 +3512,7 @@ mod tests {
             panic!("expected ValueObject kind, got {kind:?}");
         };
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "as_str");
+        assert_eq!(expected_methods[0].name.as_str(), "as_str");
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
         assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
@@ -3505,7 +3540,7 @@ mod tests {
             panic!("expected UseCase kind, got {kind:?}");
         };
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "execute");
+        assert_eq!(expected_methods[0].name.as_str(), "execute");
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
         assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
@@ -3536,7 +3571,7 @@ mod tests {
         };
         assert_eq!(implements.len(), 1);
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "run");
+        assert_eq!(expected_methods[0].name.as_str(), "run");
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
         assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
@@ -3569,7 +3604,7 @@ mod tests {
         };
         assert_eq!(expected_members.len(), 1);
         assert_eq!(expected_methods.len(), 1);
-        assert_eq!(expected_methods[0].name(), "calculate");
+        assert_eq!(expected_methods[0].name.as_str(), "calculate");
 
         let encoded = encode(&doc).unwrap();
         // S1: DomainService must serialize as "domain_service" kind tag.

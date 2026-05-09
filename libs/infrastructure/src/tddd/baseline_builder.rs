@@ -97,6 +97,8 @@ mod tests {
 
     use domain::schema::{FunctionNode, TraitImplEntry, TraitNode, TypeKind, TypeNode};
     use domain::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
+    use domain::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use domain::tddd::catalogue_v2::roles::SelfReceiver;
 
     use super::*;
 
@@ -105,7 +107,14 @@ mod tests {
     }
 
     fn unit_method(name: &str) -> MethodDeclaration {
-        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            None,
+        )
     }
 
     #[test]
@@ -156,7 +165,7 @@ mod tests {
         let names: Vec<&str> = entry.members().iter().map(|m| m.name()).collect();
         assert_eq!(names, vec!["Done", "InProgress", "Todo"]);
         assert_eq!(entry.methods().len(), 1);
-        assert_eq!(entry.methods()[0].name(), "kind");
+        assert_eq!(entry.methods()[0].name.as_str(), "kind");
     }
 
     #[test]
@@ -173,7 +182,7 @@ mod tests {
 
         let entry = bl.get_type("Draft").unwrap();
         assert_eq!(entry.methods().len(), 1);
-        assert_eq!(entry.methods()[0].name(), "publish");
+        assert_eq!(entry.methods()[0].name.as_str(), "publish");
     }
 
     #[test]
@@ -188,7 +197,7 @@ mod tests {
         let bl = build_baseline(&graph, make_timestamp());
 
         let entry = bl.get_trait("TrackReader").unwrap();
-        let names: Vec<&str> = entry.methods().iter().map(|m| m.name()).collect();
+        let names: Vec<&str> = entry.methods().iter().map(|m| m.name.as_str()).collect();
         assert_eq!(names, vec!["find", "list"]);
     }
 
@@ -307,7 +316,10 @@ mod tests {
     #[test]
     fn test_build_baseline_captures_functions_with_module_path() {
         let mut functions = HashMap::new();
-        let params = vec![ParamDeclaration::new("graph", "TypeGraph")];
+        let params = vec![ParamDeclaration::new(
+            ParamName::new("graph").unwrap(),
+            TypeRef::new("TypeGraph").unwrap(),
+        )];
         let returns = vec!["TypeBaseline".to_string()];
         let node = FunctionNode::new(params, returns, false, Some("infra::tddd".to_string()));
         functions.insert(("build_baseline".to_string(), Some("infra::tddd".to_string())), node);
@@ -318,7 +330,7 @@ mod tests {
         assert_eq!(bl.functions().len(), 1);
         let entry = bl.get_function("infra::tddd::build_baseline").unwrap();
         assert_eq!(entry.params().len(), 1);
-        assert_eq!(entry.params()[0].name(), "graph");
+        assert_eq!(entry.params()[0].name.as_str(), "graph");
         assert_eq!(entry.returns(), &["TypeBaseline"]);
         assert!(!entry.is_async());
         assert_eq!(entry.module_path(), Some("infra::tddd"));

@@ -17,164 +17,28 @@
 //! rename were performed together in the TDDD-01 track (see ADR
 //! `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` D3 and DM-06 in
 //! `knowledge/strategy/TODO.md`).
+//!
+//! ## T008 partial — V1 type migration (MethodDeclaration / ParamDeclaration)
+//!
+//! The V1 `MethodDeclaration` and `ParamDeclaration` (plain `String` fields) were
+//! deleted and replaced by `catalogue_v2::methods` equivalents (newtype fields:
+//! `MethodName`, `ParamName`, `TypeRef`, `SelfReceiver`).  All workspace call sites
+//! were migrated to the V2 newtype API in the same change; the workspace compiles
+//! cleanly with no String-argument callers remaining.  The `pub use` below
+//! re-exports the V2 types at the old `catalogue::*` path so that import paths stay
+//! stable across the migration (not a backward-compatibility shim).
 
 use std::collections::HashSet;
 
 use crate::ConfidenceSignal;
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::spec::SpecValidationError;
-
-// ---------------------------------------------------------------------------
-// ParamDeclaration — single parameter in a method signature
-// ---------------------------------------------------------------------------
-
-/// A single parameter in a method signature, captured at L1 resolution.
-///
-/// L1 resolution means: the type string uses last-segment short names and
-/// preserves the generic structure verbatim (e.g. `"Result<Option<User>, DomainError>"`).
-/// Module paths (`domain::user::UserId`) are NOT included — codec validation
-/// rejects `ty` strings containing `::`.
-///
-/// # Examples
-///
-/// ```text
-/// // fn find_by_id(&self, id: UserId) -> Result<User, DomainError>
-/// // ...
-/// // params[0]: { name: "id", ty: "UserId" }
-/// ```
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ParamDeclaration {
-    name: String,
-    ty: String,
-}
-
-impl ParamDeclaration {
-    /// Creates a new `ParamDeclaration`.
-    #[must_use]
-    pub fn new(name: impl Into<String>, ty: impl Into<String>) -> Self {
-        Self { name: name.into(), ty: ty.into() }
-    }
-
-    /// Returns the parameter binding name.
-    #[must_use]
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    /// Returns the parameter type string (L1 short names, generics preserved).
-    #[must_use]
-    pub fn ty(&self) -> &str {
-        &self.ty
-    }
-}
-
-// ---------------------------------------------------------------------------
-// MethodDeclaration — structured method signature at L1 resolution
-// ---------------------------------------------------------------------------
-
-/// A structured method signature at L1 resolution.
-///
-/// Shared across three contexts:
-/// - Catalogue declaration: `TypeDefinitionKind::SecondaryPort { expected_methods }`
-///   or `TypeDefinitionKind::ApplicationService { expected_methods }` (populated in T006)
-/// - `TypeGraph`: `TypeNode::methods` / `TraitNode::methods` (the "code reality"
-///   extracted from rustdoc JSON)
-/// - Baseline: `TypeBaselineEntry::methods` / `TraitBaselineEntry::methods`
-///   (captured snapshot at `/track:design` time)
-///
-/// Type strings (`ParamDeclaration::ty`, `returns`) use last-segment short
-/// names and preserve generics verbatim (e.g. `"Result<Option<User>, DomainError>"`,
-/// not `"Result"` or `"domain::user::Result"`). Codec validation rejects
-/// strings containing `::`.
-///
-/// See ADR `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §D2
-/// for the L1 JSON schema and forward-check rules.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MethodDeclaration {
-    name: String,
-    /// Self-receiver form: `"&self"` / `"&mut self"` / `"self"` / `None`
-    /// (associated function without a self parameter).
-    receiver: Option<String>,
-    params: Vec<ParamDeclaration>,
-    /// Return type string (`"()"` when the return type is the unit type).
-    returns: String,
-    /// Whether the method is declared `async fn`.
-    is_async: bool,
-}
-
-impl MethodDeclaration {
-    /// Creates a new `MethodDeclaration`.
-    #[must_use]
-    pub fn new(
-        name: impl Into<String>,
-        receiver: Option<String>,
-        params: Vec<ParamDeclaration>,
-        returns: impl Into<String>,
-        is_async: bool,
-    ) -> Self {
-        Self { name: name.into(), receiver, params, returns: returns.into(), is_async }
-    }
-
-    /// Returns the method name.
-    #[must_use]
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    /// Returns the self-receiver form (`"&self"` / `"&mut self"` / `"self"`),
-    /// or `None` for associated functions.
-    #[must_use]
-    pub fn receiver(&self) -> Option<&str> {
-        self.receiver.as_deref()
-    }
-
-    /// Returns the ordered parameter list (excluding the self receiver).
-    #[must_use]
-    pub fn params(&self) -> &[ParamDeclaration] {
-        &self.params
-    }
-
-    /// Returns the return type string.
-    #[must_use]
-    pub fn returns(&self) -> &str {
-        &self.returns
-    }
-
-    /// Returns `true` if the method is declared `async fn`.
-    #[must_use]
-    pub fn is_async(&self) -> bool {
-        self.is_async
-    }
-
-    /// Reconstructs a human-readable signature string from the structured
-    /// fields for rendering / debugging.
-    ///
-    /// Layout:
-    ///
-    /// ```text
-    /// [async ]fn name(receiver[, param1: ty1, param2: ty2]) -> returns
-    /// ```
-    ///
-    /// The unit return type is rendered as `"()"`.
-    #[must_use]
-    pub fn signature_string(&self) -> String {
-        let async_prefix = if self.is_async { "async " } else { "" };
-        let receiver = self.receiver.as_deref().unwrap_or("");
-        let params_str = self
-            .params
-            .iter()
-            .map(|p| format!("{}: {}", p.name, p.ty))
-            .collect::<Vec<_>>()
-            .join(", ");
-        let args = match (receiver.is_empty(), params_str.is_empty()) {
-            (true, true) => String::new(),
-            (true, false) => params_str,
-            (false, true) => receiver.to_string(),
-            (false, false) => format!("{receiver}, {params_str}"),
-        };
-        format!("{async_prefix}fn {}({}) -> {}", self.name, args, self.returns)
-    }
-}
+// Re-exports that preserve the `catalogue::MethodDeclaration` / `catalogue::ParamDeclaration`
+// module paths after V1 types were deleted and replaced by V2 (catalogue_v2::methods).
+// All call sites have been migrated to the V2 newtype API (MethodName / ParamName / TypeRef /
+// SelfReceiver); the `pub use` keeps import paths stable across the migration.
+// These types are NOT source-compatible with the old V1 constructor signatures.
+pub use crate::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
 
 // ---------------------------------------------------------------------------
 // Identifier validation helpers (module-private)
@@ -985,9 +849,36 @@ impl TypeCatalogueDocument {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use crate::tddd::catalogue_v2::roles::SelfReceiver;
+
+    /// Build a [`ParamDeclaration`] from plain `&str` values (test helper).
+    fn mk_param(name: &str, ty: &str) -> ParamDeclaration {
+        ParamDeclaration::new(
+            ParamName::new(name).expect("test param name"),
+            TypeRef::new(ty).expect("test param ty"),
+        )
+    }
+
+    /// Build a [`MethodDeclaration`] from plain `&str` values (test helper).
+    fn mk_method(
+        name: &str,
+        receiver: Option<SelfReceiver>,
+        params: Vec<ParamDeclaration>,
+        returns: &str,
+    ) -> MethodDeclaration {
+        MethodDeclaration::new(
+            MethodName::new(name).expect("test method name"),
+            receiver,
+            params,
+            TypeRef::new(returns).expect("test return type"),
+            false,
+            None,
+        )
+    }
 
     // --- TypeAction ---
 
@@ -1333,19 +1224,17 @@ mod tests {
     fn test_type_catalogue_entry_secondary_port_kind() {
         let kind = TypeDefinitionKind::SecondaryPort {
             expected_methods: vec![
-                MethodDeclaration::new(
+                mk_method(
                     "find_by_id",
-                    Some("&self".into()),
-                    vec![ParamDeclaration::new("id", "UserId")],
+                    Some(SelfReceiver::SharedRef),
+                    vec![mk_param("id", "UserId")],
                     "Option<User>",
-                    false,
                 ),
-                MethodDeclaration::new(
+                mk_method(
                     "save",
-                    Some("&self".into()),
-                    vec![ParamDeclaration::new("user", "User")],
+                    Some(SelfReceiver::SharedRef),
+                    vec![mk_param("user", "User")],
                     "Result<(), DomainError>",
-                    false,
                 ),
             ],
         };
@@ -1364,12 +1253,11 @@ mod tests {
     #[test]
     fn test_type_catalogue_entry_application_service_kind() {
         let kind = TypeDefinitionKind::ApplicationService {
-            expected_methods: vec![MethodDeclaration::new(
+            expected_methods: vec![mk_method(
                 "execute",
-                Some("&self".into()),
-                vec![ParamDeclaration::new("cmd", "CreateCommand")],
+                Some(SelfReceiver::SharedRef),
+                vec![mk_param("cmd", "CreateCommand")],
                 "Result<(), AppError>",
-                false,
             )],
         };
         let entry = TypeCatalogueEntry::new(
@@ -1593,8 +1481,7 @@ mod tests {
     fn test_struct_kinds_carry_expected_methods_field() {
         // Build one method declaration to confirm every struct-based kind
         // (M1) accepts a non-empty `expected_methods` list at the type level.
-        let method =
-            MethodDeclaration::new("len", Some("&self".to_owned()), vec![], "usize", false);
+        let method = mk_method("len", Some(SelfReceiver::SharedRef), vec![], "usize");
         let methods = vec![method];
 
         let typestate = TypeDefinitionKind::Typestate {
@@ -1657,15 +1544,11 @@ mod tests {
             name: "audit_log".to_owned(),
             ty: "Vec<AuditEntry>".to_owned(),
         };
-        let method = MethodDeclaration::new(
+        let method = mk_method(
             "transfer",
-            Some("&mut self".to_owned()),
-            vec![
-                ParamDeclaration::new("from", "AccountId"),
-                ParamDeclaration::new("to", "AccountId"),
-            ],
+            Some(SelfReceiver::ExclusiveRef),
+            vec![mk_param("from", "AccountId"), mk_param("to", "AccountId")],
             "Result<(), DomainError>",
-            false,
         );
 
         let kind = TypeDefinitionKind::DomainService {
@@ -1678,7 +1561,7 @@ mod tests {
             TypeDefinitionKind::DomainService { expected_members, expected_methods } => {
                 assert_eq!(expected_members.len(), 1);
                 assert_eq!(expected_methods.len(), 1);
-                assert_eq!(expected_methods[0].name(), "transfer");
+                assert_eq!(expected_methods[0].name.as_str(), "transfer");
             }
             _ => panic!("expected DomainService variant"),
         }
@@ -1979,12 +1862,11 @@ mod tests {
 
     #[test]
     fn test_trait_impl_decl_accessors() {
-        let methods =
-            vec![MethodDeclaration::new("find", Some("&self".into()), vec![], "()", false)];
+        let methods = vec![mk_method("find", Some(SelfReceiver::SharedRef), vec![], "()")];
         let decl = TraitImplDecl::new("ReviewReader", methods.clone());
         assert_eq!(decl.trait_name(), "ReviewReader");
         assert_eq!(decl.expected_methods().len(), 1);
-        assert_eq!(decl.expected_methods()[0].name(), "find");
+        assert_eq!(decl.expected_methods()[0].name.as_str(), "find");
     }
 
     #[test]

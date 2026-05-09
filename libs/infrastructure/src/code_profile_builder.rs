@@ -22,6 +22,8 @@ use domain::schema::{
     FunctionInfo, FunctionNode, SchemaExport, TraitImplEntry, TraitNode, TypeGraph, TypeNode,
 };
 use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration};
+use domain::tddd::catalogue_v2::identifiers::{MethodName, TypeRef};
+use domain::tddd::catalogue_v2::roles::SelfReceiver;
 
 /// Builds a [`TypeGraph`] from a [`SchemaExport`].
 ///
@@ -51,13 +53,22 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
             .flat_map(|i| i.methods())
             .collect();
 
-        let method_decls: Vec<MethodDeclaration> =
-            inherent_methods.iter().map(|f| function_info_to_method_decl(f)).collect();
-
-        let outgoing: HashSet<String> = inherent_methods
+        // Pair each inherent method with its MethodDeclaration, keeping only those
+        // that convert successfully.  Both method_decls and outgoing are built from
+        // this filtered set so the graph stays internally consistent: a method that
+        // is absent from `methods()` cannot contribute a typestate transition edge.
+        let converted: Vec<(&FunctionInfo, MethodDeclaration)> = inherent_methods
             .iter()
-            .filter(|m| m.has_self_receiver())
-            .flat_map(|m| m.return_type_names().iter().cloned())
+            .filter_map(|f| function_info_to_method_decl(f).map(|decl| (*f, decl)))
+            .collect();
+
+        let method_decls: Vec<MethodDeclaration> =
+            converted.iter().map(|(_, decl)| decl.clone()).collect();
+
+        let outgoing: HashSet<String> = converted
+            .iter()
+            .filter(|(f, _)| f.has_self_receiver())
+            .flat_map(|(f, _)| f.return_type_names().iter().cloned())
             .filter(|rtn| typestate_names.contains(rtn.as_str()))
             .collect();
 
@@ -82,7 +93,7 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
             .filter(|i| base_name(i.target_type()) == type_info.name())
             .filter_map(|i| {
                 let trait_name = i.trait_name()?;
-                let methods = i.methods().iter().map(function_info_to_method_decl).collect();
+                let methods = i.methods().iter().filter_map(function_info_to_method_decl).collect();
                 // Look up origin by def_path (stable identity); fall back to empty string
                 // when the def_path is unavailable (inherent impl or missing paths entry).
                 let origin = i
@@ -113,7 +124,7 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
     let mut traits = HashMap::new();
     for trait_info in schema.traits() {
         let method_decls: Vec<MethodDeclaration> =
-            trait_info.methods().iter().map(function_info_to_method_decl).collect();
+            trait_info.methods().iter().filter_map(function_info_to_method_decl).collect();
         traits.insert(trait_info.name().to_string(), TraitNode::new(method_decls));
     }
 
@@ -148,14 +159,22 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
 
 /// Converts a `FunctionInfo` (flat rustdoc-derived) into a `MethodDeclaration`
 /// (the structured L1 signature used by `TypeNode::methods` / `TraitNode::methods`).
-fn function_info_to_method_decl(f: &FunctionInfo) -> MethodDeclaration {
-    MethodDeclaration::new(
-        f.name().to_string(),
-        f.receiver().map(str::to_string),
-        f.params().to_vec(),
-        f.returns().to_string(),
-        f.is_async(),
-    )
+///
+/// Returns `None` when the method name, return type, or receiver string cannot be
+/// parsed — this should never occur for rustdoc-derived data, but is treated as a
+/// silent skip rather than a panic to keep the pipeline infallible.  Returning `None`
+/// on receiver parse failure (rather than collapsing to `None`) keeps the resulting
+/// `MethodDeclaration` consistent with the `FunctionInfo` source: a method that claims
+/// a self receiver must carry one in its declaration, or must be excluded entirely.
+fn function_info_to_method_decl(f: &FunctionInfo) -> Option<MethodDeclaration> {
+    let name = MethodName::new(f.name()).ok()?;
+    let receiver = match f.receiver() {
+        Some(r) => Some(r.parse::<SelfReceiver>().ok()?),
+        None => None,
+    };
+    let returns = TypeRef::new(f.returns()).ok()?;
+    let docs = f.docs().map(str::to_string);
+    Some(MethodDeclaration::new(name, receiver, f.params().to_vec(), returns, f.is_async(), docs))
 }
 
 /// Strips the generic parameter list from a `format_type`-rendered string.
@@ -172,6 +191,7 @@ fn base_name(formatted: &str) -> &str {
 mod tests {
     use domain::schema::{FunctionInfo, ImplInfo, SchemaExport, TraitInfo, TypeInfo, TypeKind};
     use domain::tddd::catalogue::MemberDeclaration;
+    use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef as TypeRefV2};
 
     use super::*;
 
@@ -265,9 +285,9 @@ mod tests {
         let draft = profile.get_type("Draft").unwrap();
         assert_eq!(draft.methods().len(), 1);
         let transition = &draft.methods()[0];
-        assert_eq!(transition.name(), "transition");
-        assert_eq!(transition.returns(), "Published");
-        assert_eq!(transition.receiver(), Some("self"));
+        assert_eq!(transition.name.as_str(), "transition");
+        assert_eq!(transition.returns.as_str(), "Published");
+        assert_eq!(transition.receiver.map(|r| r.to_string()).as_deref(), Some("self"));
     }
 
     #[test]
@@ -320,7 +340,7 @@ mod tests {
             SchemaExport::new("test".to_string(), vec![], vec![], vec![trait_info], vec![]);
         let profile = build_type_graph(&schema, &HashSet::new());
         let code_trait = profile.get_trait("Repo").unwrap();
-        let names: Vec<&str> = code_trait.methods().iter().map(|m| m.name()).collect();
+        let names: Vec<&str> = code_trait.methods().iter().map(|m| m.name.as_str()).collect();
         assert_eq!(names, vec!["save", "find"]);
         assert_eq!(code_trait.methods().len(), 2);
     }
@@ -348,7 +368,7 @@ mod tests {
         assert_eq!(node.trait_impls().len(), 1);
         assert_eq!(node.trait_impls()[0].trait_name(), "TrackReader");
         assert_eq!(node.trait_impls()[0].methods().len(), 1);
-        assert_eq!(node.trait_impls()[0].methods()[0].name(), "read");
+        assert_eq!(node.trait_impls()[0].methods()[0].name.as_str(), "read");
     }
 
     #[test]
@@ -482,7 +502,10 @@ mod tests {
             None,
             vec![],
             false,
-            vec![ParamDeclaration::new("x", "u32"), ParamDeclaration::new("y", "u32")],
+            vec![
+                ParamDeclaration::new(ParamName::new("x").unwrap(), TypeRefV2::new("u32").unwrap()),
+                ParamDeclaration::new(ParamName::new("y").unwrap(), TypeRefV2::new("u32").unwrap()),
+            ],
             "()".to_string(),
             None,
             true,
@@ -492,8 +515,8 @@ mod tests {
 
         let node = profile.get_function("compute", None).unwrap();
         assert_eq!(node.params().len(), 2);
-        assert_eq!(node.params()[0].name(), "x");
-        assert_eq!(node.params()[1].name(), "y");
+        assert_eq!(node.params()[0].name.as_str(), "x");
+        assert_eq!(node.params()[1].name.as_str(), "y");
         assert!(node.is_async());
     }
 

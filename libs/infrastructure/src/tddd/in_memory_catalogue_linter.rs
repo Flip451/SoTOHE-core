@@ -354,6 +354,8 @@ mod tests {
         TypeCatalogueEntry, TypeDefinitionKind,
     };
     use domain::tddd::catalogue_linter::{CatalogueLinterRule, CatalogueLinterRuleKind};
+    use domain::tddd::catalogue_v2::identifiers::{MethodName, TypeRef};
+    use domain::tddd::catalogue_v2::roles::SelfReceiver;
 
     use super::InMemoryCatalogueLinter;
     use domain::tddd::catalogue_linter::CatalogueLinter as _;
@@ -377,8 +379,14 @@ mod tests {
     }
 
     fn value_object_entry_with_methods(name: &str) -> TypeCatalogueEntry {
-        let method =
-            MethodDeclaration::new("is_valid", Some("&self".into()), vec![], "bool", false);
+        let method = MethodDeclaration::new(
+            MethodName::new("is_valid").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("bool").unwrap(),
+            false,
+            None,
+        );
         TypeCatalogueEntry::new(
             name,
             "A value object with a behavioral method",

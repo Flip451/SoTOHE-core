@@ -778,7 +778,7 @@ fn evaluate_impl_methods(
     let mut missing = Vec::new();
     for declared in expected {
         let rendered = declared.signature_string();
-        match code_methods.iter().find(|c| c.name() == declared.name()) {
+        match code_methods.iter().find(|c| c.name == declared.name) {
             Some(code) if method_structurally_matches(declared, code) => {
                 found.push(rendered);
             }
@@ -812,7 +812,7 @@ fn evaluate_trait_methods(
     let mut missing = Vec::new();
     for declared in expected_methods {
         let rendered = declared.signature_string();
-        match code_trait.methods().iter().find(|c| c.name() == declared.name()) {
+        match code_trait.methods().iter().find(|c| c.name == declared.name) {
             Some(code) if method_structurally_matches(declared, code) => {
                 found.push(rendered);
             }
@@ -823,11 +823,11 @@ fn evaluate_trait_methods(
     }
 
     // Reverse check — any code method not declared is extra.
-    let declared_names: HashSet<&str> = expected_methods.iter().map(|m| m.name()).collect();
+    let declared_names: HashSet<&str> = expected_methods.iter().map(|m| m.name.as_str()).collect();
     let mut extra: Vec<String> = code_trait
         .methods()
         .iter()
-        .filter(|c| !declared_names.contains(c.name()))
+        .filter(|c| !declared_names.contains(c.name.as_str()))
         .map(|c| c.signature_string())
         .collect();
     extra.sort();
@@ -856,24 +856,24 @@ fn method_structurally_matches(
     a: &crate::tddd::catalogue::MethodDeclaration,
     b: &crate::tddd::catalogue::MethodDeclaration,
 ) -> bool {
-    if a.name() != b.name() {
+    if a.name != b.name {
         return false;
     }
-    if a.receiver() != b.receiver() {
+    if a.receiver != b.receiver {
         return false;
     }
-    if a.params().len() != b.params().len() {
+    if a.params.len() != b.params.len() {
         return false;
     }
-    for (pa, pb) in a.params().iter().zip(b.params()) {
-        if pa.ty() != pb.ty() {
+    for (pa, pb) in a.params.iter().zip(&b.params) {
+        if pa.ty != pb.ty {
             return false;
         }
     }
-    if a.returns() != b.returns() {
+    if a.returns != b.returns {
         return false;
     }
-    if a.is_async() != b.is_async() {
+    if a.is_async != b.is_async {
         return false;
     }
     true
@@ -1146,7 +1146,7 @@ fn function_signature_matches(
         return false;
     }
     for (np, ep) in node.params().iter().zip(expected_params) {
-        if np.ty() != ep.ty() {
+        if np.ty.as_str() != ep.ty.as_str() {
             return false;
         }
     }
@@ -1165,8 +1165,11 @@ fn render_fn_signature(
     is_async: bool,
 ) -> String {
     let prefix = if is_async { "async " } else { "" };
-    let params_str =
-        params.iter().map(|p| format!("{}: {}", p.name(), p.ty())).collect::<Vec<_>>().join(", ");
+    let params_str = params
+        .iter()
+        .map(|p| format!("{}: {}", p.name.as_str(), p.ty.as_str()))
+        .collect::<Vec<_>>()
+        .join(", ");
     let returns_str = returns.join(", ");
     format!("{prefix}fn {name}({params_str}) -> {returns_str}")
 }
@@ -1257,17 +1260,34 @@ pub fn undeclared_functions_to_signals(fq_names: &[String]) -> Vec<TypeSignal> {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
 mod tests {
     use std::collections::HashMap;
 
     use super::*;
     use crate::schema::{TraitImplEntry, TraitNode, TypeNode};
     use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, TraitImplDecl};
+    use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use crate::tddd::catalogue_v2::roles::SelfReceiver;
+
+    /// Build a [`ParamDeclaration`] from plain `&str` values (test helper).
+    fn mk_param(name: &str, ty: &str) -> crate::tddd::catalogue::ParamDeclaration {
+        crate::tddd::catalogue::ParamDeclaration::new(
+            ParamName::new(name).expect("test param name"),
+            TypeRef::new(ty).expect("test param ty"),
+        )
+    }
 
     /// Build a `MethodDeclaration` that takes no args and returns unit.
     fn unit_method(name: &str) -> MethodDeclaration {
-        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+        MethodDeclaration::new(
+            MethodName::new(name).expect("test method name"),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").expect("unit return type"),
+            false,
+            None,
+        )
     }
 
     /// Build a `TypeGraph` with struct-kinded types only (no members, no methods).
@@ -1772,11 +1792,12 @@ mod tests {
             "desc",
             TypeDefinitionKind::SecondaryPort {
                 expected_methods: vec![MethodDeclaration::new(
-                    "save",
-                    Some("&self".into()),
-                    vec![crate::tddd::catalogue::ParamDeclaration::new("user", "User")],
-                    "Result<(), DomainError>",
+                    MethodName::new("save").expect("test method name"),
+                    Some(SelfReceiver::SharedRef),
+                    vec![mk_param("user", "User")],
+                    TypeRef::new("Result<(), DomainError>").expect("test return type"),
                     false,
+                    None,
                 )],
             },
             TypeAction::Add,
@@ -1786,11 +1807,12 @@ mod tests {
         // Code trait has the same name and params but different return.
         let mut traits = HashMap::new();
         let code_method = MethodDeclaration::new(
-            "save",
-            Some("&self".into()),
-            vec![crate::tddd::catalogue::ParamDeclaration::new("user", "User")],
-            "()",
+            MethodName::new("save").expect("test method name"),
+            Some(SelfReceiver::SharedRef),
+            vec![mk_param("user", "User")],
+            TypeRef::new("()").expect("test return type"),
             false,
+            None,
         );
         traits.insert("Repo".to_string(), TraitNode::new(vec![code_method]));
         let profile = TypeGraph::new(HashMap::new(), traits);
@@ -2289,8 +2311,14 @@ mod tests {
     fn test_evaluate_secondary_adapter_yellow_method_signature_mismatch() {
         // Per ADR 2026-04-11-0003 WIP-Yellow rule: method signature mismatch is a
         // forward-check miss → Yellow (not Red).
-        let declared_method =
-            MethodDeclaration::new("find", Some("&self".into()), vec![], "Option<Review>", false);
+        let declared_method = MethodDeclaration::new(
+            MethodName::new("find").expect("test method name"),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Option<Review>").expect("test return type"),
+            false,
+            None,
+        );
         let entry = TypeCatalogueEntry::new(
             "FsReviewStore",
             "desc",
@@ -2305,11 +2333,12 @@ mod tests {
         .unwrap();
         // Code has the method but with different return type
         let code_method = MethodDeclaration::new(
-            "find",
-            Some("&self".into()),
+            MethodName::new("find").expect("test method name"),
+            Some(SelfReceiver::SharedRef),
             vec![],
-            "Result<Review, Error>", // different returns
+            TypeRef::new("Result<Review, Error>").expect("test return type"), // different returns
             false,
+            None,
         );
         let profile = make_profile_with_adapter(
             "FsReviewStore",
@@ -3264,7 +3293,7 @@ mod tests {
         let entry = free_fn_entry(
             "save_track",
             Some("usecase::track"),
-            vec![crate::tddd::catalogue::ParamDeclaration::new("cmd", "SaveCommand")],
+            vec![mk_param("cmd", "SaveCommand")],
             vec!["Result".to_string()],
             false,
             TypeAction::Add,
@@ -3272,7 +3301,7 @@ mod tests {
         let profile = make_profile_with_fn(
             "save_track",
             Some("usecase::track"),
-            vec![crate::tddd::catalogue::ParamDeclaration::new("cmd", "SaveCommand")],
+            vec![mk_param("cmd", "SaveCommand")],
             vec!["Result".to_string()],
             false,
         );
@@ -3322,7 +3351,7 @@ mod tests {
         let entry = free_fn_entry(
             "save_track",
             Some("usecase::track"),
-            vec![crate::tddd::catalogue::ParamDeclaration::new("cmd", "SaveCommand")],
+            vec![mk_param("cmd", "SaveCommand")],
             vec!["Result".to_string()],
             false,
             TypeAction::Add,
@@ -3331,7 +3360,7 @@ mod tests {
         let profile = make_profile_with_fn(
             "save_track",
             Some("usecase::track"),
-            vec![crate::tddd::catalogue::ParamDeclaration::new("cmd", "WrongCommand")],
+            vec![mk_param("cmd", "WrongCommand")],
             vec!["Result".to_string()],
             false,
         );

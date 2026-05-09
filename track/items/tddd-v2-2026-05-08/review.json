@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0daa3df547919c8fd6e11c060f671549c53beefb77b438a5008107f55fbbc71f",
+          "at": "2026-05-09T02:17:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0daa3df547919c8fd6e11c060f671549c53beefb77b438a5008107f55fbbc71f",
+          "at": "2026-05-09T02:18:40Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -956,24 +974,163 @@
           "findings": [],
           "hash": "rvw1:sha256:c7fc13ba9255618b72ba1e39e0866bc58752911e63f39bceb185bb2829b07db9",
           "at": "2026-05-09T05:17:44Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Phase1Error` is still marked `🟡` here, but the briefing for this transition says the T006-related types, including `Phase1Error`, should already be `🔵`. That leaves the signal table inconsistent with the intended transient state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 71,
+              "category": "contradiction"
+            },
+            {
+              "message": "`MethodDeclaration` is still marked `🔵`, but the briefing says the old `MethodDeclaration` / `ParamDeclaration` pair should both remain `🟡` until T008 removes the legacy schema. This makes the old-type transition only half-applied.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 62,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3d50470ec5ba661de51c36d6c3f068fd44cf03ae510c56cd2e93e6488725a038",
+          "at": "2026-05-09T05:30:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T006 signal transition is only half-applied: `ThreeWaySignal` and `ThreeWayEvaluationReport` are still marked 🟡 here, but the briefing says the whole T006 domain-type block should already be 🔵. That leaves the rendered plan-artifact snapshot internally inconsistent about what is implemented.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 46,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:2fcda053a778fd3bdf09b1af3e6447df3d34633196fb1413239c4d062819e93f",
+          "at": "2026-05-09T05:39:46Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0daa3df547919c8fd6e11c060f671549c53beefb77b438a5008107f55fbbc71f",
-          "at": "2026-05-09T02:17:41Z"
+          "hash": "rvw1:sha256:94ca90f806eec16fe3bf0a798662be9a2c297784e21ca654db0590d9e40c206c",
+          "at": "2026-05-09T05:43:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0daa3df547919c8fd6e11c060f671549c53beefb77b438a5008107f55fbbc71f",
-          "at": "2026-05-09T02:18:40Z"
+          "hash": "rvw1:sha256:94ca90f806eec16fe3bf0a798662be9a2c297784e21ca654db0590d9e40c206c",
+          "at": "2026-05-09T05:44:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ParamDeclaration` and `MethodDeclaration` are marked 🟡 in the rendered signal table here, but the briefing says both should stay 🔵 because the v2 definitions are the ones currently selected and the old/new collision is only transient until T008. This makes the rendered plan state contradict the intended gate state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2f8f4a7cab54a6972fdf8b3dfe208d1be9c9ac180d209f87a454f436a69aa48f",
+          "at": "2026-05-09T05:46:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f8f4a7cab54a6972fdf8b3dfe208d1be9c9ac180d209f87a454f436a69aa48f",
+          "at": "2026-05-09T05:48:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f8f4a7cab54a6972fdf8b3dfe208d1be9c9ac180d209f87a454f436a69aa48f",
+          "at": "2026-05-09T05:49:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b629f6b72205280d56f51dd4f8295670fcbd1de8622ad75cde9561475b1f202e",
+          "at": "2026-05-09T05:51:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b629f6b72205280d56f51dd4f8295670fcbd1de8622ad75cde9561475b1f202e",
+          "at": "2026-05-09T05:52:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94ca90f806eec16fe3bf0a798662be9a2c297784e21ca654db0590d9e40c206c",
+          "at": "2026-05-09T05:54:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94ca90f806eec16fe3bf0a798662be9a2c297784e21ca654db0590d9e40c206c",
+          "at": "2026-05-09T05:55:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b629f6b72205280d56f51dd4f8295670fcbd1de8622ad75cde9561475b1f202e",
+          "at": "2026-05-09T05:59:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b629f6b72205280d56f51dd4f8295670fcbd1de8622ad75cde9561475b1f202e",
+          "at": "2026-05-09T06:00:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94ca90f806eec16fe3bf0a798662be9a2c297784e21ca654db0590d9e40c206c",
+          "at": "2026-05-09T06:01:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94ca90f806eec16fe3bf0a798662be9a2c297784e21ca654db0590d9e40c206c",
+          "at": "2026-05-09T06:03:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a6b180f2d8de004e2495ccdc42a6c987c4b905ac4b6ddd558532c51d1bbdca5",
+          "at": "2026-05-09T06:51:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a6b180f2d8de004e2495ccdc42a6c987c4b905ac4b6ddd558532c51d1bbdca5",
+          "at": "2026-05-09T06:53:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a6b180f2d8de004e2495ccdc42a6c987c4b905ac4b6ddd558532c51d1bbdca5",
+          "at": "2026-05-09T06:53:30Z"
         }
       ]
     },
@@ -1438,6 +1595,57 @@
           "findings": [],
           "hash": "rvw1:sha256:3908c89d6d13bbf5276eff6788dc92a2346cc09032fb4ad4ed9b1c3bd68d6924",
           "at": "2026-05-09T04:53:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_info_to_method_decl()` can now return `None`, but `outgoing` is still computed from `inherent_methods` before filtering. If a method is skipped, the node keeps its typestate transition targets even though the method no longer exists in `methods()`, which makes the graph internally inconsistent. Build `outgoing` from the same filtered set or skip the whole method before both collections.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/code_profile_builder.rs",
+              "line": 57,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_params()` silently drops any parameter whose name or formatted type fails the newtype validation. Because `export()` already returns `Result`, this turns invalid rustdoc input into a truncated `SchemaExport` instead of an error, so downstream consumers lose method parameters without any signal. Propagate a codec error instead of `filter_map`-skipping.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 573,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:511aa3e3d0dec6efb85bffc3ed16bb6cc676852aa17b153eac1561853127d9ac",
+          "at": "2026-05-09T06:52:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_info_to_method_decl` is no longer a lossless adapter: it always drops `FunctionInfo::docs` and silently collapses any receiver string that fails `SelfReceiver` parsing to `None`, while the surrounding code still uses `FunctionInfo::has_self_receiver()` to compute outgoing transitions. That means a `TypeGraph` built from non-canonical input can end up with method signatures, docs, and transition edges that disagree, and even on valid input every method doc is discarded before the baseline/render path sees it. `schema_export.rs` already populates these docs upstream, so this loses data that the new `MethodDeclaration` model can carry.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/code_profile_builder.rs",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c452eac52944485c01212b74717b1624b1aca59ecda7d8a62deee31597cb5154",
+          "at": "2026-05-09T07:01:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eafda2819b9d9ab8457a9ac152bc89db735343bf00318df6ecb06ea044cc67c9",
+          "at": "2026-05-09T07:06:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eafda2819b9d9ab8457a9ac152bc89db735343bf00318df6ecb06ea044cc67c9",
+          "at": "2026-05-09T07:11:04Z"
         }
       ]
     },
@@ -1556,6 +1764,116 @@
           "findings": [],
           "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
           "at": "2026-05-09T02:22:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ThreeWaySignal` stores the derived kind as a public field, and `ThreeWayEvaluationReport` exposes its `Vec` publicly. That leaves the documented invariant unenforced: external code can construct or mutate a value with mismatched `region`/`signal` or with `Skip` entries inside a report, and `len()`/`has_violations()`/`is_in_progress()` will then report the wrong state. Make the derived state private or validate on construction so the domain type cannot represent an invalid report.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
+              "line": 182,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e8798a0a0cd123f1d7b186c030e6ee130dabc8ad23a406ae33404d1bbc2de4ec",
+          "at": "2026-05-09T05:31:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ThreeWayEvaluationReport::new` does not enforce the module's own invariant that reports contain only non-skip signals. It stores `Skip` entries verbatim, so any caller can construct a report that contradicts the public contract in `port.rs` and leaks skipped items through `iter()`/`len()`. Consider filtering `Skip` values here or making construction fallible/private.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
+              "line": 269,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1d1da0d760a509d983783c1298ee3f32f1622388ee555738f968d780ab2bbc19",
+          "at": "2026-05-09T05:37:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
+          "at": "2026-05-09T05:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
+          "at": "2026-05-09T05:42:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Re-exporting `catalogue_v2::methods::{MethodDeclaration, ParamDeclaration}` here makes `catalogue::MethodDeclaration` look like the old API path, but it is not API-compatible anymore. The V2 constructor now requires `MethodName` / `ParamName` / `TypeRef` and the accessor methods (`name()`, `params()`, `returns()`, `ty()`, etc.) are gone, so downstream code that was compiling against the documented `catalogue::*` surface will break at source level. A plain `pub use` does not provide the promised compatibility shim.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "line": 26,
+              "category": "compatibility"
+            },
+            {
+              "message": "P1: `MethodDeclaration` now derives `Eq` with a public `docs: Option<String>` field, and baseline structural comparison uses full vector equality (`self.methods == other.methods`). That means doc-only differences between two otherwise identical methods will flip `TypeBaselineEntry::structurally_equal()` / `TraitBaselineEntry::structurally_equal()` to `false`, which creates false consistency failures even though docs are non-structural metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bb5edcc2a9e53b0ba75f3ef9a8b602828a7cf211db9288bed320ec459497d1e3",
+          "at": "2026-05-09T06:52:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`methods_structurally_equal` still treats `ParamDeclaration` as fully equal (`a.params == b.params`), so a harmless parameter binding rename on an unchanged method will now be reported as structural drift. That diverges from the method/function matching logic in `signals.rs` and `consistency.rs`, which intentionally ignores binding names and compares only parameter types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/baseline.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8bd7a3f9e6f7fa462799842a29e3f8e717186f90689cf4acd12e3e33e74ece06",
+          "at": "2026-05-09T06:58:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Re-exporting the V2 `MethodDeclaration`/`ParamDeclaration` here is not source-compatible with the existing `domain::tddd::catalogue::*` callers. The new constructor takes `MethodName`/`ParamName`/`TypeRef` newtypes, so any still-unmigrated call sites that pass `String` arguments will stop compiling. Keep a compatibility shim or finish the downstream rewrites in the same change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "line": 31,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:00cfaa954f2d02a5567473eab37dada61fcfbb35f4b9e416f37a90f375864658",
+          "at": "2026-05-09T07:04:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
+          "at": "2026-05-09T07:09:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
+          "at": "2026-05-09T07:13:27Z"
         }
       ]
     }

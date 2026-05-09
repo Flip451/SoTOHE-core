@@ -336,7 +336,7 @@ pub fn check_consistency(
                         .params()
                         .iter()
                         .zip(baseline_entry.params())
-                        .all(|(code_p, base_p)| code_p.ty() == base_p.ty());
+                        .all(|(code_p, base_p)| code_p.ty.as_str() == base_p.ty.as_str());
                 let structurally_equal = params_structurally_equal
                     && code_node.returns() == baseline_entry.returns()
                     && code_node.is_async() == baseline_entry.is_async();
@@ -671,7 +671,7 @@ pub fn check_type_signals(
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
 mod tests {
     use std::collections::{HashMap, HashSet};
 
@@ -682,10 +682,27 @@ mod tests {
         FunctionBaselineEntry, TraitBaselineEntry, TypeBaseline, TypeBaselineEntry,
     };
     use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
+    use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use crate::tddd::catalogue_v2::roles::SelfReceiver;
+
+    /// Build a [`ParamDeclaration`] from plain `&str` values (test helper).
+    fn mk_param(name: &str, ty: &str) -> ParamDeclaration {
+        ParamDeclaration::new(
+            ParamName::new(name).expect("test param name"),
+            TypeRef::new(ty).expect("test param ty"),
+        )
+    }
 
     /// Helper: build a `MethodDeclaration` that takes no args and returns unit.
     fn unit_method(name: &str) -> MethodDeclaration {
-        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+        MethodDeclaration::new(
+            MethodName::new(name).expect("test method name"),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").expect("unit return type"),
+            false,
+            None,
+        )
     }
 
     /// Helper: turn a slice of field/variant names into `Vec<MemberDeclaration>`
@@ -1797,7 +1814,7 @@ mod tests {
         let bl = baseline_with_functions(vec![(
             "usecase::track::save_track",
             FunctionBaselineEntry::new(
-                vec![ParamDeclaration::new("id", "u64")],
+                vec![mk_param("id", "u64")],
                 vec!["()".to_string()],
                 false,
                 Some("usecase::track".to_string()),
@@ -1808,7 +1825,7 @@ mod tests {
         functions.insert(
             ("save_track".to_string(), Some("usecase::track".to_string())),
             FunctionNode::new(
-                vec![ParamDeclaration::new("id", "u64")],
+                vec![mk_param("id", "u64")],
                 vec!["()".to_string()],
                 false,
                 Some("usecase::track".to_string()),
@@ -1852,7 +1869,7 @@ mod tests {
         let bl = baseline_with_functions(vec![(
             "usecase::track::save_track",
             FunctionBaselineEntry::new(
-                vec![ParamDeclaration::new("id", "u64")],
+                vec![mk_param("id", "u64")],
                 vec!["()".to_string()],
                 false,
                 Some("usecase::track".to_string()),
@@ -1863,7 +1880,7 @@ mod tests {
         functions.insert(
             ("save_track".to_string(), Some("usecase::track".to_string())),
             FunctionNode::new(
-                vec![ParamDeclaration::new("id", "u64")],
+                vec![mk_param("id", "u64")],
                 vec!["()".to_string()],
                 true, // is_async changed
                 Some("usecase::track".to_string()),
@@ -2017,7 +2034,7 @@ mod tests {
         let bl = baseline_with_functions(vec![(
             "usecase::track::save_track",
             FunctionBaselineEntry::new(
-                vec![ParamDeclaration::new("id", "u64")], // old binding name "id"
+                vec![mk_param("id", "u64")], // old binding name "id"
                 vec!["()".to_string()],
                 false,
                 Some("usecase::track".to_string()),
@@ -2028,7 +2045,7 @@ mod tests {
         functions.insert(
             ("save_track".to_string(), Some("usecase::track".to_string())),
             FunctionNode::new(
-                vec![ParamDeclaration::new("user_id", "u64")], // renamed binding name
+                vec![mk_param("user_id", "u64")], // renamed binding name
                 vec!["()".to_string()],
                 false,
                 Some("usecase::track".to_string()),
@@ -2055,7 +2072,7 @@ mod tests {
         let bl = baseline_with_functions(vec![(
             "usecase::track::save_track",
             FunctionBaselineEntry::new(
-                vec![ParamDeclaration::new("id", "u64")],
+                vec![mk_param("id", "u64")],
                 vec!["()".to_string()],
                 false,
                 Some("usecase::track".to_string()),
@@ -2066,7 +2083,7 @@ mod tests {
         functions.insert(
             ("save_track".to_string(), Some("usecase::track".to_string())),
             FunctionNode::new(
-                vec![ParamDeclaration::new("id", "TrackId")], // type changed
+                vec![mk_param("id", "TrackId")], // type changed
                 vec!["()".to_string()],
                 false,
                 Some("usecase::track".to_string()),

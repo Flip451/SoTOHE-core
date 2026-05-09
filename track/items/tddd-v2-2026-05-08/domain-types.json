@@ -1109,15 +1109,21 @@
       "expected_variants": [
         {
           "name": "ActionContradiction",
-          "payload_types": []
+          "payload_types": [
+            "String"
+          ]
         },
         {
           "name": "UnresolvedTypeRef",
-          "payload_types": []
+          "payload_types": [
+            "String"
+          ]
         },
         {
           "name": "DanglingId",
-          "payload_types": []
+          "payload_types": [
+            "String"
+          ]
         }
       ],
       "spec_refs": [
@@ -1244,26 +1250,10 @@
     },
     {
       "name": "ThreeWaySignal",
-      "description": "Signal result for one item in Phase 2 3-way evaluation. Fields: item_name (String), region (SignalRegion), signal (ThreeWaySignalKind).",
+      "description": "Signal result for one item in Phase 2 3-way evaluation. Fields: item_name (String), region (SignalRegion), signal (ThreeWaySignalKind). All fields are private; type existence check only.",
       "approved": true,
       "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "item_name",
-          "ty": "String"
-        },
-        {
-          "kind": "field",
-          "name": "region",
-          "ty": "SignalRegion"
-        },
-        {
-          "kind": "field",
-          "name": "signal",
-          "ty": "ThreeWaySignalKind"
-        }
-      ],
+      "expected_members": [],
       "expected_methods": [],
       "spec_refs": [
         {
@@ -1280,16 +1270,10 @@
     },
     {
       "name": "ThreeWayEvaluationReport",
-      "description": "Report produced by Phase 2. Contains Vec<ThreeWaySignal> for evaluated items that yield a non-skip signal (Blue / Yellow / Red); S ∩ C 構造一致 + action=Reference items are omitted (skip, ADR 3 D3). Replaces ConsistencyReport for the new 3-way evaluator path.",
+      "description": "Report produced by Phase 2. Contains Vec<ThreeWaySignal> for evaluated items that yield a non-skip signal (Blue / Yellow / Red); S ∩ C 構造一致 + action=Reference items are omitted (skip, ADR 3 D3). Replaces ConsistencyReport for the new 3-way evaluator path. Field signals is private; type existence check only.",
       "approved": true,
       "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "signals",
-          "ty": "Vec<ThreeWaySignal>"
-        }
-      ],
+      "expected_members": [],
       "expected_methods": [],
       "spec_refs": [
         {

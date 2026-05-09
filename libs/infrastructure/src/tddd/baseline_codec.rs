@@ -16,6 +16,8 @@ use domain::schema::TypeKind;
 use domain::tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration,
 };
+use domain::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+use domain::tddd::catalogue_v2::roles::SelfReceiver;
 use domain::{
     FunctionBaselineEntry, Timestamp, TraitBaselineEntry, TraitImplBaselineEntry, TypeBaseline,
     TypeBaselineEntry, ValidationError,
@@ -216,7 +218,7 @@ pub fn decode(json: &str) -> Result<TypeBaseline, BaselineCodecError> {
             .map(|dto| member_from_dto(dto, &name))
             .collect::<Result<Vec<_>, _>>()?;
         let methods: Vec<MethodDeclaration> =
-            entry_dto.methods.into_iter().map(method_from_dto).collect();
+            entry_dto.methods.into_iter().map(method_from_dto).collect::<Result<Vec<_>, _>>()?;
         // T007 (S4): decode trait_impls.
         let trait_impls: Vec<TraitImplBaselineEntry> =
             entry_dto.trait_impls.into_iter().map(trait_impl_from_dto).collect();
@@ -227,14 +229,18 @@ pub fn decode(json: &str) -> Result<TypeBaseline, BaselineCodecError> {
     let mut traits = HashMap::with_capacity(dto.traits.len());
     for (name, entry_dto) in dto.traits {
         let methods: Vec<MethodDeclaration> =
-            entry_dto.methods.into_iter().map(method_from_dto).collect();
+            entry_dto.methods.into_iter().map(method_from_dto).collect::<Result<Vec<_>, _>>()?;
         traits.insert(name, TraitBaselineEntry::new(methods));
     }
 
     // T007 (S4): decode functions map.
     let mut functions = HashMap::with_capacity(dto.functions.len());
     for (fq_name, fn_dto) in dto.functions {
-        let params: Vec<ParamDeclaration> = fn_dto.params.into_iter().map(param_from_dto).collect();
+        let params: Vec<ParamDeclaration> = fn_dto
+            .params
+            .into_iter()
+            .map(|p| param_from_dto(p, &fq_name))
+            .collect::<Result<Vec<_>, _>>()?;
         let entry =
             FunctionBaselineEntry::new(params, fn_dto.returns, fn_dto.is_async, fn_dto.module_path);
         functions.insert(fq_name, entry);
@@ -324,24 +330,43 @@ fn member_to_dto(member: &MemberDeclaration) -> MemberDto {
     }
 }
 
-fn method_from_dto(dto: MethodDto) -> MethodDeclaration {
-    let params: Vec<ParamDeclaration> =
-        dto.params.into_iter().map(|p| ParamDeclaration::new(p.name, p.ty)).collect();
-    MethodDeclaration::new(dto.name, dto.receiver, params, dto.returns, dto.is_async)
+fn method_from_dto(dto: MethodDto) -> Result<MethodDeclaration, BaselineCodecError> {
+    let name = MethodName::new(&dto.name).map_err(|e| BaselineCodecError::InvalidEntry {
+        name: dto.name.clone(),
+        reason: format!("invalid method name: {e}"),
+    })?;
+    let receiver = if let Some(r) = &dto.receiver {
+        Some(r.parse::<SelfReceiver>().map_err(|e| BaselineCodecError::InvalidEntry {
+            name: dto.name.clone(),
+            reason: format!("invalid receiver '{r}': {e}"),
+        })?)
+    } else {
+        None
+    };
+    let returns = TypeRef::new(&dto.returns).map_err(|e| BaselineCodecError::InvalidEntry {
+        name: dto.name.clone(),
+        reason: format!("invalid returns type '{}': {e}", dto.returns),
+    })?;
+    let params: Vec<ParamDeclaration> = dto
+        .params
+        .into_iter()
+        .map(|p| param_from_dto(p, &dto.name))
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(MethodDeclaration::new(name, receiver, params, returns, dto.is_async, None))
 }
 
 fn method_to_dto(method: &MethodDeclaration) -> MethodDto {
     let params: Vec<ParamDto> = method
-        .params()
+        .params
         .iter()
-        .map(|p| ParamDto { name: p.name().to_string(), ty: p.ty().to_string() })
+        .map(|p| ParamDto { name: p.name.as_str().to_string(), ty: p.ty.as_str().to_string() })
         .collect();
     MethodDto {
-        name: method.name().to_string(),
-        receiver: method.receiver().map(str::to_string),
+        name: method.name.as_str().to_string(),
+        receiver: method.receiver.map(|r| r.to_string()),
         params,
-        returns: method.returns().to_string(),
-        is_async: method.is_async(),
+        returns: method.returns.as_str().to_string(),
+        is_async: method.is_async,
     }
 }
 
@@ -382,7 +407,10 @@ fn baseline_to_dto(baseline: &TypeBaseline) -> BaselineDto {
             let params: Vec<ParamDto> = entry
                 .params()
                 .iter()
-                .map(|p| ParamDto { name: p.name().to_string(), ty: p.ty().to_string() })
+                .map(|p| ParamDto {
+                    name: p.name.as_str().to_string(),
+                    ty: p.ty.as_str().to_string(),
+                })
                 .collect();
             (
                 fq_name.clone(),
@@ -416,8 +444,16 @@ fn trait_impl_to_dto(entry: &TraitImplBaselineEntry) -> TraitImplEntryDto {
     }
 }
 
-fn param_from_dto(dto: ParamDto) -> ParamDeclaration {
-    ParamDeclaration::new(dto.name, dto.ty)
+fn param_from_dto(dto: ParamDto, context: &str) -> Result<ParamDeclaration, BaselineCodecError> {
+    let name = ParamName::new(&dto.name).map_err(|e| BaselineCodecError::InvalidEntry {
+        name: context.to_owned(),
+        reason: format!("invalid param name '{}': {e}", dto.name),
+    })?;
+    let ty = TypeRef::new(&dto.ty).map_err(|e| BaselineCodecError::InvalidEntry {
+        name: context.to_owned(),
+        reason: format!("invalid param type '{}': {e}", dto.ty),
+    })?;
+    Ok(ParamDeclaration::new(name, ty))
 }
 
 // ---------------------------------------------------------------------------
@@ -496,16 +532,16 @@ mod tests {
         // Members are sorted at construction
         assert_eq!(names, vec!["Done", "InProgress", "Skipped", "Todo"]);
         assert_eq!(entry.methods().len(), 1);
-        assert_eq!(entry.methods()[0].name(), "kind");
-        assert_eq!(entry.methods()[0].receiver(), Some("&self"));
-        assert_eq!(entry.methods()[0].returns(), "TaskStatusKind");
+        assert_eq!(entry.methods()[0].name.as_str(), "kind");
+        assert_eq!(entry.methods()[0].receiver.map(|r| r.to_string()).as_deref(), Some("&self"));
+        assert_eq!(entry.methods()[0].returns.as_str(), "TaskStatusKind");
     }
 
     #[test]
     fn test_decode_trait_entry() {
         let bl = decode(SAMPLE_JSON).unwrap();
         let entry = bl.get_trait("TrackWriter").unwrap();
-        let names: Vec<&str> = entry.methods().iter().map(|m| m.name()).collect();
+        let names: Vec<&str> = entry.methods().iter().map(|m| m.name.as_str()).collect();
         assert_eq!(names, vec!["save", "update"]);
     }
 
@@ -709,8 +745,8 @@ mod tests {
 
         let entry = bl.get_function("infra::tddd::build_baseline").unwrap();
         assert_eq!(entry.params().len(), 1);
-        assert_eq!(entry.params()[0].name(), "graph");
-        assert_eq!(entry.params()[0].ty(), "TypeGraph");
+        assert_eq!(entry.params()[0].name.as_str(), "graph");
+        assert_eq!(entry.params()[0].ty.as_str(), "TypeGraph");
         assert_eq!(entry.returns(), &["TypeBaseline"]);
         assert!(!entry.is_async());
         assert_eq!(entry.module_path(), Some("infra::tddd"));
@@ -746,7 +782,7 @@ mod tests {
         assert_eq!(bl2.functions().len(), 1);
         let entry = bl2.get_function("crate::mod_a::fn_one").unwrap();
         assert_eq!(entry.params().len(), 1);
-        assert_eq!(entry.params()[0].name(), "x");
+        assert_eq!(entry.params()[0].name.as_str(), "x");
         assert_eq!(entry.returns(), &["String"]);
         assert_eq!(entry.module_path(), Some("crate::mod_a"));
     }
