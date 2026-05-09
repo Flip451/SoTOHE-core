@@ -4,56 +4,47 @@
     {
       "id": "T001",
       "description": "新 catalogue schema domain 型 (newtype 系 + Role 3 enum + ItemAction + SelfReceiver + Layer) を実装する。Identifier (共通 base validation) / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath の 12 newtype に Display / Serialize / Deserialize / FromStr を実装する。DataRole (13 値) / ContractRole (3 値) / FunctionRole (2 値) / ItemAction (4 値) / SelfReceiver (3 値) / Layer (3 値) を enum として実装する。libs/domain/src/tddd/catalogue.rs 内の新 tddd::catalogue_v2 (または tddd/catalogue/ サブモジュール) に配置する。ラウンドトリップ unit test (AC-03) を追加する。この時点では旧型 (TypeDefinitionKind 等) はまだ残す。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "in_progress"
     },
     {
       "id": "T002",
       "description": "新 catalogue schema domain 型 (複合構造: TypeKindV2 / CompositePattern / VariantPayload / VariantDecl / FieldDecl / MethodDeclaration / ParamDeclaration 修正 / TraitImplDeclV2 / TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument + CatalogueDocumentError) を実装する。TypeKindV2 (Struct/Enum/TypeAlias の 3 variant payload-encoded) / CompositePattern / VariantPayload (Unit/Tuple/Struct) / VariantDecl (name+payload, serde default=Unit) / FieldDecl / TraitImplDeclV2 (identity-only) を実装する。既存 ParamDeclaration / MethodDeclaration を newtype フィールド (ParamName/TypeRef/MethodName/SelfReceiver) に修正する。TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument (3-BTreeMap + validation) / CatalogueDocumentError を実装する。crate_name とファイル名一致 validation を実装する。serde ラウンドトリップ unit test (AC-01 / AC-02 / AC-03 の新構造部分) を追加する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T003",
       "description": "新 catalogue schema の infrastructure 層 serde codec を実装する。CatalogueDocumentCodecError (Json / UnsupportedSchemaVersion / InvalidEntry / CrateNameMismatch) を infrastructure 層に実装する。旧 TypeCatalogueCodecError / TypeCatalogueDocument / TypeCatalogueEntry / TypeDefinitionKind を読む serde 経路を削除し (no-backward-compat 原則)、新 CatalogueDocument 専用 codec を infrastructure/src/tddd/catalogue_codec.rs に実装する。FsCatalogueLoader (infrastructure) を CatalogueDocument を返すように修正し、CatalogueLoader port (infrastructure-types.json に declare) の返り値型を Vec<(LayerId, CatalogueDocument)> に変更する。旧 TypeCatalogueCodecError を削除する。codec unit test (AC-01 の serde round-trip / CrateNameMismatch / UnsupportedSchemaVersion) を追加する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "ExtendedCrate schema を domain 層に実装する。ExtendedCrate { krate: rustdoc_types::Crate, item_actions: BTreeMap<Id, ItemAction> } を libs/domain/src/tddd/ 内 (例: extended_crate.rs) に実装する。BaselineRustdocCodecError (Json/IoError/UnsupportedFormatVersion) を infrastructure 層に実装し、rustdoc_types::Crate JSON をロードする concrete deserializer を infrastructure internal implementation (catalogue に track する named adapter contract なし) として実装する。CatalogueToExtendedCratePort (domain 層 secondary_port) と NewTypeGraphCodecError (domain 層 error_type) を実装する。CatalogueToExtendedCrateCodecError (infrastructure 層 error_type) を実装する。AC-04 の ExtendedCrate unit test を追加する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "Catalogue → ExtendedCrate (TypeGraph A) codec の core 変換ロジックを実装する。syn crate を使用した TypeRef generics parse (syn::parse_str::<syn::Type> → rustdoc_types::Type 変換) を実装する。std prelude allowlist (Vec/Option/Result/String/Box 等) の自動解決を実装する。未解決マーカー表現 (未 declare 型の保持方式) を実装する。TraitImplDeclV2.origin_crate + TypeRef crate prefix からの external_crates 自動 build (per-graph incremental crate_id 発番, crate_id==0 は自 crate) を実装する。inline → id 参照変換 (FieldDecl/VariantDecl を別 Item として index に登録し Vec<Id> 参照) を実装する。1 type = 1 Inherent Impl block の grouping を実装する。Crate.paths の [crate_name, ...module_path, item_name] 形式生成を実装する。CatalogueToExtendedCrateCodec (infrastructure 層 secondary_adapter) として CatalogueToExtendedCratePort を実装する。AC-05 / AC-06 の codec unit test (inline→id-ref 変換 / generics parse / module_path 込み paths 生成 / std prelude 自動解決 / 未解決マーカー生成) を追加する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T006",
       "description": "Signal evaluator Phase 1 (S/D 構築) を domain 層に実装する。SignalRegion (12 variant) / ThreeWaySignalKind (Skip/Blue/Yellow/Red) / ThreeWaySignal / ThreeWayEvaluationReport を domain 層に実装する (T007 の SignalEvaluatorV2 が実装する SignalEvaluatorPort の戻り値型として T006 で定義する必要がある)。SignalEvaluatorPort を domain 層に実装する (evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error>)。Phase1Error (ActionContradiction / UnresolvedTypeRef / DanglingId) を実装する。Phase 1 アルゴリズム: B 由来全要素を S に Reference で attach (types/traits=short name / functions=FunctionPath で identity、S 内 flat incremental Id 再発番)。A の各要素を action 別 (Add/Modify/Reference/Delete) に処理して S/D を構築する。Phase 1.5 (unresolved marker closed-world 検証: Delete 後の S を universe set とし、resolve 不能なら Phase1Error) を実装する。Phase 1.6 (dangling Id 検証) を実装する。external_crates の S/D 各スコープでの再発番を実装する。AC-07 の Phase 1 unit test (action 別処理 / ActionContradiction / UnresolvedTypeRef / DanglingId) を追加する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T007",
       "description": "Signal evaluator Phase 2 (S/D/C 3-way 評価) を infrastructure 層に実装する。SignalRegion / ThreeWaySignalKind / ThreeWaySignal / ThreeWayEvaluationReport は T006 で domain 層に定義済み。SignalEvaluatorV2 (infrastructure 層 secondary_adapter: implements SignalEvaluatorPort) を実装し、Phase 2 の 11 領域 × signal table (ADR 3 D3) を実装する: S∩C+構造一致+action別 / S∩C+構造不一致+action別 / S\\C+action別 / D∩C / D\\C / C\\(S∪D) の各領域を網羅する。identity 判定は types/traits=short name / functions=FunctionPath で統一する。AC-08 の Phase 2 unit test (全 11 領域の signal 判定、境界ケース含む) を追加する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T008",
       "description": "既存 TypeGraph (libs/domain/src/schema.rs の TypeNode/TraitNode/FunctionNode/TraitImplEntry HashMap ベース独自 schema) を削除し、TypeGraph を読む既存コード (tddd/consistency.rs / tddd/signals.rs / contract_map_render.rs / infrastructure/tddd/type_signals_evaluator.rs / infrastructure/tddd/type_graph_cluster.rs 等) を新 TypeGraph 形式 (rustdoc_types::Crate / ExtendedCrate) に書き換える。旧 TypeBaseline / TypeBaselineEntry / TraitBaselineEntry / FunctionBaselineEntry / TraitImplBaselineEntry (libs/domain/src/tddd/baseline.rs) を削除し、baseline の保存・ロードを rustdoc_types::Crate JSON に変更する。SchemaExportCodecError / EvaluateSignalsError など既存 reference 型は signature 整合性のみ確認し必要に応じて修正する。FsContractMapWriter など reference adapter は TypeGraph 形式変更に合わせて最低限の呼び出し側修正を行う (renderer の詳細化は OS-06 でスコープ外)。cargo make ci-rust (fmt-check + clippy + nextest + deny + check-layers) が通るよう Rust CI を緑にする。verify-* catalogue 整合性ゲート (verify-catalogue-spec-refs / check-catalogue-spec-signals) は T003 以降の *-types.json 旧フォーマットに対して新 codec が読めないため T009 完了後に確認する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T009",
       "description": "bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {

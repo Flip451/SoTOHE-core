@@ -1,115 +1,172 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T00:36:24Z",
-  "declaration_hash": "623e4a0e48eda40a4287b7c05f20f68cc87aeba6d98a3d25433aa6aa1cc0c4b9",
+  "generated_at": "2026-05-09T01:20:31Z",
+  "declaration_hash": "5f470bc4d48f256064e1f22fa2f812ae8960b9607e53a9d4f75af9ea75790426",
   "signals": [
     {
       "type_name": "Identifier",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TraitName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FieldName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "MethodName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ParamName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "VariantName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CrateName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FunctionName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ModulePath",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FunctionPath",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "crate_name: CrateName",
+        "module_path: ModulePath",
+        "name: FunctionName"
+      ]
+    },
+    {
+      "type_name": "IdentifierError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Empty",
+        "InvalidCharacters",
+        "InvalidFunctionPath",
+        "InvalidSegment"
+      ]
     },
     {
       "type_name": "DataRole",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AggregateRoot",
+        "Command",
+        "DomainService",
+        "Dto",
+        "Entity",
+        "ErrorType",
+        "Factory",
+        "Interactor",
+        "Query",
+        "SecondaryAdapter",
+        "Specification",
+        "UseCase",
+        "ValueObject"
+      ]
     },
     {
       "type_name": "ContractRole",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ApplicationService",
+        "SecondaryPort",
+        "SpecificationPort"
+      ]
     },
     {
       "type_name": "FunctionRole",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FreeFunction",
+        "UseCaseFunction"
+      ]
     },
     {
       "type_name": "ItemAction",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Add",
+        "Delete",
+        "Modify",
+        "Reference"
+      ]
     },
     {
       "type_name": "SelfReceiver",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ExclusiveRef",
+        "Owned",
+        "SharedRef"
+      ]
     },
     {
       "type_name": "Layer",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Domain",
+        "Infrastructure",
+        "Usecase"
+      ]
     },
     {
       "type_name": "CompositePattern",

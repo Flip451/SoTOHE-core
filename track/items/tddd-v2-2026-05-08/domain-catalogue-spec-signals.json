@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "623e4a0e48eda40a4287b7c05f20f68cc87aeba6d98a3d25433aa6aa1cc0c4b9",
+  "catalogue_declaration_hash": "5f470bc4d48f256064e1f22fa2f812ae8960b9607e53a9d4f75af9ea75790426",
   "signals": [
     {
       "type_name": "Identifier",
@@ -48,6 +48,10 @@
     },
     {
       "type_name": "FunctionPath",
+      "signal": "blue"
+    },
+    {
+      "type_name": "IdentifierError",
       "signal": "blue"
     },
     {

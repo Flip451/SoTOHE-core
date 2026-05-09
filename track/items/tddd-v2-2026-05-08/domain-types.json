@@ -278,6 +278,48 @@
       ]
     },
     {
+      "name": "IdentifierError",
+      "description": "Error type for Identifier and all newtype wrappers around it. 4 variants: Empty (identifier string was empty) / InvalidCharacters(String) (contains chars outside ASCII alphanumeric+underscore or starts with digit) / InvalidSegment(String) (module path segment invalid) / InvalidFunctionPath(String) (FunctionPath string format invalid) (ADR 1 D5).",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        {
+          "name": "Empty",
+          "payload_types": []
+        },
+        {
+          "name": "InvalidCharacters",
+          "payload_types": [
+            "String"
+          ]
+        },
+        {
+          "name": "InvalidSegment",
+          "payload_types": [
+            "String"
+          ]
+        },
+        {
+          "name": "InvalidFunctionPath",
+          "payload_types": [
+            "String"
+          ]
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-v2-2026-05-08/spec.json",
+          "anchor": "IN-03",
+          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
+        },
+        {
+          "file": "track/items/tddd-v2-2026-05-08/spec.json",
+          "anchor": "AC-03",
+          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
+        }
+      ]
+    },
+    {
       "name": "DataRole",
       "description": "Role enum for TypeEntry (struct / enum / type alias). 13 values: ValueObject / Entity / AggregateRoot / DomainService / Specification / Factory / UseCase / Interactor / Command / Query / Dto / ErrorType / SecondaryAdapter. TypeEntry only accepts DataRole; ContractRole on TypeEntry is a parse-time type error (ADR 1 D2).",
       "approved": true,

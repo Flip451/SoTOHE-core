@@ -1,6 +1,89 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`identifiers.rs` is 854 lines long, which exceeds the repository's 700-line hard limit for a module. The extra size is mostly from co-locating the large test block with the implementation, so this already violates the stated module-size rule and makes future changes harder to keep coherent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 1,
+              "category": "architecture"
+            },
+            {
+              "message": "`ModulePath::from_identifiers` is a new public constructor, but there is no unit test covering its happy path. That leaves a public API path in this module without the required test coverage, so a regression in this constructor would not be caught by the current suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 263,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:aaf0127f33a1070f6bcfd34341467d85a42693d267741ea654422b8a72eefbb3",
+          "at": "2026-05-09T00:51:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ItemAction` derives `strum::Display`/`EnumString` without a rename policy, so it accepts/emits `Add`, `Modify`, etc. The inherited TDDD-03 catalogue contract uses lowercase tags (`add`, `modify`, `reference`, `delete`), and the existing codec/fixtures use those values. Unless this enum is renamed with `#[strum(serialize_all = \"snake_case\")]` (and covered by tests), valid catalogue actions will be rejected or re-emitted with the wrong spelling once the v2 codec maps through these domain strings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "`SelfReceiver` currently parses/displays the Rust variant names (`Owned`, `SharedRef`, `ExclusiveRef`), but ADR D8 defines the catalogue values as the receiver tokens `self`, `&self`, and `&mut self`. This makes the domain `FromStr` reject the receiver strings already used in catalogue data and will force every caller to duplicate a custom mapping instead of using the validated domain enum. Add explicit strum serializations for the three variants and tests for the token forms.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 183,
+              "category": "correctness"
+            },
+            {
+              "message": "`Layer` also derives default strum casing, so `Layer::Domain.to_string()` is `Domain` and parsing `domain` fails. ADR D1 defines the layer axis as the lowercase catalogue values `domain` / `usecase` / `infrastructure`; with the current implementation, valid v2 documents using the specified layer values cannot round-trip through the domain enum. Add the appropriate strum serialization policy and tests for the lowercase spellings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 214,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:59:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96ad85ab07e8bdbc22652769ba2c392e5dadd47c10ef708a2f3b3f91ec71bb86",
+          "at": "2026-05-09T01:06:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:17:35Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -673,6 +756,49 @@
           "findings": [],
           "hash": "rvw1:sha256:6a43733446a8f285f114f34f42529e0a1619a74c9c70001faadb882f4fa1aa66",
           "at": "2026-05-09T00:34:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1bafa21994ccdab213e393d8787799e95e931f500d0b662cb02d03fb2d2c632",
+          "at": "2026-05-09T00:50:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1bafa21994ccdab213e393d8787799e95e931f500d0b662cb02d03fb2d2c632",
+          "at": "2026-05-09T00:57:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This transition is no longer status-only: `domain-types.json:281-307` adds a new `IdentifierError`, and `domain-types.md:13-14` promotes `CompositePattern`/`VariantPayload` to blue even though `plan.md:13` still leaves T002 as todo. That makes the rendered plan describe a later semantic state than the task graph actually permits.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5d2017181e59c3463406c88266c0ae07dc7c5dd6f14127fd2690030b3d088af6",
+          "at": "2026-05-09T01:15:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d2017181e59c3463406c88266c0ae07dc7c5dd6f14127fd2690030b3d088af6",
+          "at": "2026-05-09T01:18:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d2017181e59c3463406c88266c0ae07dc7c5dd6f14127fd2690030b3d088af6",
+          "at": "2026-05-09T01:20:03Z"
         }
       ]
     }

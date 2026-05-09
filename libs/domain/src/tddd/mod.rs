@@ -15,6 +15,7 @@ pub mod catalogue;
 pub mod catalogue_linter;
 pub mod catalogue_ports;
 pub mod catalogue_spec_signal;
+pub mod catalogue_v2;
 pub mod consistency;
 pub mod contract_map_content;
 pub mod contract_map_options;

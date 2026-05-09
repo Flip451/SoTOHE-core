@@ -4,12 +4,12 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DataRole | enum | — | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter | 🟡 | 🔵 |
-| ContractRole | enum | — | SpecificationPort, ApplicationService, SecondaryPort | 🟡 | 🔵 |
-| FunctionRole | enum | — | FreeFunction, UseCaseFunction | 🟡 | 🔵 |
-| ItemAction | enum | — | Add, Modify, Reference, Delete | 🟡 | 🔵 |
-| SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🟡 | 🔵 |
-| Layer | enum | — | Domain, Usecase, Infrastructure | 🟡 | 🔵 |
+| DataRole | enum | — | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter | 🔵 | 🔵 |
+| ContractRole | enum | — | SpecificationPort, ApplicationService, SecondaryPort | 🔵 | 🔵 |
+| FunctionRole | enum | — | FreeFunction, UseCaseFunction | 🔵 | 🔵 |
+| ItemAction | enum | — | Add, Modify, Reference, Delete | 🔵 | 🔵 |
+| SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🔵 | 🔵 |
+| Layer | enum | — | Domain, Usecase, Infrastructure | 🔵 | 🔵 |
 | CompositePattern | enum | — | Plain, TypestateState, Newtype | 🟡 | 🔵 |
 | VariantPayload | enum | — | Unit, Tuple, Struct | 🟡 | 🔵 |
 | TypeKindV2 | enum | — | Struct, Enum, TypeAlias | 🟡 | 🟡 |
@@ -24,18 +24,18 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| Identifier | value_object | — | — | 🟡 | 🔵 |
-| TypeName | value_object | — | — | 🟡 | 🔵 |
-| TraitName | value_object | — | — | 🟡 | 🔵 |
-| FieldName | value_object | — | — | 🟡 | 🔵 |
-| MethodName | value_object | — | — | 🟡 | 🔵 |
-| ParamName | value_object | — | — | 🟡 | 🔵 |
-| VariantName | value_object | — | — | 🟡 | 🔵 |
-| CrateName | value_object | — | — | 🟡 | 🔵 |
-| FunctionName | value_object | — | — | 🟡 | 🔵 |
-| ModulePath | value_object | — | — | 🟡 | 🔵 |
-| TypeRef | value_object | — | — | 🟡 | 🔵 |
-| FunctionPath | value_object | — | — | 🟡 | 🔵 |
+| Identifier | value_object | — | — | 🔵 | 🔵 |
+| TypeName | value_object | — | — | 🔵 | 🔵 |
+| TraitName | value_object | — | — | 🔵 | 🔵 |
+| FieldName | value_object | — | — | 🔵 | 🔵 |
+| MethodName | value_object | — | — | 🔵 | 🔵 |
+| ParamName | value_object | — | — | 🔵 | 🔵 |
+| VariantName | value_object | — | — | 🔵 | 🔵 |
+| CrateName | value_object | — | — | 🔵 | 🔵 |
+| FunctionName | value_object | — | — | 🔵 | 🔵 |
+| ModulePath | value_object | — | — | 🔵 | 🔵 |
+| TypeRef | value_object | — | — | 🔵 | 🔵 |
+| FunctionPath | value_object | — | — | 🔵 | 🔵 |
 | FieldDecl | value_object | — | — | 🟡 | 🔵 |
 | VariantDecl | value_object | — | — | 🟡 | 🔵 |
 | TraitImplDeclV2 | value_object | — | — | 🟡 | 🔵 |
@@ -67,6 +67,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| IdentifierError | error_type | — | Empty, InvalidCharacters, InvalidSegment, InvalidFunctionPath | 🔵 | 🔵 |
 | CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🟡 | 🔵 |
 | Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🟡 | 🔵 |
 | NewTypeGraphCodecError | error_type | — | InvalidTypeRef, AmbiguousTypeName | 🟡 | 🔵 |

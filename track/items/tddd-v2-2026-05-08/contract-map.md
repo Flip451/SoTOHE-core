@@ -20,6 +20,7 @@ flowchart LR
         L6_domain_ModulePath(ModulePath)
         L6_domain_TypeRef(TypeRef)
         L6_domain_FunctionPath(FunctionPath)
+        L6_domain_IdentifierError>IdentifierError]
         L6_domain_DataRole{{DataRole}}
         L6_domain_ContractRole{{ContractRole}}
         L6_domain_FunctionRole{{FunctionRole}}
