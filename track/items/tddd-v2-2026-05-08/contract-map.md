@@ -38,7 +38,7 @@ flowchart LR
         L6_domain_FunctionEntry(FunctionEntry)
         L6_domain_CatalogueDocument(CatalogueDocument)
         L6_domain_CatalogueDocumentError>CatalogueDocumentError]
-        L6_domain_ExtendedCrate(ExtendedCrate)
+        L6_domain_ExtendedCrate[ExtendedCrate]:::domain_service
         L6_domain_Phase1Error>Phase1Error]
         L6_domain_SignalRegion{{SignalRegion}}
         L6_domain_ThreeWaySignalKind{{ThreeWaySignalKind}}
@@ -112,6 +112,10 @@ flowchart LR
     L6_domain_CompositePattern -->|"::Newtype"| L6_domain_TypeRef
     L6_domain_CompositePattern -->|"::TypestateState"| L6_domain_MethodName
     L6_domain_CompositePattern -->|"::TypestateState"| L6_domain_TypeName
+    L6_domain_ExtendedCrate -->|"action_for"| L6_domain_ItemAction
+    L6_domain_ExtendedCrate -->|"into_parts"| L6_domain_ItemAction
+    L6_domain_ExtendedCrate -->|"item_actions"| L6_domain_ItemAction
+    L6_domain_ExtendedCrate -->|"new(item_actions)"| L6_domain_ItemAction
     L6_domain_SignalEvaluatorPort -->|"evaluate"| L6_domain_Phase1Error
     L6_domain_SignalEvaluatorPort -->|"evaluate"| L6_domain_ThreeWayEvaluationReport
     L6_domain_SignalEvaluatorPort -->|"evaluate(a)"| L6_domain_ExtendedCrate

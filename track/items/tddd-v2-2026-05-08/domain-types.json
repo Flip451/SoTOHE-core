@@ -1033,22 +1033,61 @@
     },
     {
       "name": "ExtendedCrate",
-      "description": "TypeGraph A / S: rustdoc_types::Crate extended with per-Item action. Fields: krate (rustdoc_types::Crate), item_actions (BTreeMap<Id, ItemAction>). B / C / D are pure rustdoc_types::Crate (no wrapper needed). (ADR 2 D2).",
+      "description": "TypeGraph A / S: rustdoc_types::Crate extended with per-Item action. Private fields krate (Crate) and item_actions (BTreeMap<Id, ItemAction>) are accessed via constructor + accessor methods (no public fields). B / C / D are pure rustdoc_types::Crate (no wrapper needed). (ADR 2 D2).",
       "approved": true,
-      "kind": "value_object",
-      "expected_members": [
+      "action": "modify",
+      "kind": "domain_service",
+      "expected_members": [],
+      "expected_methods": [
         {
-          "kind": "field",
-          "name": "krate",
-          "ty": "Crate"
+          "name": "new",
+          "params": [
+            {
+              "name": "krate",
+              "ty": "Crate"
+            },
+            {
+              "name": "item_actions",
+              "ty": "BTreeMap<Id, ItemAction>"
+            }
+          ],
+          "returns": "ExtendedCrate",
+          "is_async": false
         },
         {
-          "kind": "field",
+          "name": "krate",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Crate",
+          "is_async": false
+        },
+        {
           "name": "item_actions",
-          "ty": "BTreeMap<Id, ItemAction>"
+          "receiver": "&self",
+          "params": [],
+          "returns": "&BTreeMap<Id, ItemAction>",
+          "is_async": false
+        },
+        {
+          "name": "action_for",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&Id"
+            }
+          ],
+          "returns": "Option<ItemAction>",
+          "is_async": false
+        },
+        {
+          "name": "into_parts",
+          "receiver": "self",
+          "params": [],
+          "returns": "(Crate, BTreeMap<Id, ItemAction>)",
+          "is_async": false
         }
       ],
-      "expected_methods": [],
       "spec_refs": [
         {
           "file": "track/items/tddd-v2-2026-05-08/spec.json",
@@ -1267,17 +1306,22 @@
     },
     {
       "name": "NewTypeGraphCodecError",
-      "description": "Error type for Catalogue -> ExtendedCrate (TypeGraph A) codec. Variants: InvalidTypeRef (syn parse failure on TypeRef string) / AmbiguousTypeName (short name collision within the same catalogue). Crate-prefixed TypeRef values are never rejected as errors — they are auto-collected into external_crates (ADR 2 D5 / D11). (ADR 2 D9).",
+      "description": "Error type for Catalogue -> ExtendedCrate (TypeGraph A) codec. Variants: InvalidTypeRef(String) (syn parse failure on TypeRef string, carries human-readable description) / AmbiguousTypeName(String) (short name collision within the same catalogue, carries the conflicting short name). Crate-prefixed TypeRef values are never rejected as errors — they are auto-collected into external_crates (ADR 2 D5 / D11). (ADR 2 D9).",
       "approved": true,
+      "action": "modify",
       "kind": "error_type",
       "expected_variants": [
         {
           "name": "InvalidTypeRef",
-          "payload_types": []
+          "payload_types": [
+            "String"
+          ]
         },
         {
           "name": "AmbiguousTypeName",
-          "payload_types": []
+          "payload_types": [
+            "String"
+          ]
         }
       ],
       "spec_refs": [

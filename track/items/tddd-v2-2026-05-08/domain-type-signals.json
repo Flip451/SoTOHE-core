@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T02:25:49Z",
-  "declaration_hash": "5f470bc4d48f256064e1f22fa2f812ae8960b9607e53a9d4f75af9ea75790426",
+  "generated_at": "2026-05-09T05:18:38Z",
+  "declaration_hash": "52ed9f8cb7ae52ed09c5d950013a187072ba49a27c284176fd12d663d042540a",
   "signals": [
     {
       "type_name": "Identifier",
@@ -302,13 +302,9 @@
     },
     {
       "type_name": "ExtendedCrate",
-      "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "item_actions: BTreeMap<Id, ItemAction>",
-        "krate: Crate"
-      ]
+      "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "Phase1Error",
@@ -343,11 +339,11 @@
     {
       "type_name": "NewTypeGraphCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
-        "AmbiguousTypeName()",
-        "InvalidTypeRef()"
+      "found_items": [
+        "AmbiguousTypeName",
+        "InvalidTypeRef"
       ]
     },
     {
@@ -470,9 +466,9 @@
     {
       "type_name": "ParamDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
+      "found_items": [
         "name: ParamName",
         "ty: TypeRef"
       ]
@@ -480,15 +476,15 @@
     {
       "type_name": "MethodDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
-        "docs: Option<String>",
-        "is_async: bool",
+      "found_items": [
         "name: MethodName",
-        "params: Vec<ParamDeclaration>",
         "receiver: Option<SelfReceiver>",
-        "returns: TypeRef"
+        "params: Vec<ParamDeclaration>",
+        "returns: TypeRef",
+        "is_async: bool",
+        "docs: Option<String>"
       ]
     },
     {

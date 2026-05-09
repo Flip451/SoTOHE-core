@@ -11,8 +11,8 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueDocumentCodecError | error_type | — | Json, UnsupportedSchemaVersion, InvalidEntry, CrateNameMismatch | 🟡 | 🔵 |
-| CatalogueToExtendedCrateCodecError | error_type | — | InvalidTypeRef, AmbiguousIdentifier | 🟡 | 🔵 |
-| BaselineRustdocCodecError | error_type | — | Json, IoError, UnsupportedFormatVersion | 🟡 | 🔵 |
+| CatalogueToExtendedCrateCodecError | error_type | modify | InvalidTypeRef, AmbiguousIdentifier | 🔵 | 🔵 |
+| BaselineRustdocCodecError | error_type | modify | Json, IoError, UnsupportedFormatVersion | 🔵 | 🔵 |
 | SchemaExportCodecError | error_type | reference | Json | 🔵 | 🔵 |
 | TypeCatalogueCodecError | error_type | delete | Json, Validation, UnsupportedSchemaVersion, InvalidEntry | 🟡 | 🔵 |
 | BaselineCodecError | error_type | delete | Json, UnsupportedSchemaVersion, MissingField | 🟡 | 🔵 |
@@ -27,7 +27,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueToExtendedCrateCodec | secondary_adapter | — | impl CatalogueToExtendedCratePort | 🟡 | 🔵 |
+| CatalogueToExtendedCrateCodec | secondary_adapter | — | impl CatalogueToExtendedCratePort | 🔵 | 🔵 |
 | SignalEvaluatorV2 | secondary_adapter | — | impl SignalEvaluatorPort | 🟡 | 🔵 |
 | FsCatalogueLoader | secondary_adapter | modify | impl CatalogueLoader | 🟡 | 🔵 |
 | FsCatalogueSpecSignalsStore | secondary_adapter | reference | impl CatalogueSpecSignalsWriter | 🔵 | 🔵 |

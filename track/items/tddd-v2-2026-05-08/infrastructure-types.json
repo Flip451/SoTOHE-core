@@ -3,13 +3,15 @@
   "type_definitions": [
     {
       "name": "CatalogueDocumentCodecError",
-      "description": "Error type for the new CatalogueDocument serde codec. Replaces TypeCatalogueCodecError for the new schema. Variants: Json (serde_json error) / UnsupportedSchemaVersion / InvalidEntry / CrateNameMismatch (filename vs declared crate_name).",
+      "description": "Error type for the new CatalogueDocument serde codec. Replaces TypeCatalogueCodecError for the new schema. Variants: Json(serde_json::Error) (tuple, carries serde_json deserialization error) / UnsupportedSchemaVersion (unit) / InvalidEntry (unit) / CrateNameMismatch (unit, filename vs declared crate_name).",
       "approved": true,
       "kind": "error_type",
       "expected_variants": [
         {
           "name": "Json",
-          "payload_types": []
+          "payload_types": [
+            "Error"
+          ]
         },
         {
           "name": "UnsupportedSchemaVersion",
@@ -49,17 +51,23 @@
     },
     {
       "name": "CatalogueToExtendedCrateCodecError",
-      "description": "Error type for the Catalogue -> ExtendedCrate (TypeGraph A) codec. Variants: InvalidTypeRef (syn parse failed on TypeRef) / AmbiguousIdentifier (short name collision). Crate-prefixed TypeRef values are auto-collected into external_crates and never rejected (ADR 2 D5 / D11 open-world semantics); ExternalCrateUnresolvable is not a valid codec error.",
+      "description": "Error type for the Catalogue -> ExtendedCrate (TypeGraph A) codec. Variants: InvalidTypeRef { type_ref: String, reason: String } (syn parse failed; struct variant carrying the offending TypeRef and a reason string) / AmbiguousIdentifier { name: String } (short name collision; struct variant carrying the conflicting name). Crate-prefixed TypeRef values are auto-collected into external_crates and never rejected (ADR 2 D5 / D11 open-world semantics); ExternalCrateUnresolvable is not a valid codec error.",
       "approved": true,
+      "action": "modify",
       "kind": "error_type",
       "expected_variants": [
         {
           "name": "InvalidTypeRef",
-          "payload_types": []
+          "payload_types": [
+            "String",
+            "String"
+          ]
         },
         {
           "name": "AmbiguousIdentifier",
-          "payload_types": []
+          "payload_types": [
+            "String"
+          ]
         }
       ],
       "spec_refs": [
@@ -132,21 +140,29 @@
     },
     {
       "name": "BaselineRustdocCodecError",
-      "description": "Error type for loading rustdoc_types::Crate JSON as Baseline (B) or Current (C). Variants: Json (serde_json error) / IoError / UnsupportedFormatVersion.",
+      "description": "Error type for loading rustdoc_types::Crate JSON as Baseline (B) or Current (C). Variants: Json(serde_json::Error) (tuple, carries serde_json deserialization error) / IoError(io::Error) (tuple, carries filesystem I/O error) / UnsupportedFormatVersion { actual: u32, expected: u32 } (struct variant, carries the mismatched version numbers).",
       "approved": true,
+      "action": "modify",
       "kind": "error_type",
       "expected_variants": [
         {
           "name": "Json",
-          "payload_types": []
+          "payload_types": [
+            "Error"
+          ]
         },
         {
           "name": "IoError",
-          "payload_types": []
+          "payload_types": [
+            "Error"
+          ]
         },
         {
           "name": "UnsupportedFormatVersion",
-          "payload_types": []
+          "payload_types": [
+            "u32",
+            "u32"
+          ]
         }
       ],
       "spec_refs": [

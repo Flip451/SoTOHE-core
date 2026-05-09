@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cea3a7b54fef7193713fc6034e5b39341de8739852438ae11f9ffac9d6dfe163",
+  "catalogue_declaration_hash": "3ffd86ace9daee5952726ca790461ba068509afbdf7de4af379817dfc985ff57",
   "signals": [
     {
       "type_name": "CatalogueDocumentCodecError",

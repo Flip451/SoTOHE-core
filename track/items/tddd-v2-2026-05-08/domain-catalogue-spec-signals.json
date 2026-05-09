@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5f470bc4d48f256064e1f22fa2f812ae8960b9607e53a9d4f75af9ea75790426",
+  "catalogue_declaration_hash": "52ed9f8cb7ae52ed09c5d950013a187072ba49a27c284176fd12d663d042540a",
   "signals": [
     {
       "type_name": "Identifier",

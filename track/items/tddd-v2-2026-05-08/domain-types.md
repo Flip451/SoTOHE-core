@@ -43,7 +43,6 @@
 | TraitEntry | value_object | — | — | 🔵 | 🔵 |
 | FunctionEntry | value_object | — | — | 🔵 | 🔵 |
 | CatalogueDocument | value_object | — | — | 🔵 | 🔵 |
-| ExtendedCrate | value_object | — | — | 🟡 | 🔵 |
 | ThreeWaySignal | value_object | — | — | 🟡 | 🔵 |
 | ThreeWayEvaluationReport | value_object | — | — | 🟡 | 🔵 |
 | TypeCatalogueDocument | value_object | delete | — | 🟡 | 🔵 |
@@ -59,8 +58,8 @@
 | FunctionNode | value_object | delete | — | 🟡 | 🔵 |
 | EnumVariantDeclaration | value_object | delete | — | 🟡 | 🔵 |
 | TraitImplDecl | value_object | delete | — | 🟡 | 🔵 |
-| ParamDeclaration | value_object | modify | — | 🟡 | 🔵 |
-| MethodDeclaration | value_object | modify | — | 🟡 | 🔵 |
+| ParamDeclaration | value_object | modify | — | 🔵 | 🔵 |
+| MethodDeclaration | value_object | modify | — | 🔵 | 🔵 |
 | ConsistencyReport | value_object | reference | — | 🔵 | 🔵 |
 
 ## Error Types
@@ -70,7 +69,7 @@
 | IdentifierError | error_type | — | Empty, InvalidCharacters, InvalidSegment, InvalidFunctionPath | 🔵 | 🔵 |
 | CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🔵 | 🔵 |
 | Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🟡 | 🔵 |
-| NewTypeGraphCodecError | error_type | — | InvalidTypeRef, AmbiguousTypeName | 🟡 | 🔵 |
+| NewTypeGraphCodecError | error_type | modify | InvalidTypeRef, AmbiguousTypeName | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -81,4 +80,10 @@
 | ContractMapWriter | secondary_port | reference | fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError> | 🔵 | 🟡 |
 | CatalogueLinter | secondary_port | modify | fn run(&self, rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🟡 | 🟡 |
 | SchemaExporter | secondary_port | reference | fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> | 🔵 | 🟡 |
+
+## Domain Services
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| ExtendedCrate | domain_service | modify | — | 🔵 | 🔵 |
 
