@@ -366,6 +366,313 @@
           "findings": [],
           "hash": "rvw1:sha256:f03bb174f84bc9b6333a159d271b23d4d454a5dd106515761a2b88e0445aad2a",
           "at": "2026-05-08T19:00:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[TypeRef](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.json#L221) is documented as rejecting `::` module-path separators, but T005 requires extracting crate prefixes from `TypeRef` to auto-build `external_crates` ([plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/plan.md#L32)) and [spec.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/spec.json#L173) explicitly depends on that prefix-based extraction. As written, the codec cannot represent any external type path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.json",
+              "line": 221,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SignalRegion` is described as encoding 11 evaluation regions, but the enum lists 12 variants ([domain-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.json#L1062)). That clashes with the repeated `11 regions` wording in [spec.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/spec.json#L193) and [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/plan.md#L42), so T007 does not have a single unambiguous table shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.json",
+              "line": 1062,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:cd0bf5bafaaa49c4e6fb6c7202edafd475f7296fe92f2fa8dbff4df427985bb7",
+          "at": "2026-05-08T19:46:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4c1e8952034348c3bc1e3b537bd686a07343ac099881e390dc3c03f191d27b4",
+          "at": "2026-05-08T19:51:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec says Phase 2 uses a \"12 領域 × signal table\" while citing ADR 3 D3, but the implementation plan for T007 correctly says ADR 3 D3 is an 11-region table. The same 12-region wording is repeated for IN-12 and AC-08, so the plan artifacts disagree on the required evaluator coverage and tests. Either align the spec to the ADR/plan's 11 logical regions, or explicitly distinguish 12 enum variants from 11 logical regions as domain-types.json does.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/spec.md",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "T004 requires implementing a concrete `BaselineRustdocCodec`, but the infrastructure type catalogue and contract map only define `BaselineRustdocCodecError`; the secondary-adapter list includes `CatalogueToExtendedCrateCodec`, `SignalEvaluatorV2`, and `FsCatalogueLoader`, with no baseline codec node or SOT chain. This leaves a task-required implementation outside the catalogue/contract artifacts, so the plan is not traceable: either add the adapter entry and its contract edges/spec refs, or remove the codec from T004 if raw `rustdoc_types::Crate` deserialization is intended.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c4c1e8952034348c3bc1e3b537bd686a07343ac099881e390dc3c03f191d27b4",
+          "at": "2026-05-08T19:55:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-12 says Phase 2 covers `S ∩ C` only for `構造一致 + action別`, but AC-08 and T007 require handling `S ∩ C + 構造不一致` as a distinct signal region. This makes the canonical spec internally inconsistent and can lead implementers to omit the mismatch rows from the 3-way table despite the acceptance test requiring them.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/spec.json",
+              "line": 193,
+              "category": "contradiction"
+            },
+            {
+              "message": "T006 is ordered before T007 and is required to implement `SignalEvaluatorPort` returning `Result<ThreeWayEvaluationReport, Phase1Error>`, but T007 is the task that introduces `ThreeWayEvaluationReport` and the related Phase 2 report types. With the stated sequential dependency `T006 完了 → T007 着手`, T006 cannot complete the port as described without a type that the plan defers to the next task.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 36,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:fb0084941c40b02030a726ab8e1e0a161c73c5a0dc1e775ae737fde9709f6606",
+          "at": "2026-05-08T20:01:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineRustdocCodec` is introduced as a filesystem-loading `secondary_adapter`, but its catalogue entry has `implements: []` and the contract map shows no port edge for it. That leaves the new Baseline/Current rustdoc JSON dependency outside the trait boundary, unlike the other new adapters, so the plan is not hexagonal/traceable for B/C loading. Add a secondary port for this loader or reclassify it as an infrastructure-internal helper instead of an adapter contract item.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/infrastructure-types.json",
+              "line": 175,
+              "category": "architecture_violation"
+            }
+          ],
+          "hash": "rvw1:sha256:a27e3d9eeac7430aa550c076d6bd0d23dbb165933a48187a7e33a7af955016a5",
+          "at": "2026-05-08T20:07:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 requires implementing a concrete `BaselineRustdocCodec`, but the infrastructure catalogue only declares `BaselineRustdocCodecError` and the contract map has no `BaselineRustdocCodec` adapter node or edge. That leaves a task-required implementation outside the plan artifacts' SOT chain, so the implementation plan is not traceable for the baseline/current rustdoc loader.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ab53316e1228b98bdb495a34239087d13b77742bf7738dcddc47482d2933de8a",
+          "at": "2026-05-08T20:12:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d003cb49fe97277b5a9702faf44f77ffb0e26a7113014acd20049cd0c9072077",
+          "at": "2026-05-08T20:15:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef406f4533e64cb80536647457b457980abd1640a19394435ba9f82c69c6b62b",
+          "at": "2026-05-08T20:28:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 is ordered before the catalogue rewrite but still requires `cargo make ci` to be green. By this point T003 has removed the old `TypeCatalogueDocument` read path, while T009 later says the existing `*-types.json` files must still be converted because the new codec cannot read the old schema. That makes the T008 CI gate infeasible; the catalogue rewrite has to happen before the first full CI/verify gate that uses the new codec.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 51,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`CatalogueLinter` is kept as an unmodified reference port whose signature still takes `&TypeCatalogueDocument`, but the same catalogue marks `TypeCatalogueDocument` for deletion. Once the old schema is removed, this referenced port cannot remain unchanged, so the plan contradicts itself about whether old catalogue schema consumers are migrated.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ef406f4533e64cb80536647457b457980abd1640a19394435ba9f82c69c6b62b",
+          "at": "2026-05-08T20:31:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The codec error catalogue says crate-prefixed TypeRef values can fail as `UnknownCrateName`, but the same plan requires external_crates to be auto-built from every TraitImplDecl origin crate and TypeRef crate prefix. Under ADR 2 D5/IN-10, a prefix like `domain_core::UserId` is supposed to be collected and assigned a per-graph crate_id, not rejected as unresolved. If implemented as written, valid cross-crate references would be treated as codec errors.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.json",
+              "line": 1228,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:43703a3070f7005b3dc039a0625b05ff0b8b47a63800e1da6c0a5df60ab0631f",
+          "at": "2026-05-08T20:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueToExtendedCrateCodecError` adds `ExternalCrateUnresolvable`, but the plan/spec says the A codec is open-world: crate-prefixed and std-allowlisted references are auto-collected into `external_crates`, while unresolved catalogue-local references are carried as markers and rejected later by Phase 1. The domain port also returns `NewTypeGraphCodecError`, whose catalogue entry explicitly limits codec errors to parse/ambiguity cases. This extra codec-level rejection path contradicts the declared TypeRef/external_crates semantics and would either be unreachable or force the adapter to violate the port contract.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/infrastructure-types.json",
+              "line": 52,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f881294aa98eb962237f853b6613652545bb4dfc76c8d3a44b96134213cbcf06",
+          "at": "2026-05-08T20:44:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdda58a9a90a9ddaac71195f0b2d7f914678d6d2df91c1cf33b820a6ddadc781",
+          "at": "2026-05-08T20:48:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase catalogue still marks both reference ports as cat-spec yellow, but the briefing says this layer should be 2 blue / 0 yellow / 0 red. That leaves the usecase signal summary out of sync with the artifact.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The domain catalogue now has more than the single accepted yellow: `ContractMapWriter`, `CatalogueLinter`, and `SchemaExporter` are cat-spec yellow in addition to the intended `TypeKindV2` yellow. That contradicts the briefing's 57 blue / 1 yellow / 0 red summary and means the domain yellow budget is exceeded.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4732d7b49801580e0bc50ef40ee5f8dcb4fa1f8a4c006c91d4d31cbd0799ec5d",
+          "at": "2026-05-08T20:55:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4732d7b49801580e0bc50ef40ee5f8dcb4fa1f8a4c006c91d4d31cbd0799ec5d",
+          "at": "2026-05-08T20:59:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This entry says the contract-map renderer update for the new TypeGraph format is out of scope, but the spec includes the required `contract_map_render` rewrite in IN-13/AC-09 and OS-06 only defers detailed TypeKind/Role rendering. If implementers follow this catalogue wording, T008 can skip the renderer migration and fail the planned acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/infrastructure-types.json",
+              "line": 430,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4732d7b49801580e0bc50ef40ee5f8dcb4fa1f8a4c006c91d4d31cbd0799ec5d",
+          "at": "2026-05-08T21:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 says Phase 1 takes `A + B + C` to build `S` and `D`, but the rest of the plan and ADR 3 split this as Phase 1 = `A + B` construction and Phase 2 = `S / D / C` comparison. This acceptance criterion can drive the wrong tests or implementation by making `C` a Phase 1 dependency when it should only be used in Phase 2.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/spec.json",
+              "line": 488,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ThreeWayEvaluationReport` is described as containing signals for “all evaluated items,” but ADR 3 D3 defines the `S ∩ C + Reference + match` region as `skip` specifically to reduce output by not emitting those maintained items. As written, the report contract would include skipped reference matches, contradicting the intended signal output semantics.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.json",
+              "line": 1202,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:62ca9638e73ff86790284de64baac02e6b47511111ea2e6826143b0ec463ce3f",
+          "at": "2026-05-08T21:08:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0db2bf7192d42c45cfd806fc0079d6294821437652e14401338ee981da8b1bef",
+          "at": "2026-05-08T21:14:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueDocumentError` declares `DuplicateTypeName` / `DuplicateTraitName` / `DuplicateFunctionPath`, but the document is modeled directly as `BTreeMap`s. If the new codec deserializes straight into those maps, duplicate keys are collapsed before validation, so these errors cannot be observed as written unless you add a raw intermediate form or a custom duplicate-preserving parse step.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.json",
+              "line": 953,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:07d0d2ea017423f03aecd61ad77848d08c0e0aad0d6144a2074fe16d7c96bf89",
+          "at": "2026-05-08T21:20:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07d0d2ea017423f03aecd61ad77848d08c0e0aad0d6144a2074fe16d7c96bf89",
+          "at": "2026-05-08T21:24:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`InMemoryCatalogueLinter` is declared as a referenced adapter that is “not modified in this track,” but `domain-types.json` changes the `CatalogueLinter` port signature to take `&CatalogueDocument` and explicitly says the adapter's implements edge is preserved. Since an implementation of a modified trait must update its method signature, leaving this adapter as reference-only makes the plan internally inconsistent and can leave T008 with a stale `TypeCatalogueDocument` implementation after the old schema is deleted.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/infrastructure-types.json",
+              "line": 456,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:07d0d2ea017423f03aecd61ad77848d08c0e0aad0d6144a2074fe16d7c96bf89",
+          "at": "2026-05-08T21:26:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbc07ad0998d181b73b762042db820906ada0de3adc8db222ffe27f3225671ea",
+          "at": "2026-05-08T21:31:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a43733446a8f285f114f34f42529e0a1619a74c9c70001faadb882f4fa1aa66",
+          "at": "2026-05-09T00:26:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a43733446a8f285f114f34f42529e0a1619a74c9c70001faadb882f4fa1aa66",
+          "at": "2026-05-09T00:34:19Z"
         }
       ]
     }

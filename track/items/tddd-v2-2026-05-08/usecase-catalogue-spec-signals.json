@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "81e7c46df6cc9fba270f8e91281641322b84005b019affe6847490856d1da442",
+  "signals": [
+    {
+      "type_name": "PreCommitTypeSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueSpecSignalsWriter",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "signal": "yellow"
+    }
+  ]
+}

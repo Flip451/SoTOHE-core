@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-09T00:36:25Z",
+  "declaration_hash": "81e7c46df6cc9fba270f8e91281641322b84005b019affe6847490856d1da442",
+  "signals": [
+    {
+      "type_name": "PreCommitTypeSignalsService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn run(&self, track_id: String, workspace_root: PathBuf) -> Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError>"
+      ]
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "impl PreCommitTypeSignalsService"
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecSignalsWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>"
+      ]
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn export_as_json(&self, crate_name: &str) -> Result<String, String>"
+      ]
+    }
+  ]
+}

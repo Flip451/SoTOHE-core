@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-09T00:36:24Z",
+  "declaration_hash": "623e4a0e48eda40a4287b7c05f20f68cc87aeba6d98a3d25433aa6aa1cc0c4b9",
+  "signals": [
+    {
+      "type_name": "Identifier",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FieldName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "MethodName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ParamName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VariantName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CrateName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FunctionName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ModulePath",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeRef",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FunctionPath",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "DataRole",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ContractRole",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FunctionRole",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ItemAction",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SelfReceiver",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "Layer",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CompositePattern",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VariantPayload",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeKindV2",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FieldDecl",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VariantDecl",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FunctionEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueDocumentError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ExtendedCrate",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "Phase1Error",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalRegion",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ThreeWaySignalKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ThreeWaySignal",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ThreeWayEvaluationReport",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "NewTypeGraphCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueToExtendedCratePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalEvaluatorPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeBaseline",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "FunctionBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitImplBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeGraph",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeNode",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitNode",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "FunctionNode",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "EnumVariantDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeAction",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TypestateTransitions",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitImplDecl",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "ParamDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "name: ParamName",
+        "ty: TypeRef"
+      ]
+    },
+    {
+      "type_name": "MethodDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "docs: Option<String>",
+        "is_async: bool",
+        "name: MethodName",
+        "params: Vec<ParamDeclaration>",
+        "receiver: Option<SelfReceiver>",
+        "returns: TypeRef"
+      ]
+    },
+    {
+      "type_name": "ConsistencyReport",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError>"
+      ]
+    },
+    {
+      "type_name": "CatalogueLinter",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn run(&self, rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>"
+      ]
+    },
+    {
+      "type_name": "SchemaExporter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError>"
+      ]
+    }
+  ]
+}

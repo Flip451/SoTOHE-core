@@ -1,0 +1,578 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "TypeDefinitionKind の単一 enum 構造を廃止し、catalogue schema を 3 軸 (Language × Role × Layer) に分離された新 schema (CatalogueDocument: types / traits / functions の 3 BTreeMap + DataRole / ContractRole / FunctionRole / TypeKind) に刷新することで、軸間制約 (Role × Entry 種別、Pattern × Kind、members × kind) を parse 段階で schema 構造として enforce できるようにする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "TypeGraph の内部表現を rustdoc_types::Crate ベースに統一し、Catalogue 由来 (A) / Baseline (B) / Current (C) の 3 TypeGraph を共通形式で保持できる ExtendedCrate + Codec 基盤を実装することで、3-way 突合の前提となる型表現の一元化を達成する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "Signal evaluator を 2-phase 構造 (Phase 1: S / D 構築 + Phase 2: 11 領域 × signal table の 3-way 評価) に再設計することで、TDDD のゴール「C = B ∪ A 完全一致」を operational に表現し、declare 整合性エラーを Phase 2 より前の段階で早期検出できるようにする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "sibling ADR 2026-05-02-0316 の EnumVariantDeclaration { name, payload_types: Vec<String> } 表現を VariantPayload enum (Unit / Tuple / Struct の 3 variant) に supersede し、enum variant の unit / tuple / struct の意味的差異を parse 段階で schema 構造として encode できるようにする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D12"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "catalogue schema の全面刷新: TypeDefinitionKind 単一 enum を廃止し、CatalogueDocument (schema_version / crate_name / layer / types: BTreeMap<TypeName,TypeEntry> / traits: BTreeMap<TraitName,TraitEntry> / functions: BTreeMap<FunctionPath,FunctionEntry>) を新規実装する。TypeEntry は action / role: DataRole / kind: TypeKind (Struct { pattern: CompositePattern, fields } / Enum { variants } / TypeAlias { target }) / methods / trait_impls / module_path / docs を持つ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "Role 軸の 3 enum 実装: DataRole (13 値) / ContractRole (3 値) / FunctionRole (2 値) を別 enum として実装し、TypeEntry に ContractRole を付けようとすると parse 段階で reject される構造を実現する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "newtype 系 (Identifier / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath) の実装: 各 newtype に Display / FromStr / Serialize / Deserialize を実装し、コンパイル時に型の文脈違反を検出できるようにする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "VariantDecl / VariantPayload (Unit / Tuple(Vec<TypeRef>) / Struct(Vec<FieldDecl>)) の実装: sibling ADR 2026-05-02-0316 の payload_types: Vec<String> 表現を supersede し、unit / tuple / struct variant の意味的差異を schema 構造で encode する。serde default で payload 省略時を Unit として解釈する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D12"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "TraitEntry / FunctionEntry / MethodDeclaration / ParamDeclaration / SelfReceiver enum / TraitImplDecl (identity-only: trait_name + origin_crate) の実装: SelfReceiver は Owned / SharedRef / ExclusiveRef の 3 値 enum とし、TraitImplDecl は methods field を持たない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D8"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "crate 単位ファイル管理の実装: 1 CatalogueDocument = 1 crate = 1 layer の制約を schema + validation で enforce する。crate_name フィールドとファイル名 (<crate_name>-types.json) の一致を validation で検証する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "ExtendedCrate schema の実装: ExtendedCrate { krate: rustdoc_types::Crate, item_actions: BTreeMap<Id, ItemAction> } を新規実装する。TypeGraph A (Catalogue 由来) と S (突合中間表現) は ExtendedCrate 型を使用し、B (Baseline) / C (Current) / D (Delete 集合) は rustdoc_types::Crate 純粋型を使用する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "Catalogue → ExtendedCrate (TypeGraph A) codec の実装: CatalogueDocument を入力として ExtendedCrate を構築する。inline 表現 (FieldDecl / VariantDecl inline) を id 参照表現 (field / variant を別 Item として index に登録、親から Vec<Id> 参照) に変換する (D8)。1 type = 1 Inherent Impl block で inherent methods を集約する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D8"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "TypeRef generics parse の実装: catalogue の TypeRef(String) を syn crate を用いて parse し、rustdoc_types::Type の各 variant (ResolvedPath / Primitive / Tuple / Slice 等) にマッピングする。A codec は open-world で TypeRef parse を進め、catalogue 内未 declare 型は未解決マーカーで保持する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D9"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "external_crates の自動 build の実装: TraitImplDecl.origin_crate + TypeRef crate prefix + std prelude allowlist から外部 crate name を抽出し、crate_id を per-graph incremental に発番する。crate_id == 0 は自 crate に予約する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "Signal evaluator Phase 1 (S / D 構築) の実装: B 由来要素を S に Reference で取り込み、A の各要素を action 別 (Add / Modify / Reference / Delete) に処理して S / D を構築する。Id は types/traits = short name、functions = FunctionPath で identity し、S / D 内で per-graph flat incremental に再発番する。未解決マーカーの closed-world 検証と dangling Id 検証を Phase 1.5 / 1.6 で実施する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-12",
+        "text": "Signal evaluator Phase 2 (3-way 評価) の実装: S / D / C の 3-way 評価で 11 領域 × signal table (skip / 🔵 / 🟡 / 🔴) を判定する。S ∩ C (構造一致 × action 別 + 構造不一致 × action 別) / S \\ C (action 別) / D ∩ C / D \\ C / C \\ (S ∪ D) の各領域を網羅する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-13",
+        "text": "既存 TypeGraph (libs/domain/src/schema.rs の TypeNode / TraitNode / FunctionNode / TraitImplEntry HashMap ベース独自 schema) の rustdoc_types::Crate ベース実装への置換: TypeGraph を読む既存コード (consistency / signals / contract_map_render 等) の書き換えを含む",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "既存 4 グループ評価 (TDDD-02: A\\B / A∩B / B\\A / ∁(A∪B)∩C) の Phase 1 + Phase 2 構造への書き換え: libs/domain/src/tddd/consistency.rs (または後継) の全面 refactor。TDDD-02 / TDDD-03 の意味論を継承しつつ Phase 1 + Phase 2 の 2-phase 構造に再構成する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D7"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D8"
+          }
+        ]
+      },
+      {
+        "id": "IN-15",
+        "text": "serde codec の新 schema 専用実装: 旧 catalogue schema (TypeDefinitionKind ベース / payload_types: Vec<String> ベース) を読む経路を持たない新 schema 専用 codec を実装する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "Linter の詳細設計と実装: Linter は CatalogueDocument の role / pattern × 構造制約を enforcement する別 component として位置づけられる (ADR 3 D6)。本 track では Architecture 全体像における Linter の位置づけを明確にするが、Linter の rule config schema / DSL / CLI 統合の詳細設計と実装は別 ADR / 別 track の対象とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "過去 track / 過去 catalogue の遡及変換: 旧 catalogue schema (TypeDefinitionKind ベース / payload_types 一律表現) を新 schema に変換する migration 作業は行わない。新 schema は新規 track の catalogue から採用する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "aggregate / entity kind の具体的な Role 値追加: spin-off ADR 2026-04-29-1653 (aggregate-entity-kind-representation) は deferred のまま。DataRole の 13 値は本 track の ADR 1 D2 で確定した値域で実装する。Role 値域の変更は別 ADR で判断する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "typestate transition rendering の更新: sibling spin-off ADR 2026-04-29-0241 (typestate-transition-edge-rendering) で transitions_to から transition_methods 経由の遷移先導出への変更が必要になるが、同 ADR の更新と rendering logic の変更は別 track で実施する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "外部 crate 依存の意図的 declare (CatalogueDocument に external_crates: Vec<ExternalCrateDecl> を追加する β 案): 現状は S.external_crates を残存 Item 参照から自動構築する α 案 (ADR 2 D5 / ADR 3 D2) で実装する。意図的トラックが必要になった場合は別 ADR で評価する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "Contract Map renderer / Reality View renderer の新 TypeGraph 形式への完全対応: TypeGraph 置換に伴い renderer の書き換えが必要な部分は本 track の実装範囲に含まれるが、TypeKind / Role 軸に合わせた render ロジックの詳細化 (例: typestate transition edge の transition_methods 対応) は renderer 専用 track で扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "Language 軸の実現は enum 導入ではなく 3 BTreeMap (types / traits / functions) による entry-separation encoding とする。CatalogueDocument に language フィールドも Language enum も導入しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "BTreeMap の key 形式は types / traits = TypeName / TraitName (短名)、functions = FunctionPath (crate_name + module_path + name、フルパス) とする。cross-workspace 参照は crate name 直接 prefix 形式 (例: domain_core::register_user) で表現し、crate:: prefix も :: leading も使わない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D11"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "TypeGraph の identity 判定は types / traits = short name、functions = FunctionPath の full path とする。Id (rustdoc 流 u32 wrapper) は ExtendedCrate スコープに閉じる per-graph 値であり、graph 横断で同じ値が同じ Item を指すことを保証しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "B (Baseline) と C (Current) は rustdoc_types::Crate 純粋型として保持する。action は S 構築時に Signal evaluator が動的に attach する (B に永続 action を embed しない)。TypeGraph の純粋性を維持する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "Signal evaluator の入力は TypeGraph A (ExtendedCrate) + B (rustdoc_types::Crate) + C (rustdoc_types::Crate) の 3 つのみとする。CatalogueDocument は Signal evaluator が直接読まない。action は A の item_actions に既に attach 済みであるため別途 CatalogueDocument の読み込みは不要",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "A codec は open-world で TypeRef parse を進める。catalogue 内 未 declare 型は未解決マーカーで保持し、A codec 段階では Error reject しない。closed-world 検証は Phase 1 (S 構築時) で Delete 処理後の S を universe set として行い、resolve 不能なマーカーを Phase 1 Error として reject する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D10"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "TraitImplDecl は trait identity (trait_name + origin_crate) のみで encode し、methods field を持たない。codec は trait impl の methods を空 Vec として encode する。trait def と impl の signature 整合は Rust コンパイラに委ねる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D10"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D12"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "TypeRef の generics parse は syn crate を使用する。tokenizer / generics nesting handler の自前実装は行わない。codec が書くのは syn::parse_str::<syn::Type>(...) で得た AST を rustdoc_types::Type の各 variant にマッピングする変換ロジックのみとする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "新 catalogue schema の serde codec は旧 schema (TypeDefinitionKind ベース / payload_types: Vec<String> ベース) を読む経路を持たない。backward compat 移行 layer は導入しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-10",
+      "text": "TypeRef の crate prefix なし参照は同 catalogue 内 declare 型を参照する。bool / u32 等の Rust primitive は Type::Primitive に encode する。Vec / Option / Result / String / Box 等の std prelude 型は codec 固定の allowlist で std 外部 crate 参照として自動解決する。allowlist 外の未解決マーカーのみ Phase 1 で検証する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D11"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "新 CatalogueDocument (types / traits / functions の 3 BTreeMap + DataRole / ContractRole / FunctionRole + TypeKind) が serde でシリアライズ / デシリアライズできる。TypeEntry に ContractRole を付けようとすると parse 段階で型エラーになる。FieldDecl / VariantDecl / ParamDeclaration / MethodDeclaration のラウンドトリップテストが通る",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "VariantPayload (Unit / Tuple(Vec<TypeRef>) / Struct(Vec<FieldDecl>)) が serde でシリアライズ / デシリアライズできる。payload 省略時 (serde default) が Unit として解釈される。struct variant のフィールド名が VariantPayload::Struct(Vec<FieldDecl>) で宣言できる。旧 payload_types: Vec<String> 形式を読む経路が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D12"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "newtype 系 (Identifier / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath) が実装されており、型の文脈違反 (TypeName を MethodName フィールドに渡す等) がコンパイルエラーになる。各 newtype の Display / Serialize / Deserialize がラウンドトリップを通す",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "ExtendedCrate { krate: rustdoc_types::Crate, item_actions: BTreeMap<Id, ItemAction> } が実装されており、TypeGraph A (Catalogue 由来) と S (突合中間表現) として使用できる。B / C / D は rustdoc_types::Crate 純粋型として保持される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "Catalogue → ExtendedCrate codec が CatalogueDocument を入力として ExtendedCrate を構築できる。inline 表現が id 参照表現に変換されており、1 type = 1 Inherent Impl block で inherent methods が集約される。module_path を持つ Item の Crate.paths が [crate_name, ...module_path, item_name] 形式で生成される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D8"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "TypeRef generics parse が syn crate を用いて Result<Option<User>, DomainError> のような generics 含む文字列を rustdoc_types::Type 構造に変換できる。std prelude 型 (Vec / Option / Result 等) が allowlist により std 外部 crate 参照として自動解決される。未解決マーカーが未 declare 型に対して生成される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D9"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D11"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "Signal evaluator Phase 1 が A + B を入力として S (ExtendedCrate) と D (rustdoc_types::Crate) を構築できる (C は Phase 2 の 3-way 評価で使用; Phase 1 では使用しない)。action 別 (Add / Modify / Reference / Delete) の処理が正しく動作し、declare 整合性違反 (add で B に既存 / modify で B に不在等) が Phase 1 Error として reject される。未解決マーカーの closed-world 検証が Delete 処理後の S を universe set として実施される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "Signal evaluator Phase 2 が S / D / C の 3-way 評価で 11 領域 × signal table (skip / 🔵 / 🟡 / 🔴) を正しく判定できる。S ∩ C + 構造不一致 + action=Reference が 🔴 になる。S \\ C + action=Modify が 🔴 になる。D ∩ C が 🟡 になる。C \\ (S ∪ D) が 🔴 になる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "既存 TypeGraph (libs/domain/src/schema.rs の TypeNode / TraitNode / FunctionNode 等) が rustdoc_types::Crate ベースの実装に置換されており、TypeGraph を読む既存コード (consistency / signals / contract_map_render 等) が新 TypeGraph 形式で動作する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass する。新 schema の実装による既存テストへのリグレッションが存在せず、catalogue schema / codec / signal evaluator に対する新規ユニットテストが追加されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Source Tag Types"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/typed-deserialization.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/language-policy.md",
+      "anchor": "Rust First"
+    },
+    {
+      "file": "knowledge/conventions/type-designer-kind-selection.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 45,
+    "yellow": 0,
+    "red": 0
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-09T00:36:26Z",
+  "declaration_hash": "cea3a7b54fef7193713fc6034e5b39341de8739852438ae11f9ffac9d6dfe163",
+  "signals": [
+    {
+      "type_name": "CatalogueDocumentCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueToExtendedCrateCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueToExtendedCrateCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "BaselineRustdocCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalEvaluatorV2",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SchemaExportCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json"
+      ]
+    },
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "BaselineCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "FsCatalogueLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn load_all(&self) -> Result<Vec<(LayerId, CatalogueDocument)>, LoadAllCataloguesError>"
+      ]
+    },
+    {
+      "type_name": "CatalogueLoader",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "EvaluateSignalsError",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "0: String"
+      ]
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueSpecSignalsWriter"
+      ]
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ContractMapWriter"
+      ]
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "fn run(&self, rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>"
+      ]
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SchemaExporter",
+        "SchemaExporterPort"
+      ]
+    }
+  ]
+}

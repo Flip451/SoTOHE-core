@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "PreCommitTypeSignalsService",
+      "description": "Existing application_service trait for running pre-commit type signal checks. Referenced for continuity — not modified in this track. The signal evaluation path feeds the infrastructure signal evaluator which is being rewritten for the 3-way diff algorithm (IN-12).",
+      "approved": true,
+      "action": "reference",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "PathBuf"
+            }
+          ],
+          "returns": "Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError>",
+          "is_async": false
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-v2-2026-05-08/spec.json",
+          "anchor": "AC-09",
+          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
+        },
+        {
+          "file": "track/items/tddd-v2-2026-05-08/spec.json",
+          "anchor": "AC-10",
+          "hash": "041ddde914ee111b121cd6262666de4d16ea1be46e369c5e79d5271fe8afa5c8"
+        }
+      ]
+    },
+    {
+      "name": "PreCommitTypeSignalsInteractor",
+      "description": "Existing interactor implementing PreCommitTypeSignalsService. Referenced for continuity — not modified in this track.",
+      "approved": true,
+      "action": "reference",
+      "kind": "interactor",
+      "expected_members": [],
+      "declares_application_service": [
+        "PreCommitTypeSignalsService"
+      ],
+      "expected_methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/tddd-v2-2026-05-08/spec.json",
+          "anchor": "AC-09",
+          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
+        },
+        {
+          "file": "track/items/tddd-v2-2026-05-08/spec.json",
+          "anchor": "AC-10",
+          "hash": "041ddde914ee111b121cd6262666de4d16ea1be46e369c5e79d5271fe8afa5c8"
+        }
+      ]
+    },
+    {
+      "name": "CatalogueSpecSignalsWriter",
+      "description": "Existing secondary_port for persisting catalogue-spec signal documents. Referenced to expose implements edge for FsCatalogueSpecSignalsStore in infrastructure — not modified in this track.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "write_catalogue_spec_signals",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            },
+            {
+              "name": "doc",
+              "ty": "&CatalogueSpecSignalsDocument"
+            }
+          ],
+          "returns": "Result<(), RepositoryError>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "R7 declare obligation: FsCatalogueSpecSignalsStore implements CatalogueSpecSignalsWriter; port must be declared in catalogue for implements edge visibility."
+        }
+      ]
+    },
+    {
+      "name": "SchemaExporterPort",
+      "description": "Existing secondary_port (usecase layer) for exporting crate schema as JSON string. Referenced to expose implements edge for RustdocSchemaExporter in infrastructure — not modified in this track.",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "export_as_json",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<String, String>",
+          "is_async": false
+        }
+      ],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "R7 declare obligation: RustdocSchemaExporter implements SchemaExporterPort; port must be declared in catalogue for implements edge visibility."
+        }
+      ]
+    }
+  ]
+}
