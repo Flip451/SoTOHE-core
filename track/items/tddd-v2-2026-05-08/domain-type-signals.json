@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T14:52:40Z",
-  "declaration_hash": "b9a8f40c85e46aab25bf36dd654beecd3a00456927bae5028d299de3935fa7a8",
+  "generated_at": "2026-05-09T15:21:42Z",
+  "declaration_hash": "7419c7be02ef3d65326e0e196d99a75dc96245af79b7f232ecec477d12b0204d",
   "signals": [
     {
       "type_name": "Identifier",
@@ -158,17 +158,6 @@
       ]
     },
     {
-      "type_name": "Layer",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Domain",
-        "Infrastructure",
-        "Usecase"
-      ]
-    },
-    {
       "type_name": "CompositePattern",
       "kind_tag": "enum",
       "signal": "blue",
@@ -281,7 +270,7 @@
       "found_items": [
         "schema_version: u32",
         "crate_name: CrateName",
-        "layer: Layer",
+        "layer: LayerId",
         "types: BTreeMap<TypeName, TypeEntry>",
         "traits: BTreeMap<TraitName, TraitEntry>",
         "functions: BTreeMap<FunctionPath, FunctionEntry>"

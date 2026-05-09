@@ -1875,6 +1875,20 @@
           "findings": [],
           "hash": "rvw1:sha256:a4211c81d471f6c68230bc4563cc380cbceb7a5d049a698920d719a3cf2cda91",
           "at": "2026-05-09T14:48:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2595d8fbf603986639180c77ad567827020667d7c5dd79a3ed3f966293e670e",
+          "at": "2026-05-09T15:02:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2595d8fbf603986639180c77ad567827020667d7c5dd79a3ed3f966293e670e",
+          "at": "2026-05-09T15:03:42Z"
         }
       ]
     },
@@ -2103,6 +2117,20 @@
           "findings": [],
           "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
           "at": "2026-05-09T07:13:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61c79bc1bbd569538d189aac82d8e1237b68f6e4923e7dc77e072020fccb885b",
+          "at": "2026-05-09T15:02:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61c79bc1bbd569538d189aac82d8e1237b68f6e4923e7dc77e072020fccb885b",
+          "at": "2026-05-09T15:04:48Z"
         }
       ]
     },
@@ -3250,6 +3278,93 @@
           "findings": [],
           "hash": "rvw1:sha256:95c950d8b53576f0b5963c8a3ee70581058bc60b2abdb0b7c2d379a2e3c14225",
           "at": "2026-05-09T07:36:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59e20859bb200ae3eda9af5ff8d1ccd062fa1b1943a2f63090cc7124d7b5f999",
+          "at": "2026-05-09T14:50:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59e20859bb200ae3eda9af5ff8d1ccd062fa1b1943a2f63090cc7124d7b5f999",
+          "at": "2026-05-09T14:52:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64fd4072e5feefda4e00459c49632bd056f9b4b2b5d43801c53046f600881d39",
+          "at": "2026-05-09T15:03:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan still describes T001/S1 as implementing `Layer (3 値)` as a primitive enum, while the updated ADR D1/D6 now defines the Layer axis as an `architecture-rules.json`-driven `LayerId` newtype. This leaves the current plan artifacts with two incompatible schema definitions for `CatalogueDocument.layer` (and even later T003 already expects `LayerId`), so readers cannot tell whether the catalogue layer field is the old fixed enum or the new data-driven identifier.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:64fd4072e5feefda4e00459c49632bd056f9b4b2b5d43801c53046f600881d39",
+          "at": "2026-05-09T15:05:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan still describes T001/S1 as implementing a fixed `Layer (3 値)` enum, while the updated ADR D1/D6 now defines `CatalogueDocument.layer` as an `architecture-rules.json`-driven `LayerId` newtype, and later T003 already expects `Vec<(LayerId, CatalogueDocument)>`. These are incompatible schema definitions within the plan artifacts; update the T001/S1 wording (and regenerated `plan.md`) to use `LayerId` instead of the old fixed enum.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:64fd4072e5feefda4e00459c49632bd056f9b4b2b5d43801c53046f600881d39",
+          "at": "2026-05-09T15:08:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a1779abc42a8ab331419da9bb703e708632b4463eff96b050ffd74e7c39f62c",
+          "at": "2026-05-09T15:11:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The inventory still models `Layer` as a 3-value enum here, but the updated plan/ADR switched the layer axis to the `LayerId` newtype and explicitly says the fixed enum should not be introduced. That leaves the plan artifacts internally inconsistent and can steer the next implementation step toward the obsolete type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eab20e0bfe0a6e2868ea077107fda38cc9e24d24be19652d980a85ae6ce2b119",
+          "at": "2026-05-09T15:13:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d68d793509eb4b70b4e60aed919fd00c9d50be63725e1d450326fee2cd8917",
+          "at": "2026-05-09T15:19:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d68d793509eb4b70b4e60aed919fd00c9d50be63725e1d450326fee2cd8917",
+          "at": "2026-05-09T15:21:19Z"
         }
       ]
     }

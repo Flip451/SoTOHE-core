@@ -3,7 +3,7 @@
   "tasks": [
     {
       "id": "T001",
-      "description": "新 catalogue schema domain 型 (newtype 系 + Role 3 enum + ItemAction + SelfReceiver + Layer) を実装する。Identifier (共通 base validation) / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath の 12 newtype に Display / Serialize / Deserialize / FromStr を実装する。DataRole (13 値) / ContractRole (3 値) / FunctionRole (2 値) / ItemAction (4 値) / SelfReceiver (3 値) / Layer (3 値) を enum として実装する。libs/domain/src/tddd/catalogue.rs 内の新 tddd::catalogue_v2 (または tddd/catalogue/ サブモジュール) に配置する。ラウンドトリップ unit test (AC-03) を追加する。この時点では旧型 (TypeDefinitionKind 等) はまだ残す。",
+      "description": "新 catalogue schema domain 型 (newtype 系 + Role 3 enum + ItemAction + SelfReceiver + LayerId) を実装する。Identifier (共通 base validation) / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath の 12 newtype に Display / Serialize / Deserialize / FromStr を実装する。DataRole (13 値) / ContractRole (3 値) / FunctionRole (2 値) / ItemAction (4 値) / SelfReceiver (3 値) を enum として実装する。Layer 軸は ADR `2026-04-17-1528-tddd-contract-map` §D1 で定義済みの `LayerId` newtype (architecture-rules.json 駆動) を使用する (固定 3 値 enum は導入しない)。libs/domain/src/tddd/catalogue.rs 内の新 tddd::catalogue_v2 (または tddd/catalogue/ サブモジュール) に配置する。ラウンドトリップ unit test (AC-03) を追加する。この時点では旧型 (TypeDefinitionKind 等) はまだ残す。",
       "status": "done",
       "commit_hash": "ba7d0eb2574049186b9478ffb62b0e62b07a3084"
     },
@@ -39,7 +39,8 @@
     {
       "id": "T007",
       "description": "Signal evaluator Phase 2 (S/D/C 3-way 評価) を infrastructure 層に実装する。SignalRegion / ThreeWaySignalKind / ThreeWaySignal / ThreeWayEvaluationReport は T006 で domain 層に定義済み。SignalEvaluatorV2 (infrastructure 層 secondary_adapter: implements SignalEvaluatorPort) を実装し、Phase 2 の 11 領域 × signal table (ADR 3 D3) を実装する: S∩C+構造一致+action別 / S∩C+構造不一致+action別 / S\\C+action別 / D∩C / D\\C / C\\(S∪D) の各領域を網羅する。identity 判定は types/traits=short name / functions=FunctionPath で統一する。AC-08 の Phase 2 unit test (全 11 領域の signal 判定、境界ケース含む) を追加する。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "cdb77d020122336ac1140077c138a7d53acd60d7"
     },
     {
       "id": "T008",
@@ -59,7 +60,7 @@
         "id": "S1",
         "title": "新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)",
         "description": [
-          "T001 は newtype 系 12 種 (Identifier base + 各 newtype) と Role/Action/Layer の primitive enum を実装する。T002 はこれを基盤として複合構造 (TypeKindV2 / CompositePattern / VariantPayload / エントリ群 / CatalogueDocument) を実装する。",
+          "T001 は newtype 系 12 種 (Identifier base + 各 newtype) と Role/Action の primitive enum および Layer 軸に使用する LayerId newtype を実装する。T002 はこれを基盤として複合構造 (TypeKindV2 / CompositePattern / VariantPayload / エントリ群 / CatalogueDocument) を実装する。",
           "ADR 1 D1-D12 の型レベル制約 (TypeEntry に ContractRole を付けようとすると parse 段階で reject / members×kind の制約 schema 構造 encode / VariantPayload 3 variant) を CatalogueDocument 実装に折り込む。",
           "旧型 (TypeDefinitionKind 等) はこのフェーズでは削除しない。T003 の codec 切り替え後に T008 で一括削除する。<500 行 / commit を維持するため newtype+primitive と複合構造を T001/T002 に 2 分割している。"
         ],

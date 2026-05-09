@@ -26,7 +26,6 @@ flowchart LR
         L6_domain_FunctionRole{{FunctionRole}}
         L6_domain_ItemAction{{ItemAction}}
         L6_domain_SelfReceiver{{SelfReceiver}}
-        L6_domain_Layer{{Layer}}
         L6_domain_CompositePattern{{CompositePattern}}
         L6_domain_VariantPayload{{VariantPayload}}
         L6_domain_TypeKindV2{{TypeKindV2}}

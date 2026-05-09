@@ -1278,12 +1278,11 @@ fn receiver_type(receiver: SelfReceiver) -> Type {
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic, clippy::expect_used)]
 mod tests {
     use domain::tddd::CatalogueToExtendedCratePort;
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{CompositePattern, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::methods::MethodDeclaration;
-    use domain::tddd::catalogue_v2::roles::{
-        ContractRole, DataRole, ItemAction, Layer, SelfReceiver,
-    };
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, SelfReceiver};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
     use domain::tddd::catalogue_v2::{
@@ -1296,7 +1295,11 @@ mod tests {
     use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 
     fn make_doc(crate_name: &str) -> CatalogueDocument {
-        CatalogueDocument::new(2, CrateName::new(crate_name).unwrap(), Layer::Domain)
+        CatalogueDocument::new(
+            2,
+            CrateName::new(crate_name).unwrap(),
+            LayerId::try_new("domain").expect("static valid"),
+        )
     }
 
     // -----------------------------------------------------------------------

@@ -99,7 +99,7 @@ Pattern × Language 制約は `TypeKind::Struct` の payload に `CompositePatte
 
 **Role 軸** — D2 で定義する 3 enum (DataRole / ContractRole / FunctionRole) に分離する。全 Role が Language を一意決定する。
 
-**Layer 軸 (3 値)** — `domain` / `usecase` / `infrastructure`。`CatalogueDocument` 内に `layer: Layer` フィールドを持ち (D6 で定義)、1 ファイル = 1 crate = 1 layer の対応を schema 上で明示する。ファイル名 (`<crate_name>-types.json`) との整合は validation で検証する。
+**Layer 軸** — `architecture-rules.json` の `layers[].crate` フィールドと対応する `LayerId` newtype (`libs/domain/src/tddd/layer_id.rs`、ADR `2026-04-17-1528-tddd-contract-map.md` §D1 で定義済み)。`CatalogueDocument` 内に `layer: LayerId` フィールドを持ち (D6 で定義)、1 ファイル = 1 crate = 1 layer の対応を schema 上で明示する。ファイル名 (`<crate_name>-types.json`) との整合は validation で検証する。layer 値が workspace 内に実在する layer か (`architecture-rules.json` との整合性) は use-site validation (CatalogueLoader / SignalEvaluatorV2 等) で検証する。
 
 Rust 特化を本 ADR で明示する。Language 軸の 3 値 (DataType / Contract / Function) は Rust 固有の設計であり、多言語化が必要になった場合は framework ごと fork することを前提とする (本 ADR が Rust 特化前提として確定するため、段階的な schema 開放は行わない)。
 
@@ -197,7 +197,7 @@ pub struct FunctionPath {
 pub struct CatalogueDocument {
     schema_version: u32,
     crate_name: CrateName,   // ファイル名と一致することを validation で検証
-    layer: Layer,             // この crate が属する layer を宣言
+    layer: LayerId,           // この crate が属する layer を宣言 (architecture-rules.json 駆動)
     types: BTreeMap<TypeName, TypeEntry>,
     traits: BTreeMap<TraitName, TraitEntry>,
     functions: BTreeMap<FunctionPath, FunctionEntry>,

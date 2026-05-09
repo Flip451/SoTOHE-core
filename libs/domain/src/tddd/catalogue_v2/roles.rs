@@ -1,12 +1,15 @@
-//! Role enums and action/receiver/layer enums for the catalogue v2 schema.
+//! Role enums and action/receiver enums for the catalogue v2 schema.
 //!
-//! Implements all 6 enums from the TDDD v2 domain-types.json:
+//! Implements 5 enums from the TDDD v2 domain-types.json:
 //! - `DataRole` (13 values) — for `TypeEntry`
 //! - `ContractRole` (3 values) — for `TraitEntry`
 //! - `FunctionRole` (2 values) — for `FunctionEntry`
 //! - `ItemAction` (4 values) — per-entry action
 //! - `SelfReceiver` (3 values) — method self-receiver form
-//! - `Layer` (3 values) — architectural layer
+//!
+//! The architectural layer axis is represented by [`crate::tddd::LayerId`] — a
+//! data-driven validated newtype (ADR `2026-05-08-0248` D1). The former
+//! hardcoded `Layer` enum has been removed.
 //!
 //! All enums derive `strum::Display` and `strum::EnumString` for string
 //! round-trips, consistent with the domain serde-free policy
@@ -178,33 +181,6 @@ pub enum SelfReceiver {
 }
 
 // ---------------------------------------------------------------------------
-// Layer — 3 values for CatalogueDocument::layer
-// ---------------------------------------------------------------------------
-
-/// Enum for `CatalogueDocument::layer`.
-///
-/// Declares the architectural layer of the catalogue file (ADR 1 D1 / D6).
-/// One catalogue document corresponds to one crate in one layer.
-///
-/// The `Display` / `FromStr` format uses lowercase (`"domain"`, `"usecase"`,
-/// `"infrastructure"`) matching the three lowercase layer axis values defined in
-/// ADR 1 D1.
-///
-/// 3 values: `Domain`, `Usecase`, `Infrastructure`.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, strum::Display, strum::EnumString, strum::IntoStaticStr,
-)]
-#[strum(serialize_all = "snake_case")]
-pub enum Layer {
-    /// The domain layer — pure business logic, no I/O.
-    Domain,
-    /// The usecase / application layer — orchestration of domain logic.
-    Usecase,
-    /// The infrastructure layer — I/O adapters, codecs, persistence.
-    Infrastructure,
-}
-
-// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -246,8 +222,6 @@ mod tests {
 
     const ALL_SELF_RECEIVERS: &[SelfReceiver] =
         &[SelfReceiver::Owned, SelfReceiver::SharedRef, SelfReceiver::ExclusiveRef];
-
-    const ALL_LAYERS: &[Layer] = &[Layer::Domain, Layer::Usecase, Layer::Infrastructure];
 
     // -----------------------------------------------------------------------
     // DataRole — 13 values
@@ -428,45 +402,6 @@ mod tests {
         assert_eq!("self".parse::<SelfReceiver>().unwrap(), SelfReceiver::Owned);
         assert_eq!("&self".parse::<SelfReceiver>().unwrap(), SelfReceiver::SharedRef);
         assert_eq!("&mut self".parse::<SelfReceiver>().unwrap(), SelfReceiver::ExclusiveRef);
-    }
-
-    // -----------------------------------------------------------------------
-    // Layer — 3 values
-    // -----------------------------------------------------------------------
-
-    #[test]
-    fn test_layer_has_3_variants() {
-        assert_eq!(ALL_LAYERS.len(), 3);
-    }
-
-    #[test]
-    fn test_layer_display_fromstr_roundtrip_all_variants() {
-        for layer in ALL_LAYERS {
-            let s = layer.to_string();
-            let parsed: Layer = s.parse().unwrap();
-            assert_eq!(*layer, parsed, "roundtrip failed for Layer::{layer:?}");
-        }
-    }
-
-    #[test]
-    fn test_layer_domain_display() {
-        // Layer::Domain displays as the lowercase layer axis value "domain" per ADR 1 D1.
-        assert_eq!(Layer::Domain.to_string(), "domain");
-    }
-
-    #[test]
-    fn test_layer_fromstr_with_lowercase_succeeds() {
-        // The lowercase layer axis values from ADR 1 D1 must parse correctly.
-        assert_eq!("domain".parse::<Layer>().unwrap(), Layer::Domain);
-        assert_eq!("usecase".parse::<Layer>().unwrap(), Layer::Usecase);
-        assert_eq!("infrastructure".parse::<Layer>().unwrap(), Layer::Infrastructure);
-    }
-
-    #[test]
-    fn test_layer_fromstr_with_pascal_case_returns_error() {
-        // PascalCase should NOT parse — only lowercase is valid.
-        let result = "Domain".parse::<Layer>();
-        assert!(result.is_err(), "PascalCase 'Domain' should not parse as Layer::Domain");
     }
 
     // -----------------------------------------------------------------------

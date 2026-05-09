@@ -520,43 +520,6 @@
       ]
     },
     {
-      "name": "Layer",
-      "description": "Enum for CatalogueDocument::layer. 3 values: Domain / Usecase / Infrastructure. Declares the architectural layer of the catalogue file (ADR 1 D1 / D6).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Domain",
-          "payload_types": []
-        },
-        {
-          "name": "Usecase",
-          "payload_types": []
-        },
-        {
-          "name": "Infrastructure",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-06",
-          "hash": "a142a004cad044aa254c3511a93e2f4ea95246ff21f9ec57282a765a7ec3a58c"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
-    },
-    {
       "name": "CompositePattern",
       "description": "Pattern for TypeKind::Struct (ADR 1 D3 / D7). 3 variants: Plain (no special pattern) / TypestateState { of: TypeName, transition_methods: Vec<MethodName> } (typestate state with transition method references) / Newtype { inner: TypeRef } (newtype wrapper). Struct payload encodes Pattern x Kind constraint at schema level.",
       "approved": true,
@@ -932,7 +895,7 @@
     },
     {
       "name": "CatalogueDocument",
-      "description": "New top-level catalogue document schema. Fields: schema_version (u32), crate_name (CrateName), layer (Layer), types (BTreeMap<TypeName,TypeEntry>), traits (BTreeMap<TraitName,TraitEntry>), functions (BTreeMap<FunctionPath,FunctionEntry>). 1 file = 1 crate = 1 layer (ADR 1 D1 / D6). crate_name validated against filename <crate_name>-types.json.",
+      "description": "New top-level catalogue document schema. Fields: schema_version (u32), crate_name (CrateName), layer (LayerId), types (BTreeMap<TypeName,TypeEntry>), traits (BTreeMap<TraitName,TraitEntry>), functions (BTreeMap<FunctionPath,FunctionEntry>). 1 file = 1 crate = 1 layer (ADR 1 D1 / D6). crate_name validated against filename <crate_name>-types.json. layer uses LayerId newtype (architecture-rules.json driven, ADR 2026-04-17-1528-tddd-contract-map §D1).",
       "approved": true,
       "kind": "value_object",
       "expected_members": [
@@ -949,7 +912,7 @@
         {
           "kind": "field",
           "name": "layer",
-          "ty": "Layer"
+          "ty": "LayerId"
         },
         {
           "kind": "field",

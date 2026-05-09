@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b9a8f40c85e46aab25bf36dd654beecd3a00456927bae5028d299de3935fa7a8",
+  "catalogue_declaration_hash": "7419c7be02ef3d65326e0e196d99a75dc96245af79b7f232ecec477d12b0204d",
   "signals": [
     {
       "type_name": "Identifier",
@@ -72,10 +72,6 @@
     },
     {
       "type_name": "SelfReceiver",
-      "signal": "blue"
-    },
-    {
-      "type_name": "Layer",
       "signal": "blue"
     },
     {

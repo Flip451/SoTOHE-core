@@ -9,7 +9,6 @@
 | FunctionRole | enum | — | FreeFunction, UseCaseFunction | 🔵 | 🔵 |
 | ItemAction | enum | — | Add, Modify, Reference, Delete | 🔵 | 🔵 |
 | SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🔵 | 🔵 |
-| Layer | enum | — | Domain, Usecase, Infrastructure | 🔵 | 🔵 |
 | CompositePattern | enum | — | Plain, TypestateState, Newtype | 🔵 | 🔵 |
 | VariantPayload | enum | — | Unit, Tuple, Struct | 🔵 | 🔵 |
 | TypeKindV2 | enum | — | Struct, Enum, TypeAlias | 🔵 | 🟡 |

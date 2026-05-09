@@ -6,8 +6,9 @@
 //! ## Modules
 //!
 //! - [`identifiers`]: 12 newtype wrappers with `Display` / `FromStr` / validation.
-//! - [`roles`]: 6 enums (`DataRole`, `ContractRole`, `FunctionRole`, `ItemAction`,
-//!   `SelfReceiver`, `Layer`) with `Display` / `FromStr` via strum.
+//! - [`roles`]: 5 enums (`DataRole`, `ContractRole`, `FunctionRole`, `ItemAction`,
+//!   `SelfReceiver`) with `Display` / `FromStr` via strum. The Layer axis is
+//!   represented by [`crate::tddd::LayerId`] (ADR `2026-05-08-0248` D1).
 //! - [`composite`]: `TypeKindV2` and `CompositePattern` (pattern-encoded struct kinds).
 //! - [`variants`]: `FieldDecl`, `VariantPayload`, `VariantDecl`.
 //! - [`methods`]: `ParamDecl`, `MethodDecl` (V2 typed-newtype method/param declarations).
@@ -51,7 +52,7 @@ pub use identifiers::{
 
 pub use methods::{MethodDeclaration, ParamDeclaration};
 
-pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, Layer, SelfReceiver};
+pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver};
 
 pub use traits::TraitImplDeclV2;
 
