@@ -81,6 +81,27 @@
           "findings": [],
           "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
           "at": "2026-05-09T01:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:37:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:39:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:46:47Z"
         }
       ]
     },
@@ -799,6 +820,79 @@
           "findings": [],
           "hash": "rvw1:sha256:5d2017181e59c3463406c88266c0ae07dc7c5dd6f14127fd2690030b3d088af6",
           "at": "2026-05-09T01:20:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:229565afe84842b365aac4e98532269672c4cc6ef9d4e8dbc02ca3dd17600ad9",
+          "at": "2026-05-09T01:35:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` now marks multiple T002 deliverables as Signal 🔵, starting with `CompositePattern`/`VariantPayload`, while `impl-plan.json` and `plan.md` still have T002 only `in_progress` and describe those same composite structures as the active task's remaining work. The plan artifacts now disagree about whether T002's semantic scope is already satisfied, which can mislead the T002 transition/review gate. Keep these rows yellow until T002 is actually completed, or complete T002 consistently with its commit metadata.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:229565afe84842b365aac4e98532269672c4cc6ef9d4e8dbc02ca3dd17600ad9",
+          "at": "2026-05-09T01:37:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The transition marks T002 only as `in_progress`, but this generated catalogue already flips several T002 deliverables such as `CompositePattern`, `VariantPayload`, `FieldDecl`, `VariantDecl`, `TraitImplDeclV2`, `TypeEntry`, `TraitEntry`, `FunctionEntry`, and `CatalogueDocument` to blue. That contradicts the plan view, where those same domain types are still the work of T002, and makes the artifacts read as if T002 is already satisfied while it is only being started.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:229565afe84842b365aac4e98532269672c4cc6ef9d4e8dbc02ca3dd17600ad9",
+          "at": "2026-05-09T01:38:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:229565afe84842b365aac4e98532269672c4cc6ef9d4e8dbc02ca3dd17600ad9",
+          "at": "2026-05-09T01:41:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccae2a6b9ff49b16531897b71a9822bc3c510e862842d2dc49c6925c74e5e1ab",
+          "at": "2026-05-09T01:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` now marks the T002 composite-schema deliverables starting with `CompositePattern` as 🔵, while the plan artifacts still show T002 as the active in-progress task. For the stated T001-done/T002-start transition, these semantic signal changes make the artifacts assert that T002 outputs are already satisfied before T002 is completed; either keep these signals unchanged for this transition or advance the task state/briefing consistently.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ccae2a6b9ff49b16531897b71a9822bc3c510e862842d2dc49c6925c74e5e1ab",
+          "at": "2026-05-09T01:52:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccae2a6b9ff49b16531897b71a9822bc3c510e862842d2dc49c6925c74e5e1ab",
+          "at": "2026-05-09T01:54:24Z"
         }
       ]
     }

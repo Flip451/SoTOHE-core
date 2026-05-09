@@ -10,9 +10,9 @@
 | ItemAction | enum | — | Add, Modify, Reference, Delete | 🔵 | 🔵 |
 | SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🔵 | 🔵 |
 | Layer | enum | — | Domain, Usecase, Infrastructure | 🔵 | 🔵 |
-| CompositePattern | enum | — | Plain, TypestateState, Newtype | 🟡 | 🔵 |
-| VariantPayload | enum | — | Unit, Tuple, Struct | 🟡 | 🔵 |
-| TypeKindV2 | enum | — | Struct, Enum, TypeAlias | 🟡 | 🟡 |
+| CompositePattern | enum | — | Plain, TypestateState, Newtype | 🔵 | 🔵 |
+| VariantPayload | enum | — | Unit, Tuple, Struct | 🔵 | 🔵 |
+| TypeKindV2 | enum | — | Struct, Enum, TypeAlias | 🔵 | 🟡 |
 | SignalRegion | enum | — | SIntersectC_Match_Add, SIntersectC_Match_Modify, SIntersectC_Match_Reference, SIntersectC_Mismatch_Reference, SIntersectC_Mismatch_Add, SIntersectC_Mismatch_Modify, SMinusC_Reference, SMinusC_Add, SMinusC_Modify, DIntersectC, DMinusC, CMinusSUnionD | 🟡 | 🔵 |
 | ThreeWaySignalKind | enum | — | Skip, Blue, Yellow, Red | 🟡 | 🔵 |
 | TypeDefinitionKind | enum | delete | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, DomainService, FreeFunction | 🟡 | 🔵 |
@@ -36,13 +36,13 @@
 | ModulePath | value_object | — | — | 🔵 | 🔵 |
 | TypeRef | value_object | — | — | 🔵 | 🔵 |
 | FunctionPath | value_object | — | — | 🔵 | 🔵 |
-| FieldDecl | value_object | — | — | 🟡 | 🔵 |
-| VariantDecl | value_object | — | — | 🟡 | 🔵 |
-| TraitImplDeclV2 | value_object | — | — | 🟡 | 🔵 |
-| TypeEntry | value_object | — | — | 🟡 | 🔵 |
-| TraitEntry | value_object | — | — | 🟡 | 🔵 |
-| FunctionEntry | value_object | — | — | 🟡 | 🔵 |
-| CatalogueDocument | value_object | — | — | 🟡 | 🔵 |
+| FieldDecl | value_object | — | — | 🔵 | 🔵 |
+| VariantDecl | value_object | — | — | 🔵 | 🔵 |
+| TraitImplDeclV2 | value_object | — | — | 🔵 | 🔵 |
+| TypeEntry | value_object | — | — | 🔵 | 🔵 |
+| TraitEntry | value_object | — | — | 🔵 | 🔵 |
+| FunctionEntry | value_object | — | — | 🔵 | 🔵 |
+| CatalogueDocument | value_object | — | — | 🔵 | 🔵 |
 | ExtendedCrate | value_object | — | — | 🟡 | 🔵 |
 | ThreeWaySignal | value_object | — | — | 🟡 | 🔵 |
 | ThreeWayEvaluationReport | value_object | — | — | 🟡 | 🔵 |
@@ -59,8 +59,8 @@
 | FunctionNode | value_object | delete | — | 🟡 | 🔵 |
 | EnumVariantDeclaration | value_object | delete | — | 🟡 | 🔵 |
 | TraitImplDecl | value_object | delete | — | 🟡 | 🔵 |
-| ParamDeclaration | value_object | modify | — | 🟡 | 🔵 |
-| MethodDeclaration | value_object | modify | — | 🟡 | 🔵 |
+| ParamDeclaration | value_object | modify | — | 🔵 | 🔵 |
+| MethodDeclaration | value_object | modify | — | 🔵 | 🔵 |
 | ConsistencyReport | value_object | reference | — | 🔵 | 🔵 |
 
 ## Error Types
@@ -68,7 +68,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | IdentifierError | error_type | — | Empty, InvalidCharacters, InvalidSegment, InvalidFunctionPath | 🔵 | 🔵 |
-| CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🟡 | 🔵 |
+| CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🔵 | 🔵 |
 | Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🟡 | 🔵 |
 | NewTypeGraphCodecError | error_type | — | InvalidTypeRef, AmbiguousTypeName | 🟡 | 🔵 |
 

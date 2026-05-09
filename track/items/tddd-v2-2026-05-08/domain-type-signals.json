@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T01:20:31Z",
+  "generated_at": "2026-05-09T01:58:23Z",
   "declaration_hash": "5f470bc4d48f256064e1f22fa2f812ae8960b9607e53a9d4f75af9ea75790426",
   "signals": [
     {
@@ -171,68 +171,134 @@
     {
       "type_name": "CompositePattern",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Newtype",
+        "Plain",
+        "TypestateState"
+      ]
     },
     {
       "type_name": "VariantPayload",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Struct",
+        "Tuple",
+        "Unit"
+      ]
     },
     {
       "type_name": "TypeKindV2",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Enum",
+        "Struct",
+        "TypeAlias"
+      ]
     },
     {
       "type_name": "FieldDecl",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "name: FieldName",
+        "ty: TypeRef"
+      ]
     },
     {
       "type_name": "VariantDecl",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "name: VariantName",
+        "payload: VariantPayload"
+      ]
     },
     {
       "type_name": "TraitImplDeclV2",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "trait_name: TraitName",
+        "origin_crate: CrateName"
+      ]
     },
     {
       "type_name": "TypeEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "action: ItemAction",
+        "role: DataRole",
+        "kind: TypeKindV2",
+        "methods: Vec<MethodDeclaration>",
+        "trait_impls: Vec<TraitImplDeclV2>",
+        "module_path: ModulePath",
+        "docs: Option<String>"
+      ]
     },
     {
       "type_name": "TraitEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "action: ItemAction",
+        "role: ContractRole",
+        "methods: Vec<MethodDeclaration>",
+        "module_path: ModulePath",
+        "docs: Option<String>"
+      ]
     },
     {
       "type_name": "FunctionEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "action: ItemAction",
+        "role: FunctionRole",
+        "params: Vec<ParamDeclaration>",
+        "returns: TypeRef",
+        "is_async: bool",
+        "docs: Option<String>"
+      ]
     },
     {
       "type_name": "CatalogueDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "schema_version: u32",
+        "crate_name: CrateName",
+        "layer: Layer",
+        "types: BTreeMap<TypeName, TypeEntry>",
+        "traits: BTreeMap<TraitName, TraitEntry>",
+        "functions: BTreeMap<FunctionPath, FunctionEntry>"
+      ]
     },
     {
       "type_name": "CatalogueDocumentError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CrateNameMismatch",
+        "DuplicateFunctionPath",
+        "DuplicateTraitName",
+        "DuplicateTypeName",
+        "InvalidIdentifier"
+      ]
     },
     {
       "type_name": "ExtendedCrate",
@@ -393,9 +459,9 @@
     {
       "type_name": "ParamDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
+      "found_items": [
         "name: ParamName",
         "ty: TypeRef"
       ]
@@ -403,15 +469,15 @@
     {
       "type_name": "MethodDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
-        "docs: Option<String>",
-        "is_async: bool",
+      "found_items": [
         "name: MethodName",
-        "params: Vec<ParamDeclaration>",
         "receiver: Option<SelfReceiver>",
-        "returns: TypeRef"
+        "params: Vec<ParamDeclaration>",
+        "returns: TypeRef",
+        "is_async: bool",
+        "docs: Option<String>"
       ]
     },
     {

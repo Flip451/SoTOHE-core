@@ -8,6 +8,12 @@
 //! - [`identifiers`]: 12 newtype wrappers with `Display` / `FromStr` / validation.
 //! - [`roles`]: 6 enums (`DataRole`, `ContractRole`, `FunctionRole`, `ItemAction`,
 //!   `SelfReceiver`, `Layer`) with `Display` / `FromStr` via strum.
+//! - [`composite`]: `TypeKindV2` and `CompositePattern` (pattern-encoded struct kinds).
+//! - [`variants`]: `FieldDecl`, `VariantPayload`, `VariantDecl`.
+//! - [`methods`]: `ParamDecl`, `MethodDecl` (V2 typed-newtype method/param declarations).
+//! - [`traits`]: `TraitImplDeclV2` (identity-only trait impl record).
+//! - [`entries`]: `TypeEntry`, `TraitEntry`, `FunctionEntry` (BTreeMap values).
+//! - [`document`]: `CatalogueDocument`, `CatalogueDocumentError` (top-level document + validation).
 //!
 //! ## Design notes
 //!
@@ -15,17 +21,38 @@
 //! the domain layer is serialization-free. The infrastructure codec layer handles all
 //! JSON serialization and deserialization.
 //!
-//! **Additive only (T001)** — existing legacy types (`TypeDefinitionKind`, etc.)
-//! in `super::catalogue` are left untouched until T008.
+//! **Additive only (T001 / T002)** — existing legacy types (`TypeDefinitionKind`, etc.)
+//! in `super::catalogue` are left untouched until T008. The V2 types live exclusively
+//! in this `catalogue_v2` module hierarchy.
 
+pub mod composite;
+pub mod document;
+pub mod entries;
 pub mod identifiers;
+pub mod methods;
 pub mod roles;
+pub mod traits;
+pub mod variants;
 
-// Re-export all public types for convenient access via the module root.
+// ---------------------------------------------------------------------------
+// Re-exports — all public types accessible via the module root
+// ---------------------------------------------------------------------------
+
+pub use composite::{CompositePattern, TypeKindV2};
+
+pub use document::{CatalogueDocument, CatalogueDocumentError};
+
+pub use entries::{FunctionEntry, TraitEntry, TypeEntry};
 
 pub use identifiers::{
     CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError, MethodName,
     ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
 };
 
+pub use methods::{MethodDeclaration, ParamDeclaration};
+
 pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, Layer, SelfReceiver};
+
+pub use traits::TraitImplDeclV2;
+
+pub use variants::{FieldDecl, VariantDecl, VariantPayload};
