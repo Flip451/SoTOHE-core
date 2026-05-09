@@ -59,8 +59,8 @@
 | FunctionNode | value_object | delete | — | 🟡 | 🔵 |
 | EnumVariantDeclaration | value_object | delete | — | 🟡 | 🔵 |
 | TraitImplDecl | value_object | delete | — | 🟡 | 🔵 |
-| ParamDeclaration | value_object | modify | — | 🔵 | 🔵 |
-| MethodDeclaration | value_object | modify | — | 🔵 | 🔵 |
+| ParamDeclaration | value_object | modify | — | 🟡 | 🔵 |
+| MethodDeclaration | value_object | modify | — | 🟡 | 🔵 |
 | ConsistencyReport | value_object | reference | — | 🔵 | 🔵 |
 
 ## Error Types
@@ -76,7 +76,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueToExtendedCratePort | secondary_port | — | fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError> | 🟡 | 🔵 |
+| CatalogueToExtendedCratePort | secondary_port | — | fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError> | 🔵 | 🔵 |
 | SignalEvaluatorPort | secondary_port | — | fn evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error> | 🟡 | 🔵 |
 | ContractMapWriter | secondary_port | reference | fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError> | 🔵 | 🟡 |
 | CatalogueLinter | secondary_port | modify | fn run(&self, rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🟡 | 🟡 |

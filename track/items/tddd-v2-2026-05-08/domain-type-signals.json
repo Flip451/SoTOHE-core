@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T01:58:23Z",
+  "generated_at": "2026-05-09T02:25:49Z",
   "declaration_hash": "5f470bc4d48f256064e1f22fa2f812ae8960b9607e53a9d4f75af9ea75790426",
   "signals": [
     {
@@ -304,7 +304,11 @@
       "type_name": "ExtendedCrate",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "item_actions: BTreeMap<Id, ItemAction>",
+        "krate: Crate"
+      ]
     },
     {
       "type_name": "Phase1Error",
@@ -340,13 +344,20 @@
       "type_name": "NewTypeGraphCodecError",
       "kind_tag": "error_type",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "AmbiguousTypeName()",
+        "InvalidTypeRef()"
+      ]
     },
     {
       "type_name": "CatalogueToExtendedCratePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError>"
+      ]
     },
     {
       "type_name": "SignalEvaluatorPort",
@@ -459,9 +470,9 @@
     {
       "type_name": "ParamDeclaration",
       "kind_tag": "value_object",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
-      "found_items": [
+      "missing_items": [
         "name: ParamName",
         "ty: TypeRef"
       ]
@@ -469,15 +480,15 @@
     {
       "type_name": "MethodDeclaration",
       "kind_tag": "value_object",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
-      "found_items": [
-        "name: MethodName",
-        "receiver: Option<SelfReceiver>",
-        "params: Vec<ParamDeclaration>",
-        "returns: TypeRef",
+      "missing_items": [
+        "docs: Option<String>",
         "is_async: bool",
-        "docs: Option<String>"
+        "name: MethodName",
+        "params: Vec<ParamDeclaration>",
+        "receiver: Option<SelfReceiver>",
+        "returns: TypeRef"
       ]
     },
     {

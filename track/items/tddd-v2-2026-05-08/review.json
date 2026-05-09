@@ -1,107 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`identifiers.rs` is 854 lines long, which exceeds the repository's 700-line hard limit for a module. The extra size is mostly from co-locating the large test block with the implementation, so this already violates the stated module-size rule and makes future changes harder to keep coherent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 1,
-              "category": "architecture"
-            },
-            {
-              "message": "`ModulePath::from_identifiers` is a new public constructor, but there is no unit test covering its happy path. That leaves a public API path in this module without the required test coverage, so a regression in this constructor would not be caught by the current suite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 263,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:aaf0127f33a1070f6bcfd34341467d85a42693d267741ea654422b8a72eefbb3",
-          "at": "2026-05-09T00:51:46Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
-          "at": "2026-05-09T00:56:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ItemAction` derives `strum::Display`/`EnumString` without a rename policy, so it accepts/emits `Add`, `Modify`, etc. The inherited TDDD-03 catalogue contract uses lowercase tags (`add`, `modify`, `reference`, `delete`), and the existing codec/fixtures use those values. Unless this enum is renamed with `#[strum(serialize_all = \"snake_case\")]` (and covered by tests), valid catalogue actions will be rejected or re-emitted with the wrong spelling once the v2 codec maps through these domain strings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 145,
-              "category": "correctness"
-            },
-            {
-              "message": "`SelfReceiver` currently parses/displays the Rust variant names (`Owned`, `SharedRef`, `ExclusiveRef`), but ADR D8 defines the catalogue values as the receiver tokens `self`, `&self`, and `&mut self`. This makes the domain `FromStr` reject the receiver strings already used in catalogue data and will force every caller to duplicate a custom mapping instead of using the validated domain enum. Add explicit strum serializations for the three variants and tests for the token forms.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 183,
-              "category": "correctness"
-            },
-            {
-              "message": "`Layer` also derives default strum casing, so `Layer::Domain.to_string()` is `Domain` and parsing `domain` fails. ADR D1 defines the layer axis as the lowercase catalogue values `domain` / `usecase` / `infrastructure`; with the current implementation, valid v2 documents using the specified layer values cannot round-trip through the domain enum. Add the appropriate strum serialization policy and tests for the lowercase spellings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 214,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
-          "at": "2026-05-09T00:59:07Z"
+          "hash": "rvw1:sha256:0daa3df547919c8fd6e11c060f671549c53beefb77b438a5008107f55fbbc71f",
+          "at": "2026-05-09T02:17:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:96ad85ab07e8bdbc22652769ba2c392e5dadd47c10ef708a2f3b3f91ec71bb86",
-          "at": "2026-05-09T01:06:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
-          "at": "2026-05-09T01:14:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
-          "at": "2026-05-09T01:17:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:37:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:39:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:46:47Z"
+          "hash": "rvw1:sha256:0daa3df547919c8fd6e11c060f671549c53beefb77b438a5008107f55fbbc71f",
+          "at": "2026-05-09T02:18:40Z"
         }
       ]
     },
@@ -893,6 +807,193 @@
           "findings": [],
           "hash": "rvw1:sha256:ccae2a6b9ff49b16531897b71a9822bc3c510e862842d2dc49c6925c74e5e1ab",
           "at": "2026-05-09T01:54:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The transient-state signal updates for T004 are incomplete: `ExtendedCrate` and `NewTypeGraphCodecError` are still marked `🟡`, but the briefing says T004-related types should already be `🔵` during this in-progress transition. That leaves the plan artifacts inconsistent about the current stage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 46,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ParamDeclaration` and `MethodDeclaration` are still marked `🟡`, but the briefing says these T002-related types should be `🔵` after the T002 commit. The artifact therefore contradicts its own stated post-T002 signal state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.md",
+              "line": 62,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ff1ab0c649b327b00f28b6bc0b330eb14d8e684bc67d34e4ad48882390f6add8",
+          "at": "2026-05-09T02:18:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff1ab0c649b327b00f28b6bc0b330eb14d8e684bc67d34e4ad48882390f6add8",
+          "at": "2026-05-09T02:20:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff1ab0c649b327b00f28b6bc0b330eb14d8e684bc67d34e4ad48882390f6add8",
+          "at": "2026-05-09T02:21:44Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54f47f22b28cfb5cada3fcdc397c2783ce34d33ac153fef148842248781b1353",
+          "at": "2026-05-09T02:18:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineRustdocCodec` fully deserializes into the current `rustdoc_types::Crate` before checking `format_version`. That means rustdoc JSON from an unsupported schema can fail serde first and be reported as `Json` instead of `UnsupportedFormatVersion` (for example, older format versions before `Crate::target` was added lack the now-required `target` field). Since this codec is meant to reject format mismatches via `UnsupportedFormatVersion`, read/parse just `format_version` first, compare it with `FORMAT_VERSION`, and only then deserialize the full `Crate`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_rustdoc_codec.rs",
+              "line": 98,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:54f47f22b28cfb5cada3fcdc397c2783ce34d33ac153fef148842248781b1353",
+          "at": "2026-05-09T02:21:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5addf0b41457b0af532b9669b2d27fe9f73cce33b75d09b8bc079a047a83d62d",
+          "at": "2026-05-09T02:24:56Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`identifiers.rs` is 854 lines long, which exceeds the repository's 700-line hard limit for a module. The extra size is mostly from co-locating the large test block with the implementation, so this already violates the stated module-size rule and makes future changes harder to keep coherent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 1,
+              "category": "architecture"
+            },
+            {
+              "message": "`ModulePath::from_identifiers` is a new public constructor, but there is no unit test covering its happy path. That leaves a public API path in this module without the required test coverage, so a regression in this constructor would not be caught by the current suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 263,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:aaf0127f33a1070f6bcfd34341467d85a42693d267741ea654422b8a72eefbb3",
+          "at": "2026-05-09T00:51:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ItemAction` derives `strum::Display`/`EnumString` without a rename policy, so it accepts/emits `Add`, `Modify`, etc. The inherited TDDD-03 catalogue contract uses lowercase tags (`add`, `modify`, `reference`, `delete`), and the existing codec/fixtures use those values. Unless this enum is renamed with `#[strum(serialize_all = \"snake_case\")]` (and covered by tests), valid catalogue actions will be rejected or re-emitted with the wrong spelling once the v2 codec maps through these domain strings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "`SelfReceiver` currently parses/displays the Rust variant names (`Owned`, `SharedRef`, `ExclusiveRef`), but ADR D8 defines the catalogue values as the receiver tokens `self`, `&self`, and `&mut self`. This makes the domain `FromStr` reject the receiver strings already used in catalogue data and will force every caller to duplicate a custom mapping instead of using the validated domain enum. Add explicit strum serializations for the three variants and tests for the token forms.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 183,
+              "category": "correctness"
+            },
+            {
+              "message": "`Layer` also derives default strum casing, so `Layer::Domain.to_string()` is `Domain` and parsing `domain` fails. ADR D1 defines the layer axis as the lowercase catalogue values `domain` / `usecase` / `infrastructure`; with the current implementation, valid v2 documents using the specified layer values cannot round-trip through the domain enum. Add the appropriate strum serialization policy and tests for the lowercase spellings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 214,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:59:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96ad85ab07e8bdbc22652769ba2c392e5dadd47c10ef708a2f3b3f91ec71bb86",
+          "at": "2026-05-09T01:06:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:37:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:39:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:46:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
+          "at": "2026-05-09T02:19:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
+          "at": "2026-05-09T02:22:46Z"
         }
       ]
     }

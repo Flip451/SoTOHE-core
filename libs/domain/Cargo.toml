@@ -11,6 +11,7 @@ workspace = true
 [dependencies]
 chrono = { workspace = true }
 globset = { workspace = true }
+rustdoc-types = "0.57"
 strum = { workspace = true }
 thiserror = { workspace = true }
 

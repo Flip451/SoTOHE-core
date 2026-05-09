@@ -255,6 +255,7 @@ dependencies = [
  "chrono",
  "globset",
  "rstest",
+ "rustdoc-types",
  "strum",
  "thiserror",
 ]

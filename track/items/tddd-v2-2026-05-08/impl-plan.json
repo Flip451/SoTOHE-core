@@ -10,7 +10,8 @@
     {
       "id": "T002",
       "description": "新 catalogue schema domain 型 (複合構造: TypeKindV2 / CompositePattern / VariantPayload / VariantDecl / FieldDecl / MethodDeclaration / ParamDeclaration 修正 / TraitImplDeclV2 / TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument + CatalogueDocumentError) を実装する。TypeKindV2 (Struct/Enum/TypeAlias の 3 variant payload-encoded) / CompositePattern / VariantPayload (Unit/Tuple/Struct) / VariantDecl (name+payload, serde default=Unit) / FieldDecl / TraitImplDeclV2 (identity-only) を実装する。既存 ParamDeclaration / MethodDeclaration を newtype フィールド (ParamName/TypeRef/MethodName/SelfReceiver) に修正する。TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument (3-BTreeMap + validation) / CatalogueDocumentError を実装する。crate_name とファイル名一致 validation を実装する。serde ラウンドトリップ unit test (AC-01 / AC-02 / AC-03 の新構造部分) を追加する。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "1efb5b6bdd0d91e29e2136644fc291e60ddfc1e3"
     },
     {
       "id": "T003",
@@ -20,7 +21,7 @@
     {
       "id": "T004",
       "description": "ExtendedCrate schema を domain 層に実装する。ExtendedCrate { krate: rustdoc_types::Crate, item_actions: BTreeMap<Id, ItemAction> } を libs/domain/src/tddd/ 内 (例: extended_crate.rs) に実装する。BaselineRustdocCodecError (Json/IoError/UnsupportedFormatVersion) を infrastructure 層に実装し、rustdoc_types::Crate JSON をロードする concrete deserializer を infrastructure internal implementation (catalogue に track する named adapter contract なし) として実装する。CatalogueToExtendedCratePort (domain 層 secondary_port) と NewTypeGraphCodecError (domain 層 error_type) を実装する。CatalogueToExtendedCrateCodecError (infrastructure 層 error_type) を実装する。AC-04 の ExtendedCrate unit test を追加する。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",

@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
 
-## Tasks (1/9 resolved)
+## Tasks (2/9 resolved)
 
 ### S1 — 新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)
 
@@ -10,7 +10,7 @@
 > 旧型 (TypeDefinitionKind 等) はこのフェーズでは削除しない。T003 の codec 切り替え後に T008 で一括削除する。<500 行 / commit を維持するため newtype+primitive と複合構造を T001/T002 に 2 分割している。
 
 - [x] **T001**: 新 catalogue schema domain 型 (newtype 系 + Role 3 enum + ItemAction + SelfReceiver + Layer) を実装する。Identifier (共通 base validation) / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath の 12 newtype に Display / Serialize / Deserialize / FromStr を実装する。DataRole (13 値) / ContractRole (3 値) / FunctionRole (2 値) / ItemAction (4 値) / SelfReceiver (3 値) / Layer (3 値) を enum として実装する。libs/domain/src/tddd/catalogue.rs 内の新 tddd::catalogue_v2 (または tddd/catalogue/ サブモジュール) に配置する。ラウンドトリップ unit test (AC-03) を追加する。この時点では旧型 (TypeDefinitionKind 等) はまだ残す。 (`ba7d0eb2574049186b9478ffb62b0e62b07a3084`)
-- [~] **T002**: 新 catalogue schema domain 型 (複合構造: TypeKindV2 / CompositePattern / VariantPayload / VariantDecl / FieldDecl / MethodDeclaration / ParamDeclaration 修正 / TraitImplDeclV2 / TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument + CatalogueDocumentError) を実装する。TypeKindV2 (Struct/Enum/TypeAlias の 3 variant payload-encoded) / CompositePattern / VariantPayload (Unit/Tuple/Struct) / VariantDecl (name+payload, serde default=Unit) / FieldDecl / TraitImplDeclV2 (identity-only) を実装する。既存 ParamDeclaration / MethodDeclaration を newtype フィールド (ParamName/TypeRef/MethodName/SelfReceiver) に修正する。TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument (3-BTreeMap + validation) / CatalogueDocumentError を実装する。crate_name とファイル名一致 validation を実装する。serde ラウンドトリップ unit test (AC-01 / AC-02 / AC-03 の新構造部分) を追加する。
+- [x] **T002**: 新 catalogue schema domain 型 (複合構造: TypeKindV2 / CompositePattern / VariantPayload / VariantDecl / FieldDecl / MethodDeclaration / ParamDeclaration 修正 / TraitImplDeclV2 / TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument + CatalogueDocumentError) を実装する。TypeKindV2 (Struct/Enum/TypeAlias の 3 variant payload-encoded) / CompositePattern / VariantPayload (Unit/Tuple/Struct) / VariantDecl (name+payload, serde default=Unit) / FieldDecl / TraitImplDeclV2 (identity-only) を実装する。既存 ParamDeclaration / MethodDeclaration を newtype フィールド (ParamName/TypeRef/MethodName/SelfReceiver) に修正する。TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument (3-BTreeMap + validation) / CatalogueDocumentError を実装する。crate_name とファイル名一致 validation を実装する。serde ラウンドトリップ unit test (AC-01 / AC-02 / AC-03 の新構造部分) を追加する。 (`1efb5b6bdd0d91e29e2136644fc291e60ddfc1e3`)
 
 ### S2 — 新 CatalogueDocument serde codec — infrastructure 層 (CatalogueLoader 更新含む)
 
@@ -28,7 +28,7 @@
 > TypeRef parse は syn::parse_str::<syn::Type> を使い自前 tokenizer は書かない (CN-08)。未解決マーカーは open-world で保持し、closed-world 検証は T006 Phase 1 で実施 (CN-06)。
 > S1/S2 の完了後に着手する。
 
-- [ ] **T004**: ExtendedCrate schema を domain 層に実装する。ExtendedCrate { krate: rustdoc_types::Crate, item_actions: BTreeMap<Id, ItemAction> } を libs/domain/src/tddd/ 内 (例: extended_crate.rs) に実装する。BaselineRustdocCodecError (Json/IoError/UnsupportedFormatVersion) を infrastructure 層に実装し、rustdoc_types::Crate JSON をロードする concrete deserializer を infrastructure internal implementation (catalogue に track する named adapter contract なし) として実装する。CatalogueToExtendedCratePort (domain 層 secondary_port) と NewTypeGraphCodecError (domain 層 error_type) を実装する。CatalogueToExtendedCrateCodecError (infrastructure 層 error_type) を実装する。AC-04 の ExtendedCrate unit test を追加する。
+- [~] **T004**: ExtendedCrate schema を domain 層に実装する。ExtendedCrate { krate: rustdoc_types::Crate, item_actions: BTreeMap<Id, ItemAction> } を libs/domain/src/tddd/ 内 (例: extended_crate.rs) に実装する。BaselineRustdocCodecError (Json/IoError/UnsupportedFormatVersion) を infrastructure 層に実装し、rustdoc_types::Crate JSON をロードする concrete deserializer を infrastructure internal implementation (catalogue に track する named adapter contract なし) として実装する。CatalogueToExtendedCratePort (domain 層 secondary_port) と NewTypeGraphCodecError (domain 層 error_type) を実装する。CatalogueToExtendedCrateCodecError (infrastructure 層 error_type) を実装する。AC-04 の ExtendedCrate unit test を追加する。
 - [ ] **T005**: Catalogue → ExtendedCrate (TypeGraph A) codec の core 変換ロジックを実装する。syn crate を使用した TypeRef generics parse (syn::parse_str::<syn::Type> → rustdoc_types::Type 変換) を実装する。std prelude allowlist (Vec/Option/Result/String/Box 等) の自動解決を実装する。未解決マーカー表現 (未 declare 型の保持方式) を実装する。TraitImplDeclV2.origin_crate + TypeRef crate prefix からの external_crates 自動 build (per-graph incremental crate_id 発番, crate_id==0 は自 crate) を実装する。inline → id 参照変換 (FieldDecl/VariantDecl を別 Item として index に登録し Vec<Id> 参照) を実装する。1 type = 1 Inherent Impl block の grouping を実装する。Crate.paths の [crate_name, ...module_path, item_name] 形式生成を実装する。CatalogueToExtendedCrateCodec (infrastructure 層 secondary_adapter) として CatalogueToExtendedCratePort を実装する。AC-05 / AC-06 の codec unit test (inline→id-ref 変換 / generics parse / module_path 込み paths 生成 / std prelude 自動解決 / 未解決マーカー生成) を追加する。
 
 ### S4 — Signal evaluator Phase 1 (S/D 構築) + Phase 2 (3-way 評価)

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T01:58:25Z",
+  "generated_at": "2026-05-09T02:25:50Z",
   "declaration_hash": "cea3a7b54fef7193713fc6034e5b39341de8739852438ae11f9ffac9d6dfe163",
   "signals": [
     {
@@ -13,7 +13,11 @@
       "type_name": "CatalogueToExtendedCrateCodecError",
       "kind_tag": "error_type",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "AmbiguousIdentifier()",
+        "InvalidTypeRef()"
+      ]
     },
     {
       "type_name": "CatalogueToExtendedCrateCodec",
@@ -25,7 +29,12 @@
       "type_name": "BaselineRustdocCodecError",
       "kind_tag": "error_type",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "missing_items": [
+        "IoError()",
+        "Json()",
+        "UnsupportedFormatVersion()"
+      ]
     },
     {
       "type_name": "SignalEvaluatorV2",
