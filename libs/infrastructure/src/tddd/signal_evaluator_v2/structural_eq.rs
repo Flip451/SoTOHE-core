@@ -1,0 +1,343 @@
+//! Structural equality helpers for Phase 2 item comparison.
+//!
+//! Compares `rustdoc_types` items for structural equality, ignoring docs and
+//! parameter binding names.  Used in Phase 2 to decide whether S-side and C-side
+//! items are identical (determining the `Match` / `Mismatch` sub-region).
+//!
+//! Generics, function, and trait helpers live in the sibling `generics_eq` module.
+
+use std::collections::{BTreeMap, HashMap};
+
+use rustdoc_types::{Id, Item, ItemEnum};
+
+use super::format::format_type;
+use super::generics_eq::{
+    fn_sigs_structurally_equal, generics_structurally_equal, traits_structurally_equal,
+};
+
+// Re-export so callers (tests, phase2) can access via this module path.
+pub(super) use super::generics_eq::build_trait_method_map;
+
+/// Returns `true` if two items are structurally equal (same type/trait/function shape).
+///
+/// Comparison ignores docs and parameter binding names; only structural fields
+/// (field types, enum variant shapes, function signatures) are compared.
+///
+/// Requires `a_index` / `b_index` to resolve child items (fields, variants,
+/// trait methods) by their Ids.  This avoids false mismatches from comparing
+/// graph-local Ids across different Id spaces (S vs C).
+///
+/// Type comparison uses `format_type` (L1 short-name string representation) so
+/// A-derived and rustdoc-derived items compare symmetrically.
+pub(super) fn items_structurally_equal(
+    a: &Item,
+    b: &Item,
+    a_index: &HashMap<Id, Item>,
+    b_index: &HashMap<Id, Item>,
+    crate_name: &str,
+) -> bool {
+    match (&a.inner, &b.inner) {
+        (ItemEnum::Struct(sa), ItemEnum::Struct(sb)) => {
+            structs_structurally_equal(sa, sb, a_index, b_index)
+        }
+        (ItemEnum::Enum(ea), ItemEnum::Enum(eb)) => {
+            enums_structurally_equal(ea, eb, a_index, b_index)
+        }
+        (ItemEnum::TypeAlias(ta), ItemEnum::TypeAlias(tb)) => {
+            format_type(&ta.type_) == format_type(&tb.type_)
+                && generics_structurally_equal(&ta.generics, &tb.generics)
+        }
+        (ItemEnum::Trait(ta), ItemEnum::Trait(tb)) => {
+            traits_structurally_equal(ta, tb, a_index, b_index)
+        }
+        (ItemEnum::Function(fa), ItemEnum::Function(fb)) => fn_sigs_structurally_equal(
+            &fa.sig,
+            &fb.sig,
+            &fa.header,
+            &fb.header,
+            &fa.generics,
+            &fb.generics,
+        ),
+        // For trait impls: compare for_ + trait path (identity), header flags,
+        // generics, AND the method map (structural content) so that any change
+        // inside an impl block produces a structural mismatch.
+        (ItemEnum::Impl(ia), ItemEnum::Impl(ib)) => {
+            use super::format::format_generic_args;
+            use super::normalize_impl_trait_path;
+            if ia.is_unsafe != ib.is_unsafe || ia.is_negative != ib.is_negative {
+                return false;
+            }
+            let for_equal = format_type(&ia.for_) == format_type(&ib.for_);
+            // Normalize the trait path using the same rules as build_impl_identity_map:
+            // local traits (`crate::MyTrait`, `MyTrait`, `{crate_name}::MyTrait`) strip
+            // to their last segment so codec and rustdoc paths compare equal; external
+            // crate paths (`serde::Serialize`) are preserved verbatim.
+            let normalize_trait_path = |p: &rustdoc_types::Path| {
+                let normalized = normalize_impl_trait_path(&p.path, crate_name);
+                if let Some(args) = &p.args {
+                    let rendered = format_generic_args(args);
+                    if rendered.is_empty() {
+                        normalized
+                    } else {
+                        format!("{}<{}>", normalized, rendered)
+                    }
+                } else {
+                    normalized
+                }
+            };
+            let trait_equal = ia.trait_.as_ref().map(normalize_trait_path)
+                == ib.trait_.as_ref().map(normalize_trait_path);
+            if !for_equal || !trait_equal {
+                return false;
+            }
+            if !generics_structurally_equal(&ia.generics, &ib.generics) {
+                return false;
+            }
+            // Compare method/associated-item maps only when the S-side impl has methods.
+            // Catalogue-derived trait impls are identity-only (empty `items` list): the
+            // catalogue declares "Foo implements Display" without encoding the actual method
+            // bodies.  If the S-side impl is identity-only (no items), skip the content
+            // comparison — identity equality (for_ + trait_ + generics) is sufficient.
+            // When a_items is non-empty, the S-side carries a modified impl with explicit
+            // content, so a full method-map comparison is required.
+            if !ia.items.is_empty() {
+                let a_methods = build_trait_method_map(&ia.items, a_index, Some(&ia.generics));
+                let b_methods = build_trait_method_map(&ib.items, b_index, Some(&ib.generics));
+                if a_methods != b_methods {
+                    return false;
+                }
+            }
+            true
+        }
+        _ => false,
+    }
+}
+
+/// Builds a merged `method_name → sig_str` map for all inherent impl blocks
+/// (impl blocks without a trait) of a type.
+///
+/// Inherent methods are not independently evaluated in Phase 2's impl identity
+/// map (see `build_impl_identity_map` doc comment), so type structural equality
+/// must cover them to detect changes in `TypeEntry.methods` (catalogue-declared
+/// inherent methods encoded as inherent impl items by the codec).
+fn build_inherent_method_map(
+    impl_ids: &[Id],
+    index: &HashMap<Id, Item>,
+) -> BTreeMap<String, String> {
+    let mut merged = BTreeMap::new();
+    for impl_id in impl_ids {
+        if let Some(impl_item) = index.get(impl_id) {
+            if let ItemEnum::Impl(impl_) = &impl_item.inner {
+                // Only inherent impls (no trait).
+                if impl_.trait_.is_some() {
+                    continue;
+                }
+                let methods = build_trait_method_map(&impl_.items, index, Some(&impl_.generics));
+                for (name, sig) in methods {
+                    merged.insert(name, sig);
+                }
+            }
+        }
+    }
+    merged
+}
+
+fn structs_structurally_equal(
+    a: &rustdoc_types::Struct,
+    b: &rustdoc_types::Struct,
+    a_index: &HashMap<Id, Item>,
+    b_index: &HashMap<Id, Item>,
+) -> bool {
+    if !generics_structurally_equal(&a.generics, &b.generics) {
+        return false;
+    }
+    // Compare inherent method signatures so that adding, removing, or changing an
+    // inherent method (TypeEntry.methods in the catalogue) registers as a mismatch.
+    let a_methods = build_inherent_method_map(&a.impls, a_index);
+    let b_methods = build_inherent_method_map(&b.impls, b_index);
+    if a_methods != b_methods {
+        return false;
+    }
+    use rustdoc_types::StructKind;
+    match (&a.kind, &b.kind) {
+        (StructKind::Unit, StructKind::Unit) => true,
+        (StructKind::Tuple(af), StructKind::Tuple(bf)) => {
+            // Compare field types by position.
+            af.len() == bf.len()
+                && af.iter().zip(bf.iter()).all(|(a_opt, b_opt)| match (a_opt, b_opt) {
+                    (Some(aid), Some(bid)) => field_types_equal(aid, bid, a_index, b_index),
+                    (None, None) => true,
+                    _ => false,
+                })
+        }
+        (
+            StructKind::Plain { fields: af, has_stripped_fields: asf },
+            StructKind::Plain { fields: bf, has_stripped_fields: bsf },
+        ) => {
+            // A struct with stripped (hidden) fields cannot compare equal to one without.
+            // Including this flag prevents a rustdoc-truncated shape from matching a
+            // fully-visible empty/unit shape.
+            if asf != bsf {
+                return false;
+            }
+            // Compare named fields: same count, same names, same types (order-insensitive).
+            if af.len() != bf.len() {
+                return false;
+            }
+            // Build name → type-string maps for both sides then compare.
+            let a_field_map = build_field_name_type_map(af, a_index);
+            let b_field_map = build_field_name_type_map(bf, b_index);
+            a_field_map == b_field_map
+        }
+        _ => false,
+    }
+}
+
+/// Returns `true` if the tuple-field items at `a_id` and `b_id` have the same type.
+fn field_types_equal(
+    a_id: &Id,
+    b_id: &Id,
+    a_index: &HashMap<Id, Item>,
+    b_index: &HashMap<Id, Item>,
+) -> bool {
+    let a_ty = match a_index.get(a_id) {
+        Some(item) => match &item.inner {
+            ItemEnum::StructField(ty) => format_type(ty),
+            _ => return false,
+        },
+        None => return false,
+    };
+    let b_ty = match b_index.get(b_id) {
+        Some(item) => match &item.inner {
+            ItemEnum::StructField(ty) => format_type(ty),
+            _ => return false,
+        },
+        None => return false,
+    };
+    a_ty == b_ty
+}
+
+/// Builds a `name → format_type(field_type)` map from a list of field Ids.
+fn build_field_name_type_map(
+    field_ids: &[Id],
+    index: &HashMap<Id, Item>,
+) -> BTreeMap<String, String> {
+    let mut map = BTreeMap::new();
+    for id in field_ids {
+        if let Some(item) = index.get(id) {
+            if let Some(name) = &item.name {
+                let ty_str = match &item.inner {
+                    ItemEnum::StructField(ty) => format_type(ty),
+                    _ => continue,
+                };
+                map.insert(name.clone(), ty_str);
+            }
+        }
+    }
+    map
+}
+
+fn enums_structurally_equal(
+    a: &rustdoc_types::Enum,
+    b: &rustdoc_types::Enum,
+    a_index: &HashMap<Id, Item>,
+    b_index: &HashMap<Id, Item>,
+) -> bool {
+    if !generics_structurally_equal(&a.generics, &b.generics) {
+        return false;
+    }
+    // `has_stripped_variants` means some variants were excluded from rustdoc output.
+    // If one side has stripped variants and the other does not, the full variant set
+    // may differ — treat as structurally unequal to avoid false Blue signals.
+    if a.has_stripped_variants != b.has_stripped_variants {
+        return false;
+    }
+    if a.variants.len() != b.variants.len() {
+        return false;
+    }
+    // Compare variant names (and their kind) in sorted order.
+    let a_variants = build_variant_shape_map(&a.variants, a_index);
+    let b_variants = build_variant_shape_map(&b.variants, b_index);
+    if a_variants != b_variants {
+        return false;
+    }
+    // Compare inherent method signatures so that adding, removing, or changing an
+    // inherent method (TypeEntry.methods in the catalogue) registers as a mismatch.
+    let a_methods = build_inherent_method_map(&a.impls, a_index);
+    let b_methods = build_inherent_method_map(&b.impls, b_index);
+    a_methods == b_methods
+}
+
+/// Builds a `variant_name → shape_string` map for enum variants.
+///
+/// The shape string captures the variant kind (unit / tuple field-type-list /
+/// struct field-name:type-pairs) using `format_type` for type strings.
+fn build_variant_shape_map(
+    variant_ids: &[Id],
+    index: &HashMap<Id, Item>,
+) -> BTreeMap<String, String> {
+    let mut map = BTreeMap::new();
+    for id in variant_ids {
+        if let Some(item) = index.get(id) {
+            if let Some(name) = &item.name {
+                let shape = match &item.inner {
+                    ItemEnum::Variant(v) => {
+                        let kind_str = format_variant_kind(&v.kind, index);
+                        // Include the explicit discriminant so that `A = 1` vs `A = 2`
+                        // produce different shape strings and register as a mismatch.
+                        match &v.discriminant {
+                            Some(d) => format!("{kind_str}={}", d.expr.replace("::", ".")),
+                            None => kind_str,
+                        }
+                    }
+                    _ => continue,
+                };
+                map.insert(name.clone(), shape);
+            }
+        }
+    }
+    map
+}
+
+/// Formats an enum variant kind as a deterministic string for structural comparison.
+fn format_variant_kind(kind: &rustdoc_types::VariantKind, index: &HashMap<Id, Item>) -> String {
+    use rustdoc_types::VariantKind;
+    match kind {
+        VariantKind::Plain => "plain".to_string(),
+        VariantKind::Tuple(opt_ids) => {
+            // Preserve `None` slots as `_` so that a variant with stripped/hidden
+            // fields does not compare equal to a shorter variant.
+            let types: Vec<String> = opt_ids
+                .iter()
+                .map(|opt| match opt {
+                    None => "_".to_string(),
+                    Some(id) => index
+                        .get(id)
+                        .and_then(|item| match &item.inner {
+                            ItemEnum::StructField(ty) => Some(format_type(ty)),
+                            _ => None,
+                        })
+                        .unwrap_or_else(|| "_".to_string()),
+                })
+                .collect();
+            format!("tuple({})", types.join(","))
+        }
+        VariantKind::Struct { fields, has_stripped_fields } => {
+            let mut field_map: BTreeMap<String, String> = BTreeMap::new();
+            for id in fields {
+                if let Some(item) = index.get(id) {
+                    if let Some(name) = &item.name {
+                        if let ItemEnum::StructField(ty) = &item.inner {
+                            field_map.insert(name.clone(), format_type(ty));
+                        }
+                    }
+                }
+            }
+            let entries: Vec<String> = field_map.iter().map(|(n, t)| format!("{n}:{t}")).collect();
+            // Include the stripped-fields marker so a variant with hidden fields does
+            // not compare equal to a fully-visible variant with the same field set.
+            let stripped = if *has_stripped_fields { ",..stripped" } else { "" };
+            format!("struct{{{}{}}}", entries.join(","), stripped)
+        }
+    }
+}

@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
 
-## Tasks (4/9 resolved)
+## Tasks (5/9 resolved)
 
 ### S1 — 新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)
 
@@ -38,8 +38,8 @@
 > S3 の ExtendedCrate + codec が前提となるため S3 完了後に着手する。
 > identity 判定基準 (types/traits=short name / functions=FunctionPath、ADR 2 D3 / ADR 3 D2) を Phase 1/2 の全処理で統一する (CN-03)。
 
-- [~] **T006**: Signal evaluator Phase 1 (S/D 構築) を domain 層に実装する。SignalRegion (12 variant) / ThreeWaySignalKind (Skip/Blue/Yellow/Red) / ThreeWaySignal / ThreeWayEvaluationReport を domain 層に実装する (T007 の SignalEvaluatorV2 が実装する SignalEvaluatorPort の戻り値型として T006 で定義する必要がある)。SignalEvaluatorPort を domain 層に実装する (evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error>)。Phase1Error (ActionContradiction / UnresolvedTypeRef / DanglingId) を実装する。Phase 1 アルゴリズム: B 由来全要素を S に Reference で attach (types/traits=short name / functions=FunctionPath で identity、S 内 flat incremental Id 再発番)。A の各要素を action 別 (Add/Modify/Reference/Delete) に処理して S/D を構築する。Phase 1.5 (unresolved marker closed-world 検証: Delete 後の S を universe set とし、resolve 不能なら Phase1Error) を実装する。Phase 1.6 (dangling Id 検証) を実装する。external_crates の S/D 各スコープでの再発番を実装する。AC-07 の Phase 1 unit test (action 別処理 / ActionContradiction / UnresolvedTypeRef / DanglingId) を追加する。
-- [ ] **T007**: Signal evaluator Phase 2 (S/D/C 3-way 評価) を infrastructure 層に実装する。SignalRegion / ThreeWaySignalKind / ThreeWaySignal / ThreeWayEvaluationReport は T006 で domain 層に定義済み。SignalEvaluatorV2 (infrastructure 層 secondary_adapter: implements SignalEvaluatorPort) を実装し、Phase 2 の 11 領域 × signal table (ADR 3 D3) を実装する: S∩C+構造一致+action別 / S∩C+構造不一致+action別 / S\C+action別 / D∩C / D\C / C\(S∪D) の各領域を網羅する。identity 判定は types/traits=short name / functions=FunctionPath で統一する。AC-08 の Phase 2 unit test (全 11 領域の signal 判定、境界ケース含む) を追加する。
+- [x] **T006**: Signal evaluator Phase 1 (S/D 構築) を domain 層に実装する。SignalRegion (12 variant) / ThreeWaySignalKind (Skip/Blue/Yellow/Red) / ThreeWaySignal / ThreeWayEvaluationReport を domain 層に実装する (T007 の SignalEvaluatorV2 が実装する SignalEvaluatorPort の戻り値型として T006 で定義する必要がある)。SignalEvaluatorPort を domain 層に実装する (evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error>)。Phase1Error (ActionContradiction / UnresolvedTypeRef / DanglingId) を実装する。Phase 1 アルゴリズム: B 由来全要素を S に Reference で attach (types/traits=short name / functions=FunctionPath で identity、S 内 flat incremental Id 再発番)。A の各要素を action 別 (Add/Modify/Reference/Delete) に処理して S/D を構築する。Phase 1.5 (unresolved marker closed-world 検証: Delete 後の S を universe set とし、resolve 不能なら Phase1Error) を実装する。Phase 1.6 (dangling Id 検証) を実装する。external_crates の S/D 各スコープでの再発番を実装する。AC-07 の Phase 1 unit test (action 別処理 / ActionContradiction / UnresolvedTypeRef / DanglingId) を追加する。 (`55281f5103e1e30b4c1db8aa2593b109496be385`)
+- [~] **T007**: Signal evaluator Phase 2 (S/D/C 3-way 評価) を infrastructure 層に実装する。SignalRegion / ThreeWaySignalKind / ThreeWaySignal / ThreeWayEvaluationReport は T006 で domain 層に定義済み。SignalEvaluatorV2 (infrastructure 層 secondary_adapter: implements SignalEvaluatorPort) を実装し、Phase 2 の 11 領域 × signal table (ADR 3 D3) を実装する: S∩C+構造一致+action別 / S∩C+構造不一致+action別 / S\C+action別 / D∩C / D\C / C\(S∪D) の各領域を網羅する。identity 判定は types/traits=short name / functions=FunctionPath で統一する。AC-08 の Phase 2 unit test (全 11 領域の signal 判定、境界ケース含む) を追加する。
 
 ### S5 — 旧 TypeGraph 置換 + 旧 schema 削除 + 既存コード書き換え
 

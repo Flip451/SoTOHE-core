@@ -28,7 +28,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueToExtendedCrateCodec | secondary_adapter | — | impl CatalogueToExtendedCratePort | 🔵 | 🔵 |
-| SignalEvaluatorV2 | secondary_adapter | — | impl SignalEvaluatorPort | 🟡 | 🔵 |
+| SignalEvaluatorV2 | secondary_adapter | — | impl SignalEvaluatorPort | 🔵 | 🔵 |
 | FsCatalogueLoader | secondary_adapter | modify | impl CatalogueLoader | 🟡 | 🔵 |
 | FsCatalogueSpecSignalsStore | secondary_adapter | reference | impl CatalogueSpecSignalsWriter | 🔵 | 🔵 |
 | FsContractMapWriter | secondary_adapter | reference | impl ContractMapWriter | 🔵 | 🔵 |

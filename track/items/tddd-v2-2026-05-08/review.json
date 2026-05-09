@@ -1,6 +1,2111 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54f47f22b28cfb5cada3fcdc397c2783ce34d33ac153fef148842248781b1353",
+          "at": "2026-05-09T02:18:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineRustdocCodec` fully deserializes into the current `rustdoc_types::Crate` before checking `format_version`. That means rustdoc JSON from an unsupported schema can fail serde first and be reported as `Json` instead of `UnsupportedFormatVersion` (for example, older format versions before `Crate::target` was added lack the now-required `target` field). Since this codec is meant to reject format mismatches via `UnsupportedFormatVersion`, read/parse just `format_version` first, compare it with `FORMAT_VERSION`, and only then deserialize the full `Crate`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_rustdoc_codec.rs",
+              "line": 98,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:54f47f22b28cfb5cada3fcdc397c2783ce34d33ac153fef148842248781b1353",
+          "at": "2026-05-09T02:21:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5addf0b41457b0af532b9669b2d27fe9f73cce33b75d09b8bc079a047a83d62d",
+          "at": "2026-05-09T02:24:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New external crate prefixes are assigned a placeholder `u32::MAX - 1` during `parse_type_ref_str`, and the returned `Type::ResolvedPath` is never rewritten after the real crate id is registered. The first reference to any unseen crate (for example `serde::Serialize`) will therefore point at an id that does not exist in `external_crates`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 315,
+              "category": "correctness"
+            },
+            {
+              "message": "`assign_ids` stores type and trait short names in the same `HashMap<String, Id>` without checking for collisions. If a type and trait share the same short name, one silently overwrites the other, so the later encode pass writes both entries under a single `Id` instead of surfacing the documented `AmbiguousTypeName` error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 137,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolved_path_type` builds `Type::ResolvedPath` with an empty `path` string for every impl target. Downstream consumers that render or inspect `Impl.for_` by path will see a blank target type, so inherent and trait impl blocks lose the name of the type they belong to.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 749,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4cfbfc1340679661dbcc4ef2bcab4b9b727cf559670b4e6934fe900067f84239",
+          "at": "2026-05-09T02:50:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_type_ref_str` ignores the `u32` returned by `emit_external_crate` and always leaves the parsed `Type::ResolvedPath` pointing at `u32::MAX - 1`. Any crate-prefixed `TypeRef` therefore becomes a dangling reference instead of the newly registered crate id.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 315,
+              "category": "correctness"
+            },
+            {
+              "message": "`assign_ids` overwrites `local_name_to_id` on every insert, so a type/trait/function short-name collision silently rebinds earlier entries instead of raising `AmbiguousTypeName` as the port contract promises. That can miswire both `TypeRef` resolution and `TraitImplDeclV2` lookup.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 141,
+              "category": "correctness"
+            },
+            {
+              "message": "`encode_trait_impl_blocks` emits `Impl` items, but the surrounding struct/enum items only store the inherent impl id (`impls: vec![impl_id]`). The trait-impl ids are never attached anywhere, so consumers walking `Struct::impls` or `Enum::impls` will miss every trait implementation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 396,
+              "category": "correctness"
+            },
+            {
+              "message": "`Self` never gets a special case here, so `encode_method_items` will serialize constructors and methods returning `Self` as unresolved markers instead of the owning type. That breaks common APIs that use `Self` in parameter or return position.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 185,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4cfbfc1340679661dbcc4ef2bcab4b9b727cf559670b4e6934fe900067f84239",
+          "at": "2026-05-09T02:53:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Generic-argument handling is lossy here: `AssocType` is rewritten as a plain type argument, while `Const`, `AssocConst`, and `Constraint` are dropped. Valid Rust forms like `Iterator<Item = T>` or `ArrayVec<u8, 32>` will not round-trip to the same `rustdoc_types` shape, so downstream consumers see a different type than the catalogue declared.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 293,
+              "category": "correctness"
+            },
+            {
+              "message": "External trait impls are encoded with `Path.id = Id(ext_crate_id)`, but `Path.id` is an item id, not a crate id. Because crate ids start at 1, this collides with normal local item ids and can make later `krate.paths` lookups resolve the impl to an unrelated local item instead of treating the trait as external.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 708,
+              "category": "correctness"
+            },
+            {
+              "message": "Trait methods are emitted with `has_body: true` even though `TraitEntry::methods` are declarations, not implementations. That misclassifies trait-associated functions in the rustdoc graph and can confuse any consumer that uses `has_body` to distinguish signatures from concrete methods.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 679,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a1efc7e7285791b2ae48315a4afb30273ea5631b7ba7420601288c492d90de69",
+          "at": "2026-05-09T03:00:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Path.id` is an item id in rustdoc JSON, but this branch stores the external crate id (`std_crate_id`) for std-prelude paths and the crate id for crate-prefixed paths. Those ids can collide with real local item ids and cause downstream lookups to resolve the wrong item instead of the referenced external type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 206,
+              "category": "correctness"
+            },
+            {
+              "message": "External trait impls are encoded with the sentinel `UNRESOLVED_CRATE_ID` and no matching `paths` entry is created. Downstream consumers recover trait origin through `krate.paths[trait_id]`, so these impls will lose their origin crate and become effectively anonymous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 715,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f04cd8e05a0a8107f376928894793777c402a0a378f74e88a9754b6b77c680a4",
+          "at": "2026-05-09T03:07:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeKindV2::Struct` is treated as `fields` only: the `pattern` is discarded at the match site, and `encode_struct` always emits `StructKind::Plain`. That means supported catalogue inputs like `CompositePattern::Newtype { .. }` and `TypestateState { .. }` are encoded as empty/plain structs, losing the declared shape of the type.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 207,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolved_path_type()` builds `Impl.for_` with an empty `path` string for every inherent/trait impl target. Downstream consumers that format or inspect impl targets by path will see a blank type name, so the owning type is effectively lost in the emitted rustdoc graph.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 821,
+              "category": "correctness"
+            },
+            {
+              "message": "`convert_generic_args()` is lossy for several valid Rust forms: `Const` arguments are downgraded to an unresolved marker, while `AssocConst` and `Constraint` are dropped entirely. A `TypeRef` that uses const generics or higher-order constraints will not round-trip to the same `rustdoc_types` shape.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 299,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e45549a24d39becff0c3495f3be49a0c3508e923d8fcbdc0b56ea7a3bca5df8b",
+          "at": "2026-05-09T03:14:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode_trait_impl_blocks` resolves the trait item by short name alone and ignores `origin_crate`. If the crate defines a local item with the same name as an external trait (for example `Display` while also implementing `std::fmt::Display`), this branch will pick the local `Id` and emit an `Impl` that points at the wrong trait, while never registering the external trait path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 752,
+              "category": "correctness"
+            },
+            {
+              "message": "The std-prelude allowlist is checked before local catalogue resolution, so a catalogue type or trait named like a prelude item (`Vec`, `Result`, `String`, etc.) is silently encoded as `std::...` instead of the local item. There is no validation in this scope preventing those names, so this produces incorrect `TypeRef` resolution and downstream graph data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 215,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4595fdb94a8c465d12553495aa7e2b7371a81a909b2411c47ab4adaa1403141a",
+          "at": "2026-05-09T03:22:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `syn` parser is only partially implemented, so valid Rust type syntax is silently mangled instead of preserved. `convert_type` falls back to `<unknown_type>` for `dyn Trait`, `impl Trait`, function pointers, parenthesized types, and qualified paths, and `convert_generic_arg` drops `_`, `AssocConst`, and `Constraint` arguments entirely. That means a syntactically valid `TypeRef` can be encoded into a different type with no error, which is a correctness bug for the codec.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 154,
+              "category": "correctness"
+            },
+            {
+              "message": "`encode_method_items` inserts method `Function` items into `index` but never registers them in `Crate::paths`. The codec therefore emits an incomplete `paths` table for every inherent/trait method, unlike top-level functions and other in-crate items. Any downstream consumer that resolves canonical names or provenance through `paths` will not be able to find methods.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 675,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:76d9cba5c7969fde6084f330987ff2e2f51c8a21543446837c5f3f2d12e6e7c4",
+          "at": "2026-05-09T03:27:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`convert_type_path` treats every multi-segment `syn::TypePath` as an external crate prefix, and it turns any `qself` path into `<qualified_path>`. That mis-encodes valid Rust type refs such as `crate::foo::Bar`, `self::Bar`, `super::Bar`, and associated types like `<T as Trait>::Assoc` / `Iterator::Item` as unresolved markers or fake external crates, which will corrupt `external_crates` and drop type information.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "`array_len_to_string` only preserves integer literals; any const-generic array length expression is collapsed to `<const_len>`. `rustdoc_types::Type::Array.len` is supposed to retain the stringified expression, so `[u8; N]`, `[u8; N + 1]`, etc. lose their real length and downstream consumers get incorrect type data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 555,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e216ee3b4fe0a10f1076c3650a53f98a347580f57d683515c512f7bea427dba0",
+          "at": "2026-05-09T03:42:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dyn Trait` and `impl Trait` bounds bypass all of the identifier-resolution logic used for `Type::Path`: every trait bound is emitted as `Id(u32::MAX)` with a raw path string, so `dyn Clone`, `impl Iterator`, or `impl serde::Serialize` never resolve against the local catalogue, never hit the std-prelude allowlist, and never auto-register external crates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 340,
+              "category": "correctness"
+            },
+            {
+              "message": "`Module.items` is built from `state.local_name_to_id.values()` where `local_name_to_id` is a `HashMap`, so the root module's child order is nondeterministic across runs. The same catalogue can therefore serialize with different top-level item ordering, which is flaky for downstream diffs/snapshots.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 252,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2cf9046d1e9f60581356a1a53ceb4b434cb014a5f14a7454c25a764219d97acf",
+          "at": "2026-05-09T03:47:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Const-expression rendering is lossy here: any cast expression is rewritten as `as _`, so valid inputs like `[u8; N as usize]` or `ArrayVec<T, N as usize>` do not round-trip and downstream consumers lose the actual target type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 686,
+              "category": "correctness"
+            },
+            {
+              "message": "`CatalogueToExtendedCrateCodec::encode` is a new public API, but this change only adds happy-path coverage. The two error exits (`AmbiguousIdentifier` and invalid `TypeRef`) are not exercised by direct codec tests, so regressions in collision detection or error mapping can slip through.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 70,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:b1bc946109dd2f656fd62ab0695c40953a2b66d84f7df09999c62a1a159a101a",
+          "at": "2026-05-09T03:53:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`STD_PRELUDE_TYPES` are converted to `std::{name}` and tagged with the unresolved sentinel id in both the type-path and trait-bound branches, but many listed entries are not actually defined at that path (`String`, `Vec`, `HashMap`, `Arc`, `Clone`, etc.). That means valid standard-library references are emitted as incorrect paths and become indistinguishable from truly unresolved types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 238,
+              "category": "correctness"
+            },
+            {
+              "message": "Associated const generic constraints are serialized with `syn_expr_to_string`, which collapses any expression beyond a literal or simple path to `\"<const_expr>\"`. Valid inputs such as `Trait<N = A + 1>` or `Trait<LEN = N as usize>` therefore lose their actual value during encoding.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 525,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3916ca023f8dce71764ab4747282bf864d5212b54c3077e26d9a2f8b2c908093",
+          "at": "2026-05-09T03:59:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "External trait impls are indexed with `path = [origin_crate, trait_name]`, so a `std::fmt::Display` impl becomes `std::Display`. That does not match the canonical def-paths used elsewhere (`type_ref_parser` canonicalizes `Display` to `std::fmt::Display`), so downstream trait-origin lookup will miss or alias std traits.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 798,
+              "category": "correctness"
+            },
+            {
+              "message": "When `origin_crate` matches the current crate but `local_name_to_id` has no entry, the code allocates a fresh id and never inserts a corresponding trait item or `ItemSummary`. The resulting impl points at a dangling trait reference instead of failing fast.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 785,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d9a85da087c58c426aa0324b956123e35944e49aac4f9735e59e4e4c9c2fd9c5",
+          "at": "2026-05-09T04:05:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Bare function pointer parsing drops the source ABI and HRTB lifetimes: `TypeBareFn.abi` is hardcoded to `Abi::Rust`, and `bare_fn.lifetimes` is ignored, so valid `extern \"C\" fn` / `for<'a> fn` TypeRef strings are misrepresented in the output type graph.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 455,
+              "category": "correctness"
+            },
+            {
+              "message": "Generic associated-item metadata is lost during parsing. The `Constraint` variant is discarded, and both `AssocType`/`AssocConst` always set `args: None`, so valid forms like `Iterator<Item: Clone>` or `Trait<Assoc<'a> = T>` lose information instead of being encoded into `AssocItemConstraint` data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 499,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c275cb19b12ffe0e20e5326f242d3bf3dba2c5b36a5a79cec31d1ac3b113b99e",
+          "at": "2026-05-09T04:10:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode_function` drops the crate component from `FunctionPath`: `register_path` always uses `self.crate_name` and `crate_id: 0`, so any cross-workspace function key (`FunctionPath::crate_name`) will be flattened into the current crate and serialized under the wrong path. This should either validate `fn_path.crate_name == doc.crate_name` or preserve the embedded crate name when building `Crate::paths`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 674,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1da37edec436234c6a4a80837142be097e273279a61292a3016ff2675983e4a9",
+          "at": "2026-05-09T04:20:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Free-function paths are inserted into `local_name_to_id`, and that map is later used by `resolve_local` for single-segment `TypeRef`s. A root-level function named like a type or prelude item (for example `String` or `Clone`) can therefore be selected as the resolution target, producing a `Path.id` that points at a function item instead of a type/trait. The same shared map also turns otherwise valid type/function name sharing into false `AmbiguousIdentifier` errors.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 158,
+              "category": "correctness"
+            },
+            {
+              "message": "`Self` is special-cased before the local-name lookup, so a valid catalogue declaration named `Self` can never be referenced: every `TypeRef` with that spelling is forced to the `Id(0)` self placeholder. Since the identifier layer does not reject `Self`, this silently mis-encodes valid input.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 210,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa4b03695ee964218de23c548aeab604809c99a8add40127d41816d8c7d3a749",
+          "at": "2026-05-09T04:24:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cross-workspace functions are still stamped with `crate_id: 0` when the `Function` item is inserted. `register_path_for_crate(...)` records the right external crate in `paths`, but `Item::crate_id` remains local, so consumers that filter on `crate_id` will misclassify external functions as part of the current crate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 702,
+              "category": "correctness"
+            },
+            {
+              "message": "The `std` trait path fallback guesses `std::{name}` for any trait not in `std_canonical_path`'s hardcoded table. That produces wrong definition paths for valid std traits outside the list, such as `std::error::Error` or `std::io::Read`, which then breaks trait-origin resolution and any downstream path comparisons.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 831,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:00763ebbcd33cec63b129ba01ee412d292eaae4ab571c35ac7bdc2a63a2b8681",
+          "at": "2026-05-09T04:31:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ca24cd066bc8ee1e6a2cc13dd2fb45b5df994a9ef7dc37cef8e7e0eb362e6c3",
+          "at": "2026-05-09T04:37:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeRef` values that are explicitly resolved as std-prelude or crate-prefixed external types are encoded with `Id(UNRESOLVED_CRATE_ID)`, the same marker used for genuinely unknown identifiers. ADR D11/CN-10 says std allowlist and crate-prefixed refs are resolved and must not become Phase 1 unresolved-type errors; only allowlist-outside unknowns should. Because these resolved externals have no distinct id or `paths` entry tying them to `external_crates`, downstream closed-world validation cannot reliably distinguish valid `std::...`/`domain_core::...` references from typos without string-special-casing. Allocate/link a synthetic external item id with a `paths` summary, or use a separate unresolved representation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 244,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ca24cd066bc8ee1e6a2cc13dd2fb45b5df994a9ef7dc37cef8e7e0eb362e6c3",
+          "at": "2026-05-09T04:41:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_external_type_ids` only rewrites generic arguments when the `ResolvedPath` itself still has `Id(UNRESOLVED_CRATE_ID)`. For a local generic such as `Wrapper<serde::Value>`, the outer `Wrapper` resolves to a local id, so the match falls through and the nested external `serde::Value` keeps the unresolved sentinel even though `serde` was registered. Phase 1 will then reject a valid crate-prefixed TypeRef as undeclared. Recurse into `p.args` for every `ResolvedPath`, not only unresolved ones.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 371,
+              "category": "correctness"
+            },
+            {
+              "message": "The catch-all arm explicitly passes through `DynTrait` and `FunctionPointer`, but the parser can produce external paths inside both forms, for example `dyn Clone`, `dyn serde::Serialize`, or `fn(serde::Value) -> String`. Those nested paths remain at `Id(UNRESOLVED_CRATE_ID)` after external-crate registration, so closed-world validation will treat valid std/external references as unresolved. Add recursive fix-up for `Type::DynTrait` and `Type::FunctionPointer` contents.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 418,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5246946b8af1bdc1bff12fe31dc428740c0d0e4661be7ae1d01952c2e115b2b9",
+          "at": "2026-05-09T04:47:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3908c89d6d13bbf5276eff6788dc92a2346cc09032fb4ad4ed9b1c3bd68d6924",
+          "at": "2026-05-09T04:53:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_info_to_method_decl()` can now return `None`, but `outgoing` is still computed from `inherent_methods` before filtering. If a method is skipped, the node keeps its typestate transition targets even though the method no longer exists in `methods()`, which makes the graph internally inconsistent. Build `outgoing` from the same filtered set or skip the whole method before both collections.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/code_profile_builder.rs",
+              "line": 57,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_params()` silently drops any parameter whose name or formatted type fails the newtype validation. Because `export()` already returns `Result`, this turns invalid rustdoc input into a truncated `SchemaExport` instead of an error, so downstream consumers lose method parameters without any signal. Propagate a codec error instead of `filter_map`-skipping.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "line": 573,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:511aa3e3d0dec6efb85bffc3ed16bb6cc676852aa17b153eac1561853127d9ac",
+          "at": "2026-05-09T06:52:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_info_to_method_decl` is no longer a lossless adapter: it always drops `FunctionInfo::docs` and silently collapses any receiver string that fails `SelfReceiver` parsing to `None`, while the surrounding code still uses `FunctionInfo::has_self_receiver()` to compute outgoing transitions. That means a `TypeGraph` built from non-canonical input can end up with method signatures, docs, and transition edges that disagree, and even on valid input every method doc is discarded before the baseline/render path sees it. `schema_export.rs` already populates these docs upstream, so this loses data that the new `MethodDeclaration` model can carry.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/code_profile_builder.rs",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c452eac52944485c01212b74717b1624b1aca59ecda7d8a62deee31597cb5154",
+          "at": "2026-05-09T07:01:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eafda2819b9d9ab8457a9ac152bc89db735343bf00318df6ecb06ea044cc67c9",
+          "at": "2026-05-09T07:06:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eafda2819b9d9ab8457a9ac152bc89db735343bf00318df6ecb06ea044cc67c9",
+          "at": "2026-05-09T07:11:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2 structural equality is comparing graph-local IDs instead of item shape for structs/enums, and traits are reduced to an item-count check. Two identical APIs encoded with different rustdoc IDs will therefore be classified as mismatches, which breaks the core signal table.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1106,
+              "category": "correctness"
+            },
+            {
+              "message": "Phase 1 copies A child items into S using their original IDs and silently skips any occupied slot. Because A and B use independent ID spaces, nested Add/Modify items can alias unrelated B items or drop their children entirely, corrupting S before Phase 1.5/2 run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 338,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_external_crates_for_scope` rebuilds `external_crates` with fresh IDs but leaves the copied `ItemSummary.crate_id` values untouched. The returned S/D crate graphs are internally inconsistent, so any consumer that resolves `paths` through `crate_id` will look up the wrong external crate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 881,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:902debbc3b7b25fc8f495acf9b0c1ad2a0f52e25ba5f2dc6ef3f6dcf5cb6c74d",
+          "at": "2026-05-09T07:37:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_child_ids` stops at `Enum` items and never descends into `ItemEnum::Variant` payloads, so tuple/struct variant fields are never copied/remapped into S. That leaves enum payload items missing or stale after Add/Modify/Delete and can produce malformed graphs or bogus dangling-id behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 322,
+              "category": "correctness"
+            },
+            {
+              "message": "The type walker only handles a small subset of `rustdoc_types::Type` variants. `FunctionPointer`, `QualifiedPath`, `ImplTrait`, `DynTrait`, and `GenericArgs::Parenthesized` are effectively ignored, so unresolved refs in those shapes bypass Phase 1 validation and structurally different APIs can collapse to the same `_` rendering in Phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 834,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_variant_shape_map` drops `None` slots from `VariantKind::Tuple(Vec<Option<Id>>)`. A variant with stripped/hidden fields can therefore normalize to the same `tuple(...)` string as a shorter variant, which makes Phase 2 report a match for unequal enum shapes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1397,
+              "category": "correctness"
+            },
+            {
+              "message": "`fn_sigs_structurally_equal` ignores `FunctionSignature.is_c_variadic` and all `FunctionHeader` fields except `is_async`. Variadic, `extern`, `const`, or `unsafe` functions can therefore be classified as structurally equal to a plain function with the same parameter/return types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1471,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:446c63311d59bd878d249ccb9bdf3f8558b652cc36dff1b87b8985ea327ad55b",
+          "at": "2026-05-09T07:46:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Phase 1 allocates new Ids from `1` without reserving any Ids already present in `B`. Because B items are inserted into `s_index` before any A-side `Add`/`Delete`/`Modify` allocation, the first fresh allocation will reuse an existing rustdoc id and overwrite the baseline entry in `s_index`/`d_index`. In practice this corrupts S for any non-empty baseline crate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 194,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Qualified-path trait references are never resolved or checked for dangling ids. `type_has_unresolved_marker`, `resolve_type`, and `collect_ids_from_type` recurse into `Type::QualifiedPath.self_type` and its generic args, but they ignore `trait_.id` entirely. That lets unresolved or deleted trait refs in projections like `<T as Trait>::Assoc` survive Phase 1.5/1.6 without an error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 838,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `insert_s_type` hardcodes `ItemSummary.kind` to `ItemKind::Struct` for every inserted type/trait item. Enums, traits, and type aliases therefore get emitted with incorrect `Crate::paths` metadata, which makes the returned S/D crates structurally wrong for downstream consumers that inspect path kinds.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 223,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1599116310c26c2381b554971b7ec404b8628357a93c0788cba79bb468183306",
+          "at": "2026-05-09T07:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting or modifying a trait only moves the trait root; its copied child items stay in `s_index`. Because phase 2 scans the whole crate for `Function` and `TypeAlias` identities, stale trait methods/associated types can still be emitted as standalone signals after the trait was removed or replaced.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 293,
+              "category": "correctness"
+            },
+            {
+              "message": "`GenericArgs::AngleBracketed.constraints` are dropped here, and the same omission appears in the resolver/ID collector/formatter paths. Constrained types like `Iterator<Item = Foo>` can therefore compare equal when the associated binding changes, and unresolved or dangling refs inside those constraints are never validated.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1062,
+              "category": "correctness"
+            },
+            {
+              "message": "`Type::FunctionPointer` rendering keeps `is_unsafe` but drops the ABI, so `extern \\\"C\\\" fn` and plain `fn` fields/type aliases collapse to the same structural string. That can hide real API changes in phase 2.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1782,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8a9670a580c9be5bd08b1352b7d2ce2d5ae8c39d3f15dff9aa0a3cef6b3fa7ca",
+          "at": "2026-05-09T07:59:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 never traverses `Type::ImplTrait` or `Type::DynTrait` when scanning for unresolved markers or dangling ids. As a result, a deleted or unresolved trait bound inside `impl Trait` / `dyn Trait` can slip through validation and be treated as a valid match in Phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 879,
+              "category": "correctness"
+            },
+            {
+              "message": "The unresolved-marker check only rejects `Id(UNRESOLVED_CRATE_ID)` when the path has no `::`. The A codec emits the same sentinel shape for unresolved `crate::`, `self::`, and `super::` references, so those unresolved local paths bypass Phase 1.5 instead of raising `UnresolvedTypeRef`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 990,
+              "category": "correctness"
+            },
+            {
+              "message": "`fn_sigs_structurally_equal` compares only the rendered inputs/output plus header flags; it never checks `Function::generics` or where-clause metadata. A generic-constraint change can therefore be classified as a match and reported as Blue/Skip when it should be a structural mismatch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1749,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c1a3f48552bf0065b82dd7b4da1f52299914c74ba40f6c3b327e57a8f6e472d",
+          "at": "2026-05-09T08:08:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_ids_from_type` pushes every `ResolvedPath` id unconditionally, so external markers like `std::vec::Vec` stay as `Id(UNRESOLVED_CRATE_ID)`. The Phase 1.6 loop then treats that marker as a dangling reference, which means any surviving item that uses an external crate type will fail with `DanglingId` even though those references are expected to remain unresolved.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1196,
+              "category": "correctness"
+            },
+            {
+              "message": "This identity map includes every `ItemEnum::Function`, which in rustdoc also covers methods inside `trait`/`impl` blocks. Because Phase 1 does not preserve child `paths` entries when copying those items into S, the fallback here collapses pathless methods to bare names, so unrelated methods like `new` or `read` can overwrite each other and produce spurious function signals. Restrict this to free functions or keep a disambiguating identity for associated methods.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 122,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fc5570a195304929b69abd40e359dcbefd32be158727c51cef0af0ca6ac46d09",
+          "at": "2026-05-09T08:14:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Structural equality is too weak for generic types. `TypeAlias` compares only the underlying target type, `Struct`/`Enum` comparisons ignore `Generics` completely, and `generics_structurally_equal` collapses every non-lifetime parameter to a count. That means changes like `T` vs `const N: usize`, renamed/added type params, or altered generic bounds can be reported as a match/skip even though the API shape changed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1604,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Phase 1 validation does not traverse `Impl` items. `collect_type_refs_from_item` and `resolve_unresolved_in_item` only inspect `StructField`, `TypeAlias`, and `Function`, so an impl block that still references a deleted trait/type survives Phase 1 without `UnresolvedTypeRef` or `DanglingId`. Deleting a trait while a surviving type still has an impl for it is therefore a false negative.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 961,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fd7ce249c45cd5c90c4c26c03d33315ce053ba6b5e52ef932179c33cdca733dc",
+          "at": "2026-05-09T08:18:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 only walks `Type` nodes from fields/type aliases/functions/impls. It never inspects `Generics` on structs, enums, traits, or functions, so unresolved markers and deleted-item references inside bounds/where-clauses are never rejected. That leaves invalid A items able to pass Phase 1 and also bypass the Phase 1.6 dangling-id check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 962,
+              "category": "correctness"
+            },
+            {
+              "message": "Phase 2 structural comparison drops important generic payloads: `ImplTrait`/`DynTrait` keep only trait short names, `Type::QualifiedPath` ignores `trait_.args`, and `GenericArgs::Constraint(_)` is discarded entirely. Distinct signatures such as `impl Iterator<Item = u8>` vs `impl Iterator<Item = u16>` can therefore compare equal and produce the wrong signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 2059,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:446580418cf32e327e48f17c3ed60d999ebd9b46497ef606ea245cac7a79e910",
+          "at": "2026-05-09T08:24:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 detects unresolved markers in struct/enum/trait/function/impl generics, but `resolve_unresolved_in_item` never walks those generics, and `resolve_type` has no arms for `ImplTrait` or `DynTrait`. Unresolved references inside generic bounds/defaults or `impl Trait`/`dyn Trait` types will therefore survive Phase 1.5 instead of raising `UnresolvedTypeRef`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1051,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_external_crate_names_from_type` does not inspect the `trait_` path itself for `Type::QualifiedPath`, and it ignores `Type::ImplTrait` entirely. If an item only references a foreign crate through a projection or trait bound, the per-scope `external_crates` set can be incomplete and `crate_id` patching can stay wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1472,
+              "category": "correctness"
+            },
+            {
+              "message": "`traits_structurally_equal` delegates to `build_trait_method_map`, but that map drops method generics and where-clauses. Two traits whose methods differ only by generic parameters or bounds can compare equal and be reported as matching in Phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1911,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:da6fa17205bce012fb6b95e286df337bdcf2a3eb32919b175327b86eb0e4118e",
+          "at": "2026-05-09T08:29:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Both identity builders scan every entry in `krate.index` without checking `item.crate_id == 0`, so cross-crate items that the codec stores with non-zero crate ids will be treated as local API and fed into Phase 1/2. That can produce false signals for foreign functions/types and makes S/D include items that are not part of the crate under review.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 95,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `generics_structurally_equal` only compares the count/kind of generic params plus where predicates; it drops each type/const param’s bound/default/type entirely. As a result, signatures like `fn f<T: Copy>()` vs `fn f<T: Clone>()` or `const N: usize` vs `const N: u64` compare equal, so real API changes can be misclassified as unchanged.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 2205,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Trait structural comparison collapses every non-function associated item to `\"\"`, so associated types/consts are only checked for presence, not shape. A trait whose associated type default or bounds change will still compare equal, which suppresses a breaking-change signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 2148,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:103801967e49d54f9a99b7c209729364fca1cefcdd3b51c65a04070a000f7b3f",
+          "at": "2026-05-09T08:35:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Phase 1 does not fully walk the `rustdoc_types::Item`/`GenericArgs` surface. `collect_type_refs_from_item` and `resolve_unresolved_in_item` ignore `ItemEnum::AssocType` / `ItemEnum::AssocConst`, and `resolve_generic_args` / `collect_ids_from_generic_args` only handle `AssocItemConstraintKind::Equality`, not `Constraint(bounds)`. That means unresolved markers or deleted-item `Id`s embedded in trait associated types/consts or generic constraints can survive Phase 1 and reach Phase 2, which violates the contract that all unresolved refs and dangling ids are rejected early.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1016,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `Impl` items are never included in the identity maps or Phase 2 evaluation. `build_type_trait_identity_map` / `build_function_identity_map` only cover types, traits, and free functions, and the final `C \\ (S ∪ D)` pass only checks `c_types` and `c_fns`, so undeclared implementations in C can never produce the required `CMinusSUnionD` red signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 92,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f3adff77e6c658534d4089fc104a6bc4cef95563384b274ae729d4241c53e77e",
+          "at": "2026-05-09T08:40:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: External crate metadata is not reconstructed for A-sourced refs. `collect_external_crate_names_from_type()` only records crates when `p.id != UNRESOLVED_CRATE_ID`, but `type_ref_parser` uses that sentinel for every external path (including `std::...` and `serde::...`). As a result, S/D can be built with incomplete `external_crates` and unpatched `ItemSummary.crate_id` values whenever the catalogue introduces a new external dependency. See [signal_evaluator_v2.rs:1768](file:///home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs#L1768).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1768,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Impl handling is incomplete and will misclassify signals. `phase2_evaluate()` includes impls in the report, but `items_structurally_equal()` has no `ItemEnum::Impl` arm, so every S∩C impl is treated as a mismatch even when identical. On top of that, `build_impl_identity_map()` keys impls by short type/trait name only, so distinct impls can overwrite each other. See [signal_evaluator_v2.rs:152](file:///home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs#L152) and [signal_evaluator_v2.rs:2088](file:///home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs#L2088).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 152,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `args_have_unresolved_marker()` ignores `AssocItemConstraintKind::Constraint(bounds)` inside angle-bracketed generic args. That means unresolved placeholders nested in associated-item constraint bounds never enter Phase 1.5, and Phase 1.6 cannot catch them because the sentinel id is explicitly skipped there. See [signal_evaluator_v2.rs:982](file:///home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs#L982).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 982,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ad0f9a410417646bbd0adb087ac0d13f7bcdebf884b55197bd60df7edef05fc6",
+          "at": "2026-05-09T08:48:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.6 rejects any referenced `Id` that is not in `s_index` or `s_paths`, but `s_paths` only stores the top-level local items inserted by `insert_s_type`/`insert_s_fn`. Rustdoc external references still use real `ResolvedPath` ids from `b.paths`/`external_crates`, so ordinary std/external types in fields, bounds, or signatures will now trip `Phase1Error::DanglingId` even though they are valid.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 839,
+              "category": "correctness"
+            },
+            {
+              "message": "Impl identity is collapsed too aggressively: `build_impl_identity_map` keys only on `format_type(&impl_.for_)` plus the trait short name, and `phase2_evaluate` uses that key for S/D/C matching. Distinct impls that differ by trait origin or trait arguments can overwrite each other, so one impl can disappear from the report entirely instead of being evaluated separately.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 146,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d99e78eafce52ccf93dab26d6cd95e3fb54e80879978199b826aba759fe29761",
+          "at": "2026-05-09T08:54:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 never seeds or deletes `ItemEnum::Impl` items: S/D only receive types/traits and free functions, and `collect_child_ids` never traverses the `Struct::impls` links that point to impl blocks. As a result, `build_impl_identity_map` in Phase 2 will see empty S/D impl sets and every impl in C will fall into `CMinusSUnionD`, even when it is declared in A/B.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 625,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_function_identity_map` treats every local `ItemEnum::Function` with a `paths` entry as a free function, but it never filters out ids that belong to trait or impl method lists. If a method carries a rustdoc path, it will be counted as a standalone function signal in addition to its containing trait/impl, causing duplicate or misplaced Phase 2 results.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 123,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:540035c45a960f5f84eac09266e8f4f1581d1144d88388313466698d7e8c3448",
+          "at": "2026-05-09T09:00:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Deleting a type drops all of its child impl blocks from `S`, but never transfers those impls into `D`. Because phase 2 only evaluates impls by scanning `D`, any trait impl attached to a deleted type disappears from `DIntersectC` / `DMinusC` entirely instead of being reported as deleted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 364,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Generic-bound ordering is treated as significant in structural equality. `format_where_predicate()` feeds `format_generic_bounds()` directly into the comparison key, so semantically equivalent bounds such as `where T: A + B` vs `where T: B + A` compare unequal and will produce false phase-2 mismatches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 2617,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c36efbb7e7054999102bb2962b24b84b911e65058b1cbd5367817368eb1d4325",
+          "at": "2026-05-09T09:05:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting a type/trait with impl blocks leaves the impl descendants behind. `move_impl_children_to_d` removes the `Impl` node before `remove_child_items_from_s` runs, so the recursive purge can no longer reach that impl's methods/associated items. Those orphaned items can survive Phase 1 and be misclassified in Phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 630,
+              "category": "correctness"
+            },
+            {
+              "message": "`impl` comparison is reduced to `for_` + trait path only. Combined with the function-identity filter that excludes impl/trait methods, any change inside an impl block (added/removed/changed methods or associated consts/types) is invisible to the evaluator, so real API changes will still look like a match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 2250,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:31a9acdd224eac27b12ab34f259fcf0345a357af79ee6bb82a257891195317d3",
+          "at": "2026-05-09T09:09:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The impl branch only compares `for_`, trait path, and the child-item map. It ignores `impl_.generics`, `is_unsafe`, `is_negative`, `blanket_impl`, and `is_synthetic`, so a changed impl header can still be reported as a match. Because `build_impl_identity_map` also admits every local impl block, rustdoc blanket/synthetic/negative impls will be treated as ordinary contract items and can produce spurious `CMinusSUnionD` reds.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 2258,
+              "category": "correctness"
+            },
+            {
+              "message": "Function-pointer types are only walked through `sig.inputs` and `sig.output`. Their `generic_params` are never resolved, never checked for dangling ids, and never included in `format_type`, so generic or higher-ranked fn-pointer signatures can evade Phase 1 validation and compare equal in Phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1464,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3e6de3eeb7b3dd1a51980650db6b97f522686ff2d386c24acb3f9233505a6cb5",
+          "at": "2026-05-09T09:14:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Using only the short name as the identity key means two types/traits with the same name in different modules overwrite each other in the Phase 1 maps. That can silently drop one item from S/D and can also resolve later `crate::Foo` references to the wrong `Foo` during Phase 1.5.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 95,
+              "category": "correctness"
+            },
+            {
+              "message": "Trait supertrait bounds are never carried through this pipeline: `collect_type_refs_from_item` ignores `Trait.bounds`, `resolve_unresolved_in_item` never rewrites them, and `traits_structurally_equal` does not compare them. As a result, deleted/renamed supertraits can slip past Phase 1.6 and real trait API changes in `bounds` will be reported as unchanged.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 1192,
+              "category": "correctness"
+            },
+            {
+              "message": "The dangling-id check only rejects references that are present in `b.paths` with `crate_id == 0`; any other unknown `Id` is explicitly accepted as \"valid\". That means a malformed local reference that is neither an S item, a B child item, nor an external-crate item will survive Phase 1.6 instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 947,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:40436db9de6e2c46eccc01b5bf17d5c140a5198613cf831518b710bc8820a46b",
+          "at": "2026-05-09T09:20:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2 is emitting type/trait identities as full module paths here, but the `SignalRegion`/`ThreeWaySignal` contract is short-name based for types and traits. Because `phase2_evaluate` forwards this key verbatim, the report will no longer match downstream consumers that key signals by short name.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 137,
+              "category": "correctness"
+            },
+            {
+              "message": "`impl_.for_` is still formatted with `format_type`, which strips module paths. Two impl blocks for distinct `Foo` types in different modules collapse to the same `Foo: Trait` key, and one overwrites the other in the map, so one impl signal is silently dropped.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 229,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fd14b1a8057abbbc12b2dfb23de53bd2ec586d589dcd521e4f013f61ed347cd2",
+          "at": "2026-05-09T09:36:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.6 only exempts ids found in `b.paths` with `crate_id != 0`, so A-sourced external types that the codec rewrites to synthetic ids are still treated as dangling and rejected. Legitimate references like `std`/`serde` will trip `DanglingId` even though they are valid external dependencies.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 943,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_impl_identity_map` keys impls by `format_type(&impl_.for_)`, which strips module paths. Two distinct `Foo` types in different modules that implement the same trait will collide and one impl will overwrite the other, so Phase 2 silently loses signals for same-named types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 203,
+              "category": "correctness"
+            },
+            {
+              "message": "Structural comparison is order-sensitive for associated-type/const constraints inside generic args. `format_generic_args` preserves `constraints` in input order, but `format_type` is the equality key, so equivalent paths with reordered constraints can compare unequal and produce false mismatch signals.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2.rs",
+              "line": 2974,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1bc7f1bee9c90eb3cbb091a1591ffa17bff176526a0fd74c31b90f8ff9fff8e8",
+          "at": "2026-05-09T09:44:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `format_generic_bounds` / `build_generics_fingerprint` drop `GenericBound::TraitBound.modifier`, so `T: Sized` and `T: ?Sized` normalize to the same fingerprint. That feeds `generics_structurally_equal`, so real API changes in generic bounds can be reported as matches. See [format.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs#L231) and [structural_eq.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs#L428).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 231,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `format_type` for `Type::FunctionPointer` omits `FunctionHeader.is_const` and `is_async`; only ABI/unsafe/variadic are encoded. That collapses distinct function-pointer types into the same structural key, so field and alias comparisons can miss changes. See [format.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs#L122).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 122,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d0665beb3cbafb2c4ee3da2db7dbb2dc60092e60d62e343474c210fc0737065d",
+          "at": "2026-05-09T10:20:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting a parent item transfers only the `Impl` node into `D`, not its subtree, and the impl's `for_` still points at the old S-side id. `D.index` therefore contains dangling impl references and loses the method/assoc-item data needed to keep the returned crate graph internally consistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 225,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d0665beb3cbafb2c4ee3da2db7dbb2dc60092e60d62e343474c210fc0737065d",
+          "at": "2026-05-09T10:24:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_impl_identity_map` uses `format_type(&impl_.for_)` plus the raw trait path string as the key. That collapses distinct impls for same-named types in different modules (`a::Foo` vs `b::Foo` both become `Foo`) and also fails to match semantically identical local trait paths when A emits `crate::...` but rustdoc emits `my_crate::...`. The result is silent impl loss or mismatched Phase 2 signals.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 225,
+              "category": "correctness"
+            },
+            {
+              "message": "Local unresolved-path resolution only strips a single `crate::`/`self::`/`super::` prefix and then looks up the remaining string in the short-name map. For nested paths like `crate::nested::User`, the lookup becomes `nested::User`, which can never resolve even when `User` exists in S. Valid A-sourced references in nested modules will therefore be rejected as `UnresolvedTypeRef`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/resolve_type.rs",
+              "line": 338,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:18fe5664898c8d21c28d720968cf9f66a8345bb063238d09593973c3e1b892a5",
+          "at": "2026-05-09T10:29:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Impl structural comparison uses raw trait-path string equality, so local impls that normalize to the same identity key (`crate::MyTrait` vs `my_crate::MyTrait`) still compare unequal and Phase 2 will report false mismatches for matching impls.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 68,
+              "category": "correctness"
+            },
+            {
+              "message": "Impl trait-path resolution only strips one leading prefix before lookup; a valid nested local path like `crate::nested::User` becomes `nested::User`, which never matches the short-name map and raises `UnresolvedTypeRef` for valid A items.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/resolution.rs",
+              "line": 76,
+              "category": "correctness"
+            },
+            {
+              "message": "Deleted types are moved to D with a fresh Id, but transferred impl blocks are inserted unchanged. Their `for_` still points at the old S/B Id, so D ends up with dangling impl references instead of a self-consistent graph.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 247,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:77d5de206151675e56629410047e9c493556da017cb31108e1069a275f9f0245",
+          "at": "2026-05-09T10:43:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Impl identity is still normalized to the last path segment for every trait, so distinct traits with the same short name collide. That means Phase 2 can drop or misclassify impl signals when a crate uses `serde::Serialize` and `other::Serialize`-style names; `items_structurally_equal` strips trait paths the same way, so the collision is not confined to the map builder.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 265,
+              "category": "correctness"
+            },
+            {
+              "message": "Plain structs and struct variants ignore the `has_stripped_fields` marker, so a rustdoc shape with hidden fields can compare equal to a fully visible empty/unit shape. That turns truncated docs into false matches instead of conservative mismatches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 118,
+              "category": "correctness"
+            },
+            {
+              "message": "`format_type` drops important qualifiers from composite types. `DynTrait.lifetime` is never rendered, and function-pointer formatting omits `is_const`, so distinct types like `dyn Foo + 'a` vs `dyn Foo + 'static` or `const fn(...)` vs `fn(...)` collapse to the same string and can produce false structural matches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 101,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:70e684bfd335f92806ba6c9661aad2f2e1f02a36e0c280330ae03fe109e47744",
+          "at": "2026-05-09T10:52:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Local impls from rustdoc will not match codec impls here. `normalize_impl_trait_path()` only strips `crate::`/`self::`/`super::` prefixes, so `my_crate::Trait` is preserved verbatim even though the comments and Phase 2 contract say it should normalize to the same short name as `MyTrait`. That makes `build_impl_identity_map()` and the impl branch in `items_structurally_equal()` split the same impl into different keys/signatures, producing spurious mismatch/undeclared-impl signals for local impls.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 273,
+              "category": "correctness"
+            },
+            {
+              "message": "`Trait::implementations` is never treated as a child subtree. `collect_child_ids()` only returns `t.items` for `ItemEnum::Trait`, so deleting a trait moves the trait item and its methods but leaves all of its impl blocks in S. Those impls still carry `trait_.id` pointing at the old B-side trait, so Phase 1.6 will report `DanglingId` instead of completing a trait delete. Include the trait implementation ids in the child walk or transfer them when moving a trait to D.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 56,
+              "category": "correctness"
+            },
+            {
+              "message": "`Type::Pat` is unsupported throughout the new type walkers. It falls through `type_has_unresolved_marker()`/`collect_ids_from_type()`/`resolve_type()` and `format_type()` collapses it to `_`. Any pattern-typed field or signature can therefore skip Phase 1.5/1.6 validation, and distinct pattern types can compare equal in Phase 2. This needs an explicit `Type::Pat` branch that recurses into the underlying type/pattern payload.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 31,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c53d35f19a1a233943cb6143649bccaa8f6c18dd273134f15c1db3652044cc8f",
+          "at": "2026-05-09T10:58:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplTrait`/`DynTrait` formatting is order-sensitive here, unlike `format_generic_bounds`, which sorts equivalent bounds. That means semantically equivalent signatures such as `impl A + B` vs `impl B + A` (and the analogous `dyn` cases) can compare unequal in Phase 2, producing spurious mismatch signals.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 78,
+              "category": "correctness"
+            },
+            {
+              "message": "Normalizing impl trait paths to the last segment collapses distinct external traits with the same short name, and the same helper is reused by structural equality. A crate that implements both `serde::Serialize` and `other::Serialize` for the same type will key both impls as `Type: Serialize`, so one overwrites the other and Phase 2 can miss or misattribute a signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 274,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c7d1f29131866684c3ba8e9f5b2b884b41ae00e871d814821e6dae4bd178193a",
+          "at": "2026-05-09T11:06:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "B-seeded impl blocks are copied into S with their original `impl.for_.id` unchanged. Phase 1.6 then sees that old B parent id as dangling because the parent was reinserted under a fresh S id, so any baseline type/trait with impls will fail Phase 1 with `DanglingId`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 186,
+              "category": "correctness"
+            },
+            {
+              "message": "Phase 2 builds S impl identities with `build_impl_identity_map(s_krate, \"\")`, but S contains rustdoc-style B impls whose local trait paths look like `my_crate::Trait`. With an empty crate name those paths are kept verbatim instead of normalized, so valid S impls never match C/D keys and are reported as false `SMinusC`/`CMinusSUnionD` signals.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs",
+              "line": 31,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8dfabcdb03d3ed583783709a82a1d11b24751824ea3e8228017349a6ea2decf6",
+          "at": "2026-05-09T11:13:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Impl-trait identity keys are built with `format!(\"{}{}\", normalized_trait_path, format_generic_args(args))`, so there is no delimiter between the path and its generic args. That lets distinct impls collide, e.g. `Foo` + `Bar` and `FooBar` both normalize to the same key, and `structural_eq.rs` repeats the same concatenation when comparing impls.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 234,
+              "category": "phase2"
+            },
+            {
+              "message": "`format_type`/`format_generic_bounds` drop non-trait bounds (`GenericBound::Outlives` and `GenericBound::Use`) from `impl Trait` and generic where-clauses, so structurally different APIs can compare equal. For example, `impl Copy + 'a` and `impl Copy` both stringify to `impl Copy`, and the same omission feeds `generics_structurally_equal` via the shared helpers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 78,
+              "category": "phase2"
+            },
+            {
+              "message": "`resolve_type` rewrites function-pointer inputs and outputs but leaves `fp.generic_params` unchanged. `collect_refs.rs` already scans those HRTB params for unresolved markers and dangling ids, so a local `UNRESOLVED_CRATE_ID` hidden in a `for<'a>` bound survives Phase 1.5 and is never rejected in Phase 1.6.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/resolve_type.rs",
+              "line": 200,
+              "category": "phase1"
+            }
+          ],
+          "hash": "rvw1:sha256:88a558bec5b1ac9bbefd42a740027f6eeac67d2397915840f1e2093bd90fcbed",
+          "at": "2026-05-09T11:18:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The crate-name collector does not recurse through `Type::RawPointer` or `Type::Pat`, so an external dependency that only appears under `*const/*mut` types or pattern types is omitted from the per-scope `external_crates` map and never gets its `ItemSummary.crate_id` renumbered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/external_crates.rs",
+              "line": 88,
+              "category": "correctness"
+            },
+            {
+              "message": "`Type::FunctionPointer` is only scanned for its `sig.inputs`/`sig.output`; its `generic_params` are skipped entirely. That means external types referenced in higher-ranked function-pointer bounds/defaults are also invisible to external-crate collection, leaving the scope metadata incomplete.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/external_crates.rs",
+              "line": 128,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aac2cacaf4d0fbea21ab7f8815a071e2f2ed4d4ab3b9ff582f2c306a0a16a4d0",
+          "at": "2026-05-09T11:27:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A-sourced impl blocks keep their original `impl.for_.id`: `insert_a_item_tree_into_s` remaps only child-item ids, and `remap_child_ids_in_item` explicitly skips `Type::ResolvedPath`. For any added/modified type that has impls, the impl self-type still points at the old A id, so Phase 1 can either trip a false dangling-id error or silently bind the impl to an unrelated B item that reuses that numeric id.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 91,
+              "category": "correctness"
+            },
+            {
+              "message": "`patch_impl_for_ids` rewrites every copied impl to the parent item's id, but rustdoc trait `implementations` do not use `for_` as the parent relation. For trait impls the relevant parent reference is `impl.trait_`, while `for_` is still the implementing type. This corrupts trait-impl identity during baseline seeding and trait deletion, leaving `trait_.id` stale and making Phase 2 classify those impls against the wrong key.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 213,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:59f7975b2169ba6f10ffe3a54a5fc735562f77b594f84f681ae23ed57caf95f7",
+          "at": "2026-05-09T11:32:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_type_trait_identity_map` and `build_impl_identity_map` use plain `BTreeMap::insert`, so the last item with a given short name silently wins. Because `krate.index` iteration order is hash-based, a crate with two `User` types (or two `User: Trait` impls) in different modules will nondeterministically drop one item and its signals instead of rejecting the ambiguity.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 123,
+              "category": "correctness"
+            },
+            {
+              "message": "Higher-ranked trait-bound `generic_params` are never traversed. `resolve_generic_bound` preserves them unchanged, and the Phase 1.5/1.6 scanners plus Phase 2 formatting/equality never recurse into them either, so unresolved or dangling ids inside `for<'a, T: ...>`-style bounds are missed and distinct `impl Trait` / `dyn Trait` shapes can compare equal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 47,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b2e5d2a0b6288efec1e2c47dbc951d0ba7211910a1a2f47ab361c14b34bc896",
+          "at": "2026-05-09T11:38:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 never traverses or rewrites `GenericBound::TraitBound.generic_params`: `collect_type_refs_from_generics` drops them, and `resolve_generic_bound` returns them unchanged. That means HRTB bounds like `for<'a, T: crate::Foo>` can keep unresolved `Id(UNRESOLVED_CRATE_ID)` markers without ever triggering `UnresolvedTypeRef`, so invalid refs can survive Phase 1.5/1.6 silently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 160,
+              "category": "correctness"
+            },
+            {
+              "message": "Phase 2 generic comparison is too lossy: `build_generics_fingerprint` and `generics_structurally_equal` only record trait-path strings, and `format_generic_bounds` also omits nested `generic_params`. As a result, bounds that differ only by lifetime/HRTB detail (`T: 'a`, `T: use<'a>`, `for<'a>` vs `for<'b>`) compare equal, so structurally changed items can be reported as matches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs",
+              "line": 112,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55fcf2f5686fa80db1cf978297f50fb247b16628d2e03ebea4dfe6cd013b2797",
+          "at": "2026-05-09T11:43:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Inherent `impl` blocks are dropped from Phase 2 entirely. `build_impl_identity_map` skips every `Impl` with `trait_ == None`, so undeclared inherent impls in `C` never reach `CMinusSUnionD`, and any add/modify/delete on inherent impls is invisible to the evaluator.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 234,
+              "category": "correctness"
+            },
+            {
+              "message": "Phase 1 remaps item ids for copied subtrees, but `remap_child_ids_in_item` only rewrites structural child-id lists. It never rewrites embedded `Type::ResolvedPath` ids, so any recursive or sibling reference whose target id is reassigned in S will still point at the old id and be rejected later as a false `DanglingId`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 88,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7db31404efd605a518099fc414e718addc57fa14f664ebc678ab2edf156c148d",
+          "at": "2026-05-09T11:48:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Type::ImplTrait`/`Type::DynTrait` keep `generic_params` unchanged while only rewriting the outer trait path. Any unresolved local id nested in those binders survives Phase 1.5, and Phase 1.6 will not catch it because the sentinel `UNRESOLVED_CRATE_ID` is skipped when collecting dangling ids.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/resolve_type.rs",
+              "line": 277,
+              "category": "correctness"
+            },
+            {
+              "message": "Trait-bound normalization drops the `modifier` field and only keeps the trait path/args. That collapses distinct bounds like `T: Sized` vs `T: ?Sized` in Phase 2; the same lossiness also shows up in the generic fingerprints used by `generics_eq.rs`, so real signature changes can still be reported as matches.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 276,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:82cb4f5589e65b7f7d1aef61311bd917ea94c10c36fc90e1c8675eec393d3791",
+          "at": "2026-05-09T11:55:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 still ignores `WherePredicate::BoundPredicate.generic_params` when scanning and resolving type refs. `collect_type_refs_from_generics` drops those binder params entirely, and `resolve_generics` in `resolve_type.rs` copies them through unchanged, so a `where for<'a, T: Foo>` binder can keep unresolved or deleted-item references hidden from Phase 1. That means S can pass validation with dangling refs still embedded in the where-clause HRTB.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 199,
+              "category": "correctness"
+            },
+            {
+              "message": "Phase 2 canonicalization is lossy for higher-ranked binders: `format_type` renders `Type::FunctionPointer` with only lifetime binders, `Type::ImplTrait` / `Type::DynTrait` drop `generic_params` entirely, and `format_where_predicate` strips `WherePredicate::BoundPredicate.generic_params`. As a result, two signatures that differ only in HRTB binder bounds or const/type params can compare equal and be classified as a match when they should mismatch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 78,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4c2a41977f8d31d657bd0ca3999f0f294ceec2e3686de233e1ad93419ff8c1b4",
+          "at": "2026-05-09T12:01:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`insert_b_item_tree_into_s()` reassigns a fresh S id to every baseline root item, but it only patches impl parent pointers. It never rewrites `Type::ResolvedPath.id` values that point at other top-level B items, so ordinary baseline cross-references like `Order.user_id -> UserId` keep the old B id and are later reported as `DanglingId` even when the target is still present in S. That makes Phase 1 reject valid crates with internal type references.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 219,
+              "category": "correctness"
+            },
+            {
+              "message": "Structural equality is not alpha-equivalent: `format_type()` renders `Type::Generic(name)` verbatim, and the same stringification is used by the function/trait/impl comparators. Renaming generic parameters (`T` -> `U`) in an otherwise identical item will therefore produce a false mismatch signal, contrary to the module docs that say parameter binding names are ignored.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 92,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:63000a2ea0fb0482e1b30613ca236e0198baa2210ee6f605a127f2d91f98f7fe",
+          "at": "2026-05-09T12:10:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `generics_structurally_equal` and the sibling fingerprint builder both drop non-trait bounds on type parameters (`GenericBound::Outlives` / `GenericBound::Use`). `format.rs` explicitly treats those bounds as part of the rendered signature, so Phase 2 can now report a `Match`/`Skip` for APIs whose only change is a lifetime or capture bound on a generic parameter. See [`generics_eq.rs`](//home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs#L112) and [`generics_eq.rs`](//home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs#L214), contrasted with [`format.rs`](//home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs#L119).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs",
+              "line": 214,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Phase 1 validation does not recurse into higher-ranked trait-bound binder type parameters inside `GenericBound::TraitBound`. The resolver does recurse there, so unresolved or dangling ids nested in `for<T: ...>`-style binders can slip through Phase 1.5 / 1.6 undetected. The gap is in [`collect_refs.rs`](//home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs#L47), compared with the recursive handling in [`resolve_type.rs`](//home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/resolve_type.rs#L55).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 47,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e32426cb8b04ee4c365616211c6efa5a455c1c60d108b2ba8c8bbed72f4c9578",
+          "at": "2026-05-09T12:19:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.6 treats any `Id` found in `b.index` as a valid child-item reference, so references to deleted child items (for example an associated type or struct field removed with its parent) are never reported as `DanglingId`. That lets stale ids survive into Phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 277,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_trait_method_map` omits `FunctionHeader::abi` when comparing trait/impl methods, so two methods with the same name and parameter/return types but different ABI compare equal. Phase 2 can therefore classify a real mismatch as a match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs",
+              "line": 58,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e85edde233ce67b84ccab0a05d55981900b974d7ff828833ad755e283129cdcf",
+          "at": "2026-05-09T12:27:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: the `Modify` path inserts a remapped A subtree but never patches direct `impl` children back to the preserved S-side parent id. `remap_and_copy_a_children_to_s()` only remaps child lists and returns the root item; it does not call `patch_impl_for_ids()` / `patch_impl_trait_ids()`. Any modified struct/trait with impl blocks will keep `impl.for_.id` or `impl.trait_.id` pointing at the old A-side id, which can trip Phase 1.6 dangling-id validation or mis-key Phase 2 impl matching. The `Add` path already does the patching, so `Modify` needs the same step.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 117,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:777a0720f24d64d1c6f7eceae3d3948e0c1b800a0eaf9f468a207af2b2d381f4",
+          "at": "2026-05-09T12:32:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_type` has no `Type::Pat` arm, so unresolved markers nested inside pattern types survive Phase 1.5 unchanged. The item is only scanned once before resolution, so that placeholder can bypass the intended `UnresolvedTypeRef` failure path and reach Phase 2 still unresolved.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/resolve_type.rs",
+              "line": 167,
+              "category": "correctness"
+            },
+            {
+              "message": "`format_hrtb_type_params` only formats the first layer of HRTB binders. Any trait bound nested inside a binder's own `generic_params` is dropped, so `generics_structurally_equal` and `build_generics_fingerprint` treat distinct nested `for<...>` bounds as equal and can emit false matches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 50,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_external_crates_for_scope` does not recurse into nested HRTB binders when harvesting external crate names. If an external type appears only inside a nested `for<...>` bound, that crate is omitted from the scope's `external_crates` map and the patched `ItemSummary.crate_id` data becomes incomplete.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/external_crates.rs",
+              "line": 128,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e6e6e3302fc223a0952623f5ad025e50d9a949c78efa2d411d9b18a51416c18f",
+          "at": "2026-05-09T12:37:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The evaluator silently collapses same-named items, so only one `Foo` survives when a crate has `Foo` in multiple modules. `build_type_trait_identity_map` and the Phase 1 name maps are keyed by short name only, and the `or_insert`/`get` path means later collisions are dropped or resolved to the wrong `Id`; `build_impl_identity_map` has the same problem for local trait impls. That can misclassify Add/Modify/Delete/Reference actions and lose Phase 2 signals for crates that legitimately contain same-name types/traits in different modules.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 128,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8827eb64e2a588258dd846554de0d85c2f423a36017c9ff8d97aecd219c7105d",
+          "at": "2026-05-09T12:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Traversal drops `GenericBound::TraitBound.generic_params` in the unresolved/dangling-reference and external-crate collectors, so anything nested under an HRTB binder is invisible to Phase 1.5/1.6 and to `external_crates` synthesis. In `phase1/builder.rs`, Phase 1.5 only runs `resolve_unresolved_in_item` on items flagged by `item_has_unresolved_marker`; but `collect_type_refs_from_item` flattens trait/assoc-type bounds to `Type::ResolvedPath` without recursing into their binder params, and `collect_ids_from_generic_args` / `collect_ext_crate_names_from_generic_args` do the same for constraint bounds. That means unresolved markers or dangling `Id`s inside those binders can survive, and external crates referenced only there are not added. See [phase1/builder.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs#L230), [collect_refs.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs#L225), [collect_refs.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs#L399), and [external_crates.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/external_crates.rs#L235).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 225,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:26165ccdfe19ea6f58d5d1d6dbaf5f9566623225bfd5a9c2fe27218c1ada470d",
+          "at": "2026-05-09T12:52:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Trait-path formatting collapses everything to the last path segment in `format_type`, `format_generic_bounds`, and `format_hrtb_type_params`. That makes distinct external traits such as `serde::Serialize` and `other::Serialize` compare equal in Phase 2, so `items_structurally_equal` can miss real mismatches in function signatures, trait bounds, `impl Trait`/`dyn Trait`, and qualified paths.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 126,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e9e1ec6f3b5661678c4f76eadcc9dbfd38b575502da17ace908e8c91b90f628a",
+          "at": "2026-05-09T12:57:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `collect_type_refs_from_item()` does not recurse into `GenericBound::TraitBound.generic_params` for `ItemEnum::AssocType` bounds. That means associated-type bounds like `type Assoc: for<T: LocalTrait> ...` can hide unresolved markers, dangling ids, and external-crate references from Phase 1.5/1.6 and `build_external_crates_for_scope`, so invalid references in those binders can pass validation silently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 255,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:31437157c246c7e5efd26910a4224512408914ac576054fe74411da2a529aa29",
+          "at": "2026-05-09T13:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`format.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs#L121) collapses every `Type::Generic` to the same placeholder (`\"_\"`). That destroys which generic parameter a use site refers to, so distinct signatures like `fn f<T, U>(x: T, y: U)` and `fn f<T, U>(x: T, y: T)` both compare equal. The same loss of information flows into struct/enum/type-alias and impl/trait comparisons because they all rely on `format_type`, which can produce false Blue/Match signals for real structural mismatches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 121,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a828781a7ae00438050d45eecc8474b12d4e96309bd655c95600eb38b30e33a7",
+          "at": "2026-05-09T13:09:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Trait structural comparison ignores `Function.has_body`, so a trait method changing between required (`fn foo(&self);`) and defaulted (`fn foo(&self) { ... }`) still hashes to the same signature and is treated as equal. That can suppress a real API change in Phase 2. The omission is in [`generics_eq.rs`](...) where the `ItemEnum::Function` branch only fingerprints header/signature/generics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs",
+              "line": 59,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `build_external_crates_for_scope` assigns fresh external crate ids by iterating a `HashSet`, so the order is randomized per process. The same input crate can therefore produce different `external_crates` numbering and different patched `paths.crate_id` values across runs, making the phase-1 output nondeterministic and flaky for any downstream serialization/diffing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/external_crates.rs",
+              "line": 52,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:05ab67981f2c7f2dd0889d7122d9b541112db8e879e476e8270aebe59e33de14",
+          "at": "2026-05-09T13:13:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`type_has_unresolved_marker()` does not descend into `Type::QualifiedPath.args`, so unresolved local refs nested in qualified-path generic arguments can bypass Phase 1.5 and survive without being resolved or rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/collect_refs.rs",
+              "line": 52,
+              "category": "correctness"
+            },
+            {
+              "message": "A-sourced child impl blocks are inserted here without any `ItemAction`, so `phase2_evaluate()` falls back to `Reference` for them and skips blue/yellow/red signals for impls under added/modified types or traits.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 200,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:853cab27f7f287b5dd030f9bd77c11dfea05f7653dcffc2116fc164c6a955a0d",
+          "at": "2026-05-09T13:18:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A-sourced enum variants never rewrite their payload field ids during Phase 1 remapping. `collect_child_ids` treats `Variant` payloads as children, but `remap_child_ids_in_item` leaves `VariantKind::Tuple/Struct` unchanged, so inserted variants still point at the old A-side ids. That leaves stale intra-enum links and makes Phase 2 enum comparison see missing fields instead of the real payload.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 130,
+              "category": "correctness"
+            },
+            {
+              "message": "A-sourced traits also lose their `implementations` remap. `collect_child_ids` includes `t.implementations`, but `remap_child_ids_in_item` only rewrites `t.items`. The trait item keeps stale impl ids, so later delete/move logic cannot find or transfer the impl blocks and they can remain behind in S with dangling trait references.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 137,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a76af049307aef0cd84fe18ed271b18c9e7b56e7044bb53ca06fe3359289eba9",
+          "at": "2026-05-09T13:23:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Inherent `impl Foo { ... }` blocks are explicitly materialized into S/D by the Phase 1 child-item helpers, but `build_impl_identity_map` drops every `Impl` with `trait_.is_none()`, and Phase 2 only evaluates the resulting impl identity map. That makes `TypeEntry.methods` invisible to the evaluator: adding, removing, or changing an inherent method will never produce a signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 240,
+              "category": "correctness"
+            },
+            {
+              "message": "Enum structural equality only compares the visible variant list and each variant's kind. It ignores `Enum::has_stripped_variants` and every variant's explicit discriminant, so a truncated rustdoc enum or a discriminant-only change can still compare equal and suppress a real drift signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 193,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7877d471807ab67fc3c4346a1772ece8831e6fd5885ba96096e17036f163ca3b",
+          "at": "2026-05-09T13:30:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 correctness: deleted structs/enums/traits are moved to D without repairing their child-id lists. `remove_child_items_from_s` removes fields/variants/trait members from S, but `move_type_to_d` inserts the original parent `Item` into D unchanged, so the parent still points at ids that no longer exist in `d_index`. That leaves D internally malformed for every delete of a struct/enum/trait, and the Phase 1.6 dangling-id check will not catch it because it only walks type references, not structural child lists.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/state.rs",
+              "line": 138,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:86fff51c8a32e406c7a8a5f08854e50aa470ae0b27c0afb0611d8f9609b40a87",
+          "at": "2026-05-09T13:35:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4a15cb8ef262e3d40b409ba87ffcfcdc50c88992d606979f9a7400edceb8a32",
+          "at": "2026-05-09T13:42:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.6 treats every non-sentinel referenced Id as valid only if it is present in S or in B's paths. A catalogue-derived Add/Modify item can contain known external references encoded with synthetic Ids in A.paths (for example std::vec::Vec or an external trait impl), but those path entries are not copied into S and this check does not consult A.paths. The referenced synthetic Id then falls through to DanglingId, so valid catalogue entries using external types are rejected before Phase 2.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 297,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e4a15cb8ef262e3d40b409ba87ffcfcdc50c88992d606979f9a7400edceb8a32",
+          "at": "2026-05-09T13:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_generic_args` renders both associated-type equality (`Item = Type`) and associated-type constraint (`Item: Bound`) with the same `name:rhs` string. That makes semantically different signatures such as `Iterator<Item = Copy>` and `Iterator<Item: Copy>` compare equal, so Phase 2 can emit a false Match/Blue instead of a mismatch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 317,
+              "category": "correctness"
+            },
+            {
+              "message": "Generic type parameters are rendered by their source names during signature comparison. Because `generics_structurally_equal` ignores generic parameter names, otherwise identical APIs that only rename a generic parameter, such as `fn f<T>(x: T)` vs `fn f<U>(x: U)`, will still compare unequal through `format_type` and produce false mismatch signals. Canonicalize generics by parameter position before formatting use sites.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 122,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:096785eac350ae533993ab652154cb0fb0af5336bf9d60c3fdae628263e2ac57",
+          "at": "2026-05-09T13:51:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: A-sourced `Type::ResolvedPath` ids are never remapped when an Add/Modify item is copied into S. The codec resolves catalogue-local type names to A-side item ids, but this helper only remaps structural child lists and leaves field/generic/return type path ids pointing at the old A id space. For valid declarations like a modified struct field `role: Role` where `Role` remains in S under B's id, Phase 1.6 will either reject with `DanglingId` or, worse, accept the stale id if it happens to collide with an unrelated S item. The A insertion/modify path needs to rewrite local resolved path ids through the S identity map/remap, not rely only on `UNRESOLVED_CRATE_ID`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 93,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:21ea04ebd084a95ef84242dbc9f6f0029069229f0159ada57ef8ac53f8746470",
+          "at": "2026-05-09T13:59:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.6 accepts any referenced Id that happens to exist in S before checking whether that Id came from A's catalogue id space. Add/Modify items keep A-side `ResolvedPath.id` values for local refs, so a reference to a deleted local type can be silently accepted if the A id collides with a retained B/S id. For example, if A assigns `DeleteMe` Id(1) and B/S has `Keep` Id(1), a modified item referring to deleted `DeleteMe` passes this Rule 1 check instead of returning `Phase1Error::DanglingId`, violating the closed-world/dangling-id requirement. Remap A local type refs to S ids, or consult `a_krate.paths` for A-sourced refs before accepting numeric S-id presence.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 311,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:002212e75ae0e3e8f382386a3cddb55c71cdc68e825c4ee04c730c86aab8cc96",
+          "at": "2026-05-09T14:06:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A-only external type references are accepted by the dangling-id pass using `a_krate.paths`, but the subsequent external-crate rebuild only has access to `b`. For added/modified catalogue items whose fields or bounds reference an external crate that was not present in the baseline, `collect_ext_crate_name_from_path` cannot resolve the non-sentinel A synthetic id, so S is built without the required `external_crates` entry and without a valid path summary for that external id. This violates the Phase 1 per-scope external-crate renumbering contract and can leave the intermediate S graph internally inconsistent for A-added external refs. Pass A's path/external-crate metadata into this rebuild or copy/renumber A external path summaries before constructing S.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/external_crates.rs",
+              "line": 110,
+              "category": "algorithm-correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a4d701ceeab7ff34220a76b9e88f522206fd927a2c2459d2fbcd9bc9c0fe5b5d",
+          "at": "2026-05-09T14:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Trait impl equality compares method maps, but catalogue-derived trait impls are identity-only and have no encoded methods. Because Phase 2 evaluates impl identities, an achieved declared impl in C will usually have methods while S's A-derived impl has an empty `items` list, causing `S ∩ C` to be classified as a structural mismatch and leaving Add/Modify impls Yellow (or Reference impls Red) indefinitely. Impl equality should not require method-map equality for identity-only declarations, or impls should not be evaluated independently.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:300cd62100fd9d8221437063dc131054941448b72612061972707128518d6629",
+          "at": "2026-05-09T14:23:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 only carries impl blocks into S/D when they are reachable through `collect_child_ids`, but `TypeAlias` falls through to `_ => vec![]` and there is no separate pass over standalone `Impl` items. Phase 2 does evaluate impl identities, so trait impls for type aliases, which cannot be attached through a `TypeAlias.impls` field in rustdoc_types, get dropped from S/D and then appear as `CMinusSUnionD` reds even when declared or present in the baseline. Add handling for standalone impl items or an attachment path for aliases before evaluating impls in Phase 2.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs",
+              "line": 67,
+              "category": "correctness"
+            },
+            {
+              "message": "Trait method signature comparison canonicalizes only method-local generics (`f.generics`). Methods on generic traits commonly reference the trait's own type parameters, so `trait Repo<T> { fn get(&self) -> T; }` and the same trait with `U` compare as different even though `generics_structurally_equal` intentionally ignores generic parameter names. This can produce false mismatch signals for harmless trait generic renames; include the enclosing trait generics in the canonical map when building trait method signatures.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6a42b8ba649121e3de50cb70602300fe36b382df54cce4437fdc22c6817cee8d",
+          "at": "2026-05-09T14:28:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`move_type_to_d` only moves impls reachable through `collect_child_ids(&item)`, but Phase 1 explicitly inserts orphan impls for items whose rustdoc shape has no `impls` field, especially `TypeAlias`. When such an item is deleted, those orphan impls remain in S as `Reference`; their `impl.for_` still points at the deleted local item, so Phase 1.6 returns `DanglingId` instead of moving the impl to D and producing the expected delete signal. Track orphan impls by their `for_`/`trait_` target and move matching ones during delete.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/state.rs",
+              "line": 144,
+              "category": "correctness"
+            },
+            {
+              "message": "The per-scope external-crate rebuild creates new `external_crates` maps but never copies the referenced external `ItemSummary` entries from B or A into `state.s_paths`/`state.d_paths` before constructing S and D. Type refs keep their original external synthetic `Id`s, while the resulting `Crate.paths` contains only local top-level summaries, so those ids cannot be resolved against the returned S/D graph and the new crate-id numbering is not actually attached to the referenced paths. Copy referenced external path summaries from the source crate(s) into the scope paths and rewrite their `crate_id` to the new per-scope ids.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 433,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:47e94d3bf1f98c5aab28eefb8e85cd1c9aa1ea35387e90a3b74bc5695acc49fb",
+          "at": "2026-05-09T14:35:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.45 rewrites every item in `state.s_index` with an A-id to S-id map. Because B and A use independent `rustdoc_types::Id` spaces, this also rewrites B-derived Reference items whose ids happen to equal A ids. That can corrupt B local references and, more importantly, mask a real dangling reference after a delete by changing a B reference to some unrelated retained S item before the Phase 1.6 check runs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 312,
+              "category": "correctness"
+            },
+            {
+              "message": "A-sourced external references are only resolved through `extra_a` when the same numeric id is absent from `b.paths`. Since A synthetic external ids can collide with B path ids, an A-added/modified item that references a new external type can be classified using B metadata or skipped entirely, leaving S with missing or wrong `external_crates` / `paths.crate_id` entries.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/external_crates.rs",
+              "line": 148,
+              "category": "correctness"
+            },
+            {
+              "message": "The A-side id remapper leaves `GenericBound::TraitBound.generic_params` untouched, so local type ids nested under HRTB binders remain in A's id space. The Phase 1.6 collector now recurses into those binders, so valid Add/Modify items with bounds like `for<T: LocalTrait>` can be rejected as `DanglingId` even when `LocalTrait` is present in S.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 753,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4fef4377916f6ecb2083c595631084bf437906f7ce75348a456fc81d7a528ae5",
+          "at": "2026-05-09T14:42:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4211c81d471f6c68230bc4563cc380cbceb7a5d049a698920d719a3cf2cda91",
+          "at": "2026-05-09T14:48:11Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`identifiers.rs` is 854 lines long, which exceeds the repository's 700-line hard limit for a module. The extra size is mostly from co-locating the large test block with the implementation, so this already violates the stated module-size rule and makes future changes harder to keep coherent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 1,
+              "category": "architecture"
+            },
+            {
+              "message": "`ModulePath::from_identifiers` is a new public constructor, but there is no unit test covering its happy path. That leaves a public API path in this module without the required test coverage, so a regression in this constructor would not be caught by the current suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 263,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:aaf0127f33a1070f6bcfd34341467d85a42693d267741ea654422b8a72eefbb3",
+          "at": "2026-05-09T00:51:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ItemAction` derives `strum::Display`/`EnumString` without a rename policy, so it accepts/emits `Add`, `Modify`, etc. The inherited TDDD-03 catalogue contract uses lowercase tags (`add`, `modify`, `reference`, `delete`), and the existing codec/fixtures use those values. Unless this enum is renamed with `#[strum(serialize_all = \"snake_case\")]` (and covered by tests), valid catalogue actions will be rejected or re-emitted with the wrong spelling once the v2 codec maps through these domain strings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "`SelfReceiver` currently parses/displays the Rust variant names (`Owned`, `SharedRef`, `ExclusiveRef`), but ADR D8 defines the catalogue values as the receiver tokens `self`, `&self`, and `&mut self`. This makes the domain `FromStr` reject the receiver strings already used in catalogue data and will force every caller to duplicate a custom mapping instead of using the validated domain enum. Add explicit strum serializations for the three variants and tests for the token forms.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 183,
+              "category": "correctness"
+            },
+            {
+              "message": "`Layer` also derives default strum casing, so `Layer::Domain.to_string()` is `Domain` and parsing `domain` fails. ADR D1 defines the layer axis as the lowercase catalogue values `domain` / `usecase` / `infrastructure`; with the current implementation, valid v2 documents using the specified layer values cannot round-trip through the domain enum. Add the appropriate strum serialization policy and tests for the lowercase spellings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 214,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:59:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96ad85ab07e8bdbc22652769ba2c392e5dadd47c10ef708a2f3b3f91ec71bb86",
+          "at": "2026-05-09T01:06:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:37:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:39:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:46:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
+          "at": "2026-05-09T02:19:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
+          "at": "2026-05-09T02:22:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ThreeWaySignal` stores the derived kind as a public field, and `ThreeWayEvaluationReport` exposes its `Vec` publicly. That leaves the documented invariant unenforced: external code can construct or mutate a value with mismatched `region`/`signal` or with `Skip` entries inside a report, and `len()`/`has_violations()`/`is_in_progress()` will then report the wrong state. Make the derived state private or validate on construction so the domain type cannot represent an invalid report.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
+              "line": 182,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e8798a0a0cd123f1d7b186c030e6ee130dabc8ad23a406ae33404d1bbc2de4ec",
+          "at": "2026-05-09T05:31:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ThreeWayEvaluationReport::new` does not enforce the module's own invariant that reports contain only non-skip signals. It stores `Skip` entries verbatim, so any caller can construct a report that contradicts the public contract in `port.rs` and leaks skipped items through `iter()`/`len()`. Consider filtering `Skip` values here or making construction fallible/private.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
+              "line": 269,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1d1da0d760a509d983783c1298ee3f32f1622388ee555738f968d780ab2bbc19",
+          "at": "2026-05-09T05:37:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
+          "at": "2026-05-09T05:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
+          "at": "2026-05-09T05:42:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Re-exporting `catalogue_v2::methods::{MethodDeclaration, ParamDeclaration}` here makes `catalogue::MethodDeclaration` look like the old API path, but it is not API-compatible anymore. The V2 constructor now requires `MethodName` / `ParamName` / `TypeRef` and the accessor methods (`name()`, `params()`, `returns()`, `ty()`, etc.) are gone, so downstream code that was compiling against the documented `catalogue::*` surface will break at source level. A plain `pub use` does not provide the promised compatibility shim.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "line": 26,
+              "category": "compatibility"
+            },
+            {
+              "message": "P1: `MethodDeclaration` now derives `Eq` with a public `docs: Option<String>` field, and baseline structural comparison uses full vector equality (`self.methods == other.methods`). That means doc-only differences between two otherwise identical methods will flip `TypeBaselineEntry::structurally_equal()` / `TraitBaselineEntry::structurally_equal()` to `false`, which creates false consistency failures even though docs are non-structural metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bb5edcc2a9e53b0ba75f3ef9a8b602828a7cf211db9288bed320ec459497d1e3",
+          "at": "2026-05-09T06:52:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`methods_structurally_equal` still treats `ParamDeclaration` as fully equal (`a.params == b.params`), so a harmless parameter binding rename on an unchanged method will now be reported as structural drift. That diverges from the method/function matching logic in `signals.rs` and `consistency.rs`, which intentionally ignores binding names and compares only parameter types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/baseline.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8bd7a3f9e6f7fa462799842a29e3f8e717186f90689cf4acd12e3e33e74ece06",
+          "at": "2026-05-09T06:58:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Re-exporting the V2 `MethodDeclaration`/`ParamDeclaration` here is not source-compatible with the existing `domain::tddd::catalogue::*` callers. The new constructor takes `MethodName`/`ParamName`/`TypeRef` newtypes, so any still-unmigrated call sites that pass `String` arguments will stop compiling. Keep a compatibility shim or finish the downstream rewrites in the same change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "line": 31,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:00cfaa954f2d02a5567473eab37dada61fcfbb35f4b9e416f37a90f375864658",
+          "at": "2026-05-09T07:04:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
+          "at": "2026-05-09T07:09:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
+          "at": "2026-05-09T07:13:27Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -1131,749 +3236,20 @@
           "findings": [],
           "hash": "rvw1:sha256:1a6b180f2d8de004e2495ccdc42a6c987c4b905ac4b6ddd558532c51d1bbdca5",
           "at": "2026-05-09T06:53:30Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:54f47f22b28cfb5cada3fcdc397c2783ce34d33ac153fef148842248781b1353",
-          "at": "2026-05-09T02:18:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineRustdocCodec` fully deserializes into the current `rustdoc_types::Crate` before checking `format_version`. That means rustdoc JSON from an unsupported schema can fail serde first and be reported as `Json` instead of `UnsupportedFormatVersion` (for example, older format versions before `Crate::target` was added lack the now-required `target` field). Since this codec is meant to reject format mismatches via `UnsupportedFormatVersion`, read/parse just `format_version` first, compare it with `FORMAT_VERSION`, and only then deserialize the full `Crate`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_rustdoc_codec.rs",
-              "line": 98,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:54f47f22b28cfb5cada3fcdc397c2783ce34d33ac153fef148842248781b1353",
-          "at": "2026-05-09T02:21:56Z"
+          "hash": "rvw1:sha256:95c950d8b53576f0b5963c8a3ee70581058bc60b2abdb0b7c2d379a2e3c14225",
+          "at": "2026-05-09T07:34:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5addf0b41457b0af532b9669b2d27fe9f73cce33b75d09b8bc079a047a83d62d",
-          "at": "2026-05-09T02:24:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "New external crate prefixes are assigned a placeholder `u32::MAX - 1` during `parse_type_ref_str`, and the returned `Type::ResolvedPath` is never rewritten after the real crate id is registered. The first reference to any unseen crate (for example `serde::Serialize`) will therefore point at an id that does not exist in `external_crates`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 315,
-              "category": "correctness"
-            },
-            {
-              "message": "`assign_ids` stores type and trait short names in the same `HashMap<String, Id>` without checking for collisions. If a type and trait share the same short name, one silently overwrites the other, so the later encode pass writes both entries under a single `Id` instead of surfacing the documented `AmbiguousTypeName` error.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 137,
-              "category": "correctness"
-            },
-            {
-              "message": "`resolved_path_type` builds `Type::ResolvedPath` with an empty `path` string for every impl target. Downstream consumers that render or inspect `Impl.for_` by path will see a blank target type, so inherent and trait impl blocks lose the name of the type they belong to.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 749,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4cfbfc1340679661dbcc4ef2bcab4b9b727cf559670b4e6934fe900067f84239",
-          "at": "2026-05-09T02:50:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`parse_type_ref_str` ignores the `u32` returned by `emit_external_crate` and always leaves the parsed `Type::ResolvedPath` pointing at `u32::MAX - 1`. Any crate-prefixed `TypeRef` therefore becomes a dangling reference instead of the newly registered crate id.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 315,
-              "category": "correctness"
-            },
-            {
-              "message": "`assign_ids` overwrites `local_name_to_id` on every insert, so a type/trait/function short-name collision silently rebinds earlier entries instead of raising `AmbiguousTypeName` as the port contract promises. That can miswire both `TypeRef` resolution and `TraitImplDeclV2` lookup.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 141,
-              "category": "correctness"
-            },
-            {
-              "message": "`encode_trait_impl_blocks` emits `Impl` items, but the surrounding struct/enum items only store the inherent impl id (`impls: vec![impl_id]`). The trait-impl ids are never attached anywhere, so consumers walking `Struct::impls` or `Enum::impls` will miss every trait implementation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 396,
-              "category": "correctness"
-            },
-            {
-              "message": "`Self` never gets a special case here, so `encode_method_items` will serialize constructors and methods returning `Self` as unresolved markers instead of the owning type. That breaks common APIs that use `Self` in parameter or return position.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 185,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4cfbfc1340679661dbcc4ef2bcab4b9b727cf559670b4e6934fe900067f84239",
-          "at": "2026-05-09T02:53:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Generic-argument handling is lossy here: `AssocType` is rewritten as a plain type argument, while `Const`, `AssocConst`, and `Constraint` are dropped. Valid Rust forms like `Iterator<Item = T>` or `ArrayVec<u8, 32>` will not round-trip to the same `rustdoc_types` shape, so downstream consumers see a different type than the catalogue declared.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 293,
-              "category": "correctness"
-            },
-            {
-              "message": "External trait impls are encoded with `Path.id = Id(ext_crate_id)`, but `Path.id` is an item id, not a crate id. Because crate ids start at 1, this collides with normal local item ids and can make later `krate.paths` lookups resolve the impl to an unrelated local item instead of treating the trait as external.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 708,
-              "category": "correctness"
-            },
-            {
-              "message": "Trait methods are emitted with `has_body: true` even though `TraitEntry::methods` are declarations, not implementations. That misclassifies trait-associated functions in the rustdoc graph and can confuse any consumer that uses `has_body` to distinguish signatures from concrete methods.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 679,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:a1efc7e7285791b2ae48315a4afb30273ea5631b7ba7420601288c492d90de69",
-          "at": "2026-05-09T03:00:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Path.id` is an item id in rustdoc JSON, but this branch stores the external crate id (`std_crate_id`) for std-prelude paths and the crate id for crate-prefixed paths. Those ids can collide with real local item ids and cause downstream lookups to resolve the wrong item instead of the referenced external type.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 206,
-              "category": "correctness"
-            },
-            {
-              "message": "External trait impls are encoded with the sentinel `UNRESOLVED_CRATE_ID` and no matching `paths` entry is created. Downstream consumers recover trait origin through `krate.paths[trait_id]`, so these impls will lose their origin crate and become effectively anonymous.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 715,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f04cd8e05a0a8107f376928894793777c402a0a378f74e88a9754b6b77c680a4",
-          "at": "2026-05-09T03:07:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeKindV2::Struct` is treated as `fields` only: the `pattern` is discarded at the match site, and `encode_struct` always emits `StructKind::Plain`. That means supported catalogue inputs like `CompositePattern::Newtype { .. }` and `TypestateState { .. }` are encoded as empty/plain structs, losing the declared shape of the type.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 207,
-              "category": "correctness"
-            },
-            {
-              "message": "`resolved_path_type()` builds `Impl.for_` with an empty `path` string for every inherent/trait impl target. Downstream consumers that format or inspect impl targets by path will see a blank type name, so the owning type is effectively lost in the emitted rustdoc graph.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 821,
-              "category": "correctness"
-            },
-            {
-              "message": "`convert_generic_args()` is lossy for several valid Rust forms: `Const` arguments are downgraded to an unresolved marker, while `AssocConst` and `Constraint` are dropped entirely. A `TypeRef` that uses const generics or higher-order constraints will not round-trip to the same `rustdoc_types` shape.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 299,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e45549a24d39becff0c3495f3be49a0c3508e923d8fcbdc0b56ea7a3bca5df8b",
-          "at": "2026-05-09T03:14:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`encode_trait_impl_blocks` resolves the trait item by short name alone and ignores `origin_crate`. If the crate defines a local item with the same name as an external trait (for example `Display` while also implementing `std::fmt::Display`), this branch will pick the local `Id` and emit an `Impl` that points at the wrong trait, while never registering the external trait path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 752,
-              "category": "correctness"
-            },
-            {
-              "message": "The std-prelude allowlist is checked before local catalogue resolution, so a catalogue type or trait named like a prelude item (`Vec`, `Result`, `String`, etc.) is silently encoded as `std::...` instead of the local item. There is no validation in this scope preventing those names, so this produces incorrect `TypeRef` resolution and downstream graph data.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 215,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4595fdb94a8c465d12553495aa7e2b7371a81a909b2411c47ab4adaa1403141a",
-          "at": "2026-05-09T03:22:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `syn` parser is only partially implemented, so valid Rust type syntax is silently mangled instead of preserved. `convert_type` falls back to `<unknown_type>` for `dyn Trait`, `impl Trait`, function pointers, parenthesized types, and qualified paths, and `convert_generic_arg` drops `_`, `AssocConst`, and `Constraint` arguments entirely. That means a syntactically valid `TypeRef` can be encoded into a different type with no error, which is a correctness bug for the codec.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 154,
-              "category": "correctness"
-            },
-            {
-              "message": "`encode_method_items` inserts method `Function` items into `index` but never registers them in `Crate::paths`. The codec therefore emits an incomplete `paths` table for every inherent/trait method, unlike top-level functions and other in-crate items. Any downstream consumer that resolves canonical names or provenance through `paths` will not be able to find methods.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 675,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:76d9cba5c7969fde6084f330987ff2e2f51c8a21543446837c5f3f2d12e6e7c4",
-          "at": "2026-05-09T03:27:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`convert_type_path` treats every multi-segment `syn::TypePath` as an external crate prefix, and it turns any `qself` path into `<qualified_path>`. That mis-encodes valid Rust type refs such as `crate::foo::Bar`, `self::Bar`, `super::Bar`, and associated types like `<T as Trait>::Assoc` / `Iterator::Item` as unresolved markers or fake external crates, which will corrupt `external_crates` and drop type information.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 184,
-              "category": "correctness"
-            },
-            {
-              "message": "`array_len_to_string` only preserves integer literals; any const-generic array length expression is collapsed to `<const_len>`. `rustdoc_types::Type::Array.len` is supposed to retain the stringified expression, so `[u8; N]`, `[u8; N + 1]`, etc. lose their real length and downstream consumers get incorrect type data.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 555,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e216ee3b4fe0a10f1076c3650a53f98a347580f57d683515c512f7bea427dba0",
-          "at": "2026-05-09T03:42:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dyn Trait` and `impl Trait` bounds bypass all of the identifier-resolution logic used for `Type::Path`: every trait bound is emitted as `Id(u32::MAX)` with a raw path string, so `dyn Clone`, `impl Iterator`, or `impl serde::Serialize` never resolve against the local catalogue, never hit the std-prelude allowlist, and never auto-register external crates.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 340,
-              "category": "correctness"
-            },
-            {
-              "message": "`Module.items` is built from `state.local_name_to_id.values()` where `local_name_to_id` is a `HashMap`, so the root module's child order is nondeterministic across runs. The same catalogue can therefore serialize with different top-level item ordering, which is flaky for downstream diffs/snapshots.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 252,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2cf9046d1e9f60581356a1a53ceb4b434cb014a5f14a7454c25a764219d97acf",
-          "at": "2026-05-09T03:47:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Const-expression rendering is lossy here: any cast expression is rewritten as `as _`, so valid inputs like `[u8; N as usize]` or `ArrayVec<T, N as usize>` do not round-trip and downstream consumers lose the actual target type.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 686,
-              "category": "correctness"
-            },
-            {
-              "message": "`CatalogueToExtendedCrateCodec::encode` is a new public API, but this change only adds happy-path coverage. The two error exits (`AmbiguousIdentifier` and invalid `TypeRef`) are not exercised by direct codec tests, so regressions in collision detection or error mapping can slip through.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 70,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:b1bc946109dd2f656fd62ab0695c40953a2b66d84f7df09999c62a1a159a101a",
-          "at": "2026-05-09T03:53:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`STD_PRELUDE_TYPES` are converted to `std::{name}` and tagged with the unresolved sentinel id in both the type-path and trait-bound branches, but many listed entries are not actually defined at that path (`String`, `Vec`, `HashMap`, `Arc`, `Clone`, etc.). That means valid standard-library references are emitted as incorrect paths and become indistinguishable from truly unresolved types.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 238,
-              "category": "correctness"
-            },
-            {
-              "message": "Associated const generic constraints are serialized with `syn_expr_to_string`, which collapses any expression beyond a literal or simple path to `\"<const_expr>\"`. Valid inputs such as `Trait<N = A + 1>` or `Trait<LEN = N as usize>` therefore lose their actual value during encoding.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 525,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3916ca023f8dce71764ab4747282bf864d5212b54c3077e26d9a2f8b2c908093",
-          "at": "2026-05-09T03:59:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "External trait impls are indexed with `path = [origin_crate, trait_name]`, so a `std::fmt::Display` impl becomes `std::Display`. That does not match the canonical def-paths used elsewhere (`type_ref_parser` canonicalizes `Display` to `std::fmt::Display`), so downstream trait-origin lookup will miss or alias std traits.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 798,
-              "category": "correctness"
-            },
-            {
-              "message": "When `origin_crate` matches the current crate but `local_name_to_id` has no entry, the code allocates a fresh id and never inserts a corresponding trait item or `ItemSummary`. The resulting impl points at a dangling trait reference instead of failing fast.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 785,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d9a85da087c58c426aa0324b956123e35944e49aac4f9735e59e4e4c9c2fd9c5",
-          "at": "2026-05-09T04:05:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Bare function pointer parsing drops the source ABI and HRTB lifetimes: `TypeBareFn.abi` is hardcoded to `Abi::Rust`, and `bare_fn.lifetimes` is ignored, so valid `extern \"C\" fn` / `for<'a> fn` TypeRef strings are misrepresented in the output type graph.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 455,
-              "category": "correctness"
-            },
-            {
-              "message": "Generic associated-item metadata is lost during parsing. The `Constraint` variant is discarded, and both `AssocType`/`AssocConst` always set `args: None`, so valid forms like `Iterator<Item: Clone>` or `Trait<Assoc<'a> = T>` lose information instead of being encoded into `AssocItemConstraint` data.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 499,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c275cb19b12ffe0e20e5326f242d3bf3dba2c5b36a5a79cec31d1ac3b113b99e",
-          "at": "2026-05-09T04:10:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`encode_function` drops the crate component from `FunctionPath`: `register_path` always uses `self.crate_name` and `crate_id: 0`, so any cross-workspace function key (`FunctionPath::crate_name`) will be flattened into the current crate and serialized under the wrong path. This should either validate `fn_path.crate_name == doc.crate_name` or preserve the embedded crate name when building `Crate::paths`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 674,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1da37edec436234c6a4a80837142be097e273279a61292a3016ff2675983e4a9",
-          "at": "2026-05-09T04:20:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Free-function paths are inserted into `local_name_to_id`, and that map is later used by `resolve_local` for single-segment `TypeRef`s. A root-level function named like a type or prelude item (for example `String` or `Clone`) can therefore be selected as the resolution target, producing a `Path.id` that points at a function item instead of a type/trait. The same shared map also turns otherwise valid type/function name sharing into false `AmbiguousIdentifier` errors.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 158,
-              "category": "correctness"
-            },
-            {
-              "message": "`Self` is special-cased before the local-name lookup, so a valid catalogue declaration named `Self` can never be referenced: every `TypeRef` with that spelling is forced to the `Id(0)` self placeholder. Since the identifier layer does not reject `Self`, this silently mis-encodes valid input.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 210,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:aa4b03695ee964218de23c548aeab604809c99a8add40127d41816d8c7d3a749",
-          "at": "2026-05-09T04:24:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Cross-workspace functions are still stamped with `crate_id: 0` when the `Function` item is inserted. `register_path_for_crate(...)` records the right external crate in `paths`, but `Item::crate_id` remains local, so consumers that filter on `crate_id` will misclassify external functions as part of the current crate.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 702,
-              "category": "correctness"
-            },
-            {
-              "message": "The `std` trait path fallback guesses `std::{name}` for any trait not in `std_canonical_path`'s hardcoded table. That produces wrong definition paths for valid std traits outside the list, such as `std::error::Error` or `std::io::Read`, which then breaks trait-origin resolution and any downstream path comparisons.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 831,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:00763ebbcd33cec63b129ba01ee412d292eaae4ab571c35ac7bdc2a63a2b8681",
-          "at": "2026-05-09T04:31:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ca24cd066bc8ee1e6a2cc13dd2fb45b5df994a9ef7dc37cef8e7e0eb362e6c3",
-          "at": "2026-05-09T04:37:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeRef` values that are explicitly resolved as std-prelude or crate-prefixed external types are encoded with `Id(UNRESOLVED_CRATE_ID)`, the same marker used for genuinely unknown identifiers. ADR D11/CN-10 says std allowlist and crate-prefixed refs are resolved and must not become Phase 1 unresolved-type errors; only allowlist-outside unknowns should. Because these resolved externals have no distinct id or `paths` entry tying them to `external_crates`, downstream closed-world validation cannot reliably distinguish valid `std::...`/`domain_core::...` references from typos without string-special-casing. Allocate/link a synthetic external item id with a `paths` summary, or use a separate unresolved representation.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
-              "line": 244,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9ca24cd066bc8ee1e6a2cc13dd2fb45b5df994a9ef7dc37cef8e7e0eb362e6c3",
-          "at": "2026-05-09T04:41:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_external_type_ids` only rewrites generic arguments when the `ResolvedPath` itself still has `Id(UNRESOLVED_CRATE_ID)`. For a local generic such as `Wrapper<serde::Value>`, the outer `Wrapper` resolves to a local id, so the match falls through and the nested external `serde::Value` keeps the unresolved sentinel even though `serde` was registered. Phase 1 will then reject a valid crate-prefixed TypeRef as undeclared. Recurse into `p.args` for every `ResolvedPath`, not only unresolved ones.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 371,
-              "category": "correctness"
-            },
-            {
-              "message": "The catch-all arm explicitly passes through `DynTrait` and `FunctionPointer`, but the parser can produce external paths inside both forms, for example `dyn Clone`, `dyn serde::Serialize`, or `fn(serde::Value) -> String`. Those nested paths remain at `Id(UNRESOLVED_CRATE_ID)` after external-crate registration, so closed-world validation will treat valid std/external references as unresolved. Add recursive fix-up for `Type::DynTrait` and `Type::FunctionPointer` contents.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 418,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5246946b8af1bdc1bff12fe31dc428740c0d0e4661be7ae1d01952c2e115b2b9",
-          "at": "2026-05-09T04:47:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3908c89d6d13bbf5276eff6788dc92a2346cc09032fb4ad4ed9b1c3bd68d6924",
-          "at": "2026-05-09T04:53:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`function_info_to_method_decl()` can now return `None`, but `outgoing` is still computed from `inherent_methods` before filtering. If a method is skipped, the node keeps its typestate transition targets even though the method no longer exists in `methods()`, which makes the graph internally inconsistent. Build `outgoing` from the same filtered set or skip the whole method before both collections.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/code_profile_builder.rs",
-              "line": 57,
-              "category": "correctness"
-            },
-            {
-              "message": "`extract_params()` silently drops any parameter whose name or formatted type fails the newtype validation. Because `export()` already returns `Result`, this turns invalid rustdoc input into a truncated `SchemaExport` instead of an error, so downstream consumers lose method parameters without any signal. Propagate a codec error instead of `filter_map`-skipping.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
-              "line": 573,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:511aa3e3d0dec6efb85bffc3ed16bb6cc676852aa17b153eac1561853127d9ac",
-          "at": "2026-05-09T06:52:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`function_info_to_method_decl` is no longer a lossless adapter: it always drops `FunctionInfo::docs` and silently collapses any receiver string that fails `SelfReceiver` parsing to `None`, while the surrounding code still uses `FunctionInfo::has_self_receiver()` to compute outgoing transitions. That means a `TypeGraph` built from non-canonical input can end up with method signatures, docs, and transition edges that disagree, and even on valid input every method doc is discarded before the baseline/render path sees it. `schema_export.rs` already populates these docs upstream, so this loses data that the new `MethodDeclaration` model can carry.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/code_profile_builder.rs",
-              "line": 166,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c452eac52944485c01212b74717b1624b1aca59ecda7d8a62deee31597cb5154",
-          "at": "2026-05-09T07:01:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eafda2819b9d9ab8457a9ac152bc89db735343bf00318df6ecb06ea044cc67c9",
-          "at": "2026-05-09T07:06:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eafda2819b9d9ab8457a9ac152bc89db735343bf00318df6ecb06ea044cc67c9",
-          "at": "2026-05-09T07:11:04Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`identifiers.rs` is 854 lines long, which exceeds the repository's 700-line hard limit for a module. The extra size is mostly from co-locating the large test block with the implementation, so this already violates the stated module-size rule and makes future changes harder to keep coherent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 1,
-              "category": "architecture"
-            },
-            {
-              "message": "`ModulePath::from_identifiers` is a new public constructor, but there is no unit test covering its happy path. That leaves a public API path in this module without the required test coverage, so a regression in this constructor would not be caught by the current suite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 263,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:aaf0127f33a1070f6bcfd34341467d85a42693d267741ea654422b8a72eefbb3",
-          "at": "2026-05-09T00:51:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
-          "at": "2026-05-09T00:56:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ItemAction` derives `strum::Display`/`EnumString` without a rename policy, so it accepts/emits `Add`, `Modify`, etc. The inherited TDDD-03 catalogue contract uses lowercase tags (`add`, `modify`, `reference`, `delete`), and the existing codec/fixtures use those values. Unless this enum is renamed with `#[strum(serialize_all = \"snake_case\")]` (and covered by tests), valid catalogue actions will be rejected or re-emitted with the wrong spelling once the v2 codec maps through these domain strings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 145,
-              "category": "correctness"
-            },
-            {
-              "message": "`SelfReceiver` currently parses/displays the Rust variant names (`Owned`, `SharedRef`, `ExclusiveRef`), but ADR D8 defines the catalogue values as the receiver tokens `self`, `&self`, and `&mut self`. This makes the domain `FromStr` reject the receiver strings already used in catalogue data and will force every caller to duplicate a custom mapping instead of using the validated domain enum. Add explicit strum serializations for the three variants and tests for the token forms.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 183,
-              "category": "correctness"
-            },
-            {
-              "message": "`Layer` also derives default strum casing, so `Layer::Domain.to_string()` is `Domain` and parsing `domain` fails. ADR D1 defines the layer axis as the lowercase catalogue values `domain` / `usecase` / `infrastructure`; with the current implementation, valid v2 documents using the specified layer values cannot round-trip through the domain enum. Add the appropriate strum serialization policy and tests for the lowercase spellings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 214,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
-          "at": "2026-05-09T00:59:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96ad85ab07e8bdbc22652769ba2c392e5dadd47c10ef708a2f3b3f91ec71bb86",
-          "at": "2026-05-09T01:06:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
-          "at": "2026-05-09T01:14:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
-          "at": "2026-05-09T01:17:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:37:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:39:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:46:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
-          "at": "2026-05-09T02:19:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
-          "at": "2026-05-09T02:22:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ThreeWaySignal` stores the derived kind as a public field, and `ThreeWayEvaluationReport` exposes its `Vec` publicly. That leaves the documented invariant unenforced: external code can construct or mutate a value with mismatched `region`/`signal` or with `Skip` entries inside a report, and `len()`/`has_violations()`/`is_in_progress()` will then report the wrong state. Make the derived state private or validate on construction so the domain type cannot represent an invalid report.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
-              "line": 182,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e8798a0a0cd123f1d7b186c030e6ee130dabc8ad23a406ae33404d1bbc2de4ec",
-          "at": "2026-05-09T05:31:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ThreeWayEvaluationReport::new` does not enforce the module's own invariant that reports contain only non-skip signals. It stores `Skip` entries verbatim, so any caller can construct a report that contradicts the public contract in `port.rs` and leaks skipped items through `iter()`/`len()`. Consider filtering `Skip` values here or making construction fallible/private.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
-              "line": 269,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1d1da0d760a509d983783c1298ee3f32f1622388ee555738f968d780ab2bbc19",
-          "at": "2026-05-09T05:37:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
-          "at": "2026-05-09T05:39:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
-          "at": "2026-05-09T05:42:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: Re-exporting `catalogue_v2::methods::{MethodDeclaration, ParamDeclaration}` here makes `catalogue::MethodDeclaration` look like the old API path, but it is not API-compatible anymore. The V2 constructor now requires `MethodName` / `ParamName` / `TypeRef` and the accessor methods (`name()`, `params()`, `returns()`, `ty()`, etc.) are gone, so downstream code that was compiling against the documented `catalogue::*` surface will break at source level. A plain `pub use` does not provide the promised compatibility shim.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
-              "line": 26,
-              "category": "compatibility"
-            },
-            {
-              "message": "P1: `MethodDeclaration` now derives `Eq` with a public `docs: Option<String>` field, and baseline structural comparison uses full vector equality (`self.methods == other.methods`). That means doc-only differences between two otherwise identical methods will flip `TypeBaselineEntry::structurally_equal()` / `TraitBaselineEntry::structurally_equal()` to `false`, which creates false consistency failures even though docs are non-structural metadata.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
-              "line": 72,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bb5edcc2a9e53b0ba75f3ef9a8b602828a7cf211db9288bed320ec459497d1e3",
-          "at": "2026-05-09T06:52:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`methods_structurally_equal` still treats `ParamDeclaration` as fully equal (`a.params == b.params`), so a harmless parameter binding rename on an unchanged method will now be reported as structural drift. That diverges from the method/function matching logic in `signals.rs` and `consistency.rs`, which intentionally ignores binding names and compares only parameter types.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/baseline.rs",
-              "line": 40,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8bd7a3f9e6f7fa462799842a29e3f8e717186f90689cf4acd12e3e33e74ece06",
-          "at": "2026-05-09T06:58:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: Re-exporting the V2 `MethodDeclaration`/`ParamDeclaration` here is not source-compatible with the existing `domain::tddd::catalogue::*` callers. The new constructor takes `MethodName`/`ParamName`/`TypeRef` newtypes, so any still-unmigrated call sites that pass `String` arguments will stop compiling. Keep a compatibility shim or finish the downstream rewrites in the same change.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
-              "line": 31,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:00cfaa954f2d02a5567473eab37dada61fcfbb35f4b9e416f37a90f375864658",
-          "at": "2026-05-09T07:04:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
-          "at": "2026-05-09T07:09:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
-          "at": "2026-05-09T07:13:27Z"
+          "hash": "rvw1:sha256:95c950d8b53576f0b5963c8a3ee70581058bc60b2abdb0b7c2d379a2e3c14225",
+          "at": "2026-05-09T07:36:23Z"
         }
       ]
     }

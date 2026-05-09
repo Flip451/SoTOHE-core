@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T07:14:07Z",
+  "generated_at": "2026-05-09T14:52:41Z",
   "declaration_hash": "3ffd86ace9daee5952726ca790461ba068509afbdf7de4af379817dfc985ff57",
   "signals": [
     {
@@ -42,8 +42,11 @@
     {
       "type_name": "SignalEvaluatorV2",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SignalEvaluatorPort"
+      ]
     },
     {
       "type_name": "SchemaExportCodecError",
