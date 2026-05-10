@@ -192,6 +192,7 @@ dependencies = [
  "infrastructure",
  "libc",
  "rstest",
+ "rustdoc-types",
  "serde",
  "serde_json",
  "tempfile",

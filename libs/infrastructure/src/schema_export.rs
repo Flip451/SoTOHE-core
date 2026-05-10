@@ -32,6 +32,30 @@ impl RustdocSchemaExporter {
     pub fn new(workspace_root: PathBuf) -> Self {
         Self { workspace_root }
     }
+
+    /// Runs `cargo +nightly rustdoc --output-format json` for `crate_name` and
+    /// returns the path to the generated JSON file.
+    ///
+    /// The file is written inside the workspace's `target/doc/` directory.
+    /// The caller is responsible for reading or copying the file before the
+    /// next rustdoc run overwrites it.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SchemaExportError::NightlyNotFound`] if the nightly toolchain
+    /// is not installed.
+    ///
+    /// Returns [`SchemaExportError::RustdocFailed`] if `cargo rustdoc` fails.
+    ///
+    /// Returns [`SchemaExportError::CrateNotFound`] if the crate is not in the
+    /// workspace.
+    pub fn export_rustdoc_json_path(
+        &self,
+        crate_name: &str,
+    ) -> Result<std::path::PathBuf, SchemaExportError> {
+        check_nightly_available()?;
+        run_rustdoc(&self.workspace_root, crate_name)
+    }
 }
 
 impl SchemaExporter for RustdocSchemaExporter {

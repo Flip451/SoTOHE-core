@@ -413,11 +413,6 @@ pub enum TrackCommand {
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
 
-        /// Optional comma-separated `kind_tag` filter (e.g.
-        /// `secondary_port,use_case`). When omitted every kind is rendered.
-        #[arg(long)]
-        kind_filter: Option<String>,
-
         /// Optional comma-separated layer id filter (e.g.
         /// `domain,usecase`). When omitted every `tddd.enabled` layer is
         /// rendered. Unknown layer ids fail closed.
@@ -474,11 +469,14 @@ pub enum TrackCommand {
 
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     ///
-    /// Idempotent: if the baseline file already exists it is kept as-is. Re-capturing
-    /// the baseline after implementation has started pollutes the pre-implementation
-    /// snapshot, so the `--force` knob has been removed. If a genuine re-capture is
-    /// required, delete the stale `<layer>-types-baseline.json` file manually before
-    /// re-running.
+    /// Idempotent by default: if the baseline file already exists it is kept as-is.
+    /// Re-capturing the baseline after implementation has started pollutes the
+    /// pre-implementation snapshot. Use `--force` only when explicitly migrating
+    /// from an older baseline format (e.g. TypeBaseline JSON v2 → rustdoc JSON).
+    ///
+    /// `--source-workspace` lets you capture the API from a different Cargo
+    /// workspace (e.g. a git worktree at `main`) while writing the baseline files
+    /// into the current branch's track directory.
     BaselineCapture {
         /// Path to the track items root directory (e.g., `track/items`).
         #[arg(long, default_value = "track/items")]
@@ -487,15 +485,27 @@ pub enum TrackCommand {
         /// Track ID (directory name under items_dir).
         track_id: String,
 
-        /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
+        /// Workspace root directory used for architecture-rules.json resolution
+        /// and the default rustdoc source. Defaults to current directory.
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
+
+        /// Optional source workspace for rustdoc export. When supplied,
+        /// rustdoc is invoked from this workspace instead of `workspace_root`.
+        /// Useful for capturing a baseline from a git worktree at `main`.
+        #[arg(long)]
+        source_workspace: Option<PathBuf>,
 
         /// Optional layer id filter. When omitted all `tddd.enabled` layers
         /// are processed in `architecture-rules.json` order. When supplied,
         /// the specified layer id must be `tddd.enabled=true`.
         #[arg(long)]
         layer: Option<String>,
+
+        /// Overwrite existing baseline files. Use only when migrating from an
+        /// older baseline format.
+        #[arg(long)]
+        force: bool,
     },
 
     /// Run catalogue lint rules against a layer catalogue and report violations.
@@ -519,6 +529,41 @@ pub enum TrackCommand {
         /// Defaults to current directory.
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
+    },
+
+    /// Run the 3-way (A/B/C) signal evaluation for a track and print the report.
+    ///
+    /// A = ExtendedCrate built from `<layer>-types.json` via `CatalogueToExtendedCrateCodec`.
+    /// B = `rustdoc_types::Crate` loaded from `<layer>-types-baseline.json` via
+    ///     `BaselineRustdocCodec` (captured at pre-implementation main HEAD).
+    /// C = `rustdoc_types::Crate` captured live via `cargo +nightly rustdoc`.
+    ///
+    /// Processes every `tddd.enabled` layer in `architecture-rules.json`.
+    /// Outputs a markdown report to stdout (one table per layer).
+    /// Exits with code 1 when any Red signals are found.
+    ThreeWaySignals {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Workspace root directory (must contain `architecture-rules.json`).
+        /// Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+
+        /// Optional layer id filter. When omitted all `tddd.enabled` layers
+        /// are processed. When supplied, the specified layer id must be
+        /// `tddd.enabled=true`.
+        #[arg(long)]
+        layer: Option<String>,
+
+        /// Optional output file path. When supplied the markdown report is
+        /// written to the file in addition to stdout.
+        #[arg(long)]
+        output: Option<PathBuf>,
     },
 }
 
@@ -666,21 +711,27 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             cluster_depth,
             edges,
         ),
-        TrackCommand::ContractMap { items_dir, track_id, workspace_root, kind_filter, layers } => {
-            tddd::contract_map::execute_contract_map(
-                items_dir,
-                track_id,
-                workspace_root,
-                kind_filter,
-                layers,
-            )
+        TrackCommand::ContractMap { items_dir, track_id, workspace_root, layers } => {
+            tddd::contract_map::execute_contract_map(items_dir, track_id, workspace_root, layers)
         }
         TrackCommand::SpecElementHash { items_dir, track_id, anchor } => {
             tddd::spec_element_hash::execute_spec_element_hash(items_dir, track_id, anchor)
         }
-        TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, layer } => {
-            tddd::baseline::execute_baseline_capture(items_dir, track_id, workspace_root, layer)
-        }
+        TrackCommand::BaselineCapture {
+            items_dir,
+            track_id,
+            workspace_root,
+            source_workspace,
+            layer,
+            force,
+        } => tddd::baseline::execute_baseline_capture(
+            items_dir,
+            track_id,
+            workspace_root,
+            source_workspace,
+            layer,
+            force,
+        ),
         TrackCommand::CatalogueSpecSignals { items_dir, track_id, workspace_root, layer } => {
             tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
                 items_dir,
@@ -691,6 +742,15 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         }
         TrackCommand::Lint { track_id, layer_id, workspace_root } => {
             tddd::lint::execute_lint(workspace_root, track_id, layer_id)
+        }
+        TrackCommand::ThreeWaySignals { items_dir, track_id, workspace_root, layer, output } => {
+            tddd::three_way_signals::execute_three_way_signals(
+                items_dir,
+                track_id,
+                workspace_root,
+                layer,
+                output,
+            )
         }
     };
     match result {

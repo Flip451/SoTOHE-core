@@ -10,6 +10,8 @@ use domain::check_type_signals;
 use domain::spec::check_spec_doc_signals;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
+use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub;
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::track::symlink_guard;
 
@@ -228,8 +230,44 @@ fn evaluate_layer_catalogue(
             ))]);
         }
     };
+    // Decode the catalogue.  For schema_version=3 (v3) catalogues, fall through
+    // to the `CatalogueDocumentCodec` + `v3_doc_to_stub` path which produces a
+    // v2-compat `TypeCatalogueDocument` stub so that `check_type_signals` can
+    // evaluate the externally-stored signal file against it.
     let mut doc = match catalogue_codec::decode(catalogue_str) {
         Ok(d) => d,
+        Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
+            // Try the v3 codec path.
+            // Derive the crate-name stem (e.g. `"domain"` from `"domain-types.json"`)
+            // the same way `type_signals_evaluator` does: strip the `-types.json` suffix
+            // from the filename, falling back to `file_stem()` for unexpected names.
+            let stem = catalogue_path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("")
+                .strip_suffix("-types.json")
+                .unwrap_or_else(|| {
+                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
+                })
+                .to_owned();
+            match CatalogueDocumentCodec::decode(catalogue_str, &stem) {
+                Ok(v3_doc) => match v3_doc_to_stub(&v3_doc) {
+                    Ok(stub) => stub,
+                    Err(e) => {
+                        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                            "{}: failed to convert v3 catalogue to stub: {e}",
+                            catalogue_path.display()
+                        ))]);
+                    }
+                },
+                Err(e) => {
+                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "{}: failed to decode as v3 catalogue: {e:?}",
+                        catalogue_path.display()
+                    ))]);
+                }
+            }
+        }
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "{}: invalid {}: {e}",

@@ -8,6 +8,8 @@ use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, der
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
 use crate::spec;
+use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub;
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::contract_map_adapter::FsCatalogueLoader;
 use crate::tddd::{catalogue_codec, type_signals_codec};
 use crate::type_catalogue_render;
@@ -1077,6 +1079,124 @@ pub fn sync_rendered_views(
                             binding.rendered_file(),
                             track_dir.display()
                         );
+                    }
+                    Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(v)) => {
+                        // schema_version 3+ catalogues use CatalogueDocument (v3 codec).
+                        // Try the v3 codec path first; if that succeeds, convert to a
+                        // TypeCatalogueDocument stub so the existing render path can
+                        // produce an up-to-date `<layer>-types.md`. Only fall back to a
+                        // warning (skipping the render) if the v3 codec also rejects the
+                        // file — which is a genuine error condition, not a version mismatch.
+                        let stem = catalogue_path
+                            .file_name()
+                            .and_then(|n| n.to_str())
+                            .and_then(|n| n.strip_suffix("-types.json"))
+                            .map(str::to_owned)
+                            .unwrap_or_else(|| {
+                                catalogue_path
+                                    .file_stem()
+                                    .and_then(|s| s.to_str())
+                                    .unwrap_or("")
+                                    .to_owned()
+                            });
+                        match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
+                            Ok(v3_doc) => match v3_doc_to_stub(&v3_doc) {
+                                Ok(mut doc) => {
+                                    // Populate signals from `<layer>-type-signals.json` so
+                                    // the Signal column shows Blue/Yellow/Red instead of `—`.
+                                    // Same logic as the v2 path above: non-fatal, falls back
+                                    // to `—` on missing / symlinked / stale signal files.
+                                    let signal_path_v3 = track_dir.join(binding.signal_file());
+                                    let is_plain_file_v3 = signal_path_v3
+                                        .symlink_metadata()
+                                        .map(|m| m.file_type().is_file())
+                                        .unwrap_or(false);
+                                    if is_plain_file_v3 {
+                                        if let Ok(signal_json) =
+                                            std::fs::read_to_string(&signal_path_v3)
+                                        {
+                                            if let Ok(signals_doc) =
+                                                type_signals_codec::decode(&signal_json)
+                                            {
+                                                let current_hash =
+                                                    type_signals_codec::declaration_hash(
+                                                        catalogue_content.as_bytes(),
+                                                    );
+                                                if signals_doc.declaration_hash() == current_hash {
+                                                    doc.set_signals(signals_doc.signals().to_vec());
+                                                } else {
+                                                    eprintln!(
+                                                        "warning: ignoring stale {} for {} \
+                                                         (declaration_hash mismatch) — rendered \
+                                                         signal column will fall back to `—`",
+                                                        binding.signal_file(),
+                                                        track_dir.display()
+                                                    );
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // Load `<layer>-catalogue-spec-signals.json` for the
+                                    // Cat-Spec column (ADR 2026-04-23-0344 §D2.5), same as
+                                    // the v2 path above.  Opt-in gated; fail-closed on
+                                    // missing / symlinked / malformed / stale — remediation
+                                    // is documented in the error message.  Opt-out layers
+                                    // render the legacy 5-column view (None).
+                                    let spec_signals_doc_v3 = if binding
+                                        .catalogue_spec_signal_enabled()
+                                    {
+                                        Some(
+                                                type_catalogue_render::load_catalogue_spec_signals_for_view(
+                                                    &track_dir.join(
+                                                        binding.catalogue_spec_signal_file(),
+                                                    ),
+                                                    catalogue_content.as_bytes(),
+                                                )
+                                                .map_err(|e| {
+                                                    RenderError::Io(std::io::Error::other(
+                                                        e.to_string(),
+                                                    ))
+                                                })?,
+                                            )
+                                    } else {
+                                        None
+                                    };
+                                    let rendered = type_catalogue_render::render_type_catalogue(
+                                        &doc,
+                                        catalogue_file,
+                                        spec_signals_doc_v3.as_ref(),
+                                    );
+                                    let rendered_md_path = track_dir.join(binding.rendered_file());
+                                    let old_md = match std::fs::read_to_string(&rendered_md_path) {
+                                        Ok(content) => Some(content),
+                                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+                                        Err(e) => return Err(RenderError::Io(e)),
+                                    };
+                                    if old_md.as_deref().is_none_or(|existing| {
+                                        !rendered_matches(existing, &rendered)
+                                    }) {
+                                        atomic_write_file(&rendered_md_path, rendered.as_bytes())?;
+                                        changed.push(rendered_md_path);
+                                    }
+                                }
+                                Err(reason) => {
+                                    return Err(RenderError::Io(std::io::Error::other(format!(
+                                        "v3 stub conversion failed for {} in {}: {reason}",
+                                        binding.rendered_file(),
+                                        track_dir.display()
+                                    ))));
+                                }
+                            },
+                            Err(v3_err) => {
+                                return Err(RenderError::Io(std::io::Error::other(format!(
+                                    "catalogue {} in {} has schema_version {v} \
+                                     (not supported by v2 codec); \
+                                     v3 codec also rejected it: {v3_err}",
+                                    catalogue_file,
+                                    track_dir.display()
+                                ))));
+                            }
+                        }
                     }
                     Err(e) => {
                         return Err(RenderError::Io(std::io::Error::other(format!(
@@ -3579,14 +3699,15 @@ mod tests {
         // Regression guard for the "0-edge orphan" bug:
         // `render_contract_map_view` was inside the `!is_done_or_archived`
         // block, so a track that reached `done` status never had its
-        // contract-map regenerated after the T002 variant-payload edge
-        // renderer was committed.  The fix moves the call outside the guard.
+        // contract-map regenerated after the fix that moved the call outside
+        // the guard.
         //
         // This test proves that:
         // 1. `sync_rendered_views` produces a `contract-map.md` even when the
         //    track status is `done` (all tasks in impl-plan.json are done).
-        // 2. The rendered contract-map contains the variant payload edge
-        //    `MemberDeclaration -->|"::Variant"| EnumVariantDeclaration`.
+        // 2. The rendered contract-map contains the OS-06 stub scaffold
+        //    (deferment comment + empty subgraph). Edge rendering is deferred
+        //    to T012 (OS-06 out-of-scope).
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-done-cmap");
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -3609,7 +3730,8 @@ mod tests {
         )
         .unwrap();
 
-        // domain-types.json with enum entries carrying variant payload edges.
+        // domain-types.json with enum entries (v2 stub format; converted to
+        // TypeCatalogueDocument by catalogue_bulk_loader for OS-06 stub rendering).
         std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_WITH_ENUM_VARIANTS)
             .unwrap();
 
@@ -3621,13 +3743,18 @@ mod tests {
             "contract-map.md must be rendered for done tracks; changed: {changed:?}"
         );
 
-        // The rendered contract-map must contain the variant payload edge.
+        // OS-06 stub: the rendered contract-map must contain the deferment
+        // comment and the domain subgraph. Edge rendering is deferred to T012.
         let cmap = std::fs::read_to_string(track_dir.join("contract-map.md")).unwrap();
         assert!(
-            cmap.contains(
-                "L6_domain_MemberDeclaration -->|\"::Variant\"| L6_domain_EnumVariantDeclaration"
-            ),
-            "variant payload edge must appear in contract-map.md for done track; got:\n{cmap}"
+            cmap.contains("OS-06 DEFERRED"),
+            "OS-06 deferment comment must appear in contract-map.md; got:\n{cmap}"
         );
+        assert!(
+            cmap.contains("subgraph domain [domain]"),
+            "domain subgraph must appear in contract-map.md; got:\n{cmap}"
+        );
+        // Stub must not emit mermaid edge arrows (T012 deferred).
+        assert!(!cmap.contains("-->|"), "stub must not emit mermaid edges; got:\n{cmap}");
     }
 }

@@ -1,12 +1,14 @@
 //! `sotp track baseline-capture` — capture TypeGraph snapshot as baseline.
 //!
 //! Generates `<layer>-types-baseline.json` from the current TypeGraph.
-//! Always idempotent: if the baseline file already exists it is kept as-is.
+//! Idempotent by default: if the baseline file already exists it is kept as-is.
 //! Re-capturing the baseline after implementation has started would overwrite
 //! the pre-implementation snapshot with the current state, collapsing the
 //! signal semantics (new `add` entries become `AddButAlreadyInBaseline` noise).
-//! If a genuine re-capture is required, delete the stale
-//! `<layer>-types-baseline.json` file manually first.
+//! Use `--force` only when explicitly migrating from an older baseline format.
+//!
+//! `--source-workspace` lets you capture from a different Cargo workspace (e.g.
+//! a git worktree at `main`) while writing baseline files into the current track dir.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -19,15 +21,13 @@ use crate::commands::track::tddd::signals::resolve_layers;
 /// Steps:
 /// 1. Resolve the set of TDDD-enabled layers to process (all enabled, or just the
 ///    specified `--layer`).
-/// 2. For each layer binding, check if the baseline already exists (skip if so).
-/// 3. Export the target crate schema via rustdoc JSON.
-/// 4. Build TypeGraph and convert to TypeBaseline.
-/// 5. Encode and write to `<layer>-types-baseline.json`.
+/// 2. For each layer binding, check if the baseline already exists (skip if so,
+///    unless `force` is true).
+/// 3. Export the target crate schema via rustdoc JSON from `source_workspace`
+///    (defaults to `workspace_root` when not supplied).
+/// 4. Write raw rustdoc JSON to `<layer>-types-baseline.json`.
 ///
 /// When `--layer` is omitted, all TDDD-enabled layers are processed in `layers[]` order.
-///
-/// Always idempotent: existing baseline files are preserved. To re-capture, delete
-/// the stale file manually first.
 ///
 /// # Errors
 ///
@@ -37,7 +37,9 @@ pub fn execute_baseline_capture(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
+    source_workspace: Option<PathBuf>,
     layer: Option<String>,
+    force: bool,
 ) -> Result<ExitCode, CliError> {
     // Resolve the set of TDDD-enabled layers to process. When
     // `architecture-rules.json` is absent we fall back to the legacy
@@ -79,14 +81,27 @@ pub fn execute_baseline_capture(
         }
     }
 
+    // Resolve the rustdoc source workspace (defaults to workspace_root when not supplied).
+    let rustdoc_workspace = source_workspace.as_deref().unwrap_or(&workspace_root);
+
     for binding in &bindings {
-        infrastructure::tddd::baseline_capture::capture_baseline_for_layer(
-            &items_dir,
-            &track_id,
-            &workspace_root,
-            binding,
-        )
-        .map_err(|e| CliError::Message(e.0))?;
+        if force {
+            infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer(
+                &items_dir,
+                &track_id,
+                rustdoc_workspace,
+                binding,
+            )
+            .map_err(|e| CliError::Message(e.0))?;
+        } else {
+            infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer(
+                &items_dir,
+                &track_id,
+                rustdoc_workspace,
+                binding,
+            )
+            .map_err(|e| CliError::Message(e.0))?;
+        }
     }
 
     Ok(ExitCode::SUCCESS)
@@ -96,6 +111,24 @@ pub fn execute_baseline_capture(
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use rustdoc_types::FORMAT_VERSION;
+
+    /// Minimal valid rustdoc JSON used as a stand-in baseline for idempotency tests.
+    /// Required because `BaselineRustdocCodec::load` validates `format_version`.
+    fn minimal_rustdoc_json() -> String {
+        format!(
+            r#"{{
+                "root": 0,
+                "crate_version": null,
+                "includes_private": false,
+                "index": {{}},
+                "paths": {{}},
+                "external_crates": {{}},
+                "format_version": {FORMAT_VERSION},
+                "target": {{"triple": "", "target_features": []}}
+            }}"#
+        )
+    }
 
     #[test]
     fn test_baseline_capture_with_invalid_track_id_returns_error() {
@@ -103,8 +136,14 @@ mod tests {
         let items_dir = dir.path().join("track/items");
         std::fs::create_dir_all(&items_dir).unwrap();
 
-        let result =
-            execute_baseline_capture(items_dir, "../evil".to_owned(), dir.path().into(), None);
+        let result = execute_baseline_capture(
+            items_dir,
+            "../evil".to_owned(),
+            dir.path().into(),
+            None,
+            None,
+            false,
+        );
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
 
@@ -115,11 +154,20 @@ mod tests {
         let track_dir = items_dir.join("test-track");
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // Write a dummy baseline file (domain layer — default when no architecture-rules.json).
-        std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
+        // Write a minimal valid rustdoc baseline (domain layer — default when no
+        // architecture-rules.json). Idempotency now validates `format_version`, so an empty
+        // `{}` is rejected before the skip path is reached.
+        std::fs::write(track_dir.join("domain-types-baseline.json"), minimal_rustdoc_json())
+            .unwrap();
 
-        let result =
-            execute_baseline_capture(items_dir, "test-track".to_owned(), dir.path().into(), None);
+        let result = execute_baseline_capture(
+            items_dir,
+            "test-track".to_owned(),
+            dir.path().into(),
+            None,
+            None,
+            false,
+        );
         assert!(result.is_ok(), "should skip existing baseline without error");
     }
 
@@ -157,13 +205,16 @@ mod tests {
         // skip path → Ok(SUCCESS). If the dispatch went to domain, the baseline
         // file checked would be domain-types-baseline.json, which is absent, so the
         // command would proceed to export and fail — proving the dispatch is wrong.
-        std::fs::write(track_dir.join("usecase-types-baseline.json"), "{}").unwrap();
+        std::fs::write(track_dir.join("usecase-types-baseline.json"), minimal_rustdoc_json())
+            .unwrap();
 
         let result = execute_baseline_capture(
             items_dir,
             "test-track".to_owned(),
             dir.path().into(),
+            None,
             Some("usecase".to_owned()),
+            false,
         );
 
         // Ok(SUCCESS) proves skip triggered for usecase-types-baseline.json.
@@ -208,11 +259,18 @@ mod tests {
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
 
         // domain baseline exists → skip; usecase baseline absent → proceeds to export → fails.
-        std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
+        std::fs::write(track_dir.join("domain-types-baseline.json"), minimal_rustdoc_json())
+            .unwrap();
         // do NOT write usecase-types-baseline.json
 
-        let result =
-            execute_baseline_capture(items_dir, "test-track".to_owned(), dir.path().into(), None);
+        let result = execute_baseline_capture(
+            items_dir,
+            "test-track".to_owned(),
+            dir.path().into(),
+            None,
+            None,
+            false,
+        );
 
         assert!(
             result.is_err(),

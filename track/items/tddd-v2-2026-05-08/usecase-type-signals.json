@@ -1,43 +1,55 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-09T15:21:42Z",
-  "declaration_hash": "81e7c46df6cc9fba270f8e91281641322b84005b019affe6847490856d1da442",
+  "generated_at": "2026-05-10T16:09:39Z",
+  "declaration_hash": "43ed12899f0dccced82a26fe0be521e6d07f660c0a5696244a6697975c3f9b1b",
   "signals": [
     {
-      "type_name": "PreCommitTypeSignalsService",
-      "kind_tag": "application_service",
+      "type_name": "LintRuleKind",
+      "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "fn run(&self, track_id: String, workspace_root: PathBuf) -> Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError>"
-      ]
+      "found_type": true
     },
     {
-      "type_name": "PreCommitTypeSignalsInteractor",
-      "kind_tag": "interactor",
+      "type_name": "RenderContractMapCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "kind_tag": "error_type",
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "impl PreCommitTypeSignalsService"
+        "Display",
+        "Error",
+        "From<CatalogueLoaderError>",
+        "From<ContractMapWriterError>"
       ]
     },
     {
       "type_name": "CatalogueSpecSignalsWriter",
       "kind_tag": "secondary_port",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "fn write_catalogue_spec_signals(&self, track_id: &TrackId, layer_id: &str, doc: &CatalogueSpecSignalsDocument) -> Result<(), RepositoryError>"
-      ]
+      "found_type": true
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreCommitTypeSignalsService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SchemaExporterPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "fn export_as_json(&self, crate_name: &str) -> Result<String, String>"
-      ]
+      "found_type": true
     }
   ]
 }

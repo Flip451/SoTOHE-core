@@ -1,113 +1,17 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7419c7be02ef3d65326e0e196d99a75dc96245af79b7f232ecec477d12b0204d",
+  "catalogue_declaration_hash": "fb6801b94b6dad576e85da5c1260f579ac9dc8ac58e96bfa7e1cf1e7772dce0e",
   "signals": [
     {
-      "type_name": "Identifier",
+      "type_name": "ActionContradiction",
       "signal": "blue"
     },
     {
-      "type_name": "TypeName",
+      "type_name": "ActionContradictionKind",
       "signal": "blue"
     },
     {
-      "type_name": "TraitName",
-      "signal": "blue"
-    },
-    {
-      "type_name": "FieldName",
-      "signal": "blue"
-    },
-    {
-      "type_name": "MethodName",
-      "signal": "blue"
-    },
-    {
-      "type_name": "ParamName",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VariantName",
-      "signal": "blue"
-    },
-    {
-      "type_name": "CrateName",
-      "signal": "blue"
-    },
-    {
-      "type_name": "FunctionName",
-      "signal": "blue"
-    },
-    {
-      "type_name": "ModulePath",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TypeRef",
-      "signal": "blue"
-    },
-    {
-      "type_name": "FunctionPath",
-      "signal": "blue"
-    },
-    {
-      "type_name": "IdentifierError",
-      "signal": "blue"
-    },
-    {
-      "type_name": "DataRole",
-      "signal": "blue"
-    },
-    {
-      "type_name": "ContractRole",
-      "signal": "blue"
-    },
-    {
-      "type_name": "FunctionRole",
-      "signal": "blue"
-    },
-    {
-      "type_name": "ItemAction",
-      "signal": "blue"
-    },
-    {
-      "type_name": "SelfReceiver",
-      "signal": "blue"
-    },
-    {
-      "type_name": "CompositePattern",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VariantPayload",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TypeKindV2",
-      "signal": "yellow"
-    },
-    {
-      "type_name": "FieldDecl",
-      "signal": "blue"
-    },
-    {
-      "type_name": "VariantDecl",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TraitImplDeclV2",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TypeEntry",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TraitEntry",
-      "signal": "blue"
-    },
-    {
-      "type_name": "FunctionEntry",
+      "type_name": "AdrDecisionCommonError",
       "signal": "blue"
     },
     {
@@ -119,27 +23,111 @@
       "signal": "blue"
     },
     {
+      "type_name": "CatalogueLintViolation",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinterError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinterRule",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CompositePattern",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ConsistencyReport",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapRenderOptions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractRole",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CrateName",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DataRole",
+      "signal": "blue"
+    },
+    {
       "type_name": "ExtendedCrate",
       "signal": "blue"
     },
     {
-      "type_name": "Phase1Error",
+      "type_name": "FieldDecl",
       "signal": "blue"
     },
     {
-      "type_name": "SignalRegion",
+      "type_name": "FieldName",
       "signal": "blue"
     },
     {
-      "type_name": "ThreeWaySignalKind",
+      "type_name": "FunctionBaselineEntry",
       "signal": "blue"
     },
     {
-      "type_name": "ThreeWaySignal",
+      "type_name": "FunctionEntry",
       "signal": "blue"
     },
     {
-      "type_name": "ThreeWayEvaluationReport",
+      "type_name": "FunctionName",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FunctionNode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FunctionPath",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FunctionRole",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GenericArgsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "Identifier",
+      "signal": "blue"
+    },
+    {
+      "type_name": "IdentifierError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ItemAction",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LayerId",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MethodDeclaration",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MethodName",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ModulePath",
       "signal": "blue"
     },
     {
@@ -147,23 +135,63 @@
       "signal": "blue"
     },
     {
-      "type_name": "CatalogueToExtendedCratePort",
+      "type_name": "ParamDeclaration",
       "signal": "blue"
     },
     {
-      "type_name": "SignalEvaluatorPort",
+      "type_name": "ParamName",
       "signal": "blue"
     },
     {
-      "type_name": "TypeDefinitionKind",
+      "type_name": "Phase1Error",
       "signal": "blue"
     },
     {
-      "type_name": "TypeCatalogueDocument",
+      "type_name": "SelfReceiver",
       "signal": "blue"
     },
     {
-      "type_name": "TypeCatalogueEntry",
+      "type_name": "SignalRegion",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ThreeWayEvaluationReport",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ThreeWaySignal",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ThreeWaySignalKind",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitBaselineEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitImplBaselineEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitImplEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitName",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitNode",
       "signal": "blue"
     },
     {
@@ -175,15 +203,7 @@
       "signal": "blue"
     },
     {
-      "type_name": "TraitBaselineEntry",
-      "signal": "blue"
-    },
-    {
-      "type_name": "FunctionBaselineEntry",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TraitImplBaselineEntry",
+      "type_name": "TypeEntry",
       "signal": "blue"
     },
     {
@@ -191,60 +211,72 @@
       "signal": "blue"
     },
     {
+      "type_name": "TypeKindV2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeName",
+      "signal": "blue"
+    },
+    {
       "type_name": "TypeNode",
       "signal": "blue"
     },
     {
-      "type_name": "TraitNode",
+      "type_name": "TypeRef",
       "signal": "blue"
     },
     {
-      "type_name": "FunctionNode",
+      "type_name": "VariantDecl",
       "signal": "blue"
     },
     {
-      "type_name": "EnumVariantDeclaration",
+      "type_name": "VariantName",
       "signal": "blue"
     },
     {
-      "type_name": "MemberDeclaration",
+      "type_name": "VariantPayload",
       "signal": "blue"
     },
     {
-      "type_name": "TypeAction",
+      "type_name": "CatalogueLinter",
       "signal": "blue"
     },
     {
-      "type_name": "TypestateTransitions",
+      "type_name": "CatalogueLoader",
       "signal": "blue"
     },
     {
-      "type_name": "TraitImplDecl",
-      "signal": "blue"
-    },
-    {
-      "type_name": "ParamDeclaration",
-      "signal": "blue"
-    },
-    {
-      "type_name": "MethodDeclaration",
-      "signal": "blue"
-    },
-    {
-      "type_name": "ConsistencyReport",
+      "type_name": "CatalogueToExtendedCratePort",
       "signal": "blue"
     },
     {
       "type_name": "ContractMapWriter",
-      "signal": "yellow"
-    },
-    {
-      "type_name": "CatalogueLinter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "SchemaExporter",
-      "signal": "yellow"
+      "signal": "blue"
+    },
+    {
+      "type_name": "SignalEvaluatorPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::consistency::check_consistency",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::signals::evaluate_type_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::signals::undeclared_functions_to_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::signals::undeclared_to_signals",
+      "signal": "blue"
     }
   ]
 }

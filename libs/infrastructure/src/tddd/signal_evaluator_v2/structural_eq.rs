@@ -34,7 +34,7 @@ pub(super) fn items_structurally_equal(
     b: &Item,
     a_index: &HashMap<Id, Item>,
     b_index: &HashMap<Id, Item>,
-    crate_name: &str,
+    _crate_name: &str,
 ) -> bool {
     match (&a.inner, &b.inner) {
         (ItemEnum::Struct(sa), ItemEnum::Struct(sb)) => {
@@ -63,26 +63,41 @@ pub(super) fn items_structurally_equal(
         // inside an impl block produces a structural mismatch.
         (ItemEnum::Impl(ia), ItemEnum::Impl(ib)) => {
             use super::format::format_generic_args;
-            use super::normalize_impl_trait_path;
             if ia.is_unsafe != ib.is_unsafe || ia.is_negative != ib.is_negative {
                 return false;
             }
             let for_equal = format_type(&ia.for_) == format_type(&ib.for_);
-            // Normalize the trait path using the same rules as build_impl_identity_map:
-            // local traits (`crate::MyTrait`, `MyTrait`, `{crate_name}::MyTrait`) strip
-            // to their last segment so codec and rustdoc paths compare equal; external
-            // crate paths (`serde::Serialize`) are preserved verbatim.
+            // Normalize the trait path to a short-name form for structural equality.
+            //
+            // Identity-key matching (in `build_impl_identity_map`) already confirmed that
+            // S and C refer to the same trait — using `krate.paths` for disambiguation.
+            // Here we only need to confirm they are the same trait (not identical path
+            // strings), so we reduce to the short name + generic args.
+            //
+            // S-side (A-codec): generics embedded in path string with `args: None`
+            //   e.g. Path { path: "core::convert::From<CatalogueLoaderError>", args: None }
+            // C-side (rustdoc): base path in `path`, generics in `args`
+            //   e.g. Path { path: "From", args: Some(AngleBracketed(["CatalogueLoaderError"])) }
+            //
+            // Reducing both to `"From<CatalogueLoaderError>"` produces equality.
             let normalize_trait_path = |p: &rustdoc_types::Path| {
-                let normalized = normalize_impl_trait_path(&p.path, crate_name);
-                if let Some(args) = &p.args {
-                    let rendered = format_generic_args(args);
-                    if rendered.is_empty() {
-                        normalized
-                    } else {
-                        format!("{}<{}>", normalized, rendered)
-                    }
+                // Strip module prefix to get the short base name (last segment).
+                // Also strip any generic suffix embedded in the path string so we can
+                // compare it with the `args`-derived suffix.
+                let last_seg = p.path.rsplit("::").next().unwrap_or(p.path.as_str());
+                // A-side codec form: generics embedded in the path string with args = None.
+                // Keep the entire last segment (including `<...>` suffix) as-is.
+                if p.args.is_none() {
+                    last_seg.to_string()
                 } else {
-                    normalized
+                    // C-side rustdoc form: base in path, generics in args.
+                    let base = last_seg.split('<').next().unwrap_or(last_seg);
+                    let rendered = p.args.as_deref().map_or(String::new(), format_generic_args);
+                    if rendered.is_empty() {
+                        base.to_string()
+                    } else {
+                        format!("{base}<{rendered}>")
+                    }
                 }
             };
             let trait_equal = ia.trait_.as_ref().map(normalize_trait_path)

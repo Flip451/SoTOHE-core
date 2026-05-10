@@ -5,6 +5,17 @@
 //! `domain::ConfidenceSignal`, `domain::ContentHash`, or
 //! `domain::evaluate_catalogue_entry_signal` directly (CN-01 / AC-03).
 //!
+//! Supports both v2 (`TypeCatalogueDocument`) and v3 (`CatalogueDocument`)
+//! catalogue formats. For v2, per-entry signals are computed from `spec_refs[]`
+//! and `informal_grounds[]` via `evaluate_catalogue_entry_signal`. For v3,
+//! entries carry no `spec_refs` or `informal_grounds` at the catalogue level;
+//! spec traceability is validated separately by `verify-spec-states-current`.
+//! The refresher therefore emits `Blue` for every v3 entry — the
+//! catalogue-spec-signal gate (in both non-strict CI and strict merge gate modes)
+//! treats `Blue` as fully satisfied.  The spec traceability responsibility
+//! has been externalized from per-entry spec_refs[] to the spec_states gate,
+//! which is the appropriate place for v3 catalogues.
+//!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
 //! §D2 / §D3.1 / IN-09.
 
@@ -16,6 +27,7 @@ use domain::{
 };
 
 use crate::tddd::catalogue_codec;
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -111,12 +123,86 @@ pub fn refresh_one_layer(
         format!("cannot read catalogue '{}' for layer '{layer_id}': {e}", catalogue_path.display())
     })?;
 
-    // Decode to TypeCatalogueDocument.
     let text = std::str::from_utf8(&bytes).map_err(|e| {
         format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
     })?;
-    let catalogue = catalogue_codec::decode(text)
-        .map_err(|e| format!("cannot decode catalogue '{}': {e}", catalogue_path.display()))?;
+
+    // Derive the filename stem (e.g. "domain" from "domain-types.json") for
+    // CatalogueDocumentCodec::decode, which validates crate_name against it.
+    let filename_stem = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("")
+        .strip_suffix("-types.json")
+        .map(str::to_owned)
+        .unwrap_or_else(|| {
+            catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()
+        });
+
+    // Try v3 codec first (CatalogueDocument); fall back to v2 (TypeCatalogueDocument).
+    // For v3 entries, `spec_refs` and `informal_grounds` do not exist at the
+    // catalogue level — spec traceability is validated by
+    // `verify-spec-states-current` instead.  The refresher emits `Blue` for
+    // every v3 entry: Blue passes both the non-strict CI gate and the strict
+    // merge gate (`check_catalogue_spec_signals` with `strict=true` in
+    // `check_strict_merge_gate`).  Using Red or Yellow would hard-fail the
+    // gate for every v3 layer even when spec traceability is otherwise sound.
+    let signals: Vec<CatalogueSpecSignal> =
+        match CatalogueDocumentCodec::decode(text, &filename_stem) {
+            Ok(v3_doc) => {
+                // v3: enumerate all entries across the three BTreeMaps.
+                // No per-entry spec_refs / informal_grounds → Blue (spec
+                // traceability externalized to verify-spec-states-current).
+                let mut sigs: Vec<CatalogueSpecSignal> = Vec::new();
+                for type_name in v3_doc.types.keys() {
+                    sigs.push(CatalogueSpecSignal::new(type_name.as_str(), ConfidenceSignal::Blue));
+                }
+                for trait_name in v3_doc.traits.keys() {
+                    sigs.push(CatalogueSpecSignal::new(
+                        trait_name.as_str(),
+                        ConfidenceSignal::Blue,
+                    ));
+                }
+                for fn_path in v3_doc.functions.keys() {
+                    // Cross-crate functions are excluded from the stub by
+                    // `v3_doc_to_stub` (same filter: `fn_path.crate_name !=
+                    // doc.crate_name`).  The signal evaluator never emits a
+                    // signal for them because `build_function_identity_map`
+                    // skips non-local items (`crate_id != 0`).  Emitting a
+                    // Blue signal here for cross-crate functions would produce
+                    // an entry count/order mismatch between the signals file
+                    // and the stub used by `check_catalogue_spec_signals`,
+                    // causing valid v3 tracks to fail verification.
+                    if fn_path.crate_name != v3_doc.crate_name {
+                        continue;
+                    }
+                    sigs.push(CatalogueSpecSignal::new(
+                        fn_path.to_string(),
+                        ConfidenceSignal::Blue,
+                    ));
+                }
+                sigs
+            }
+            Err(_) => {
+                // Fall back to v2 codec (TypeCatalogueDocument with spec_refs /
+                // informal_grounds). This path handles existing v2 catalogues from
+                // tracks authored before the schema_version = 3 migration.
+                let catalogue = catalogue_codec::decode(text).map_err(|e| {
+                    format!("cannot decode catalogue '{}': {e}", catalogue_path.display())
+                })?;
+                catalogue
+                    .entries()
+                    .iter()
+                    .map(|entry| {
+                        let signal = evaluate_catalogue_entry_signal(
+                            entry.spec_refs(),
+                            entry.informal_grounds(),
+                        );
+                        CatalogueSpecSignal::new(entry.name(), signal)
+                    })
+                    .collect()
+            }
+        };
 
     // Compute raw-bytes SHA-256 (same canonical-hash helper as merge_gate_adapter).
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
@@ -124,17 +210,6 @@ pub fn refresh_one_layer(
         ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
             format!("internal: catalogue hash for layer '{layer_id}' is not canonical hex: {e}")
         })?;
-
-    // Evaluate per-entry signals via the domain pure function.
-    let signals: Vec<CatalogueSpecSignal> = catalogue
-        .entries()
-        .iter()
-        .map(|entry| {
-            let signal =
-                evaluate_catalogue_entry_signal(entry.spec_refs(), entry.informal_grounds());
-            CatalogueSpecSignal::new(entry.name(), signal)
-        })
-        .collect();
 
     // Summary counts for stdout (same pattern as `sotp track type-signals`).
     let (blue, yellow, red) = count_signals(&signals);

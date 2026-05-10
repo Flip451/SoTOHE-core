@@ -1,17 +1,13 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3ffd86ace9daee5952726ca790461ba068509afbdf7de4af379817dfc985ff57",
+  "catalogue_declaration_hash": "cbf8c313ec891b1be97fe77fba0ef5085127809140cdece59005dbd93883e938",
   "signals": [
     {
-      "type_name": "CatalogueDocumentCodecError",
+      "type_name": "BaselineCodecError",
       "signal": "blue"
     },
     {
-      "type_name": "CatalogueToExtendedCrateCodecError",
-      "signal": "blue"
-    },
-    {
-      "type_name": "CatalogueToExtendedCrateCodec",
+      "type_name": "BaselineRustdocCodec",
       "signal": "blue"
     },
     {
@@ -19,31 +15,39 @@
       "signal": "blue"
     },
     {
-      "type_name": "SignalEvaluatorV2",
+      "type_name": "CatalogueDocumentCodec",
       "signal": "blue"
     },
     {
-      "type_name": "SchemaExportCodecError",
+      "type_name": "CatalogueDocumentCodecError",
       "signal": "blue"
     },
     {
-      "type_name": "TypeCatalogueCodecError",
+      "type_name": "CatalogueToExtendedCrateCodec",
       "signal": "blue"
     },
     {
-      "type_name": "BaselineCodecError",
+      "type_name": "CatalogueToExtendedCrateCodecError",
       "signal": "blue"
     },
     {
-      "type_name": "FsCatalogueLoader",
+      "type_name": "ClusterPlan",
       "signal": "blue"
     },
     {
-      "type_name": "CatalogueLoader",
+      "type_name": "CrossEdge",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EdgeSet",
       "signal": "blue"
     },
     {
       "type_name": "EvaluateSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsCatalogueLoader",
       "signal": "blue"
     },
     {
@@ -59,7 +63,111 @@
       "signal": "blue"
     },
     {
+      "type_name": "LoadAllCataloguesError",
+      "signal": "blue"
+    },
+    {
       "type_name": "RustdocSchemaExporter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SchemaExportCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SignalEvaluatorV2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SignalSummary",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeGraphExportError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeGraphRenderOptions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::code_profile_builder::build_type_graph",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_builder::build_baseline",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::capture_baseline_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_codec::decode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_codec::encode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_cluster::classify_types",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_export::execute_type_graph_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_clustered",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_flat",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_overview",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::write_type_graph_dir",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::write_type_graph_file",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::evaluate_and_write_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::consistency_report_to_findings",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components",
       "signal": "blue"
     }
   ]

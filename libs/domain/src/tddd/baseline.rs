@@ -20,6 +20,10 @@
 //!   by fully-qualified name (e.g. `"crate::module::fn_name"`). String key is
 //!   used here (vs the in-memory tuple key in `TypeGraph`) so that JSON
 //!   serialization in T007 `baseline_codec` can use a plain object key.
+//!
+//! T008: this module is private (no pub re-export from lib.rs). The types are
+//! retained to avoid full deletion before the follow-up cleanup track.
+#![allow(dead_code)]
 
 use std::collections::HashMap;
 

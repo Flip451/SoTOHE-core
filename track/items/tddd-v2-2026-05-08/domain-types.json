@@ -1,2074 +1,848 @@
 {
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "Identifier",
-      "description": "Common base newtype for Rust identifier validation: non-empty, no leading digit, ASCII alphanumeric+underscore only. Shared validation base for TypeName, TraitName, FieldName, MethodName, ParamName, VariantName, CrateName, FunctionName (ADR 1 D5).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "CatalogueDocument": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "New top-level catalogue document schema. Fields: schema_version (u32), crate_name (CrateName), layer (LayerId), types (BTreeMap<TypeName,TypeEntry>), traits (BTreeMap<TraitName,TraitEntry>), functions (BTreeMap<FunctionPath,FunctionEntry>). 1 file = 1 crate = 1 layer (ADR 1 D1 / D6)."
     },
-    {
-      "name": "TypeName",
-      "description": "Newtype around Identifier for type short names (last segment, no '::' separator). BTreeMap key in CatalogueDocument::types map (ADR 1 D5 / D11).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-02",
-          "hash": "92111963ca861ce02a5f08ab16bcb8963f1fea7cfa033a9810c34d86292a6f13"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "TraitName",
-      "description": "Newtype around Identifier for trait short names. BTreeMap key in CatalogueDocument::traits map (ADR 1 D5 / D11).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-02",
-          "hash": "92111963ca861ce02a5f08ab16bcb8963f1fea7cfa033a9810c34d86292a6f13"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "FieldName",
-      "description": "Newtype around Identifier for struct field names used in FieldDecl (ADR 1 D5).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "MethodName",
-      "description": "Newtype around Identifier for method names in MethodDeclaration and CompositePattern::TypestateState::transition_methods (ADR 1 D5 / D3).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "ParamName",
-      "description": "Newtype around Identifier for function/method parameter names in ParamDeclaration (ADR 1 D5).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "VariantName",
-      "description": "Newtype around Identifier for enum variant names in VariantDecl (ADR 1 D5).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "CrateName",
-      "description": "Newtype around Identifier for crate names. Used in FunctionPath::crate_name and TraitImplDeclV2::origin_crate (ADR 1 D5 / D10).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-02",
-          "hash": "92111963ca861ce02a5f08ab16bcb8963f1fea7cfa033a9810c34d86292a6f13"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "FunctionName",
-      "description": "Newtype around Identifier for function names in FunctionPath (ADR 1 D5 / D11).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "ModulePath",
-      "description": "Newtype wrapping Vec<Identifier> for module path segment lists. serde default = empty vec (= crate root). Used in TypeEntry, TraitEntry, FunctionPath (ADR 1 D5 / D7).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "TypeRef",
-      "description": "Newtype wrapping String for generics-inclusive type reference strings (e.g. 'Result<Option<User>, DomainError>', 'std::HashMap<String, u32>', 'domain_core::UserId'). Allows angle brackets, commas, and '::' for crate-prefixed cross-crate references (ADR 2 D11). Distinct from Identifier (ADR 1 D5).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
-    },
-    {
-      "name": "FunctionPath",
-      "description": "Full-path key for FunctionEntry BTreeMap: crate_name + module_path (serde default=empty) + name. Cross-workspace functions use crate name prefix directly (no '::' prefix; no 'crate::' prefix) per ADR 1 D11.",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "crate_name",
-          "ty": "CrateName"
-        },
-        {
-          "kind": "field",
-          "name": "module_path",
-          "ty": "ModulePath"
-        },
-        {
-          "kind": "field",
-          "name": "name",
-          "ty": "FunctionName"
-        }
+    "CatalogueDocumentError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "CrateNameMismatch" },
+          { "name": "DuplicateTypeName" },
+          { "name": "DuplicateTraitName" },
+          { "name": "DuplicateFunctionPath" },
+          { "name": "InvalidIdentifier" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-02",
-          "hash": "92111963ca861ce02a5f08ab16bcb8963f1fea7cfa033a9810c34d86292a6f13"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
+      "docs": "Error for CatalogueDocument validation (ADR 1 D6)."
     },
-    {
-      "name": "IdentifierError",
-      "description": "Error type for Identifier and all newtype wrappers around it. 4 variants: Empty (identifier string was empty) / InvalidCharacters(String) (contains chars outside ASCII alphanumeric+underscore or starts with digit) / InvalidSegment(String) (module path segment invalid) / InvalidFunctionPath(String) (FunctionPath string format invalid) (ADR 1 D5).",
-      "approved": true,
-      "kind": "error_type",
-      "expected_variants": [
-        {
-          "name": "Empty",
-          "payload_types": []
-        },
-        {
-          "name": "InvalidCharacters",
-          "payload_types": [
-            "String"
-          ]
-        },
-        {
-          "name": "InvalidSegment",
-          "payload_types": [
-            "String"
-          ]
-        },
-        {
-          "name": "InvalidFunctionPath",
-          "payload_types": [
-            "String"
-          ]
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-03",
-          "hash": "bdf53d2c0f6a19875dfaffd453db0cfe02cda7a3d381f2fae53d37880ea94309"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-03",
-          "hash": "0752b47847316fdfb6e0831cc9b963e9ac477c5d86989aa2b6e6bfb6e1332b9e"
-        }
-      ]
+    "CompositePattern": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Plain" },
+          { "name": "TypestateState", "payload": { "kind": "struct", "fields": [{ "name": "of", "ty": "TypeName" }, { "name": "transition_methods", "ty": "Vec<MethodName>" }] } },
+          { "name": "Newtype", "payload": { "kind": "struct", "fields": [{ "name": "inner", "ty": "TypeRef" }] } }
+        ]
+      },
+      "docs": "Pattern for TypeKindV2::Struct (ADR 1 D3 / D7)."
     },
-    {
-      "name": "DataRole",
-      "description": "Role enum for TypeEntry (struct / enum / type alias). 13 values: ValueObject / Entity / AggregateRoot / DomainService / Specification / Factory / UseCase / Interactor / Command / Query / Dto / ErrorType / SecondaryAdapter. TypeEntry only accepts DataRole; ContractRole on TypeEntry is a parse-time type error (ADR 1 D2).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "ValueObject",
-          "payload_types": []
-        },
-        {
-          "name": "Entity",
-          "payload_types": []
-        },
-        {
-          "name": "AggregateRoot",
-          "payload_types": []
-        },
-        {
-          "name": "DomainService",
-          "payload_types": []
-        },
-        {
-          "name": "Specification",
-          "payload_types": []
-        },
-        {
-          "name": "Factory",
-          "payload_types": []
-        },
-        {
-          "name": "UseCase",
-          "payload_types": []
-        },
-        {
-          "name": "Interactor",
-          "payload_types": []
-        },
-        {
-          "name": "Command",
-          "payload_types": []
-        },
-        {
-          "name": "Query",
-          "payload_types": []
-        },
-        {
-          "name": "Dto",
-          "payload_types": []
-        },
-        {
-          "name": "ErrorType",
-          "payload_types": []
-        },
-        {
-          "name": "SecondaryAdapter",
-          "payload_types": []
-        }
+    "CrateName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-02",
-          "hash": "5f15f5e0d2e87c0bdfe830f915cb37b172807868780cb8166c289ac1c9d2a0c4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Newtype around Identifier for crate names (ADR 1 D5)."
     },
-    {
-      "name": "ContractRole",
-      "description": "Role enum for TraitEntry. 3 values: SpecificationPort / ApplicationService / SecondaryPort. Attaching ContractRole to TypeEntry is a parse-time type error (ADR 1 D2).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "SpecificationPort",
-          "payload_types": []
-        },
-        {
-          "name": "ApplicationService",
-          "payload_types": []
-        },
-        {
-          "name": "SecondaryPort",
-          "payload_types": []
-        }
+    "DataRole": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ValueObject" },
+          { "name": "Entity" },
+          { "name": "AggregateRoot" },
+          { "name": "DomainService" },
+          { "name": "Specification" },
+          { "name": "Factory" },
+          { "name": "UseCase" },
+          { "name": "Interactor" },
+          { "name": "Command" },
+          { "name": "Query" },
+          { "name": "Dto" },
+          { "name": "ErrorType" },
+          { "name": "SecondaryAdapter" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" },
+        { "trait_name": "TryFrom", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-02",
-          "hash": "5f15f5e0d2e87c0bdfe830f915cb37b172807868780cb8166c289ac1c9d2a0c4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Role enum for TypeEntry (struct / enum / type alias). 13 values (ADR 1 D2)."
     },
-    {
-      "name": "FunctionRole",
-      "description": "Role enum for FunctionEntry. 2 values: FreeFunction / UseCaseFunction (ADR 1 D2).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "FreeFunction",
-          "payload_types": []
-        },
-        {
-          "name": "UseCaseFunction",
-          "payload_types": []
-        }
+    "ContractRole": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "SpecificationPort" },
+          { "name": "ApplicationService" },
+          { "name": "SecondaryPort" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" },
+        { "trait_name": "TryFrom", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-02",
-          "hash": "5f15f5e0d2e87c0bdfe830f915cb37b172807868780cb8166c289ac1c9d2a0c4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Role enum for TraitEntry. 3 values (ADR 1 D2)."
     },
-    {
-      "name": "ItemAction",
-      "description": "Action for each catalogue entry. 4 values: Add / Modify / Reference / Delete. Replaces TypeAction. Serde default = Add. Inherit semantics from TDDD-03 (ADR 1 D4).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Add",
-          "payload_types": []
-        },
-        {
-          "name": "Modify",
-          "payload_types": []
-        },
-        {
-          "name": "Reference",
-          "payload_types": []
-        },
-        {
-          "name": "Delete",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+    "ExtendedCrate": {
+      "action": "add",
+      "role": "DomainService",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "TypeGraph A / S: rustdoc_types::Crate extended with per-Item action (ADR 2 D2)."
     },
-    {
-      "name": "SelfReceiver",
-      "description": "Enum for MethodDeclaration receiver. 3 values: Owned (self) / SharedRef (&self) / ExclusiveRef (&mut self). Option<SelfReceiver> = None means associated function (no self receiver) (ADR 1 D8).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Owned",
-          "payload_types": []
-        },
-        {
-          "name": "SharedRef",
-          "payload_types": []
-        },
-        {
-          "name": "ExclusiveRef",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-05",
-          "hash": "6dbbf76a99bf54f7b0dc817a4315ea9376631d47875be50d8a0eb774281683a3"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+    "FieldDecl": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "name", "ty": "FieldName" },
+          { "name": "ty", "ty": "TypeRef" }
+        ]
+      },
+      "docs": "Struct field declaration: name (FieldName) and type (TypeRef) (ADR 1 D7)."
     },
-    {
-      "name": "CompositePattern",
-      "description": "Pattern for TypeKind::Struct (ADR 1 D3 / D7). 3 variants: Plain (no special pattern) / TypestateState { of: TypeName, transition_methods: Vec<MethodName> } (typestate state with transition method references) / Newtype { inner: TypeRef } (newtype wrapper). Struct payload encodes Pattern x Kind constraint at schema level.",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Plain",
-          "payload_types": []
-        },
-        {
-          "name": "TypestateState",
-          "payload_types": [
-            "TypeName",
-            "Vec<MethodName>"
-          ]
-        },
-        {
-          "name": "Newtype",
-          "payload_types": [
-            "TypeRef"
-          ]
-        }
+    "FieldName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Newtype around Identifier for struct field names (ADR 1 D5)."
     },
-    {
-      "name": "VariantPayload",
-      "description": "Payload for VariantDecl. 3 variants: Unit (no payload, serde default) / Tuple(Vec<TypeRef>) (unnamed field list) / Struct(Vec<FieldDecl>) (named field list). Supersedes EnumVariantDeclaration::payload_types Vec<String> (ADR 1 D12). Serde default = Unit when payload field is omitted.",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Unit",
-          "payload_types": []
-        },
-        {
-          "name": "Tuple",
-          "payload_types": [
-            "Vec<TypeRef>"
-          ]
-        },
-        {
-          "name": "Struct",
-          "payload_types": [
-            "Vec<FieldDecl>"
-          ]
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-04",
-          "hash": "c30752c82807d15e127b6f8888aa2167d9e2ac296ca9d72517077e14f30fdae4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-02",
-          "hash": "848901c873993cf1f7802b1b6e5e4d549f23a17befaad5745a62b9b50934abc2"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "GO-04",
-          "hash": "2c75178cc1784527a3c2a0c716352147ea58cd56cae8e9ef6b07a0e46e9245f6"
-        }
-      ]
+    "FunctionEntry": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "action", "ty": "ItemAction" },
+          { "name": "role", "ty": "FunctionRole" },
+          { "name": "params", "ty": "Vec<ParamDeclaration>" },
+          { "name": "returns", "ty": "TypeRef" },
+          { "name": "is_async", "ty": "bool" },
+          { "name": "docs", "ty": "Option<String>" }
+        ]
+      },
+      "docs": "Entry in CatalogueDocument::functions BTreeMap (ADR 1 D7)."
     },
-    {
-      "name": "TypeKindV2",
-      "description": "Language-level kind for TypeEntry (new name to avoid collision with domain::schema::TypeKind being deleted). 3 variants payload-encoded: Struct { pattern: CompositePattern, fields: Vec<FieldDecl> } / Enum { variants: Vec<VariantDecl> } / TypeAlias { target: TypeRef }. Struct is the only variant that carries CompositePattern (ADR 1 D3 / D7).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Struct",
-          "payload_types": [
-            "CompositePattern",
-            "Vec<FieldDecl>"
-          ]
-        },
-        {
-          "name": "Enum",
-          "payload_types": [
-            "Vec<VariantDecl>"
-          ]
-        },
-        {
-          "name": "TypeAlias",
-          "payload_types": [
-            "TypeRef"
-          ]
-        }
+    "FunctionName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "Named TypeKindV2 in catalogue to avoid name collision with domain::schema::TypeKind (declared as delete below). In implementation the module separation (tddd::catalogue vs schema) disambiguates; the catalogue uses short names as keys so both would appear as TypeKind. This suffix avoids the collision at the catalogue level."
-        }
-      ]
+      "docs": "Newtype around Identifier for function names (ADR 1 D5)."
     },
-    {
-      "name": "FieldDecl",
-      "description": "Struct field declaration: name (FieldName) and type (TypeRef). Used in TypeKindV2::Struct::fields and VariantPayload::Struct (ADR 1 D7).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "name",
-          "ty": "FieldName"
-        },
-        {
-          "kind": "field",
-          "name": "ty",
-          "ty": "TypeRef"
-        }
+    "FunctionPath": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "crate_name", "ty": "CrateName" },
+          { "name": "module_path", "ty": "ModulePath" },
+          { "name": "name", "ty": "FunctionName" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
       ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Full-path key for FunctionEntry BTreeMap (ADR 1 D5 / D11)."
     },
-    {
-      "name": "VariantDecl",
-      "description": "Enum variant declaration: name (VariantName) and payload (VariantPayload, serde default = Unit). Replaces EnumVariantDeclaration (ADR 1 D12).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "name",
-          "ty": "VariantName"
-        },
-        {
-          "kind": "field",
-          "name": "payload",
-          "ty": "VariantPayload"
-        }
+    "FunctionRole": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FreeFunction" },
+          { "name": "UseCaseFunction" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" },
+        { "trait_name": "TryFrom", "origin_crate": "core" }
       ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-04",
-          "hash": "c30752c82807d15e127b6f8888aa2167d9e2ac296ca9d72517077e14f30fdae4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-02",
-          "hash": "848901c873993cf1f7802b1b6e5e4d549f23a17befaad5745a62b9b50934abc2"
-        }
-      ]
+      "docs": "Role enum for FunctionEntry. 2 values (ADR 1 D2)."
     },
-    {
-      "name": "TraitImplDeclV2",
-      "description": "New trait implementation declaration: trait identity only (trait_name: TraitName, origin_crate: CrateName). No methods field — trait/impl signature alignment delegated to Rust compiler (ADR 1 D10). Replaces old TraitImplDecl.",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "trait_name",
-          "ty": "TraitName"
-        },
-        {
-          "kind": "field",
-          "name": "origin_crate",
-          "ty": "CrateName"
-        }
+    "GenericArgsError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty" },
+          { "name": "StartsWithAngleBracket" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-05",
-          "hash": "6dbbf76a99bf54f7b0dc817a4315ea9376631d47875be50d8a0eb774281683a3"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-07",
-          "hash": "412bc8a9fd3d8b12b73a4e4f13df1b7a6dd4429f95734b18b78e7b69156124c7"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Validation error for TraitImplDeclV2::new_with_generic_args. Rejects empty/whitespace-only strings and strings that start with `<` (already-bracketed form)."
     },
-    {
-      "name": "TypeEntry",
-      "description": "Entry in CatalogueDocument::types BTreeMap. Fields: action (ItemAction), role (DataRole), kind (TypeKindV2), methods (Vec<MethodDeclaration>), trait_impls (Vec<TraitImplDeclV2>), module_path (ModulePath, serde default=empty), docs (Option<String>). TypeEntry only accepts DataRole (ADR 1 D7).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "action",
-          "ty": "ItemAction"
-        },
-        {
-          "kind": "field",
-          "name": "role",
-          "ty": "DataRole"
-        },
-        {
-          "kind": "field",
-          "name": "kind",
-          "ty": "TypeKindV2"
-        },
-        {
-          "kind": "field",
-          "name": "methods",
-          "ty": "Vec<MethodDeclaration>"
-        },
-        {
-          "kind": "field",
-          "name": "trait_impls",
-          "ty": "Vec<TraitImplDeclV2>"
-        },
-        {
-          "kind": "field",
-          "name": "module_path",
-          "ty": "ModulePath"
-        },
-        {
-          "kind": "field",
-          "name": "docs",
-          "ty": "Option<String>"
-        }
+    "Identifier": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "String" } },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
       ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Common base newtype for Rust identifier validation (ADR 1 D5)."
     },
-    {
-      "name": "TraitEntry",
-      "description": "Entry in CatalogueDocument::traits BTreeMap. Fields: action (ItemAction), role (ContractRole), methods (Vec<MethodDeclaration>), module_path (ModulePath, serde default=empty), docs (Option<String>) (ADR 1 D7).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "action",
-          "ty": "ItemAction"
-        },
-        {
-          "kind": "field",
-          "name": "role",
-          "ty": "ContractRole"
-        },
-        {
-          "kind": "field",
-          "name": "methods",
-          "ty": "Vec<MethodDeclaration>"
-        },
-        {
-          "kind": "field",
-          "name": "module_path",
-          "ty": "ModulePath"
-        },
-        {
-          "kind": "field",
-          "name": "docs",
-          "ty": "Option<String>"
-        }
+    "IdentifierError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty" },
+          { "name": "InvalidCharacters", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidSegment", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidFunctionPath", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-05",
-          "hash": "6dbbf76a99bf54f7b0dc817a4315ea9376631d47875be50d8a0eb774281683a3"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Error type for Identifier and all newtype wrappers around it (ADR 1 D5)."
     },
-    {
-      "name": "FunctionEntry",
-      "description": "Entry in CatalogueDocument::functions BTreeMap. Fields: action (ItemAction), role (FunctionRole), params (Vec<ParamDeclaration>), returns (TypeRef), is_async (bool), docs (Option<String>) (ADR 1 D7).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "action",
-          "ty": "ItemAction"
-        },
-        {
-          "kind": "field",
-          "name": "role",
-          "ty": "FunctionRole"
-        },
-        {
-          "kind": "field",
-          "name": "params",
-          "ty": "Vec<ParamDeclaration>"
-        },
-        {
-          "kind": "field",
-          "name": "returns",
-          "ty": "TypeRef"
-        },
-        {
-          "kind": "field",
-          "name": "is_async",
-          "ty": "bool"
-        },
-        {
-          "kind": "field",
-          "name": "docs",
-          "ty": "Option<String>"
-        }
+    "ItemAction": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Add" },
+          { "name": "Modify" },
+          { "name": "Reference" },
+          { "name": "Delete" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" },
+        { "trait_name": "TryFrom", "origin_crate": "core" }
       ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-05",
-          "hash": "6dbbf76a99bf54f7b0dc817a4315ea9376631d47875be50d8a0eb774281683a3"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
+      "docs": "Action for each catalogue entry. 4 values (ADR 1 D4)."
     },
-    {
-      "name": "CatalogueDocument",
-      "description": "New top-level catalogue document schema. Fields: schema_version (u32), crate_name (CrateName), layer (LayerId), types (BTreeMap<TypeName,TypeEntry>), traits (BTreeMap<TraitName,TraitEntry>), functions (BTreeMap<FunctionPath,FunctionEntry>). 1 file = 1 crate = 1 layer (ADR 1 D1 / D6). crate_name validated against filename <crate_name>-types.json. layer uses LayerId newtype (architecture-rules.json driven, ADR 2026-04-17-1528-tddd-contract-map §D1).",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "schema_version",
-          "ty": "u32"
-        },
-        {
-          "kind": "field",
-          "name": "crate_name",
-          "ty": "CrateName"
-        },
-        {
-          "kind": "field",
-          "name": "layer",
-          "ty": "LayerId"
-        },
-        {
-          "kind": "field",
-          "name": "types",
-          "ty": "BTreeMap<TypeName, TypeEntry>"
-        },
-        {
-          "kind": "field",
-          "name": "traits",
-          "ty": "BTreeMap<TraitName, TraitEntry>"
-        },
-        {
-          "kind": "field",
-          "name": "functions",
-          "ty": "BTreeMap<FunctionPath, FunctionEntry>"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-06",
-          "hash": "a142a004cad044aa254c3511a93e2f4ea95246ff21f9ec57282a765a7ec3a58c"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-01",
-          "hash": "d11a832564dc2644d4ac3af5eb6f90528472c742d39c4a36400dd2f62f80d5b9"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
-    },
-    {
-      "name": "CatalogueDocumentError",
-      "description": "Error for CatalogueDocument validation: CrateNameMismatch (filename vs crate_name field) / DuplicateTypeName / DuplicateTraitName / DuplicateFunctionPath / InvalidIdentifier (ADR 1 D6).",
-      "approved": true,
-      "kind": "error_type",
-      "expected_variants": [
-        {
-          "name": "CrateNameMismatch",
-          "payload_types": []
-        },
-        {
-          "name": "DuplicateTypeName",
-          "payload_types": []
-        },
-        {
-          "name": "DuplicateTraitName",
-          "payload_types": []
-        },
-        {
-          "name": "DuplicateFunctionPath",
-          "payload_types": []
-        },
-        {
-          "name": "InvalidIdentifier",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-06",
-          "hash": "a142a004cad044aa254c3511a93e2f4ea95246ff21f9ec57282a765a7ec3a58c"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
-    },
-    {
-      "name": "ExtendedCrate",
-      "description": "TypeGraph A / S: rustdoc_types::Crate extended with per-Item action. Private fields krate (Crate) and item_actions (BTreeMap<Id, ItemAction>) are accessed via constructor + accessor methods (no public fields). B / C / D are pure rustdoc_types::Crate (no wrapper needed). (ADR 2 D2).",
-      "approved": true,
+    "MethodDeclaration": {
       "action": "modify",
-      "kind": "domain_service",
-      "expected_members": [],
-      "expected_methods": [
-        {
-          "name": "new",
-          "params": [
-            {
-              "name": "krate",
-              "ty": "Crate"
-            },
-            {
-              "name": "item_actions",
-              "ty": "BTreeMap<Id, ItemAction>"
-            }
-          ],
-          "returns": "ExtendedCrate",
-          "is_async": false
-        },
-        {
-          "name": "krate",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&Crate",
-          "is_async": false
-        },
-        {
-          "name": "item_actions",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&BTreeMap<Id, ItemAction>",
-          "is_async": false
-        },
-        {
-          "name": "action_for",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "id",
-              "ty": "&Id"
-            }
-          ],
-          "returns": "Option<ItemAction>",
-          "is_async": false
-        },
-        {
-          "name": "into_parts",
-          "receiver": "self",
-          "params": [],
-          "returns": "(Crate, BTreeMap<Id, ItemAction>)",
-          "is_async": false
-        }
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "name", "ty": "MethodName" },
+          { "name": "receiver", "ty": "Option<SelfReceiver>" },
+          { "name": "params", "ty": "Vec<ParamDeclaration>" },
+          { "name": "returns", "ty": "TypeRef" },
+          { "name": "is_async", "ty": "bool" },
+          { "name": "docs", "ty": "Option<String>" }
+        ]
+      },
+      "docs": "Method declaration with SelfReceiver enum for receiver and optional docs (ADR 1 D8 / D9)."
+    },
+    "MethodName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-07",
-          "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-04",
-          "hash": "7b6153d5a463cbf878682c66f0b18ee40fef3336997e5f8fcceb26070101585a"
-        }
-      ]
+      "docs": "Newtype around Identifier for method names (ADR 1 D5)."
     },
-    {
-      "name": "Phase1Error",
-      "description": "Error for Phase 1 S/D construction. Variants: ActionContradiction (add with existing B / modify|reference|delete without B) / UnresolvedTypeRef (closed-world check failure) / DanglingId (dangling Id after unresolved marker resolution) (ADR 3 D2).",
-      "approved": true,
-      "kind": "error_type",
-      "expected_variants": [
-        {
-          "name": "ActionContradiction",
-          "payload_types": [
-            "String"
-          ]
-        },
-        {
-          "name": "UnresolvedTypeRef",
-          "payload_types": [
-            "String"
-          ]
-        },
-        {
-          "name": "DanglingId",
-          "payload_types": [
-            "String"
-          ]
-        }
+    "ModulePath": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Vec<Identifier>" } },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-11",
-          "hash": "d0ea1d981961bf5ada665db6672d594033744de132e7c3ea93d978efa80801f0"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-07",
-          "hash": "7a0f122276f20ca61b084f8886e3afe50a694d0516c0b9900b1d83e82a4ae39a"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-06",
-          "hash": "6558636150f07300299a7009a74954f44210a646fbc656e6a6e87535165eebbc"
-        }
-      ]
+      "docs": "Newtype wrapping Vec<Identifier> for module path segment lists (ADR 1 D5 / D7)."
     },
-    {
-      "name": "SignalRegion",
-      "description": "Enum encoding 12 variants representing the evaluation regions from ADR 3 D3 Phase 2 3-way table (11 logical rows; the 'S∩C+Match' row is split into Add and Modify variants): SIntersectC_Match_Add / SIntersectC_Match_Modify / SIntersectC_Match_Reference / SIntersectC_Mismatch_Reference / SIntersectC_Mismatch_Add / SIntersectC_Mismatch_Modify / SMinusC_Reference / SMinusC_Add / SMinusC_Modify / DIntersectC / DMinusC / CMinusSUnionD.",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "SIntersectC_Match_Add",
-          "payload_types": []
-        },
-        {
-          "name": "SIntersectC_Match_Modify",
-          "payload_types": []
-        },
-        {
-          "name": "SIntersectC_Match_Reference",
-          "payload_types": []
-        },
-        {
-          "name": "SIntersectC_Mismatch_Reference",
-          "payload_types": []
-        },
-        {
-          "name": "SIntersectC_Mismatch_Add",
-          "payload_types": []
-        },
-        {
-          "name": "SIntersectC_Mismatch_Modify",
-          "payload_types": []
-        },
-        {
-          "name": "SMinusC_Reference",
-          "payload_types": []
-        },
-        {
-          "name": "SMinusC_Add",
-          "payload_types": []
-        },
-        {
-          "name": "SMinusC_Modify",
-          "payload_types": []
-        },
-        {
-          "name": "DIntersectC",
-          "payload_types": []
-        },
-        {
-          "name": "DMinusC",
-          "payload_types": []
-        },
-        {
-          "name": "CMinusSUnionD",
-          "payload_types": []
-        }
+    "NewTypeGraphCodecError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidTypeRef", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "AmbiguousTypeName", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-12",
-          "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-08",
-          "hash": "c93b99b46283acbf4313257f46e98df7b60cb00ee5fc7ce444438f18d27d9442"
-        }
-      ]
+      "docs": "Error type for Catalogue -> ExtendedCrate (TypeGraph A) codec (ADR 2 D9)."
     },
-    {
-      "name": "ThreeWaySignalKind",
-      "description": "Signal kind for Phase 2 3-way evaluation result. 4 values: Skip / Blue / Yellow / Red (ADR 3 D3).",
-      "approved": true,
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Skip",
-          "payload_types": []
-        },
-        {
-          "name": "Blue",
-          "payload_types": []
-        },
-        {
-          "name": "Yellow",
-          "payload_types": []
-        },
-        {
-          "name": "Red",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-12",
-          "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-08",
-          "hash": "c93b99b46283acbf4313257f46e98df7b60cb00ee5fc7ce444438f18d27d9442"
-        }
-      ]
-    },
-    {
-      "name": "ThreeWaySignal",
-      "description": "Signal result for one item in Phase 2 3-way evaluation. Fields: item_name (String), region (SignalRegion), signal (ThreeWaySignalKind). All fields are private; type existence check only.",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-12",
-          "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-08",
-          "hash": "c93b99b46283acbf4313257f46e98df7b60cb00ee5fc7ce444438f18d27d9442"
-        }
-      ]
-    },
-    {
-      "name": "ThreeWayEvaluationReport",
-      "description": "Report produced by Phase 2. Contains Vec<ThreeWaySignal> for evaluated items that yield a non-skip signal (Blue / Yellow / Red); S ∩ C 構造一致 + action=Reference items are omitted (skip, ADR 3 D3). Replaces ConsistencyReport for the new 3-way evaluator path. Field signals is private; type existence check only.",
-      "approved": true,
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-12",
-          "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-08",
-          "hash": "c93b99b46283acbf4313257f46e98df7b60cb00ee5fc7ce444438f18d27d9442"
-        }
-      ]
-    },
-    {
-      "name": "NewTypeGraphCodecError",
-      "description": "Error type for Catalogue -> ExtendedCrate (TypeGraph A) codec. Variants: InvalidTypeRef(String) (syn parse failure on TypeRef string, carries human-readable description) / AmbiguousTypeName(String) (short name collision within the same catalogue, carries the conflicting short name). Crate-prefixed TypeRef values are never rejected as errors — they are auto-collected into external_crates (ADR 2 D5 / D11). (ADR 2 D9).",
-      "approved": true,
+    "ParamDeclaration": {
       "action": "modify",
-      "kind": "error_type",
-      "expected_variants": [
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "name", "ty": "ParamName" },
+          { "name": "ty", "ty": "TypeRef" }
+        ]
+      },
+      "docs": "Function/method parameter declaration (ADR 1 D5)."
+    },
+    "ParamName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
+      ],
+      "docs": "Newtype around Identifier for parameter names (ADR 1 D5)."
+    },
+    "Phase1Error": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ActionContradiction", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "UnresolvedTypeRef", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "DanglingId", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error for Phase 1 S/D construction (ADR 3 D2)."
+    },
+    "SelfReceiver": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Owned" },
+          { "name": "SharedRef" },
+          { "name": "ExclusiveRef" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" },
+        { "trait_name": "TryFrom", "origin_crate": "core" }
+      ],
+      "docs": "Enum for MethodDeclaration receiver. 3 values (ADR 1 D8)."
+    },
+    "SignalRegion": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "SIntersectC_Match_Add" },
+          { "name": "SIntersectC_Match_Modify" },
+          { "name": "SIntersectC_Match_Reference" },
+          { "name": "SIntersectC_Mismatch_Reference" },
+          { "name": "SIntersectC_Mismatch_Add" },
+          { "name": "SIntersectC_Mismatch_Modify" },
+          { "name": "SMinusC_Reference" },
+          { "name": "SMinusC_Add" },
+          { "name": "SMinusC_Modify" },
+          { "name": "DIntersectC" },
+          { "name": "DMinusC" },
+          { "name": "CMinusSUnionD" }
+        ]
+      },
+      "docs": "Enum encoding 12 variants for Phase 2 3-way evaluation regions (ADR 3 D3)."
+    },
+    "ThreeWayEvaluationReport": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "Report produced by Phase 2 containing non-skip signals (ADR 3 D3)."
+    },
+    "ThreeWaySignal": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "Signal result for one item in Phase 2 3-way evaluation (ADR 3 D3)."
+    },
+    "ThreeWaySignalKind": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Skip" },
+          { "name": "Blue" },
+          { "name": "Yellow" },
+          { "name": "Red" }
+        ]
+      },
+      "docs": "Signal kind for Phase 2 3-way evaluation result (ADR 3 D3)."
+    },
+    "TraitEntry": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "action", "ty": "ItemAction" },
+          { "name": "role", "ty": "ContractRole" },
+          { "name": "methods", "ty": "Vec<MethodDeclaration>" },
+          { "name": "module_path", "ty": "ModulePath" },
+          { "name": "docs", "ty": "Option<String>" }
+        ]
+      },
+      "docs": "Entry in CatalogueDocument::traits BTreeMap (ADR 1 D7)."
+    },
+    "TraitImplDeclV2": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "trait_name", "ty": "TraitName" },
+          { "name": "origin_crate", "ty": "CrateName" },
+          { "name": "generic_args", "ty": "Option<String>" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" }
+      ],
+      "docs": "New trait implementation declaration: trait identity + optional generic args (ADR 1 D10). generic_args disambiguates multiple From<X> impls on the same type (e.g. thiserror #[from] variants). Display renders as TraitName<Args> or bare TraitName."
+    },
+    "TraitName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
+      ],
+      "docs": "Newtype around Identifier for trait short names (ADR 1 D5)."
+    },
+    "TypeEntry": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "action", "ty": "ItemAction" },
+          { "name": "role", "ty": "DataRole" },
+          { "name": "kind", "ty": "TypeKindV2" },
+          { "name": "methods", "ty": "Vec<MethodDeclaration>" },
+          { "name": "trait_impls", "ty": "Vec<TraitImplDeclV2>" },
+          { "name": "module_path", "ty": "ModulePath" },
+          { "name": "docs", "ty": "Option<String>" }
+        ]
+      },
+      "docs": "Entry in CatalogueDocument::types BTreeMap (ADR 1 D7)."
+    },
+    "TypeKindV2": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Struct", "payload": { "kind": "struct", "fields": [{ "name": "pattern", "ty": "CompositePattern" }, { "name": "fields", "ty": "Vec<FieldDecl>" }] } },
+          { "name": "Enum", "payload": { "kind": "struct", "fields": [{ "name": "variants", "ty": "Vec<VariantDecl>" }] } },
+          { "name": "TypeAlias", "payload": { "kind": "struct", "fields": [{ "name": "target", "ty": "TypeRef" }] } }
+        ]
+      },
+      "docs": "Language-level kind for TypeEntry. 3 variants (ADR 1 D3 / D7)."
+    },
+    "TypeName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
+      ],
+      "docs": "Newtype around Identifier for type short names (ADR 1 D5)."
+    },
+    "TypeRef": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "String" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
+      ],
+      "docs": "Newtype wrapping String for generics-inclusive type reference strings (ADR 2 D11)."
+    },
+    "VariantDecl": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "name", "ty": "VariantName" },
+          { "name": "payload", "ty": "VariantPayload" }
+        ]
+      },
+      "docs": "Enum variant declaration: name (VariantName) and payload (VariantPayload) (ADR 1 D12)."
+    },
+    "VariantName": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "Identifier" } },
+      "trait_impls": [
+        { "trait_name": "AsRef", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "FromStr", "origin_crate": "core" }
+      ],
+      "docs": "Newtype around Identifier for enum variant names (ADR 1 D5)."
+    },
+    "VariantPayload": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unit" },
+          { "name": "Tuple", "payload": { "kind": "tuple", "fields": ["Vec<TypeRef>"] } },
+          { "name": "Struct", "payload": { "kind": "tuple", "fields": ["Vec<FieldDecl>"] } }
+        ]
+      },
+      "docs": "Payload for VariantDecl. 3 variants (ADR 1 D12)."
+    },
+    "ConsistencyReport": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was part of consistency checking that depended on TypeGraph/TypeBaseline. Replaced by the 3-way evaluator."
+    },
+    "AdrDecisionCommonError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "EmptyId" },
+          { "name": "EmptyImplementedIn" },
+          { "name": "EmptySupersededBy" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Validation errors for AdrDecisionCommon fields. Modified in this track: variant structure updated (added EmptyImplementedIn / EmptySupersededBy vs earlier snapshot)."
+    },
+    "ActionContradiction": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was raised by check_consistency when a catalogue action contradicted baseline. Replaced by Phase1Error::ActionContradiction in SignalEvaluatorV2."
+    },
+    "ActionContradictionKind": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "AddExistingType" },
+          { "name": "DeleteMissingType" }
+        ]
+      },
+      "docs": "T008: deleted. Was the kind sub-enum for ActionContradiction. Replaced by Phase1Error string messages."
+    },
+    "TypeGraph": {
+      "action": "delete",
+      "role": "DomainService",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. TypeGraph (built from SchemaExport) replaced by rustdoc_types::Crate as the canonical code snapshot. SignalEvaluatorV2 operates on ExtendedCrate + rustdoc_types::Crate directly."
+    },
+    "TypeNode": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a node in TypeGraph for types. Replaced by rustdoc_types::Item in the new 3-way evaluator."
+    },
+    "TraitNode": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a node in TypeGraph for traits. Replaced by rustdoc_types::Item in the new 3-way evaluator."
+    },
+    "FunctionNode": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a node in TypeGraph for free functions. Replaced by rustdoc_types::Item in the new 3-way evaluator."
+    },
+    "TraitImplEntry": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a trait implementation record in TypeNode. Replaced by rustdoc_types::Impl items in ExtendedCrate."
+    },
+    "TypeBaseline": {
+      "action": "delete",
+      "role": "DomainService",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. TypeBaseline snapshot replaced by raw rustdoc_types::Crate JSON as baseline B. SignalEvaluatorV2 uses B directly."
+    },
+    "TypeBaselineEntry": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a per-type entry in TypeBaseline. Replaced by rustdoc_types::Item in baseline B."
+    },
+    "TraitBaselineEntry": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a per-trait entry in TypeBaseline. Replaced by rustdoc_types::Item in baseline B."
+    },
+    "FunctionBaselineEntry": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a per-function entry in TypeBaseline. Replaced by rustdoc_types::Item in baseline B."
+    },
+    "TraitImplBaselineEntry": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "T008: deleted. Was a trait-impl record in TypeBaselineEntry for origin-crate-aware filtering. Replaced by rustdoc_types::Impl in baseline B."
+    },
+    "LayerId": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "newtype", "inner": "String" } },
+      "docs": "Validated architecture layer identifier newtype (ADR 2026-04-17-1528 D1). Used as BTreeMap key in CatalogueLoader::load_all return type and as CatalogueDocument::layer field type."
+    },
+    "CatalogueLinterRuleKind": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FieldEmpty" },
+          { "name": "FieldNonEmpty" },
+          { "name": "KindLayerConstraint" }
+        ]
+      },
+      "docs": "Existing enum of rule categories for CatalogueLinterRule. Domain counterpart of usecase LintRuleKind."
+    },
+    "CatalogueLinterRule": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "Existing value object representing one catalogue linter rule. Passed as &[CatalogueLinterRule] to CatalogueLinter::run."
+    },
+    "CatalogueLintViolation": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "Existing value object produced when a CatalogueLinterRule fires. Returned as Vec<CatalogueLintViolation> from CatalogueLinter::run."
+    },
+    "CatalogueLinterError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidRuleConfig", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "docs": "Existing error type for CatalogueLinter::run execution failures."
+    },
+    "ContractMapRenderOptions": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "pattern": { "pattern": "plain" },
+        "fields": [
+          { "name": "layers", "ty": "Vec<LayerId>" },
+          { "name": "signal_overlay", "ty": "bool" },
+          { "name": "action_overlay", "ty": "bool" },
+          { "name": "include_spec_source_edges", "ty": "bool" }
+        ]
+      },
+      "methods": [
         {
-          "name": "InvalidTypeRef",
-          "payload_types": [
-            "String"
-          ]
-        },
-        {
-          "name": "AmbiguousTypeName",
-          "payload_types": [
-            "String"
-          ]
+          "name": "empty",
+          "returns": "Self"
         }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-08",
-          "hash": "92379bdca00d2b52bef4c81dbfb9a1095f99e5ddf88ca234bf8cd55398fd0d96"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-05",
-          "hash": "060fd2a68dcc84323a759d0f43d73e7a248533b7aa6154327031ea1952f70a4a"
-        }
-      ]
-    },
-    {
-      "name": "CatalogueToExtendedCratePort",
-      "description": "Secondary port for Catalogue -> ExtendedCrate (TypeGraph A) conversion. Declared in domain; implemented by CatalogueToExtendedCrateCodec in infrastructure (ADR 2 D8).",
-      "approved": true,
-      "kind": "secondary_port",
-      "expected_methods": [
+      "docs": "Render-configuration value object for render_contract_map. Modified: removed stale kind_filter field (baseline was captured before T003 removed it); current shape is 4 fields + empty() associated function."
+    }
+  },
+  "traits": {
+    "CatalogueToExtendedCratePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
         {
           "name": "encode",
           "receiver": "&self",
-          "params": [
-            {
-              "name": "doc",
-              "ty": "CatalogueDocument"
-            }
-          ],
+          "params": [{ "name": "doc", "ty": "CatalogueDocument" }],
           "returns": "Result<ExtendedCrate, NewTypeGraphCodecError>",
           "is_async": false
         }
       ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-08",
-          "hash": "92379bdca00d2b52bef4c81dbfb9a1095f99e5ddf88ca234bf8cd55398fd0d96"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-05",
-          "hash": "060fd2a68dcc84323a759d0f43d73e7a248533b7aa6154327031ea1952f70a4a"
-        }
-      ]
+      "docs": "Secondary port for Catalogue -> ExtendedCrate (TypeGraph A) conversion (ADR 2 D8)."
     },
-    {
-      "name": "SignalEvaluatorPort",
-      "description": "Secondary port for 3-way signal evaluator (Phase 1 + Phase 2). Inputs: A (ExtendedCrate) + B (Crate) + C (Crate). Output: ThreeWayEvaluationReport or Phase1Error. Declared in domain (ADR 3 D5).",
-      "approved": true,
-      "kind": "secondary_port",
-      "expected_methods": [
-        {
-          "name": "evaluate",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "a",
-              "ty": "ExtendedCrate"
-            },
-            {
-              "name": "b",
-              "ty": "Crate"
-            },
-            {
-              "name": "c",
-              "ty": "Crate"
-            }
-          ],
-          "returns": "Result<ThreeWayEvaluationReport, Phase1Error>",
-          "is_async": false
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-11",
-          "hash": "d0ea1d981961bf5ada665db6672d594033744de132e7c3ea93d978efa80801f0"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-12",
-          "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-05",
-          "hash": "d0ebe7ab3812f39319b255962c4f85d7692786b69322f3bea03665fe75ce5d25"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-07",
-          "hash": "7a0f122276f20ca61b084f8886e3afe50a694d0516c0b9900b1d83e82a4ae39a"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-08",
-          "hash": "c93b99b46283acbf4313257f46e98df7b60cb00ee5fc7ce444438f18d27d9442"
-        }
-      ]
-    },
-    {
-      "name": "TypeDefinitionKind",
-      "description": "Old single-enum 15-variant TypeDefinitionKind (domain::tddd::catalogue). Deleted as replaced by the 3-axis separation: DataRole + ContractRole + FunctionRole + TypeKindV2 in CatalogueDocument (ADR 1 D1). New schema uses TypeEntry/TraitEntry/FunctionEntry with separate role/kind fields.",
-      "approved": true,
-      "action": "delete",
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Typestate",
-          "payload_types": []
-        },
-        {
-          "name": "Enum",
-          "payload_types": []
-        },
-        {
-          "name": "ValueObject",
-          "payload_types": []
-        },
-        {
-          "name": "ErrorType",
-          "payload_types": []
-        },
-        {
-          "name": "SecondaryPort",
-          "payload_types": []
-        },
-        {
-          "name": "ApplicationService",
-          "payload_types": []
-        },
-        {
-          "name": "UseCase",
-          "payload_types": []
-        },
-        {
-          "name": "Interactor",
-          "payload_types": []
-        },
-        {
-          "name": "Dto",
-          "payload_types": []
-        },
-        {
-          "name": "Command",
-          "payload_types": []
-        },
-        {
-          "name": "Query",
-          "payload_types": []
-        },
-        {
-          "name": "Factory",
-          "payload_types": []
-        },
-        {
-          "name": "SecondaryAdapter",
-          "payload_types": []
-        },
-        {
-          "name": "DomainService",
-          "payload_types": []
-        },
-        {
-          "name": "FreeFunction",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        }
-      ]
-    },
-    {
-      "name": "TypeCatalogueDocument",
-      "description": "Old top-level catalogue document (schema_version + entries: Vec<TypeCatalogueEntry>). Deleted as replaced by CatalogueDocument (3-BTreeMap new schema) (ADR 1 D1 / D6).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        }
-      ]
-    },
-    {
-      "name": "TypeCatalogueEntry",
-      "description": "Old per-entry record (name + description + kind: TypeDefinitionKind + action: TypeAction + approved + spec_refs + informal_grounds). Deleted as replaced by TypeEntry / TraitEntry / FunctionEntry (ADR 1 D1).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        }
-      ]
-    },
-    {
-      "name": "TypeBaseline",
-      "description": "Old TypeBaseline (HashMap-based, domain::tddd::baseline). Deleted as baseline is now stored as rustdoc_types::Crate JSON (B = pure rustdoc_types::Crate) (ADR 2 D2).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "TypeBaselineEntry",
-      "description": "Old TypeBaselineEntry (domain::tddd::baseline). Deleted together with TypeBaseline.",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "TraitBaselineEntry",
-      "description": "Old TraitBaselineEntry (domain::tddd::baseline). Deleted together with TypeBaseline.",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "FunctionBaselineEntry",
-      "description": "Old FunctionBaselineEntry (domain::tddd::baseline). Deleted together with TypeBaseline.",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "TraitImplBaselineEntry",
-      "description": "Old TraitImplBaselineEntry (domain::tddd::baseline). Deleted together with TypeBaseline.",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "TypeGraph",
-      "description": "Old TypeGraph (domain::schema, HashMap-based TypeNode/TraitNode/FunctionNode). Deleted as replaced by rustdoc_types::Crate-based ExtendedCrate (ADR 2 D1).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "TypeNode",
-      "description": "Old TypeNode (domain::schema). Deleted together with TypeGraph (ADR 2 D1).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "TraitNode",
-      "description": "Old TraitNode (domain::schema). Deleted together with TypeGraph (ADR 2 D1).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "FunctionNode",
-      "description": "Old FunctionNode (domain::schema). Deleted together with TypeGraph (ADR 2 D1).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-13",
-          "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "EnumVariantDeclaration",
-      "description": "Old EnumVariantDeclaration with payload_types: Vec<String> (domain::tddd::catalogue). Deleted as superseded by VariantDecl + VariantPayload (ADR 1 D12).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-04",
-          "hash": "c30752c82807d15e127b6f8888aa2167d9e2ac296ca9d72517077e14f30fdae4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "GO-04",
-          "hash": "2c75178cc1784527a3c2a0c716352147ea58cd56cae8e9ef6b07a0e46e9245f6"
-        }
-      ]
-    },
-    {
-      "name": "MemberDeclaration",
-      "description": "Old MemberDeclaration enum (Field / Variant). Deleted as replaced by FieldDecl and VariantDecl as separate types with distinct, typed payloads (ADR 1 D1 / CN-09).",
-      "approved": true,
-      "action": "delete",
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Variant",
-          "payload_types": []
-        },
-        {
-          "name": "Field",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        }
-      ]
-    },
-    {
-      "name": "TypeAction",
-      "description": "Old TypeAction enum (Add / Modify / Reference / Delete). Deleted as replaced by ItemAction (same 4 values, renamed per ADR 1 D4).",
-      "approved": true,
-      "action": "delete",
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Add",
-          "payload_types": []
-        },
-        {
-          "name": "Modify",
-          "payload_types": []
-        },
-        {
-          "name": "Reference",
-          "payload_types": []
-        },
-        {
-          "name": "Delete",
-          "payload_types": []
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        }
-      ]
-    },
-    {
-      "name": "TypestateTransitions",
-      "description": "Old TypestateTransitions enum (Terminal / To(Vec<String>)). Deleted as replaced by CompositePattern::TypestateState { of, transition_methods } (ADR 1 D3).",
-      "approved": true,
-      "action": "delete",
-      "kind": "enum",
-      "expected_variants": [
-        {
-          "name": "Terminal",
-          "payload_types": []
-        },
-        {
-          "name": "To",
-          "payload_types": [
-            "Vec<String>"
-          ]
-        }
-      ],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-01",
-          "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        }
-      ]
-    },
-    {
-      "name": "TraitImplDecl",
-      "description": "Old TraitImplDecl carrying expected_methods: Vec<MethodDeclaration>. Deleted as replaced by TraitImplDeclV2 (trait identity only: trait_name + origin_crate, no methods field per ADR 1 D10).",
-      "approved": true,
-      "action": "delete",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-05",
-          "hash": "6dbbf76a99bf54f7b0dc817a4315ea9376631d47875be50d8a0eb774281683a3"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-15",
-          "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-07",
-          "hash": "412bc8a9fd3d8b12b73a4e4f13df1b7a6dd4429f95734b18b78e7b69156124c7"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "CN-09",
-          "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962"
-        }
-      ]
-    },
-    {
-      "name": "ParamDeclaration",
-      "description": "Existing ParamDeclaration (raw String fields). Modified to use newtype-wrapped fields (ParamName / TypeRef) aligned to ADR 1 D5 newtype system.",
-      "approved": true,
+    "CatalogueLinter": {
       "action": "modify",
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "name",
-          "ty": "ParamName"
-        },
-        {
-          "kind": "field",
-          "name": "ty",
-          "ty": "TypeRef"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-05",
-          "hash": "6dbbf76a99bf54f7b0dc817a4315ea9376631d47875be50d8a0eb774281683a3"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
-    },
-    {
-      "name": "MethodDeclaration",
-      "description": "Existing MethodDeclaration. Modified to use SelfReceiver enum for receiver (ADR 1 D8) and add docs: Option<String> field (ADR 1 D9).",
-      "approved": true,
-      "action": "modify",
-      "kind": "value_object",
-      "expected_members": [
-        {
-          "kind": "field",
-          "name": "name",
-          "ty": "MethodName"
-        },
-        {
-          "kind": "field",
-          "name": "receiver",
-          "ty": "Option<SelfReceiver>"
-        },
-        {
-          "kind": "field",
-          "name": "params",
-          "ty": "Vec<ParamDeclaration>"
-        },
-        {
-          "kind": "field",
-          "name": "returns",
-          "ty": "TypeRef"
-        },
-        {
-          "kind": "field",
-          "name": "is_async",
-          "ty": "bool"
-        },
-        {
-          "kind": "field",
-          "name": "docs",
-          "ty": "Option<String>"
-        }
-      ],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-05",
-          "hash": "6dbbf76a99bf54f7b0dc817a4315ea9376631d47875be50d8a0eb774281683a3"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-01",
-          "hash": "ce03fbe93ea5765c522bb59dfa13567f0ecdea9efe83e9efa835efea6a8f7efc"
-        }
-      ]
-    },
-    {
-      "name": "ConsistencyReport",
-      "description": "Existing ConsistencyReport (domain::tddd::consistency). Referenced for transition period — will be superseded by ThreeWayEvaluationReport once the new signal evaluator is complete (IN-14).",
-      "approved": true,
-      "action": "reference",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "IN-14",
-          "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790"
-        },
-        {
-          "file": "track/items/tddd-v2-2026-05-08/spec.json",
-          "anchor": "AC-09",
-          "hash": "f53cbf024e3b0376964e6c197b3846d0f309ad77ab50a5fea26226e1afb1cbc1"
-        }
-      ]
-    },
-    {
-      "name": "ContractMapWriter",
-      "description": "Existing secondary_port for persisting contract-map content. Referenced to expose implements edge for FsContractMapWriter in infrastructure — not modified in this track.",
-      "approved": true,
-      "action": "reference",
-      "kind": "secondary_port",
-      "expected_methods": [
-        {
-          "name": "write",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "&TrackId"
-            },
-            {
-              "name": "content",
-              "ty": "&ContractMapContent"
-            }
-          ],
-          "returns": "Result<(), ContractMapWriterError>",
-          "is_async": false
-        }
-      ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "R7 declare obligation: FsContractMapWriter implements ContractMapWriter; port must be declared in catalogue for implements edge visibility."
-        }
-      ]
-    },
-    {
-      "name": "CatalogueLinter",
-      "description": "Secondary_port for running catalogue lint rules. Modified in T008 to update the `catalogue` parameter from the deleted `TypeCatalogueDocument` to the new `CatalogueDocument` (ADR 1 D1). The implements edge for InMemoryCatalogueLinter in infrastructure is preserved.",
-      "approved": true,
-      "action": "modify",
-      "kind": "secondary_port",
-      "expected_methods": [
+      "role": "SecondaryPort",
+      "methods": [
         {
           "name": "run",
           "receiver": "&self",
           "params": [
-            {
-              "name": "rules",
-              "ty": "&[CatalogueLinterRule]"
-            },
-            {
-              "name": "catalogue",
-              "ty": "&CatalogueDocument"
-            },
-            {
-              "name": "layer_id",
-              "ty": "&str"
-            }
+            { "name": "rules", "ty": "&[CatalogueLinterRule]" },
+            { "name": "catalogue", "ty": "&CatalogueDocument" },
+            { "name": "layer_id", "ty": "&str" }
           ],
           "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
           "is_async": false
         }
       ],
-      "informal_grounds": [
-        {
-          "kind": "user_directive",
-          "summary": "R7 declare obligation: InMemoryCatalogueLinter implements CatalogueLinter; port must be declared in catalogue for implements edge visibility. Modified in T008 as TypeCatalogueDocument is deleted."
-        }
-      ]
+      "docs": "Secondary port for running catalogue lint rules. Modified to use CatalogueDocument."
     },
-    {
-      "name": "SchemaExporter",
-      "description": "Existing secondary_port for extracting public API of a crate as SchemaExport. Referenced to expose implements edge for RustdocSchemaExporter in infrastructure — not modified in this track.",
-      "approved": true,
+    "ContractMapWriter": {
       "action": "reference",
-      "kind": "secondary_port",
-      "expected_methods": [
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&TrackId" },
+            { "name": "content", "ty": "&ContractMapContent" }
+          ],
+          "returns": "Result<(), ContractMapWriterError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Existing secondary_port for persisting contract-map content."
+    },
+    "SchemaExporter": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
         {
           "name": "export",
           "receiver": "&self",
-          "params": [
-            {
-              "name": "crate_name",
-              "ty": "&str"
-            }
-          ],
+          "params": [{ "name": "crate_name", "ty": "&str" }],
           "returns": "Result<SchemaExport, SchemaExportError>",
           "is_async": false
         }
       ],
-      "informal_grounds": [
+      "docs": "Existing secondary_port for extracting public API of a crate as SchemaExport."
+    },
+    "CatalogueLoader": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
         {
-          "kind": "user_directive",
-          "summary": "R7 declare obligation: RustdocSchemaExporter implements SchemaExporter; port must be declared in catalogue for implements edge visibility."
+          "name": "load_all",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>",
+          "is_async": false
         }
-      ]
+      ],
+      "docs": "Existing secondary_port CatalogueLoader. Return type unchanged from v2 (TypeCatalogueDocument). The infrastructure adapter reads v3 CatalogueDocument files and converts them to TypeCatalogueDocument stubs via v3_doc_to_stub before returning; the V3StubConversion error variant surfaces when that conversion fails. Full v2-to-v3 port upgrade is deferred to a follow-up track."
+    },
+    "SignalEvaluatorPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "evaluate",
+          "receiver": "&self",
+          "params": [
+            { "name": "a", "ty": "ExtendedCrate" },
+            { "name": "b", "ty": "rustdoc_types::Crate" },
+            { "name": "c", "ty": "rustdoc_types::Crate" }
+          ],
+          "returns": "Result<ThreeWayEvaluationReport, Phase1Error>",
+          "is_async": false
+        }
+      ],
+      "docs": "Secondary port for 3-way signal evaluator (Phase 1 + Phase 2) (ADR 3 D5)."
     }
-  ]
+  },
+  "functions": {
+    "domain::tddd::consistency::check_consistency": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "ConsistencyReport",
+      "is_async": false,
+      "docs": "T008: deleted. Was the main consistency-check entry point comparing TypeGraph against TypeBaseline. Replaced by SignalEvaluatorV2 3-way evaluation."
+    },
+    "domain::tddd::signals::evaluate_type_signals": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Vec<TypeSignal>",
+      "is_async": false,
+      "docs": "T008: deleted. Was the v1/v2 signal evaluator entry point using TypeGraph + TypeBaseline. Replaced by SignalEvaluatorV2."
+    },
+    "domain::tddd::signals::undeclared_to_signals": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Vec<TypeSignal>",
+      "is_async": false,
+      "docs": "T008: deleted. Was a helper for the old signals.rs that produced reverse signals for undeclared types. Replaced by Phase 2 CMinusSUnionD region logic."
+    },
+    "domain::tddd::signals::undeclared_functions_to_signals": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Vec<TypeSignal>",
+      "is_async": false,
+      "docs": "T008: deleted. Was a helper for the old signals.rs that produced reverse signals for undeclared free functions. Replaced by Phase 2 CMinusSUnionD region logic."
+    }
+  }
 }

@@ -10,7 +10,9 @@
 //! layer-neutral rename from `DomainType*` to `TypeDefinition*` /
 //! `TypeCatalogue*` / `TypeSignal` (ADR 0002 §D3).
 
-pub mod baseline;
+// T008: baseline kept mod-scope (no pub re-export); signals removed.
+// baseline.rs types are private to this crate — public re-exports removed from lib.rs.
+mod baseline;
 pub mod catalogue;
 pub mod catalogue_linter;
 pub mod catalogue_ports;
@@ -25,7 +27,6 @@ pub mod extended_crate;
 pub mod layer_id;
 pub mod new_typegraph_codec_error;
 pub mod signal_evaluator;
-pub mod signals;
 pub mod type_signals_doc;
 
 pub use catalogue_ports::{

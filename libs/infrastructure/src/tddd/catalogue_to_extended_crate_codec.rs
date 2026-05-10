@@ -1096,12 +1096,20 @@ impl EncoderState {
                 let synthetic_trait_id = self.alloc_id();
 
                 // Build the canonical path segments for this external trait.
-                // For std traits, use the known full module path (e.g. `std::fmt::Display`)
-                // so that downstream consumers can match against canonical rustdoc paths.
+                // These segments are used by downstream consumers (e.g. `schema_export`)
+                // to recover the trait's origin crate via `krate.paths[trait_id].crate_id`.
+                // They are NOT used for impl-identity key matching (which goes through
+                // `trait_path_str` + `normalize_impl_trait_path`).
+                // For std/core traits, use the known full module path (e.g.
+                // `std::fmt::Display`, `core::convert::From`) for accurate path metadata.
                 // For other crates, fall back to `[crate_name, trait_name]`.
                 let trait_path_segments: Vec<String> = if cn == "std" {
                     let canonical =
                         crate::tddd::type_ref_parser::std_canonical_path(ti.trait_name.as_str());
+                    canonical.split("::").map(str::to_string).collect()
+                } else if cn == "core" {
+                    let canonical =
+                        crate::tddd::type_ref_parser::core_canonical_path(ti.trait_name.as_str());
                     canonical.split("::").map(str::to_string).collect()
                 } else {
                     vec![cn, ti.trait_name.as_str().to_string()]
@@ -1119,12 +1127,66 @@ impl EncoderState {
 
             // Build the trait path using the canonical full path string for external traits,
             // or the short name for local traits (which are looked up by id in the index).
+            //
+            // `normalize_impl_trait_path` (used by `build_impl_identity_map` on S, D, and C)
+            // keeps external-crate paths verbatim and strips local-crate prefixes to the
+            // short name.  S-side paths must therefore match the C-side rustdoc format:
+            //
+            // * std traits: `std_canonical_path` returns the full module path
+            //   (e.g. `std::fmt::Display`), which rustdoc also uses verbatim.
+            // * Non-std external traits (e.g. `serde`, `core`, `futures`): rustdoc emits
+            //   the full path `"{crate_name}::{trait_name}"` (e.g. `serde::Serialize`).
+            //   Using only the bare short name here would produce an unresolved local-path
+            //   key (e.g. `"Serialize"`) that `normalize_impl_trait_path` cannot distinguish
+            //   from a local trait, causing an identity-key mismatch and missed evaluation.
+            // * Local traits: use the bare short name (no `::` prefix) so that
+            //   `normalize_impl_trait_path` correctly identifies it as a local-unresolved
+            //   path and strips it to the short name on both S and C sides.
+            //
+            // When `generic_args` is present (e.g. `"CatalogueLoaderError"` for a specific
+            // `#[from]` variant), append them in angle-bracket notation so the generated
+            // identity key matches the C-side rustdoc key exactly (e.g. `From<CatalogueLoaderError>`).
             let trait_path_str = {
                 let is_external = ti.origin_crate.as_str() != self.crate_name.as_str();
-                if is_external && ti.origin_crate.as_str() == "std" {
-                    crate::tddd::type_ref_parser::std_canonical_path(ti.trait_name.as_str())
+                let base = if is_external {
+                    let cn = ti.origin_crate.as_str();
+                    if cn == "std" {
+                        crate::tddd::type_ref_parser::std_canonical_path(ti.trait_name.as_str())
+                    } else if cn == "core" {
+                        // `core` traits: emit the fully-qualified canonical path
+                        // (e.g. `"core::convert::From"`, `"core::fmt::Display"`).
+                        //
+                        // `build_impl_identity_map` uses `krate.paths` to resolve C-side
+                        // impl trait paths to their canonical qualified form, so S-side and
+                        // C-side both produce `"core::convert::From"` as the identity key.
+                        // This correctly disambiguates `core::fmt::Display` from a
+                        // user-defined local `Display` trait (which would have `crate_id == 0`
+                        // in `krate.paths` and would be stripped to its short name).
+                        crate::tddd::type_ref_parser::core_canonical_path(ti.trait_name.as_str())
+                    } else if cn == "domain" || cn == "usecase" {
+                        // `domain`/`usecase` traits: use a two-segment qualified path
+                        // (e.g. `"domain::CatalogueLoader"`, `"usecase::SignalEvaluatorPort"`).
+                        //
+                        // C-side rustdoc emits just the short name for these cross-workspace
+                        // crate traits, but `krate.paths` has the canonical `crate_id != 0`
+                        // entry with the full path `["{cn}", "{trait_name}"]`.
+                        // `build_impl_identity_map` resolves via `krate.paths.join("::")`,
+                        // producing `"domain::CatalogueLoader"` — matching this S-side form.
+                        format!("{cn}::{}", ti.trait_name.as_str())
+                    } else {
+                        // For all other external crates, build a two-segment path
+                        // `{crate_name}::{trait_name}` (e.g. `serde::Serialize`).
+                        // `build_impl_identity_map` uses `krate.paths.join("::")` which
+                        // produces `"serde::Serialize"` for a `serde` origin trait — matching
+                        // this two-segment form.
+                        format!("{cn}::{}", ti.trait_name.as_str())
+                    }
                 } else {
                     ti.trait_name.as_str().to_string()
+                };
+                match ti.generic_args() {
+                    Some(args) => format!("{base}<{args}>"),
+                    None => base,
                 }
             };
             let trait_path = Path { path: trait_path_str, id: trait_id, args: None };
@@ -1794,6 +1856,119 @@ mod tests {
         let doc = make_doc("domain");
         let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
         assert!(ec.krate().index.contains_key(&Id(0)), "expected root Id(0)");
+    }
+
+    // -----------------------------------------------------------------------
+    // generic_args in TraitImplDeclV2 → trait_path_str includes <X>
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_encode_trait_impl_with_generic_args_produces_impl_with_parameterised_trait_path() {
+        // When `generic_args` is Some, the Impl item's trait path must be
+        // `"From<CatalogueLoaderError>"` so that `build_impl_identity_map` produces
+        // the key `"RenderContractMapError: From<CatalogueLoaderError>"`, matching
+        // the C-side rustdoc key exactly.
+        let mut doc = make_doc("usecase");
+        doc.types.insert(
+            TypeName::new("RenderContractMapError").unwrap(),
+            TypeEntry {
+                action: ItemAction::Modify,
+                role: DataRole::ErrorType,
+                kind: TypeKindV2::Enum { variants: vec![] },
+                methods: vec![],
+                trait_impls: vec![
+                    TraitImplDeclV2::new_with_generic_args(
+                        TraitName::new("From").unwrap(),
+                        CrateName::new("core").unwrap(),
+                        "CatalogueLoaderError".to_string(),
+                    )
+                    .unwrap(),
+                    TraitImplDeclV2::new_with_generic_args(
+                        TraitName::new("From").unwrap(),
+                        CrateName::new("core").unwrap(),
+                        "ContractMapWriterError".to_string(),
+                    )
+                    .unwrap(),
+                ],
+                module_path: ModulePath::root(),
+                docs: None,
+            },
+        );
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let krate = ec.krate();
+
+        // Collect trait impl paths from all Impl items that have a trait.
+        let trait_paths: Vec<String> = krate
+            .index
+            .values()
+            .filter_map(|item| {
+                if let ItemEnum::Impl(impl_) = &item.inner {
+                    impl_.trait_.as_ref().map(|tp| tp.path.clone())
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        // `core::From` with generic_args: emit the fully-qualified `core::convert::From`
+        // path with generic args appended.  `build_impl_identity_map` resolves C-side via
+        // `krate.paths`, obtaining `"core::convert::From"` as the canonical qualified form.
+        // S-side uses `core_canonical_path("From")` = `"core::convert::From"` so both
+        // sides produce the same identity key.
+        assert!(
+            trait_paths.iter().any(|p| p == "core::convert::From<CatalogueLoaderError>"),
+            "expected impl trait path 'core::convert::From<CatalogueLoaderError>', got: {trait_paths:?}"
+        );
+        assert!(
+            trait_paths.iter().any(|p| p == "core::convert::From<ContractMapWriterError>"),
+            "expected impl trait path 'core::convert::From<ContractMapWriterError>', got: {trait_paths:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core_trait_path() {
+        // When `generic_args` is None and `origin_crate` is `"core"`, the impl trait path
+        // must be the fully-qualified canonical path (`"core::convert::From"` not bare `"From"`).
+        // `build_impl_identity_map` uses `krate.paths` to resolve C-side trait paths to
+        // their canonical qualified form (e.g. `"core::convert::From"`) so S-side must
+        // emit the same form to avoid identity-key mismatches.
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("SomeError").unwrap(),
+            TypeEntry {
+                action: ItemAction::Add,
+                role: DataRole::ErrorType,
+                kind: TypeKindV2::Enum { variants: vec![] },
+                methods: vec![],
+                trait_impls: vec![TraitImplDeclV2::new(
+                    TraitName::new("From").unwrap(),
+                    CrateName::new("core").unwrap(),
+                )],
+                module_path: ModulePath::root(),
+                docs: None,
+            },
+        );
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let krate = ec.krate();
+
+        let trait_paths: Vec<String> = krate
+            .index
+            .values()
+            .filter_map(|item| {
+                if let ItemEnum::Impl(impl_) = &item.inner {
+                    impl_.trait_.as_ref().map(|tp| tp.path.clone())
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        assert!(
+            trait_paths.iter().any(|p| p == "core::convert::From"),
+            "expected qualified 'core::convert::From' trait path when generic_args is None, got: {trait_paths:?}"
+        );
     }
 
     // -----------------------------------------------------------------------

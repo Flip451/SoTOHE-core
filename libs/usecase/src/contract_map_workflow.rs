@@ -16,7 +16,6 @@
 //! All I/O flows through the domain ports.
 
 use domain::TrackId;
-use domain::tddd::catalogue::TypeDefinitionKind;
 use domain::tddd::catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };
@@ -25,25 +24,15 @@ use domain::tddd::{ContractMapRenderOptions, LayerId, render_contract_map};
 /// Command input for [`RenderContractMap::execute`].
 ///
 /// All fields accept raw strings so callers (e.g. the CLI) never need to
-/// import domain types (`TrackId`, `LayerId`, `TypeDefinitionKind`).
+/// import domain types (`TrackId`, `LayerId`).
 /// The interactor validates and converts them internally.
 ///
 /// Fields mirror the CLI arguments (`sotp track contract-map <track-id>
-/// [--kind-filter k1,k2] [--layers l1,l2]`).
+/// [--layers l1,l2]`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RenderContractMapCommand {
     /// Raw track identifier string (validated by the interactor).
     pub track_id: String,
-    /// If `Some`, only entries whose `kind_tag` matches one of the listed
-    /// kind tag strings are rendered. `Some(vec![])` filters every entry
-    /// out and produces empty subgraphs (not an error).
-    ///
-    /// Valid values: `"typestate"`, `"enum"`, `"value_object"`,
-    /// `"error_type"`, `"secondary_port"`, `"secondary_adapter"`,
-    /// `"application_service"`, `"use_case"`, `"interactor"`, `"dto"`,
-    /// `"command"`, `"query"`, `"factory"`, `"domain_service"`,
-    /// `"free_function"`.
-    pub kind_filter: Option<Vec<String>>,
     /// If `Some`, restricts rendering to the listed layer identifier
     /// strings. The interactor fails with
     /// [`RenderContractMapError::LayerNotFound`] when any supplied string
@@ -89,14 +78,6 @@ pub enum RenderContractMapError {
     /// not produce — typically a CLI typo or a disabled layer.
     #[error("layer '{layer_id}' is not a tddd.enabled layer for track '{track_id}'")]
     LayerNotFound { track_id: String, layer_id: String },
-
-    /// A `kind_filter` token is not a recognised `kind_tag`.
-    #[error(
-        "unknown kind-filter value '{kind_tag}'; expected one of: typestate, enum, \
-         value_object, error_type, secondary_port, secondary_adapter, application_service, \
-         use_case, interactor, dto, command, query, factory, domain_service, free_function"
-    )]
-    UnknownKindFilter { kind_tag: String },
 
     /// The `track_id` string is not a valid track identifier.
     #[error("invalid track ID: {reason}")]
@@ -160,21 +141,6 @@ where
         let track_id = TrackId::try_new(cmd.track_id.clone())
             .map_err(|e| RenderContractMapError::InvalidTrackId { reason: e.to_string() })?;
 
-        // Parse kind_filter strings to TypeDefinitionKind values.
-        let kind_filter: Option<Vec<TypeDefinitionKind>> = cmd
-            .kind_filter
-            .as_ref()
-            .map(|tags| {
-                tags.iter()
-                    .map(|tag| {
-                        parse_kind_tag(tag).ok_or_else(|| {
-                            RenderContractMapError::UnknownKindFilter { kind_tag: tag.clone() }
-                        })
-                    })
-                    .collect::<Result<Vec<_>, _>>()
-            })
-            .transpose()?;
-
         let (layer_order, catalogues) = self.loader.load_all(&track_id)?;
 
         if layer_order.is_empty() {
@@ -208,7 +174,6 @@ where
 
         let opts = ContractMapRenderOptions {
             layers: layer_filter.clone().unwrap_or_default(),
-            kind_filter: kind_filter.clone(),
             signal_overlay: false,
             action_overlay: false,
             include_spec_source_edges: false,
@@ -232,79 +197,15 @@ where
     }
 }
 
-/// Parse a `kind_tag` string into a [`TypeDefinitionKind`] with empty payload
-/// fields. The renderer compares entries by `kind_tag` rather than by
-/// structural equality, so empty payload placeholders are correct here.
-///
-/// Returns `None` for unrecognised tags.
-fn parse_kind_tag(tag: &str) -> Option<TypeDefinitionKind> {
-    use domain::tddd::catalogue::TypestateTransitions;
-
-    Some(match tag.to_ascii_lowercase().as_str() {
-        "typestate" => TypeDefinitionKind::Typestate {
-            transitions: TypestateTransitions::Terminal,
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "enum" => TypeDefinitionKind::Enum { expected_variants: Vec::new() },
-        "value_object" => TypeDefinitionKind::ValueObject {
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "error_type" => TypeDefinitionKind::ErrorType { expected_variants: Vec::new() },
-        "secondary_port" => TypeDefinitionKind::SecondaryPort { expected_methods: Vec::new() },
-        "secondary_adapter" => TypeDefinitionKind::SecondaryAdapter {
-            implements: Vec::new(),
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "application_service" => {
-            TypeDefinitionKind::ApplicationService { expected_methods: Vec::new() }
-        }
-        "use_case" => TypeDefinitionKind::UseCase {
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "interactor" => TypeDefinitionKind::Interactor {
-            expected_members: Vec::new(),
-            declares_application_service: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "dto" => {
-            TypeDefinitionKind::Dto { expected_members: Vec::new(), expected_methods: Vec::new() }
-        }
-        "command" => TypeDefinitionKind::Command {
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "query" => {
-            TypeDefinitionKind::Query { expected_members: Vec::new(), expected_methods: Vec::new() }
-        }
-        "factory" => TypeDefinitionKind::Factory {
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "domain_service" => TypeDefinitionKind::DomainService {
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-        "free_function" => TypeDefinitionKind::FreeFunction {
-            module_path: None,
-            expected_params: Vec::new(),
-            expected_returns: Vec::new(),
-            expected_is_async: false,
-        },
-        _ => return None,
-    })
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use std::collections::BTreeMap;
 
     use domain::tddd::ContractMapContent;
-    use domain::tddd::catalogue::{TypeAction, TypeCatalogueDocument, TypeCatalogueEntry};
+    use domain::tddd::catalogue::{
+        TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+    };
     use mockall::{mock, predicate};
 
     use super::*;
@@ -401,11 +302,7 @@ mod tests {
         });
 
         let interactor = RenderContractMapInteractor::new(loader, writer);
-        let cmd = RenderContractMapCommand {
-            track_id: "t001".to_owned(),
-            kind_filter: None,
-            layer_filter: None,
-        };
+        let cmd = RenderContractMapCommand { track_id: "t001".to_owned(), layer_filter: None };
         let out = interactor.execute(&cmd).unwrap();
         assert_eq!(out.rendered_layer_count, 3);
         assert_eq!(out.total_entry_count, 3);
@@ -422,11 +319,7 @@ mod tests {
         writer.expect_write().times(0);
 
         let interactor = RenderContractMapInteractor::new(loader, writer);
-        let cmd = RenderContractMapCommand {
-            track_id: "t002".to_owned(),
-            kind_filter: None,
-            layer_filter: None,
-        };
+        let cmd = RenderContractMapCommand { track_id: "t002".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::CatalogueLoaderFailed(_)));
     }
@@ -448,11 +341,7 @@ mod tests {
         });
 
         let interactor = RenderContractMapInteractor::new(loader, writer);
-        let cmd = RenderContractMapCommand {
-            track_id: "t003".to_owned(),
-            kind_filter: None,
-            layer_filter: None,
-        };
+        let cmd = RenderContractMapCommand { track_id: "t003".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::ContractMapWriterFailed(_)));
     }
@@ -466,11 +355,7 @@ mod tests {
         writer.expect_write().times(0);
 
         let interactor = RenderContractMapInteractor::new(loader, writer);
-        let cmd = RenderContractMapCommand {
-            track_id: "t004".to_owned(),
-            kind_filter: None,
-            layer_filter: None,
-        };
+        let cmd = RenderContractMapCommand { track_id: "t004".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         match err {
             RenderContractMapError::EmptyCatalogue { track_id } => {
@@ -493,7 +378,6 @@ mod tests {
         let interactor = RenderContractMapInteractor::new(loader, writer);
         let cmd = RenderContractMapCommand {
             track_id: "t005".to_owned(),
-            kind_filter: None,
             layer_filter: Some(vec!["typo-layer".to_owned()]),
         };
         let err = interactor.execute(&cmd).unwrap_err();
@@ -504,61 +388,5 @@ mod tests {
             }
             other => panic!("expected LayerNotFound, got {other:?}"),
         }
-    }
-
-    #[test]
-    fn test_execute_kind_filter_filters_entries_but_still_writes() {
-        let (order, catalogues) = three_layer_catalogues();
-        let mut loader = MockLoader::new();
-        loader
-            .expect_load_all()
-            .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
-
-        let mut writer = MockWriter::new();
-        writer.expect_write().times(1).returning(|_: &TrackId, content: &ContractMapContent| {
-            let text = content.as_ref();
-            assert!(text.contains("flowchart LR"));
-            assert!(text.contains("usecase_RegisterUser[/RegisterUser/]"));
-            assert!(!text.contains("domain_User(User)"));
-            Ok(())
-        });
-
-        let interactor = RenderContractMapInteractor::new(loader, writer);
-        let cmd = RenderContractMapCommand {
-            track_id: "t006".to_owned(),
-            kind_filter: Some(vec!["use_case".to_owned()]),
-            layer_filter: None,
-        };
-        let out = interactor.execute(&cmd).unwrap();
-        // Metrics reflect the loader output, not the post-filter entry count.
-        assert_eq!(out.rendered_layer_count, 3);
-        assert_eq!(out.total_entry_count, 3);
-    }
-
-    #[test]
-    fn test_execute_kind_filter_empty_vec_still_writes_empty_subgraphs() {
-        let (order, catalogues) = three_layer_catalogues();
-        let mut loader = MockLoader::new();
-        loader
-            .expect_load_all()
-            .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
-
-        let mut writer = MockWriter::new();
-        writer.expect_write().times(1).returning(|_: &TrackId, content: &ContractMapContent| {
-            let text = content.as_ref();
-            assert!(text.contains("flowchart LR"));
-            assert!(text.contains("subgraph domain [domain]"));
-            assert!(!text.contains("domain_User"));
-            assert!(!text.contains("usecase_RegisterUser"));
-            Ok(())
-        });
-
-        let interactor = RenderContractMapInteractor::new(loader, writer);
-        let cmd = RenderContractMapCommand {
-            track_id: "t007".to_owned(),
-            kind_filter: Some(Vec::new()),
-            layer_filter: None,
-        };
-        interactor.execute(&cmd).unwrap();
     }
 }

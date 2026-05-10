@@ -4,85 +4,98 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DataRole | enum | — | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter | 🔵 | 🔵 |
-| ContractRole | enum | — | SpecificationPort, ApplicationService, SecondaryPort | 🔵 | 🔵 |
-| FunctionRole | enum | — | FreeFunction, UseCaseFunction | 🔵 | 🔵 |
-| ItemAction | enum | — | Add, Modify, Reference, Delete | 🔵 | 🔵 |
-| SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🔵 | 🔵 |
-| CompositePattern | enum | — | Plain, TypestateState, Newtype | 🔵 | 🔵 |
-| VariantPayload | enum | — | Unit, Tuple, Struct | 🔵 | 🔵 |
-| TypeKindV2 | enum | — | Struct, Enum, TypeAlias | 🔵 | 🟡 |
-| SignalRegion | enum | — | SIntersectC_Match_Add, SIntersectC_Match_Modify, SIntersectC_Match_Reference, SIntersectC_Mismatch_Reference, SIntersectC_Mismatch_Add, SIntersectC_Mismatch_Modify, SMinusC_Reference, SMinusC_Add, SMinusC_Modify, DIntersectC, DMinusC, CMinusSUnionD | 🔵 | 🔵 |
-| ThreeWaySignalKind | enum | — | Skip, Blue, Yellow, Red | 🔵 | 🔵 |
-| TypeDefinitionKind | enum | delete | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, DomainService, FreeFunction | 🟡 | 🔵 |
-| MemberDeclaration | enum | delete | Variant, Field | 🟡 | 🔵 |
-| TypeAction | enum | delete | Add, Modify, Reference, Delete | 🟡 | 🔵 |
-| TypestateTransitions | enum | delete | Terminal, To | 🟡 | 🔵 |
+| ActionContradictionKind | enum | delete | — | 🔵 | 🔵 |
+| CatalogueLinterRuleKind | enum | reference | — | 🔵 | 🔵 |
+| CompositePattern | enum | — | — | 🔵 | 🔵 |
+| ContractRole | enum | — | — | 🔵 | 🔵 |
+| DataRole | enum | — | — | 🔵 | 🔵 |
+| FunctionRole | enum | — | — | 🔵 | 🔵 |
+| ItemAction | enum | — | — | 🔵 | 🔵 |
+| SelfReceiver | enum | — | — | 🔵 | 🔵 |
+| SignalRegion | enum | — | — | 🔵 | 🔵 |
+| ThreeWaySignalKind | enum | — | — | 🟡 | 🔵 |
+| TypeKindV2 | enum | — | — | 🔵 | 🔵 |
+| VariantPayload | enum | — | — | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| Identifier | value_object | — | — | 🔵 | 🔵 |
-| TypeName | value_object | — | — | 🔵 | 🔵 |
-| TraitName | value_object | — | — | 🔵 | 🔵 |
-| FieldName | value_object | — | — | 🔵 | 🔵 |
-| MethodName | value_object | — | — | 🔵 | 🔵 |
-| ParamName | value_object | — | — | 🔵 | 🔵 |
-| VariantName | value_object | — | — | 🔵 | 🔵 |
-| CrateName | value_object | — | — | 🔵 | 🔵 |
-| FunctionName | value_object | — | — | 🔵 | 🔵 |
-| ModulePath | value_object | — | — | 🔵 | 🔵 |
-| TypeRef | value_object | — | — | 🔵 | 🔵 |
-| FunctionPath | value_object | — | — | 🔵 | 🔵 |
-| FieldDecl | value_object | — | — | 🔵 | 🔵 |
-| VariantDecl | value_object | — | — | 🔵 | 🔵 |
-| TraitImplDeclV2 | value_object | — | — | 🔵 | 🔵 |
-| TypeEntry | value_object | — | — | 🔵 | 🔵 |
-| TraitEntry | value_object | — | — | 🔵 | 🔵 |
+| ActionContradiction | value_object | delete | — | 🔵 | 🔵 |
+| CatalogueDocument | value_object | — | — | 🟡 | 🔵 |
+| CatalogueLintViolation | value_object | reference | — | 🔵 | 🔵 |
+| CatalogueLinterRule | value_object | reference | — | 🔵 | 🔵 |
+| ConsistencyReport | value_object | delete | — | 🔵 | 🔵 |
+| ContractMapRenderOptions | value_object | modify | — | 🔵 | 🔵 |
+| CrateName | value_object | — | — | 🟡 | 🔵 |
+| FieldDecl | value_object | — | — | 🟡 | 🔵 |
+| FieldName | value_object | — | — | 🟡 | 🔵 |
+| FunctionBaselineEntry | value_object | delete | — | 🔵 | 🔵 |
 | FunctionEntry | value_object | — | — | 🔵 | 🔵 |
-| CatalogueDocument | value_object | — | — | 🔵 | 🔵 |
-| ThreeWaySignal | value_object | — | — | 🔵 | 🔵 |
-| ThreeWayEvaluationReport | value_object | — | — | 🔵 | 🔵 |
-| TypeCatalogueDocument | value_object | delete | — | 🟡 | 🔵 |
-| TypeCatalogueEntry | value_object | delete | — | 🟡 | 🔵 |
-| TypeBaseline | value_object | delete | — | 🟡 | 🔵 |
-| TypeBaselineEntry | value_object | delete | — | 🟡 | 🔵 |
-| TraitBaselineEntry | value_object | delete | — | 🟡 | 🔵 |
-| FunctionBaselineEntry | value_object | delete | — | 🟡 | 🔵 |
-| TraitImplBaselineEntry | value_object | delete | — | 🟡 | 🔵 |
-| TypeGraph | value_object | delete | — | 🟡 | 🔵 |
-| TypeNode | value_object | delete | — | 🟡 | 🔵 |
-| TraitNode | value_object | delete | — | 🟡 | 🔵 |
-| FunctionNode | value_object | delete | — | 🟡 | 🔵 |
-| EnumVariantDeclaration | value_object | delete | — | 🟡 | 🔵 |
-| TraitImplDecl | value_object | delete | — | 🟡 | 🔵 |
-| ParamDeclaration | value_object | modify | — | 🔵 | 🔵 |
-| MethodDeclaration | value_object | modify | — | 🔵 | 🔵 |
-| ConsistencyReport | value_object | reference | — | 🔵 | 🔵 |
+| FunctionName | value_object | — | — | 🟡 | 🔵 |
+| FunctionNode | value_object | delete | — | 🔵 | 🔵 |
+| FunctionPath | value_object | — | — | 🟡 | 🔵 |
+| Identifier | value_object | — | — | 🟡 | 🔵 |
+| LayerId | value_object | reference | — | 🔵 | 🔵 |
+| MethodDeclaration | value_object | modify | — | 🟡 | 🔵 |
+| MethodName | value_object | — | — | 🟡 | 🔵 |
+| ModulePath | value_object | — | — | 🟡 | 🔵 |
+| ParamDeclaration | value_object | modify | — | 🟡 | 🔵 |
+| ParamName | value_object | — | — | 🟡 | 🔵 |
+| ThreeWayEvaluationReport | value_object | — | — | 🟡 | 🔵 |
+| ThreeWaySignal | value_object | — | — | 🟡 | 🔵 |
+| TraitBaselineEntry | value_object | delete | — | 🔵 | 🔵 |
+| TraitEntry | value_object | — | — | 🔵 | 🔵 |
+| TraitImplBaselineEntry | value_object | delete | — | 🔵 | 🔵 |
+| TraitImplDeclV2 | value_object | — | — | 🟡 | 🔵 |
+| TraitImplEntry | value_object | delete | — | 🔵 | 🔵 |
+| TraitName | value_object | — | — | 🟡 | 🔵 |
+| TraitNode | value_object | delete | — | 🔵 | 🔵 |
+| TypeBaselineEntry | value_object | delete | — | 🔵 | 🔵 |
+| TypeEntry | value_object | — | — | 🔵 | 🔵 |
+| TypeName | value_object | — | — | 🟡 | 🔵 |
+| TypeNode | value_object | delete | — | 🔵 | 🔵 |
+| TypeRef | value_object | — | — | 🟡 | 🔵 |
+| VariantDecl | value_object | — | — | 🟡 | 🔵 |
+| VariantName | value_object | — | — | 🟡 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| IdentifierError | error_type | — | Empty, InvalidCharacters, InvalidSegment, InvalidFunctionPath | 🔵 | 🔵 |
-| CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🔵 | 🔵 |
-| Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🔵 | 🔵 |
-| NewTypeGraphCodecError | error_type | modify | InvalidTypeRef, AmbiguousTypeName | 🔵 | 🔵 |
+| AdrDecisionCommonError | error_type | modify | — | 🔵 | 🔵 |
+| CatalogueDocumentError | error_type | — | — | 🔵 | 🔵 |
+| CatalogueLinterError | error_type | reference | — | 🔵 | 🔵 |
+| GenericArgsError | error_type | — | — | 🟡 | 🔵 |
+| IdentifierError | error_type | — | — | 🔵 | 🔵 |
+| NewTypeGraphCodecError | error_type | — | — | 🔵 | 🔵 |
+| Phase1Error | error_type | — | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueToExtendedCratePort | secondary_port | — | fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError> | 🔵 | 🔵 |
-| SignalEvaluatorPort | secondary_port | — | fn evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error> | 🔵 | 🔵 |
-| ContractMapWriter | secondary_port | reference | fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError> | 🔵 | 🟡 |
-| CatalogueLinter | secondary_port | modify | fn run(&self, rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🟡 | 🟡 |
-| SchemaExporter | secondary_port | reference | fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> | 🔵 | 🟡 |
+| CatalogueLinter | secondary_port | modify | — | 🟡 | 🔵 |
+| CatalogueLoader | secondary_port | modify | — | 🟡 | 🔵 |
+| CatalogueToExtendedCratePort | secondary_port | — | — | 🟡 | 🔵 |
+| ContractMapWriter | secondary_port | reference | — | 🔵 | 🔵 |
+| SchemaExporter | secondary_port | reference | — | 🔵 | 🔵 |
+| SignalEvaluatorPort | secondary_port | — | — | 🟡 | 🔵 |
 
 ## Domain Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ExtendedCrate | domain_service | modify | — | 🔵 | 🔵 |
+| ExtendedCrate | domain_service | — | — | 🟡 | 🔵 |
+| TypeBaseline | domain_service | delete | — | 🔵 | 🔵 |
+| TypeGraph | domain_service | delete | — | 🔵 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| domain::tddd::consistency::check_consistency | free_function | delete | — | 🔵 | 🔵 |
+| domain::tddd::signals::evaluate_type_signals | free_function | delete | — | 🔵 | 🔵 |
+| domain::tddd::signals::undeclared_functions_to_signals | free_function | delete | — | 🔵 | 🔵 |
+| domain::tddd::signals::undeclared_to_signals | free_function | delete | — | 🔵 | 🔵 |
 

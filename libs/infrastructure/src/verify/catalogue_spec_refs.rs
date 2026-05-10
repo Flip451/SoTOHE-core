@@ -17,7 +17,10 @@ use domain::{
     check_catalogue_spec_ref_integrity,
 };
 
-use crate::tddd::{catalogue_codec, catalogue_spec_signals_codec, type_signals_codec};
+use crate::tddd::{
+    catalogue_codec, catalogue_document_codec::CatalogueDocumentCodec,
+    catalogue_spec_signals_codec, type_signals_codec,
+};
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::TdddLayerBinding;
 
@@ -151,6 +154,12 @@ pub fn read_spec_element_hashes(
 /// # Errors
 ///
 /// Returns a human-readable error string on I/O or decode failures.
+///
+/// For v3 catalogues the per-entry `spec_refs[]` check is structurally n/a
+/// (v3 externalizes spec traceability to `verify-spec-states-current`).
+/// A `[INFO]` message is printed to `stdout` so the caller can see that the
+/// check was intentionally skipped rather than silently omitted.  The returned
+/// findings vec is empty (exit code 0) because the skip is structurally correct.
 pub fn verify_one_layer_formatted(
     track_dir: &Path,
     items_dir: &Path,
@@ -158,6 +167,55 @@ pub fn verify_one_layer_formatted(
     spec_element_hashes: &BTreeMap<SpecElementId, ContentHash>,
     skip_stale: bool,
 ) -> Result<Vec<String>, String> {
+    let layer_id = binding.layer_id();
+    let catalogue_path = track_dir.join(binding.catalogue_file());
+
+    // Pre-read the catalogue to detect v3 before calling verify_one_layer.
+    // `verify_one_layer` returns Ok(vec![]) for v3 without providing an
+    // observable indication; we print an [INFO] line here so the output is
+    // auditable.  The read is guarded by the same symlink check used inside
+    // `verify_one_layer`.
+    let catalogue_present =
+        reject_symlinks_below(&catalogue_path, items_dir).map_err(|e| format!("{e}"))?;
+    if catalogue_present {
+        let bytes = std::fs::read(&catalogue_path)
+            .map_err(|e| format!("cannot read catalogue '{}': {e}", catalogue_path.display()))?;
+        let text = std::str::from_utf8(&bytes).map_err(|e| {
+            format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
+        })?;
+        if let Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) =
+            catalogue_codec::decode(text)
+        {
+            // v3 catalogue: confirm well-formedness, then emit an observable Info
+            // message rather than silently returning an empty findings list.
+            // Printing to stdout (not returning in the findings vec) keeps the
+            // exit code at 0 while still surfacing the skip reason.
+            let stem = catalogue_path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("")
+                .strip_suffix("-types.json")
+                .unwrap_or_else(|| {
+                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
+                })
+                .to_owned();
+            return match CatalogueDocumentCodec::decode(text, &stem) {
+                Ok(_) => {
+                    println!(
+                        "[INFO] [{layer_id}] v3 catalogue — per-entry spec_refs[] do not \
+                         exist; spec traceability is validated by verify-spec-states-current."
+                    );
+                    Ok(Vec::new())
+                }
+                Err(e) => Err(format!(
+                    "catalogue '{}' for layer '{layer_id}' failed to decode as v3 catalogue: \
+                     {e:?}",
+                    catalogue_path.display()
+                )),
+            };
+        }
+    }
+
     let findings =
         verify_one_layer(track_dir, items_dir, binding, spec_element_hashes, skip_stale)?;
     Ok(findings.into_iter().map(|f| format_finding(&f)).collect())
@@ -197,8 +255,39 @@ fn verify_one_layer(
     let text = std::str::from_utf8(&bytes).map_err(|e| {
         format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
     })?;
-    let catalogue = catalogue_codec::decode(text)
-        .map_err(|e| format!("cannot decode catalogue '{}': {e}", catalogue_path.display()))?;
+    let catalogue = match catalogue_codec::decode(text) {
+        Ok(d) => d,
+        Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
+            // v3 catalogue: per-entry spec_refs[] do not exist in the v3 schema.
+            // Spec traceability has moved to spec_states.json (verified by
+            // verify-spec-states-current).
+            //
+            // Decode via CatalogueDocumentCodec to confirm the v3 catalogue is
+            // well-formed (real validation: malformed v3 → Err).  For well-formed
+            // v3 we return Ok(vec![]) because there are no spec_refs[] to check —
+            // this is structurally correct, not fail-open.
+            let stem = catalogue_path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("")
+                .strip_suffix("-types.json")
+                .unwrap_or_else(|| {
+                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
+                })
+                .to_owned();
+            return match CatalogueDocumentCodec::decode(text, &stem) {
+                Ok(_) => Ok(Vec::new()),
+                Err(e) => Err(format!(
+                    "catalogue '{}' for layer '{layer_id}' failed to decode as v3 catalogue: \
+                     {e:?}",
+                    catalogue_path.display()
+                )),
+            };
+        }
+        Err(e) => {
+            return Err(format!("cannot decode catalogue '{}': {e}", catalogue_path.display()));
+        }
+    };
 
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
     let catalogue_hash = ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
@@ -286,5 +375,163 @@ pub fn format_finding(finding: &SpecRefFinding) -> String {
                 actual_catalogue_hash.to_hex()
             )
         }
+    }
+}
+
+/// Check whether a catalogue file is a well-formed v3 catalogue, returning a
+/// `VerifyFinding` that reflects the outcome at the appropriate severity.
+///
+/// - Well-formed v3 catalogue → `Ok(Some(VerifyFinding::new(Severity::Info, "... v3 catalogue ...")))`.
+/// - Malformed v3 catalogue (decode error) → `Ok(Some(VerifyFinding::error(...)))`.
+/// - v2 (or any non-v3) catalogue → `Ok(None)` (caller handles v2 normally).
+/// - I/O or UTF-8 error → `Err(reason)`.
+///
+/// This function is intended for use by tests that need to surface the Info
+/// finding for v3 catalogues.  The per-layer `verify_one_layer_formatted` path
+/// returns `Ok(vec![])` for well-formed v3 because the v2 spec_refs[] check is
+/// structurally inapplicable for v3; spec traceability is validated by
+/// `verify-spec-states-current` instead.
+///
+/// # Errors
+///
+/// Returns a human-readable error string on I/O or UTF-8 read failures.
+#[cfg(test)]
+pub(crate) fn check_v3_catalogue_finding(
+    catalogue_path: &std::path::Path,
+) -> Result<Option<domain::verify::VerifyFinding>, String> {
+    use domain::verify::{Severity, VerifyFinding};
+
+    let bytes = std::fs::read(catalogue_path)
+        .map_err(|e| format!("cannot read catalogue '{}': {e}", catalogue_path.display()))?;
+    let text = std::str::from_utf8(&bytes).map_err(|e| {
+        format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
+    })?;
+
+    match catalogue_codec::decode(text) {
+        Ok(_) => Ok(None), // v2 catalogue — not v3, nothing to report
+        Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
+            let stem = catalogue_path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("")
+                .strip_suffix("-types.json")
+                .unwrap_or_else(|| {
+                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
+                })
+                .to_owned();
+            let catalogue_name = catalogue_path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or_else(|| catalogue_path.to_str().unwrap_or("unknown"));
+            match CatalogueDocumentCodec::decode(text, &stem) {
+                Ok(_) => Ok(Some(VerifyFinding::new(
+                    Severity::Info,
+                    format!(
+                        "{catalogue_name}: v3 catalogue — per-entry spec_refs[] \
+                         do not exist; spec traceability is validated by \
+                         verify-spec-states-current."
+                    ),
+                ))),
+                Err(e) => Ok(Some(VerifyFinding::error(format!(
+                    "{catalogue_name}: failed to decode as v3 catalogue: {e:?}"
+                )))),
+            }
+        }
+        Err(_) => Ok(None), // other decode errors are v2 errors — not v3
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
+mod tests {
+    use domain::verify::Severity;
+    use tempfile::TempDir;
+
+    use super::*;
+
+    // -----------------------------------------------------------------------
+    // Fixtures
+    // -----------------------------------------------------------------------
+
+    /// Minimal valid v3 domain catalogue with a single type.
+    const V3_CATALOGUE_DOMAIN: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "A simple value object."
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+    /// Malformed v3 catalogue (missing required `layer` field).
+    const V3_CATALOGUE_MISSING_LAYER: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain"
+}"#;
+
+    fn write_file(dir: &std::path::Path, name: &str, content: &str) {
+        std::fs::write(dir.join(name), content).unwrap();
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: well-formed v3 catalogue → Info finding (not Error)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_v3_catalogue_well_formed_produces_info_finding() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "domain-types.json", V3_CATALOGUE_DOMAIN);
+        let path = tmp.path().join("domain-types.json");
+
+        let finding_opt = check_v3_catalogue_finding(&path).unwrap();
+
+        // Must produce Some(Info) finding with the "v3 catalogue" text.
+        let finding =
+            finding_opt.expect("well-formed v3 catalogue must produce a Some(VerifyFinding)");
+        assert_eq!(
+            finding.severity(),
+            Severity::Info,
+            "well-formed v3 catalogue must produce Info severity, got: {:?}",
+            finding.severity()
+        );
+        assert!(
+            finding.message().contains("v3 catalogue"),
+            "Info finding must contain 'v3 catalogue'; message: {}",
+            finding.message()
+        );
+        assert!(
+            finding.message().contains("verify-spec-states-current"),
+            "Info finding must reference 'verify-spec-states-current'; message: {}",
+            finding.message()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: malformed v3 catalogue → Error finding
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_v3_catalogue_malformed_produces_error_finding() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "domain-types.json", V3_CATALOGUE_MISSING_LAYER);
+        let path = tmp.path().join("domain-types.json");
+
+        let finding_opt = check_v3_catalogue_finding(&path).unwrap();
+
+        let finding =
+            finding_opt.expect("malformed v3 catalogue must produce a Some(VerifyFinding)");
+        assert_eq!(
+            finding.severity(),
+            Severity::Error,
+            "malformed v3 catalogue must produce Error severity, got: {:?}",
+            finding.severity()
+        );
     }
 }

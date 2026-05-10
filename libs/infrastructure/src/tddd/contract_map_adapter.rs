@@ -121,6 +121,9 @@ fn map_loader_error(err: LoadAllCataloguesError) -> CatalogueLoaderError {
                 reason: format!("invalid layer id '{value}': {source}"),
             }
         }
+        LoadAllCataloguesError::V3StubConversion { layer_id, path: _, reason } => {
+            CatalogueLoaderError::DecodeFailed { layer_id, reason }
+        }
     }
 }
 
@@ -419,25 +422,16 @@ mod tests {
         );
     }
 
-    /// E2E: load a catalogue that declares `MemberDeclaration` (kind=enum) with
-    /// a `Variant` arm carrying `payload_types: ["EnumVariantDeclaration"]`, and
-    /// `EnumVariantDeclaration` (kind=value_object) in the same layer.
+    /// E2E: load a v3 catalogue with two types and verify the OS-06 stub
+    /// renderer emits empty subgraphs with the deferment comment.
     ///
-    /// After loading via `FsCatalogueLoader` and rendering via
-    /// `render_contract_map`, the output must contain the variant payload edge
-    /// `MemberDeclaration -->|"::Variant"| EnumVariantDeclaration`.
-    ///
-    /// This test proves that:
-    /// 1. `decode_enum_variant_list` correctly round-trips `expected_variants`
-    ///    from the JSON into `Vec<EnumVariantDeclaration>`.
-    /// 2. `render_contract_map` emits the edge for the `Variant` arm's payload
-    ///    type when the target (`EnumVariantDeclaration`) is present in the
-    ///    `type_index` built from the same catalogue.
-    ///
-    /// Reproduces the "0 edges" regression described in the PR follow-up for
-    /// track `enum-variant-payload-schema-2026-05-02`.
+    /// T008: The full v3 rendering pipeline (edges, node shapes) is OS-06
+    /// deferred (T012). This test verifies the stub behaviour: the output
+    /// contains the flowchart scaffold and an OS-06 deferment comment, with
+    /// one subgraph per loaded layer (entries converted from v3→v2 stub by
+    /// `catalogue_bulk_loader`).
     #[test]
-    fn test_e2e_member_declaration_variant_payload_edge_roundtrip() {
+    fn test_e2e_v3_catalogue_renders_os06_stub() {
         const RULES: &str = r#"{
           "version": 2,
           "layers": [
@@ -455,32 +449,36 @@ mod tests {
           ]
         }"#;
 
-        // Minimal catalogue reflecting the actual `domain-types.json` for the
-        // `enum-variant-payload-schema-2026-05-02` track:
-        //   - EnumVariantDeclaration  (value_object)
-        //   - MemberDeclaration       (enum, Variant arm with payload_types: ["EnumVariantDeclaration"])
-        const CATALOGUE: &str = r#"{
-          "schema_version": 2,
-          "type_definitions": [
-            {
-              "name": "EnumVariantDeclaration",
-              "description": "Holds variant name and payload types.",
-              "approved": true,
-              "kind": "value_object",
-              "expected_members": [],
-              "expected_methods": []
+        // Minimal v3 catalogue with two types.
+        // Wire format: TypeKindDto uses #[serde(tag = "kind")] so the
+        // discriminator field is named "kind"; PatternDto uses #[serde(tag =
+        // "pattern")]. DataRole uses PascalCase (strum default).
+        const CATALOGUE_V3: &str = r#"{
+          "schema_version": 3,
+          "crate_name": "domain",
+          "layer": "domain",
+          "types": {
+            "UserId": {
+              "action": "add",
+              "role": "ValueObject",
+              "kind": {
+                "kind": "struct",
+                "pattern": { "pattern": "newtype", "inner": "u64" }
+              },
+              "module_path": "domain::user"
             },
-            {
-              "name": "MemberDeclaration",
-              "description": "Enum variant or struct field.",
-              "approved": true,
-              "kind": "enum",
-              "expected_variants": [
-                {"name": "Variant", "payload_types": ["EnumVariantDeclaration"]},
-                {"name": "Field",   "payload_types": ["String", "String"]}
-              ]
+            "User": {
+              "action": "add",
+              "role": "Entity",
+              "kind": {
+                "kind": "struct",
+                "pattern": { "pattern": "plain" }
+              },
+              "module_path": "domain::user"
             }
-          ]
+          },
+          "traits": {},
+          "functions": {}
         }"#;
 
         let tmp = tempfile::tempdir().unwrap();
@@ -491,43 +489,30 @@ mod tests {
         let track_root = root.join("track-items");
         let id = track_id("t-e2e");
         let track_dir = track_root.join(id.as_ref());
-        write(&track_dir.join("domain-types.json"), CATALOGUE);
+        write(&track_dir.join("domain-types.json"), CATALOGUE_V3);
 
         let loader = FsCatalogueLoader::new(track_root, rules_path, root.to_path_buf());
         let (layer_order, catalogues) = loader.load_all(&id).unwrap();
 
         assert_eq!(layer_order.len(), 1, "expected 1 layer");
         let domain_doc = catalogues.get(&layer_order[0]).unwrap();
-        // Verify the codec decoded expected_variants correctly (pre-render
-        // assertion so a codec failure surfaces before the render assertion).
-        let member_entry = domain_doc
-            .entries()
-            .iter()
-            .find(|e| e.name() == "MemberDeclaration")
-            .expect("MemberDeclaration must be present in decoded catalogue");
-        let domain::tddd::catalogue::TypeDefinitionKind::Enum { expected_variants } =
-            member_entry.kind()
-        else {
-            panic!("MemberDeclaration must decode as TypeDefinitionKind::Enum");
-        };
-        assert_eq!(expected_variants.len(), 2, "expected 2 variants (Variant, Field)");
-        let variant_arm =
-            expected_variants.iter().find(|v| v.name() == "Variant").expect("Variant arm missing");
-        assert_eq!(
-            variant_arm.payload_types(),
-            &["EnumVariantDeclaration"],
-            "Variant arm payload_types must survive codec round-trip"
-        );
+        // v3→v2 stub conversion: 2 types become 2 stub TypeCatalogueEntry values.
+        assert_eq!(domain_doc.entries().len(), 2, "expected 2 stub entries from v3 doc");
 
-        // Render and assert edge is present.
+        // Render: OS-06 stub must emit deferment comment + domain subgraph.
         let opts = ContractMapRenderOptions::default();
         let content = render_contract_map(&catalogues, &layer_order, &opts);
         let text = content.as_ref();
+        assert!(text.contains("flowchart LR"), "render must contain flowchart LR; got:\n{text}");
         assert!(
-            text.contains(
-                "L6_domain_MemberDeclaration -->|\"::Variant\"| L6_domain_EnumVariantDeclaration"
-            ),
-            "render_contract_map must emit variant payload edge; output was:\n{text}"
+            text.contains("OS-06 DEFERRED"),
+            "render must contain OS-06 deferment comment; got:\n{text}"
         );
+        assert!(
+            text.contains("subgraph domain [domain]"),
+            "render must contain domain subgraph; got:\n{text}"
+        );
+        // Stub: no mermaid edge arrows emitted (note: `-->` appears in HTML comment close).
+        assert!(!text.contains("-->|"), "stub must not emit edges");
     }
 }

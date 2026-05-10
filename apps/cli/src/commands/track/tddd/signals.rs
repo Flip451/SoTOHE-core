@@ -324,6 +324,9 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_with_missing_domain_types_json_returns_error() {
+        // T008: the old evaluator is removed and returns an error stub regardless of
+        // whether domain-types.json is present. This test verifies the command is
+        // fail-closed (returns Err) when invoked on a track without a catalogue file.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -334,9 +337,7 @@ mod tests {
         let workspace_root = dir.path().to_path_buf();
 
         let result = execute_type_signals(items_dir, "test-track".to_owned(), workspace_root, None);
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(msg.contains("/track:design"), "error must suggest /track:design, got: {msg}");
+        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
     }
 
     #[test]
@@ -378,6 +379,9 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_with_usecase_layer_dispatches_to_usecase_catalogue() {
+        // T008: the old evaluator is removed. This test verifies the command is fail-closed
+        // (returns Err) when invoked with --layer usecase. The evaluator stub error is
+        // returned regardless of which layer is targeted.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -408,17 +412,8 @@ mod tests {
             Some("usecase".to_owned()),
         );
 
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(
-            msg.contains("usecase-types.json"),
-            "error must mention usecase-types.json (not domain), got: {msg}"
-        );
-        assert!(
-            !msg.contains("domain-types.json"),
-            "error must NOT mention domain-types.json for --layer usecase, got: {msg}"
-        );
-        assert!(!msg.contains("not yet supported"), "Phase 1 rejection must be gone, got: {msg}");
+        // T008: evaluator stub always returns Err — just verify fail-closed.
+        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
     }
 
     // --- ensure_active_track tests ---
@@ -564,6 +559,9 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_no_layer_filter_iterates_all_enabled_bindings() {
+        // T008: the old evaluator is removed and always returns Err. This test verifies
+        // that invoking without --layer filter still returns an error (evaluator stub fires
+        // on the first binding — domain — and propagates immediately).
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -597,17 +595,8 @@ mod tests {
             None,
         );
 
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(
-            !msg.contains("usecase-types.json"),
-            "error must NOT mention usecase-types.json; domain binding must be processed first; \
-             got: {msg}"
-        );
-        assert!(
-            msg.contains("export schema") || msg.contains("nightly") || msg.contains("failed"),
-            "error must be from domain's rustdoc export step, got: {msg}"
-        );
+        // T008: evaluator stub always returns Err — just verify fail-closed.
+        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
     }
 
     /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.

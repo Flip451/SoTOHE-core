@@ -55,6 +55,7 @@ use domain::tddd::catalogue_linter::{
 /// for a fully-active linter, or with
 /// [`InMemoryCatalogueLinter::with_disabled_rules`] to suppress specific rules
 /// by their rule-id (see CN-06).
+#[derive(Default)]
 pub struct InMemoryCatalogueLinter {
     disabled_rules: Vec<String>,
 }
@@ -217,12 +218,6 @@ impl InMemoryCatalogueLinter {
                  expected_methods, expected_members, expected_variants, declares_application_service"
             ))),
         }
-    }
-}
-
-impl Default for InMemoryCatalogueLinter {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

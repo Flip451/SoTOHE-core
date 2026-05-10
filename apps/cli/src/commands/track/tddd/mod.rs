@@ -7,3 +7,4 @@ pub(crate) mod graph;
 pub(crate) mod lint;
 pub(crate) mod signals;
 pub(crate) mod spec_element_hash;
+pub(crate) mod three_way_signals;

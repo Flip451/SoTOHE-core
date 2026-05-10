@@ -878,6 +878,104 @@ pub(crate) fn std_canonical_path(short_name: &str) -> String {
     .to_string()
 }
 
+/// Maps a well-known `core` trait short name to its canonical rustdoc path.
+///
+/// `core` re-exports most of the same traits as `std`, but under `core::*`
+/// module paths.  When a catalogue entry declares `origin_crate = "core"`,
+/// the rustdoc JSON emitted for C-side impls will use `core::convert::From`
+/// rather than `std::convert::From`.  This function mirrors `std_canonical_path`
+/// but produces `core::*` paths so the S-side codec generates identity keys
+/// that match the C-side rustdoc output.
+///
+/// Falls back to `"core::{name}"` for any trait not in the lookup table.
+pub(crate) fn core_canonical_path(short_name: &str) -> String {
+    match short_name {
+        // core::convert
+        "From" => "core::convert::From",
+        "Into" => "core::convert::Into",
+        "TryFrom" => "core::convert::TryFrom",
+        "TryInto" => "core::convert::TryInto",
+        "AsRef" => "core::convert::AsRef",
+        "AsMut" => "core::convert::AsMut",
+        // core::clone
+        "Clone" => "core::clone::Clone",
+        // core::marker
+        "Copy" => "core::marker::Copy",
+        "Send" => "core::marker::Send",
+        "Sync" => "core::marker::Sync",
+        "Sized" => "core::marker::Sized",
+        "Unpin" => "core::marker::Unpin",
+        "PhantomData" => "core::marker::PhantomData",
+        // core::fmt
+        "Debug" => "core::fmt::Debug",
+        "Display" => "core::fmt::Display",
+        "Formatter" => "core::fmt::Formatter",
+        // core::cmp
+        "PartialEq" => "core::cmp::PartialEq",
+        "Eq" => "core::cmp::Eq",
+        "Ord" => "core::cmp::Ord",
+        "PartialOrd" => "core::cmp::PartialOrd",
+        // core::hash
+        "Hash" => "core::hash::Hash",
+        "Hasher" => "core::hash::Hasher",
+        "BuildHasher" => "core::hash::BuildHasher",
+        // core::default
+        "Default" => "core::default::Default",
+        // core::iter
+        "Iterator" => "core::iter::Iterator",
+        "IntoIterator" => "core::iter::IntoIterator",
+        "DoubleEndedIterator" => "core::iter::DoubleEndedIterator",
+        "ExactSizeIterator" => "core::iter::ExactSizeIterator",
+        "FromIterator" => "core::iter::FromIterator",
+        "Extend" => "core::iter::Extend",
+        "Sum" => "core::iter::Sum",
+        "Product" => "core::iter::Product",
+        // core::ops
+        "Drop" => "core::ops::Drop",
+        "Deref" => "core::ops::Deref",
+        "DerefMut" => "core::ops::DerefMut",
+        "FnOnce" => "core::ops::FnOnce",
+        "FnMut" => "core::ops::FnMut",
+        "Fn" => "core::ops::Fn",
+        "Add" => "core::ops::Add",
+        "Sub" => "core::ops::Sub",
+        "Mul" => "core::ops::Mul",
+        "Div" => "core::ops::Div",
+        "Rem" => "core::ops::Rem",
+        "Neg" => "core::ops::Neg",
+        "Not" => "core::ops::Not",
+        "BitAnd" => "core::ops::BitAnd",
+        "BitOr" => "core::ops::BitOr",
+        "BitXor" => "core::ops::BitXor",
+        "Shl" => "core::ops::Shl",
+        "Shr" => "core::ops::Shr",
+        "Index" => "core::ops::Index",
+        "IndexMut" => "core::ops::IndexMut",
+        "AddAssign" => "core::ops::AddAssign",
+        "SubAssign" => "core::ops::SubAssign",
+        "MulAssign" => "core::ops::MulAssign",
+        "DivAssign" => "core::ops::DivAssign",
+        "RemAssign" => "core::ops::RemAssign",
+        "BitAndAssign" => "core::ops::BitAndAssign",
+        "BitOrAssign" => "core::ops::BitOrAssign",
+        "BitXorAssign" => "core::ops::BitXorAssign",
+        "ShlAssign" => "core::ops::ShlAssign",
+        "ShrAssign" => "core::ops::ShrAssign",
+        // core::str
+        "FromStr" => "core::str::FromStr",
+        // core::borrow
+        "Borrow" => "core::borrow::Borrow",
+        "BorrowMut" => "core::borrow::BorrowMut",
+        // core::pin
+        "Pin" => "core::pin::Pin",
+        // core::error (stable since Rust 1.81)
+        "Error" => "core::error::Error",
+        // Fall back to `core::{name}` for any unknown entry.
+        other => return format!("core::{other}"),
+    }
+    .to_string()
+}
+
 /// Converts a `syn::Expr` to a textual representation.
 ///
 /// Best-effort: literal integers and paths are rendered verbatim; other forms

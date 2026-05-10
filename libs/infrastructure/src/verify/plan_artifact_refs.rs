@@ -21,8 +21,11 @@ use std::path::{Path, PathBuf};
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use thiserror::Error;
 
+use domain::verify::Severity;
+
 use crate::spec::codec as spec_codec;
 use crate::tddd::catalogue_codec;
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::track::symlink_guard;
 
 /// Errors specific to the `plan-artifact-refs` verifier.
@@ -230,12 +233,61 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
 
         // The catalogue codec already validates SpecRef newtypes (SpecElementId, ContentHash)
         // and InformalGroundRef (kind variant + non-empty summary).
-        let catalogue_doc = match catalogue_codec::decode(&catalogue_content) {
-            Ok(d) => d,
+        let catalogue_doc_opt = match catalogue_codec::decode(&catalogue_content) {
+            Ok(d) => Some(d),
+            Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
+                // v3 catalogue: per-entry spec_refs[] do not exist in the v3 schema.
+                // Spec traceability has moved to spec_states.json (verified by
+                // verify-spec-states-current).
+                //
+                // Decode via CatalogueDocumentCodec to confirm the v3 catalogue is
+                // well-formed — decode failure surfaces a real error finding.
+                let stem = std::path::Path::new(catalogue_name)
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("")
+                    .strip_suffix("-types.json")
+                    .unwrap_or_else(|| {
+                        std::path::Path::new(catalogue_name)
+                            .file_stem()
+                            .and_then(|s| s.to_str())
+                            .unwrap_or("unknown")
+                    })
+                    .to_owned();
+                match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
+                    Ok(_) => {
+                        // Well-formed v3 catalogue: emit an Info finding explaining
+                        // why per-entry spec_refs[] validation is structurally
+                        // inapplicable and where traceability is validated instead.
+                        findings.push(VerifyFinding::new(
+                            Severity::Info,
+                            format!(
+                                "{catalogue_name}: v3 catalogue — per-entry spec_refs[] \
+                                 do not exist; spec traceability is validated by \
+                                 verify-spec-states-current."
+                            ),
+                        ));
+                        continue;
+                    }
+                    Err(e) => {
+                        findings.push(VerifyFinding::error(format!(
+                            "{catalogue_name}: failed to decode as v3 catalogue: {e:?}"
+                        )));
+                        continue;
+                    }
+                }
+            }
             Err(e) => {
                 findings.push(VerifyFinding::error(format!("Cannot parse {catalogue_name}: {e}")));
                 continue;
             }
+        };
+
+        // Both the `UnsupportedSchemaVersion` arm and the generic `Err` arm above
+        // call `continue`, so reaching here guarantees `catalogue_doc_opt` is `Some`.
+        // Use `let ... else` to make that invariant explicit without a panic path.
+        let Some(catalogue_doc) = catalogue_doc_opt else {
+            continue;
         };
 
         for entry in catalogue_doc.entries() {
@@ -1905,6 +1957,81 @@ mod tests {
             !has_block_warning,
             "block with exactly 10 lines must not emit warning: {:?}",
             outcome
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // v3 catalogue tests
+    // -----------------------------------------------------------------------
+
+    /// Minimal valid v3 domain catalogue.
+    const V3_CATALOGUE_DOMAIN: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "docs": "A simple value object."
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+    /// Malformed v3 catalogue (missing required `layer` field).
+    const V3_CATALOGUE_MISSING_LAYER: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain"
+}"#;
+
+    #[test]
+    fn test_v3_catalogue_produces_info_finding_not_error() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        write_file(&track_dir, "domain-types.json", V3_CATALOGUE_DOMAIN);
+
+        let outcome = verify(&track_dir);
+
+        // v3 catalogue must produce an Info finding (not an Error) about spec_refs[].
+        let info_finding = outcome.findings().iter().find(|f| {
+            f.severity() == domain::verify::Severity::Info && f.message().contains("v3 catalogue")
+        });
+        assert!(
+            info_finding.is_some(),
+            "v3 catalogue must produce an Info finding with 'v3 catalogue'; findings: {:?}",
+            outcome.findings()
+        );
+
+        // Must not produce any error-level finding.
+        let has_error =
+            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        assert!(
+            !has_error,
+            "v3 catalogue must not produce error findings; findings: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_v3_catalogue_malformed_produces_error_finding() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), "test-track");
+        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+        write_file(&track_dir, "domain-types.json", V3_CATALOGUE_MISSING_LAYER);
+
+        let outcome = verify(&track_dir);
+
+        // Malformed v3 catalogue must produce an error finding.
+        let has_error =
+            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        assert!(
+            has_error,
+            "malformed v3 catalogue must produce an error finding; findings: {:?}",
+            outcome.findings()
         );
     }
 }

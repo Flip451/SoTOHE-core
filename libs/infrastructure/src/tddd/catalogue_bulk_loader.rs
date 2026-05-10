@@ -12,15 +12,29 @@
 //! All reads are guarded by `reject_symlinks_below` (see
 //! `knowledge/conventions/security.md`): a missing catalogue is reported as
 //! `CatalogueNotFound` rather than being silently skipped.
+//!
+//! T008: The loader handles both v3 (`CatalogueDocument`, schema_version=3)
+//! and v2 (`TypeCatalogueDocument`, schema_version=2) catalogues. V3
+//! catalogues are converted to minimal stub `TypeCatalogueDocument` entries
+//! (preserving entry names + role-mapped shapes) so the contract-map renderer
+//! can emit node subgraphs. Cross-reference edges are OS-06 (out of scope)
+//! and are not reconstructed. The `CatalogueLoader` port continues to return
+//! `TypeCatalogueDocument` for compatibility with `CatalogueLinter` (which
+//! operates on v2 entries and is not migrated in T008).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use domain::ValidationError;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue::TypeCatalogueDocument;
+use domain::tddd::catalogue::{
+    TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+};
+use domain::tddd::catalogue_v2::composite::{CompositePattern, TypeKindV2};
+use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 
 use crate::tddd::catalogue_codec::{self, TypeCatalogueCodecError};
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::{self, LoadTdddLayersError, TdddLayerBinding};
 
@@ -48,7 +62,7 @@ pub enum LoadAllCataloguesError {
     #[error("catalogue file '{}' does not exist for layer '{layer_id}'", .path.display())]
     CatalogueNotFound { layer_id: String, path: PathBuf },
 
-    /// Catalogue file failed to decode.
+    /// Catalogue file failed to decode (both v3 and v2 codecs rejected it).
     #[error("failed to decode catalogue for layer '{layer_id}' at {}: {source}", .path.display())]
     Decode {
         layer_id: String,
@@ -68,6 +82,14 @@ pub enum LoadAllCataloguesError {
         #[source]
         source: ValidationError,
     },
+
+    /// A v3-to-v2 stub conversion failed (e.g. empty entry name in a v3 catalogue).
+    ///
+    /// This should not occur in practice because v3 `TypeName`/`TraitName`/`FunctionPath`
+    /// are validated newtypes, but is reported as an error rather than silently dropped
+    /// so that malformed catalogues are diagnosed rather than producing truncated output.
+    #[error("v3 stub conversion failed for layer '{layer_id}' at {}: {reason}", .path.display())]
+    V3StubConversion { layer_id: String, path: PathBuf, reason: String },
 }
 
 /// Load every `tddd.enabled` layer's catalogue from `track_dir` and return
@@ -77,6 +99,11 @@ pub enum LoadAllCataloguesError {
 /// that layers with zero dependencies (inside the enabled set) come first;
 /// the second element maps each layer to its decoded
 /// [`TypeCatalogueDocument`].
+///
+/// V3 catalogues (`schema_version = 3`) are converted to minimal stub
+/// `TypeCatalogueDocument` entries (entry name + role-mapped shape) so that
+/// downstream rendering can emit node subgraphs. Cross-reference edges are
+/// OS-06 (out of scope) and are not reconstructed.
 ///
 /// # Arguments
 ///
@@ -95,7 +122,7 @@ pub enum LoadAllCataloguesError {
 /// * `architecture-rules.json` cannot be read, parsed, or is reached through
 ///   a symlink below `trusted_root`.
 /// * Any enabled layer's catalogue file does not exist or is a symlink.
-/// * Any catalogue file fails to decode via [`catalogue_codec::decode`].
+/// * Any catalogue file fails to decode (both v3 and v2 codecs rejected).
 /// * `may_depend_on` forms a cycle among the `tddd.enabled` layers (deps
 ///   pointing to disabled or absent layers are silently ignored so that
 ///   `tddd.enabled = false` layers do not force ordering decisions).
@@ -161,13 +188,35 @@ pub fn load_all_catalogues(
                 let json = std::fs::read_to_string(&catalogue_path).map_err(|source| {
                     LoadAllCataloguesError::Io { path: catalogue_path.clone(), source }
                 })?;
-                let doc = catalogue_codec::decode(&json).map_err(|source| {
-                    LoadAllCataloguesError::Decode {
-                        layer_id: layer_id.as_ref().to_owned(),
-                        path: catalogue_path.clone(),
-                        source,
-                    }
-                })?;
+                // Try v3 codec first (schema_version = 3); fall back to v2.
+                // For v3 catalogues, convert to a stub TypeCatalogueDocument so
+                // the contract-map renderer can emit node shapes. Cross-reference
+                // edges remain OS-06 (out of scope) and are not reconstructed.
+                let doc = match derive_filename_stem(&catalogue_path) {
+                    Some(stem) => match CatalogueDocumentCodec::decode(&json, &stem) {
+                        Ok(v3_doc) => v3_doc_to_stub(&v3_doc).map_err(|reason| {
+                            LoadAllCataloguesError::V3StubConversion {
+                                layer_id: layer_id.as_ref().to_owned(),
+                                path: catalogue_path.clone(),
+                                reason,
+                            }
+                        })?,
+                        Err(_) => catalogue_codec::decode(&json).map_err(|source| {
+                            LoadAllCataloguesError::Decode {
+                                layer_id: layer_id.as_ref().to_owned(),
+                                path: catalogue_path.clone(),
+                                source,
+                            }
+                        })?,
+                    },
+                    None => catalogue_codec::decode(&json).map_err(|source| {
+                        LoadAllCataloguesError::Decode {
+                            layer_id: layer_id.as_ref().to_owned(),
+                            path: catalogue_path.clone(),
+                            source,
+                        }
+                    })?,
+                };
                 catalogues.insert(layer_id.clone(), doc);
                 ordered_ids.push(layer_id);
             }
@@ -326,16 +375,10 @@ fn topological_sort(
 
     // Preserve the input ordering for all ties by scanning `enabled_ids` at
     // each step and picking the first unprocessed node with in_degree == 0.
-    // A simple FIFO queue is insufficient here: when two nodes become ready
-    // at different processing steps, FIFO emits them in processing order
-    // rather than in their original input order. Scanning from the front of
-    // `enabled_ids` each time guarantees stable input-order tie-breaking
-    // across all scheduling points.
     let mut processed: BTreeSet<&str> = BTreeSet::new();
     let mut result: Vec<String> = Vec::with_capacity(enabled_ids.len());
 
     loop {
-        // Find the first unprocessed node in input order that is ready.
         let next = enabled_ids
             .iter()
             .copied()
@@ -362,6 +405,202 @@ fn topological_sort(
         return Err(LoadAllCataloguesError::TopologicalSortFailed { cycle });
     }
     Ok(result)
+}
+
+// ---------------------------------------------------------------------------
+// v3 → v2 stub conversion helpers
+// ---------------------------------------------------------------------------
+
+/// Extract the filename stem (portion before `-types.json`).
+///
+/// Returns `Some("domain")` for `"domain-types.json"`, `None` when the path
+/// has no filename.
+fn derive_filename_stem(path: &Path) -> Option<String> {
+    let filename = path.file_name()?.to_str()?;
+    Some(
+        filename
+            .strip_suffix("-types.json")
+            .map(str::to_owned)
+            .unwrap_or_else(|| path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()),
+    )
+}
+
+/// Converts a v3 [`CatalogueDocument`] into a minimal stub [`TypeCatalogueDocument`]
+/// for contract-map rendering and `<layer>-types.md` rendering.
+///
+/// Cross-reference edges are OS-06 (out of scope) and are not reconstructed —
+/// the stub entries carry no `expected_methods`, `implements`, or variant
+/// payload types, so no edges are emitted by the contract-map renderer. The node
+/// shapes (mermaid shapes derived from `TypeDefinitionKind`) are preserved by
+/// mapping v3 roles to the closest v2 kind variant.
+///
+/// Each entry's `ItemAction` is preserved (mapped to the corresponding `TypeAction`)
+/// so that `render_type_catalogue` can render action markers (`modify`, `delete`,
+/// etc.) in the `<layer>-types.md` output.
+///
+/// Returns `Err(reason)` if any entry name fails [`TypeCatalogueEntry::new`]
+/// validation (empty/whitespace-only name). This should not occur in practice
+/// because v3 `TypeName`/`TraitName`/`FunctionPath` are validated newtypes, but
+/// the error is surfaced rather than silently dropped so that malformed catalogues
+/// are diagnosed rather than producing truncated rendering output.
+///
+/// Exposed as `pub(crate)` so that `track::render` can use the same v3→stub
+/// conversion when rendering `<layer>-types.md` for schema_version = 3 catalogues.
+pub(crate) fn v3_doc_to_stub(
+    doc: &domain::tddd::catalogue_v2::CatalogueDocument,
+) -> Result<TypeCatalogueDocument, String> {
+    let mut entries: Vec<TypeCatalogueEntry> = Vec::new();
+
+    // Type entries: DataRole → TypeDefinitionKind stub
+    for (type_name, type_entry) in &doc.types {
+        let kind = data_role_to_kind(type_entry.role, &type_entry.kind);
+        let action = item_action_to_type_action(type_entry.action);
+        let entry = TypeCatalogueEntry::new(
+            type_name.as_str(),
+            type_entry.docs.as_deref().unwrap_or(""),
+            kind,
+            action,
+            true,
+        )
+        .map_err(|e| format!("type entry '{type_name}': {e}"))?;
+        entries.push(entry);
+    }
+
+    // Trait entries: ContractRole → TypeDefinitionKind stub
+    for (trait_name, trait_entry) in &doc.traits {
+        let kind = contract_role_to_kind(trait_entry.role);
+        let action = item_action_to_type_action(trait_entry.action);
+        let entry = TypeCatalogueEntry::new(
+            trait_name.as_str(),
+            trait_entry.docs.as_deref().unwrap_or(""),
+            kind,
+            action,
+            true,
+        )
+        .map_err(|e| format!("trait entry '{trait_name}': {e}"))?;
+        entries.push(entry);
+    }
+
+    // Function entries: FunctionRole → FreeFunction stub.
+    //
+    // Cross-crate functions (fn_path.crate_name != doc.crate_name, ADR 2 D5) are
+    // intentionally excluded from the stub.  `build_function_identity_map` skips
+    // non-local items (`crate_id != 0`), so the signal evaluator never emits a
+    // signal for them.  If they were included in the stub, `check_type_signals`
+    // would find them in the expected set but not in the signals file, producing a
+    // spurious "missing signal evaluation" gate failure on every regeneration.
+    for (fn_path, fn_entry) in &doc.functions {
+        if fn_path.crate_name != doc.crate_name {
+            continue;
+        }
+        let kind = function_role_to_kind(fn_entry.role);
+        let action = item_action_to_type_action(fn_entry.action);
+        let entry = TypeCatalogueEntry::new(
+            fn_path.to_string(),
+            fn_entry.docs.as_deref().unwrap_or(""),
+            kind,
+            action,
+            true,
+        )
+        .map_err(|e| format!("function entry '{fn_path}': {e}"))?;
+        entries.push(entry);
+    }
+
+    Ok(TypeCatalogueDocument::new(3, entries))
+}
+
+/// Convert a v3 [`ItemAction`] to the corresponding v2 [`TypeAction`].
+///
+/// The two enums have identical semantics and variant names; this function
+/// performs the structural mapping so the rendered `<layer>-types.md` table
+/// shows the correct action markers (e.g. `modify`, `delete`) for v3 entries.
+fn item_action_to_type_action(action: ItemAction) -> TypeAction {
+    match action {
+        ItemAction::Add => TypeAction::Add,
+        ItemAction::Modify => TypeAction::Modify,
+        ItemAction::Reference => TypeAction::Reference,
+        ItemAction::Delete => TypeAction::Delete,
+    }
+}
+
+/// Map a v3 `DataRole` (+ `TypeKindV2` for typestate detection) to the closest
+/// v2 `TypeDefinitionKind` stub for node-shape rendering.
+fn data_role_to_kind(role: DataRole, kind_v2: &TypeKindV2) -> TypeDefinitionKind {
+    // Typestate detection: Struct with TypestateState pattern → Typestate stub.
+    if let TypeKindV2::Struct { pattern: CompositePattern::TypestateState { .. }, .. } = kind_v2 {
+        return TypeDefinitionKind::Typestate {
+            transitions: domain::tddd::catalogue::TypestateTransitions::Terminal,
+            expected_members: vec![],
+            expected_methods: vec![],
+        };
+    }
+    // Enum kind → Enum stub (role ignored for shape selection, ErrorType excepted).
+    if matches!(kind_v2, TypeKindV2::Enum { .. }) && matches!(role, DataRole::ErrorType) {
+        return TypeDefinitionKind::ErrorType { expected_variants: vec![] };
+    }
+    if matches!(kind_v2, TypeKindV2::Enum { .. }) {
+        return TypeDefinitionKind::Enum { expected_variants: vec![] };
+    }
+    // Struct / TypeAlias → role-based shape.
+    match role {
+        DataRole::ValueObject
+        | DataRole::Entity
+        | DataRole::AggregateRoot
+        | DataRole::Specification => {
+            TypeDefinitionKind::ValueObject { expected_members: vec![], expected_methods: vec![] }
+        }
+        DataRole::DomainService => {
+            TypeDefinitionKind::DomainService { expected_members: vec![], expected_methods: vec![] }
+        }
+        DataRole::Factory => {
+            TypeDefinitionKind::Factory { expected_members: vec![], expected_methods: vec![] }
+        }
+        DataRole::UseCase => {
+            TypeDefinitionKind::UseCase { expected_members: vec![], expected_methods: vec![] }
+        }
+        DataRole::Interactor => TypeDefinitionKind::Interactor {
+            expected_members: vec![],
+            expected_methods: vec![],
+            declares_application_service: vec![],
+        },
+        DataRole::Command => {
+            TypeDefinitionKind::Command { expected_members: vec![], expected_methods: vec![] }
+        }
+        DataRole::Query => {
+            TypeDefinitionKind::Query { expected_members: vec![], expected_methods: vec![] }
+        }
+        DataRole::Dto => {
+            TypeDefinitionKind::Dto { expected_members: vec![], expected_methods: vec![] }
+        }
+        DataRole::ErrorType => TypeDefinitionKind::ErrorType { expected_variants: vec![] },
+        DataRole::SecondaryAdapter => TypeDefinitionKind::SecondaryAdapter {
+            expected_members: vec![],
+            expected_methods: vec![],
+            implements: vec![],
+        },
+    }
+}
+
+/// Map a v3 `ContractRole` to the closest v2 `TypeDefinitionKind` stub.
+fn contract_role_to_kind(role: ContractRole) -> TypeDefinitionKind {
+    match role {
+        ContractRole::SecondaryPort | ContractRole::SpecificationPort => {
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }
+        }
+        ContractRole::ApplicationService => {
+            TypeDefinitionKind::ApplicationService { expected_methods: vec![] }
+        }
+    }
+}
+
+/// Map a v3 `FunctionRole` to the v2 `FreeFunction` stub.
+fn function_role_to_kind(_role: FunctionRole) -> TypeDefinitionKind {
+    TypeDefinitionKind::FreeFunction {
+        module_path: None,
+        expected_params: vec![],
+        expected_returns: vec![],
+        expected_is_async: false,
+    }
 }
 
 #[cfg(test)]
@@ -534,12 +773,84 @@ mod tests {
         assert_eq!(ordered, vec!["b".to_owned(), "a".to_owned()]);
     }
 
+    // T008: test_extract_type_names_is_reusable_from_this_module deleted.
+    // type_graph_render::extract_type_names no longer exists (type_graph_render is stubbed in T008).
+
+    /// Verify that `v3_doc_to_stub` preserves `ItemAction` values rather than
+    /// hardcoding `TypeAction::Add`. Each v3 `ItemAction` variant must map to
+    /// the corresponding `TypeAction` so that `render_type_catalogue` can show
+    /// the correct action markers (modify, delete, etc.) in `<layer>-types.md`.
     #[test]
-    fn test_extract_type_names_is_reusable_from_this_module() {
-        // Visibility test: the pub(crate) promotion of extract_type_names
-        // allows `catalogue_bulk_loader` tests to import and call it.
-        use crate::tddd::type_graph_render::extract_type_names;
-        let names = extract_type_names("Result<Option<User>, DomainError>");
-        assert_eq!(names, vec!["Result", "Option", "User", "DomainError"]);
+    fn test_v3_doc_to_stub_preserves_item_action() {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::composite::{CompositePattern, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+        use domain::tddd::catalogue_v2::identifiers::{
+            FunctionName, FunctionPath, ModulePath, TypeRef,
+        };
+        use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
+        use domain::tddd::catalogue_v2::{CatalogueDocument, CrateName, TraitName, TypeName};
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
+
+        // TypeEntry with Modify action
+        let type_name = TypeName::new("MyType").unwrap();
+        doc.types.insert(
+            type_name,
+            TypeEntry {
+                action: ItemAction::Modify,
+                role: DataRole::ValueObject,
+                kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+                methods: vec![],
+                trait_impls: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+            },
+        );
+
+        // TraitEntry with Delete action
+        let trait_name = TraitName::new("MyTrait").unwrap();
+        doc.traits.insert(
+            trait_name,
+            TraitEntry {
+                action: ItemAction::Delete,
+                role: ContractRole::SecondaryPort,
+                methods: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+            },
+        );
+
+        // FunctionEntry with Reference action (same crate, so it should be included)
+        let fn_path = FunctionPath::at_root(crate_name, FunctionName::new("my_fn").unwrap());
+        doc.functions.insert(
+            fn_path,
+            FunctionEntry {
+                action: ItemAction::Reference,
+                role: FunctionRole::FreeFunction,
+                params: vec![],
+                returns: TypeRef::new("()").unwrap(),
+                is_async: false,
+                docs: None,
+            },
+        );
+
+        let stub = v3_doc_to_stub(&doc).unwrap();
+        let entries: Vec<_> = stub.entries().iter().collect();
+
+        // Find entries by name
+        let type_entry = entries.iter().find(|e| e.name() == "MyType").unwrap();
+        let trait_entry = entries.iter().find(|e| e.name() == "MyTrait").unwrap();
+        let fn_entry = entries.iter().find(|e| e.name().contains("my_fn")).unwrap();
+
+        assert_eq!(type_entry.action(), TypeAction::Modify, "type action must map Modify→Modify");
+        assert_eq!(trait_entry.action(), TypeAction::Delete, "trait action must map Delete→Delete");
+        assert_eq!(
+            fn_entry.action(),
+            TypeAction::Reference,
+            "function action must map Reference→Reference"
+        );
     }
 }

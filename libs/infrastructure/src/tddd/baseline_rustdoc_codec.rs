@@ -75,20 +75,14 @@ pub enum BaselineRustdocCodecError {
 /// Both use the same wire format (`rustdoc_types::Crate` JSON) and the same
 /// deserialization path.
 ///
-/// This is an infrastructure-internal type; it is not part of the public
-/// TDDD catalogue (infrastructure-types.json) and should not be used outside
-/// the infrastructure layer.
+/// Codec for loading `rustdoc_types::Crate` from JSON files produced by
+/// `cargo +nightly rustdoc --output-format json`.
 ///
-/// T005 (`CatalogueToExtendedCrateCodec`) and downstream callers will use this
-/// codec to load TypeGraph B (Baseline) and C (Current). The `#[allow(dead_code)]`
-/// suppresses the "never constructed" lint while the codec has no caller yet.
-#[allow(dead_code)]
+/// Used by the `three-way-signals` command to load TypeGraph B (Baseline) and
+/// TypeGraph C (Current) for `SignalEvaluatorV2`.
 #[derive(Debug, Clone)]
-pub(crate) struct BaselineRustdocCodec;
+pub struct BaselineRustdocCodec;
 
-// T005 callers will use these methods once `CatalogueToExtendedCrateCodec` is
-// implemented. Suppress the dead-code lint until that point.
-#[allow(dead_code)]
 impl BaselineRustdocCodec {
     /// Loads and deserializes a `rustdoc_types::Crate` from the given JSON file.
     ///
@@ -101,7 +95,7 @@ impl BaselineRustdocCodec {
     ///
     /// Returns `BaselineRustdocCodecError::UnsupportedFormatVersion` if the
     /// file's `format_version` differs from `rustdoc_types::FORMAT_VERSION`.
-    pub(crate) fn load(path: &Path) -> Result<Crate, BaselineRustdocCodecError> {
+    pub fn load(path: &Path) -> Result<Crate, BaselineRustdocCodecError> {
         let content = std::fs::read_to_string(path)?;
         Self::check_and_deserialize(&content)
     }
@@ -117,7 +111,7 @@ impl BaselineRustdocCodec {
     ///
     /// Returns `BaselineRustdocCodecError::UnsupportedFormatVersion` if the
     /// `format_version` field does not match the expected constant.
-    pub(crate) fn from_json(json: &str) -> Result<Crate, BaselineRustdocCodecError> {
+    pub fn from_json(json: &str) -> Result<Crate, BaselineRustdocCodecError> {
         Self::check_and_deserialize(json)
     }
 

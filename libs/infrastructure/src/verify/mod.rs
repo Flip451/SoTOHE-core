@@ -10,12 +10,8 @@
 // Re-export core verify types so the CLI layer imports from here instead of `domain`.
 pub use domain::verify::{Severity, VerifyFinding, VerifyOutcome};
 
-// Re-export domain types needed by CLI test code (AC-03: no domain imports in apps/cli/src/).
-pub use spec_code_consistency::{
-    ConfidenceSignal, ConsistencyReport, Timestamp, TypeAction, TypeBaseline, TypeBaselineEntry,
-    TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeGraph, TypeKind,
-    check_consistency, consistency_report_to_findings, evaluate_consistency_from_components,
-};
+// T008: TypeGraph / TypeBaseline / ConsistencyReport re-exports removed.
+// The spec_code_consistency module is now a stub; these types no longer exist.
 
 pub mod adr_signals;
 pub mod architecture_rules;

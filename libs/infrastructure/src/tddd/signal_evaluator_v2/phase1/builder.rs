@@ -383,79 +383,146 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     // After resolution and A-side id remapping (Phase 1.45), check that no local-crate Id
     // referenced in S's items is missing from S.
     //
-    // `collect_referenced_ids` pre-filters the Id list so that:
-    // - `Id(UNRESOLVED_CRATE_ID)` is **never** yielded.  A-sourced external type references
-    //   (e.g. `serde::Serialize`) retain `Id(UNRESOLVED_CRATE_ID)` as the path id after
-    //   Phase 1.5 (because `is_local_unresolved_path` guards external names).
-    //   `collect_ids_from_type` explicitly skips any id equal to `UNRESOLVED_CRATE_ID`, so
-    //   external references never reach this check and are never rejected as dangling.
+    // A- and B-side items use INDEPENDENT Id spaces.  Phase 1.45 remaps A-sourced local type
+    // refs to S-side Ids, but A-side synthetic external Ids (from `ensure_external_type_id`,
+    // e.g. Id for `std::result::Result`) and A-side function Ids are NOT remapped and survive
+    // in A-sourced items.  B-sourced items retain their original B-side Ids.
     //
-    // After Phase 1.45, all A-sourced local type refs have been remapped to S-side Ids.
-    // A-side Ids that could not be remapped (because the target type was deleted) remain stale;
-    // Phase 1.6 correctly rejects them via Rule 4 below.
+    // Because the two Id spaces are independent, the same numeric Id can mean different things:
+    // e.g. A-side Id N may be a synthetic external type for `std::result::Result` while B-side
+    // Id N is a local constant like `AGENT_PROFILES_PATH`, or vice-versa.
     //
-    // Exemption rules for non-UNRESOLVED ids (in evaluation order):
-    // 1. Present in `s_ids` or `s_paths` → S-local ref (possibly remapped from A-side), valid.
-    // 2. In `b.paths` with `crate_id != 0` → B-side external-crate item (std/serde/…), valid.
-    // 3. In `b.paths` with `crate_id == 0` but not in S → local item deleted in Phase 1, REJECT.
-    // 4. In `a_krate.paths` with `crate_id != 0` → A-side external-crate item referenced by an
-    //    Add/Modify item (e.g. std::vec::Vec, an external trait impl).  Phase 1.45 does not
-    //    remap external-crate Ids (they use `UNRESOLVED_CRATE_ID` anyway), but some paths in
-    //    `a_krate.paths` may carry external-crate synthetic Ids that survived remapping.
-    // 5. Not in `b.paths`, not in `a_krate.paths` (external), not in S → stale or unknown id,
-    //    REJECT (fail-closed).
+    // To avoid false positives, the rule set is split by item source:
     //
-    // Note: the old Rule 5 exempted B-side child items (StructField, Variant, …) found in
-    // `b.index` but not `b.paths` as unconditionally valid.  That was incorrect: if the child's
-    // parent was deleted in Phase 1, `remove_child_items_from_s` purges the child from S too,
-    // so the reference to it is genuinely dangling.  Since `insert_b_item_tree_into_s` now
-    // inserts ALL B child items into S under their original Ids (via `copy_b_children_to_s`),
-    // every valid B child ref is already in `s_ids` and is covered by Rule 1.  Any id that
-    // reaches this point is therefore stale/dangling regardless of `b.index` membership.
+    // A-SOURCED items (Add/Modify action, or child with fresh id >= first_fresh_id):
+    //   Their type ref Ids are A-side Ids (possibly remapped to S-side for local types).
+    //   A-side paths are consulted first, B-side paths as fallback.
+    //   0. Id(0) — sentinel — skip.
+    //   1. In S → valid.
+    //   2a. In `a_krate.paths` with crate_id != 0 → A-side external → valid.
+    //   2b. In `a_krate.paths` with crate_id == 0 → A-side local not remapped → DanglingId.
+    //   3. In `b.paths` with crate_id != 0 → B-side external (possible for Modify) → valid.
+    //   4. In `b.paths` with crate_id == 0 → deleted local → DanglingId.
+    //   5. Not found → stale → DanglingId.
+    //
+    // B-SOURCED items (Reference action, id < first_fresh_id):
+    //   Their type ref Ids are B-side Ids.  A-side paths are NOT consulted — doing so
+    //   would produce false positives when A-side happens to map the same numeric Id to a
+    //   local function while B-side maps it to an external crate type.
+    //   0. Id(0) — sentinel — skip.
+    //   1. In S → valid.
+    //   2. In `b.paths` with crate_id != 0 → B-side external → valid.
+    //   3. In `b.paths` with crate_id == 0 → deleted local → DanglingId.
+    //   4. Not found → stale → DanglingId.
+    //
+    // `collect_referenced_ids` pre-filters the Id list so that `Id(UNRESOLVED_CRATE_ID)` is
+    // never yielded (A-side external type refs that were not resolved to a concrete external Id
+    // keep `UNRESOLVED_CRATE_ID` after Phase 1.5 and are explicitly skipped by the collector).
+    //
+    // Note: the old Rule 5 (before this change) exempted B-side child items found in `b.index`
+    // but not `b.paths` as unconditionally valid.  That was incorrect: if the child's parent was
+    // deleted in Phase 1, `remove_child_items_from_s` purges the child from S too, so the
+    // reference is genuinely dangling.  Since `insert_b_item_tree_into_s` inserts ALL B child
+    // items into S under their original Ids, every valid B child ref is already in `s_ids`
+    // (Rule 1).  Any id that reaches the terminal rule is therefore stale/dangling.
+
     let s_ids: HashSet<Id> = state.s_index.keys().copied().collect();
 
     for item in state.s_index.values() {
         let item_name = item.name.clone().unwrap_or_else(|| format!("<id:{}>", item.id.0));
+
+        // Determine whether this item is A-sourced.
+        //
+        // Top-level items (types, traits, functions) have entries in `s_actions`.
+        // Use the action as the discriminator: Add / Modify = A-sourced; Reference = B-sourced.
+        //
+        // Child items (struct fields, enum variants, impl blocks, etc.) are NOT stored in
+        // `s_actions`.  Fall back to the Id-based heuristic: A-side children get fresh Ids
+        // allocated by `insert_a_item_tree_into_s` / `remap_and_copy_a_children_to_s`
+        // (all >= `first_fresh_id`); B-side children keep their original B-side Ids
+        // (all < `first_fresh_id`, by construction).
+        //
+        // Note: ALL functions are inserted via `insert_s_fn`, which allocates a fresh Id
+        // regardless of whether the function is B-sourced (Reference) or A-sourced (Add).
+        // Therefore `id >= first_fresh_id` is NOT a reliable discriminator for functions.
+        // The `s_actions` lookup is the authoritative source for all top-level items.
+        let item_is_a_sourced = match state.s_actions.get(&item.id) {
+            Some(&ItemAction::Add) | Some(&ItemAction::Modify) => true,
+            Some(_) => false, // Reference or Delete → B-sourced (or already handled)
+            None => {
+                // Not in s_actions → child item; use Id-based heuristic.
+                item.id.0 >= first_fresh_id
+            }
+        };
+
         for referenced_id in collect_referenced_ids(item) {
-            // Rule 1: id is in S (B-sourced or remapped A-sourced) — valid.
+            // Rule 0: Id(0) is the crate root module / `Self` sentinel — skip unconditionally.
+            if referenced_id.0 == 0 {
+                continue;
+            }
+            // Rule 1: id is in S — valid regardless of source.
             if s_ids.contains(&referenced_id) || state.s_paths.contains_key(&referenced_id) {
                 continue;
             }
-            // Rules 2–3: id appears in B's paths.
-            if let Some(ps) = b.paths.get(&referenced_id) {
-                if ps.crate_id != 0 {
-                    // Rule 2: External-crate item (std/serde/…) — valid cross-crate ref.
-                    continue;
+
+            if item_is_a_sourced {
+                // A-sourced item: type ref Ids are A-side Ids (or S-side after remapping).
+                // Check A-side paths before B-side to correctly handle A-side synthetic
+                // external Ids (e.g. `std::result::Result`) that may coincidentally collide
+                // with B-side local Ids (e.g. a constant `AGENT_PROFILES_PATH`).
+                if let Some(a_ps) = a_krate.paths.get(&referenced_id) {
+                    if a_ps.crate_id != 0 {
+                        // Rule 2a: A-side external-crate item — valid cross-crate ref.
+                        continue;
+                    }
+                    // Rule 2b: A-side local id not remapped by Phase 1.45 (type deleted or
+                    // a function Id — functions are not tracked in s_type_name_to_id).
+                    let a_name = a_ps.path.last().map(|s| s.as_str()).unwrap_or("<unknown>");
+                    return Err(Phase1Error::DanglingId(format!(
+                        "{item_name} -> Id({}) is an A-side local ref to '{}' which is not present in S \
+                         (the type may have been deleted or was never declared in the catalogue)",
+                        referenced_id.0, a_name
+                    )));
                 }
-                // Rule 3: Local top-level item (crate_id == 0) not in S → deleted → dangling.
+                // Fallthrough: not in A-side paths; check B-side (possible for Modify items
+                // that have not had every type ref remapped, or synthetic impl items).
+                if let Some(ps) = b.paths.get(&referenced_id) {
+                    if ps.crate_id != 0 {
+                        // Rule 3: B-side external-crate item — valid.
+                        continue;
+                    }
+                    // Rule 4: B-side local deleted.
+                    return Err(Phase1Error::DanglingId(format!(
+                        "{item_name} -> Id({}) not found in S (may have been deleted in Phase 1)",
+                        referenced_id.0
+                    )));
+                }
+                // Rule 5: stale or unknown.
                 return Err(Phase1Error::DanglingId(format!(
-                    "{item_name} -> Id({}) not found in S (may have been deleted in Phase 1)",
+                    "{item_name} -> Id({}) is not in S and not in A or B paths (stale reference or unknown id)",
+                    referenced_id.0
+                )));
+            } else {
+                // B-sourced item: type ref Ids are B-side Ids.  Do NOT consult A-side paths —
+                // A-side local function Ids may collide with B-side external type Ids, causing
+                // false-positive DanglingId errors.
+                if let Some(ps) = b.paths.get(&referenced_id) {
+                    if ps.crate_id != 0 {
+                        // Rule 2: B-side external-crate item — valid.
+                        continue;
+                    }
+                    // Rule 3: B-side local deleted.
+                    return Err(Phase1Error::DanglingId(format!(
+                        "{item_name} -> Id({}) not found in S (may have been deleted in Phase 1)",
+                        referenced_id.0
+                    )));
+                }
+                // Rule 4: stale or unknown.
+                return Err(Phase1Error::DanglingId(format!(
+                    "{item_name} -> Id({}) is not in S and not in B paths (stale reference or unknown id)",
                     referenced_id.0
                 )));
             }
-            // Rule 4: id appears in A's paths with crate_id != 0 — A-side external-crate item.
-            // (Local A-side Ids were remapped to S-side Ids in Phase 1.45 and are covered by
-            // Rule 1.  An A-side local Id that survives here means Phase 1.45 could not find
-            // a corresponding S item — which is a dangling reference, caught by Rule 5 below.)
-            if let Some(a_ps) = a_krate.paths.get(&referenced_id) {
-                if a_ps.crate_id != 0 {
-                    // Rule 4: External-crate item (std/serde/…) — valid cross-crate ref.
-                    continue;
-                }
-                // A-side local id that was NOT remapped in Phase 1.45 (target type deleted).
-                let a_name = a_ps.path.last().map(|s| s.as_str()).unwrap_or("<unknown>");
-                return Err(Phase1Error::DanglingId(format!(
-                    "{item_name} -> Id({}) is an A-side local ref to '{}' which is not present in S \
-                     (the type may have been deleted or was never declared in the catalogue)",
-                    referenced_id.0, a_name
-                )));
-            }
-            // Rule 5: Not in S, not in b.paths, not in a_krate.paths → stale or unknown id,
-            // REJECT (fail-closed).
-            return Err(Phase1Error::DanglingId(format!(
-                "{item_name} -> Id({}) is not in S and not in B or A paths (stale reference or unknown id)",
-                referenced_id.0
-            )));
         }
     }
 

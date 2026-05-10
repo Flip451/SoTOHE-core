@@ -908,6 +908,11 @@ description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filt
 script_runner = "@shell"
 script = ['bin/sotp track baseline-capture "$@"']
 
+[tasks.track-three-way-signals]
+description = "[wrapper] Run Phase 1 + Phase 2 three-way signal evaluation (A=Catalogue, B=Baseline, C=Current). Usage: cargo make track-three-way-signals -- <track-id> [--layer <id>] [--output <path>]"
+script_runner = "@shell"
+script = ['bin/sotp track three-way-signals "$@"']
+
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"
