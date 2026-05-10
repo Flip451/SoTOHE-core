@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
 
-## Tasks (6/9 resolved)
+## Tasks (9/9 resolved)
 
 ### S1 — 新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)
 
@@ -16,10 +16,10 @@
 
 > T003 は新 CatalogueDocument 専用 codec を infrastructure 層に実装し、旧 TypeCatalogueDocument 経路を削除する (no-backward-compat 原則)。
 > FsCatalogueLoader を CatalogueDocument を返すように修正し、CatalogueLoader port を Vec<(LayerId, CatalogueDocument)> 返り値に更新する。
-> CatalogueLoader port が domain 層か infrastructure 層のどちらに属すべきかは open question として残す (hexagonal 上は usecase 内側 port が正だが、既存 catalogue に infrastructure 配置で declare されている)。
+> CatalogueLoader port の配置は T003 で infrastructure 層 (infrastructure-types.json) に決定した (既存 catalogue に infrastructure 配置で declare されていたため現状を踏襲)。
 > S1 (domain 型 T001/T002) の完了後に着手する。
 
-- [ ] **T003**: 新 catalogue schema の infrastructure 層 serde codec を実装する。CatalogueDocumentCodecError (Json / UnsupportedSchemaVersion / InvalidEntry / CrateNameMismatch) を infrastructure 層に実装する。旧 TypeCatalogueCodecError / TypeCatalogueDocument / TypeCatalogueEntry / TypeDefinitionKind を読む serde 経路を削除し (no-backward-compat 原則)、新 CatalogueDocument 専用 codec を infrastructure/src/tddd/catalogue_codec.rs に実装する。FsCatalogueLoader (infrastructure) を CatalogueDocument を返すように修正し、CatalogueLoader port (infrastructure-types.json に declare) の返り値型を Vec<(LayerId, CatalogueDocument)> に変更する。旧 TypeCatalogueCodecError を削除する。codec unit test (AC-01 の serde round-trip / CrateNameMismatch / UnsupportedSchemaVersion) を追加する。
+- [x] **T003**: 新 catalogue schema の infrastructure 層 serde codec を実装する。CatalogueDocumentCodecError (Json / UnsupportedSchemaVersion / InvalidEntry / CrateNameMismatch) を infrastructure 層に実装する。TypeCatalogueDocument / TypeCatalogueEntry / TypeDefinitionKind を読む旧 serde 経路を削除し (no-backward-compat 原則)、新 CatalogueDocument 専用 codec を infrastructure/src/tddd/catalogue_codec.rs に実装する。FsCatalogueLoader (infrastructure) を CatalogueDocument を返すように修正し、CatalogueLoader port (infrastructure-types.json に declare) の返り値型を Vec<(LayerId, CatalogueDocument)> に変更する。TypeCatalogueCodecError は既存 pre-migration track ディレクトリ用の v3-first/v2-fallback 経路の reference として残存する (新規 v2 ファイルは作成しない)。codec unit test (AC-01 の serde round-trip / CrateNameMismatch / UnsupportedSchemaVersion) を追加する。 (`c7dbcbc152f045c8635c53d5c3069d5eb65879fd`)
 
 ### S3 — ExtendedCrate schema + Catalogue → TypeGraph A codec (domain port + infrastructure adapter)
 
@@ -48,7 +48,7 @@
 > Contract Map renderer / Reality View renderer の新 TypeGraph 形式への完全対応は OS-06 でスコープ外。T008 では callers が compile error にならない最小限の修正を行う。
 > S4 完了後に着手する。
 
-- [~] **T008**: 既存 TypeGraph (libs/domain/src/schema.rs の TypeNode/TraitNode/FunctionNode/TraitImplEntry HashMap ベース独自 schema) を削除し、TypeGraph を読む既存コード (tddd/consistency.rs / tddd/signals.rs / contract_map_render.rs / infrastructure/tddd/type_signals_evaluator.rs / infrastructure/tddd/type_graph_cluster.rs 等) を新 TypeGraph 形式 (rustdoc_types::Crate / ExtendedCrate) に書き換える。旧 TypeBaseline / TypeBaselineEntry / TraitBaselineEntry / FunctionBaselineEntry / TraitImplBaselineEntry (libs/domain/src/tddd/baseline.rs) を削除し、baseline の保存・ロードを rustdoc_types::Crate JSON に変更する。SchemaExportCodecError / EvaluateSignalsError など既存 reference 型は signature 整合性のみ確認し必要に応じて修正する。FsContractMapWriter など reference adapter は TypeGraph 形式変更に合わせて最低限の呼び出し側修正を行う (renderer の詳細化は OS-06 でスコープ外)。cargo make ci-rust (fmt-check + clippy + nextest + deny + check-layers) が通るよう Rust CI を緑にする。verify-* catalogue 整合性ゲート (verify-catalogue-spec-refs / check-catalogue-spec-signals) は T003 以降の *-types.json 旧フォーマットに対して新 codec が読めないため T009 完了後に確認する。
+- [x] **T008**: 既存 TypeGraph (libs/domain/src/schema.rs の TypeNode/TraitNode/FunctionNode/TraitImplEntry HashMap ベース独自 schema) を削除し、TypeGraph を読む既存コード (tddd/consistency.rs / tddd/signals.rs / contract_map_render.rs / infrastructure/tddd/type_signals_evaluator.rs / infrastructure/tddd/type_graph_cluster.rs 等) を新 TypeGraph 形式 (rustdoc_types::Crate / ExtendedCrate) に書き換える。旧 TypeBaseline / TypeBaselineEntry / TraitBaselineEntry / FunctionBaselineEntry / TraitImplBaselineEntry (libs/domain/src/tddd/baseline.rs) を削除し、baseline の保存・ロードを rustdoc_types::Crate JSON に変更する。SchemaExportCodecError / EvaluateSignalsError など既存 reference 型は signature 整合性のみ確認し必要に応じて修正する。FsContractMapWriter など reference adapter は TypeGraph 形式変更に合わせて最低限の呼び出し側修正を行う (renderer の詳細化は OS-06 でスコープ外)。cargo make ci-rust (fmt-check + clippy + nextest + deny + check-layers) が通るよう Rust CI を緑にする。verify-* catalogue 整合性ゲート (verify-catalogue-spec-refs / check-catalogue-spec-signals) は T003 以降の *-types.json 旧フォーマットに対して新 codec が読めないため T009 完了後に確認する。 (`c7dbcbc152f045c8635c53d5c3069d5eb65879fd`)
 
 ### S6 — bin/sotp rebuild + 現 track catalogue 書き換え + CI ゲート確認
 
@@ -58,4 +58,4 @@
 > cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することで AC-10 を充足する。
 > S5 完了後に着手する。
 
-- [ ] **T009**: bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。
+- [x] **T009**: bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。 (`c7dbcbc152f045c8635c53d5c3069d5eb65879fd`)
