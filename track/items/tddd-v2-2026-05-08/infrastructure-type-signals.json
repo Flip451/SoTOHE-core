@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-11T09:58:15Z",
-  "declaration_hash": "5d8e8d91141df61bbe69bb3b3f87fbb7b6d26f44ea3f0541392bbec998239fa2",
+  "generated_at": "2026-05-11T16:59:35Z",
+  "declaration_hash": "7c95428e0fb5df8c8d7eb97d66127a10425b483c596a6566e8a203eaf8c4b2ff",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
@@ -23,7 +23,7 @@
     {
       "type_name": "CatalogueDocumentCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::default::Default"
@@ -43,7 +43,7 @@
     {
       "type_name": "CatalogueToExtendedCrateCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "CatalogueToExtendedCratePort",
@@ -63,20 +63,10 @@
     {
       "type_name": "FsCatalogueLoader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "CatalogueLoader"
-      ]
-    },
-    {
-      "type_name": "InMemoryCatalogueLinter",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": true,
-      "found_items": [
-        "CatalogueLinter",
-        "core::default::Default"
       ]
     },
     {
@@ -93,7 +83,7 @@
     {
       "type_name": "RustdocSchemaExporter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "SchemaExporter",
@@ -103,7 +93,7 @@
     {
       "type_name": "SignalEvaluatorV2",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "SignalEvaluatorPort",
@@ -286,6 +276,12 @@
     },
     {
       "type_name": "FsContractMapWriter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true

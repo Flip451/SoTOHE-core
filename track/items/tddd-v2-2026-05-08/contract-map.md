@@ -9,7 +9,7 @@ flowchart LR
         %% 73 entries (nodes deferred to T012)
     end
     subgraph usecase [usecase]
-        %% 7 entries (nodes deferred to T012)
+        %% 6 entries (nodes deferred to T012)
     end
     subgraph infrastructure [infrastructure]
         %% 43 entries (nodes deferred to T012)

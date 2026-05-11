@@ -739,16 +739,35 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
         build_external_crates_for_scope(&state.d_index, &state.d_paths, b, None, None);
     patch_paths_crate_ids(&mut state.d_paths, b, &d_name_to_new_id, None);
 
+    // Allocate fresh Phase1-managed Ids for the S and D root modules before
+    // consuming any fields of `state`.
+    //
+    // Both ids must be allocated here — before `state.s_actions` is partially
+    // moved into `ExtendedCrate::new` — because `alloc_id` takes `&mut self`
+    // (borrowing `state`) and cannot be called after a partial move.
+    //
+    // Use fresh ids rather than hardcoding Id(0) for the root module.  B's
+    // items are inserted into S under their original B-side Ids (see
+    // `insert_b_item_tree_into_s`), and Id(0) in B may be occupied by a real
+    // data item (e.g. an enum variant at the first alphabetical position in
+    // rustdoc output).  Hardcoding Id(0) as the root would overwrite that
+    // B-seeded data item, causing Phase 2's structural equality check to fail
+    // for any enum whose variant list includes Id(0) —
+    // `build_variant_shape_map` would find a Module item instead of a Variant
+    // and silently drop the variant from the shape map, producing a spurious
+    // `SIntersectC_Mismatch_Reference` 🔴 signal for an otherwise-unchanged type.
+    let s_root_id = state.alloc_id();
+    let d_root_id = state.alloc_id();
+
     // Build root module item for S.
-    let root_id = Id(0);
     let mut s_top_ids: Vec<Id> =
         state.s_type_name_to_id.values().chain(state.s_fn_path_to_id.values()).copied().collect();
     s_top_ids.sort_by_key(|id| id.0);
-    let s_root_item = make_root_module_item(root_id, crate_name.clone(), s_top_ids);
-    state.s_index.insert(root_id, s_root_item);
+    let s_root_item = make_root_module_item(s_root_id, crate_name.clone(), s_top_ids);
+    state.s_index.insert(s_root_id, s_root_item);
 
     let s_krate = Crate {
-        root: root_id,
+        root: s_root_id,
         crate_version: None,
         includes_private: false,
         index: state.s_index,
@@ -760,14 +779,15 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     let s = ExtendedCrate::new(s_krate, state.s_actions);
 
     // Build root module item for D.
+    // (d_root_id was pre-allocated above before the partial move of state.s_actions.)
     let mut d_top_ids: Vec<Id> =
         state.d_type_name_to_id.values().chain(state.d_fn_path_to_id.values()).copied().collect();
     d_top_ids.sort_by_key(|id| id.0);
-    let d_root_item = make_root_module_item(root_id, crate_name.clone(), d_top_ids);
-    state.d_index.insert(root_id, d_root_item);
+    let d_root_item = make_root_module_item(d_root_id, crate_name.clone(), d_top_ids);
+    state.d_index.insert(d_root_id, d_root_item);
 
     let d = Crate {
-        root: root_id,
+        root: d_root_id,
         crate_version: None,
         includes_private: false,
         index: state.d_index,

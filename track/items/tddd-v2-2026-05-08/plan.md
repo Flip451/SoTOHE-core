@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
 
-## Tasks (17/17 resolved)
+## Tasks (16/17 resolved)
 
 ### S1 — 新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)
 
@@ -84,7 +84,7 @@
 > T016 は render.rs の v3 fallback を修正して Cat-Spec 列を復元する (ADR 2026-05-11-1257 D2)。S8 完了後に着手する。
 > S8 完了後に着手する。
 
-- [x] **T013**: catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2)。各エントリの `spec_refs` と `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(spec_refs, informal_grounds)` に渡して信号色を決定する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
+- [x] **T013**: catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2 / D5)。各エントリの `action` / `spec_refs` / `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(action, spec_refs, informal_grounds)` に渡して信号色を決定する。`action: reference` かつ grounding 空のエントリは 🔵 Blue (ADR 2026-05-11-1257 D5)、それ以外は informal-priority rule (ADR 2026-04-23-0344 §D1.1) を適用する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
 - [x] **T014**: catalogue_bulk_loader.rs (infrastructure) の `v3_doc_to_stub` 関数を更新し、CatalogueDocument → TypeCatalogueDocument stub 変換時に `spec_refs` と `informal_grounds` を stub に複写する (ADR 2026-05-11-1257 D3)。T012 により codec decode 段階で cross-crate function path が reject されるため、`v3_doc_to_stub` 内の cross-crate function フィルタ (line ~493 付近) は dead code となる — 削除する。テスト: grounding コレクションが変換後 stub に保存されることを確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
 - [x] **T015**: type_signals_evaluator.rs (infrastructure, line ~250 付近) の cross-crate function フィルタを削除する (ADR 2026-05-11-1257 D4)。T012 により codec decode 段階で cross-crate path が reject されるため、このフィルタは impossible-to-trigger な dead code となる。フィルタ削除後、type-signal 評価が全エントリで uniform に動作することを unit test で確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
 - [x] **T016**: track/render.rs (infrastructure) の v3 fallback を修正し、catalogue-spec-signals doc を正しくロードして `render_type_catalogue` に渡す (ADR 2026-05-11-1257 D2 — 信号の可視性)。現状は v3 fallback で `None` を渡しているため Cat-Spec 列が非表示になっている。修正後に Cat-Spec 列が rendered view に表示されることを確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
@@ -94,4 +94,4 @@
 > T017 は bin/sotp rebuild 後に全 3 layer の type-signals / catalogue-spec-signals を再生成し、rendered view を更新して cargo make ci を pass させる (AC-10 充足)。
 > T013-T016 (S9) 全完了後に着手する。CI ゲートが全通過することで spec-link 復元スコープの完了を確認する。
 
-- [x] **T017**: 統合ゲート確認: bin/sotp を rebuild し (cargo make build-sotp)、全 3 layer の type-signals と catalogue-spec-signals を再生成する (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3 + `bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3)。`cargo make track-sync-views` で rendered view を再生成する。`cargo make ci` が pass することを確認する (verify-catalogue-spec-refs / check-catalogue-spec-signals を含む全ゲート通過)。AC-10 を充足する最終統合タスク。Layer: integration。 (`81f86500d926f4da6adaef1817897d86393922b9`)
+- [~] **T017**: 統合ゲート確認: bin/sotp を rebuild し (cargo make build-sotp)、全 3 layer の type-signals と catalogue-spec-signals を再生成する (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3 + `bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3)。`cargo make track-sync-views` で rendered view を再生成する。`cargo make ci` が pass することを確認する (verify-catalogue-spec-refs / check-catalogue-spec-signals を含む全ゲート通過)。AC-10 を充足する最終統合タスク。Layer: integration。

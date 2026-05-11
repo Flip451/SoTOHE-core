@@ -231,6 +231,16 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-16",
+        "text": "catalogue↔spec 信号評価器 (SoT Chain ②) を action-aware に変更する: `evaluate_catalogue_entry_signal` に `action: ItemAction` 引数を追加し、`action: reference` かつ grounding 空 (`spec_refs: []` / `informal_grounds: []`) のエントリを 🔵 Blue と評価する。`action: add / modify / delete` のエントリは従来の informal-priority rule (ADR `2026-04-23-0344` §D1.1) をそのまま適用する。[source: ADR 2026-05-11-1257 D5]",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md",
+            "anchor": "D5"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -571,7 +581,7 @@
     }
   ],
   "signals": {
-    "blue": 45,
+    "blue": 46,
     "yellow": 0,
     "red": 0
   }

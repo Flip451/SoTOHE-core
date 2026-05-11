@@ -8,19 +8,22 @@
 //! Supports both v2 (`TypeCatalogueDocument`) and v3 (`CatalogueDocument`)
 //! catalogue formats. For both v2 and v3, per-entry signals are computed from
 //! `spec_refs[]` and `informal_grounds[]` via `evaluate_catalogue_entry_signal`.
-//! The informal-priority rule (ADR `2026-04-23-0344` §D1.1) applies:
+//! The informal-priority rule (ADR `2026-04-23-0344` §D1.1) applies, with the
+//! `action: "reference"` exemption from ADR `2026-05-11-1257` D5:
+//! - `action == Reference` + both empty → Blue (baseline-implicit grounding)
 //! - `informal_grounds` non-empty → Yellow
 //! - `informal_grounds` empty + `spec_refs` non-empty → Blue
-//! - both empty → Red
+//! - both empty (non-reference action) → Red
 //!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
-//! §D2 / §D3.1 / IN-09.
+//! §D2 / §D3.1 / IN-09; `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5.
 
 use std::path::Path;
 
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::{
     CatalogueSpecSignal, CatalogueSpecSignalsDocument, ConfidenceSignal, ContentHash, TrackId,
-    evaluate_catalogue_entry_signal,
+    TypeAction, evaluate_catalogue_entry_signal,
 };
 
 use crate::tddd::catalogue_codec;
@@ -147,18 +150,27 @@ pub fn refresh_one_layer(
                 // per-entry signal from spec_refs / informal_grounds.
                 let mut sigs: Vec<CatalogueSpecSignal> = Vec::new();
                 for (type_name, entry) in &v3_doc.types {
-                    let signal =
-                        evaluate_catalogue_entry_signal(&entry.spec_refs, &entry.informal_grounds);
+                    let signal = evaluate_catalogue_entry_signal(
+                        entry.action,
+                        &entry.spec_refs,
+                        &entry.informal_grounds,
+                    );
                     sigs.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
                 }
                 for (trait_name, entry) in &v3_doc.traits {
-                    let signal =
-                        evaluate_catalogue_entry_signal(&entry.spec_refs, &entry.informal_grounds);
+                    let signal = evaluate_catalogue_entry_signal(
+                        entry.action,
+                        &entry.spec_refs,
+                        &entry.informal_grounds,
+                    );
                     sigs.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
                 }
                 for (fn_path, entry) in &v3_doc.functions {
-                    let signal =
-                        evaluate_catalogue_entry_signal(&entry.spec_refs, &entry.informal_grounds);
+                    let signal = evaluate_catalogue_entry_signal(
+                        entry.action,
+                        &entry.spec_refs,
+                        &entry.informal_grounds,
+                    );
                     sigs.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
                 }
                 sigs
@@ -173,7 +185,9 @@ pub fn refresh_one_layer(
                     .entries()
                     .iter()
                     .map(|entry| {
+                        let action = type_action_to_item_action(entry.action());
                         let signal = evaluate_catalogue_entry_signal(
+                            action,
                             entry.spec_refs(),
                             entry.informal_grounds(),
                         );
@@ -213,6 +227,20 @@ pub fn refresh_one_layer(
         blue + yellow + red
     );
     Ok(())
+}
+
+/// Convert a v2 [`TypeAction`] to the corresponding v3 [`ItemAction`].
+///
+/// Used when computing catalogue-spec signals for a v2 `TypeCatalogueEntry` so
+/// that `evaluate_catalogue_entry_signal` (which uses the v3 `ItemAction` enum)
+/// can apply the D5 reference-action exemption correctly.
+fn type_action_to_item_action(action: TypeAction) -> ItemAction {
+    match action {
+        TypeAction::Add => ItemAction::Add,
+        TypeAction::Modify => ItemAction::Modify,
+        TypeAction::Reference => ItemAction::Reference,
+        TypeAction::Delete => ItemAction::Delete,
+    }
 }
 
 fn count_signals(signals: &[CatalogueSpecSignal]) -> (usize, usize, usize) {
@@ -292,15 +320,27 @@ mod tests {
         // Replicate the refresher's v3 signal computation inline.
         let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
         for (type_name, entry) in &v3_doc.types {
-            let signal = evaluate_catalogue_entry_signal(&entry.spec_refs, &entry.informal_grounds);
+            let signal = evaluate_catalogue_entry_signal(
+                entry.action,
+                &entry.spec_refs,
+                &entry.informal_grounds,
+            );
             signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
         }
         for (trait_name, entry) in &v3_doc.traits {
-            let signal = evaluate_catalogue_entry_signal(&entry.spec_refs, &entry.informal_grounds);
+            let signal = evaluate_catalogue_entry_signal(
+                entry.action,
+                &entry.spec_refs,
+                &entry.informal_grounds,
+            );
             signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
         }
         for (fn_path, entry) in &v3_doc.functions {
-            let signal = evaluate_catalogue_entry_signal(&entry.spec_refs, &entry.informal_grounds);
+            let signal = evaluate_catalogue_entry_signal(
+                entry.action,
+                &entry.spec_refs,
+                &entry.informal_grounds,
+            );
             signals.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
         }
 

@@ -75,7 +75,7 @@
     },
     {
       "id": "T013",
-      "description": "catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2)。各エントリの `spec_refs` と `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(spec_refs, informal_grounds)` に渡して信号色を決定する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。",
+      "description": "catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2 / D5)。各エントリの `action` / `spec_refs` / `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(action, spec_refs, informal_grounds)` に渡して信号色を決定する。`action: reference` かつ grounding 空のエントリは 🔵 Blue (ADR 2026-05-11-1257 D5)、それ以外は informal-priority rule (ADR 2026-04-23-0344 §D1.1) を適用する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。",
       "status": "done",
       "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
     },
@@ -100,8 +100,7 @@
     {
       "id": "T017",
       "description": "統合ゲート確認: bin/sotp を rebuild し (cargo make build-sotp)、全 3 layer の type-signals と catalogue-spec-signals を再生成する (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3 + `bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3)。`cargo make track-sync-views` で rendered view を再生成する。`cargo make ci` が pass することを確認する (verify-catalogue-spec-refs / check-catalogue-spec-signals を含む全ゲート通過)。AC-10 を充足する最終統合タスク。Layer: integration。",
-      "status": "done",
-      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+      "status": "in_progress"
     }
   ],
   "plan": {

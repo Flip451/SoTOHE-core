@@ -101,6 +101,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [secondary_adapter が参照する port は当該 track の catalogue に必ず declare する](2026-04-29-0243-cross-track-port-reference.md) | Proposed | 2026-04-29 |
 | [Free Function L2 Evaluator: returns 比較を source form に統一する](2026-05-01-0702-free-function-l2-source-form-evaluator.md) | Proposed | 2026-05-01 |
 | [Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別](2026-05-01-1226-reality-view-edge-coverage-expansion.md) | — | 2026-05-01 |
+| [旧 spec-code-consistency の廃止と catalogue-impl-signals 診断コマンドの導入: レイヤー配置・インターフェース・CI ゲート](2026-05-11-2330-catalogue-impl-signals-command-layering.md) | Proposed | 2026-05-11 |
 
 ### トラック・ワークフロー
 

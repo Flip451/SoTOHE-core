@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 45, yellow: 0, red: 0 }
+signals: { blue: 46, yellow: 0, red: 0 }
 ---
 
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
@@ -31,6 +31,7 @@ signals: { blue: 45, yellow: 0, red: 0 }
 - [IN-13] 既存 TypeGraph (libs/domain/src/schema.rs の TypeNode / TraitNode / FunctionNode / TraitImplEntry HashMap ベース独自 schema) の rustdoc_types::Crate ベース実装への置換: TypeGraph を読む既存コード (consistency / signals / contract_map_render 等) の書き換えを含む [adr: knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md#D1] [tasks: T008]
 - [IN-14] 既存 4 グループ評価 (TDDD-02: A\B / A∩B / B\A / ∁(A∪B)∩C) の Phase 1 + Phase 2 構造への書き換え: libs/domain/src/tddd/consistency.rs (または後継) の全面 refactor。TDDD-02 / TDDD-03 の意味論を継承しつつ Phase 1 + Phase 2 の 2-phase 構造に再構成する [adr: knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D7, knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D8] [tasks: T006, T007, T008, T015]
 - [IN-15] serde codec の新 schema 専用実装: 旧 catalogue schema (TypeDefinitionKind ベース / payload_types: Vec<String> ベース) を読む経路を持たない新 schema 専用 codec を実装する [adr: knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md#D1] [tasks: T003, T011, T012]
+- [IN-16] catalogue↔spec 信号評価器 (SoT Chain ②) を action-aware に変更する: `evaluate_catalogue_entry_signal` に `action: ItemAction` 引数を追加し、`action: reference` かつ grounding 空 (`spec_refs: []` / `informal_grounds: []`) のエントリを 🔵 Blue と評価する。`action: add / modify / delete` のエントリは従来の informal-priority rule (ADR `2026-04-23-0344` §D1.1) をそのまま適用する。[source: ADR 2026-05-11-1257 D5] [adr: knowledge/adr/2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md#D5] [tasks: T013]
 
 ### Out of Scope
 - [OS-01] Linter の詳細設計と実装: Linter は CatalogueDocument の role / pattern × 構造制約を enforcement する別 component として位置づけられる (ADR 3 D6)。本 track では Architecture 全体像における Linter の位置づけを明確にするが、Linter の rule config schema / DSL / CLI 統合の詳細設計と実装は別 ADR / 別 track の対象とする [adr: knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D6]
@@ -78,5 +79,5 @@ signals: { blue: 45, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 45  🟡 0  🔴 0
+🔵 46  🟡 0  🔴 0
 

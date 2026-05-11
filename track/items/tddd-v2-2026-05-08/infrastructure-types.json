@@ -84,14 +84,17 @@
     "CatalogueDocumentCodec": {
       "action": "add",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "unit_struct" },
       "trait_impls": [
         { "trait_name": "Default", "origin_crate": "core" }
       ],
       "methods": [
-        { "name": "new", "params": [], "returns": "Self" }
+        { "name": "new", "params": [], "returns": "Self" },
+        { "name": "decode", "params": [{ "name": "json", "ty": "&str" }, { "name": "filename_stem", "ty": "&str" }], "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>" },
+        { "name": "load", "params": [{ "name": "path", "ty": "&std::path::Path" }], "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>" },
+        { "name": "encode", "params": [{ "name": "doc", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" }], "returns": "Result<String, CatalogueDocumentCodecError>" }
       ],
-      "docs": "Stateless codec struct that encodes/decodes CatalogueDocument to/from JSON (schema_version=3).",
+      "docs": "Stateless codec struct that encodes/decodes CatalogueDocument to/from JSON (schema_version=3). Methods: new (constructor), decode (json+stem → CatalogueDocument), load (path → CatalogueDocument), encode (CatalogueDocument → JSON). All methods are static (no receiver).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-15", "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95" }
       ],
@@ -100,7 +103,7 @@
     "CatalogueToExtendedCrateCodec": {
       "action": "add",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "unit_struct" },
       "trait_impls": [
         { "trait_name": "CatalogueToExtendedCratePort", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }
@@ -147,9 +150,12 @@
     "FsCatalogueLoader": {
       "action": "modify",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [{ "trait_name": "CatalogueLoader", "origin_crate": "domain" }],
-      "docs": "Existing FsCatalogueLoader. Modified to load CatalogueDocument instead of TypeCatalogueDocument.",
+      "methods": [
+        { "name": "new", "params": [{ "name": "track_root", "ty": "std::path::PathBuf" }, { "name": "rules_path", "ty": "std::path::PathBuf" }, { "name": "trusted_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
+      ],
+      "docs": "Existing FsCatalogueLoader. Modified to load CatalogueDocument instead of TypeCatalogueDocument. Added new() method declaration to resolve SIntersectC_Mismatch_Modify Yellow (A-side inherent method map was empty, C has new()).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
       ],
@@ -162,9 +168,7 @@
       "trait_impls": [{ "trait_name": "CatalogueSpecSignalsWriter", "origin_crate": "usecase" }],
       "docs": "Existing FsCatalogueSpecSignalsStore. Referenced — not modified in this track.",
       "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "discussion", "summary": "Pre-existing secondary adapter for catalogue-spec signals persistence. Referenced for contract-map edge completeness; not modified in this track." }
-      ]
+      "informal_grounds": []
     },
     "FsContractMapWriter": {
       "action": "reference",
@@ -173,14 +177,12 @@
       "trait_impls": [{ "trait_name": "ContractMapWriter", "origin_crate": "domain" }],
       "docs": "Existing FsContractMapWriter (implements ContractMapWriter). Referenced.",
       "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "discussion", "summary": "Pre-existing secondary adapter for contract-map persistence. Referenced for contract-map edge completeness; not modified in this track." }
-      ]
+      "informal_grounds": []
     },
     "InMemoryCatalogueLinter": {
-      "action": "modify",
+      "action": "reference",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [
         { "trait_name": "CatalogueLinter", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }
@@ -189,11 +191,9 @@
         { "name": "new", "params": [], "returns": "Self" },
         { "name": "with_disabled_rules", "params": [{ "name": "disabled_rules", "ty": "Vec<String>" }], "returns": "Self" }
       ],
-      "docs": "Existing InMemoryCatalogueLinter. Modified to use CatalogueDocument in run() parameter.",
+      "docs": "Pre-existing InMemoryCatalogueLinter. Referenced: the only change in this track was replacing a hand-written `impl Default` with `#[derive(Default)]`, which is structurally equivalent per ADR D9. No behavioural change; spec_refs and informal_grounds are intentionally empty for a reference entry.",
       "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "discussion", "summary": "Pre-existing linter adapter modified as side-effect of CatalogueDocument introduction. Linter detailed design is out of scope (OS-01); this modification updates the run() parameter type." }
-      ]
+      "informal_grounds": []
     },
     "EdgeSet": {
       "action": "delete",
@@ -208,7 +208,7 @@
     "RustdocSchemaExporter": {
       "action": "modify",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [
         { "trait_name": "SchemaExporter", "origin_crate": "domain" },
         { "trait_name": "SchemaExporterPort", "origin_crate": "usecase" }
@@ -234,14 +234,12 @@
       },
       "docs": "Existing error type for the SchemaExport -> TypeGraph codec. Referenced for continuity.",
       "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "discussion", "summary": "Pre-existing error type for schema export codec. Referenced for contract-map edge completeness; not modified in this track." }
-      ]
+      "informal_grounds": []
     },
     "SignalEvaluatorV2": {
       "action": "add",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "unit_struct" },
       "trait_impls": [
         { "trait_name": "SignalEvaluatorPort", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }

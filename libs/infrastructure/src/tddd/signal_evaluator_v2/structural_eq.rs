@@ -58,9 +58,21 @@ pub(super) fn items_structurally_equal(
             &fa.generics,
             &fb.generics,
         ),
-        // For trait impls: compare for_ + trait path (identity), header flags,
-        // generics, AND the method map (structural content) so that any change
-        // inside an impl block produces a structural mismatch.
+        // For trait impls: compare for_ + trait path (identity), header flags, and
+        // generics only.  Method-map comparison is intentionally omitted per ADR D9:
+        // the catalogue declares "which traits are implemented" without recording
+        // method bodies or the provenance of the implementation
+        // (`#[derive(...)]`-generated vs hand-written).  A `#[derive(Default)]` and
+        // a hand-written `impl Default { fn default() -> Self { Self::new() } }` are
+        // structurally equal from the catalogue's perspective — both implement the
+        // same trait contract.
+        //
+        // S-side (A-codec): generics embedded in path string with `args: None`
+        //   e.g. Path { path: "core::convert::From<CatalogueLoaderError>", args: None }
+        // C-side (rustdoc): base path in `path`, generics in `args`
+        //   e.g. Path { path: "From", args: Some(AngleBracketed(["CatalogueLoaderError"])) }
+        //
+        // Reducing both to `"From<CatalogueLoaderError>"` produces equality.
         (ItemEnum::Impl(ia), ItemEnum::Impl(ib)) => {
             use super::format::format_generic_args;
             if ia.is_unsafe != ib.is_unsafe || ia.is_negative != ib.is_negative {
@@ -73,13 +85,6 @@ pub(super) fn items_structurally_equal(
             // S and C refer to the same trait — using `krate.paths` for disambiguation.
             // Here we only need to confirm they are the same trait (not identical path
             // strings), so we reduce to the short name + generic args.
-            //
-            // S-side (A-codec): generics embedded in path string with `args: None`
-            //   e.g. Path { path: "core::convert::From<CatalogueLoaderError>", args: None }
-            // C-side (rustdoc): base path in `path`, generics in `args`
-            //   e.g. Path { path: "From", args: Some(AngleBracketed(["CatalogueLoaderError"])) }
-            //
-            // Reducing both to `"From<CatalogueLoaderError>"` produces equality.
             let normalize_trait_path = |p: &rustdoc_types::Path| {
                 // Strip module prefix to get the short base name (last segment).
                 // Also strip any generic suffix embedded in the path string so we can
@@ -105,24 +110,7 @@ pub(super) fn items_structurally_equal(
             if !for_equal || !trait_equal {
                 return false;
             }
-            if !generics_structurally_equal(&ia.generics, &ib.generics) {
-                return false;
-            }
-            // Compare method/associated-item maps only when the S-side impl has methods.
-            // Catalogue-derived trait impls are identity-only (empty `items` list): the
-            // catalogue declares "Foo implements Display" without encoding the actual method
-            // bodies.  If the S-side impl is identity-only (no items), skip the content
-            // comparison — identity equality (for_ + trait_ + generics) is sufficient.
-            // When a_items is non-empty, the S-side carries a modified impl with explicit
-            // content, so a full method-map comparison is required.
-            if !ia.items.is_empty() {
-                let a_methods = build_trait_method_map(&ia.items, a_index, Some(&ia.generics));
-                let b_methods = build_trait_method_map(&ib.items, b_index, Some(&ib.generics));
-                if a_methods != b_methods {
-                    return false;
-                }
-            }
-            true
+            generics_structurally_equal(&ia.generics, &ib.generics)
         }
         _ => false,
     }
@@ -369,9 +357,12 @@ fn format_variant_kind(kind: &rustdoc_types::VariantKind, index: &HashMap<Id, It
 mod tests {
     use std::collections::HashMap;
 
-    use rustdoc_types::{Generics, Id, Item, ItemEnum, Struct, StructKind, Type, Visibility};
+    use rustdoc_types::{
+        FunctionHeader, FunctionSignature, Generics, Id, Impl, Item, ItemEnum, Path, Struct,
+        StructKind, Type, Visibility,
+    };
 
-    use super::structs_structurally_equal;
+    use super::{items_structurally_equal, structs_structurally_equal};
 
     fn make_struct_field_item(id: Id, ty_str: &str) -> Item {
         Item {
@@ -465,6 +456,140 @@ mod tests {
         assert!(
             !structs_structurally_equal(&s_struct, &c_struct, &s_index, &c_index),
             "different field types must not match"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR D9: provenance-agnostic trait-impl comparison
+    // -----------------------------------------------------------------------
+
+    fn make_item(id: Id, inner: ItemEnum) -> Item {
+        Item {
+            id,
+            crate_id: 0,
+            name: None,
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner,
+        }
+    }
+
+    fn default_fn_item(id: Id) -> Item {
+        make_item(
+            id,
+            ItemEnum::Function(rustdoc_types::Function {
+                sig: FunctionSignature { inputs: vec![], output: None, is_c_variadic: false },
+                generics: empty_generics(),
+                header: FunctionHeader {
+                    is_unsafe: false,
+                    is_const: false,
+                    is_async: false,
+                    abi: rustdoc_types::Abi::Rust,
+                },
+                has_body: true,
+            }),
+        )
+    }
+
+    fn make_impl_item(id: Id, for_name: &str, trait_name: &str, items: Vec<Id>) -> Item {
+        make_item(
+            id,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: Some(Path { path: trait_name.to_string(), id: Id(999), args: None }),
+                for_: Type::ResolvedPath(Path {
+                    path: for_name.to_string(),
+                    id: Id(1),
+                    args: None,
+                }),
+                items,
+                is_negative: false,
+                is_synthetic: false,
+                blanket_impl: None,
+            }),
+        )
+    }
+
+    /// ADR D9: hand-written `impl Default` (S-side, with `default` method in items)
+    /// vs `#[derive(Default)]` (C-side, empty items) → structurally equal.
+    ///
+    /// This is the exact scenario from Issue 2: `InMemoryCatalogueLinter` baseline
+    /// had a hand-written `impl Default` with a `default` method; this track replaced
+    /// it with `#[derive(Default)]` which produces an impl with empty items list.
+    /// Per D9, these are structurally equal because the catalogue only cares that
+    /// `Default` is implemented, not how it is implemented.
+    #[test]
+    fn test_impl_hand_written_default_vs_derive_default_are_structurally_equal() {
+        // S-side: hand-written `impl Default for Foo { fn default() -> Self { ... } }`
+        // Items list is non-empty (contains the `default` function id).
+        let s_default_fn_id = Id(100);
+        let s_impl = make_impl_item(Id(10), "Foo", "Default", vec![s_default_fn_id]);
+        let mut s_index = HashMap::new();
+        s_index.insert(s_default_fn_id, default_fn_item(s_default_fn_id));
+
+        // C-side: `#[derive(Default)]` produces an impl with empty items list.
+        let c_impl = make_impl_item(Id(20), "Foo", "Default", vec![]);
+        let c_index = HashMap::new();
+
+        assert!(
+            items_structurally_equal(&s_impl, &c_impl, &s_index, &c_index, "my_crate"),
+            "hand-written impl Default vs #[derive(Default)] must be structurally equal (ADR D9)"
+        );
+    }
+
+    /// ADR D9 converse: `#[derive(Default)]` (S-side, empty items)
+    /// vs hand-written `impl Default` (C-side, with items) → structurally equal.
+    #[test]
+    fn test_impl_derive_default_vs_hand_written_default_are_structurally_equal() {
+        // S-side: `#[derive(Default)]` — empty items list.
+        let s_impl = make_impl_item(Id(10), "Foo", "Default", vec![]);
+        let s_index = HashMap::new();
+
+        // C-side: hand-written `impl Default` with a `default` method.
+        let c_default_fn_id = Id(200);
+        let c_impl = make_impl_item(Id(20), "Foo", "Default", vec![c_default_fn_id]);
+        let mut c_index = HashMap::new();
+        c_index.insert(c_default_fn_id, default_fn_item(c_default_fn_id));
+
+        assert!(
+            items_structurally_equal(&s_impl, &c_impl, &s_index, &c_index, "my_crate"),
+            "#[derive(Default)] vs hand-written impl Default must be structurally equal (ADR D9)"
+        );
+    }
+
+    /// Different trait names must NOT be structurally equal.
+    #[test]
+    fn test_impl_different_trait_names_are_not_equal() {
+        let s_impl = make_impl_item(Id(10), "Foo", "Default", vec![]);
+        let s_index = HashMap::new();
+
+        let c_impl = make_impl_item(Id(20), "Foo", "Display", vec![]);
+        let c_index = HashMap::new();
+
+        assert!(
+            !items_structurally_equal(&s_impl, &c_impl, &s_index, &c_index, "my_crate"),
+            "impls with different trait names must not be structurally equal"
+        );
+    }
+
+    /// Different `for_` types must NOT be structurally equal.
+    #[test]
+    fn test_impl_different_for_types_are_not_equal() {
+        let s_impl = make_impl_item(Id(10), "Foo", "Default", vec![]);
+        let s_index = HashMap::new();
+
+        let c_impl = make_impl_item(Id(20), "Bar", "Default", vec![]);
+        let c_index = HashMap::new();
+
+        assert!(
+            !items_structurally_equal(&s_impl, &c_impl, &s_index, &c_index, "my_crate"),
+            "impls with different for_ types must not be structurally equal"
         );
     }
 }

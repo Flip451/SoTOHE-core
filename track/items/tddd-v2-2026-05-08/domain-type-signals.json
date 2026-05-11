@@ -1,24 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-11T09:58:14Z",
-  "declaration_hash": "665fff96ca1a47d8a5cb8f9953f1da0010cbbe2cbbf706574324c7e2a6af515d",
+  "generated_at": "2026-05-11T16:59:33Z",
+  "declaration_hash": "560d3fbbce5a971ededf9f50a253eef39fdb65132a219cf150bd7e7dfa4f2038",
   "signals": [
-    {
-      "type_name": "AdrDecisionCommonError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::error::Error",
-        "core::fmt::Display"
-      ]
-    },
     {
       "type_name": "CatalogueDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -36,12 +24,6 @@
         "core::error::Error",
         "core::fmt::Display"
       ]
-    },
-    {
-      "type_name": "CatalogueLinter",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
     },
     {
       "type_name": "CatalogueLoader",
@@ -83,7 +65,7 @@
     {
       "type_name": "CrateName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -129,7 +111,7 @@
     {
       "type_name": "FieldName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -155,7 +137,7 @@
     {
       "type_name": "FunctionName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -212,7 +194,7 @@
     {
       "type_name": "Identifier",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -264,7 +246,7 @@
     {
       "type_name": "MethodGenericParam",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -274,7 +256,7 @@
     {
       "type_name": "MethodName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -290,7 +272,7 @@
     {
       "type_name": "ModulePath",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -328,7 +310,7 @@
     {
       "type_name": "ParamName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -387,7 +369,7 @@
     {
       "type_name": "ThreeWayEvaluationReport",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -397,7 +379,7 @@
     {
       "type_name": "ThreeWaySignal",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -428,7 +410,7 @@
     {
       "type_name": "TraitImplDeclV2",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -439,7 +421,7 @@
     {
       "type_name": "TraitName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -455,7 +437,7 @@
     {
       "type_name": "TypeDefinitionKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -485,7 +467,7 @@
     {
       "type_name": "TypeName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -501,7 +483,7 @@
     {
       "type_name": "TypeRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -517,7 +499,7 @@
     {
       "type_name": "TypestateMarker",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -528,7 +510,7 @@
     {
       "type_name": "TypestateTransitions",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -559,7 +541,7 @@
     {
       "type_name": "VariantName",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -582,6 +564,12 @@
         "core::cmp::PartialEq",
         "core::default::Default"
       ]
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ActionContradiction",
@@ -688,6 +676,12 @@
     {
       "type_name": "CatalogueLintViolation",
       "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinter",
+      "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
     },

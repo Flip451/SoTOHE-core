@@ -12,9 +12,10 @@
 //! in usecase.
 
 use domain::tddd::LayerId;
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::{
     CatalogueSpecSignal, CatalogueSpecSignalsDocument, ContentHash, RepositoryError, TrackId,
-    ValidationError, evaluate_catalogue_entry_signal,
+    TypeAction, ValidationError, evaluate_catalogue_entry_signal,
 };
 use thiserror::Error;
 
@@ -193,8 +194,12 @@ where
             .entries()
             .iter()
             .map(|entry| {
-                let signal =
-                    evaluate_catalogue_entry_signal(entry.spec_refs(), entry.informal_grounds());
+                let action = type_action_to_item_action(entry.action());
+                let signal = evaluate_catalogue_entry_signal(
+                    action,
+                    entry.spec_refs(),
+                    entry.informal_grounds(),
+                );
                 CatalogueSpecSignal::new(entry.name(), signal)
             })
             .collect();
@@ -220,6 +225,20 @@ where
             })?;
 
         Ok(())
+    }
+}
+
+/// Convert a v2 [`TypeAction`] to the corresponding v3 [`ItemAction`].
+///
+/// Used when computing catalogue-spec signals for a v2 `TypeCatalogueEntry` so
+/// that `evaluate_catalogue_entry_signal` (which uses the v3 `ItemAction` enum)
+/// can apply the D5 reference-action exemption correctly.
+fn type_action_to_item_action(action: TypeAction) -> ItemAction {
+    match action {
+        TypeAction::Add => ItemAction::Add,
+        TypeAction::Modify => ItemAction::Modify,
+        TypeAction::Reference => ItemAction::Reference,
+        TypeAction::Delete => ItemAction::Delete,
     }
 }
 
@@ -463,6 +482,27 @@ mod tests {
         .unwrap()
     }
 
+    fn catalogue_entry_with_action(
+        name: &str,
+        action: TypeAction,
+        spec_refs: Vec<domain::SpecRef>,
+        informal_grounds: Vec<InformalGroundRef>,
+    ) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::with_refs(
+            name,
+            "test entry",
+            TypeDefinitionKind::ValueObject {
+                expected_members: Vec::new(),
+                expected_methods: Vec::new(),
+            },
+            action,
+            true,
+            spec_refs,
+            informal_grounds,
+        )
+        .unwrap()
+    }
+
     fn catalogue_with(entries: Vec<TypeCatalogueEntry>) -> TypeCatalogueDocument {
         TypeCatalogueDocument::new(1, entries)
     }
@@ -625,5 +665,36 @@ mod tests {
             RefreshCatalogueSpecSignalsError::WriteFailed { ref layer_id, .. }
                 if layer_id == "domain"
         ));
+    }
+
+    /// A `TypeAction::Reference` entry with empty `spec_refs` and empty
+    /// `informal_grounds` must evaluate to `Blue` (ADR
+    /// `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5).
+    /// This test verifies the action-threading path for the `Reference` variant
+    /// specifically — a regression in `type_action_to_item_action` or the
+    /// `entry.action()` call site would produce `Red` instead of `Blue`.
+    #[test]
+    fn refresh_reference_action_with_no_spec_refs_or_informal_evaluates_to_blue() {
+        let cat = catalogue_with(vec![catalogue_entry_with_action(
+            "ExternalType",
+            TypeAction::Reference,
+            Vec::new(),
+            Vec::new(),
+        )]);
+        let hash_hex = hex_pattern(0xcc);
+        let reader = FixedReader::found(cat, hash_hex);
+        let writer = CapturingWriter::new();
+        let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
+
+        interactor.execute(&refresh_cmd("track/my-track", "my-track", "domain")).unwrap();
+
+        let (_, _, doc) = interactor.writer.single();
+        assert_eq!(doc.signals.len(), 1);
+        assert_eq!(doc.signals[0].type_name, "ExternalType");
+        assert_eq!(
+            doc.signals[0].signal,
+            domain::ConfidenceSignal::Blue,
+            "Reference action with empty spec_refs + informal_grounds must be Blue (D5 exemption)"
+        );
     }
 }

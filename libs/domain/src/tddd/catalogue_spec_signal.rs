@@ -20,6 +20,7 @@ use std::path::PathBuf;
 use crate::ConfidenceSignal;
 use crate::plan_ref::{ContentHash, InformalGroundRef, SpecElementId, SpecRef};
 use crate::tddd::catalogue::TypeCatalogueDocument;
+use crate::tddd::catalogue_v2::roles::ItemAction;
 use crate::tddd::layer_id::LayerId;
 
 /// Schema version of `<layer>-catalogue-spec-signals.json` — pinned to `1`
@@ -176,9 +177,11 @@ impl CatalogueSpecSignalsDocument {
 /// Evaluates the catalogue-spec confidence signal for a single catalogue entry.
 ///
 /// Implements the **informal-priority rule** (ADR
-/// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.1). The rule is
-/// the per-layer analogue of Phase 1's
-/// [`evaluate_requirement_signal`](crate::evaluate_requirement_signal):
+/// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.1) with the
+/// `action: "reference"` exemption added by ADR
+/// `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5.
+///
+/// ## Base rule (§D1.1, applies to all `add` / `modify` / `delete` entries)
 ///
 /// - `informal_grounds[]` non-empty → 🟡 Yellow (unpersisted ground; takes
 ///   priority regardless of `spec_refs[]` because any remaining informal ground
@@ -187,15 +190,30 @@ impl CatalogueSpecSignalsDocument {
 ///   spec grounding with no pending promotion)
 /// - both empty → 🔴 Red
 ///
+/// ## `reference` exemption (ADR `2026-05-11-1257` D5)
+///
+/// A `action == ItemAction::Reference` entry with **both** `spec_refs` and
+/// `informal_grounds` empty evaluates to 🔵 Blue because the type exists in
+/// baseline B and no explicit grounding is required. If either field is
+/// non-empty the base §D1.1 rule takes precedence (explicit grounding is
+/// honoured as-is).
+///
 /// Per-`SpecRef` integrity (dangling `anchor`, hash drift, stale signals) is
 /// outside this signal's scope and is reported via [`SpecRefFinding`] by the
 /// binary gate (`check_catalogue_spec_ref_integrity`, authored in T004). This
 /// function is pure and I/O-free.
 #[must_use]
 pub fn evaluate_catalogue_entry_signal(
+    action: ItemAction,
     spec_refs: &[SpecRef],
     informal_grounds: &[InformalGroundRef],
 ) -> ConfidenceSignal {
+    // ADR 2026-05-11-1257 D5: reference-action entries with no explicit
+    // grounding are implicitly Blue (type exists in baseline B).
+    if action == ItemAction::Reference && spec_refs.is_empty() && informal_grounds.is_empty() {
+        return ConfidenceSignal::Blue;
+    }
+    // Base rule: informal-priority (ADR 2026-04-23-0344 §D1.1).
     if !informal_grounds.is_empty() {
         return ConfidenceSignal::Yellow;
     }
@@ -639,6 +657,7 @@ mod tests {
     // ---------------------------------------------------------------------------
 
     use crate::plan_ref::{InformalGroundKind, InformalGroundRef, InformalGroundSummary, SpecRef};
+    use crate::tddd::catalogue_v2::roles::ItemAction;
 
     fn informal(kind: InformalGroundKind, summary: &str) -> InformalGroundRef {
         InformalGroundRef::new(kind, InformalGroundSummary::try_new(summary).unwrap())
@@ -648,23 +667,27 @@ mod tests {
         SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(0x00))
     }
 
+    // ---------------------------------------------------------------------------
+    // Base rule tests (§D1.1, add / modify / delete actions)
+    // ---------------------------------------------------------------------------
+
     #[test]
     fn evaluate_catalogue_entry_signal_returns_red_when_both_refs_empty() {
-        let signal = evaluate_catalogue_entry_signal(&[], &[]);
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Add, &[], &[]);
         assert_eq!(signal, ConfidenceSignal::Red);
     }
 
     #[test]
     fn evaluate_catalogue_entry_signal_returns_blue_when_only_spec_refs_present() {
         let refs = vec![spec_ref("IN-01")];
-        let signal = evaluate_catalogue_entry_signal(&refs, &[]);
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Add, &refs, &[]);
         assert_eq!(signal, ConfidenceSignal::Blue);
     }
 
     #[test]
     fn evaluate_catalogue_entry_signal_returns_yellow_when_informal_grounds_present() {
         let grounds = vec![informal(InformalGroundKind::UserDirective, "pending promotion")];
-        let signal = evaluate_catalogue_entry_signal(&[], &grounds);
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Add, &[], &grounds);
         assert_eq!(signal, ConfidenceSignal::Yellow);
     }
 
@@ -672,10 +695,43 @@ mod tests {
     fn evaluate_catalogue_entry_signal_yellow_takes_priority_over_spec_refs() {
         let refs = vec![spec_ref("IN-01"), spec_ref("IN-02")];
         let grounds = vec![informal(InformalGroundKind::Discussion, "still iterating")];
-        let signal = evaluate_catalogue_entry_signal(&refs, &grounds);
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Add, &refs, &grounds);
         // Informal-priority rule: any informal ground → Yellow regardless of
         // spec_refs count. Promotion to Blue requires clearing informal_grounds.
         assert_eq!(signal, ConfidenceSignal::Yellow);
+    }
+
+    // ---------------------------------------------------------------------------
+    // D5 reference-action exemption tests (ADR 2026-05-11-1257)
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_reference_action_with_both_empty_returns_blue() {
+        // D5 exemption: reference-action + both empty → Blue (baseline-implicit grounding).
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Reference, &[], &[]);
+        assert_eq!(signal, ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_reference_action_with_informal_grounds_returns_yellow() {
+        // D5: non-empty informal_grounds → base §D1.1 rule takes over → Yellow.
+        let grounds = vec![informal(InformalGroundKind::Discussion, "explicit note")];
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Reference, &[], &grounds);
+        assert_eq!(signal, ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_add_action_with_both_empty_returns_red() {
+        // add-action is not exempt: both empty → Red.
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Add, &[], &[]);
+        assert_eq!(signal, ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn evaluate_catalogue_entry_signal_modify_action_with_both_empty_returns_red() {
+        // modify-action is not exempt: both empty → Red.
+        let signal = evaluate_catalogue_entry_signal(ItemAction::Modify, &[], &[]);
+        assert_eq!(signal, ConfidenceSignal::Red);
     }
 
     // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5d8e8d91141df61bbe69bb3b3f87fbb7b6d26f44ea3f0541392bbec998239fa2",
+  "catalogue_declaration_hash": "7c95428e0fb5df8c8d7eb97d66127a10425b483c596a6566e8a203eaf8c4b2ff",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -56,15 +56,15 @@
     },
     {
       "type_name": "FsCatalogueSpecSignalsStore",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "FsContractMapWriter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "InMemoryCatalogueLinter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "LoadAllCataloguesError",
@@ -76,7 +76,7 @@
     },
     {
       "type_name": "SchemaExportCodecError",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "SignalEvaluatorV2",

@@ -21,7 +21,7 @@
 | CatalogueToExtendedCrateCodecError | error_type | — | — | 🔵 | 🔵 |
 | EvaluateSignalsError | error_type | reference | — | 🔵 | 🔵 |
 | LoadAllCataloguesError | error_type | modify | — | 🔵 | 🔵 |
-| SchemaExportCodecError | error_type | reference | — | 🔵 | 🟡 |
+| SchemaExportCodecError | error_type | reference | — | 🔵 | 🔵 |
 | TypeCatalogueCodecError | error_type | reference | — | 🔵 | 🔵 |
 | TypeGraphExportError | error_type | delete | — | 🔵 | 🔵 |
 
@@ -30,14 +30,14 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BaselineRustdocCodec | secondary_adapter | — | — | 🔵 | 🔵 |
-| CatalogueDocumentCodec | secondary_adapter | — | — | 🟡 | 🔵 |
-| CatalogueToExtendedCrateCodec | secondary_adapter | — | — | 🟡 | 🔵 |
-| FsCatalogueLoader | secondary_adapter | modify | — | 🟡 | 🔵 |
-| FsCatalogueSpecSignalsStore | secondary_adapter | reference | — | 🔵 | 🟡 |
-| FsContractMapWriter | secondary_adapter | reference | — | 🔵 | 🟡 |
-| InMemoryCatalogueLinter | secondary_adapter | modify | — | 🟡 | 🟡 |
-| RustdocSchemaExporter | secondary_adapter | modify | — | 🟡 | 🔵 |
-| SignalEvaluatorV2 | secondary_adapter | — | — | 🟡 | 🔵 |
+| CatalogueDocumentCodec | secondary_adapter | — | — | 🔵 | 🔵 |
+| CatalogueToExtendedCrateCodec | secondary_adapter | — | — | 🔵 | 🔵 |
+| FsCatalogueLoader | secondary_adapter | modify | — | 🔵 | 🔵 |
+| FsCatalogueSpecSignalsStore | secondary_adapter | reference | — | 🔵 | 🔵 |
+| FsContractMapWriter | secondary_adapter | reference | — | 🔵 | 🔵 |
+| InMemoryCatalogueLinter | secondary_adapter | reference | — | 🔵 | 🔵 |
+| RustdocSchemaExporter | secondary_adapter | modify | — | 🔵 | 🔵 |
+| SignalEvaluatorV2 | secondary_adapter | — | — | 🔵 | 🔵 |
 
 ## Free Functions
 

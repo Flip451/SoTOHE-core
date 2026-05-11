@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "665fff96ca1a47d8a5cb8f9953f1da0010cbbe2cbbf706574324c7e2a6af515d",
+  "catalogue_declaration_hash": "560d3fbbce5a971ededf9f50a253eef39fdb65132a219cf150bd7e7dfa4f2038",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -9,10 +9,6 @@
     {
       "type_name": "ActionContradictionKind",
       "signal": "blue"
-    },
-    {
-      "type_name": "AdrDecisionCommonError",
-      "signal": "yellow"
     },
     {
       "type_name": "CatalogueDocument",
@@ -24,19 +20,19 @@
     },
     {
       "type_name": "CatalogueLintViolation",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "CatalogueLinterError",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "CatalogueLinterRule",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "CatalogueLinterRuleKind",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "ConsistencyReport",
@@ -44,7 +40,7 @@
     },
     {
       "type_name": "ContractMapRenderOptions",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "ContractRole",
@@ -256,7 +252,7 @@
     },
     {
       "type_name": "CatalogueLinter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "CatalogueLoader",
@@ -268,14 +264,18 @@
     },
     {
       "type_name": "ContractMapWriter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "SchemaExporter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "SignalEvaluatorPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal",
       "signal": "blue"
     },
     {

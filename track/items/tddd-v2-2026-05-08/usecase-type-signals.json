@@ -1,18 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-11T09:58:14Z",
-  "declaration_hash": "34db733d9b2ff91e9d7f4ba470d5ad34b1cd405cb45db9b344e4069fe95a7f59",
+  "generated_at": "2026-05-11T16:59:34Z",
+  "declaration_hash": "3a84f07763b136ab59906c23bb7274512dd90610a6fac90c453f4fbbbf0a86a4",
   "signals": [
-    {
-      "type_name": "LintRuleKind",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::cmp::Eq",
-        "core::cmp::PartialEq"
-      ]
-    },
     {
       "type_name": "RenderContractMapCommand",
       "kind_tag": "command",
