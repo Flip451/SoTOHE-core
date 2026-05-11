@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| LintRuleKind | enum | modify | — | 🔵 | 🔵 |
+| LintRuleKind | enum | modify | — | 🔵 | 🟡 |
 
 ## Error Types
 
@@ -16,20 +16,20 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueSpecSignalsWriter | secondary_port | reference | — | 🔵 | 🔵 |
-| SchemaExporterPort | secondary_port | reference | — | 🔵 | 🔵 |
+| CatalogueSpecSignalsWriter | secondary_port | reference | — | 🔵 | 🟡 |
+| SchemaExporterPort | secondary_port | reference | — | 🔵 | 🟡 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreCommitTypeSignalsService | application_service | reference | — | 🔵 | 🔵 |
+| PreCommitTypeSignalsService | application_service | reference | — | 🔵 | 🟡 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreCommitTypeSignalsInteractor | interactor | reference | — | 🔵 | 🔵 |
+| PreCommitTypeSignalsInteractor | interactor | reference | — | 🔵 | 🟡 |
 
 ## Commands
 

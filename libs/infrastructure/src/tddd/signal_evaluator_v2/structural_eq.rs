@@ -177,7 +177,14 @@ fn structs_structurally_equal(
     match (&a.kind, &b.kind) {
         (StructKind::Unit, StructKind::Unit) => true,
         (StructKind::Tuple(af), StructKind::Tuple(bf)) => {
-            // Compare field types by position.
+            // Compare field types by position, including `None` slots.
+            //
+            // Tuple field positions are part of the public API: a `pub` field at index `.1`
+            // vs `.0` is a semantic difference. The catalogue (S-side) does NOT add `None`
+            // placeholder slots for private fields (since it cannot know their positions).
+            // Structs with private fields will therefore always have a different vector
+            // length from the C-side (rustdoc) representation: this is the intended
+            // fail-closed behaviour — they produce a Mismatch rather than a false Blue.
             af.len() == bf.len()
                 && af.iter().zip(bf.iter()).all(|(a_opt, b_opt)| match (a_opt, b_opt) {
                     (Some(aid), Some(bid)) => field_types_equal(aid, bid, a_index, b_index),
@@ -354,5 +361,110 @@ fn format_variant_kind(kind: &rustdoc_types::VariantKind, index: &HashMap<Id, It
             let stripped = if *has_stripped_fields { ",..stripped" } else { "" };
             format!("struct{{{}{}}}", entries.join(","), stripped)
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
+mod tests {
+    use std::collections::HashMap;
+
+    use rustdoc_types::{Generics, Id, Item, ItemEnum, Struct, StructKind, Type, Visibility};
+
+    use super::structs_structurally_equal;
+
+    fn make_struct_field_item(id: Id, ty_str: &str) -> Item {
+        Item {
+            id,
+            crate_id: 0,
+            name: None,
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::StructField(Type::Primitive(ty_str.to_owned())),
+        }
+    }
+
+    fn empty_generics() -> Generics {
+        Generics { params: vec![], where_predicates: vec![] }
+    }
+
+    fn make_tuple_struct(field_ids: Vec<Option<Id>>) -> Struct {
+        Struct { kind: StructKind::Tuple(field_ids), generics: empty_generics(), impls: vec![] }
+    }
+
+    // Build an index with field items for all Some entries in `field_ids`,
+    // paired with `ty_strs` in order (skipping None slots when pairing).
+    fn build_index(field_ids: &[Option<Id>], ty_strs: &[&str]) -> HashMap<Id, Item> {
+        let mut index = HashMap::new();
+        let some_ids: Vec<Id> = field_ids.iter().filter_map(|opt| *opt).collect();
+        for (id, ty) in some_ids.iter().zip(ty_strs.iter()) {
+            index.insert(*id, make_struct_field_item(*id, ty));
+        }
+        index
+    }
+
+    /// All-public tuple struct: S-side and C-side both have only Some entries.
+    /// Types match — must compare equal.
+    #[test]
+    fn test_tuple_struct_all_public_fields_match() {
+        // S-side: [Some(1), Some(2)] — no private fields
+        let s_fields: Vec<Option<Id>> = vec![Some(Id(1)), Some(Id(2))];
+        let s_index = build_index(&s_fields, &["u32", "String"]);
+        let s_struct = make_tuple_struct(s_fields);
+
+        // C-side: [Some(10), Some(11)] — same types in same positions
+        let c_fields: Vec<Option<Id>> = vec![Some(Id(10)), Some(Id(11))];
+        let c_index = build_index(&c_fields, &["u32", "String"]);
+        let c_struct = make_tuple_struct(c_fields);
+
+        assert!(
+            structs_structurally_equal(&s_struct, &c_struct, &s_index, &c_index),
+            "all-public tuple structs with matching types must compare equal"
+        );
+    }
+
+    /// S-side adds a trailing None when has_stripped_fields=true.
+    /// C-side (code changed to no private fields) has no Nones.
+    /// Lengths differ → Mismatch — detects private-field removal.
+    #[test]
+    fn test_tuple_struct_private_field_removed_does_not_match() {
+        // S-side: [Some(1), None] — one public + stripped flag encoded as trailing None
+        let s_fields: Vec<Option<Id>> = vec![Some(Id(1)), None];
+        let s_index = build_index(&s_fields, &["String"]);
+        let s_struct = make_tuple_struct(s_fields);
+
+        // C-side: [Some(10)] — code now has no private fields
+        let c_fields: Vec<Option<Id>> = vec![Some(Id(10))];
+        let c_index = build_index(&c_fields, &["String"]);
+        let c_struct = make_tuple_struct(c_fields);
+
+        // Lengths differ (2 vs 1) → Mismatch, preventing false Blue on private-field removal.
+        assert!(
+            !structs_structurally_equal(&s_struct, &c_struct, &s_index, &c_index),
+            "S-side trailing-None vs C-side with no None must not match (detects removal)"
+        );
+    }
+
+    /// Different public field types must not match.
+    #[test]
+    fn test_tuple_struct_different_field_types_does_not_match() {
+        // S-side: [Some(1)] type=u32
+        let s_fields: Vec<Option<Id>> = vec![Some(Id(1))];
+        let s_index = build_index(&s_fields, &["u32"]);
+        let s_struct = make_tuple_struct(s_fields);
+
+        // C-side: [Some(10)] type=String
+        let c_fields: Vec<Option<Id>> = vec![Some(Id(10))];
+        let c_index = build_index(&c_fields, &["String"]);
+        let c_struct = make_tuple_struct(c_fields);
+
+        assert!(
+            !structs_structurally_equal(&s_struct, &c_struct, &s_index, &c_index),
+            "different field types must not match"
+        );
     }
 }

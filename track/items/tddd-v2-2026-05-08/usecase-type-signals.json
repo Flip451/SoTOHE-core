@@ -1,19 +1,27 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-10T16:09:39Z",
-  "declaration_hash": "43ed12899f0dccced82a26fe0be521e6d07f660c0a5696244a6697975c3f9b1b",
+  "generated_at": "2026-05-11T09:58:14Z",
+  "declaration_hash": "34db733d9b2ff91e9d7f4ba470d5ad34b1cd405cb45db9b344e4069fe95a7f59",
   "signals": [
     {
       "type_name": "LintRuleKind",
       "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "RenderContractMapCommand",
       "kind_tag": "command",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "RenderContractMapError",
@@ -21,10 +29,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error",
-        "From<CatalogueLoaderError>",
-        "From<ContractMapWriterError>"
+        "core::convert::From<CatalogueLoaderError>",
+        "core::convert::From<ContractMapWriterError>",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {

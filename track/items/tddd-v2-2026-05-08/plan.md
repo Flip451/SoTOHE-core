@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
 
-## Tasks (9/9 resolved)
+## Tasks (17/17 resolved)
 
 ### S1 — 新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)
 
@@ -10,16 +10,16 @@
 > 旧型 (TypeDefinitionKind 等) はこのフェーズでは削除しない。T003 の codec 切り替え後に T008 で一括削除する。<500 行 / commit を維持するため newtype+primitive と複合構造を T001/T002 に 2 分割している。
 
 - [x] **T001**: 新 catalogue schema domain 型 (newtype 系 + Role 3 enum + ItemAction + SelfReceiver + LayerId) を実装する。Identifier (共通 base validation) / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath の 12 newtype に Display / Serialize / Deserialize / FromStr を実装する。DataRole (13 値) / ContractRole (3 値) / FunctionRole (2 値) / ItemAction (4 値) / SelfReceiver (3 値) を enum として実装する。Layer 軸は ADR `2026-04-17-1528-tddd-contract-map` §D1 で定義済みの `LayerId` newtype (architecture-rules.json 駆動) を使用する (固定 3 値 enum は導入しない)。libs/domain/src/tddd/catalogue.rs 内の新 tddd::catalogue_v2 (または tddd/catalogue/ サブモジュール) に配置する。ラウンドトリップ unit test (AC-03) を追加する。この時点では旧型 (TypeDefinitionKind 等) はまだ残す。 (`ba7d0eb2574049186b9478ffb62b0e62b07a3084`)
-- [x] **T002**: 新 catalogue schema domain 型 (複合構造: TypeKindV2 / CompositePattern / VariantPayload / VariantDecl / FieldDecl / MethodDeclaration / ParamDeclaration 修正 / TraitImplDeclV2 / TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument + CatalogueDocumentError) を実装する。TypeKindV2 (Struct/Enum/TypeAlias の 3 variant payload-encoded) / CompositePattern / VariantPayload (Unit/Tuple/Struct) / VariantDecl (name+payload, serde default=Unit) / FieldDecl / TraitImplDeclV2 (identity-only) を実装する。既存 ParamDeclaration / MethodDeclaration を newtype フィールド (ParamName/TypeRef/MethodName/SelfReceiver) に修正する。TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument (3-BTreeMap + validation) / CatalogueDocumentError を実装する。crate_name とファイル名一致 validation を実装する。serde ラウンドトリップ unit test (AC-01 / AC-02 / AC-03 の新構造部分) を追加する。 (`1efb5b6bdd0d91e29e2136644fc291e60ddfc1e3`)
+- [x] **T002**: 新 catalogue schema domain 型 (複合構造: TypeKindV2 / VariantPayload / VariantDecl / FieldDecl / TypestateMarker / MethodDeclaration / ParamDeclaration 修正 / TraitImplDeclV2 / TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument + CatalogueDocumentError) を実装する。TypeKindV2 (UnitStruct / TupleStruct { fields: Vec<TypeRef>, has_stripped_fields } / PlainStruct { fields: Vec<FieldDecl>, has_stripped_fields, typestate: Option<TypestateMarker> } / Enum / TypeAlias の 5 flat variant payload-encoded) / VariantPayload (Unit/Tuple/Struct) / VariantDecl (name+payload, serde default=Unit) / FieldDecl / TraitImplDeclV2 (identity-only) を実装する。既存 ParamDeclaration / MethodDeclaration を newtype フィールド (ParamName/TypeRef/MethodName/SelfReceiver) に修正する。TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument (3-BTreeMap + validation) / CatalogueDocumentError を実装する。crate_name とファイル名一致 validation を実装する。serde ラウンドトリップ unit test (AC-01 / AC-02 / AC-03 の新構造部分) を追加する。 (`1efb5b6bdd0d91e29e2136644fc291e60ddfc1e3`)
 
 ### S2 — 新 CatalogueDocument serde codec — infrastructure 層 (CatalogueLoader 更新含む)
 
-> T003 は新 CatalogueDocument 専用 codec を infrastructure 層に実装し、旧 TypeCatalogueDocument 経路を削除する (no-backward-compat 原則)。
-> FsCatalogueLoader を CatalogueDocument を返すように修正し、CatalogueLoader port を Vec<(LayerId, CatalogueDocument)> 返り値に更新する。
-> CatalogueLoader port の配置は T003 で infrastructure 層 (infrastructure-types.json) に決定した (既存 catalogue に infrastructure 配置で declare されていたため現状を踏襲)。
+> T003 は新 CatalogueDocument 専用 codec を infrastructure 層に実装し、旧 TypeCatalogueDocument 直接読み込み経路を削除する (no-backward-compat 原則)。
+> FsCatalogueLoader の内部実装を v3 CatalogueDocument 読み込みに切り替える。CatalogueLoader port の返り値型は BTreeMap<LayerId, TypeCatalogueDocument> を維持し、infrastructure 側で v3_doc_to_stub 変換を行う (CatalogueLinter との互換性保持)。
+> CatalogueLoader port は domain-types.json に宣言されている (既存の tddd-contract-map-phase1 catalogue から踏襲した domain 層配置)。FsCatalogueLoader adapter が infrastructure-types.json に宣言される。
 > S1 (domain 型 T001/T002) の完了後に着手する。
 
-- [x] **T003**: 新 catalogue schema の infrastructure 層 serde codec を実装する。CatalogueDocumentCodecError (Json / UnsupportedSchemaVersion / InvalidEntry / CrateNameMismatch) を infrastructure 層に実装する。TypeCatalogueDocument / TypeCatalogueEntry / TypeDefinitionKind を読む旧 serde 経路を削除し (no-backward-compat 原則)、新 CatalogueDocument 専用 codec を infrastructure/src/tddd/catalogue_codec.rs に実装する。FsCatalogueLoader (infrastructure) を CatalogueDocument を返すように修正し、CatalogueLoader port (infrastructure-types.json に declare) の返り値型を Vec<(LayerId, CatalogueDocument)> に変更する。TypeCatalogueCodecError は既存 pre-migration track ディレクトリ用の v3-first/v2-fallback 経路の reference として残存する (新規 v2 ファイルは作成しない)。codec unit test (AC-01 の serde round-trip / CrateNameMismatch / UnsupportedSchemaVersion) を追加する。 (`c7dbcbc152f045c8635c53d5c3069d5eb65879fd`)
+- [x] **T003**: 新 catalogue schema の infrastructure 層 serde codec を実装する。CatalogueDocumentCodecError (Json / UnsupportedSchemaVersion / InvalidEntry / CrateNameMismatch) を infrastructure 層に実装する。TypeCatalogueDocument / TypeCatalogueEntry / TypeDefinitionKind を読む旧 serde 経路を削除し (no-backward-compat 原則)、新 CatalogueDocument 専用 codec を infrastructure/src/tddd/catalogue_document_codec.rs に実装する。FsCatalogueLoader (infrastructure) の内部実装を v3 CatalogueDocument 読み込みに切り替え、v3_doc_to_stub で CatalogueDocument → TypeCatalogueDocument stub 変換を行い CatalogueLoader port の返り値 BTreeMap<LayerId, TypeCatalogueDocument> に詰めて返す (CatalogueLoader port の返り値型は既存の BTreeMap<LayerId, TypeCatalogueDocument> のまま維持 — 呼び出し元 CatalogueLinter が TypeCatalogueDocument を要求するため互換性を保持)。TypeCatalogueCodecError は既存 pre-migration track ディレクトリ用の v3-first/v2-fallback 経路の reference として残存する (新規 v2 ファイルは作成しない)。codec unit test (AC-01 の serde round-trip / CrateNameMismatch / UnsupportedSchemaVersion) を追加する。 (`c7dbcbc152f045c8635c53d5c3069d5eb65879fd`)
 
 ### S3 — ExtendedCrate schema + Catalogue → TypeGraph A codec (domain port + infrastructure adapter)
 
@@ -50,12 +50,48 @@
 
 - [x] **T008**: 既存 TypeGraph (libs/domain/src/schema.rs の TypeNode/TraitNode/FunctionNode/TraitImplEntry HashMap ベース独自 schema) を削除し、TypeGraph を読む既存コード (tddd/consistency.rs / tddd/signals.rs / contract_map_render.rs / infrastructure/tddd/type_signals_evaluator.rs / infrastructure/tddd/type_graph_cluster.rs 等) を新 TypeGraph 形式 (rustdoc_types::Crate / ExtendedCrate) に書き換える。旧 TypeBaseline / TypeBaselineEntry / TraitBaselineEntry / FunctionBaselineEntry / TraitImplBaselineEntry (libs/domain/src/tddd/baseline.rs) を削除し、baseline の保存・ロードを rustdoc_types::Crate JSON に変更する。SchemaExportCodecError / EvaluateSignalsError など既存 reference 型は signature 整合性のみ確認し必要に応じて修正する。FsContractMapWriter など reference adapter は TypeGraph 形式変更に合わせて最低限の呼び出し側修正を行う (renderer の詳細化は OS-06 でスコープ外)。cargo make ci-rust (fmt-check + clippy + nextest + deny + check-layers) が通るよう Rust CI を緑にする。verify-* catalogue 整合性ゲート (verify-catalogue-spec-refs / check-catalogue-spec-signals) は T003 以降の *-types.json 旧フォーマットに対して新 codec が読めないため T009 完了後に確認する。 (`c7dbcbc152f045c8635c53d5c3069d5eb65879fd`)
 
-### S6 — bin/sotp rebuild + 現 track catalogue 書き換え + CI ゲート確認
+### S6 — bin/sotp rebuild + 現 track catalogue 書き換え + CI ゲート確認 (v3 schema migration)
 
 > T009 は新 schema 実装完了後に bin/sotp を rebuild し、現 branch の track/items/tddd-v2-2026-05-08/ の *-types.json を新 CatalogueDocument 形式 (3-BTreeMap) に書き換える。
 > 旧 TypeDefinitionKind / payload_types: Vec<String> 形式の catalogue JSON は新 schema codec で読めないため全 catalogue ファイルを書き換える (no-backward-compat: backward compat 移行 layer は導入しない、CN-09)。
 > TypeKindV2 informal_grounds を spec_refs へ昇格させ、型カタログの信号機評価の yellow を解消する。
-> cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することで AC-10 を充足する。
 > S5 完了後に着手する。
 
-- [x] **T009**: bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。 (`c7dbcbc152f045c8635c53d5c3069d5eb65879fd`)
+- [x] **T009**: bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。
+
+### S7 — v3 catalogue spec-link 復元 — grounding フィールド追加 (domain 型拡張)
+
+> T010 は v3 catalogue の全エントリ種 (TypeEntry / TraitEntry / FunctionEntry) に `spec_refs` と `informal_grounds` コレクションを追加する (ADR 2026-05-11-1257 D1)。
+> 既存 v2 catalogue の SpecRef / InformalGroundRef 型を domain 層で再利用し、serde default で空 Vec を許容する。
+> S6 (v3 catalogue JSON 書き換え完了) を前提とし、domain 型レベルの変更から着手する。T011 の codec 拡張より先に完了させる必要がある。
+
+- [x] **T010**: v3 catalogue の全エントリ種 (TypeEntry / TraitEntry / FunctionEntry) に grounding コレクション (`spec_refs: Vec<SpecRef>` と `informal_grounds: Vec<InformalGroundRef>`) を追加する (ADR 2026-05-11-1257 D1)。既存 v2 catalogue の SpecRef / InformalGroundRef 型を domain 層の共有モジュールから再利用する。serde default で空 Vec を許容し、フィールド省略時は空 Vec として decode する (migration smoothness)。既存 domain unit test を更新し、grounding コレクションを含む ラウンドトリップ unit test を追加する。Layer: domain。
+
+### S8 — v3 catalogue spec-link 復元 — codec 拡張 + D4 クロス crate 検証 (infrastructure codec)
+
+> T011 は CatalogueDocumentCodec を拡張して spec_refs / informal_grounds の encode / decode を実装する (ADR 2026-05-11-1257 D1 / D3)。T012 は codec decode 時に cross-crate function path を silent drop ではなく明示的 error にする (ADR 2026-05-11-1257 D4)。
+> T011 と T012 は同じ codec ファイル上の独立した変更であり、parallel 実施が可能 (ただし T010 domain 型拡張の完了後)。
+> <500 行 / commit を維持するため grounding フィールド encode/decode (T011) と cross-crate key 検証 (T012) を分割している。
+> T010 完了後に着手する。
+
+- [x] **T011**: CatalogueDocumentCodec (infrastructure/src/tddd/catalogue_document_codec.rs) を拡張し、TypeEntry / TraitEntry / FunctionEntry の `spec_refs` および `informal_grounds` フィールドを encode / decode する (ADR 2026-05-11-1257 D1 / D3)。DTO 側に SpecRefDto / InformalGroundRefDto を追加する (v2 codec の既存 DTO を共通モジュールに移動して再利用する)。常に空でもフィールドを emit する (explicit visibility)。フィールドが存在しない場合は空 Vec として decode する (migration smoothness)。round-trip unit test (spec_refs + informal_grounds の全エントリ種) を追加する。Layer: infrastructure。
+- [x] **T012**: CatalogueDocumentCodec::decode で `functions` map の各キー (FunctionPath) が catalogue 自身の crate_name prefix で始まることを検証し、他 crate prefix のキーを silent drop せず `CatalogueDocumentCodecError::CrossCrateFunctionPath { key, expected_crate }` として decode error にする (ADR 2026-05-11-1257 D4 / 2026-05-08-0248 §D11 amendment)。テスト: 自 crate prefix のみのキーは成功 / 他 crate prefix のキーは明示的 error / 空の functions map は成功。Layer: infrastructure。
+
+### S9 — v3 catalogue spec-link 復元 — refresher/loader/evaluator の dead code 除去 + 実評価有効化
+
+> T013 は catalogue_spec_signals_refresher の v3 branch を実際の信号評価に書き換え、一律 Blue fallback と cross-crate フィルタ dead code を除去する (ADR 2026-05-11-1257 D2 / D4)。T014 は v3_doc_to_stub の grounding 複写と cross-crate フィルタ除去を行う (ADR 2026-05-11-1257 D3 / D4)。T015 は type_signals_evaluator の cross-crate フィルタ dead code を除去する (ADR 2026-05-11-1257 D4)。
+> T013 / T014 / T015 は T012 の D4 codec enforcement 完了を前提とする (codec reject により全 3 フィルタが dead code 化する)。3 task は異なるファイルへの変更であり parallel 実施が可能。
+> T016 は render.rs の v3 fallback を修正して Cat-Spec 列を復元する (ADR 2026-05-11-1257 D2)。S8 完了後に着手する。
+> S8 完了後に着手する。
+
+- [x] **T013**: catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2)。各エントリの `spec_refs` と `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(spec_refs, informal_grounds)` に渡して信号色を決定する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。
+- [x] **T014**: catalogue_bulk_loader.rs (infrastructure) の `v3_doc_to_stub` 関数を更新し、CatalogueDocument → TypeCatalogueDocument stub 変換時に `spec_refs` と `informal_grounds` を stub に複写する (ADR 2026-05-11-1257 D3)。T012 により codec decode 段階で cross-crate function path が reject されるため、`v3_doc_to_stub` 内の cross-crate function フィルタ (line ~493 付近) は dead code となる — 削除する。テスト: grounding コレクションが変換後 stub に保存されることを確認する。Layer: infrastructure。
+- [x] **T015**: type_signals_evaluator.rs (infrastructure, line ~250 付近) の cross-crate function フィルタを削除する (ADR 2026-05-11-1257 D4)。T012 により codec decode 段階で cross-crate path が reject されるため、このフィルタは impossible-to-trigger な dead code となる。フィルタ削除後、type-signal 評価が全エントリで uniform に動作することを unit test で確認する。Layer: infrastructure。
+- [x] **T016**: track/render.rs (infrastructure) の v3 fallback を修正し、catalogue-spec-signals doc を正しくロードして `render_type_catalogue` に渡す (ADR 2026-05-11-1257 D2 — 信号の可視性)。現状は v3 fallback で `None` を渡しているため Cat-Spec 列が非表示になっている。修正後に Cat-Spec 列が rendered view に表示されることを確認する。Layer: infrastructure。
+
+### S10 — 統合ゲート確認 — signals 再生成 + CI pass (spec-link 復元完了確認)
+
+> T017 は bin/sotp rebuild 後に全 3 layer の type-signals / catalogue-spec-signals を再生成し、rendered view を更新して cargo make ci を pass させる (AC-10 充足)。
+> T013-T016 (S9) 全完了後に着手する。CI ゲートが全通過することで spec-link 復元スコープの完了を確認する。
+
+- [x] **T017**: 統合ゲート確認: bin/sotp を rebuild し (cargo make build-sotp)、全 3 layer の type-signals と catalogue-spec-signals を再生成する (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3 + `bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3)。`cargo make track-sync-views` で rendered view を再生成する。`cargo make ci` が pass することを確認する (verify-catalogue-spec-refs / check-catalogue-spec-signals を含む全ゲート通過)。AC-10 を充足する最終統合タスク。Layer: integration。

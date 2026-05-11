@@ -1170,9 +1170,64 @@ fn test_multiple_derive_impls_all_filtered_from_identity_map() {
         );
     }
     // PartialEq impl should now appear as CMinusSUnionD (not filtered).
-    let has_partial_eq = report.iter().any(|s| s.item_name().contains(": PartialEq"));
+    let has_partial_eq = report.iter().any(|s| s.item_name().contains("PartialEq"));
     assert!(
         has_partial_eq,
         "PartialEq impl must appear in report (catalogue-relevant, not filtered)"
     );
+}
+
+// ---------------------------------------------------------------------------
+// normalize_impl_trait_path unit tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_normalize_impl_trait_path_bare_known_core_trait_expands_to_qualified() {
+    use super::normalize_impl_trait_path;
+    // Bare `From` → expanded to canonical three-segment path.
+    assert_eq!(normalize_impl_trait_path("From", "my_crate"), "core::convert::From");
+    // Bare `Display` → expanded to `core::fmt::Display`.
+    assert_eq!(normalize_impl_trait_path("Display", "my_crate"), "core::fmt::Display");
+}
+
+#[test]
+fn test_normalize_impl_trait_path_crate_prefix_does_not_expand_to_core() {
+    use super::normalize_impl_trait_path;
+    // `crate::Display` is a local-crate type, NOT `core::fmt::Display`.
+    // Must strip to short name, not expand via core_canonical_path.
+    assert_eq!(normalize_impl_trait_path("crate::Display", "my_crate"), "Display");
+    assert_eq!(normalize_impl_trait_path("crate::MyTrait", "my_crate"), "MyTrait");
+}
+
+#[test]
+fn test_normalize_impl_trait_path_self_and_super_prefix_strips_to_short_name() {
+    use super::normalize_impl_trait_path;
+    assert_eq!(normalize_impl_trait_path("self::Foo", "my_crate"), "Foo");
+    assert_eq!(normalize_impl_trait_path("super::Bar", "my_crate"), "Bar");
+}
+
+#[test]
+fn test_normalize_impl_trait_path_local_crate_rustdoc_path_strips_to_short_name() {
+    use super::normalize_impl_trait_path;
+    // rustdoc emits `my_crate::MyTrait` for local traits.
+    assert_eq!(normalize_impl_trait_path("my_crate::MyTrait", "my_crate"), "MyTrait");
+}
+
+#[test]
+fn test_normalize_impl_trait_path_external_path_preserved_verbatim() {
+    use super::normalize_impl_trait_path;
+    assert_eq!(normalize_impl_trait_path("serde::Serialize", "my_crate"), "serde::Serialize");
+    assert_eq!(normalize_impl_trait_path("core::convert::From", "my_crate"), "core::convert::From");
+}
+
+#[test]
+fn test_normalize_impl_trait_path_preserves_generic_args() {
+    use super::normalize_impl_trait_path;
+    // Bare known trait with generic args.
+    assert_eq!(
+        normalize_impl_trait_path("From<String>", "my_crate"),
+        "core::convert::From<String>"
+    );
+    // crate:: prefix with generic args — strip prefix, keep args.
+    assert_eq!(normalize_impl_trait_path("crate::MyTrait<u32>", "my_crate"), "MyTrait<u32>");
 }

@@ -12,6 +12,7 @@
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
 //! the domain layer is serialization-free. The infrastructure codec (T003) handles JSON.
 
+use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
 use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeRef};
 use crate::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
@@ -46,6 +47,12 @@ pub struct TypeEntry {
     pub module_path: ModulePath,
     /// Optional documentation string.
     pub docs: Option<String>,
+    /// SoT Chain ② references to spec.json elements.
+    /// Empty vec when no spec elements have been linked yet.
+    pub spec_refs: Vec<SpecRef>,
+    /// Informal ground citations (unpersisted rationale). Non-empty → 🟡 advisory signal.
+    /// Empty vec when no informal grounds have been recorded.
+    pub informal_grounds: Vec<InformalGroundRef>,
 }
 
 // ---------------------------------------------------------------------------
@@ -67,10 +74,26 @@ pub struct TraitEntry {
     pub role: ContractRole,
     /// Methods declared in this trait.
     pub methods: Vec<MethodDeclaration>,
+    /// Supertrait bounds for this trait (e.g. `[Send, Sync]` for `trait Foo: Send + Sync`).
+    ///
+    /// Default empty Vec for backward compatibility. When non-empty, the A-codec encodes
+    /// these as `GenericBound::TraitBound` entries in `Trait::bounds`, mirroring the
+    /// rustdoc C-side representation.
+    ///
+    /// Using `TypeRef` instead of `String` makes empty-bound entries unrepresentable:
+    /// `TypeRef::new` rejects empty strings at construction time, so any stored bound is
+    /// guaranteed to be a non-empty type/trait reference string.
+    pub supertrait_bounds: Vec<TypeRef>,
     /// Module path within the crate (empty = crate root). Serde default = empty.
     pub module_path: ModulePath,
     /// Optional documentation string.
     pub docs: Option<String>,
+    /// SoT Chain ② references to spec.json elements.
+    /// Empty vec when no spec elements have been linked yet.
+    pub spec_refs: Vec<SpecRef>,
+    /// Informal ground citations (unpersisted rationale). Non-empty → 🟡 advisory signal.
+    /// Empty vec when no informal grounds have been recorded.
+    pub informal_grounds: Vec<InformalGroundRef>,
 }
 
 // ---------------------------------------------------------------------------
@@ -99,6 +122,12 @@ pub struct FunctionEntry {
     pub is_async: bool,
     /// Optional documentation string.
     pub docs: Option<String>,
+    /// SoT Chain ② references to spec.json elements.
+    /// Empty vec when no spec elements have been linked yet.
+    pub spec_refs: Vec<SpecRef>,
+    /// Informal ground citations (unpersisted rationale). Non-empty → 🟡 advisory signal.
+    /// Empty vec when no informal grounds have been recorded.
+    pub informal_grounds: Vec<InformalGroundRef>,
 }
 
 // ---------------------------------------------------------------------------
@@ -109,7 +138,6 @@ pub struct FunctionEntry {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
-    use crate::tddd::catalogue_v2::composite::CompositePattern;
     use crate::tddd::catalogue_v2::identifiers::{
         CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName, TypeRef,
     };
@@ -126,11 +154,17 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
             methods: vec![],
             trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert_eq!(entry.role, DataRole::ValueObject);
         assert_eq!(entry.action, ItemAction::Add);
@@ -144,18 +178,25 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::Entity,
-            kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: fields.clone() },
+            kind: TypeKindV2::PlainStruct {
+                fields: fields.clone(),
+                has_stripped_fields: false,
+                typestate: None,
+            },
             methods: vec![],
             trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: Some("A domain entity.".to_string()),
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         match &entry.kind {
-            TypeKindV2::Struct { pattern, fields: k_fields } => {
-                assert_eq!(*pattern, CompositePattern::Plain);
+            TypeKindV2::PlainStruct { fields: k_fields, has_stripped_fields, typestate } => {
+                assert!(!has_stripped_fields);
+                assert!(typestate.is_none());
                 assert_eq!(k_fields.len(), 1);
             }
-            _ => panic!("expected Struct kind"),
+            _ => panic!("expected PlainStruct kind"),
         }
         assert_eq!(entry.docs, Some("A domain entity.".to_string()));
     }
@@ -174,6 +215,8 @@ mod tests {
             trait_impls: vec![trait_impl.clone()],
             module_path: ModulePath::root(),
             docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert_eq!(entry.trait_impls.len(), 1);
         assert_eq!(entry.trait_impls[0], trait_impl);
@@ -189,17 +232,17 @@ mod tests {
             false,
             None,
         );
+        let field_ty = TypeRef::new("String").unwrap();
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::Struct {
-                pattern: CompositePattern::Newtype { inner: TypeRef::new("String").unwrap() },
-                fields: vec![],
-            },
+            kind: TypeKindV2::TupleStruct { fields: vec![field_ty], has_stripped_fields: false },
             methods: vec![method.clone()],
             trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert_eq!(entry.methods.len(), 1);
         assert_eq!(entry.methods[0], method);
@@ -212,11 +255,17 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Modify,
             role: DataRole::AggregateRoot,
-            kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
             methods: vec![],
             trait_impls: vec![],
             module_path: module_path.clone(),
             docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert_eq!(entry.module_path, module_path);
         assert_eq!(entry.action, ItemAction::Modify);
@@ -244,11 +293,17 @@ mod tests {
             let entry = TypeEntry {
                 action: ItemAction::Add,
                 role,
-                kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             };
             assert_eq!(entry.role, role);
         }
@@ -265,8 +320,11 @@ mod tests {
             action: ItemAction::Add,
             role: ContractRole::SecondaryPort,
             methods: vec![],
+            supertrait_bounds: vec![],
             module_path: ModulePath::root(),
             docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert_eq!(entry.role, ContractRole::SecondaryPort);
     }
@@ -288,12 +346,34 @@ mod tests {
             action: ItemAction::Add,
             role: ContractRole::SecondaryPort,
             methods: vec![save_method.clone()],
+            supertrait_bounds: vec![],
             module_path: ModulePath::root(),
             docs: Some("User repository port.".to_string()),
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert_eq!(entry.methods.len(), 1);
         assert_eq!(entry.methods[0], save_method);
         assert_eq!(entry.docs, Some("User repository port.".to_string()));
+    }
+
+    #[test]
+    fn test_trait_entry_with_supertrait_bounds() {
+        let send = TypeRef::new("Send").unwrap();
+        let sync = TypeRef::new("Sync").unwrap();
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![send.clone(), sync.clone()],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert_eq!(entry.supertrait_bounds.len(), 2);
+        assert_eq!(entry.supertrait_bounds[0].as_str(), "Send");
+        assert_eq!(entry.supertrait_bounds[1].as_str(), "Sync");
     }
 
     #[test]
@@ -308,8 +388,11 @@ mod tests {
                 action: ItemAction::Add,
                 role,
                 methods: vec![],
+                supertrait_bounds: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             };
             assert_eq!(entry.role, role);
         }
@@ -329,6 +412,8 @@ mod tests {
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
             docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert_eq!(entry.role, FunctionRole::FreeFunction);
         assert!(!entry.is_async);
@@ -346,6 +431,8 @@ mod tests {
             returns: TypeRef::new("Result<UserId, ApplicationError>").unwrap(),
             is_async: true,
             docs: Some("Register a new user.".to_string()),
+            spec_refs: vec![],
+            informal_grounds: vec![],
         };
         assert!(entry.is_async);
         assert_eq!(entry.params.len(), 1);
@@ -363,9 +450,97 @@ mod tests {
                 returns: TypeRef::new("()").unwrap(),
                 is_async: false,
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             };
             assert_eq!(entry.role, role);
         }
+    }
+
+    // -----------------------------------------------------------------------
+    // Grounding fields (T010) — spec_refs and informal_grounds
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_type_entry_with_non_empty_spec_refs_stores_grounding() {
+        use crate::plan_ref::{ContentHash, SpecElementId, SpecRef};
+        use std::path::PathBuf;
+
+        let anchor = SpecElementId::try_new("IN-01").unwrap();
+        let hash = ContentHash::from_bytes([0u8; 32]);
+        let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor, hash);
+
+        let entry = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![spec_ref.clone()],
+            informal_grounds: vec![],
+        };
+        assert_eq!(entry.spec_refs.len(), 1);
+        assert_eq!(entry.spec_refs[0], spec_ref);
+        assert!(entry.informal_grounds.is_empty());
+    }
+
+    #[test]
+    fn test_trait_entry_with_non_empty_informal_grounds_stores_grounding() {
+        use crate::plan_ref::{InformalGroundKind, InformalGroundRef, InformalGroundSummary};
+
+        let summary = InformalGroundSummary::try_new("discussed in planning session").unwrap();
+        let ground = InformalGroundRef::new(InformalGroundKind::Discussion, summary);
+
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![ground.clone()],
+        };
+        assert_eq!(entry.informal_grounds.len(), 1);
+        assert_eq!(entry.informal_grounds[0], ground);
+        assert!(entry.spec_refs.is_empty());
+    }
+
+    #[test]
+    fn test_function_entry_with_spec_refs_and_informal_grounds_stores_both() {
+        use crate::plan_ref::{
+            ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
+            SpecElementId, SpecRef,
+        };
+        use std::path::PathBuf;
+
+        let anchor = SpecElementId::try_new("AC-02").unwrap();
+        let hash = ContentHash::from_bytes([0xabu8; 32]);
+        let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor, hash);
+
+        let summary = InformalGroundSummary::try_new("user directive from session").unwrap();
+        let ground = InformalGroundRef::new(InformalGroundKind::UserDirective, summary);
+
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            docs: None,
+            spec_refs: vec![spec_ref.clone()],
+            informal_grounds: vec![ground.clone()],
+        };
+        assert_eq!(entry.spec_refs.len(), 1);
+        assert_eq!(entry.spec_refs[0], spec_ref);
+        assert_eq!(entry.informal_grounds.len(), 1);
+        assert_eq!(entry.informal_grounds[0], ground);
     }
 
     // -----------------------------------------------------------------------

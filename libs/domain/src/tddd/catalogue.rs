@@ -1,7 +1,7 @@
 //! Type catalogue — declared type entries for the per-track TDDD catalogue.
 //!
 //! This module owns the **type definitions** only: `TypeAction`,
-//! `TypestateTransitions`, `TypeDefinitionKind`, `TypeCatalogueEntry`,
+//! `TypestateTransitionsSpec`, `TypeDefinitionKind`, `TypeCatalogueEntry`,
 //! `TypeSignal`, and the aggregate root `TypeCatalogueDocument`.
 //!
 //! Signal evaluation (`evaluate_type_signals` and per-kind evaluators) lives in
@@ -329,15 +329,22 @@ impl TypeAction {
 }
 
 // ---------------------------------------------------------------------------
-// TypeDefinitionKind enum + TypestateTransitions
+// TypeDefinitionKind enum + TypestateTransitionsSpec
 // ---------------------------------------------------------------------------
 
-/// Declared transitions for a typestate type.
+/// Declared transitions for a typestate type (v1 catalogue spec representation).
 ///
 /// Makes the terminal vs non-terminal distinction explicit at the type level.
 /// An empty `Vec<String>` is structurally impossible in `To` — use `Terminal`.
+///
+/// Note: renamed from `TypestateTransitions` to `TypestateTransitionsSpec` to
+/// avoid a short-name collision with `catalogue_v2::TypestateTransitions` (a
+/// struct that carries transition method names for v2 type entries). The v1
+/// catalogue path (`tddd::catalogue::TypestateTransitionsSpec`) and v2 path
+/// (`tddd::catalogue_v2::TypestateTransitions`) are now distinct in rustdoc,
+/// preventing the baseline short-name deduplication from picking the wrong type.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TypestateTransitions {
+pub enum TypestateTransitionsSpec {
     /// This typestate has no outgoing transitions (end state).
     Terminal,
     /// This typestate transitions to the named target states.
@@ -370,7 +377,7 @@ pub enum TypeDefinitionKind {
     /// to expose (L1 resolution). `expected_methods` lists the L1 method
     /// signatures expected on this typestate (e.g. transition functions).
     Typestate {
-        transitions: TypestateTransitions,
+        transitions: TypestateTransitionsSpec,
         expected_members: Vec<MemberDeclaration>,
         expected_methods: Vec<MethodDeclaration>,
     },
@@ -980,7 +987,10 @@ mod tests {
             "ReviewState",
             "Typestate for review flow",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Approved".into(), "Rejected".into()]),
+                transitions: TypestateTransitionsSpec::To(vec![
+                    "Approved".into(),
+                    "Rejected".into(),
+                ]),
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -1410,7 +1420,7 @@ mod tests {
     fn test_all_fourteen_kind_tags_are_unique() {
         let tags = [
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             }
@@ -1485,7 +1495,7 @@ mod tests {
         let methods = vec![method];
 
         let typestate = TypeDefinitionKind::Typestate {
-            transitions: TypestateTransitions::Terminal,
+            transitions: TypestateTransitionsSpec::Terminal,
             expected_members: Vec::new(),
             expected_methods: methods.clone(),
         };
@@ -1683,7 +1693,7 @@ mod tests {
             "StateA",
             "First typestate",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -1695,7 +1705,7 @@ mod tests {
             "StateB",
             "Second typestate",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["StateA".into()]),
+                transitions: TypestateTransitionsSpec::To(vec!["StateA".into()]),
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },

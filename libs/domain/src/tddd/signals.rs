@@ -28,7 +28,7 @@ use crate::ConfidenceSignal;
 use crate::schema::{FunctionNode, TypeGraph, TypeKind};
 use crate::tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, ParamDeclaration, TraitImplDecl, TypeAction,
-    TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
+    TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitionsSpec,
 };
 
 // ---------------------------------------------------------------------------
@@ -366,7 +366,7 @@ fn dominant_signal(
 fn evaluate_typestate(
     name: &str,
     kind_tag: &str,
-    transitions: &TypestateTransitions,
+    transitions: &TypestateTransitionsSpec,
     expected_members: &[MemberDeclaration],
     profile: &TypeGraph,
     _typestate_names: &HashSet<&str>,
@@ -389,11 +389,11 @@ fn evaluate_typestate(
 
     // Transition check.
     let (mut found, mut missing, mut extra) = match transitions {
-        TypestateTransitions::Terminal => {
+        TypestateTransitionsSpec::Terminal => {
             let extra: Vec<String> = code_transitions.iter().map(|s| s.to_string()).collect();
             (vec![], vec![], extra)
         }
-        TypestateTransitions::To(targets) => {
+        TypestateTransitionsSpec::To(targets) => {
             let declared: HashSet<&str> = targets.iter().map(|s| s.as_str()).collect();
             let mut found = Vec::new();
             let mut missing = Vec::new();
@@ -1364,7 +1364,7 @@ mod tests {
             "Draft",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
+                transitions: TypestateTransitionsSpec::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -1376,7 +1376,7 @@ mod tests {
             "Published",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -1395,7 +1395,7 @@ mod tests {
             "Ghost",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -1417,7 +1417,7 @@ mod tests {
             "Draft",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
+                transitions: TypestateTransitionsSpec::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -1440,7 +1440,7 @@ mod tests {
             "Draft",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
+                transitions: TypestateTransitionsSpec::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -2120,7 +2120,7 @@ mod tests {
             "Final",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -2143,7 +2143,7 @@ mod tests {
             "Draft",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
+                transitions: TypestateTransitionsSpec::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -2155,7 +2155,7 @@ mod tests {
             "Published",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -2964,7 +2964,7 @@ mod tests {
             "Status",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: vec![
                     MemberDeclaration::field("id", "StatusId"),
                     MemberDeclaration::field("label", "String"),
@@ -2994,7 +2994,7 @@ mod tests {
             "Status",
             "desc",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: vec![],
                 expected_methods: Vec::new(),
             },

@@ -16,7 +16,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
 use std::process::ExitCode;
 
-use domain::tddd::catalogue_v2::composite::{CompositePattern, TypeKindV2};
+use domain::tddd::catalogue_v2::composite::TypeKindV2;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
 use domain::tddd::type_signals_doc::TypeSignalsDocument;
 use domain::{ConfidenceSignal, Timestamp, TypeSignal};
@@ -241,15 +241,11 @@ pub fn execute_type_signals_for_layer(
             m.entry(name.as_str().to_owned()).or_default().push(contract_role_kind_tag(entry.role));
         }
         for (path, entry) in &doc.functions {
-            // Cross-crate functions (path.crate_name != doc.crate_name, ADR 2 D5) are
-            // encoded into the ExtendedCrate with `crate_id != 0`, and `build_function_identity_map`
-            // skips non-local items (`crate_id != 0`).  They therefore never receive a
-            // `ThreeWaySignal` from the evaluator.  If we added them to `kind_tag_map`, the
-            // synthetic Blue loop would mark them Blue without any evaluation — a false pass.
-            // Exclude them here so `check_type_signals` is not asked to cover them.
-            if path.crate_name != doc.crate_name {
-                continue;
-            }
+            // T012 ensures that CatalogueDocumentCodec rejects cross-crate function
+            // paths at decode time (CrossCrateFunctionPath error), so all function
+            // paths here already carry the catalogue's own crate_name prefix.
+            // No cross-crate filtering is needed.
+
             // FunctionPath keys are fully qualified (e.g. "crate::fn_name") and
             // never collide with short-name type/trait keys.
             m.entry(path.to_string()).or_default().push(function_role_kind_tag(entry.role));
@@ -685,15 +681,15 @@ fn worse_signal(a: ConfidenceSignal, b: ConfidenceSignal) -> ConfidenceSignal {
 ///   → `"value_object"` (v3 does not distinguish at the v2 shape level)
 /// - All other struct/alias roles → their canonical v2 snake_case name.
 fn data_role_kind_tag_v2(role: DataRole, kind: &TypeKindV2) -> &'static str {
-    // Typestate detection: Struct with TypestateState pattern.
-    if let TypeKindV2::Struct { pattern: CompositePattern::TypestateState { .. }, .. } = kind {
+    // Typestate detection: PlainStruct with a typestate marker.
+    if let TypeKindV2::PlainStruct { typestate: Some(_), .. } = kind {
         return "typestate";
     }
     // Enum kind: role determines error_type vs enum.
     if matches!(kind, TypeKindV2::Enum { .. }) {
         return if matches!(role, DataRole::ErrorType) { "error_type" } else { "enum" };
     }
-    // Struct / TypeAlias: role-based mapping (mirrors `data_role_to_kind`).
+    // UnitStruct / TupleStruct / PlainStruct / TypeAlias: role-based mapping.
     match role {
         DataRole::ValueObject
         | DataRole::Entity
@@ -742,4 +738,28 @@ const fn function_role_kind_tag(_role: FunctionRole) -> &'static str {
     // All v3 FunctionRole variants collapse to FreeFunction at the v2 shape level
     // (mirrors `function_role_to_kind` in `catalogue_bulk_loader.rs`).
     "free_function"
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+
+    use super::*;
+
+    /// T015: verify that `function_role_kind_tag` maps all `FunctionRole` variants to
+    /// `"free_function"` uniformly (same tag for all, no cross-crate filtering needed).
+    ///
+    /// Since T012 rejects cross-crate function paths at decode time, the kind_tag_map
+    /// building loop in `execute_type_signals_for_layer` no longer needs to skip any
+    /// function entries — all entries present in the document are own-crate functions.
+    #[test]
+    fn test_function_role_kind_tag_returns_free_function_for_all_variants() {
+        assert_eq!(function_role_kind_tag(FunctionRole::FreeFunction), "free_function");
+        assert_eq!(function_role_kind_tag(FunctionRole::UseCaseFunction), "free_function");
+    }
 }

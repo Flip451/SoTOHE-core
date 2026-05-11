@@ -9,7 +9,7 @@
 //! - [`roles`]: 5 enums (`DataRole`, `ContractRole`, `FunctionRole`, `ItemAction`,
 //!   `SelfReceiver`) with `Display` / `FromStr` via strum. The Layer axis is
 //!   represented by [`crate::tddd::LayerId`] (ADR `2026-05-08-0248` D1).
-//! - [`composite`]: `TypeKindV2` and `CompositePattern` (pattern-encoded struct kinds).
+//! - [`composite`]: `TypeKindV2`, `TypestateMarker`, and `TypestateTransitions` (flat struct kinds).
 //! - [`variants`]: `FieldDecl`, `VariantPayload`, `VariantDecl`.
 //! - [`methods`]: `ParamDecl`, `MethodDecl` (V2 typed-newtype method/param declarations).
 //! - [`traits`]: `TraitImplDeclV2` (identity-only trait impl record).
@@ -39,7 +39,7 @@ pub mod variants;
 // Re-exports — all public types accessible via the module root
 // ---------------------------------------------------------------------------
 
-pub use composite::{CompositePattern, TypeKindV2};
+pub use composite::{TypeKindV2, TypestateMarker, TypestateTransitions};
 
 pub use document::{CatalogueDocument, CatalogueDocumentError};
 
@@ -50,7 +50,7 @@ pub use identifiers::{
     ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
 };
 
-pub use methods::{MethodDeclaration, ParamDeclaration};
+pub use methods::{MethodDeclaration, MethodGenericParam, ParamDeclaration};
 
 pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver};
 

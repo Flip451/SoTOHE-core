@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "43ed12899f0dccced82a26fe0be521e6d07f660c0a5696244a6697975c3f9b1b",
+  "catalogue_declaration_hash": "34db733d9b2ff91e9d7f4ba470d5ad34b1cd405cb45db9b344e4069fe95a7f59",
   "signals": [
     {
       "type_name": "LintRuleKind",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "PreCommitTypeSignalsInteractor",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "RenderContractMapCommand",
@@ -20,15 +20,15 @@
     },
     {
       "type_name": "CatalogueSpecSignalsWriter",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "PreCommitTypeSignalsService",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "SchemaExporterPort",
-      "signal": "blue"
+      "signal": "yellow"
     }
   ]
 }

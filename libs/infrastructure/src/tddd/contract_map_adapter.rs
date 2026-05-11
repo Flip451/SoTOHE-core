@@ -451,8 +451,7 @@ mod tests {
 
         // Minimal v3 catalogue with two types.
         // Wire format: TypeKindDto uses #[serde(tag = "kind")] so the
-        // discriminator field is named "kind"; PatternDto uses #[serde(tag =
-        // "pattern")]. DataRole uses PascalCase (strum default).
+        // discriminator field is named "kind". DataRole uses PascalCase (strum default).
         const CATALOGUE_V3: &str = r#"{
           "schema_version": 3,
           "crate_name": "domain",
@@ -462,18 +461,15 @@ mod tests {
               "action": "add",
               "role": "ValueObject",
               "kind": {
-                "kind": "struct",
-                "pattern": { "pattern": "newtype", "inner": "u64" }
+                "kind": "tuple_struct",
+                "fields": ["u64"]
               },
               "module_path": "domain::user"
             },
             "User": {
               "action": "add",
               "role": "Entity",
-              "kind": {
-                "kind": "struct",
-                "pattern": { "pattern": "plain" }
-              },
+              "kind": { "kind": "plain_struct" },
               "module_path": "domain::user"
             }
           },

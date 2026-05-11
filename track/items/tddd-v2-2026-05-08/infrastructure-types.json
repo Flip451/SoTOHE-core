@@ -14,13 +14,25 @@
           { "name": "MissingField" }
         ]
       },
-      "docs": "T008: deleted. Old baseline codec error for the TypeBaseline-based evaluator. Replaced by BaselineRustdocCodecError."
+      "docs": "T008: deleted. Old baseline codec error for the TypeBaseline-based evaluator. Replaced by BaselineRustdocCodecError.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "BaselineRustdocCodec": {
       "action": "add",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "Codec struct that loads rustdoc_types::Crate JSON from the filesystem (Baseline B or Current C)."
+      "kind": { "kind": "unit_struct" },
+      "methods": [
+        { "name": "load", "params": [{ "name": "path", "ty": "&std::path::Path" }], "returns": "Result<rustdoc_types::Crate, BaselineRustdocCodecError>" },
+        { "name": "from_json", "params": [{ "name": "json", "ty": "&str" }], "returns": "Result<rustdoc_types::Crate, BaselineRustdocCodecError>" }
+      ],
+      "docs": "Codec struct that loads rustdoc_types::Crate JSON from the filesystem (Baseline B or Current C).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
     },
     "BaselineRustdocCodecError": {
       "action": "add",
@@ -38,7 +50,11 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "docs": "Error type for loading rustdoc_types::Crate JSON as Baseline (B) or Current (C). thiserror #[from] generates From<serde_json::Error> and From<io::Error>; declared here without generic args (core::convert::From) so the signal evaluator covers them via generic-args-stripped fallback."
+      "docs": "Error type for loading rustdoc_types::Crate JSON as Baseline (B) or Current (C). thiserror #[from] generates From<serde_json::Error> and From<io::Error>; declared here without generic args (core::convert::From) so the signal evaluator covers them via generic-args-stripped fallback.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
     },
     "CatalogueDocumentCodecError": {
       "action": "add",
@@ -50,7 +66,8 @@
           { "name": "Io", "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
           { "name": "UnsupportedSchemaVersion", "payload": { "kind": "struct", "fields": [{ "name": "actual", "ty": "u32" }, { "name": "expected", "ty": "u32" }] } },
           { "name": "InvalidEntry", "payload": { "kind": "struct", "fields": [{ "name": "entry_name", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
-          { "name": "CrateNameMismatch", "payload": { "kind": "struct", "fields": [{ "name": "expected", "ty": "String" }, { "name": "actual", "ty": "String" }] } }
+          { "name": "CrateNameMismatch", "payload": { "kind": "struct", "fields": [{ "name": "expected", "ty": "String" }, { "name": "actual", "ty": "String" }] } },
+          { "name": "CrossCrateFunctionPath", "payload": { "kind": "struct", "fields": [{ "name": "key", "ty": "String" }, { "name": "expected_crate", "ty": "String" }] } }
         ]
       },
       "trait_impls": [
@@ -58,20 +75,44 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "docs": "Error type for the new CatalogueDocument serde codec. Replaces TypeCatalogueCodecError. thiserror #[from] generates From<serde_json::Error> and From<io::Error>; declared here without generic args (core::convert::From) so the signal evaluator covers them via generic-args-stripped fallback."
+      "docs": "Error type for the new CatalogueDocument serde codec. Replaces TypeCatalogueCodecError. thiserror #[from] generates From<serde_json::Error> and From<io::Error>; declared here without generic args (core::convert::From) so the signal evaluator covers them via generic-args-stripped fallback.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-15", "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95" }
+      ],
+      "informal_grounds": []
     },
     "CatalogueDocumentCodec": {
       "action": "add",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "Stateless codec struct that encodes/decodes CatalogueDocument to/from JSON (schema_version=3)."
+      "kind": { "kind": "plain_struct" },
+      "trait_impls": [
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless codec struct that encodes/decodes CatalogueDocument to/from JSON (schema_version=3).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-15", "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95" }
+      ],
+      "informal_grounds": []
     },
     "CatalogueToExtendedCrateCodec": {
       "action": "add",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "trait_impls": [{ "trait_name": "CatalogueToExtendedCratePort", "origin_crate": "domain" }],
-      "docs": "Codec struct that converts CatalogueDocument into ExtendedCrate (TypeGraph A)."
+      "kind": { "kind": "plain_struct" },
+      "trait_impls": [
+        { "trait_name": "CatalogueToExtendedCratePort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Codec struct that converts CatalogueDocument into ExtendedCrate (TypeGraph A).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-08", "hash": "92379bdca00d2b52bef4c81dbfb9a1095f99e5ddf88ca234bf8cd55398fd0d96" }
+      ],
+      "informal_grounds": []
     },
     "CatalogueToExtendedCrateCodecError": {
       "action": "add",
@@ -87,60 +128,100 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "docs": "Error type for the Catalogue -> ExtendedCrate (TypeGraph A) codec."
+      "docs": "Error type for the Catalogue -> ExtendedCrate (TypeGraph A) codec.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-08", "hash": "92379bdca00d2b52bef4c81dbfb9a1095f99e5ddf88ca234bf8cd55398fd0d96" }
+      ],
+      "informal_grounds": []
     },
     "EvaluateSignalsError": {
       "action": "reference",
       "role": "ErrorType",
-      "kind": {
-        "kind": "struct",
-        "pattern": { "pattern": "newtype", "inner": "String" }
-      },
-      "docs": "Existing error type for the execute_type_signals_for_layer infrastructure function (the new T008 entry point replacing the deleted evaluate_and_write_signals). The old evaluate_and_write_signals/validate_action_diagnostics/validate_and_write_catalogue functions are deleted; execute_type_signals_for_layer is the active caller."
+      "kind": { "kind": "tuple_struct", "fields": ["String"] },
+      "docs": "Existing error type for the execute_type_signals_for_layer infrastructure function (the new T008 entry point replacing the deleted evaluate_and_write_signals). The old evaluate_and_write_signals/validate_action_diagnostics/validate_and_write_catalogue functions are deleted; execute_type_signals_for_layer is the active caller.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
     },
     "FsCatalogueLoader": {
       "action": "modify",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "kind": { "kind": "plain_struct" },
       "trait_impls": [{ "trait_name": "CatalogueLoader", "origin_crate": "domain" }],
-      "docs": "Existing FsCatalogueLoader. Modified to load CatalogueDocument instead of TypeCatalogueDocument."
+      "docs": "Existing FsCatalogueLoader. Modified to load CatalogueDocument instead of TypeCatalogueDocument.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+      ],
+      "informal_grounds": []
     },
     "FsCatalogueSpecSignalsStore": {
       "action": "reference",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "kind": { "kind": "plain_struct" },
       "trait_impls": [{ "trait_name": "CatalogueSpecSignalsWriter", "origin_crate": "usecase" }],
-      "docs": "Existing FsCatalogueSpecSignalsStore. Referenced — not modified in this track."
+      "docs": "Existing FsCatalogueSpecSignalsStore. Referenced — not modified in this track.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing secondary adapter for catalogue-spec signals persistence. Referenced for contract-map edge completeness; not modified in this track." }
+      ]
     },
     "FsContractMapWriter": {
       "action": "reference",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "kind": { "kind": "plain_struct" },
       "trait_impls": [{ "trait_name": "ContractMapWriter", "origin_crate": "domain" }],
-      "docs": "Existing FsContractMapWriter (implements ContractMapWriter). Referenced."
+      "docs": "Existing FsContractMapWriter (implements ContractMapWriter). Referenced.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing secondary adapter for contract-map persistence. Referenced for contract-map edge completeness; not modified in this track." }
+      ]
     },
     "InMemoryCatalogueLinter": {
       "action": "modify",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "trait_impls": [{ "trait_name": "CatalogueLinter", "origin_crate": "domain" }],
-      "docs": "Existing InMemoryCatalogueLinter. Modified to use CatalogueDocument in run() parameter."
+      "kind": { "kind": "plain_struct" },
+      "trait_impls": [
+        { "trait_name": "CatalogueLinter", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" },
+        { "name": "with_disabled_rules", "params": [{ "name": "disabled_rules", "ty": "Vec<String>" }], "returns": "Self" }
+      ],
+      "docs": "Existing InMemoryCatalogueLinter. Modified to use CatalogueDocument in run() parameter.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing linter adapter modified as side-effect of CatalogueDocument introduction. Linter detailed design is out of scope (OS-01); this modification updates the run() parameter type." }
+      ]
     },
     "EdgeSet": {
       "action": "delete",
       "role": "ValueObject",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "T008: deleted (previously a stub). Was an edge set for type_graph_render which was removed when TypeGraph was deleted."
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted (previously a stub). Was an edge set for type_graph_render which was removed when TypeGraph was deleted.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "RustdocSchemaExporter": {
       "action": "modify",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "kind": { "kind": "plain_struct" },
       "trait_impls": [
         { "trait_name": "SchemaExporter", "origin_crate": "domain" },
         { "trait_name": "SchemaExporterPort", "origin_crate": "usecase" }
       ],
-      "docs": "T008: modified. RustdocSchemaExporter is now also the 'C' producer for the new 3-way evaluator. Trait impl surface changed from baseline snapshot."
+      "methods": [
+        { "name": "new", "params": [{ "name": "workspace_root", "ty": "std::path::PathBuf" }], "returns": "Self" },
+        { "name": "export_rustdoc_json_path", "receiver": "&self", "params": [{ "name": "crate_name", "ty": "&str" }], "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>", "is_async": false }
+      ],
+      "docs": "T008: modified. RustdocSchemaExporter is now also the 'C' producer for the new 3-way evaluator. Trait impl surface changed from baseline snapshot.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-09", "hash": "902aa97f479c896ffa808c03ba711895d2d8443620cb8ae409679a074df5ffed" }
+      ],
+      "informal_grounds": []
     },
     "SchemaExportCodecError": {
       "action": "reference",
@@ -151,44 +232,92 @@
           { "name": "Json", "payload": { "kind": "tuple", "fields": ["serde_json::Error"] } }
         ]
       },
-      "docs": "Existing error type for the SchemaExport -> TypeGraph codec. Referenced for continuity."
+      "docs": "Existing error type for the SchemaExport -> TypeGraph codec. Referenced for continuity.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing error type for schema export codec. Referenced for contract-map edge completeness; not modified in this track." }
+      ]
     },
     "SignalEvaluatorV2": {
       "action": "add",
       "role": "SecondaryAdapter",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "trait_impls": [{ "trait_name": "SignalEvaluatorPort", "origin_crate": "domain" }],
-      "docs": "Phase 1 + Phase 2 signal evaluator struct. Stateless struct driving the 2-phase algorithm."
+      "kind": { "kind": "plain_struct" },
+      "trait_impls": [
+        { "trait_name": "SignalEvaluatorPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Phase 1 + Phase 2 signal evaluator struct. Stateless struct driving the 2-phase algorithm.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-11", "hash": "d0ea1d981961bf5ada665db6672d594033744de132e7c3ea93d978efa80801f0" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-12", "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588" }
+      ],
+      "informal_grounds": []
     },
     "ClusterPlan": {
       "action": "delete",
       "role": "ValueObject",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "T008: deleted. Was a clustering plan struct in type_graph_cluster, removed with TypeGraph."
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was a clustering plan struct in type_graph_cluster, removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "CrossEdge": {
       "action": "delete",
       "role": "ValueObject",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "T008: deleted. Was a cross-cluster edge in type_graph_cluster, removed with TypeGraph."
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was a cross-cluster edge in type_graph_cluster, removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "SignalSummary": {
       "action": "delete",
       "role": "ValueObject",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "T008: deleted. Was a summary type produced by the old TypeBaseline-based signal evaluator."
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was a summary type produced by the old TypeBaseline-based signal evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "TypeGraphExportError": {
       "action": "delete",
       "role": "ErrorType",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "T008: deleted. Was the error type for type_graph_export functions. Removed with TypeGraph."
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was the error type for type_graph_export functions. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "TypeGraphRenderOptions": {
       "action": "delete",
       "role": "ValueObject",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
-      "docs": "T008: deleted. Was the options struct for type_graph_render functions. Removed with TypeGraph."
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was the options struct for type_graph_render functions. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "CaptureBaselineError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": { "kind": "tuple_struct", "fields": ["String"] },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" }
+      ],
+      "docs": "Newtype error returned by capture_rustdoc_baseline_for_layer and force_capture_rustdoc_baseline_for_layer so the CLI can map to CliError::Message. Pre-existing type, referenced for free-function return type resolution.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
     },
     "TypeCatalogueCodecError": {
       "action": "reference",
@@ -202,7 +331,11 @@
           { "name": "InvalidEntry" }
         ]
       },
-      "docs": "Old codec error for TypeCatalogueDocument (schema_version=2). No new v2 files are created (v2 format retired per CN-09), but existing track directories may still contain v2 catalogue files. load_all_catalogues tries v3 first and falls back to v2; this error surfaces only when both codecs fail. Scheduled for deletion in a follow-up track when all v2 catalogue files are migrated."
+      "docs": "Old codec error for TypeCatalogueDocument (schema_version=2). No new v2 files are created (v2 format retired per CN-09), but existing track directories may still contain v2 catalogue files. load_all_catalogues tries v3 first and falls back to v2; this error surfaces only when both codecs fail. Scheduled for deletion in a follow-up track when all v2 catalogue files are migrated.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "CN-09", "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962" }
+      ],
+      "informal_grounds": []
     },
     "LoadAllCataloguesError": {
       "action": "modify",
@@ -225,7 +358,11 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "docs": "Errors surfaced by load_all_catalogues. Modified: added V3StubConversion variant (new in this track for v3→v2-stub conversion). Decode variant uses TypeCatalogueCodecError because load_all_catalogues tries v3 first and falls back to the v2 codec when v3 decode fails — existing pre-migration track directories may still have v2 catalogue files. No new v2 files are created (v2 format retired per CN-09). thiserror #[from] generates From<LoadTdddLayersError>; declared here without generic args so the signal evaluator covers it via generic-args-stripped fallback."
+      "docs": "Errors surfaced by load_all_catalogues. Modified: added V3StubConversion variant (new in this track for v3→v2-stub conversion). Decode variant uses TypeCatalogueCodecError because load_all_catalogues tries v3 first and falls back to the v2 codec when v3 decode fails — existing pre-migration track directories may still have v2 catalogue files. No new v2 files are created (v2 format retired per CN-09). thiserror #[from] generates From<LoadTdddLayersError>; declared here without generic args so the signal evaluator covers it via generic-args-stripped fallback.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -234,18 +371,36 @@
     "infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer": {
       "action": "add",
       "role": "FreeFunction",
-      "params": [],
-      "returns": "Result<(), BaselineRustdocCodecError>",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "binding", "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding" }
+      ],
+      "returns": "Result<(), CaptureBaselineError>",
       "is_async": false,
-      "docs": "Captures the current rustdoc_types::Crate JSON as the baseline (B) for a layer. New in T008 replacing the old capture_baseline_for_layer."
+      "docs": "Captures the current rustdoc_types::Crate JSON as the baseline (B) for a layer. New in T008 replacing the old capture_baseline_for_layer.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer": {
       "action": "add",
       "role": "FreeFunction",
-      "params": [],
-      "returns": "Result<(), BaselineRustdocCodecError>",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "binding", "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding" }
+      ],
+      "returns": "Result<(), CaptureBaselineError>",
       "is_async": false,
-      "docs": "Force-captures the current rustdoc_types::Crate JSON as the baseline, overwriting any existing baseline. New in T008."
+      "docs": "Force-captures the current rustdoc_types::Crate JSON as the baseline, overwriting any existing baseline. New in T008.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::code_profile_builder::build_type_graph": {
       "action": "delete",
@@ -253,7 +408,11 @@
       "params": [],
       "returns": "TypeGraph",
       "is_async": false,
-      "docs": "T008: deleted. Built a TypeGraph from SchemaExport. Replaced by SignalEvaluatorV2 which operates on rustdoc_types::Crate directly."
+      "docs": "T008: deleted. Built a TypeGraph from SchemaExport. Replaced by SignalEvaluatorV2 which operates on rustdoc_types::Crate directly.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::baseline_builder::build_baseline": {
       "action": "delete",
@@ -261,7 +420,11 @@
       "params": [],
       "returns": "TypeBaseline",
       "is_async": false,
-      "docs": "T008: deleted. Built a TypeBaseline from TypeGraph. Replaced by capture_rustdoc_baseline_for_layer."
+      "docs": "T008: deleted. Built a TypeBaseline from TypeGraph. Replaced by capture_rustdoc_baseline_for_layer.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::baseline_capture::capture_baseline_for_layer": {
       "action": "delete",
@@ -269,7 +432,11 @@
       "params": [],
       "returns": "Result<(), BaselineCodecError>",
       "is_async": false,
-      "docs": "T008: deleted. Old capture function using TypeBaseline. Replaced by capture_rustdoc_baseline_for_layer."
+      "docs": "T008: deleted. Old capture function using TypeBaseline. Replaced by capture_rustdoc_baseline_for_layer.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::baseline_codec::decode": {
       "action": "delete",
@@ -277,7 +444,11 @@
       "params": [],
       "returns": "Result<TypeBaseline, BaselineCodecError>",
       "is_async": false,
-      "docs": "T008: deleted. Decoded JSON to TypeBaseline. Replaced by BaselineRustdocCodec::load."
+      "docs": "T008: deleted. Decoded JSON to TypeBaseline. Replaced by BaselineRustdocCodec::load.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::baseline_codec::encode": {
       "action": "delete",
@@ -285,7 +456,11 @@
       "params": [],
       "returns": "Result<String, BaselineCodecError>",
       "is_async": false,
-      "docs": "T008: deleted. Encoded TypeBaseline to JSON. Replaced by BaselineRustdocCodec (which uses serde directly on rustdoc_types::Crate)."
+      "docs": "T008: deleted. Encoded TypeBaseline to JSON. Replaced by BaselineRustdocCodec (which uses serde directly on rustdoc_types::Crate).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_graph_cluster::classify_types": {
       "action": "delete",
@@ -293,7 +468,11 @@
       "params": [],
       "returns": "ClusterPlan",
       "is_async": false,
-      "docs": "T008: deleted. Classified types in a TypeGraph into clusters. Removed with TypeGraph."
+      "docs": "T008: deleted. Classified types in a TypeGraph into clusters. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_graph_export::execute_type_graph_for_layer": {
       "action": "delete",
@@ -301,7 +480,11 @@
       "params": [],
       "returns": "Result<(), TypeGraphExportError>",
       "is_async": false,
-      "docs": "T008: deleted. Exported TypeGraph for a layer. Removed with TypeGraph."
+      "docs": "T008: deleted. Exported TypeGraph for a layer. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_graph_render::render_type_graph_clustered": {
       "action": "delete",
@@ -309,7 +492,11 @@
       "params": [],
       "returns": "String",
       "is_async": false,
-      "docs": "T008: deleted. Rendered TypeGraph as clustered Mermaid diagram. Removed with TypeGraph."
+      "docs": "T008: deleted. Rendered TypeGraph as clustered Mermaid diagram. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_graph_render::render_type_graph_flat": {
       "action": "delete",
@@ -317,7 +504,11 @@
       "params": [],
       "returns": "String",
       "is_async": false,
-      "docs": "T008: deleted. Rendered TypeGraph as flat Mermaid diagram. Removed with TypeGraph."
+      "docs": "T008: deleted. Rendered TypeGraph as flat Mermaid diagram. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_graph_render::render_type_graph_overview": {
       "action": "delete",
@@ -325,7 +516,11 @@
       "params": [],
       "returns": "String",
       "is_async": false,
-      "docs": "T008: deleted. Rendered TypeGraph overview as Mermaid. Removed with TypeGraph."
+      "docs": "T008: deleted. Rendered TypeGraph overview as Mermaid. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_graph_render::write_type_graph_dir": {
       "action": "delete",
@@ -333,7 +528,11 @@
       "params": [],
       "returns": "Result<(), TypeGraphExportError>",
       "is_async": false,
-      "docs": "T008: deleted. Wrote TypeGraph render output to a directory. Removed with TypeGraph."
+      "docs": "T008: deleted. Wrote TypeGraph render output to a directory. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_graph_render::write_type_graph_file": {
       "action": "delete",
@@ -341,7 +540,11 @@
       "params": [],
       "returns": "Result<(), TypeGraphExportError>",
       "is_async": false,
-      "docs": "T008: deleted. Wrote TypeGraph render output to a file. Removed with TypeGraph."
+      "docs": "T008: deleted. Wrote TypeGraph render output to a file. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_signals_evaluator::evaluate_and_write_signals": {
       "action": "delete",
@@ -349,7 +552,11 @@
       "params": [],
       "returns": "Result<(), EvaluateSignalsError>",
       "is_async": false,
-      "docs": "T008: deleted. Old signal evaluation entry point using TypeBaseline + TypeGraph. Replaced by the new sotp track three-way-signals pipeline via SignalEvaluatorV2."
+      "docs": "T008: deleted. Old signal evaluation entry point using TypeBaseline + TypeGraph. Replaced by the new sotp track three-way-signals pipeline via SignalEvaluatorV2.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics": {
       "action": "delete",
@@ -357,7 +564,11 @@
       "params": [],
       "returns": "Result<(), EvaluateSignalsError>",
       "is_async": false,
-      "docs": "T008: deleted. Old validation helper for action diagnostics in the TypeBaseline-based evaluator."
+      "docs": "T008: deleted. Old validation helper for action diagnostics in the TypeBaseline-based evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue": {
       "action": "delete",
@@ -365,7 +576,11 @@
       "params": [],
       "returns": "Result<(), EvaluateSignalsError>",
       "is_async": false,
-      "docs": "T008: deleted. Old validation-and-write helper in the TypeBaseline-based evaluator."
+      "docs": "T008: deleted. Old validation-and-write helper in the TypeBaseline-based evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::verify::spec_code_consistency::consistency_report_to_findings": {
       "action": "delete",
@@ -373,7 +588,11 @@
       "params": [],
       "returns": "Vec<VerifyFinding>",
       "is_async": false,
-      "docs": "T008: deleted. Converted ConsistencyReport to VerifyFinding list. Removed with check_consistency."
+      "docs": "T008: deleted. Converted ConsistencyReport to VerifyFinding list. Removed with check_consistency.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     },
     "infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components": {
       "action": "delete",
@@ -381,7 +600,11 @@
       "params": [],
       "returns": "ConsistencyReport",
       "is_async": false,
-      "docs": "T008: deleted. Ran check_consistency from component inputs. Removed with TypeGraph/TypeBaseline."
+      "docs": "T008: deleted. Ran check_consistency from component inputs. Removed with TypeGraph/TypeBaseline.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
     }
   }
 }

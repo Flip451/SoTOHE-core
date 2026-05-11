@@ -18,19 +18,21 @@
 //! level — illegal field combinations are rejected by serde, not by manual
 //! validation.
 
-use std::path::PathBuf;
-
 use domain::tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TraitImplDecl,
 };
 use domain::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
 use domain::tddd::catalogue_v2::roles::SelfReceiver;
 use domain::{
-    ConfidenceSignal, ContentHash, InformalGroundKind, InformalGroundRef, InformalGroundSummary,
-    SpecElementId, SpecRef, SpecValidationError, TypeAction, TypeCatalogueDocument,
-    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
+    ConfidenceSignal, SpecValidationError, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry,
+    TypeDefinitionKind, TypestateTransitionsSpec,
 };
 use serde::{Deserialize, Serialize};
+
+use crate::tddd::spec_ground_codec::{
+    InformalGroundRefDto, SpecRefDto, informal_grounds_from_dtos, informal_grounds_to_dtos,
+    spec_refs_from_dtos, spec_refs_to_dtos,
+};
 
 // ---------------------------------------------------------------------------
 // Error type
@@ -109,32 +111,6 @@ struct TypeCatalogueEntryDto {
     /// Defaults to empty when absent in JSON.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub informal_grounds: Vec<InformalGroundRefDto>,
-}
-
-/// DTO for a single `SpecRef` (SoT Chain ② — catalogue→spec).
-///
-/// `deny_unknown_fields` ensures stale field names are caught at decode time.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct SpecRefDto {
-    /// Relative path to the referenced spec.json file.
-    pub file: String,
-    /// Spec element identifier (e.g. `"IN-01"`, `"AC-02"`).
-    pub anchor: String,
-    /// 64-character lowercase SHA-256 hex of the canonical JSON subtree.
-    pub hash: String,
-}
-
-/// DTO for a single `InformalGroundRef` (unpersisted rationale).
-///
-/// `deny_unknown_fields` ensures stale field names are caught at decode time.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct InformalGroundRefDto {
-    /// Kind tag: `"discussion"`, `"feedback"`, `"memory"`, or `"user_directive"`.
-    pub kind: String,
-    /// Single-line summary of the rationale.
-    pub summary: String,
 }
 
 fn default_approved() -> bool {
@@ -729,7 +705,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         .collect();
     for entry in &entries {
         if let TypeDefinitionKind::Typestate {
-            transitions: TypestateTransitions::To(targets),
+            transitions: TypestateTransitionsSpec::To(targets),
             ..
         } = entry.kind()
         {
@@ -788,8 +764,17 @@ fn type_catalogue_entry_from_dto(
 ) -> Result<TypeCatalogueEntry, TypeCatalogueCodecError> {
     let kind = type_definition_kind_from_dto(&dto.name, &dto.kind)?;
     let action = type_action_from_dto(dto.action);
-    let spec_refs = spec_refs_from_dtos(&dto.name, &dto.spec_refs)?;
-    let informal_grounds = informal_grounds_from_dtos(&dto.name, &dto.informal_grounds)?;
+    let spec_refs =
+        spec_refs_from_dtos(&dto.spec_refs).map_err(|e| TypeCatalogueCodecError::InvalidEntry {
+            name: dto.name.clone(),
+            reason: format!("{}: {}", e.field, e.reason),
+        })?;
+    let informal_grounds = informal_grounds_from_dtos(&dto.informal_grounds).map_err(|e| {
+        TypeCatalogueCodecError::InvalidEntry {
+            name: dto.name.clone(),
+            reason: format!("{}: {}", e.field, e.reason),
+        }
+    })?;
     TypeCatalogueEntry::with_refs(
         &dto.name,
         &dto.description,
@@ -800,81 +785,6 @@ fn type_catalogue_entry_from_dto(
         informal_grounds,
     )
     .map_err(TypeCatalogueCodecError::Validation)
-}
-
-/// Decode `Vec<SpecRefDto>` → `Vec<SpecRef>`.
-fn spec_refs_from_dtos(
-    entry_name: &str,
-    dtos: &[SpecRefDto],
-) -> Result<Vec<SpecRef>, TypeCatalogueCodecError> {
-    let mut out = Vec::with_capacity(dtos.len());
-    for dto in dtos {
-        let anchor = SpecElementId::try_new(&dto.anchor).map_err(|_| {
-            TypeCatalogueCodecError::InvalidEntry {
-                name: entry_name.to_owned(),
-                reason: format!(
-                    "spec_refs[].anchor '{}' is not a valid SpecElementId \
-                     (expected pattern: <UPPER>{{2,}}-<digits>+)",
-                    dto.anchor
-                ),
-            }
-        })?;
-        let hash = ContentHash::try_from_hex(&dto.hash).map_err(|_| {
-            TypeCatalogueCodecError::InvalidEntry {
-                name: entry_name.to_owned(),
-                reason: format!(
-                    "spec_refs[].hash '{}' is not a valid SHA-256 hex string \
-                     (expected 64 lowercase hex characters)",
-                    dto.hash
-                ),
-            }
-        })?;
-        out.push(SpecRef::new(PathBuf::from(&dto.file), anchor, hash));
-    }
-    Ok(out)
-}
-
-/// Decode `Vec<InformalGroundRefDto>` → `Vec<InformalGroundRef>`.
-fn informal_grounds_from_dtos(
-    entry_name: &str,
-    dtos: &[InformalGroundRefDto],
-) -> Result<Vec<InformalGroundRef>, TypeCatalogueCodecError> {
-    let mut out = Vec::with_capacity(dtos.len());
-    for dto in dtos {
-        let kind = informal_ground_kind_from_str(&dto.kind).ok_or_else(|| {
-            TypeCatalogueCodecError::InvalidEntry {
-                name: entry_name.to_owned(),
-                reason: format!(
-                    "informal_grounds[].kind '{}' is not a valid InformalGroundKind \
-                     (expected one of: discussion, feedback, memory, user_directive)",
-                    dto.kind
-                ),
-            }
-        })?;
-        let summary = InformalGroundSummary::try_new(&dto.summary).map_err(|_| {
-            TypeCatalogueCodecError::InvalidEntry {
-                name: entry_name.to_owned(),
-                reason: format!(
-                    "informal_grounds[].summary '{}' is invalid \
-                     (must be non-empty and single-line)",
-                    dto.summary
-                ),
-            }
-        })?;
-        out.push(InformalGroundRef::new(kind, summary));
-    }
-    Ok(out)
-}
-
-/// Parse an `InformalGroundKind` from its string representation.
-fn informal_ground_kind_from_str(s: &str) -> Option<InformalGroundKind> {
-    match s {
-        "discussion" => Some(InformalGroundKind::Discussion),
-        "feedback" => Some(InformalGroundKind::Feedback),
-        "memory" => Some(InformalGroundKind::Memory),
-        "user_directive" => Some(InformalGroundKind::UserDirective),
-        _ => None,
-    }
 }
 
 fn type_action_from_dto(dto: TypeActionDto) -> TypeAction {
@@ -902,9 +812,9 @@ fn type_definition_kind_from_dto(
     match dto {
         TypeDefinitionKindDto::Typestate { transitions_to, expected_members, expected_methods } => {
             let transitions = if transitions_to.is_empty() {
-                TypestateTransitions::Terminal
+                TypestateTransitionsSpec::Terminal
             } else {
-                TypestateTransitions::To(transitions_to.clone())
+                TypestateTransitionsSpec::To(transitions_to.clone())
             };
             let members = decode_member_list(entry_name, expected_members)?;
             let methods = decode_method_list(entry_name, expected_methods)?;
@@ -1348,8 +1258,8 @@ fn type_catalogue_entry_to_dto(
     let kind = match entry.kind() {
         TypeDefinitionKind::Typestate { transitions, expected_members, expected_methods } => {
             let transitions_to = match transitions {
-                TypestateTransitions::Terminal => vec![],
-                TypestateTransitions::To(v) => v.clone(),
+                TypestateTransitionsSpec::Terminal => vec![],
+                TypestateTransitionsSpec::To(v) => v.clone(),
             };
             let members = encode_member_list(entry.name(), expected_members)?;
             let methods = encode_method_list(entry.name(), expected_methods)?;
@@ -1495,28 +1405,6 @@ fn type_catalogue_entry_to_dto(
         spec_refs,
         informal_grounds,
     })
-}
-
-/// Encode `&[SpecRef]` → `Vec<SpecRefDto>`.
-fn spec_refs_to_dtos(refs: &[SpecRef]) -> Vec<SpecRefDto> {
-    refs.iter()
-        .map(|r| SpecRefDto {
-            file: r.file.to_string_lossy().into_owned(),
-            anchor: r.anchor.as_ref().to_owned(),
-            hash: r.hash.to_hex(),
-        })
-        .collect()
-}
-
-/// Encode `&[InformalGroundRef]` → `Vec<InformalGroundRefDto>`.
-fn informal_grounds_to_dtos(grounds: &[InformalGroundRef]) -> Vec<InformalGroundRefDto> {
-    grounds
-        .iter()
-        .map(|g| InformalGroundRefDto {
-            kind: g.kind.as_str().to_owned(),
-            summary: g.summary.as_ref().to_owned(),
-        })
-        .collect()
 }
 
 /// Shared helper: encode a `Vec<MethodDeclaration>` into `Vec<MethodDto>`.
@@ -1701,6 +1589,7 @@ fn method_to_dto(
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
+    use domain::InformalGroundKind;
 
     const FULL_JSON: &str = r#"{
   "schema_version": 2,
@@ -1739,7 +1628,7 @@ mod tests {
         let doc = decode(FULL_JSON).unwrap();
         assert!(matches!(
             doc.entries()[0].kind(),
-            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(v), .. } if v == &["Published"]
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitionsSpec::To(v), .. } if v == &["Published"]
         ));
     }
 

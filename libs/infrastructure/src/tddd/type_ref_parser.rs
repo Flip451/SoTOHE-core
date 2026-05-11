@@ -961,8 +961,9 @@ pub(crate) fn core_canonical_path(short_name: &str) -> String {
         "BitXorAssign" => "core::ops::BitXorAssign",
         "ShlAssign" => "core::ops::ShlAssign",
         "ShrAssign" => "core::ops::ShrAssign",
-        // core::str
-        "FromStr" => "core::str::FromStr",
+        // core::str — rustdoc emits the full re-export path including the private
+        // `traits` submodule: `core::str::traits::FromStr`.
+        "FromStr" => "core::str::traits::FromStr",
         // core::borrow
         "Borrow" => "core::borrow::Borrow",
         "BorrowMut" => "core::borrow::BorrowMut",
@@ -1082,6 +1083,68 @@ fn syn_type_to_string(ty: &syn::Type) -> String {
         }
         syn::Type::Never(_) => "!".to_string(),
         _ => "_".to_string(),
+    }
+}
+
+/// Parses a bound string (e.g. `"'static"`, `"Send"`, `"?Sized"`,
+/// `"for<'a> Fn(&'a str)"`) into a `rustdoc_types::GenericBound`.
+///
+/// Unlike `parse_type_ref`, which uses `syn::parse_str::<syn::Type>()` and
+/// rejects `?Trait`, lifetime bounds, and HRTB bounds, this function uses
+/// `syn::parse_str::<syn::TypeParamBound>()` — the same parser that
+/// `catalogue_document_codec`'s `validate_bound_str` uses — so the set of
+/// accepted strings is identical between decode and encode.
+///
+/// Conversion rules:
+/// - `'lifetime` → `GenericBound::Outlives("lifetime")`.
+/// - `?Trait` → `GenericBound::TraitBound { modifier: Maybe, generic_params: [], ... }`.
+/// - `for<'a> Trait<'a>` → `GenericBound::TraitBound { generic_params: [Lifetime('a)], ... }`.
+/// - `Trait` / `Trait<T>` → `GenericBound::TraitBound { modifier: None, generic_params: [], ... }`.
+///
+/// # Errors
+///
+/// Returns `Err(String)` if `syn` cannot parse `bound_str` as a
+/// `TypeParamBound`, or if the parsed bound is a form that cannot be
+/// represented (e.g. `Verbatim` tokens from a proc-macro expansion).
+pub(crate) fn parse_generic_bound<F, G>(
+    bound_str: &str,
+    resolve_local: &F,
+    std_crate_id: u32,
+    external_crate_ids: &HashMap<String, u32>,
+    emit_external_crate: &mut G,
+) -> Result<GenericBound, String>
+where
+    F: Fn(&str) -> Option<Id>,
+    G: FnMut(String) -> u32,
+{
+    let syn_bound: syn::TypeParamBound =
+        syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
+
+    let _ = std_crate_id; // kept for API symmetry with parse_type_ref
+    let mut ctx = ParseCtx { resolve_local, external_crate_ids, emit_external_crate };
+
+    match syn_bound {
+        syn::TypeParamBound::Lifetime(lt) => Ok(GenericBound::Outlives(lt.ident.to_string())),
+        syn::TypeParamBound::Trait(tb) => {
+            let modifier = match tb.modifier {
+                syn::TraitBoundModifier::None => TraitBoundModifier::None,
+                syn::TraitBoundModifier::Maybe(_) => TraitBoundModifier::Maybe,
+            };
+            let generic_params = bound_lifetimes_to_generic_params(tb.lifetimes.as_ref());
+            let trait_path = ctx.resolve_trait_bound_path(&tb.path);
+            Ok(GenericBound::TraitBound { trait_: trait_path, generic_params, modifier })
+        }
+        // `Verbatim` is produced by syn for future syntax forms (e.g. `use<'a, T>` precise
+        // capture bounds from Rust 2024).  These cannot be round-tripped through the
+        // `rustdoc_types::GenericBound` representation at this time, but we must not
+        // fail the entire encode: return an unresolved-path TraitBound as a best-effort
+        // placeholder so that downstream phases can at least report the bound as an
+        // unresolved reference rather than crashing.
+        _ => Ok(GenericBound::TraitBound {
+            trait_: Path { path: bound_str.to_string(), id: Id(UNRESOLVED_CRATE_ID), args: None },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        }),
     }
 }
 

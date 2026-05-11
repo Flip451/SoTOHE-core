@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-10T16:09:38Z",
-  "declaration_hash": "fb6801b94b6dad576e85da5c1260f579ac9dc8ac58e96bfa7e1cf1e7772dce0e",
+  "generated_at": "2026-05-11T09:58:14Z",
+  "declaration_hash": "665fff96ca1a47d8a5cb8f9953f1da0010cbbe2cbbf706574324c7e2a6af515d",
   "signals": [
     {
       "type_name": "AdrDecisionCommonError",
@@ -9,15 +9,21 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
       "type_name": "CatalogueDocument",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "CatalogueDocumentError",
@@ -25,31 +31,27 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
       "type_name": "CatalogueLinter",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "CatalogueLoader",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "CatalogueToExtendedCratePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": true
-    },
-    {
-      "type_name": "CompositePattern",
-      "kind_tag": "enum",
       "signal": "blue",
       "found_type": true
     },
@@ -57,7 +59,12 @@
       "type_name": "ContractMapRenderOptions",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::default::Default"
+      ]
     },
     {
       "type_name": "ContractRole",
@@ -65,9 +72,12 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr",
-        "TryFrom"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -76,9 +86,14 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -87,22 +102,29 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr",
-        "TryFrom"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "ExtendedCrate",
       "kind_tag": "domain_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "FieldDecl",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "FieldName",
@@ -110,16 +132,25 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "FunctionEntry",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "FunctionName",
@@ -127,19 +158,29 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "FunctionPath",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -148,19 +189,24 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr",
-        "TryFrom"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "GenericArgsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
@@ -169,8 +215,13 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -179,8 +230,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
@@ -189,16 +242,34 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr",
-        "TryFrom"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::default::Default",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "MethodDeclaration",
       "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
+    },
+    {
+      "type_name": "MethodGenericParam",
+      "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "MethodName",
@@ -206,9 +277,14 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -217,8 +293,14 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::default::Default",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -227,15 +309,21 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
       "type_name": "ParamDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "ParamName",
@@ -243,9 +331,14 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -254,8 +347,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
@@ -264,46 +359,71 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "FromStr",
-        "TryFrom"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "SignalEvaluatorPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "SignalRegion",
       "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::hash::Hash"
+      ]
     },
     {
       "type_name": "ThreeWayEvaluationReport",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "ThreeWaySignal",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "ThreeWaySignalKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::hash::Hash"
+      ]
     },
     {
       "type_name": "TraitEntry",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "TraitImplDeclV2",
@@ -311,7 +431,9 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "Display"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Display"
       ]
     },
     {
@@ -320,22 +442,45 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
       ]
     },
     {
       "type_name": "TypeEntry",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "TypeKindV2",
       "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "TypeName",
@@ -343,9 +488,14 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
@@ -354,16 +504,57 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "TypestateMarker",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypestateTransitions",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypestateTransitionsSpec",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
       ]
     },
     {
       "type_name": "VariantDecl",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "VariantName",
@@ -371,16 +562,26 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "AsRef",
-        "Display",
-        "FromStr"
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
       ]
     },
     {
       "type_name": "VariantPayload",
       "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::default::Default"
+      ]
     },
     {
       "type_name": "ActionContradiction",

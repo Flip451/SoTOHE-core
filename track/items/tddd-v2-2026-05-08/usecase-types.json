@@ -14,27 +14,46 @@
           { "name": "KindLayerConstraint" }
         ]
       },
-      "docs": "Usecase-owned mirror of domain CatalogueLinterRuleKind. Modified: variant set updated (added KindLayerConstraint) vs earlier baseline snapshot."
+      "trait_impls": [
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "docs": "Usecase-owned mirror of domain CatalogueLinterRuleKind. Modified: variant set updated (added KindLayerConstraint) vs earlier baseline snapshot.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Usecase mirror of domain linter rule kind. Linter detailed design is out of scope (OS-01); this type is modified as a side-effect of adding KindLayerConstraint variant for layer-role matrix enforcement." }
+      ]
     },
     "PreCommitTypeSignalsInteractor": {
       "action": "reference",
       "role": "Interactor",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "kind": { "kind": "plain_struct" },
       "trait_impls": [{ "trait_name": "PreCommitTypeSignalsService", "origin_crate": "usecase" }],
-      "docs": "Existing interactor implementing PreCommitTypeSignalsService. Referenced for continuity."
+      "docs": "Existing interactor implementing PreCommitTypeSignalsService. Referenced for continuity.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing interactor referenced for contract-map edge continuity. Not modified in this track." }
+      ]
     },
     "RenderContractMapCommand": {
       "action": "modify",
       "role": "Command",
       "kind": {
-        "kind": "struct",
-        "pattern": { "pattern": "plain" },
+        "kind": "plain_struct",
         "fields": [
           { "name": "track_id", "ty": "String" },
           { "name": "layer_filter", "ty": "Option<Vec<String>>" }
         ]
       },
-      "docs": "Command input for RenderContractMap::execute. Modified: removed stale kind_filter field (baseline was captured before T003 removed it); current shape is 2 fields (track_id, layer_filter)."
+      "trait_impls": [
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "docs": "Command input for RenderContractMap::execute. Modified: removed stale kind_filter field (baseline was captured before T003 removed it); current shape is 2 fields (track_id, layer_filter).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+      ],
+      "informal_grounds": []
     },
     "RenderContractMapError": {
       "action": "modify",
@@ -55,7 +74,11 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "docs": "Error variants for RenderContractMap::execute. Modified: removed stale UnknownKindFilter variant (baseline was captured before T003 removed it); corrected variant payloads to match actual enum (tuple and struct variants, not unit). thiserror #[from] generates From<CatalogueLoaderError> and From<ContractMapWriterError>; declared with explicit generic_args to disambiguate the two impls. Also Display/Error for thiserror-generated impls."
+      "docs": "Error variants for RenderContractMap::execute. Modified: removed stale UnknownKindFilter variant (baseline was captured before T003 removed it); corrected variant payloads to match actual enum (tuple and struct variants, not unit). thiserror #[from] generates From<CatalogueLoaderError> and From<ContractMapWriterError>; declared with explicit generic_args to disambiguate the two impls. Also Display/Error for thiserror-generated impls.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -75,7 +98,11 @@
           "is_async": false
         }
       ],
-      "docs": "Existing secondary_port for persisting catalogue-spec signal documents. Referenced to expose implements edge for FsCatalogueSpecSignalsStore."
+      "docs": "Existing secondary_port for persisting catalogue-spec signal documents. Referenced to expose implements edge for FsCatalogueSpecSignalsStore.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing secondary port for catalogue-spec signal persistence. Referenced for contract-map edge completeness; FsCatalogueSpecSignalsStore implements this port." }
+      ]
     },
     "PreCommitTypeSignalsService": {
       "action": "reference",
@@ -92,7 +119,11 @@
           "is_async": false
         }
       ],
-      "docs": "Existing application_service trait for running pre-commit type signal checks. Referenced for continuity."
+      "docs": "Existing application_service trait for running pre-commit type signal checks. Referenced for continuity.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing application service for pre-commit type signal orchestration. Referenced for contract-map edge continuity; not modified in this track." }
+      ]
     },
     "SchemaExporterPort": {
       "action": "reference",
@@ -106,7 +137,11 @@
           "is_async": false
         }
       ],
-      "docs": "Existing secondary_port for exporting crate schema as JSON string. Referenced to expose implements edge for RustdocSchemaExporter."
+      "docs": "Existing secondary_port for exporting crate schema as JSON string. Referenced to expose implements edge for RustdocSchemaExporter.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "Pre-existing secondary port for schema JSON export. Referenced for contract-map edge completeness; RustdocSchemaExporter implements this port." }
+      ]
     }
   },
   "functions": {}

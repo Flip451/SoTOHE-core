@@ -273,40 +273,91 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
         }
     }
 
-    // --- Phase 1.45: A-side local type-ref id remapping ---
-    // `type_ref_parser::parse_type_ref` resolves local catalogue types to A-side item Ids
-    // via `resolve_local`. These A-side Ids are embedded directly in `Type::ResolvedPath.id`
-    // and are NOT remapped to S-side Ids during item insertion (only structural child-list Ids
-    // are remapped in `remap_child_ids_in_item`).
+    // --- Phase 1.45: A-side type-ref id remapping (local + external) ---
     //
-    // Without remapping:
-    // - Phase 1.6 Rule 1 can produce false positives: an A-side Id for a deleted type may
-    //   coincidentally match a retained B/S Id for a different item, incorrectly passing the
-    //   dangling-Id check.
+    // ## Problem
     //
-    // Fix: build an A-side-id → S-side-id mapping from `a_krate.paths` + `s_type_name_to_id`,
-    // then rewrite all `Type::ResolvedPath.id` values in every S item using this map.  The
-    // rewrite is safe because Phase 2 uses short-name identity and `format_type` L1 resolution
-    // (not `ResolvedPath.id`) for structural equality; the only consumer of these Ids is
-    // Phase 1.6 itself.
+    // `type_ref_parser::parse_type_ref` encodes local catalogue types to A-side item Ids
+    // via `resolve_local`, and external types to A-side synthetic Ids via
+    // `ensure_external_type_id`.  Both kinds of A-side Ids are embedded directly in
+    // `Type::ResolvedPath.id` and are NOT remapped to S-side (Phase1-fresh) Ids during
+    // item insertion (only structural child-list Ids are remapped in
+    // `remap_child_ids_in_item`).
+    //
+    // These small A-side Ids (allocated sequentially from 0 inside the codec) can collide
+    // with B-side Ids when both are placed in the same `s_paths` / `s_index` map:
+    //
+    // - **Local collision (pre-existing fix)**: A-side local Id N references a local type
+    //   whose S-side Id is M (different from N).  Phase 1.6 would incorrectly validate
+    //   N as "in S" by finding an unrelated B-side item at N.
+    //
+    // - **External collision (new fix)**: A-side synthetic external Id N (e.g. Id(13) for
+    //   `core::cmp::Eq`) coincides numerically with a B-side external Id N (e.g. B's Id(65)
+    //   for `core::cmp::PartialEq`).  When both A-sourced and B-sourced items reference Id N
+    //   as their impl trait, Step 6 inserts A's path entry at N (overwriting B's), so B-side
+    //   trait impls resolve through A's wrong `external_crates` entry and generate incorrect
+    //   identity keys in `build_impl_identity_map`.
+    //
+    // ## Fix
+    //
+    // Build a comprehensive A-id → fresh-Phase1-id remapping that covers BOTH local and
+    // external A-side Ids, then apply `rewrite_type_ref_ids_in_item` to all A-sourced items
+    // in S.  After this phase:
+    //
+    // - All type-ref Ids in A-sourced items are >= `first_fresh_id` (Phase1-allocated).
+    // - External trait path entries from A-sourced impl blocks are pre-inserted into
+    //   `s_paths` at their fresh Phase1 Ids with the correct A-side crate_id (to be
+    //   re-numbered by `patch_paths_crate_ids_extra` in Step 6).
+    // - Step 6 only needs Vacant-entry insertion for B-side paths — no force-overwrite,
+    //   no namespace collision.
+    //
+    // The rewrite is safe because Phase 2 uses short-name identity and `format_type`
+    // (L1 resolution, not `ResolvedPath.id`) for structural equality; the only consumers
+    // of these Ids are Phase 1.6's dangling-Id check and Step 6's path-copy loop.
     {
-        // Build A-id → S-id map: for each A-side local item, find its name via a_krate.paths,
-        // then look up the S-side id via s_type_name_to_id.
-        let a_to_s_id: HashMap<Id, Id> = a_krate
+        // Build A-id → S-id map for LOCAL types:
+        // For each A-side local item (crate_id == 0), look up its short name in
+        // `s_type_name_to_id` to find the S-side Id (which may differ from the A-side Id).
+        let a_local_to_s_id: HashMap<Id, Id> = a_krate
             .paths
             .iter()
             .filter_map(|(&a_id, a_ps)| {
                 if a_ps.crate_id != 0 {
-                    return None; // external crate — not a local type
+                    return None; // handled separately below
                 }
-                // Use the last path segment as the type short name.
                 let name = a_ps.path.last()?.as_str();
                 let s_id = state.s_type_name_to_id.get(name)?;
                 Some((a_id, *s_id))
             })
             .collect();
 
-        if !a_to_s_id.is_empty() {
+        // Build A-id → fresh-Phase1-id map for EXTERNAL type-refs:
+        // For ALL A-side external path entries (crate_id != 0), allocate a fresh Phase1 Id
+        // and pre-insert the path entry at the fresh Id so Step 6's Vacant-entry insertion
+        // finds it already populated.
+        //
+        // A IDs and Phase-1 fresh S IDs are independent — the catalogue codec allocates its
+        // own sequential counter for A while Phase-1 uses a separate counter.  There is no
+        // numeric relationship between the two spaces and we must not filter by `< first_fresh_id`:
+        // any A external ID (regardless of value) may collide with a freshly allocated S item Id.
+        let mut a_external_to_fresh_id: HashMap<Id, Id> = HashMap::new();
+        let a_external_paths: Vec<(Id, rustdoc_types::ItemSummary)> = a_krate
+            .paths
+            .iter()
+            .filter(|&(_, a_ps)| a_ps.crate_id != 0)
+            .map(|(&a_id, a_ps)| (a_id, a_ps.clone()))
+            .collect();
+        for (old_id, path_summary) in a_external_paths {
+            let fresh_id = state.alloc_id();
+            state.s_paths.insert(fresh_id, path_summary);
+            a_external_to_fresh_id.insert(old_id, fresh_id);
+        }
+
+        // Combine both maps for the rewrite pass.
+        let mut full_remap: HashMap<Id, Id> = a_local_to_s_id;
+        full_remap.extend(a_external_to_fresh_id);
+
+        if !full_remap.is_empty() {
             // Only rewrite A-sourced items (Add / Modify actions) and their child items.
             // B-sourced Reference items use B-side Ids which are correct and must not be
             // rewritten: A and B use independent Id spaces and their Ids may collide.
@@ -337,12 +388,12 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                 // Rewrite only A-sourced items:
                 // 1. Top-level items with Add/Modify action.
                 // 2. Child items allocated with fresh ids >= first_fresh_id.
-                // Skip B-sourced Reference items (id < first_fresh_id AND in s_actions as Reference).
+                // Skip B-sourced Reference items (id < first_fresh_id AND not in Add/Modify).
                 let should_rewrite =
                     a_sourced_top_ids.contains(&item_id) || item_id.0 >= first_fresh_id;
                 if should_rewrite {
                     if let Some(item) = state.s_index.remove(&item_id) {
-                        let rewritten = rewrite_type_ref_ids_in_item(item, &a_to_s_id);
+                        let rewritten = rewrite_type_ref_ids_in_item(item, &full_remap);
                         state.s_index.insert(item_id, rewritten);
                     }
                 }
@@ -536,16 +587,87 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     // per-scope numbering.
     // Only copy entries for Ids actually present in the scope's items (type-ref scanner
     // finds these), and only external ones (crate_id != 0).
-    {
+    //
+    // After Phase 1.45, all A-sourced type-ref IDs (both local and external) have been
+    // remapped to fresh Phase1 IDs (>= first_fresh_id) and A-side external path entries are
+    // already in s_paths.  We only need to copy B-side external paths using Vacant-entry
+    // insertion — no force-overwrite needed.
+    let a_side_path_ids: HashSet<Id> = {
         // Collect all Ids referenced by items in S (types + impls + functions).
-        let mut s_referenced_ids: HashSet<Id> = HashSet::new();
+        //
+        // Separate A-sourced from B-sourced references:
+        // - A-sourced items: top-level items with Add/Modify action, or child items with
+        //   fresh Ids (>= first_fresh_id) allocated by the A-insertion path.
+        //   After Phase 1.45, all A-sourced type-ref IDs are >= first_fresh_id too.
+        // - B-sourced items: top-level items with Reference/Delete action and original
+        //   B-side Ids (< first_fresh_id).
+        //
+        // This distinction is critical because A and B use independent Id spaces.
+        // After Phase 1.45, A-sourced type-ref IDs no longer collide with B-side IDs,
+        // so Vacant-entry insertion is safe for all path entries.
+        let mut a_referenced_ids: HashSet<Id> = HashSet::new();
+        let mut b_referenced_ids: HashSet<Id> = HashSet::new();
         for item in state.s_index.values() {
-            for id in collect_referenced_ids(item) {
-                s_referenced_ids.insert(id);
+            let is_a_sourced = match state.s_actions.get(&item.id) {
+                Some(&ItemAction::Add) | Some(&ItemAction::Modify) => true,
+                Some(_) => false,
+                None => item.id.0 >= first_fresh_id,
+            };
+            let refs = collect_referenced_ids(item);
+            if is_a_sourced {
+                for id in refs {
+                    a_referenced_ids.insert(id);
+                }
+            } else {
+                for id in refs {
+                    b_referenced_ids.insert(id);
+                }
             }
         }
-        // Copy external B-side path summaries for those ids into s_paths.
-        for &ref_id in &s_referenced_ids {
+
+        // Copy external path summaries for referenced Ids into s_paths.
+        //
+        // A-side external paths: remapped to fresh IDs in Phase 1.45 and already in s_paths.
+        // Any remaining A-referenced IDs that have A-side external path entries are type-refs
+        // in field/generic/return types; insert them using Vacant-entry insertion.
+        //
+        // B-side external paths: inserted for B-referenced Ids using Vacant-entry insertion.
+        //
+        // Track which Ids were inserted from A so `patch_paths_crate_ids_extra` (not
+        // `patch_paths_crate_ids`) handles their crate_id renumbering.  A and B use
+        // independent `external_crates` numbering, so their crate_id values for the same
+        // crate name (e.g. "core" = 1 in A, "core" = 2 in B) must not be mixed.
+        let mut a_side_path_ids: HashSet<Id> = HashSet::new();
+
+        // Ids already in s_paths from Phase 1.45 (A-side remapped external IDs) are tracked
+        // by collecting them now so patch_paths_crate_ids_extra handles them.
+        for (&id, ps) in &state.s_paths {
+            if ps.crate_id != 0 {
+                // Only A-side paths were inserted into s_paths by Phase 1.45 so far.
+                a_side_path_ids.insert(id);
+            }
+        }
+
+        // Insert A-side paths for A-referenced Ids (type-refs in field/method signatures).
+        // These are IDs from `collect_referenced_ids` on A-sourced items.
+        // After Phase 1.45, impl trait IDs and all external type-ref IDs are already handled;
+        // remaining refs come from ResolvedPath type refs not covered by Phase 1.45 (e.g.
+        // A-side local paths that survived without remapping).
+        // Use Vacant-entry insertion: these IDs are fresh (from Phase 1.45 remapping) or
+        // only appear in A's path table (no collision with s_paths after Phase 1.45).
+        for &ref_id in &a_referenced_ids {
+            // Skip IDs already in s_paths (from Phase 1.45 or previous loop iterations).
+            if state.s_paths.contains_key(&ref_id) {
+                continue;
+            }
+            if let Some(ps) = a_krate.paths.get(&ref_id) {
+                if ps.crate_id != 0 {
+                    state.s_paths.insert(ref_id, ps.clone());
+                    a_side_path_ids.insert(ref_id);
+                    continue;
+                }
+            }
+            // A-side does not have an external path for this Id: fall back to B's path table.
             if let std::collections::hash_map::Entry::Vacant(e) = state.s_paths.entry(ref_id) {
                 if let Some(ps) = b.paths.get(&ref_id) {
                     if ps.crate_id != 0 {
@@ -554,18 +676,21 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                 }
             }
         }
-        // Copy external A-side path summaries (for A-added items that reference external
-        // types with A-side synthetic Ids not in b.paths).
-        for &ref_id in &s_referenced_ids {
+
+        // Insert B-side paths for B-referenced Ids (using B's path table only).
+        for &ref_id in &b_referenced_ids {
             if let std::collections::hash_map::Entry::Vacant(e) = state.s_paths.entry(ref_id) {
-                if let Some(ps) = a_krate.paths.get(&ref_id) {
+                if let Some(ps) = b.paths.get(&ref_id) {
                     if ps.crate_id != 0 {
                         e.insert(ps.clone());
                     }
                 }
             }
         }
-    }
+
+        // Store the A-side id set for use after the scope block ends.
+        a_side_path_ids
+    };
     {
         let mut d_referenced_ids: HashSet<Id> = HashSet::new();
         for item in state.d_index.values() {
@@ -586,18 +711,33 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     }
 
     // S may contain A-sourced items that reference external types via A-side synthetic Ids
-    // not present in b.paths; pass Some(&a_krate) so those Ids can be resolved via
-    // a_krate.paths + a_krate.external_crates.
-    let (s_external_crates, s_name_to_new_id) =
-        build_external_crates_for_scope(&state.s_index, &state.s_paths, b, Some(&a_krate));
-    patch_paths_crate_ids(&mut state.s_paths, b, &s_name_to_new_id);
-    // Also patch A-side external path summaries now in s_paths.
-    patch_paths_crate_ids_extra(&mut state.s_paths, &a_krate, &s_name_to_new_id);
+    // not present in b.paths; pass Some(&a_krate) and Some(&a_side_path_ids) so those
+    // paths entries are resolved via a_krate.external_crates rather than b.external_crates
+    // (the two tables use independent crate_id namespaces and must not be mixed).
+    let (s_external_crates, s_name_to_new_id) = build_external_crates_for_scope(
+        &state.s_index,
+        &state.s_paths,
+        b,
+        Some(&a_krate),
+        Some(&a_side_path_ids),
+    );
+    // Patch A-side path entries first (using A's external_crates numbering), then patch
+    // B-side path entries (using B's external_crates numbering), explicitly excluding
+    // A-side ids from the B-side pass.  This prevents mis-mapping A-sourced crate_ids
+    // through B's table: A and B use independent external_crates numbering, so the same
+    // numeric crate_id may refer to different crates in each table.
+    patch_paths_crate_ids_extra(
+        &mut state.s_paths,
+        &a_krate,
+        &s_name_to_new_id,
+        Some(&a_side_path_ids),
+    );
+    patch_paths_crate_ids(&mut state.s_paths, b, &s_name_to_new_id, Some(&a_side_path_ids));
 
     // D contains only B-sourced items; no A-side ids remain, so extra_a = None.
     let (d_external_crates, d_name_to_new_id) =
-        build_external_crates_for_scope(&state.d_index, &state.d_paths, b, None);
-    patch_paths_crate_ids(&mut state.d_paths, b, &d_name_to_new_id);
+        build_external_crates_for_scope(&state.d_index, &state.d_paths, b, None, None);
+    patch_paths_crate_ids(&mut state.d_paths, b, &d_name_to_new_id, None);
 
     // Build root module item for S.
     let root_id = Id(0);

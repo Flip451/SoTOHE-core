@@ -61,7 +61,7 @@ pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
 pub use tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction,
     TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
-    TypestateTransitions,
+    TypestateTransitionsSpec,
 };
 pub use tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,

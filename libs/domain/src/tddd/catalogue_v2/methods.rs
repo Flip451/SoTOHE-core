@@ -18,6 +18,37 @@ use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
 use crate::tddd::catalogue_v2::roles::SelfReceiver;
 
 // ---------------------------------------------------------------------------
+// MethodGenericParam — a single generic type parameter on a method (V2)
+// ---------------------------------------------------------------------------
+
+/// A single generic type parameter on a method or associated function.
+///
+/// Used when the method is declared with APIT (`impl Into<String>`) or an
+/// explicit generic parameter (`fn new<T: Into<String>>(value: T) -> Self`).
+/// The rustdoc C-side desugars APIT into synthetic `GenericParamDef` entries
+/// (e.g. `T0: Into<String>`); this struct mirrors that representation so that
+/// the A-codec can produce a matching `ExtendedCrate`.
+///
+/// Used in [`MethodDeclaration::generics`].
+///
+/// Both fields use validated newtypes to make illegal states unrepresentable:
+/// - `name: ParamName` — a valid Rust identifier (validated via `Identifier`).
+/// - `bounds: Vec<TypeRef>` — non-empty type/trait reference strings.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MethodGenericParam {
+    /// The synthetic or explicit parameter name (e.g. `T0`, `T`).
+    ///
+    /// Must be a valid Rust identifier (`[a-zA-Z_][a-zA-Z0-9_]*`).
+    pub name: ParamName,
+    /// The trait bounds imposed on this parameter (e.g. `[Into<String>]`, `[?Sized]`).
+    ///
+    /// Each entry is a non-empty type/trait reference string validated at the
+    /// codec boundary. `?Sized` is accepted (as `syn::TypeParamBound`, not
+    /// `syn::Type`) and stored as a plain `TypeRef`.
+    pub bounds: Vec<TypeRef>,
+}
+
+// ---------------------------------------------------------------------------
 // ParamDeclaration — single parameter in a method/function signature (V2)
 // ---------------------------------------------------------------------------
 
@@ -81,12 +112,19 @@ pub struct MethodDeclaration {
     pub returns: TypeRef,
     /// Whether this method is `async`.
     pub is_async: bool,
+    /// Generic type parameters on this method.
+    ///
+    /// Populated when the method is declared with APIT (`impl Into<String>`) or
+    /// an explicit generic parameter. Default empty Vec for backward compatibility.
+    /// The A-codec encodes these as `GenericParamDef::Type` entries in the function's
+    /// `Generics`, mirroring the rustdoc C-side APIT desugaring.
+    pub generics: Vec<MethodGenericParam>,
     /// Optional documentation string.
     pub docs: Option<String>,
 }
 
 impl MethodDeclaration {
-    /// Creates a new `MethodDeclaration`.
+    /// Creates a new `MethodDeclaration` with no generic parameters.
     #[must_use]
     pub fn new(
         name: MethodName,
@@ -96,7 +134,7 @@ impl MethodDeclaration {
         is_async: bool,
         docs: Option<String>,
     ) -> Self {
-        Self { name, receiver, params, returns, is_async, docs }
+        Self { name, receiver, params, returns, is_async, generics: vec![], docs }
     }
 
     /// Creates a `MethodDeclaration` for an associated function (no `self` receiver).
@@ -106,7 +144,15 @@ impl MethodDeclaration {
         params: Vec<ParamDeclaration>,
         returns: TypeRef,
     ) -> Self {
-        Self { name, receiver: None, params, returns, is_async: false, docs: None }
+        Self {
+            name,
+            receiver: None,
+            params,
+            returns,
+            is_async: false,
+            generics: vec![],
+            docs: None,
+        }
     }
 
     /// Reconstructs a human-readable signature string from the structured fields
@@ -115,13 +161,32 @@ impl MethodDeclaration {
     /// Layout:
     ///
     /// ```text
-    /// [async ]fn name(receiver[, param1: ty1, param2: ty2]) -> returns
+    /// [async ]fn name[<T0: Bound0>](receiver[, param1: ty1, param2: ty2]) -> returns
     /// ```
     ///
     /// The unit return type is rendered as `"()"` when the returns field is `"()"`.
+    /// Generic parameters are rendered as `<T0: Bound0, T1: Bound1>` when present.
     #[must_use]
     pub fn signature_string(&self) -> String {
         let async_prefix = if self.is_async { "async " } else { "" };
+        let generics_str = if self.generics.is_empty() {
+            String::new()
+        } else {
+            let params: Vec<String> = self
+                .generics
+                .iter()
+                .map(|g| {
+                    if g.bounds.is_empty() {
+                        g.name.as_str().to_owned()
+                    } else {
+                        let bounds_str =
+                            g.bounds.iter().map(|b| b.as_str()).collect::<Vec<_>>().join(" + ");
+                        format!("{}: {}", g.name.as_str(), bounds_str)
+                    }
+                })
+                .collect();
+            format!("<{}>", params.join(", "))
+        };
         let receiver_string = self.receiver.map(|r| r.to_string());
         let receiver_str = receiver_string.as_deref().unwrap_or("");
         let params_str = self
@@ -136,7 +201,13 @@ impl MethodDeclaration {
             (false, true) => receiver_str.to_string(),
             (false, false) => format!("{receiver_str}, {params_str}"),
         };
-        format!("{async_prefix}fn {}({}) -> {}", self.name.as_str(), args, self.returns.as_str())
+        format!(
+            "{async_prefix}fn {}{}({}) -> {}",
+            self.name.as_str(),
+            generics_str,
+            args,
+            self.returns.as_str()
+        )
     }
 }
 
@@ -148,6 +219,44 @@ impl MethodDeclaration {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
+
+    // -----------------------------------------------------------------------
+    // MethodGenericParam
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_method_generic_param_with_bounds_stores_fields() {
+        let p = MethodGenericParam {
+            name: ParamName::new("T0").unwrap(),
+            bounds: vec![TypeRef::new("Into<String>").unwrap()],
+        };
+        assert_eq!(p.name.as_str(), "T0");
+        assert_eq!(p.bounds[0].as_str(), "Into<String>");
+    }
+
+    #[test]
+    fn test_method_generic_param_without_bounds_is_valid() {
+        let p = MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] };
+        assert!(p.bounds.is_empty());
+    }
+
+    #[test]
+    fn test_method_generic_param_equality() {
+        let a = MethodGenericParam {
+            name: ParamName::new("T0").unwrap(),
+            bounds: vec![TypeRef::new("Send").unwrap()],
+        };
+        let b = MethodGenericParam {
+            name: ParamName::new("T0").unwrap(),
+            bounds: vec![TypeRef::new("Send").unwrap()],
+        };
+        let c = MethodGenericParam {
+            name: ParamName::new("T1").unwrap(),
+            bounds: vec![TypeRef::new("Send").unwrap()],
+        };
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+    }
 
     // -----------------------------------------------------------------------
     // ParamDeclaration
@@ -316,6 +425,31 @@ mod tests {
             None,
         );
         assert_eq!(a, b);
+    }
+
+    #[test]
+    fn test_method_declaration_with_generics_stores_and_renders_them() {
+        let name = MethodName::new("new").unwrap();
+        let param =
+            ParamDeclaration::new(ParamName::new("value").unwrap(), TypeRef::new("T0").unwrap());
+        let returns = TypeRef::new("Self").unwrap();
+        let mut decl = MethodDeclaration::associated_function(name, vec![param], returns);
+        decl.generics = vec![MethodGenericParam {
+            name: ParamName::new("T0").unwrap(),
+            bounds: vec![TypeRef::new("Into<String>").unwrap()],
+        }];
+        assert_eq!(decl.generics.len(), 1);
+        assert_eq!(decl.generics[0].name.as_str(), "T0");
+        let sig = decl.signature_string();
+        assert!(sig.contains("<T0: Into<String>>"), "sig={sig}");
+    }
+
+    #[test]
+    fn test_method_declaration_new_has_empty_generics_by_default() {
+        let name = MethodName::new("save").unwrap();
+        let returns = TypeRef::new("()").unwrap();
+        let decl = MethodDeclaration::new(name, None, vec![], returns, false, None);
+        assert!(decl.generics.is_empty());
     }
 
     #[test]

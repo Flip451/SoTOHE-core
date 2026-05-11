@@ -389,14 +389,17 @@ mod tests {
 
     /// Minimal `architecture-rules.json` enabling the `domain` layer with
     /// `catalogue_spec_signal` activated.
+    ///
+    /// Uses `"crate"` (not `"id"`) as the layer key, matching the serde rename in
+    /// `parse_tddd_layers`.  `catalogue_spec_signal` is an object (`{ "enabled": true }`)
+    /// because the parser deserialises it as `CatalogueSpecSignalBlock`, not a bool.
     const ARCH_RULES_WITH_DOMAIN: &str = r#"{
   "layers": [
     {
-      "id": "domain",
+      "crate": "domain",
       "tddd": {
         "enabled": true,
-        "catalogue_spec_signal": true,
-        "spec_states": true
+        "catalogue_spec_signal": { "enabled": true }
       }
     }
   ]
@@ -411,7 +414,7 @@ mod tests {
     "MyType": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "kind": { "kind": "plain_struct" },
       "docs": "A simple value object."
     }
   },

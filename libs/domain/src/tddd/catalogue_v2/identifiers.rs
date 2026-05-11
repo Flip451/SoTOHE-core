@@ -201,7 +201,7 @@ identifier_newtype!(
 identifier_newtype!(
     /// Newtype around `Identifier` for method names.
     ///
-    /// Used in `MethodDeclaration` and `CompositePattern::TypestateState::transition_methods`
+    /// Used in `MethodDeclaration` and `TypestateTransitions::transition_methods`
     /// (ADR 1 D5 / D3).
     MethodName
 );

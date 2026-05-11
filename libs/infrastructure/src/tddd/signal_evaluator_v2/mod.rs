@@ -453,13 +453,47 @@ pub(super) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
                     // core traits via `core_canonical_path`.
                     let joined = ps.path.join("::");
                     if !joined.contains("::") {
-                        // Single-segment path from krate.paths: likely a well-known
-                        // core/std trait whose module prefix was omitted.
-                        // `core_canonical_path` returns the canonical qualified form
-                        // (e.g. `"core::convert::From"`) for known traits and falls
-                        // back to `"core::{joined}"` for unknown ones — preserving
-                        // consistency with the S-side codec's output.
-                        crate::tddd::type_ref_parser::core_canonical_path(&joined)
+                        // Single-segment path from krate.paths: the module prefix was
+                        // omitted by rustdoc.  Reconstruct the qualified path using the
+                        // actual external crate name from `krate.external_crates`.
+                        //
+                        // Rustdoc sometimes emits a bare single-segment path (e.g. `["From"]`)
+                        // for traits from core/std/alloc.  The S-side codec emits canonical
+                        // qualified paths (`"core::convert::From"` / `"std::convert::From"`),
+                        // so we must expand single-segment paths using the same canonical
+                        // function the S-side codec uses for that crate:
+                        //   - `std`  → `std_canonical_path` (e.g. `"std::convert::From"`)
+                        //   - `core` → `core_canonical_path` (e.g. `"core::convert::From"`)
+                        //   - `alloc`→ `core_canonical_path` (alloc shares core module paths)
+                        //   - other  → `"{crate_name}::{short_name}"` (e.g. `"serde::Serialize"`)
+                        let ext_crate_name = krate
+                            .external_crates
+                            .get(&ps.crate_id)
+                            .map(|ec| ec.name.as_str())
+                            .unwrap_or("core");
+                        match ext_crate_name {
+                            "std" => crate::tddd::type_ref_parser::std_canonical_path(&joined),
+                            "core" | "alloc" => {
+                                crate::tddd::type_ref_parser::core_canonical_path(&joined)
+                            }
+                            // Workspace crates (domain, usecase): the S-side codec emits
+                            // the bare short trait name.  Return the short name here to
+                            // match the multi-segment branch below.
+                            "domain" | "usecase" => joined,
+                            other => format!("{other}::{joined}"),
+                        }
+                    } else if let Some(first_seg) = ps.path.first() {
+                        // For workspace crates (domain, usecase), the S-side catalogue codec
+                        // emits the bare short trait name (to remain consistent when rustdoc
+                        // omits the trait from krate.paths and falls back to the raw path
+                        // string).  Normalise multi-segment domain/usecase paths to the bare
+                        // short name so both sides produce the same identity key.
+                        if first_seg == "domain" || first_seg == "usecase" {
+                            // ps.path.last() is always Some when ps.path is non-empty.
+                            ps.path.last().unwrap_or(first_seg).to_string()
+                        } else {
+                            joined
+                        }
                     } else {
                         joined
                     }
@@ -565,8 +599,39 @@ pub(super) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
 ///   the string is already in canonical form and requires no further transformation.
 pub(super) fn normalize_impl_trait_path(path: &str, crate_name: &str) -> String {
     if is_local_unresolved_path(path) {
-        // Bare name or `crate::`/`self::`/`super::` prefix → short name.
-        path.rsplit("::").next().unwrap_or(path).to_string()
+        // Bare name (no `::`) or relative prefix (`crate::`/`self::`/`super::`).
+        // Split off any generic args (e.g. `"From<T>"` → base=`"From"`, args=`"<T>"`).
+        let (base, args) = split_generic_args(path);
+        let short_name = base.rsplit("::").next().unwrap_or(base);
+        // Paths with a relative prefix (`crate::X`, `self::X`, `super::X`) are
+        // local-crate references; strip to the short name without attempting any
+        // core/std expansion, which would produce incorrect results (e.g.
+        // `crate::Display` must NOT expand to `core::fmt::Display`).
+        if base.contains("::") {
+            return format!("{short_name}{args}");
+        }
+        // Bare identifiers (no `::`) may be well-known core/std traits (e.g. `From`,
+        // `Display`).  Expand to the canonical fully-qualified path so the fallback
+        // normalisation matches the S-side codec, which always emits
+        // `core_canonical_path("From")` = `"core::convert::From"`.
+        // Unknown names (local/workspace traits) are kept as the bare short name.
+        // `core_canonical_path` falls back to `"core::{name}"` (only two segments)
+        // for unrecognised names, so we distinguish known expansions by checking
+        // that the result contains at least two `::` separators (three segments).
+        // The generic args are re-appended verbatim.
+        let expanded_base = crate::tddd::type_ref_parser::core_canonical_path(short_name);
+        // `core_canonical_path` falls back to `"core::{name}"` for any name it does
+        // not recognise, so the result `"core::{short_name}"` means the name is NOT
+        // a known core/std trait.  Only expand when the result has more than two
+        // segments (i.e., points to a real sub-module like `core::convert::From`).
+        let is_known_core_trait = expanded_base.matches("::").count() >= 2;
+        if is_known_core_trait {
+            // Recognized core/std trait: use the expanded qualified path.
+            format!("{expanded_base}{args}")
+        } else {
+            // Unknown bare name: keep the short name as before.
+            format!("{short_name}{args}")
+        }
     } else if !crate_name.is_empty() && path.starts_with(&format!("{crate_name}::")) {
         // rustdoc local trait path (e.g. `my_crate::MyTrait`) → short name.
         path.rsplit("::").next().unwrap_or(path).to_string()
@@ -577,6 +642,16 @@ pub(super) fn normalize_impl_trait_path(path: &str, crate_name: &str) -> String 
         // is needed for A-side fallback paths.
         path.to_string()
     }
+}
+
+/// Splits a trait path string into the base path and a trailing generic-arg suffix.
+///
+/// Returns `(base, args)` where `args` is the suffix starting at the first `<` (if any),
+/// or `(path, "")` if no generic args are present.
+///
+/// Example: `"From<CatalogueLoaderError>"` → `("From", "<CatalogueLoaderError>")`.
+fn split_generic_args(path: &str) -> (&str, &str) {
+    if let Some(pos) = path.find('<') { (&path[..pos], &path[pos..]) } else { (path, "") }
 }
 
 /// Returns `true` if the item is a type (Struct/Enum/TypeAlias) or a Trait.

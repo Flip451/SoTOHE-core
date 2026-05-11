@@ -30,7 +30,6 @@ use std::collections::{BTreeMap, HashMap};
 
 use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::NewTypeGraphCodecError;
-use domain::tddd::catalogue_v2::composite::CompositePattern;
 use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
@@ -40,13 +39,15 @@ use domain::tddd::catalogue_v2::{
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use rustdoc_types::{
-    Crate, ExternalCrate, FORMAT_VERSION, FunctionHeader, FunctionSignature, GenericArg,
-    GenericArgs, Generics, Id, Impl, Item, ItemEnum, ItemKind, ItemSummary, Module, Path, Struct,
-    StructKind, Target, Trait, Type, TypeAlias, Variant, VariantKind, Visibility,
+    AssocItemConstraint, AssocItemConstraintKind, Crate, DynTrait, ExternalCrate, FORMAT_VERSION,
+    FunctionHeader, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
+    GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, ItemKind, ItemSummary, Module, Path,
+    PolyTrait, Struct, StructKind, Target, Term, Trait, Type, TypeAlias, Variant, VariantKind,
+    Visibility,
 };
 
 use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
-use crate::tddd::type_ref_parser::{UNRESOLVED_CRATE_ID, parse_type_ref};
+use crate::tddd::type_ref_parser::{UNRESOLVED_CRATE_ID, parse_generic_bound, parse_type_ref};
 
 // ---------------------------------------------------------------------------
 // CatalogueToExtendedCrateCodec
@@ -229,8 +230,27 @@ impl Encoder {
                 })?;
             let action = entry.action;
             match entry.kind.clone() {
-                TypeKindV2::Struct { pattern, fields } => {
-                    state.encode_struct(type_id, type_name, entry, pattern, fields)?;
+                TypeKindV2::UnitStruct => {
+                    state.encode_unit_struct(type_id, type_name, entry)?;
+                }
+                TypeKindV2::TupleStruct { fields, has_stripped_fields } => {
+                    state.encode_tuple_struct(
+                        type_id,
+                        type_name,
+                        entry,
+                        fields,
+                        has_stripped_fields,
+                    )?;
+                }
+                TypeKindV2::PlainStruct { fields, has_stripped_fields, typestate } => {
+                    state.encode_plain_struct(
+                        type_id,
+                        type_name,
+                        entry,
+                        fields,
+                        has_stripped_fields,
+                        typestate,
+                    )?;
                 }
                 TypeKindV2::Enum { variants } => {
                     state.encode_enum(type_id, type_name, entry, variants)?;
@@ -623,6 +643,108 @@ impl EncoderState {
         Ok(self.resolve_external_type_ids(raw_type))
     }
 
+    /// Encodes a bound string (e.g. `"Into<String>"`, `"Send"`, `"?Sized"`,
+    /// `"'static"`, `"for<'a> Fn(&'a str)"`) into a `rustdoc_types::GenericBound`.
+    ///
+    /// Uses `parse_generic_bound` (which parses via `syn::TypeParamBound`) so that
+    /// the set of accepted strings is identical between the decode path
+    /// (`validate_bound_str` in `catalogue_document_codec`) and this encode path.
+    /// Both use the same `syn::TypeParamBound` grammar, closing the round-trip hole
+    /// that previously existed when `parse_type_ref_str` (which uses `syn::Type`)
+    /// was used here — that stricter parser rejected `?Trait`, lifetime bounds
+    /// (`'static`), and higher-ranked trait bounds (`for<'a> Fn(&'a str)`).
+    ///
+    /// Conversion:
+    /// - `'lifetime` → `GenericBound::Outlives`.
+    /// - `?Trait` → `GenericBound::TraitBound { modifier: Maybe, ... }`.
+    /// - `for<'a> Trait<'a>` → `GenericBound::TraitBound { generic_params: [Lifetime('a)], ... }`.
+    /// - Plain trait or `~const Trait` → `GenericBound::TraitBound { modifier: None/MaybeConst, ... }`.
+    ///   (`~const` is nightly-only; the string `"~const "` prefix maps to `MaybeConst`
+    ///   but `syn` v2 stable does not recognise it as a `TraitBoundModifier` variant —
+    ///   the `parse_generic_bound` fallback covers this case via `Err` propagation.)
+    ///
+    /// # Errors
+    ///
+    /// Returns `CatalogueToExtendedCrateCodecError` if the bound string cannot be
+    /// parsed as a `TypeParamBound` by `syn`.
+    fn encode_bound_str(
+        &mut self,
+        bound_str: &str,
+    ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
+        // Handle `~const` prefix manually because stable syn v2 does not have a
+        // `TraitBoundModifier::MaybeConst` variant.  Strip the prefix and encode
+        // the remainder as a plain trait bound with MaybeConst modifier.
+        if let Some(inner) = bound_str.strip_prefix("~const ") {
+            let inner = inner.trim_start();
+            // Encode the inner trait path via parse_type_ref_str (no modifier prefix).
+            let ty = self.parse_type_ref_str(inner)?;
+            let trait_path = match ty {
+                Type::ResolvedPath(p) => p,
+                other => {
+                    return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                        type_ref: bound_str.to_string(),
+                        reason: format!(
+                            "~const bound must resolve to a trait path, got {:?}",
+                            std::mem::discriminant(&other)
+                        ),
+                    });
+                }
+            };
+            return Ok(GenericBound::TraitBound {
+                trait_: trait_path,
+                generic_params: vec![],
+                modifier: rustdoc_types::TraitBoundModifier::MaybeConst,
+            });
+        }
+
+        let std_crate_id = self
+            .ext_name_to_id
+            .get("std")
+            .copied()
+            .unwrap_or_else(|| self.ensure_external_crate("std".to_string()));
+
+        // Pass 1: discover new external crate names (same two-pass strategy as parse_type_ref_str).
+        {
+            let local_snapshot: HashMap<String, Id> = self.local_name_to_id.clone();
+            let ext_snapshot: HashMap<String, u32> = self.ext_name_to_id.clone();
+            let mut new_crate_names: Vec<String> = vec![];
+            let _ = parse_generic_bound(
+                bound_str,
+                &|name: &str| local_snapshot.get(name).copied(),
+                std_crate_id,
+                &ext_snapshot,
+                &mut |crate_name: String| {
+                    if !new_crate_names.contains(&crate_name) {
+                        new_crate_names.push(crate_name);
+                    }
+                    u32::MAX - 1
+                },
+            )
+            .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: bound_str.to_string(),
+                reason,
+            })?;
+            for crate_name in new_crate_names {
+                self.ensure_external_crate(crate_name);
+            }
+        }
+
+        // Pass 2: encode with complete crate-id map.
+        let local_snapshot2: HashMap<String, Id> = self.local_name_to_id.clone();
+        let ext_snapshot2: HashMap<String, u32> = self.ext_name_to_id.clone();
+        parse_generic_bound(
+            bound_str,
+            &|name: &str| local_snapshot2.get(name).copied(),
+            std_crate_id,
+            &ext_snapshot2,
+            &mut |crate_name: String| self.ensure_external_crate(crate_name),
+        )
+        .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+            type_ref: bound_str.to_string(),
+            reason,
+        })
+    }
+
     /// Builds `[crate_name, ...module_path, item_name]` path segments.
     fn build_path_segments(
         crate_name: &CrateName,
@@ -670,62 +792,17 @@ impl EncoderState {
         self.paths.insert(id, ItemSummary { crate_id, path, kind });
     }
 
-    /// Encodes a struct-kind `TypeEntry`.
-    fn encode_struct(
+    /// Encodes a `UnitStruct` kind `TypeEntry`.
+    fn encode_unit_struct(
         &mut self,
         type_id: Id,
         type_name: &TypeName,
         entry: &TypeEntry,
-        pattern: CompositePattern,
-        fields: Vec<FieldDecl>,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
         let module_path = entry.module_path.clone();
         let docs = entry.docs.clone();
 
-        // Choose the `StructKind` based on the pattern.
-        // - `Newtype { inner }` → `StructKind::Tuple` with a single anonymous field.
-        //   The `inner` type is the newtype's wrapped type.
-        // - `Plain` and `TypestateState { .. }` → `StructKind::Plain` with named fields.
-        let struct_kind = match &pattern {
-            CompositePattern::Newtype { inner } => {
-                let field_id = self.alloc_id();
-                let field_ty = self.parse_type_ref_str(inner.as_str())?;
-                self.index.insert(
-                    field_id,
-                    make_item(field_id, None, None, ItemEnum::StructField(field_ty)),
-                );
-                // Encode any extra declared fields (rare, but respect the catalogue).
-                let mut extra_ids: Vec<Option<Id>> = vec![Some(field_id)];
-                for field in &fields {
-                    let fid = self.alloc_id();
-                    let fty = self.parse_type_ref_str(field.ty.as_str())?;
-                    self.index.insert(fid, make_item(fid, None, None, ItemEnum::StructField(fty)));
-                    extra_ids.push(Some(fid));
-                }
-                StructKind::Tuple(extra_ids)
-            }
-            CompositePattern::Plain | CompositePattern::TypestateState { .. } => {
-                // Encode struct fields → StructField items.
-                let mut field_ids: Vec<Id> = vec![];
-                for field in &fields {
-                    let field_id = self.alloc_id();
-                    let field_ty = self.parse_type_ref_str(field.ty.as_str())?;
-                    self.index.insert(
-                        field_id,
-                        make_item(
-                            field_id,
-                            Some(field.name.as_str().to_string()),
-                            None,
-                            ItemEnum::StructField(field_ty),
-                        ),
-                    );
-                    field_ids.push(field_id);
-                }
-                StructKind::Plain { fields: field_ids, has_stripped_fields: false }
-            }
-        };
-
-        // Encode inherent method items (concrete implementations → has_body: true).
+        // Encode inherent method items.
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
         let method_ids =
             self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
@@ -743,11 +820,151 @@ impl EncoderState {
         let trait_impl_ids =
             self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
 
-        // Build the full impls list: inherent impl first, then trait impls.
         let mut all_impl_ids = vec![impl_id];
         all_impl_ids.extend(trait_impl_ids);
 
-        // Struct item.
+        let struct_item = make_item(
+            type_id,
+            Some(type_name.as_str().to_string()),
+            docs,
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Unit,
+                generics: empty_generics(),
+                impls: all_impl_ids,
+            }),
+        );
+        self.index.insert(type_id, struct_item);
+        self.register_path(type_id, ItemKind::Struct, type_name.as_str(), &module_path);
+        Ok(())
+    }
+
+    /// Encodes a `TupleStruct` kind `TypeEntry`.
+    fn encode_tuple_struct(
+        &mut self,
+        type_id: Id,
+        type_name: &TypeName,
+        entry: &TypeEntry,
+        fields: Vec<domain::tddd::catalogue_v2::identifiers::TypeRef>,
+        has_stripped_fields: bool,
+    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+        let module_path = entry.module_path.clone();
+        let docs = entry.docs.clone();
+
+        // Encode positional fields as StructField items with None names (tuple style).
+        // Positional field names (.0, .1, ...) are synthesized by the rustdoc format;
+        // the catalogue stores only the types.
+        let mut field_ids: Vec<Option<Id>> = vec![];
+        for field_ty_ref in &fields {
+            let field_id = self.alloc_id();
+            let field_ty = self.parse_type_ref_str(field_ty_ref.as_str())?;
+            self.index
+                .insert(field_id, make_item(field_id, None, None, ItemEnum::StructField(field_ty)));
+            field_ids.push(Some(field_id));
+        }
+        // Represent the presence of private fields as a single trailing None.
+        //
+        // Note on position fidelity: the catalogue (TupleStruct.has_stripped_fields) records
+        // only *whether* private fields exist, not their exact positions.  Rustdoc's
+        // StructKind::Tuple preserves exact None-slot positions.  The structural equality
+        // check therefore may not distinguish "private field moved before a public field" from
+        // an unchanged layout — both produce length-matching vectors if public-field types
+        // match.  This is an accepted limitation of the current catalogue schema: we prevent
+        // false Blue when private fields are *added or removed* (length change) but cannot
+        // surface field-position changes within tuple structs as a Mismatch.
+        if has_stripped_fields {
+            field_ids.push(None);
+        }
+
+        let struct_kind = StructKind::Tuple(field_ids);
+
+        // Encode inherent method items.
+        let methods: Vec<MethodDeclaration> = entry.methods.clone();
+        let method_ids =
+            self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
+
+        let impl_id = self.alloc_id();
+        let for_type = resolved_path_type(type_id, type_name.as_str());
+        self.index.insert(
+            impl_id,
+            make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
+        );
+
+        let trait_impls: Vec<TraitImplDeclV2> = entry.trait_impls.clone();
+        let trait_impl_ids =
+            self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
+
+        let mut all_impl_ids = vec![impl_id];
+        all_impl_ids.extend(trait_impl_ids);
+
+        let struct_item = make_item(
+            type_id,
+            Some(type_name.as_str().to_string()),
+            docs,
+            ItemEnum::Struct(Struct {
+                kind: struct_kind,
+                generics: empty_generics(),
+                impls: all_impl_ids,
+            }),
+        );
+        self.index.insert(type_id, struct_item);
+        self.register_path(type_id, ItemKind::Struct, type_name.as_str(), &module_path);
+        Ok(())
+    }
+
+    /// Encodes a `PlainStruct` kind `TypeEntry`.
+    ///
+    /// The `typestate` marker (if present) does not affect the rustdoc structure — the
+    /// plain struct is encoded identically with or without it. The marker is carried
+    /// only at the catalogue domain level for signal evaluation and rendering.
+    fn encode_plain_struct(
+        &mut self,
+        type_id: Id,
+        type_name: &TypeName,
+        entry: &TypeEntry,
+        fields: Vec<FieldDecl>,
+        has_stripped_fields: bool,
+        _typestate: Option<domain::tddd::catalogue_v2::composite::TypestateMarker>,
+    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+        let module_path = entry.module_path.clone();
+        let docs = entry.docs.clone();
+
+        // Encode named fields → StructField items.
+        let mut field_ids: Vec<Id> = vec![];
+        for field in &fields {
+            let field_id = self.alloc_id();
+            let field_ty = self.parse_type_ref_str(field.ty.as_str())?;
+            self.index.insert(
+                field_id,
+                make_item(
+                    field_id,
+                    Some(field.name.as_str().to_string()),
+                    None,
+                    ItemEnum::StructField(field_ty),
+                ),
+            );
+            field_ids.push(field_id);
+        }
+        let struct_kind = StructKind::Plain { fields: field_ids, has_stripped_fields };
+
+        // Encode inherent method items.
+        let methods: Vec<MethodDeclaration> = entry.methods.clone();
+        let method_ids =
+            self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
+
+        let impl_id = self.alloc_id();
+        let for_type = resolved_path_type(type_id, type_name.as_str());
+        self.index.insert(
+            impl_id,
+            make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
+        );
+
+        let trait_impls: Vec<TraitImplDeclV2> = entry.trait_impls.clone();
+        let trait_impl_ids =
+            self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
+
+        let mut all_impl_ids = vec![impl_id];
+        all_impl_ids.extend(trait_impl_ids);
+
         let struct_item = make_item(
             type_id,
             Some(type_name.as_str().to_string()),
@@ -889,6 +1106,15 @@ impl EncoderState {
         let method_ids =
             self.encode_method_items(&methods, false, trait_name.as_str(), &module_path)?;
 
+        // Encode supertrait bounds as GenericBound::TraitBound entries.
+        // Each bound string (e.g. "Send", "Sync", "Into<String>") is parsed via
+        // `encode_bound_str` so that generic args land in `Path.args` (not embedded
+        // in `Path.path`) and external types get proper crate ids for Phase 1 visibility.
+        let mut bounds: Vec<GenericBound> = Vec::with_capacity(entry.supertrait_bounds.len());
+        for b in &entry.supertrait_bounds {
+            bounds.push(self.encode_bound_str(b.as_str())?);
+        }
+
         let trait_item = make_item(
             trait_id,
             Some(trait_name.as_str().to_string()),
@@ -899,7 +1125,7 @@ impl EncoderState {
                 is_dyn_compatible: true,
                 items: method_ids,
                 generics: empty_generics(),
-                bounds: vec![],
+                bounds,
                 implementations: vec![],
             }),
         );
@@ -1001,19 +1227,105 @@ impl EncoderState {
                 let recv_ty = receiver_type(recv);
                 inputs.push(("self".to_string(), recv_ty));
             }
+            // Collect method-level generic parameter names so that occurrences of
+            // those names in param/return type strings are encoded as `Type::Generic`
+            // rather than as unresolved path markers.
+            //
+            // Rustdoc emits `Type::Generic("T")` for generic parameters in function
+            // signatures (both bare `T` and composite `Option<T>`, `&T`, etc.).
+            // The S-side must match exactly; otherwise Phase 1 reports
+            // `UnresolvedTypeRef` and Phase 2 structural comparison mismatches.
+            //
+            // Strategy:
+            // 1. For a bare single-word type string that matches a method generic name
+            //    (e.g. `"T"`, `"From"`, `"Display"`), produce `Type::Generic` directly
+            //    WITHOUT calling `parse_type_ref_str`.  This avoids the STD_PRELUDE_TYPES
+            //    expansion that `parse_type_ref_str` applies to well-known names: e.g.
+            //    a generic named `"From"` would otherwise be expanded to the canonical
+            //    path `"std::convert::From"`, which `rewrite_generic_types` would then
+            //    fail to rewrite back (it checks for single-segment bare paths with no
+            //    `::` in them).
+            // 2. For all other type strings, parse via `parse_type_ref_str` (composite
+            //    types, references, generics-in-generics like `Option<T>`) and then call
+            //    `rewrite_generic_types` to replace any inner bare generic occurrences.
+            let generic_names: Vec<&str> =
+                method.generics.iter().map(|g| g.name.as_str()).collect();
+
             let param_pairs: Vec<(String, String)> = method
                 .params
                 .iter()
                 .map(|p| (p.name.as_str().to_string(), p.ty.as_str().to_string()))
                 .collect();
             for (pname, pty_str) in param_pairs {
-                let pty = self.parse_type_ref_str(&pty_str)?;
+                let pty = if !generic_names.is_empty()
+                    && is_bare_generic_name(&pty_str, &generic_names)
+                {
+                    // Bare single-word name that is a method generic: emit directly.
+                    // Trim so that whitespace-padded strings (e.g. " T ") produce the
+                    // same `Type::Generic("T")` that the normal parser would emit.
+                    Type::Generic(pty_str.trim().to_string())
+                } else {
+                    let raw = self.parse_type_ref_str(&pty_str)?;
+                    if generic_names.is_empty() {
+                        raw
+                    } else {
+                        rewrite_generic_types(raw, &generic_names)
+                    }
+                };
                 inputs.push((pname, pty));
             }
             let output = if returns_str == "()" {
                 None
+            } else if !generic_names.is_empty()
+                && is_bare_generic_name(&returns_str, &generic_names)
+            {
+                // Trim so that whitespace-padded strings produce the same
+                // `Type::Generic("T")` that the normal parser would emit.
+                Some(Type::Generic(returns_str.trim().to_string()))
             } else {
-                Some(self.parse_type_ref_str(&returns_str)?)
+                let raw = self.parse_type_ref_str(&returns_str)?;
+                Some(if generic_names.is_empty() {
+                    raw
+                } else {
+                    rewrite_generic_types(raw, &generic_names)
+                })
+            };
+
+            // Encode method-level generic type parameters (e.g. APIT desugaring).
+            // Each MethodGenericParam becomes a GenericParamDef::Type entry in the
+            // function's Generics, mirroring the rustdoc C-side representation for
+            // methods declared as `fn new(value: impl Into<String>) -> Self`.
+            //
+            // `encode_bound_str` is used so that generic args land in `Path.args`
+            // (not embedded in `Path.path`) and external types get proper crate ids
+            // for Phase 1 visibility / collect_refs recursion.
+            let mut method_generic_params: Vec<GenericParamDef> =
+                Vec::with_capacity(method.generics.len());
+            for g in &method.generics {
+                let mut bounds: Vec<GenericBound> = Vec::with_capacity(g.bounds.len());
+                for b in &g.bounds {
+                    // Encode the bound string then rewrite any method-generic names that
+                    // appear as type arguments inside the bound (e.g. `Into<U>` where `U`
+                    // is another method generic).  Without this rewrite, `U` would stay as
+                    // `Id(UNRESOLVED_CRATE_ID)` and Phase 1 would report it as an
+                    // unresolved catalogue type.
+                    let raw_bound = self.encode_bound_str(b.as_str())?;
+                    let bound = if generic_names.is_empty() {
+                        raw_bound
+                    } else {
+                        rewrite_generic_types_in_bound(raw_bound, &generic_names)
+                    };
+                    bounds.push(bound);
+                }
+                method_generic_params.push(GenericParamDef {
+                    name: g.name.as_str().to_owned(),
+                    kind: GenericParamDefKind::Type { bounds, default: None, is_synthetic: true },
+                });
+            }
+            let method_generics = if method_generic_params.is_empty() {
+                empty_generics()
+            } else {
+                Generics { params: method_generic_params, where_predicates: vec![] }
             };
 
             let fn_item = make_item(
@@ -1022,7 +1334,7 @@ impl EncoderState {
                 docs,
                 ItemEnum::Function(rustdoc_types::Function {
                     sig: FunctionSignature { inputs, output, is_c_variadic: false },
-                    generics: empty_generics(),
+                    generics: method_generics,
                     has_body,
                     header: FunctionHeader {
                         is_async,
@@ -1164,15 +1476,21 @@ impl EncoderState {
                         // in `krate.paths` and would be stripped to its short name).
                         crate::tddd::type_ref_parser::core_canonical_path(ti.trait_name.as_str())
                     } else if cn == "domain" || cn == "usecase" {
-                        // `domain`/`usecase` traits: use a two-segment qualified path
-                        // (e.g. `"domain::CatalogueLoader"`, `"usecase::SignalEvaluatorPort"`).
+                        // `domain`/`usecase` workspace traits: use the bare short name.
                         //
-                        // C-side rustdoc emits just the short name for these cross-workspace
-                        // crate traits, but `krate.paths` has the canonical `crate_id != 0`
-                        // entry with the full path `["{cn}", "{trait_name}"]`.
-                        // `build_impl_identity_map` resolves via `krate.paths.join("::")`,
-                        // producing `"domain::CatalogueLoader"` — matching this S-side form.
-                        format!("{cn}::{}", ti.trait_name.as_str())
+                        // Rustdoc may or may not include these cross-workspace traits in
+                        // `krate.paths`.  When the ID is absent from `krate.paths`, the C-side
+                        // `build_impl_identity_map` falls back to the bare `trait_path.path`
+                        // string, which rustdoc may emit as just `"CatalogueLoader"` (no crate
+                        // prefix).  Using the bare name on the S-side as well ensures both
+                        // sides produce the same identity key regardless of whether the C-side
+                        // rustdoc includes a `krate.paths` entry for the trait.
+                        //
+                        // `build_impl_identity_map` strips `domain::` / `usecase::` prefixes
+                        // to the short name when they appear in multi-segment `krate.paths`
+                        // entries, so the C-side path through `krate.paths` also produces the
+                        // bare short name.
+                        ti.trait_name.as_str().to_string()
                     } else {
                         // For all other external crates, build a two-segment path
                         // `{crate_name}::{trait_name}` (e.g. `serde::Serialize`).
@@ -1311,6 +1629,200 @@ fn empty_generics() -> Generics {
     Generics { params: vec![], where_predicates: vec![] }
 }
 
+/// Recursively rewrites a `Type` tree, replacing any `ResolvedPath` node whose
+/// `path` exactly matches a method-level generic parameter name (and whose `id`
+/// is `Id(UNRESOLVED_CRATE_ID)` with no generic args) with `Type::Generic(name)`.
+///
+/// Rustdoc emits `Type::Generic("T")` for generic parameters in function
+/// signatures (e.g. `fn foo<T>(x: T)`, `fn foo<T>(x: Option<T>)`).  The
+/// catalogue codec must emit the same representation so that Phase 1 / Phase 2
+/// structural comparison succeeds.
+///
+/// Only plain single-segment unresolved paths are replaced — composite args such
+/// as `Option<T>` keep their outer `ResolvedPath(Option)` form but have the inner
+/// `T` arg rewritten to `GenericArg::Type(Type::Generic("T"))`.
+fn rewrite_generic_types(ty: Type, generic_names: &[&str]) -> Type {
+    match ty {
+        // Single-segment path (no `::` in path, no generic args) whose name is a method-level
+        // generic parameter → `Type::Generic`.
+        //
+        // Method-scope generics take precedence over catalogue-local type resolution.
+        // `parse_type_ref_str` may resolve a method generic name (e.g. `"T"`) to a local
+        // `ResolvedPath` if the catalogue also declares a type named `"T"`.  Rustdoc always
+        // emits `Type::Generic("T")` for method generics, so we must rewrite ANY
+        // single-segment no-args path whose name is in `generic_names`, regardless of its Id.
+        //
+        // Only bare single-segment paths (no `::` in `p.path`) without generic args are
+        // eligible: composite outer paths like `Option` in `Option<T>` must NOT be replaced
+        // even if a generic happens to share that name.
+        Type::ResolvedPath(ref p)
+            if p.args.is_none()
+                && !p.path.contains("::")
+                && generic_names.contains(&p.path.as_str()) =>
+        {
+            Type::Generic(p.path.clone())
+        }
+        // Composite ResolvedPath: keep the path but recurse into generic args.
+        Type::ResolvedPath(p) => {
+            let new_args = p.args.map(|args| Box::new(rewrite_generic_args(*args, generic_names)));
+            Type::ResolvedPath(Path { args: new_args, ..p })
+        }
+        Type::BorrowedRef { lifetime, is_mutable, type_ } => Type::BorrowedRef {
+            lifetime,
+            is_mutable,
+            type_: Box::new(rewrite_generic_types(*type_, generic_names)),
+        },
+        Type::RawPointer { is_mutable, type_ } => Type::RawPointer {
+            is_mutable,
+            type_: Box::new(rewrite_generic_types(*type_, generic_names)),
+        },
+        Type::Tuple(elems) => Type::Tuple(
+            elems.into_iter().map(|t| rewrite_generic_types(t, generic_names)).collect(),
+        ),
+        Type::Slice(inner) => Type::Slice(Box::new(rewrite_generic_types(*inner, generic_names))),
+        Type::Array { type_, len } => {
+            Type::Array { type_: Box::new(rewrite_generic_types(*type_, generic_names)), len }
+        }
+        // ImplTrait: recurse into each bound (e.g. `impl Iterator<Item = T>`).
+        Type::ImplTrait(bounds) => Type::ImplTrait(
+            bounds.into_iter().map(|b| rewrite_generic_types_in_bound(b, generic_names)).collect(),
+        ),
+        // DynTrait: recurse into each PolyTrait's path args (e.g. `dyn Iterator<Item = T>`).
+        Type::DynTrait(dyn_trait) => {
+            let new_traits = dyn_trait
+                .traits
+                .into_iter()
+                .map(|pt| {
+                    let new_args = pt
+                        .trait_
+                        .args
+                        .map(|args| Box::new(rewrite_generic_args(*args, generic_names)));
+                    PolyTrait {
+                        trait_: Path { args: new_args, ..pt.trait_ },
+                        generic_params: pt.generic_params,
+                    }
+                })
+                .collect();
+            Type::DynTrait(DynTrait { traits: new_traits, lifetime: dyn_trait.lifetime })
+        }
+        // FunctionPointer: recurse into input and output types.
+        // A method with a generic `fn(T) -> T` parameter type must have `T` rewritten
+        // to `Type::Generic("T")` inside the function pointer signature.
+        Type::FunctionPointer(fp) => {
+            let new_inputs = fp
+                .sig
+                .inputs
+                .into_iter()
+                .map(|(name, ty)| (name, rewrite_generic_types(ty, generic_names)))
+                .collect();
+            let new_output = fp.sig.output.map(|t| rewrite_generic_types(t, generic_names));
+            Type::FunctionPointer(Box::new(rustdoc_types::FunctionPointer {
+                sig: rustdoc_types::FunctionSignature {
+                    inputs: new_inputs,
+                    output: new_output,
+                    is_c_variadic: fp.sig.is_c_variadic,
+                },
+                generic_params: fp.generic_params,
+                header: fp.header,
+            }))
+        }
+        // Primitive, Generic, Infer, QualifiedPath: leave unchanged.
+        other => other,
+    }
+}
+
+/// Rewrites method-generic names that appear as type arguments inside a `GenericBound`.
+///
+/// `encode_bound_str` produces `GenericBound::TraitBound { trait_: Path, ... }`.
+/// If the bound has generic args (e.g. `Into<U>`) and `U` is a method-level generic,
+/// the `U` arg will be `ResolvedPath(UNRESOLVED_CRATE_ID)` after parsing.  This
+/// function rewrites those occurrences to `Type::Generic("U")` so that Phase 1
+/// does not misreport them as unresolved catalogue types.
+fn rewrite_generic_types_in_bound(bound: GenericBound, generic_names: &[&str]) -> GenericBound {
+    match bound {
+        GenericBound::TraitBound { trait_: path, generic_params, modifier } => {
+            let new_args =
+                path.args.map(|args| Box::new(rewrite_generic_args(*args, generic_names)));
+            GenericBound::TraitBound {
+                trait_: Path { args: new_args, ..path },
+                generic_params,
+                modifier,
+            }
+        }
+        // Outlives bounds have no nested types.
+        GenericBound::Outlives(_) => bound,
+        // Use bound (e.g. `T: use<'a>`) has no type args to rewrite.
+        GenericBound::Use(_) => bound,
+    }
+}
+
+/// Recursively rewrites generic args inside a `GenericArgs` node.
+///
+/// For `AngleBracketed` args, rewrites both type arguments and associated-type
+/// constraint values (e.g. `Iterator<Item = T>` where `T` is a method generic).
+fn rewrite_generic_args(args: GenericArgs, generic_names: &[&str]) -> GenericArgs {
+    match args {
+        GenericArgs::AngleBracketed { args: arg_list, constraints } => {
+            let new_args = arg_list
+                .into_iter()
+                .map(|a| match a {
+                    GenericArg::Type(t) => {
+                        GenericArg::Type(rewrite_generic_types(t, generic_names))
+                    }
+                    other => other,
+                })
+                .collect();
+            // Also rewrite types inside associated-type constraints
+            // (e.g. `Iterator<Item = T>` where `T` is a method generic).
+            let new_constraints = constraints
+                .into_iter()
+                .map(|c| rewrite_assoc_constraint(c, generic_names))
+                .collect();
+            GenericArgs::AngleBracketed { args: new_args, constraints: new_constraints }
+        }
+        GenericArgs::Parenthesized { inputs, output } => {
+            let new_inputs =
+                inputs.into_iter().map(|t| rewrite_generic_types(t, generic_names)).collect();
+            let new_output = output.map(|t| rewrite_generic_types(t, generic_names));
+            GenericArgs::Parenthesized { inputs: new_inputs, output: new_output }
+        }
+        // ReturnTypeNotation (`(..)`) has no nested types to rewrite.
+        GenericArgs::ReturnTypeNotation => GenericArgs::ReturnTypeNotation,
+    }
+}
+
+/// Rewrites method-generic names inside an `AssocItemConstraint`.
+///
+/// Handles all three constraint variants:
+/// - `Equality(Term::Type(T))` (e.g. `Item = T`) — rewrites `T` if it matches a generic name.
+/// - `Constraint(Vec<GenericBound>)` (e.g. `Item: Into<T>`) — rewrites each bound via
+///   `rewrite_generic_types_in_bound` so trait-path type args (e.g. `T` in `Into<T>`) are
+///   also rewritten to `Type::Generic("T")` when `T` is a method generic name.
+/// - `Equality(Term::Const(_))` — left unchanged (no type parameter to rewrite).
+fn rewrite_assoc_constraint(
+    constraint: AssocItemConstraint,
+    generic_names: &[&str],
+) -> AssocItemConstraint {
+    let new_args = constraint.args.map(|args| Box::new(rewrite_generic_args(*args, generic_names)));
+    let new_binding = match constraint.binding {
+        AssocItemConstraintKind::Equality(Term::Type(ty)) => {
+            AssocItemConstraintKind::Equality(Term::Type(rewrite_generic_types(ty, generic_names)))
+        }
+        AssocItemConstraintKind::Constraint(bounds) => {
+            // `Item: T` bound constraints — T may be a method generic name.
+            AssocItemConstraintKind::Constraint(
+                bounds
+                    .into_iter()
+                    .map(|b| rewrite_generic_types_in_bound(b, generic_names))
+                    .collect(),
+            )
+        }
+        // Const equality: no type to rewrite.
+        other => other,
+    };
+    AssocItemConstraint { name: constraint.name, args: new_args, binding: new_binding }
+}
+
 /// Converts a `SelfReceiver` into the corresponding `rustdoc_types::Type`.
 ///
 /// Used as the receiver parameter type in `FunctionSignature::inputs`.
@@ -1332,6 +1844,36 @@ fn receiver_type(receiver: SelfReceiver) -> Type {
     }
 }
 
+/// Returns `true` when `type_str` is a bare single-word identifier that matches
+/// one of the method-level generic parameter names in `generic_names`.
+///
+/// "Bare single-word" means:
+/// - No `::` (not a qualified path like `std::fmt::Display`)
+/// - No `<` or `>` (not a generic application like `Option<T>`)
+/// - No `'` prefix (not a lifetime)
+/// - No `&`, `*`, `[`, `(` (not a reference, pointer, slice, or tuple)
+///
+/// This pre-check prevents `parse_type_ref_str` from expanding well-known names
+/// via `STD_PRELUDE_TYPES` (e.g. `"From"` → `"std::convert::From"`) before
+/// `rewrite_generic_types` gets a chance to recognise and replace them.
+fn is_bare_generic_name(type_str: &str, generic_names: &[&str]) -> bool {
+    // Quick character-level checks before the slice lookup.
+    let t = type_str.trim();
+    if t.is_empty()
+        || t.contains("::")
+        || t.contains('<')
+        || t.contains('>')
+        || t.contains('\'')
+        || t.contains('&')
+        || t.contains('*')
+        || t.contains('[')
+        || t.contains('(')
+    {
+        return false;
+    }
+    generic_names.contains(&t)
+}
+
 // ---------------------------------------------------------------------------
 // Tests — AC-05 / AC-06
 // ---------------------------------------------------------------------------
@@ -1341,15 +1883,17 @@ fn receiver_type(receiver: SelfReceiver) -> Type {
 mod tests {
     use domain::tddd::CatalogueToExtendedCratePort;
     use domain::tddd::LayerId;
-    use domain::tddd::catalogue_v2::composite::{CompositePattern, TypeKindV2};
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
-    use domain::tddd::catalogue_v2::methods::MethodDeclaration;
+    use domain::tddd::catalogue_v2::methods::{
+        MethodDeclaration, MethodGenericParam, ParamDeclaration,
+    };
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, SelfReceiver};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, FieldName, MethodName, ModulePath, TraitName, TypeName,
-        TypeRef, VariantName,
+        CatalogueDocument, CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName,
+        TypeName, TypeRef, VariantName,
     };
     use rustdoc_types::{Id, ItemEnum, Type};
 
@@ -1383,6 +1927,8 @@ mod tests {
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
         doc.traits.insert(
@@ -1391,8 +1937,11 @@ mod tests {
                 action: ItemAction::Add,
                 role: ContractRole::SpecificationPort,
                 methods: vec![],
+                supertrait_bounds: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1422,13 +1971,14 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct {
-                    pattern: CompositePattern::Plain,
+                kind: TypeKindV2::PlainStruct {
                     fields: vec![FieldDecl::new(
                         FieldName::new("value").unwrap(),
                         // "42invalid" is not a valid Rust type expression.
                         TypeRef::new("String").unwrap(),
                     )],
+                    has_stripped_fields: false,
+                    typestate: None,
                 },
                 methods: vec![MethodDeclaration {
                     name: MethodName::new("get_value").unwrap(),
@@ -1437,11 +1987,14 @@ mod tests {
                     // TypeRef::new accepts any non-empty string; the codec rejects it at syn parse time.
                     returns: TypeRef::new("42invalid").unwrap(),
                     is_async: false,
+                    generics: vec![],
                     docs: None,
                 }],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1466,8 +2019,7 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct {
-                    pattern: CompositePattern::Plain,
+                kind: TypeKindV2::PlainStruct {
                     fields: vec![
                         FieldDecl::new(
                             FieldName::new("email").unwrap(),
@@ -1475,11 +2027,15 @@ mod tests {
                         ),
                         FieldDecl::new(FieldName::new("id").unwrap(), TypeRef::new("u32").unwrap()),
                     ],
+                    has_stripped_fields: false,
+                    typestate: None,
                 },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1518,6 +2074,8 @@ mod tests {
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1543,7 +2101,11 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
                 methods: vec![
                     MethodDeclaration::new(
                         MethodName::new("new").unwrap(),
@@ -1565,6 +2127,8 @@ mod tests {
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1597,11 +2161,17 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::from_segments(vec!["review".to_string()]).unwrap(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1623,11 +2193,17 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1653,17 +2229,20 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct {
-                    pattern: CompositePattern::Plain,
+                kind: TypeKindV2::PlainStruct {
                     fields: vec![FieldDecl::new(
                         FieldName::new("items").unwrap(),
                         TypeRef::new("Vec<String>").unwrap(),
                     )],
+                    has_stripped_fields: false,
+                    typestate: None,
                 },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1686,17 +2265,20 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct {
-                    pattern: CompositePattern::Plain,
+                kind: TypeKindV2::PlainStruct {
                     fields: vec![FieldDecl::new(
                         FieldName::new("name").unwrap(),
                         TypeRef::new("String").unwrap(),
                     )],
+                    has_stripped_fields: false,
+                    typestate: None,
                 },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1717,17 +2299,20 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct {
-                    pattern: CompositePattern::Plain,
+                kind: TypeKindV2::PlainStruct {
                     fields: vec![FieldDecl::new(
                         FieldName::new("error").unwrap(),
                         TypeRef::new("DomainError").unwrap(),
                     )],
+                    has_stripped_fields: false,
+                    typestate: None,
                 },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1750,11 +2335,17 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Modify,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
                 methods: vec![],
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1775,7 +2366,11 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::Struct { pattern: CompositePattern::Plain, fields: vec![] },
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
                 methods: vec![],
                 trait_impls: vec![TraitImplDeclV2::new(
                     TraitName::new("Serialize").unwrap(),
@@ -1783,6 +2378,8 @@ mod tests {
                 )],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1804,8 +2401,11 @@ mod tests {
                 action: ItemAction::Add,
                 role: ContractRole::SecondaryPort,
                 methods: vec![],
+                supertrait_bounds: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1836,6 +2436,8 @@ mod tests {
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1892,6 +2494,8 @@ mod tests {
                 ],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1947,6 +2551,8 @@ mod tests {
                 )],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -1996,6 +2602,8 @@ mod tests {
                 trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
         );
 
@@ -2008,5 +2616,68 @@ mod tests {
             }
         });
         assert!(struct_variant.is_some(), "expected struct Variant with fields");
+    }
+
+    // -----------------------------------------------------------------------
+    // AC-method-generics: method generic params are encoded as Type::Generic
+    // -----------------------------------------------------------------------
+
+    /// A method with `generics: [{ name: "T", bounds: ["Into<String>"] }]` and
+    /// a parameter of type `"T"` must encode that parameter as `Type::Generic("T")`,
+    /// not as a `ResolvedPath`.  Rustdoc emits `Type::Generic` for method-level
+    /// generic type parameters, so the S-side must match.
+    #[test]
+    fn test_encode_method_generic_param_type_emits_type_generic() {
+        let mut doc = make_doc("domain");
+        let mut method = MethodDeclaration::new(
+            MethodName::new("set_value").unwrap(),
+            Some(SelfReceiver::ExclusiveRef),
+            vec![ParamDeclaration::new(
+                ParamName::new("value").unwrap(),
+                TypeRef::new("T").unwrap(),
+            )],
+            TypeRef::new("()").unwrap(),
+            false,
+            None,
+        );
+        method.generics = vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Into<String>").unwrap()],
+        }];
+        doc.types.insert(
+            TypeName::new("ValueHolder").unwrap(),
+            TypeEntry {
+                action: ItemAction::Add,
+                role: DataRole::ValueObject,
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
+                methods: vec![method],
+                trait_impls: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            },
+        );
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let krate = ec.krate();
+        // Find the method Function item (set_value).
+        let fn_item = krate.index.values().find(|item| {
+            item.name.as_deref() == Some("set_value") && matches!(item.inner, ItemEnum::Function(_))
+        });
+        assert!(fn_item.is_some(), "expected Function item for set_value");
+        let ItemEnum::Function(ref f) = fn_item.unwrap().inner else { panic!("expected Function") };
+        // The first input is "self" (ExclusiveRef); the second is the "value: T" param.
+        let value_param = f.sig.inputs.iter().find(|(name, _)| name == "value");
+        assert!(value_param.is_some(), "expected input named 'value'");
+        let (_, ty) = value_param.unwrap();
+        assert!(
+            matches!(ty, Type::Generic(g) if g == "T"),
+            "expected Type::Generic(\"T\") for generic param type, got: {ty:?}"
+        );
     }
 }

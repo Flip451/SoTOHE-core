@@ -22,6 +22,12 @@ use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 /// when building S (which may contain A-sourced items that reference external types via
 /// A-side synthetic Ids not present in `b.paths`); pass `None` when building D (B-only items).
 ///
+/// `a_side_ids` is the set of path `Id`s known to be A-sourced (force-inserted from
+/// `a_krate.paths`).  Pass `Some(&a_side_path_ids)` when building S so that A-sourced
+/// paths entries are resolved via `extra_a.external_crates` (A's crate_id namespace)
+/// rather than `b.external_crates` (B's independent namespace).  Pass `None` when
+/// building D (no A-sourced entries).
+///
 /// Returns `(external_crates_map, name_to_new_crate_id)`.  The caller must use
 /// `name_to_new_crate_id` to patch up `ItemSummary.crate_id` values in the
 /// scope's `paths` map so that they reference the new IDs, not B's IDs.
@@ -30,15 +36,26 @@ pub(super) fn build_external_crates_for_scope(
     paths: &HashMap<Id, ItemSummary>,
     b: &Crate,
     extra_a: Option<&Crate>,
+    a_side_ids: Option<&HashSet<Id>>,
 ) -> (HashMap<u32, ExternalCrate>, HashMap<String, u32>) {
     // Collect external crate names referenced in this scope's type fields.
     // Use a HashSet internally for O(1) insert; then sort for deterministic id assignment.
     let mut referenced_crate_names_set: HashSet<String> = HashSet::new();
 
     // Check paths entries for external items (crate_id != 0).
-    for summary in paths.values() {
+    // A-side paths use `extra_a.external_crates` for crate_id resolution;
+    // B-side paths use `b.external_crates`.  The two tables use independent
+    // numeric namespaces and must not be mixed.
+    for (id, summary) in paths {
         if summary.crate_id != 0 {
-            if let Some(ext) = b.external_crates.get(&summary.crate_id) {
+            let is_a_side = a_side_ids.is_some_and(|set| set.contains(id));
+            if is_a_side {
+                if let Some(a) = extra_a {
+                    if let Some(ext) = a.external_crates.get(&summary.crate_id) {
+                        referenced_crate_names_set.insert(ext.name.clone());
+                    }
+                }
+            } else if let Some(ext) = b.external_crates.get(&summary.crate_id) {
                 referenced_crate_names_set.insert(ext.name.clone());
             }
         }
@@ -83,12 +100,23 @@ pub(super) fn build_external_crates_for_scope(
 ///
 /// B's old-crate-id → crate-name lookup is performed via `b.external_crates`;
 /// the name is then mapped to the new ID via `name_to_new_id`.
+///
+/// `exclude_ids`: if `Some`, only entries whose `Id` key is **not** in the set are
+/// patched.  Pass the set of A-side path Ids to avoid mis-mapping A-sourced entries
+/// through B's external-crate numbering (A and B use independent `crate_id` spaces
+/// and share no numbering contract).
 pub(super) fn patch_paths_crate_ids(
     paths: &mut HashMap<Id, ItemSummary>,
     b: &Crate,
     name_to_new_id: &HashMap<String, u32>,
+    exclude_ids: Option<&HashSet<Id>>,
 ) {
-    for summary in paths.values_mut() {
+    for (id, summary) in paths.iter_mut() {
+        if let Some(excl) = exclude_ids {
+            if excl.contains(id) {
+                continue;
+            }
+        }
         if summary.crate_id != 0 {
             if let Some(ext) = b.external_crates.get(&summary.crate_id) {
                 if let Some(&new_id) = name_to_new_id.get(&ext.name) {
@@ -102,19 +130,23 @@ pub(super) fn patch_paths_crate_ids(
 /// Patches the `crate_id` values in a `paths` map for entries that came from
 /// an extra source crate (e.g. `a_krate`).
 ///
-/// A-side path summaries use `a_krate.external_crates` for crate-id lookup; they
-/// may not have been patched by `patch_paths_crate_ids` which only uses `b.external_crates`.
+/// A-side path summaries use `a_krate.external_crates` for crate-id lookup.
+/// Pass `only_ids = Some(&a_side_path_ids)` to restrict patching to entries that
+/// are known to be A-sourced, so that B-sourced entries (which may coincidentally
+/// share the same numeric `crate_id` from B's independent id space) are left for
+/// `patch_paths_crate_ids` to handle via B's table.
 pub(super) fn patch_paths_crate_ids_extra(
     paths: &mut HashMap<Id, ItemSummary>,
     extra: &Crate,
     name_to_new_id: &HashMap<String, u32>,
+    only_ids: Option<&HashSet<Id>>,
 ) {
-    for summary in paths.values_mut() {
-        // Only patch entries still carrying a non-zero (possibly A-side) crate_id that
-        // doesn't yet correspond to a new per-scope id (i.e. > name_to_new_id max).
-        // A simple heuristic: if the crate_id is NOT already in the 1..=N per-scope range
-        // (where N = name_to_new_id.len()), it may be an A-side id that needs patching.
-        // We use `extra.external_crates` to look up the original name.
+    for (id, summary) in paths.iter_mut() {
+        if let Some(only) = only_ids {
+            if !only.contains(id) {
+                continue;
+            }
+        }
         if summary.crate_id != 0 {
             if let Some(ext) = extra.external_crates.get(&summary.crate_id) {
                 if let Some(&new_id) = name_to_new_id.get(&ext.name) {

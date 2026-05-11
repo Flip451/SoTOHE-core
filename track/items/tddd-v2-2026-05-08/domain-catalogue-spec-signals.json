@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "fb6801b94b6dad576e85da5c1260f579ac9dc8ac58e96bfa7e1cf1e7772dce0e",
+  "catalogue_declaration_hash": "665fff96ca1a47d8a5cb8f9953f1da0010cbbe2cbbf706574324c7e2a6af515d",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -12,7 +12,7 @@
     },
     {
       "type_name": "AdrDecisionCommonError",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "CatalogueDocument",
@@ -24,23 +24,19 @@
     },
     {
       "type_name": "CatalogueLintViolation",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "CatalogueLinterError",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "CatalogueLinterRule",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "CatalogueLinterRuleKind",
-      "signal": "blue"
-    },
-    {
-      "type_name": "CompositePattern",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "ConsistencyReport",
@@ -48,7 +44,7 @@
     },
     {
       "type_name": "ContractMapRenderOptions",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "ContractRole",
@@ -120,6 +116,10 @@
     },
     {
       "type_name": "MethodDeclaration",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MethodGenericParam",
       "signal": "blue"
     },
     {
@@ -203,6 +203,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "TypeDefinitionKind",
+      "signal": "blue"
+    },
+    {
       "type_name": "TypeEntry",
       "signal": "blue"
     },
@@ -227,6 +231,18 @@
       "signal": "blue"
     },
     {
+      "type_name": "TypestateMarker",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypestateTransitions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypestateTransitionsSpec",
+      "signal": "blue"
+    },
+    {
       "type_name": "VariantDecl",
       "signal": "blue"
     },
@@ -240,7 +256,7 @@
     },
     {
       "type_name": "CatalogueLinter",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "CatalogueLoader",
@@ -252,11 +268,11 @@
     },
     {
       "type_name": "ContractMapWriter",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "SchemaExporter",
-      "signal": "blue"
+      "signal": "yellow"
     },
     {
       "type_name": "SignalEvaluatorPort",

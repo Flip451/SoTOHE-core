@@ -38,7 +38,7 @@ use std::path::{Path, PathBuf};
 
 use domain::{
     CatalogueSpecSignalsDocument, ConfidenceSignal, TypeAction, TypeCatalogueDocument,
-    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
+    TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitionsSpec,
 };
 use thiserror::Error;
 
@@ -334,8 +334,8 @@ fn render_action(action: TypeAction) -> &'static str {
 fn render_details(entry: &TypeCatalogueEntry) -> String {
     match entry.kind() {
         TypeDefinitionKind::Typestate { transitions, .. } => match transitions {
-            TypestateTransitions::Terminal => "\u{2205} (terminal)".to_owned(), // ∅ (terminal)
-            TypestateTransitions::To(targets) => {
+            TypestateTransitionsSpec::Terminal => "\u{2205} (terminal)".to_owned(), // ∅ (terminal)
+            TypestateTransitionsSpec::To(targets) => {
                 targets.iter().map(|t| format!("\u{2192} {t}")).collect::<Vec<_>>().join(", ")
             }
         },
@@ -551,7 +551,7 @@ mod tests {
         let entry = make_entry(
             "Draft",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
+                transitions: TypestateTransitionsSpec::To(vec!["Published".into()]),
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -567,7 +567,7 @@ mod tests {
         let entry = make_entry(
             "Final",
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },
@@ -762,7 +762,7 @@ mod tests {
             make_entry(
                 "Draft",
                 TypeDefinitionKind::Typestate {
-                    transitions: TypestateTransitions::To(vec!["Published".into()]),
+                    transitions: TypestateTransitionsSpec::To(vec!["Published".into()]),
                     expected_members: Vec::new(),
                     expected_methods: Vec::new(),
                 },
@@ -981,7 +981,7 @@ mod tests {
             make_entry(
                 "Draft",
                 TypeDefinitionKind::Typestate {
-                    transitions: TypestateTransitions::To(vec!["Published".into()]),
+                    transitions: TypestateTransitionsSpec::To(vec!["Published".into()]),
                     expected_members: Vec::new(),
                     expected_methods: Vec::new(),
                 },
@@ -1317,7 +1317,7 @@ mod tests {
 
         let samples = vec![
             TypeDefinitionKind::Typestate {
-                transitions: TypestateTransitions::Terminal,
+                transitions: TypestateTransitionsSpec::Terminal,
                 expected_members: Vec::new(),
                 expected_methods: Vec::new(),
             },

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-10T16:09:40Z",
-  "declaration_hash": "cbf8c313ec891b1be97fe77fba0ef5085127809140cdece59005dbd93883e938",
+  "generated_at": "2026-05-11T09:58:15Z",
+  "declaration_hash": "5d8e8d91141df61bbe69bb3b3f87fbb7b6d26f44ea3f0541392bbec998239fa2",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -15,16 +15,19 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error",
-        "From"
+        "core::convert::From",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
       "type_name": "CatalogueDocumentCodec",
       "kind_tag": "secondary_adapter",
       "signal": "yellow",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::default::Default"
+      ]
     },
     {
       "type_name": "CatalogueDocumentCodecError",
@@ -32,9 +35,9 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error",
-        "From"
+        "core::convert::From",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
@@ -43,7 +46,8 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "CatalogueToExtendedCratePort"
+        "CatalogueToExtendedCratePort",
+        "core::default::Default"
       ]
     },
     {
@@ -52,8 +56,8 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error"
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
@@ -71,7 +75,8 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "CatalogueLinter"
+        "CatalogueLinter",
+        "core::default::Default"
       ]
     },
     {
@@ -80,9 +85,9 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Display",
-        "Error",
-        "From"
+        "core::convert::From",
+        "core::error::Error",
+        "core::fmt::Display"
       ]
     },
     {
@@ -101,19 +106,20 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "SignalEvaluatorPort"
+        "SignalEvaluatorPort",
+        "core::default::Default"
       ]
     },
     {
       "type_name": "infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -259,6 +265,12 @@
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
+    },
+    {
+      "type_name": "CaptureBaselineError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "EvaluateSignalsError",

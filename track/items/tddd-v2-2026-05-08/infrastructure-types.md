@@ -16,11 +16,12 @@
 |------|------|--------|---------|--------|----------|
 | BaselineCodecError | error_type | delete | — | 🔵 | 🔵 |
 | BaselineRustdocCodecError | error_type | — | — | 🔵 | 🔵 |
+| CaptureBaselineError | error_type | reference | — | 🔵 | 🔵 |
 | CatalogueDocumentCodecError | error_type | — | — | 🔵 | 🔵 |
 | CatalogueToExtendedCrateCodecError | error_type | — | — | 🔵 | 🔵 |
 | EvaluateSignalsError | error_type | reference | — | 🔵 | 🔵 |
 | LoadAllCataloguesError | error_type | modify | — | 🔵 | 🔵 |
-| SchemaExportCodecError | error_type | reference | — | 🔵 | 🔵 |
+| SchemaExportCodecError | error_type | reference | — | 🔵 | 🟡 |
 | TypeCatalogueCodecError | error_type | reference | — | 🔵 | 🔵 |
 | TypeGraphExportError | error_type | delete | — | 🔵 | 🔵 |
 
@@ -28,13 +29,13 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineRustdocCodec | secondary_adapter | — | — | 🟡 | 🔵 |
+| BaselineRustdocCodec | secondary_adapter | — | — | 🔵 | 🔵 |
 | CatalogueDocumentCodec | secondary_adapter | — | — | 🟡 | 🔵 |
 | CatalogueToExtendedCrateCodec | secondary_adapter | — | — | 🟡 | 🔵 |
 | FsCatalogueLoader | secondary_adapter | modify | — | 🟡 | 🔵 |
-| FsCatalogueSpecSignalsStore | secondary_adapter | reference | — | 🔵 | 🔵 |
-| FsContractMapWriter | secondary_adapter | reference | — | 🔵 | 🔵 |
-| InMemoryCatalogueLinter | secondary_adapter | modify | — | 🟡 | 🔵 |
+| FsCatalogueSpecSignalsStore | secondary_adapter | reference | — | 🔵 | 🟡 |
+| FsContractMapWriter | secondary_adapter | reference | — | 🔵 | 🟡 |
+| InMemoryCatalogueLinter | secondary_adapter | modify | — | 🟡 | 🟡 |
 | RustdocSchemaExporter | secondary_adapter | modify | — | 🟡 | 🔵 |
 | SignalEvaluatorV2 | secondary_adapter | — | — | 🟡 | 🔵 |
 
@@ -45,8 +46,8 @@
 | infrastructure::code_profile_builder::build_type_graph | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::baseline_builder::build_baseline | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::baseline_capture::capture_baseline_for_layer | free_function | delete | — | 🔵 | 🔵 |
-| infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer | free_function | — | — | 🟡 | 🔵 |
-| infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer | free_function | — | — | 🟡 | 🔵 |
+| infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer | free_function | — | — | 🔵 | 🔵 |
+| infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer | free_function | — | — | 🔵 | 🔵 |
 | infrastructure::tddd::baseline_codec::decode | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::baseline_codec::encode | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_graph_cluster::classify_types | free_function | delete | — | 🔵 | 🔵 |

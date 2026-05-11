@@ -21,9 +21,8 @@ use std::path::{Path, PathBuf};
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use thiserror::Error;
 
-use domain::verify::Severity;
-
 use crate::spec::codec as spec_codec;
+use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub;
 use crate::tddd::catalogue_codec;
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::track::symlink_guard;
@@ -233,15 +232,16 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
 
         // The catalogue codec already validates SpecRef newtypes (SpecElementId, ContentHash)
         // and InformalGroundRef (kind variant + non-empty summary).
+        // For v3 catalogues (UnsupportedSchemaVersion from the v2 codec), decode via
+        // CatalogueDocumentCodec and convert to a v2-compat stub so that per-entry
+        // spec_refs[] and informal_grounds[] are validated exactly as for v2.
+        // Skipping (continue) here would be fail-open: v3 entries now carry grounding fields.
         let catalogue_doc_opt = match catalogue_codec::decode(&catalogue_content) {
             Ok(d) => Some(d),
             Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
-                // v3 catalogue: per-entry spec_refs[] do not exist in the v3 schema.
-                // Spec traceability has moved to spec_states.json (verified by
-                // verify-spec-states-current).
-                //
-                // Decode via CatalogueDocumentCodec to confirm the v3 catalogue is
-                // well-formed — decode failure surfaces a real error finding.
+                // v3 catalogue: per-entry spec_refs[] and informal_grounds[] are present
+                // (D1/D3 restoration). Decode via CatalogueDocumentCodec, convert to stub
+                // (which copies grounding fields), then fall through to the entry loop.
                 let stem = std::path::Path::new(catalogue_name)
                     .file_name()
                     .and_then(|n| n.to_str())
@@ -255,20 +255,15 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                     })
                     .to_owned();
                 match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
-                    Ok(_) => {
-                        // Well-formed v3 catalogue: emit an Info finding explaining
-                        // why per-entry spec_refs[] validation is structurally
-                        // inapplicable and where traceability is validated instead.
-                        findings.push(VerifyFinding::new(
-                            Severity::Info,
-                            format!(
-                                "{catalogue_name}: v3 catalogue — per-entry spec_refs[] \
-                                 do not exist; spec traceability is validated by \
-                                 verify-spec-states-current."
-                            ),
-                        ));
-                        continue;
-                    }
+                    Ok(v3_doc) => match v3_doc_to_stub(&v3_doc) {
+                        Ok(stub) => Some(stub),
+                        Err(reason) => {
+                            findings.push(VerifyFinding::error(format!(
+                                "{catalogue_name}: v3→stub conversion failed: {reason}"
+                            )));
+                            continue;
+                        }
+                    },
                     Err(e) => {
                         findings.push(VerifyFinding::error(format!(
                             "{catalogue_name}: failed to decode as v3 catalogue: {e:?}"
@@ -1973,7 +1968,7 @@ mod tests {
     "MyType": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "struct", "pattern": { "pattern": "plain" } },
+      "kind": { "kind": "plain_struct" },
       "docs": "A simple value object."
     }
   },
@@ -1988,7 +1983,11 @@ mod tests {
 }"#;
 
     #[test]
-    fn test_v3_catalogue_produces_info_finding_not_error() {
+    fn test_v3_catalogue_with_no_spec_refs_produces_no_error() {
+        // A well-formed v3 catalogue whose entries have no spec_refs[] must
+        // produce zero error-level findings. Per-entry spec_refs[] and
+        // informal_grounds[] are now validated for v3 exactly as for v2
+        // (D1/D3 restoration); an empty spec_refs[] means nothing to check.
         let tmp = TempDir::new().unwrap();
         let track_dir = setup_repo(tmp.path(), "test-track");
         write_file(&track_dir, "spec.json", MINIMAL_SPEC);
@@ -1996,22 +1995,12 @@ mod tests {
 
         let outcome = verify(&track_dir);
 
-        // v3 catalogue must produce an Info finding (not an Error) about spec_refs[].
-        let info_finding = outcome.findings().iter().find(|f| {
-            f.severity() == domain::verify::Severity::Info && f.message().contains("v3 catalogue")
-        });
-        assert!(
-            info_finding.is_some(),
-            "v3 catalogue must produce an Info finding with 'v3 catalogue'; findings: {:?}",
-            outcome.findings()
-        );
-
         // Must not produce any error-level finding.
         let has_error =
             outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
         assert!(
             !has_error,
-            "v3 catalogue must not produce error findings; findings: {:?}",
+            "v3 catalogue with empty spec_refs must not produce error findings; findings: {:?}",
             outcome.findings()
         );
     }

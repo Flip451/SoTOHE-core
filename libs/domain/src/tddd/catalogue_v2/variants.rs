@@ -18,7 +18,7 @@ use crate::tddd::catalogue_v2::identifiers::{FieldName, TypeRef, VariantName};
 
 /// Named struct field declaration.
 ///
-/// Used in [`crate::tddd::catalogue_v2::composite::TypeKindV2::Struct::fields`]
+/// Used in [`crate::tddd::catalogue_v2::composite::TypeKindV2::PlainStruct`]
 /// and [`VariantPayload::Struct`] (ADR 1 D7).
 ///
 /// Both fields use newtype wrappers from the `identifiers` module to enforce
