@@ -57,7 +57,7 @@
 > TypeKindV2 informal_grounds を spec_refs へ昇格させ、型カタログの信号機評価の yellow を解消する。
 > S5 完了後に着手する。
 
-- [x] **T009**: bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。
+- [x] **T009**: bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。 (`81f86500d926f4da6adaef1817897d86393922b9`)
 
 ### S7 — v3 catalogue spec-link 復元 — grounding フィールド追加 (domain 型拡張)
 
@@ -65,7 +65,7 @@
 > 既存 v2 catalogue の SpecRef / InformalGroundRef 型を domain 層で再利用し、serde default で空 Vec を許容する。
 > S6 (v3 catalogue JSON 書き換え完了) を前提とし、domain 型レベルの変更から着手する。T011 の codec 拡張より先に完了させる必要がある。
 
-- [x] **T010**: v3 catalogue の全エントリ種 (TypeEntry / TraitEntry / FunctionEntry) に grounding コレクション (`spec_refs: Vec<SpecRef>` と `informal_grounds: Vec<InformalGroundRef>`) を追加する (ADR 2026-05-11-1257 D1)。既存 v2 catalogue の SpecRef / InformalGroundRef 型を domain 層の共有モジュールから再利用する。serde default で空 Vec を許容し、フィールド省略時は空 Vec として decode する (migration smoothness)。既存 domain unit test を更新し、grounding コレクションを含む ラウンドトリップ unit test を追加する。Layer: domain。
+- [x] **T010**: v3 catalogue の全エントリ種 (TypeEntry / TraitEntry / FunctionEntry) に grounding コレクション (`spec_refs: Vec<SpecRef>` と `informal_grounds: Vec<InformalGroundRef>`) を追加する (ADR 2026-05-11-1257 D1)。既存 v2 catalogue の SpecRef / InformalGroundRef 型を domain 層の共有モジュールから再利用する。serde default で空 Vec を許容し、フィールド省略時は空 Vec として decode する (migration smoothness)。既存 domain unit test を更新し、grounding コレクションを含む ラウンドトリップ unit test を追加する。Layer: domain。 (`81f86500d926f4da6adaef1817897d86393922b9`)
 
 ### S8 — v3 catalogue spec-link 復元 — codec 拡張 + D4 クロス crate 検証 (infrastructure codec)
 
@@ -74,8 +74,8 @@
 > <500 行 / commit を維持するため grounding フィールド encode/decode (T011) と cross-crate key 検証 (T012) を分割している。
 > T010 完了後に着手する。
 
-- [x] **T011**: CatalogueDocumentCodec (infrastructure/src/tddd/catalogue_document_codec.rs) を拡張し、TypeEntry / TraitEntry / FunctionEntry の `spec_refs` および `informal_grounds` フィールドを encode / decode する (ADR 2026-05-11-1257 D1 / D3)。DTO 側に SpecRefDto / InformalGroundRefDto を追加する (v2 codec の既存 DTO を共通モジュールに移動して再利用する)。常に空でもフィールドを emit する (explicit visibility)。フィールドが存在しない場合は空 Vec として decode する (migration smoothness)。round-trip unit test (spec_refs + informal_grounds の全エントリ種) を追加する。Layer: infrastructure。
-- [x] **T012**: CatalogueDocumentCodec::decode で `functions` map の各キー (FunctionPath) が catalogue 自身の crate_name prefix で始まることを検証し、他 crate prefix のキーを silent drop せず `CatalogueDocumentCodecError::CrossCrateFunctionPath { key, expected_crate }` として decode error にする (ADR 2026-05-11-1257 D4 / 2026-05-08-0248 §D11 amendment)。テスト: 自 crate prefix のみのキーは成功 / 他 crate prefix のキーは明示的 error / 空の functions map は成功。Layer: infrastructure。
+- [x] **T011**: CatalogueDocumentCodec (infrastructure/src/tddd/catalogue_document_codec.rs) を拡張し、TypeEntry / TraitEntry / FunctionEntry の `spec_refs` および `informal_grounds` フィールドを encode / decode する (ADR 2026-05-11-1257 D1 / D3)。DTO 側に SpecRefDto / InformalGroundRefDto を追加する (v2 codec の既存 DTO を共通モジュールに移動して再利用する)。常に空でもフィールドを emit する (explicit visibility)。フィールドが存在しない場合は空 Vec として decode する (migration smoothness)。round-trip unit test (spec_refs + informal_grounds の全エントリ種) を追加する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
+- [x] **T012**: CatalogueDocumentCodec::decode で `functions` map の各キー (FunctionPath) が catalogue 自身の crate_name prefix で始まることを検証し、他 crate prefix のキーを silent drop せず `CatalogueDocumentCodecError::CrossCrateFunctionPath { key, expected_crate }` として decode error にする (ADR 2026-05-11-1257 D4 / 2026-05-08-0248 §D11 amendment)。テスト: 自 crate prefix のみのキーは成功 / 他 crate prefix のキーは明示的 error / 空の functions map は成功。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
 
 ### S9 — v3 catalogue spec-link 復元 — refresher/loader/evaluator の dead code 除去 + 実評価有効化
 
@@ -84,14 +84,14 @@
 > T016 は render.rs の v3 fallback を修正して Cat-Spec 列を復元する (ADR 2026-05-11-1257 D2)。S8 完了後に着手する。
 > S8 完了後に着手する。
 
-- [x] **T013**: catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2)。各エントリの `spec_refs` と `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(spec_refs, informal_grounds)` に渡して信号色を決定する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。
-- [x] **T014**: catalogue_bulk_loader.rs (infrastructure) の `v3_doc_to_stub` 関数を更新し、CatalogueDocument → TypeCatalogueDocument stub 変換時に `spec_refs` と `informal_grounds` を stub に複写する (ADR 2026-05-11-1257 D3)。T012 により codec decode 段階で cross-crate function path が reject されるため、`v3_doc_to_stub` 内の cross-crate function フィルタ (line ~493 付近) は dead code となる — 削除する。テスト: grounding コレクションが変換後 stub に保存されることを確認する。Layer: infrastructure。
-- [x] **T015**: type_signals_evaluator.rs (infrastructure, line ~250 付近) の cross-crate function フィルタを削除する (ADR 2026-05-11-1257 D4)。T012 により codec decode 段階で cross-crate path が reject されるため、このフィルタは impossible-to-trigger な dead code となる。フィルタ削除後、type-signal 評価が全エントリで uniform に動作することを unit test で確認する。Layer: infrastructure。
-- [x] **T016**: track/render.rs (infrastructure) の v3 fallback を修正し、catalogue-spec-signals doc を正しくロードして `render_type_catalogue` に渡す (ADR 2026-05-11-1257 D2 — 信号の可視性)。現状は v3 fallback で `None` を渡しているため Cat-Spec 列が非表示になっている。修正後に Cat-Spec 列が rendered view に表示されることを確認する。Layer: infrastructure。
+- [x] **T013**: catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2)。各エントリの `spec_refs` と `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(spec_refs, informal_grounds)` に渡して信号色を決定する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
+- [x] **T014**: catalogue_bulk_loader.rs (infrastructure) の `v3_doc_to_stub` 関数を更新し、CatalogueDocument → TypeCatalogueDocument stub 変換時に `spec_refs` と `informal_grounds` を stub に複写する (ADR 2026-05-11-1257 D3)。T012 により codec decode 段階で cross-crate function path が reject されるため、`v3_doc_to_stub` 内の cross-crate function フィルタ (line ~493 付近) は dead code となる — 削除する。テスト: grounding コレクションが変換後 stub に保存されることを確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
+- [x] **T015**: type_signals_evaluator.rs (infrastructure, line ~250 付近) の cross-crate function フィルタを削除する (ADR 2026-05-11-1257 D4)。T012 により codec decode 段階で cross-crate path が reject されるため、このフィルタは impossible-to-trigger な dead code となる。フィルタ削除後、type-signal 評価が全エントリで uniform に動作することを unit test で確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
+- [x] **T016**: track/render.rs (infrastructure) の v3 fallback を修正し、catalogue-spec-signals doc を正しくロードして `render_type_catalogue` に渡す (ADR 2026-05-11-1257 D2 — 信号の可視性)。現状は v3 fallback で `None` を渡しているため Cat-Spec 列が非表示になっている。修正後に Cat-Spec 列が rendered view に表示されることを確認する。Layer: infrastructure。 (`81f86500d926f4da6adaef1817897d86393922b9`)
 
 ### S10 — 統合ゲート確認 — signals 再生成 + CI pass (spec-link 復元完了確認)
 
 > T017 は bin/sotp rebuild 後に全 3 layer の type-signals / catalogue-spec-signals を再生成し、rendered view を更新して cargo make ci を pass させる (AC-10 充足)。
 > T013-T016 (S9) 全完了後に着手する。CI ゲートが全通過することで spec-link 復元スコープの完了を確認する。
 
-- [x] **T017**: 統合ゲート確認: bin/sotp を rebuild し (cargo make build-sotp)、全 3 layer の type-signals と catalogue-spec-signals を再生成する (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3 + `bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3)。`cargo make track-sync-views` で rendered view を再生成する。`cargo make ci` が pass することを確認する (verify-catalogue-spec-refs / check-catalogue-spec-signals を含む全ゲート通過)。AC-10 を充足する最終統合タスク。Layer: integration。
+- [x] **T017**: 統合ゲート確認: bin/sotp を rebuild し (cargo make build-sotp)、全 3 layer の type-signals と catalogue-spec-signals を再生成する (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3 + `bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3)。`cargo make track-sync-views` で rendered view を再生成する。`cargo make ci` が pass することを確認する (verify-catalogue-spec-refs / check-catalogue-spec-signals を含む全ゲート通過)。AC-10 を充足する最終統合タスク。Layer: integration。 (`81f86500d926f4da6adaef1817897d86393922b9`)
