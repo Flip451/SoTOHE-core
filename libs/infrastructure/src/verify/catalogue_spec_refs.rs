@@ -11,14 +11,11 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
+use domain::plan_ref::SpecRef;
 use domain::tddd::LayerId;
-use domain::{
-    ContentHash, SpecElementId, SpecRefFinding, SpecRefFindingKind,
-    check_catalogue_spec_ref_integrity,
-};
+use domain::{ContentHash, SpecElementId, SpecRefFinding, SpecRefFindingKind};
 
 use crate::tddd::{
-    catalogue_bulk_loader::v3_doc_to_stub, catalogue_codec,
     catalogue_document_codec::CatalogueDocumentCodec, catalogue_spec_signals_codec,
     type_signals_codec,
 };
@@ -206,41 +203,21 @@ fn verify_one_layer(
     let text = std::str::from_utf8(&bytes).map_err(|e| {
         format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
     })?;
-    let catalogue = match catalogue_codec::decode(text) {
-        Ok(d) => d,
-        Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
-            // v3 catalogue: per-entry spec_refs[] and informal_grounds[] are present
-            // (D1/D3 restoration). Decode via CatalogueDocumentCodec, convert to a
-            // v2-compat stub via v3_doc_to_stub (which copies spec_refs /
-            // informal_grounds), then fall through to check_catalogue_spec_ref_integrity
-            // exactly as for v2. Returning Ok(vec![]) here would be fail-open.
-            let stem = catalogue_path
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("")
-                .strip_suffix("-types.json")
-                .unwrap_or_else(|| {
-                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
-                })
-                .to_owned();
-            let v3_doc = CatalogueDocumentCodec::decode(text, &stem).map_err(|e| {
-                format!(
-                    "catalogue '{}' for layer '{layer_id}' failed to decode as v3 catalogue: \
-                     {e:?}",
-                    catalogue_path.display()
-                )
-            })?;
-            v3_doc_to_stub(&v3_doc).map_err(|reason| {
-                format!(
-                    "catalogue '{}' for layer '{layer_id}': v3→stub conversion failed: {reason}",
-                    catalogue_path.display()
-                )
-            })?
-        }
-        Err(e) => {
-            return Err(format!("cannot decode catalogue '{}': {e}", catalogue_path.display()));
-        }
-    };
+    // T024: v3-native decode via `CatalogueDocumentCodec::decode`.
+    // Non-v3 catalogues surface as an error (CN-11 fail-closed).
+    let stem = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("")
+        .strip_suffix("-types.json")
+        .unwrap_or_else(|| catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown"))
+        .to_owned();
+    let catalogue = CatalogueDocumentCodec::decode(text, &stem).map_err(|e| {
+        format!(
+            "catalogue '{}' for layer '{layer_id}' failed to decode: {e:?}",
+            catalogue_path.display()
+        )
+    })?;
 
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
     let catalogue_hash = ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
@@ -268,13 +245,64 @@ fn verify_one_layer(
         }
     };
 
-    let findings = check_catalogue_spec_ref_integrity(
-        &layer_id_newtype,
-        &catalogue,
-        spec_element_hashes,
-        current_hash_opt.as_ref(),
-        signals_opt.as_ref(),
-    );
+    // T024: inline equivalent of `check_catalogue_spec_ref_integrity` over v3 `CatalogueDocument`.
+    let mut findings: Vec<SpecRefFinding> = Vec::new();
+
+    let mut check_entry_refs = |entry_name: String, spec_refs: &[SpecRef]| {
+        for (ref_index, spec_ref) in spec_refs.iter().enumerate() {
+            match spec_element_hashes.get(&spec_ref.anchor) {
+                None => {
+                    findings.push(SpecRefFinding::new(
+                        layer_id_newtype.clone(),
+                        SpecRefFindingKind::DanglingAnchor {
+                            catalogue_entry: entry_name.clone(),
+                            ref_index,
+                            spec_file: spec_ref.file.clone(),
+                            anchor: spec_ref.anchor.clone(),
+                        },
+                    ));
+                }
+                Some(actual_hash) if actual_hash != &spec_ref.hash => {
+                    findings.push(SpecRefFinding::new(
+                        layer_id_newtype.clone(),
+                        SpecRefFindingKind::HashMismatch {
+                            catalogue_entry: entry_name.clone(),
+                            ref_index,
+                            spec_file: spec_ref.file.clone(),
+                            anchor: spec_ref.anchor.clone(),
+                            declared: spec_ref.hash.clone(),
+                            actual: actual_hash.clone(),
+                        },
+                    ));
+                }
+                Some(_) => {} // anchor present + hash matches — no finding
+            }
+        }
+    };
+
+    for (type_name, entry) in &catalogue.types {
+        check_entry_refs(type_name.as_str().to_owned(), &entry.spec_refs);
+    }
+    for (trait_name, entry) in &catalogue.traits {
+        check_entry_refs(trait_name.as_str().to_owned(), &entry.spec_refs);
+    }
+    for (fn_path, entry) in &catalogue.functions {
+        check_entry_refs(fn_path.to_string(), &entry.spec_refs);
+    }
+
+    // StaleSignals: compare signals_opt.catalogue_declaration_hash to current hash.
+    if let (Some(current), Some(signals)) = (current_hash_opt.as_ref(), signals_opt.as_ref()) {
+        if &signals.catalogue_declaration_hash != current {
+            findings.push(SpecRefFinding::new(
+                layer_id_newtype.clone(),
+                SpecRefFindingKind::StaleSignals {
+                    declared_catalogue_hash: signals.catalogue_declaration_hash.clone(),
+                    actual_catalogue_hash: current.clone(),
+                },
+            ));
+        }
+    }
+
     Ok(findings)
 }
 
@@ -331,17 +359,13 @@ pub fn format_finding(finding: &SpecRefFinding) -> String {
     }
 }
 
-/// Test utility: check whether a catalogue file is a well-formed v3 catalogue,
-/// returning a `VerifyFinding` that reflects the outcome at the appropriate severity.
+/// Test utility: check whether a catalogue file is a well-formed v3 catalogue.
 ///
-/// - Well-formed v3 catalogue → `Ok(Some(VerifyFinding::new(Severity::Info, "... v3 catalogue ...")))`.
+/// T024: always uses `CatalogueDocumentCodec::decode` (v3-native).
+///
+/// - Well-formed v3 catalogue → `Ok(Some(VerifyFinding::new(Severity::Info, "...")))`.
 /// - Malformed v3 catalogue (decode error) → `Ok(Some(VerifyFinding::error(...)))`.
-/// - v2 (or any non-v3) catalogue → `Ok(None)` (caller handles v2 normally).
 /// - I/O or UTF-8 error → `Err(reason)`.
-///
-/// Note: this helper is test-only and does NOT reflect the production path in
-/// `verify_one_layer`, which now decodes v3 catalogues and validates their
-/// per-entry `spec_refs[]` / `informal_grounds[]` (D1/D3 restoration).
 ///
 /// # Errors
 ///
@@ -358,37 +382,29 @@ pub(crate) fn check_v3_catalogue_finding(
         format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
     })?;
 
-    match catalogue_codec::decode(text) {
-        Ok(_) => Ok(None), // v2 catalogue — not v3, nothing to report
-        Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
-            let stem = catalogue_path
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("")
-                .strip_suffix("-types.json")
-                .unwrap_or_else(|| {
-                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
-                })
-                .to_owned();
-            let catalogue_name = catalogue_path
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or_else(|| catalogue_path.to_str().unwrap_or("unknown"));
-            match CatalogueDocumentCodec::decode(text, &stem) {
-                Ok(_) => Ok(Some(VerifyFinding::new(
-                    Severity::Info,
-                    format!(
-                        "{catalogue_name}: v3 catalogue — per-entry spec_refs[] \
-                         do not exist; spec traceability is validated by \
-                         verify-spec-states-current."
-                    ),
-                ))),
-                Err(e) => Ok(Some(VerifyFinding::error(format!(
-                    "{catalogue_name}: failed to decode as v3 catalogue: {e:?}"
-                )))),
-            }
-        }
-        Err(_) => Ok(None), // other decode errors are v2 errors — not v3
+    let stem = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("")
+        .strip_suffix("-types.json")
+        .unwrap_or_else(|| catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown"))
+        .to_owned();
+    let catalogue_name = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or_else(|| catalogue_path.to_str().unwrap_or("unknown"));
+    match CatalogueDocumentCodec::decode(text, &stem) {
+        Ok(_) => Ok(Some(VerifyFinding::new(
+            Severity::Info,
+            format!(
+                "{catalogue_name}: v3 catalogue — per-entry spec_refs[] \
+                 do not exist; spec traceability is validated by \
+                 verify-spec-states-current."
+            ),
+        ))),
+        Err(e) => Ok(Some(VerifyFinding::error(format!(
+            "{catalogue_name}: failed to decode as v3 catalogue: {e:?}"
+        )))),
     }
 }
 

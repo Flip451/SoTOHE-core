@@ -4,9 +4,9 @@
 //! [`VerifyCatalogueSpecRefsInteractor`]. Composes the T006
 //! [`TrackBlobReader`] extension with a new [`SpecElementHashReader`]
 //! secondary port that supplies canonical SHA-256 digests per spec element.
-//! The pure-domain function
-//! [`check_catalogue_spec_ref_integrity`]
-//! (T004) emits `Vec<SpecRefFinding>` for each detected violation.
+//! Ref integrity check logic is inlined in `execute` (T024 v3-native migration):
+//! iterates `CatalogueDocument` types/traits/functions BTreeMaps and emits
+//! `SpecRefFinding` for each detected anchor/hash violation.
 //!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
 //! §D1.5 / §D3.2 / §D3.6 / IN-06.
@@ -15,8 +15,8 @@ use std::collections::BTreeMap;
 
 use domain::tddd::LayerId;
 use domain::{
-    ContentHash, SpecElementId, SpecRefFinding, TrackId, ValidationError,
-    check_catalogue_spec_ref_integrity,
+    ContentHash, SpecElementId, SpecRef, SpecRefFinding, SpecRefFindingKind, TrackId,
+    ValidationError,
 };
 use thiserror::Error;
 
@@ -119,8 +119,8 @@ pub trait VerifyCatalogueSpecRefs: Send + Sync {
     ///    track_id mismatch.
     /// 2. Read catalogue + raw-bytes hash (T006 port); optionally read
     ///    spec + element hashes + signals (skipped when `cmd.skip_stale`).
-    /// 3. Delegate to [`check_catalogue_spec_ref_integrity`] and return the
-    ///    resulting `Vec<SpecRefFinding>` (empty = pass).
+    /// 3. Inline spec-ref integrity check over v3 `CatalogueDocument` and return
+    ///    the resulting `Vec<SpecRefFinding>` (empty = pass).
     ///
     /// # Errors
     /// Returns [`VerifyCatalogueSpecRefsError`] on guard / port failures.
@@ -245,14 +245,69 @@ where
             }
         };
 
-        // 3. Delegate to domain pure function.
-        let findings = check_catalogue_spec_ref_integrity(
-            &cmd.layer_id,
-            &catalogue,
-            &spec_element_hashes,
-            current_hash_opt.as_ref(),
-            signals_opt.as_ref(),
-        );
+        // 3. Inline spec-ref integrity check over v3 `CatalogueDocument`.
+        //
+        // T024: equivalent of `check_catalogue_spec_ref_integrity` over the
+        // v3-native `CatalogueDocument`. Iterates types → traits → functions
+        // (BTreeMap order) and checks each entry's `spec_refs` for
+        // DanglingAnchor / HashMismatch. StaleSignals check appended last.
+        let mut findings: Vec<SpecRefFinding> = Vec::new();
+
+        // Helper closure: check spec_refs for one (name, spec_refs_slice) pair.
+        let mut check_entry_refs = |entry_name: String, spec_refs: &[SpecRef]| {
+            for (ref_index, spec_ref) in spec_refs.iter().enumerate() {
+                match spec_element_hashes.get(&spec_ref.anchor) {
+                    None => {
+                        findings.push(SpecRefFinding::new(
+                            cmd.layer_id.clone(),
+                            SpecRefFindingKind::DanglingAnchor {
+                                catalogue_entry: entry_name.clone(),
+                                ref_index,
+                                spec_file: spec_ref.file.clone(),
+                                anchor: spec_ref.anchor.clone(),
+                            },
+                        ));
+                    }
+                    Some(actual_hash) if actual_hash != &spec_ref.hash => {
+                        findings.push(SpecRefFinding::new(
+                            cmd.layer_id.clone(),
+                            SpecRefFindingKind::HashMismatch {
+                                catalogue_entry: entry_name.clone(),
+                                ref_index,
+                                spec_file: spec_ref.file.clone(),
+                                anchor: spec_ref.anchor.clone(),
+                                declared: spec_ref.hash.clone(),
+                                actual: actual_hash.clone(),
+                            },
+                        ));
+                    }
+                    Some(_) => {} // anchor present + hash matches — no finding
+                }
+            }
+        };
+
+        for (type_name, entry) in &catalogue.types {
+            check_entry_refs(type_name.as_str().to_owned(), &entry.spec_refs);
+        }
+        for (trait_name, entry) in &catalogue.traits {
+            check_entry_refs(trait_name.as_str().to_owned(), &entry.spec_refs);
+        }
+        for (fn_path, entry) in &catalogue.functions {
+            check_entry_refs(fn_path.to_string(), &entry.spec_refs);
+        }
+
+        // StaleSignals: compare signals_opt.catalogue_declaration_hash to current hash.
+        if let (Some(current), Some(signals)) = (current_hash_opt.as_ref(), signals_opt.as_ref()) {
+            if &signals.catalogue_declaration_hash != current {
+                findings.push(SpecRefFinding::new(
+                    cmd.layer_id.clone(),
+                    SpecRefFindingKind::StaleSignals {
+                        declared_catalogue_hash: signals.catalogue_declaration_hash.clone(),
+                        actual_catalogue_hash: current.clone(),
+                    },
+                ));
+            }
+        }
 
         Ok(findings)
     }
@@ -264,9 +319,11 @@ mod tests {
     use std::sync::Mutex;
 
     use domain::spec::SpecDocument;
-    use domain::tddd::catalogue::{
-        TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
-    };
+    use domain::tddd::catalogue_v2::CatalogueDocument;
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
+    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
     use domain::{
         CatalogueSpecSignal, CatalogueSpecSignalsDocument, ConfidenceSignal, ImplPlanDocument,
         SpecRef, SpecRefFindingKind,
@@ -274,15 +331,42 @@ mod tests {
 
     use super::*;
 
+    /// Build an empty v3 `CatalogueDocument` with the given layer id.
+    fn empty_catalogue(layer_id: &str) -> CatalogueDocument {
+        let crate_name = CrateName::new(layer_id).unwrap();
+        let layer = LayerId::try_new(layer_id).unwrap();
+        CatalogueDocument::new(3, crate_name, layer)
+    }
+
+    /// Add a `TypeEntry` with the given name and spec_refs to a v3 `CatalogueDocument`.
+    fn add_type_entry(doc: &mut CatalogueDocument, name: &str, spec_refs: Vec<SpecRef>) {
+        let entry = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs,
+            informal_grounds: vec![],
+        };
+        doc.types.insert(TypeName::new(name).unwrap(), entry);
+    }
+
     struct FixedReader {
-        catalogue: Mutex<Option<(TypeCatalogueDocument, String)>>,
+        catalogue: Mutex<Option<(CatalogueDocument, String)>>,
         signals: Mutex<Option<CatalogueSpecSignalsDocument>>,
         signals_not_found: bool,
     }
 
     impl FixedReader {
         fn new(
-            catalogue: TypeCatalogueDocument,
+            catalogue: CatalogueDocument,
             hash_hex: impl Into<String>,
             signals: Option<CatalogueSpecSignalsDocument>,
         ) -> Self {
@@ -326,7 +410,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String)> {
             match self.catalogue.lock().unwrap().take() {
                 Some(pair) => BlobFetchResult::Found(pair),
                 None => panic!("FixedReader catalogue consumed twice"),
@@ -389,7 +473,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String)> {
             BlobFetchResult::NotFound
         }
 
@@ -429,7 +513,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String)> {
             BlobFetchResult::FetchError("git object not found".to_owned())
         }
 
@@ -472,11 +556,11 @@ mod tests {
     /// Reader that returns a valid catalogue but panics if signals are ever accessed.
     /// Used to verify that `skip_stale=true` skips the signals port entirely.
     struct PanicOnSignalsReader {
-        catalogue: Mutex<Option<(TypeCatalogueDocument, String)>>,
+        catalogue: Mutex<Option<(CatalogueDocument, String)>>,
     }
 
     impl PanicOnSignalsReader {
-        fn new(catalogue: TypeCatalogueDocument, hash_hex: impl Into<String>) -> Self {
+        fn new(catalogue: CatalogueDocument, hash_hex: impl Into<String>) -> Self {
             Self { catalogue: Mutex::new(Some((catalogue, hash_hex.into()))) }
         }
     }
@@ -504,7 +588,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String)> {
             match self.catalogue.lock().unwrap().take() {
                 Some(pair) => BlobFetchResult::Found(pair),
                 None => panic!("PanicOnSignalsReader catalogue consumed twice"),
@@ -523,11 +607,11 @@ mod tests {
 
     /// Reader that returns a valid catalogue but `FetchError` from the signals fetch.
     struct SignalsFetchErrorReader {
-        catalogue: Mutex<Option<(TypeCatalogueDocument, String)>>,
+        catalogue: Mutex<Option<(CatalogueDocument, String)>>,
     }
 
     impl SignalsFetchErrorReader {
-        fn new(catalogue: TypeCatalogueDocument, hash_hex: impl Into<String>) -> Self {
+        fn new(catalogue: CatalogueDocument, hash_hex: impl Into<String>) -> Self {
             Self { catalogue: Mutex::new(Some((catalogue, hash_hex.into()))) }
         }
     }
@@ -555,7 +639,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String)> {
             match self.catalogue.lock().unwrap().take() {
                 Some(pair) => BlobFetchResult::Found(pair),
                 None => panic!("SignalsFetchErrorReader catalogue consumed twice"),
@@ -588,20 +672,13 @@ mod tests {
         s
     }
 
-    fn entry_with_ref(name: &str, anchor_id: &str, hash_byte: u8) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::with_refs(
-            name,
-            "test",
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
-            },
-            TypeAction::Add,
-            true,
-            vec![SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(hash_byte))],
-            Vec::new(),
-        )
-        .unwrap()
+    /// Build a v3 `CatalogueDocument` with one type entry that has a single spec_ref.
+    fn catalogue_with_ref(name: &str, anchor_id: &str, hash_byte: u8) -> CatalogueDocument {
+        let spec_refs =
+            vec![SpecRef::new("track/items/x/spec.json", anchor(anchor_id), hash(hash_byte))];
+        let mut doc = empty_catalogue("domain");
+        add_type_entry(&mut doc, name, spec_refs);
+        doc
     }
 
     fn cmd(
@@ -620,7 +697,7 @@ mod tests {
 
     #[test]
     fn verify_returns_empty_when_everything_aligns() {
-        let cat = TypeCatalogueDocument::new(1, vec![entry_with_ref("X", "IN-01", 0xab)]);
+        let cat = catalogue_with_ref("X", "IN-01", 0xab);
         let mut hashes = BTreeMap::new();
         hashes.insert(anchor("IN-01"), hash(0xab));
         let signals = CatalogueSpecSignalsDocument::new(
@@ -637,7 +714,7 @@ mod tests {
 
     #[test]
     fn verify_reports_dangling_anchor() {
-        let cat = TypeCatalogueDocument::new(1, vec![entry_with_ref("X", "IN-99", 0xab)]);
+        let cat = catalogue_with_ref("X", "IN-99", 0xab);
         let hashes = BTreeMap::new(); // empty — anchor missing
         let reader = FixedReader::new(cat, hex_pattern(0xcd), None);
         let interactor = VerifyCatalogueSpecRefsInteractor::new(reader, FixedHashReader { hashes });
@@ -650,7 +727,7 @@ mod tests {
 
     #[test]
     fn verify_reports_hash_mismatch() {
-        let cat = TypeCatalogueDocument::new(1, vec![entry_with_ref("X", "IN-01", 0xab)]);
+        let cat = catalogue_with_ref("X", "IN-01", 0xab);
         let mut hashes = BTreeMap::new();
         hashes.insert(anchor("IN-01"), hash(0xcd)); // actual 0xcd, declared 0xab
         let reader = FixedReader::new(cat, hex_pattern(0xcd), None);
@@ -664,7 +741,7 @@ mod tests {
 
     #[test]
     fn verify_reports_stale_signals_when_signals_hash_differs() {
-        let cat = TypeCatalogueDocument::new(1, vec![]);
+        let cat = empty_catalogue("domain");
         let hashes = BTreeMap::new();
         let signals = CatalogueSpecSignalsDocument::new(
             ContentHash::try_from_hex(hex_pattern(0x00)).unwrap(),
@@ -681,7 +758,7 @@ mod tests {
 
     #[test]
     fn verify_skip_stale_bypasses_signals_read() {
-        let cat = TypeCatalogueDocument::new(1, vec![entry_with_ref("X", "IN-01", 0xab)]);
+        let cat = catalogue_with_ref("X", "IN-01", 0xab);
         let mut hashes = BTreeMap::new();
         hashes.insert(anchor("IN-01"), hash(0xab));
         // PanicOnSignalsReader panics if the signals port is accessed — proving
@@ -697,7 +774,7 @@ mod tests {
 
     #[test]
     fn verify_rejects_non_track_branch() {
-        let cat = TypeCatalogueDocument::new(1, vec![]);
+        let cat = empty_catalogue("domain");
         let reader = FixedReader::new(cat, hex_pattern(0x00), None);
         let interactor = VerifyCatalogueSpecRefsInteractor::new(
             reader,
@@ -710,7 +787,7 @@ mod tests {
 
     #[test]
     fn verify_rejects_branch_track_id_mismatch() {
-        let cat = TypeCatalogueDocument::new(1, vec![]);
+        let cat = empty_catalogue("domain");
         let reader = FixedReader::new(cat, hex_pattern(0x00), None);
         let interactor = VerifyCatalogueSpecRefsInteractor::new(
             reader,
@@ -727,7 +804,7 @@ mod tests {
         // violation), even when skip_stale=true and the hash would not be
         // consumed for stale detection.  The test uses skip_stale=true to confirm
         // that the check runs unconditionally.
-        let cat = TypeCatalogueDocument::new(1, vec![]);
+        let cat = empty_catalogue("domain");
         let reader = FixedReader::new(cat, "not-hex", None);
         let interactor = VerifyCatalogueSpecRefsInteractor::new(
             reader,
@@ -765,7 +842,7 @@ mod tests {
 
     #[test]
     fn verify_rejects_spec_not_found() {
-        let cat = TypeCatalogueDocument::new(1, vec![]);
+        let cat = empty_catalogue("domain");
         let reader = FixedReader::new(cat, hex_pattern(0xcd), None);
         // Catalogue is found; hash_reader returns NotFound.
         let interactor = VerifyCatalogueSpecRefsInteractor::new(reader, SpecHashNotFoundReader);
@@ -777,7 +854,7 @@ mod tests {
 
     #[test]
     fn verify_rejects_spec_fetch_error() {
-        let cat = TypeCatalogueDocument::new(1, vec![]);
+        let cat = empty_catalogue("domain");
         let reader = FixedReader::new(cat, hex_pattern(0xcd), None);
         // Catalogue is found; hash_reader returns FetchError.
         let interactor = VerifyCatalogueSpecRefsInteractor::new(reader, SpecHashFetchErrorReader);
@@ -789,7 +866,7 @@ mod tests {
 
     #[test]
     fn verify_propagates_signals_fetch_error() {
-        let cat = TypeCatalogueDocument::new(1, vec![]);
+        let cat = empty_catalogue("domain");
         let reader = SignalsFetchErrorReader::new(cat, hex_pattern(0xcd));
         let interactor = VerifyCatalogueSpecRefsInteractor::new(
             reader,

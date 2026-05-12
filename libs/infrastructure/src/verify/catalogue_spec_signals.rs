@@ -6,12 +6,11 @@
 
 use std::path::PathBuf;
 
-use domain::check_catalogue_spec_signals;
+use domain::ConfidenceSignal;
 use domain::verify::{Severity, VerifyFinding, VerifyOutcome};
 
-use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub;
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
-use crate::tddd::{catalogue_codec, catalogue_spec_signals_codec};
+use crate::tddd::catalogue_spec_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers;
 
@@ -260,60 +259,105 @@ pub fn execute_catalogue_spec_signals(
                 continue;
             }
         };
-        // Decode the catalogue.  For schema_version=3 (v3) catalogues, fall through
-        // to the `CatalogueDocumentCodec` + `v3_doc_to_stub` path which produces a
-        // v2-compat `TypeCatalogueDocument` stub so that `check_catalogue_spec_signals`
-        // can evaluate the externally-stored signals file against the stub's entries.
-        // This is genuine validation: if the signals file references a type that does
-        // not exist in the v3 catalogue, `check_catalogue_spec_signals` surfaces a real
-        // finding.  It is NOT fail-open.
-        let catalogue_doc = match catalogue_codec::decode(&catalogue_text) {
+        // T024: v3-native decode via `CatalogueDocumentCodec::decode`.
+        // Non-v3 catalogues surface as an error finding (CN-11 fail-closed).
+        let stem = catalogue_path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("")
+            .strip_suffix("-types.json")
+            .unwrap_or_else(|| {
+                catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
+            })
+            .to_owned();
+        let catalogue_doc = match CatalogueDocumentCodec::decode(&catalogue_text, &stem) {
             Ok(d) => d,
-            Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
-                // Try the v3 codec path.  Derive the crate-name stem (e.g. `"domain"` from
-                // `"domain-types.json"`) the same way `spec_states` does: strip the
-                // `-types.json` suffix from the filename, falling back to `file_stem()`.
-                let stem = catalogue_path
-                    .file_name()
-                    .and_then(|n| n.to_str())
-                    .unwrap_or("")
-                    .strip_suffix("-types.json")
-                    .unwrap_or_else(|| {
-                        catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
-                    })
-                    .to_owned();
-                match CatalogueDocumentCodec::decode(&catalogue_text, &stem) {
-                    Ok(v3_doc) => match v3_doc_to_stub(&v3_doc) {
-                        Ok(stub) => stub,
-                        Err(e) => {
-                            outcome.add(VerifyFinding::error(format!(
-                                "{}: failed to convert v3 catalogue to stub: {e}",
-                                catalogue_path.display()
-                            )));
-                            continue;
-                        }
-                    },
-                    Err(e) => {
-                        outcome.add(VerifyFinding::error(format!(
-                            "{}: failed to decode as v3 catalogue: {e:?}",
-                            catalogue_path.display()
-                        )));
-                        continue;
-                    }
-                }
-            }
             Err(e) => {
                 outcome.add(VerifyFinding::error(format!(
-                    "{}: decode error: {e}",
+                    "{}: decode error: {e:?}",
                     catalogue_path.display()
                 )));
                 continue;
             }
         };
-        let layer_outcome =
-            check_catalogue_spec_signals(&catalogue_doc, &doc, strict, catalogue_file);
-        for finding in layer_outcome.findings() {
-            outcome.add(finding.clone());
+
+        // T024: inline equivalent of `check_catalogue_spec_signals` over v3 `CatalogueDocument`.
+        // Entry ordering: types (BTreeMap sorted) → traits → functions.
+        let total_entries =
+            catalogue_doc.types.len() + catalogue_doc.traits.len() + catalogue_doc.functions.len();
+        if total_entries != doc.signals.len() {
+            outcome.add(VerifyFinding::error(format!(
+                "{catalogue_file}: catalogue-spec signals coverage mismatch — catalogue has \
+                 {total_entries} entry/entries, signals document has {} signal(s). Regenerate \
+                 the signals file with `sotp track catalogue-spec-signals` so every catalogue \
+                 entry is covered.",
+                doc.signals.len()
+            )));
+            continue;
+        }
+
+        let catalogue_names: Vec<String> = catalogue_doc
+            .types
+            .keys()
+            .map(|k| k.as_str().to_owned())
+            .chain(catalogue_doc.traits.keys().map(|k| k.as_str().to_owned()))
+            .chain(catalogue_doc.functions.keys().map(|k| k.to_string()))
+            .collect();
+        if let Some((i, cat_name, sig)) = catalogue_names
+            .iter()
+            .zip(doc.signals.iter())
+            .enumerate()
+            .find(|(_, (cat_name, sig))| cat_name.as_str() != sig.type_name.as_str())
+            .map(|(i, (cat_name, sig))| (i, cat_name, sig))
+        {
+            outcome.add(VerifyFinding::error(format!(
+                "{catalogue_file}: catalogue-spec signals positional mismatch at index {i} \
+                 (catalogue entry '{cat_name}' vs signal '{}'). Regenerate the signals file.",
+                sig.type_name
+            )));
+            continue;
+        }
+
+        if doc.signals.is_empty() {
+            continue;
+        }
+
+        let reds: Vec<&str> = doc
+            .signals
+            .iter()
+            .filter(|s| s.signal == ConfidenceSignal::Red)
+            .map(|s| s.type_name.as_str())
+            .collect();
+        if !reds.is_empty() {
+            outcome.add(VerifyFinding::error(format!(
+                "{catalogue_file}: {} catalogue entry/entries have Red catalogue-spec signal \
+                 (missing both spec_refs[] and informal_grounds[] — every entry must carry \
+                 at least one grounding ref): {}",
+                reds.len(),
+                reds.join(", ")
+            )));
+            continue;
+        }
+
+        let yellows: Vec<&str> = doc
+            .signals
+            .iter()
+            .filter(|s| s.signal == ConfidenceSignal::Yellow)
+            .map(|s| s.type_name.as_str())
+            .collect();
+        if !yellows.is_empty() {
+            let message = format!(
+                "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal \
+                 — merge gate will block these until upgraded to Blue. Upgrade by promoting \
+                 informal_grounds[] to spec_refs[] with anchor + canonical SHA-256 hash: {}",
+                yellows.len(),
+                yellows.join(", ")
+            );
+            if strict {
+                outcome.add(VerifyFinding::error(message));
+            } else {
+                outcome.add(VerifyFinding::warning(message));
+            }
         }
     }
     outcome

@@ -19,12 +19,14 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use domain::ImplPlanDocument;
-use domain::TypeCatalogueDocument;
 use domain::TypeSignalsDocument;
 use domain::spec::SpecDocument;
+use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::{CatalogueSpecSignalsDocument, ContentHash, SpecElementId};
 use usecase::catalogue_spec_refs::SpecElementHashReader;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
+
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 
 use crate::git_cli::show::{BlobResult, fetch_blob_safe};
 
@@ -85,26 +87,25 @@ impl GitShowTrackBlobReader {
     /// filename lookup, so a generic error carrying those variants would
     /// force callers to handle impossible cases.
     fn resolve_catalogue_filename(&self, branch: &str, layer_id: &str) -> Result<String, String> {
-        let text =
-            match self.fetch_string::<TypeCatalogueDocument>(branch, "architecture-rules.json") {
-                Ok(s) => s,
-                Err(BlobFetchResult::NotFound) => {
-                    // Legacy fallback: no rules file on the branch → use the
-                    // conventional default. This is a NotFound case, not a
-                    // fetch failure, so the gate's per-layer NotFound semantic
-                    // is still meaningful.
-                    return Ok(format!("{layer_id}-types.json"));
-                }
-                Err(BlobFetchResult::FetchError(msg)) => {
-                    // Fetch error on a rules file that exists → fail-closed.
-                    return Err(msg);
-                }
-                Err(BlobFetchResult::Found(_)) => {
-                    // fetch_string never returns Err(Found); match exhaustively
-                    // to keep the code robust against enum expansion.
-                    return Err("internal: fetch_string returned Found in the Err arm".to_owned());
-                }
-            };
+        let text = match self.fetch_string::<String>(branch, "architecture-rules.json") {
+            Ok(s) => s,
+            Err(BlobFetchResult::NotFound) => {
+                // Legacy fallback: no rules file on the branch → use the
+                // conventional default. This is a NotFound case, not a
+                // fetch failure, so the gate's per-layer NotFound semantic
+                // is still meaningful.
+                return Ok(format!("{layer_id}-types.json"));
+            }
+            Err(BlobFetchResult::FetchError(msg)) => {
+                // Fetch error on a rules file that exists → fail-closed.
+                return Err(msg);
+            }
+            Err(BlobFetchResult::Found(_)) => {
+                // fetch_string never returns Err(Found); match exhaustively
+                // to keep the code robust against enum expansion.
+                return Err("internal: fetch_string returned Found in the Err arm".to_owned());
+            }
+        };
         match super::tddd_layers::parse_tddd_layers(&text) {
             Ok(bindings) => Ok(super::tddd_layers::find_binding(&bindings, layer_id)
                 .map(|b| b.catalogue_file().to_owned())
@@ -257,17 +258,37 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         branch: &str,
         track_id: &str,
         layer_id: &str,
-    ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+    ) -> BlobFetchResult<(CatalogueDocument, String)> {
         let filename = match self.resolve_catalogue_filename(branch, layer_id) {
             Ok(name) => name,
             Err(msg) => return BlobFetchResult::FetchError(msg),
         };
         let path = Self::blob_path(track_id, &filename);
-        let text = match self.fetch_string::<(TypeCatalogueDocument, String)>(branch, &path) {
+        let text = match self.fetch_string::<(CatalogueDocument, String)>(branch, &path) {
             Ok(s) => s,
             Err(result) => return result,
         };
-        let doc = match crate::tddd::catalogue_codec::decode(&text) {
+        // T024: v3-native decode via `CatalogueDocumentCodec::decode`.
+        // Non-v3 catalogues surface as `FetchError` (CN-11 fail-closed).
+        // Derive `filename_stem` the same way the other verify paths do:
+        // try to strip the `-types.json` suffix; fall back to `file_stem()`
+        // (strips just the `.json`) so that arbitrary `tddd.catalogue_file`
+        // overrides such as `shared.json` produce `shared`, not `shared.json`.
+        let filename_stem_owned = std::path::Path::new(&filename)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("")
+            .strip_suffix("-types.json")
+            .map(str::to_owned)
+            .unwrap_or_else(|| {
+                std::path::Path::new(&filename)
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .unwrap_or("unknown")
+                    .to_owned()
+            });
+        let filename_stem = filename_stem_owned.as_str();
+        let doc = match CatalogueDocumentCodec::decode(&text, filename_stem) {
             Ok(doc) => doc,
             Err(e) => {
                 return BlobFetchResult::FetchError(format!(
@@ -480,6 +501,23 @@ mod tests {
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
+}"#;
+
+    /// v3-native catalogue fixture required by `CatalogueDocumentCodec::decode`
+    /// (used only by `read_catalogue_for_spec_ref_check` tests).
+    const DOMAIN_TYPES_V3_MINIMAL: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "TrackId": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" }
+    }
+  },
+  "traits": {},
+  "functions": {}
 }"#;
 
     fn impl_plan_json_minimal() -> String {
@@ -806,8 +844,10 @@ mod tests {
     fn test_read_catalogue_for_spec_ref_check_returns_raw_sha256_not_filename() {
         // Verify that the `String` slot is the SHA-256 of the raw catalogue bytes
         // (for stale detection), NOT the resolved filename.
-        let dir =
-            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        let dir = setup_repo_with_track(
+            "foo",
+            &[("domain-types.json", DOMAIN_TYPES_V3_MINIMAL.as_bytes())],
+        );
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         match reader.read_catalogue_for_spec_ref_check("main", "foo", "domain") {
             BlobFetchResult::Found((_doc, hash_hex)) => {
@@ -821,7 +861,7 @@ mod tests {
                 assert_ne!(hash_hex, "domain-types.json", "String slot must be hash, not filename");
                 // Must match the SHA-256 of the raw catalogue bytes.
                 let expected = crate::tddd::type_signals_codec::declaration_hash(
-                    DOMAIN_TYPES_MINIMAL.as_bytes(),
+                    DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
                 );
                 assert_eq!(hash_hex, expected, "hash_hex must be SHA-256 of raw catalogue bytes");
             }
@@ -834,8 +874,10 @@ mod tests {
         // Verify that read_catalogue_for_spec_ref_check does NOT look up or require
         // the Stage-2 signal file (unlike read_type_catalogue). This test has only
         // the declaration file and no companion signal file — it must succeed.
-        let dir =
-            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        let dir = setup_repo_with_track(
+            "foo",
+            &[("domain-types.json", DOMAIN_TYPES_V3_MINIMAL.as_bytes())],
+        );
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         // If Stage-2 hydration ran, it would return FetchError (signal file absent).
         // A clean Found confirms no signal file hydration occurred.

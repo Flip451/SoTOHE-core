@@ -12,10 +12,9 @@
 //! in usecase.
 
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::{
     CatalogueSpecSignal, CatalogueSpecSignalsDocument, ContentHash, RepositoryError, TrackId,
-    TypeAction, ValidationError, evaluate_catalogue_entry_signal,
+    ValidationError, evaluate_catalogue_entry_signal,
 };
 use thiserror::Error;
 
@@ -190,18 +189,35 @@ where
         };
 
         // Step 2: evaluate per-entry signals.
+        // T024: v3-native — iterate types then traits then functions (BTreeMap order,
+        // matching the signal refresher entry ordering).
         let signals: Vec<CatalogueSpecSignal> = catalogue
-            .entries()
+            .types
             .iter()
-            .map(|entry| {
-                let action = type_action_to_item_action(entry.action());
+            .map(|(name, entry)| {
                 let signal = evaluate_catalogue_entry_signal(
-                    action,
-                    entry.spec_refs(),
-                    entry.informal_grounds(),
+                    entry.action,
+                    &entry.spec_refs,
+                    &entry.informal_grounds,
                 );
-                CatalogueSpecSignal::new(entry.name(), signal)
+                CatalogueSpecSignal::new(name.as_str(), signal)
             })
+            .chain(catalogue.traits.iter().map(|(name, entry)| {
+                let signal = evaluate_catalogue_entry_signal(
+                    entry.action,
+                    &entry.spec_refs,
+                    &entry.informal_grounds,
+                );
+                CatalogueSpecSignal::new(name.as_str(), signal)
+            }))
+            .chain(catalogue.functions.iter().map(|(path, entry)| {
+                let signal = evaluate_catalogue_entry_signal(
+                    entry.action,
+                    &entry.spec_refs,
+                    &entry.informal_grounds,
+                );
+                CatalogueSpecSignal::new(path.to_string(), signal)
+            }))
             .collect();
 
         // Step 3: parse the raw-bytes hex into a domain ContentHash.
@@ -225,20 +241,6 @@ where
             })?;
 
         Ok(())
-    }
-}
-
-/// Convert a v2 [`TypeAction`] to the corresponding v3 [`ItemAction`].
-///
-/// Used when computing catalogue-spec signals for a v2 `TypeCatalogueEntry` so
-/// that `evaluate_catalogue_entry_signal` (which uses the v3 `ItemAction` enum)
-/// can apply the D5 reference-action exemption correctly.
-fn type_action_to_item_action(action: TypeAction) -> ItemAction {
-    match action {
-        TypeAction::Add => ItemAction::Add,
-        TypeAction::Modify => ItemAction::Modify,
-        TypeAction::Reference => ItemAction::Reference,
-        TypeAction::Delete => ItemAction::Delete,
     }
 }
 
@@ -331,14 +333,16 @@ mod tests {
     // ---------------------------------------------------------------------------
 
     use domain::spec::SpecDocument;
-    use domain::tddd::catalogue::{
-        TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
-    };
+    use domain::tddd::catalogue_v2::CatalogueDocument;
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
+    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
     use domain::{ImplPlanDocument, InformalGroundKind, InformalGroundRef, InformalGroundSummary};
 
     /// Test-only mock reader that returns a fixed catalogue + raw-bytes hash.
     struct FixedReader {
-        catalogue: Mutex<Option<TypeCatalogueDocument>>,
+        catalogue: Mutex<Option<CatalogueDocument>>,
         hash_hex: String,
         /// If true, `read_catalogue_for_spec_ref_check` returns `NotFound`.
         not_found: bool,
@@ -347,7 +351,7 @@ mod tests {
     }
 
     impl FixedReader {
-        fn found(catalogue: TypeCatalogueDocument, hash_hex: impl Into<String>) -> Self {
+        fn found(catalogue: CatalogueDocument, hash_hex: impl Into<String>) -> Self {
             Self {
                 catalogue: Mutex::new(Some(catalogue)),
                 hash_hex: hash_hex.into(),
@@ -406,7 +410,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String)> {
             if self.not_found {
                 return BlobFetchResult::NotFound;
             }
@@ -458,53 +462,72 @@ mod tests {
         }
     }
 
-    fn catalogue_entry(name: &str, with_informal: bool) -> TypeCatalogueEntry {
-        let informal = if with_informal {
-            vec![InformalGroundRef::new(
-                InformalGroundKind::UserDirective,
-                InformalGroundSummary::try_new("test ground").unwrap(),
-            )]
-        } else {
-            Vec::new()
-        };
-        TypeCatalogueEntry::with_refs(
-            name,
-            "test entry",
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
+    /// Build a v3 `CatalogueDocument` with one type entry under the given name.
+    fn catalogue_with_one_type(
+        name: &str,
+        action: ItemAction,
+        spec_refs: Vec<domain::SpecRef>,
+        informal_grounds: Vec<InformalGroundRef>,
+    ) -> CatalogueDocument {
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = domain::tddd::LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let entry = TypeEntry {
+            action,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
             },
-            TypeAction::Add,
-            true,
-            Vec::new(),
-            informal,
-        )
-        .unwrap()
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs,
+            informal_grounds,
+        };
+        doc.types.insert(TypeName::new(name).unwrap(), entry);
+        doc
     }
 
     fn catalogue_entry_with_action(
         name: &str,
-        action: TypeAction,
+        action: ItemAction,
         spec_refs: Vec<domain::SpecRef>,
         informal_grounds: Vec<InformalGroundRef>,
-    ) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::with_refs(
-            name,
-            "test entry",
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
-            },
-            action,
-            true,
-            spec_refs,
-            informal_grounds,
-        )
-        .unwrap()
+    ) -> (CatalogueDocument, String) {
+        let doc = catalogue_with_one_type(name, action, spec_refs, informal_grounds);
+        (doc, name.to_owned())
     }
 
-    fn catalogue_with(entries: Vec<TypeCatalogueEntry>) -> TypeCatalogueDocument {
-        TypeCatalogueDocument::new(1, entries)
+    /// Build a v3 `CatalogueDocument` with multiple named type entries.
+    /// Each `(name, action, spec_refs, informal_grounds)` becomes one `TypeEntry`.
+    fn catalogue_with_types(
+        entries: Vec<(&str, ItemAction, Vec<domain::SpecRef>, Vec<InformalGroundRef>)>,
+    ) -> CatalogueDocument {
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = domain::tddd::LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        for (name, action, spec_refs, informal_grounds) in entries {
+            let entry = TypeEntry {
+                action,
+                role: DataRole::ValueObject,
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
+                methods: vec![],
+                trait_impls: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs,
+                informal_grounds,
+            };
+            doc.types.insert(TypeName::new(name).unwrap(), entry);
+        }
+        doc
     }
 
     /// A 64-char lowercase hex string made of the given byte repeated 32 times.
@@ -530,9 +553,21 @@ mod tests {
 
     #[test]
     fn refresh_writes_signals_with_correct_hash_and_signals_ordering() {
-        let cat = catalogue_with(vec![
-            catalogue_entry("TypeA", false), // → Red (no spec_refs, no informal)
-            catalogue_entry("TypeB", true),  // → Yellow
+        // BTreeMap sorts keys alphabetically: TypeA < TypeB, so ordering is preserved.
+        let cat = catalogue_with_types(vec![
+            ("TypeA", ItemAction::Add, Vec::new(), Vec::new()), // → Red (no spec_refs, no informal)
+            (
+                "TypeB",
+                ItemAction::Add,
+                Vec::new(),
+                vec![
+                    // → Yellow
+                    InformalGroundRef::new(
+                        InformalGroundKind::UserDirective,
+                        InformalGroundSummary::try_new("test ground").unwrap(),
+                    ),
+                ],
+            ),
         ]);
         let hash_hex = hex_pattern(0xab);
         let reader = FixedReader::found(cat, hash_hex.clone());
@@ -621,7 +656,7 @@ mod tests {
 
     #[test]
     fn refresh_rejects_invalid_catalogue_hash_hex() {
-        let cat = catalogue_with(vec![]);
+        let cat = catalogue_with_types(vec![]);
         let reader = FixedReader::found(cat, "not-a-valid-64char-hex");
         let writer = CapturingWriter::new();
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
@@ -652,7 +687,7 @@ mod tests {
 
     #[test]
     fn refresh_wraps_writer_errors() {
-        let cat = catalogue_with(vec![catalogue_entry("X", false)]);
+        let cat = catalogue_with_types(vec![("X", ItemAction::Add, Vec::new(), Vec::new())]);
         let reader = FixedReader::found(cat, hex_pattern(0x00));
         let writer = FailingWriter;
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
@@ -667,20 +702,20 @@ mod tests {
         ));
     }
 
-    /// A `TypeAction::Reference` entry with empty `spec_refs` and empty
+    /// An `ItemAction::Reference` entry with empty `spec_refs` and empty
     /// `informal_grounds` must evaluate to `Blue` (ADR
     /// `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5).
     /// This test verifies the action-threading path for the `Reference` variant
-    /// specifically — a regression in `type_action_to_item_action` or the
-    /// `entry.action()` call site would produce `Red` instead of `Blue`.
+    /// specifically — a regression in `entry.action` access or the
+    /// `evaluate_catalogue_entry_signal` call site would produce `Red` instead of `Blue`.
     #[test]
     fn refresh_reference_action_with_no_spec_refs_or_informal_evaluates_to_blue() {
-        let cat = catalogue_with(vec![catalogue_entry_with_action(
+        let (cat, _) = catalogue_entry_with_action(
             "ExternalType",
-            TypeAction::Reference,
+            ItemAction::Reference,
             Vec::new(),
             Vec::new(),
-        )]);
+        );
         let hash_hex = hex_pattern(0xcc);
         let reader = FixedReader::found(cat, hash_hex);
         let writer = CapturingWriter::new();

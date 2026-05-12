@@ -262,15 +262,16 @@ mod tests {
     }
 
     fn write_catalogue_with_dangling(track_dir: &Path) {
+        // v3-native format required by CatalogueDocumentCodec::decode.
         let cat = serde_json::json!({
-            "schema_version": 2,
-            "type_definitions": [
-                {
-                    "name": "BadType",
-                    "description": "dangling anchor",
-                    "approved": true,
-                    "kind": "value_object",
-                    "expected_methods": [],
+            "schema_version": 3,
+            "crate_name": "test_layer",
+            "layer": "test_layer",
+            "types": {
+                "BadType": {
+                    "action": "add",
+                    "role": "ValueObject",
+                    "kind": { "kind": "unit_struct" },
                     "spec_refs": [
                         {
                             "file": "track/items/x/spec.json",
@@ -279,7 +280,9 @@ mod tests {
                         }
                     ]
                 }
-            ]
+            },
+            "traits": {},
+            "functions": {}
         });
         fs::write(
             track_dir.join("test_layer-types.json"),
@@ -299,7 +302,14 @@ mod tests {
         write_architecture_rules(&ws);
         write_spec_json(&track_dir);
         // Catalogue has no entries → no findings.
-        let cat = serde_json::json!({"schema_version": 2, "type_definitions": []});
+        let cat = serde_json::json!({
+            "schema_version": 3,
+            "crate_name": "test_layer",
+            "layer": "test_layer",
+            "types": {},
+            "traits": {},
+            "functions": {}
+        });
         fs::write(
             track_dir.join("test_layer-types.json"),
             serde_json::to_string_pretty(&cat).unwrap(),
@@ -451,7 +461,14 @@ mod tests {
         write_spec_json(&track_dir);
 
         // Empty catalogue (no spec_refs) → no dangling findings regardless of signals.
-        let cat = serde_json::json!({"schema_version": 2, "type_definitions": []});
+        let cat = serde_json::json!({
+            "schema_version": 3,
+            "crate_name": "test_layer",
+            "layer": "test_layer",
+            "types": {},
+            "traits": {},
+            "functions": {}
+        });
         fs::write(
             track_dir.join("test_layer-types.json"),
             serde_json::to_string_pretty(&cat).unwrap(),
@@ -496,14 +513,14 @@ mod tests {
 
         // Catalogue references valid anchor IN-01 but with a deliberately wrong hash.
         let cat = serde_json::json!({
-            "schema_version": 2,
-            "type_definitions": [
-                {
-                    "name": "GoodType",
-                    "description": "valid anchor, wrong hash",
-                    "approved": true,
-                    "kind": "value_object",
-                    "expected_methods": [],
+            "schema_version": 3,
+            "crate_name": "test_layer",
+            "layer": "test_layer",
+            "types": {
+                "GoodType": {
+                    "action": "add",
+                    "role": "ValueObject",
+                    "kind": { "kind": "unit_struct" },
                     "spec_refs": [
                         {
                             "file": "track/items/test-track/spec.json",
@@ -512,7 +529,9 @@ mod tests {
                         }
                     ]
                 }
-            ]
+            },
+            "traits": {},
+            "functions": {}
         });
         fs::write(
             track_dir.join("test_layer-types.json"),
@@ -548,7 +567,14 @@ mod tests {
         write_spec_json(&track_dir);
 
         // Empty catalogue — no spec_refs → no dangling or hash-mismatch findings.
-        let cat = serde_json::json!({"schema_version": 2, "type_definitions": []});
+        let cat = serde_json::json!({
+            "schema_version": 3,
+            "crate_name": "test_layer",
+            "layer": "test_layer",
+            "types": {},
+            "traits": {},
+            "functions": {}
+        });
         fs::write(
             track_dir.join("test_layer-types.json"),
             serde_json::to_string_pretty(&cat).unwrap(),

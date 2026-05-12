@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-12T11:26:45Z",
-  "declaration_hash": "d6bc1643a868826ba7f7b4c5e85e7a24b25f3fb3317ac7d648c5723895452a24",
+  "generated_at": "2026-05-12T12:22:30Z",
+  "declaration_hash": "06c4d1c15619cdfd632570a5939ca1eb9c1fa6542ad8bc9686e6d9f88fc70b0b",
   "signals": [
     {
       "type_name": "CatalogueImplSignalsError",

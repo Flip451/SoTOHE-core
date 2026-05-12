@@ -916,18 +916,20 @@ mod tests {
         track_dir: &std::path::Path,
         entry_name: &str,
     ) {
+        // v3-native format required by CatalogueDocumentCodec::decode.
         let catalogue = serde_json::json!({
-            "schema_version": 2,
-            "type_definitions": [
-                {
-                    "name": entry_name,
-                    "description": "test fixture",
-                    "kind": "value_object",
+            "schema_version": 3,
+            "crate_name": "domain",
+            "layer": "domain",
+            "types": {
+                entry_name: {
                     "action": "add",
-                    "approved": true,
-                    "expected_methods": []
+                    "role": "ValueObject",
+                    "kind": { "kind": "unit_struct" }
                 }
-            ]
+            },
+            "traits": {},
+            "functions": {}
         });
         std::fs::write(
             track_dir.join("domain-types.json"),

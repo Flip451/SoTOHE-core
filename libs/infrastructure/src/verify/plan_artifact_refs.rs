@@ -18,12 +18,11 @@
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
+use domain::SpecRef;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use thiserror::Error;
 
 use crate::spec::codec as spec_codec;
-use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub;
-use crate::tddd::catalogue_codec;
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::track::symlink_guard;
 
@@ -230,70 +229,39 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
             }
         };
 
-        // The catalogue codec already validates SpecRef newtypes (SpecElementId, ContentHash)
-        // and InformalGroundRef (kind variant + non-empty summary).
-        // For v3 catalogues (UnsupportedSchemaVersion from the v2 codec), decode via
-        // CatalogueDocumentCodec and convert to a v2-compat stub so that per-entry
-        // spec_refs[] and informal_grounds[] are validated exactly as for v2.
-        // Skipping (continue) here would be fail-open: v3 entries now carry grounding fields.
-        let catalogue_doc_opt = match catalogue_codec::decode(&catalogue_content) {
-            Ok(d) => Some(d),
-            Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
-                // v3 catalogue: per-entry spec_refs[] and informal_grounds[] are present
-                // (D1/D3 restoration). Decode via CatalogueDocumentCodec, convert to stub
-                // (which copies grounding fields), then fall through to the entry loop.
-                let stem = std::path::Path::new(catalogue_name)
-                    .file_name()
-                    .and_then(|n| n.to_str())
-                    .unwrap_or("")
-                    .strip_suffix("-types.json")
-                    .unwrap_or_else(|| {
-                        std::path::Path::new(catalogue_name)
-                            .file_stem()
-                            .and_then(|s| s.to_str())
-                            .unwrap_or("unknown")
-                    })
-                    .to_owned();
-                match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
-                    Ok(v3_doc) => match v3_doc_to_stub(&v3_doc) {
-                        Ok(stub) => Some(stub),
-                        Err(reason) => {
-                            findings.push(VerifyFinding::error(format!(
-                                "{catalogue_name}: v3→stub conversion failed: {reason}"
-                            )));
-                            continue;
-                        }
-                    },
-                    Err(e) => {
-                        findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name}: failed to decode as v3 catalogue: {e:?}"
-                        )));
-                        continue;
-                    }
-                }
-            }
+        // T024: v3-native decode via `CatalogueDocumentCodec::decode`.
+        // Non-v3 catalogues surface as an error finding (CN-11 fail-closed).
+        let stem = std::path::Path::new(catalogue_name)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("")
+            .strip_suffix("-types.json")
+            .unwrap_or_else(|| {
+                std::path::Path::new(catalogue_name)
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .unwrap_or("unknown")
+            })
+            .to_owned();
+        let catalogue_doc = match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
+            Ok(d) => d,
             Err(e) => {
-                findings.push(VerifyFinding::error(format!("Cannot parse {catalogue_name}: {e}")));
+                findings
+                    .push(VerifyFinding::error(format!("Cannot parse {catalogue_name}: {e:?}")));
                 continue;
             }
         };
 
-        // Both the `UnsupportedSchemaVersion` arm and the generic `Err` arm above
-        // call `continue`, so reaching here guarantees `catalogue_doc_opt` is `Some`.
-        // Use `let ... else` to make that invariant explicit without a panic path.
-        let Some(catalogue_doc) = catalogue_doc_opt else {
-            continue;
-        };
-
-        for entry in catalogue_doc.entries() {
-            for spec_ref in entry.spec_refs() {
+        // Iterate types → traits → functions (BTreeMap order).
+        // Helper: process spec_refs for one entry name + slice.
+        let mut process_entry_refs = |entry_name: &str, spec_refs: &[SpecRef]| {
+            for spec_ref in spec_refs {
                 // Path-traversal guard: resolve the ref path and verify containment.
                 let resolved = match resolve_path(&trusted_root, &spec_ref.file) {
                     None => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': spec_ref has invalid path \
+                            "{catalogue_name} entry '{entry_name}': spec_ref has invalid path \
                              (absolute or path-traversal): {}",
-                            entry.name(),
                             spec_ref.file.display()
                         )));
                         continue;
@@ -305,8 +273,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                 match symlink_guard::reject_symlinks_below(&resolved, &trusted_root) {
                     Ok(false) => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': spec_ref file not found: {}",
-                            entry.name(),
+                            "{catalogue_name} entry '{entry_name}': spec_ref file not found: {}",
                             spec_ref.file.display()
                         )));
                         continue;
@@ -314,8 +281,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                     Ok(true) => {}
                     Err(e) => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': spec_ref symlink guard for '{}': {e}",
-                            entry.name(),
+                            "{catalogue_name} entry '{entry_name}': spec_ref symlink guard for '{}': {e}",
                             spec_ref.file.display()
                         )));
                         continue;
@@ -331,8 +297,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                     Ok(m) => m,
                     Err(e) => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': cannot load spec file '{}': {e}",
-                            entry.name(),
+                            "{catalogue_name} entry '{entry_name}': cannot load spec file '{}': {e}",
                             spec_ref.file.display()
                         )));
                         continue;
@@ -344,9 +309,8 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                 match element_map.get(anchor_str) {
                     None => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': unresolved SpecRef anchor '{}' in '{}'",
-                            entry.name(),
-                            anchor_str,
+                            "{catalogue_name} entry '{entry_name}': unresolved SpecRef anchor \
+                             '{anchor_str}' in '{}'",
                             spec_ref.file.display()
                         )));
                     }
@@ -356,10 +320,9 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                         let expected_hash = spec_ref.hash.to_hex();
                         if actual_hash != expected_hash {
                             findings.push(VerifyFinding::error(format!(
-                                "{catalogue_name} entry '{}': SpecRef hash mismatch for anchor '{}' \
-                                 in '{}': expected {expected_hash}, actual {actual_hash}",
-                                entry.name(),
-                                anchor_str,
+                                "{catalogue_name} entry '{entry_name}': SpecRef hash mismatch for \
+                                 anchor '{anchor_str}' in '{}': expected {expected_hash}, actual \
+                                 {actual_hash}",
                                 spec_ref.file.display()
                             )));
                         }
@@ -367,6 +330,16 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                 }
             }
             // InformalGroundRef: kind+summary already validated by codec
+        };
+
+        for (type_name, entry) in &catalogue_doc.types {
+            process_entry_refs(type_name.as_str(), &entry.spec_refs);
+        }
+        for (trait_name, entry) in &catalogue_doc.traits {
+            process_entry_refs(trait_name.as_str(), &entry.spec_refs);
+        }
+        for (fn_path, entry) in &catalogue_doc.functions {
+            process_entry_refs(&fn_path.to_string(), &entry.spec_refs);
         }
     }
 
@@ -1369,18 +1342,17 @@ mod tests {
         let canonical = canonical_json(element);
         let hash = canonical_json_sha256(&canonical);
 
-        // Write a domain-types.json with a SpecRef pointing at IN-01.
+        // Write a domain-types.json with a SpecRef pointing at IN-01 (v3-native).
         let catalogue = format!(
             r#"{{
-  "schema_version": 2,
-  "type_definitions": [
-    {{
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {{
+    "MyType": {{
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {{ "kind": "unit_struct" }},
       "spec_refs": [
         {{
           "file": "track/items/test-track/spec.json",
@@ -1389,7 +1361,9 @@ mod tests {
         }}
       ]
     }}
-  ]
+  }},
+  "traits": {{}},
+  "functions": {{}}
 }}"#
         );
         write_file(&track_dir, "domain-types.json", &catalogue);
@@ -1405,15 +1379,14 @@ mod tests {
         write_file(&track_dir, "spec.json", MINIMAL_SPEC);
 
         let catalogue = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" },
       "spec_refs": [
         {
           "file": "track/items/nonexistent/spec.json",
@@ -1422,7 +1395,9 @@ mod tests {
         }
       ]
     }
-  ]
+  },
+  "traits": {},
+  "functions": {}
 }"#;
         write_file(&track_dir, "domain-types.json", catalogue);
 
@@ -1437,15 +1412,14 @@ mod tests {
         write_file(&track_dir, "spec.json", MINIMAL_SPEC);
 
         let catalogue = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" },
       "spec_refs": [
         {
           "file": "track/items/test-track/spec.json",
@@ -1454,7 +1428,9 @@ mod tests {
         }
       ]
     }
-  ]
+  },
+  "traits": {},
+  "functions": {}
 }"#;
         write_file(&track_dir, "domain-types.json", catalogue);
 
@@ -1476,15 +1452,14 @@ mod tests {
         let wrong_hash = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
         let catalogue = format!(
             r#"{{
-  "schema_version": 2,
-  "type_definitions": [
-    {{
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {{
+    "MyType": {{
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {{ "kind": "unit_struct" }},
       "spec_refs": [
         {{
           "file": "track/items/test-track/spec.json",
@@ -1493,7 +1468,9 @@ mod tests {
         }}
       ]
     }}
-  ]
+  }},
+  "traits": {{}},
+  "functions": {{}}
 }}"#
         );
         write_file(&track_dir, "domain-types.json", &catalogue);
@@ -1515,17 +1492,18 @@ mod tests {
 
         // Catalogue entry with no spec_refs → nothing to validate.
         let catalogue = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": []
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" }
     }
-  ]
+  },
+  "traits": {},
+  "functions": {}
 }"#;
         write_file(&track_dir, "domain-types.json", catalogue);
 
