@@ -1,12 +1,11 @@
-//! Unit tests for `contract_map_render` (OS-06 stub).
+//! Unit tests for `contract_map_render` (IN-24 minimal placeholder).
 //!
-//! T008: The full v3 rendering pipeline is OS-06 deferred (T012).
-//! These tests verify the stub behaviour: the renderer accepts
-//! `TypeCatalogueDocument` (the v3→v2 stub produced by `catalogue_bulk_loader`)
-//! and emits:
+//! T025: The renderer is now v3-native — it takes `CatalogueDocument` directly
+//! (no v3→v2 conversion). These tests verify the placeholder behaviour:
 //! 1. A generated-file marker (CN-08).
-//! 2. An OS-06 deferment comment.
-//! 3. A `flowchart LR` block with one empty subgraph per active layer.
+//! 2. An IN-24 / OS-07 deferral comment.
+//! 3. A `flowchart LR` block with one `subgraph` per active layer, each
+//!    listing entry names as `%% type/trait/fn:` comments for observability.
 //!
 //! This file is compiled only under `#[cfg(test)]` via the `#[path]` attribute
 //! in the parent module:
@@ -22,8 +21,15 @@ use std::collections::BTreeMap;
 
 use super::*;
 use crate::tddd::LayerId;
-use crate::tddd::catalogue::{
-    TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+use crate::tddd::catalogue_v2::composite::TypeKindV2;
+use crate::tddd::catalogue_v2::document::CatalogueDocument;
+use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use crate::tddd::catalogue_v2::identifiers::{
+    CrateName, FunctionName, FunctionPath, MethodName, ModulePath, TraitName, TypeName, TypeRef,
+};
+use crate::tddd::catalogue_v2::methods::MethodDeclaration;
+use crate::tddd::catalogue_v2::roles::{
+    ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver,
 };
 use crate::tddd::contract_map_options::ContractMapRenderOptions;
 
@@ -31,41 +37,82 @@ fn layer(name: &str) -> LayerId {
     LayerId::try_new(name.to_owned()).unwrap()
 }
 
-fn empty_doc() -> TypeCatalogueDocument {
-    TypeCatalogueDocument::new(2, vec![])
+fn empty_doc(crate_name: &str) -> CatalogueDocument {
+    CatalogueDocument::new(3, CrateName::new(crate_name).unwrap(), layer(crate_name))
 }
 
-fn doc_with_entries(entries: Vec<TypeCatalogueEntry>) -> TypeCatalogueDocument {
-    TypeCatalogueDocument::new(2, entries)
+fn doc_with_type(crate_name: &str, type_name: &str) -> CatalogueDocument {
+    let mut doc = empty_doc(crate_name);
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(TypeName::new(type_name).unwrap(), entry);
+    doc
 }
 
-fn entry(name: &str, kind: TypeDefinitionKind) -> TypeCatalogueEntry {
-    TypeCatalogueEntry::new(name, format!("{name} description"), kind, TypeAction::Add, true)
-        .unwrap()
+fn doc_with_trait(crate_name: &str, trait_name: &str) -> CatalogueDocument {
+    let mut doc = empty_doc(crate_name);
+    let method = MethodDeclaration::new(
+        MethodName::new("load").unwrap(),
+        Some(SelfReceiver::SharedRef),
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        None,
+    );
+    let entry = TraitEntry {
+        action: ItemAction::Add,
+        role: ContractRole::SecondaryPort,
+        methods: vec![method],
+        supertrait_bounds: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.traits.insert(TraitName::new(trait_name).unwrap(), entry);
+    doc
 }
 
-fn simple_3layer_catalogues() -> (BTreeMap<LayerId, TypeCatalogueDocument>, Vec<LayerId>) {
+fn doc_with_function(crate_name: &str, fn_name: &str) -> CatalogueDocument {
+    let mut doc = empty_doc(crate_name);
+    let crate_n = CrateName::new(crate_name).unwrap();
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new(fn_name).unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+    doc
+}
+
+fn simple_3layer_catalogues() -> (BTreeMap<LayerId, CatalogueDocument>, Vec<LayerId>) {
     let domain = layer("domain");
     let usecase = layer("usecase");
     let infra = layer("infrastructure");
 
-    let domain_doc = doc_with_entries(vec![entry(
-        "User",
-        TypeDefinitionKind::ValueObject {
-            expected_members: Vec::new(),
-            expected_methods: Vec::new(),
-        },
-    )]);
-    let usecase_doc = doc_with_entries(vec![entry(
-        "RegisterUser",
-        TypeDefinitionKind::UseCase { expected_members: Vec::new(), expected_methods: Vec::new() },
-    )]);
-    let infra_doc = empty_doc();
-
-    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
-    catalogues.insert(domain.clone(), domain_doc);
-    catalogues.insert(usecase.clone(), usecase_doc);
-    catalogues.insert(infra.clone(), infra_doc);
+    let mut catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
+    catalogues.insert(domain.clone(), doc_with_type("domain", "User"));
+    catalogues.insert(usecase.clone(), doc_with_trait("usecase", "UserRepository"));
+    catalogues.insert(infra.clone(), empty_doc("infrastructure"));
 
     let layer_order = vec![domain, usecase, infra];
     (catalogues, layer_order)
@@ -87,15 +134,12 @@ fn test_render_contract_map_emits_fenced_mermaid_block() {
 }
 
 #[test]
-fn test_render_contract_map_emits_os06_deferment_comment() {
+fn test_render_contract_map_emits_in24_os07_deferral_comment() {
     let (catalogues, order) = simple_3layer_catalogues();
     let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
     let text = content.as_ref();
-    assert!(
-        text.contains("OS-06 DEFERRED"),
-        "output must contain OS-06 deferment comment; got:\n{text}"
-    );
-    assert!(text.contains("T012"), "output must reference T012 follow-up; got:\n{text}");
+    assert!(text.contains("IN-24"), "output must contain IN-24 deferral reference; got:\n{text}");
+    assert!(text.contains("OS-07"), "output must contain OS-07 deferral reference; got:\n{text}");
 }
 
 #[test]
@@ -111,16 +155,51 @@ fn test_render_contract_map_produces_subgraph_per_layer_in_order() {
 }
 
 #[test]
-fn test_render_contract_map_entry_count_comment() {
-    // OS-06 stub: entries are still counted via TypeCatalogueDocument stub
-    // produced by catalogue_bulk_loader for observability.
-    let (catalogues, order) = simple_3layer_catalogues();
+fn test_render_contract_map_lists_type_entry_names_as_comments() {
+    let crate_name = "domain";
+    let mut catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
+    let l = layer(crate_name);
+    catalogues.insert(l.clone(), doc_with_type(crate_name, "User"));
+    let order = vec![l];
+
     let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
     let text = content.as_ref();
-    // domain has 1 entry, usecase has 1 entry; infrastructure has 0 (no comment).
     assert!(
-        text.contains("1 entries (nodes deferred to T012)"),
-        "stub must emit entry count comment; got:\n{text}"
+        text.contains("%% type: User"),
+        "output must list type entry 'User' as comment; got:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_lists_trait_entry_names_as_comments() {
+    let crate_name = "domain";
+    let mut catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
+    let l = layer(crate_name);
+    catalogues.insert(l.clone(), doc_with_trait(crate_name, "UserRepository"));
+    let order = vec![l];
+
+    let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+    let text = content.as_ref();
+    assert!(
+        text.contains("%% trait: UserRepository"),
+        "output must list trait entry 'UserRepository' as comment; got:\n{text}"
+    );
+}
+
+#[test]
+fn test_render_contract_map_lists_function_entry_paths_as_comments() {
+    let crate_name = "domain";
+    let mut catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
+    let l = layer(crate_name);
+    catalogues.insert(l.clone(), doc_with_function(crate_name, "register_user"));
+    let order = vec![l];
+
+    let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+    let text = content.as_ref();
+    assert!(text.contains("%% fn:"), "output must list function entry as comment; got:\n{text}");
+    assert!(
+        text.contains("register_user"),
+        "output must contain function name 'register_user'; got:\n{text}"
     );
 }
 
@@ -137,9 +216,9 @@ fn test_render_contract_map_layer_filter_restricts_subgraphs() {
 
 #[test]
 fn test_render_contract_map_single_layer_architecture() {
-    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    let mut catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
     let only = layer("domain");
-    catalogues.insert(only.clone(), empty_doc());
+    catalogues.insert(only.clone(), empty_doc("domain"));
     let order = vec![only];
 
     let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
@@ -150,26 +229,34 @@ fn test_render_contract_map_single_layer_architecture() {
 }
 
 #[test]
-fn test_render_contract_map_no_edges_emitted_by_stub() {
-    // T012: edges are deferred. The stub must not emit any mermaid edge syntax.
-    // Note: `-->` appears in HTML comment close markers (`-->`); we check for
-    // mermaid-specific edge patterns (with `|` label delimiters) instead.
+fn test_render_contract_map_no_edges_emitted_by_placeholder() {
+    // IN-24: edges are deferred. The placeholder must not emit any mermaid edge syntax.
     let (catalogues, order) = simple_3layer_catalogues();
     let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
     let text = content.as_ref();
-    assert!(!text.contains("-->|"), "stub must not emit method-call edges (OS-06)");
-    assert!(!text.contains("-.impl.->"), "stub must not emit trait-impl edges (OS-06)");
-    assert!(!text.contains("==>|"), "stub must not emit typestate transition edges (OS-06)");
+    assert!(!text.contains("-->|"), "placeholder must not emit method-call edges (IN-24)");
+    assert!(!text.contains("-.impl.->"), "placeholder must not emit trait-impl edges (IN-24)");
+    assert!(!text.contains("==>|"), "placeholder must not emit typestate transition edges (IN-24)");
 }
 
 #[test]
 fn test_render_contract_map_empty_layer_order_produces_minimal_scaffold() {
-    let catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    let catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
     let order: Vec<LayerId> = Vec::new();
     let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
     let text = content.as_ref();
-    // Minimal output: header + deferment comment + empty flowchart.
+    // Minimal output: header + deferral comment + empty flowchart.
     assert!(text.contains("flowchart LR"));
-    assert!(text.contains("OS-06 DEFERRED"));
+    assert!(text.contains("IN-24"));
     assert!(!text.contains("subgraph"));
+}
+
+#[test]
+fn test_render_contract_map_does_not_reference_os06_or_t012() {
+    // Verify that old stale deferral references are gone.
+    let (catalogues, order) = simple_3layer_catalogues();
+    let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+    let text = content.as_ref();
+    assert!(!text.contains("OS-06"), "output must NOT reference stale OS-06; got:\n{text}");
+    assert!(!text.contains("T012"), "output must NOT reference stale T012; got:\n{text}");
 }

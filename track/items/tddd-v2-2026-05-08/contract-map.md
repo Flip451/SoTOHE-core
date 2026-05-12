@@ -1,17 +1,172 @@
 <!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
-<!-- OS-06 DEFERRED: v3 rendering pipeline requires ADR-level design decisions. Full implementation tracked as T012. -->
+<!-- IN-24 / OS-07 DEFERRED: detailed v3 contract-map rendering requires ADR-level design decisions (node shapes, edges, role clustering). This placeholder lists entry names per layer only. -->
 ```mermaid
 flowchart LR
-    %% contract-map renderer is OS-06 deferred (track tddd-v2-2026-05-08).
-    %% v3 schema redesign requires ADR-level design decisions and is tracked separately as T012.
-    %% Until then, this renderer outputs only the layer scaffold.
+    %% contract-map renderer: IN-24 minimal placeholder (detailed v3 rendering deferred to follow-up ADR/track per OS-07).
+    %% Each layer block lists entry names for observability. No node shapes or edges are emitted.
     subgraph domain [domain]
-        %% 91 entries (nodes deferred to T012)
+        %% type: ActionContradiction
+        %% type: ActionContradictionKind
+        %% type: CatalogueDocument
+        %% type: CatalogueDocumentError
+        %% type: CatalogueDocumentLoaderError
+        %% type: CatalogueLintViolation
+        %% type: CatalogueLinterError
+        %% type: CatalogueLinterRule
+        %% type: CatalogueLinterRuleKind
+        %% type: ConsistencyReport
+        %% type: ContractMapRenderOptions
+        %% type: ContractRole
+        %% type: CrateName
+        %% type: DataRole
+        %% type: EnumVariantDeclaration
+        %% type: ExtendedCrate
+        %% type: FieldDecl
+        %% type: FieldName
+        %% type: FunctionBaselineEntry
+        %% type: FunctionEntry
+        %% type: FunctionName
+        %% type: FunctionNode
+        %% type: FunctionPath
+        %% type: FunctionRole
+        %% type: GenericArgsError
+        %% type: Identifier
+        %% type: IdentifierError
+        %% type: ItemAction
+        %% type: LayerId
+        %% type: MemberDeclaration
+        %% type: MethodDeclaration
+        %% type: MethodGenericParam
+        %% type: MethodName
+        %% type: ModulePath
+        %% type: NewTypeGraphCodecError
+        %% type: ParamDeclaration
+        %% type: ParamName
+        %% type: Phase1Error
+        %% type: RustdocCratePortError
+        %% type: SelfReceiver
+        %% type: SignalRegion
+        %% type: TdddLayerBinding
+        %% type: TdddLayerBindingsError
+        %% type: ThreeWayEvaluationReport
+        %% type: ThreeWaySignal
+        %% type: ThreeWaySignalKind
+        %% type: TraitBaselineEntry
+        %% type: TraitEntry
+        %% type: TraitImplBaselineEntry
+        %% type: TraitImplDecl
+        %% type: TraitImplDeclV2
+        %% type: TraitImplEntry
+        %% type: TraitName
+        %% type: TraitNode
+        %% type: TypeAction
+        %% type: TypeBaseline
+        %% type: TypeBaselineEntry
+        %% type: TypeCatalogueDocument
+        %% type: TypeCatalogueEntry
+        %% type: TypeDefinitionKind
+        %% type: TypeEntry
+        %% type: TypeGraph
+        %% type: TypeKindV2
+        %% type: TypeName
+        %% type: TypeNode
+        %% type: TypeRef
+        %% type: TypeSignal
+        %% type: TypestateMarker
+        %% type: TypestateTransitions
+        %% type: TypestateTransitionsSpec
+        %% type: VariantDecl
+        %% type: VariantName
+        %% type: VariantPayload
+        %% trait: CatalogueDocumentLoaderPort
+        %% trait: CatalogueLinter
+        %% trait: CatalogueLoader
+        %% trait: CatalogueToExtendedCratePort
+        %% trait: ContractMapWriter
+        %% trait: RustdocCratePort
+        %% trait: SchemaExporter
+        %% trait: SignalEvaluatorPort
+        %% trait: TdddLayerBindingsPort
+        %% fn: domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity
+        %% fn: domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals
+        %% fn: domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal
+        %% fn: domain::tddd::consistency::check_consistency
+        %% fn: domain::tddd::consistency::check_type_signals
+        %% fn: domain::tddd::contract_map_render::render_contract_map
+        %% fn: domain::tddd::signals::evaluate_type_signals
+        %% fn: domain::tddd::signals::undeclared_functions_to_signals
+        %% fn: domain::tddd::signals::undeclared_to_signals
     end
     subgraph usecase [usecase]
-        %% 12 entries (nodes deferred to T012)
+        %% type: CatalogueImplSignalsError
+        %% type: CatalogueImplSignalsInteractor
+        %% type: PreCommitTypeSignalsInteractor
+        %% type: RenderContractMapCommand
+        %% type: RenderContractMapError
+        %% trait: CatalogueImplSignalsService
+        %% trait: CatalogueSpecSignalsWriter
+        %% trait: PreCommitTypeSignalsService
+        %% trait: SchemaExporterPort
+        %% trait: SpecElementHashReader
+        %% trait: TrackBlobReader
+        %% fn: usecase::merge_gate::check_strict_merge_gate
     end
     subgraph infrastructure [infrastructure]
-        %% 53 entries (nodes deferred to T012)
+        %% type: BaselineCodecError
+        %% type: BaselineRustdocCodec
+        %% type: BaselineRustdocCodecError
+        %% type: CaptureBaselineError
+        %% type: CatalogueDocumentCodec
+        %% type: CatalogueDocumentCodecError
+        %% type: CatalogueToExtendedCrateCodec
+        %% type: CatalogueToExtendedCrateCodecError
+        %% type: ClusterPlan
+        %% type: CrossEdge
+        %% type: EdgeSet
+        %% type: EvaluateSignalsError
+        %% type: FsCatalogueDocumentLoader
+        %% type: FsCatalogueLoader
+        %% type: FsCatalogueSpecSignalsStore
+        %% type: FsContractMapWriter
+        %% type: FsTdddLayerBindingsAdapter
+        %% type: GitShowTrackBlobReader
+        %% type: InMemoryCatalogueLinter
+        %% type: LoadAllCataloguesError
+        %% type: LoadAllCataloguesNativeError
+        %% type: RustdocCrateAdapter
+        %% type: RustdocSchemaExporter
+        %% type: SchemaExportCodecError
+        %% type: SignalEvaluatorV2
+        %% type: SignalSummary
+        %% type: TypeCatalogueCodecError
+        %% type: TypeGraphExportError
+        %% type: TypeGraphRenderOptions
+        %% fn: infrastructure::code_profile_builder::build_type_graph
+        %% fn: infrastructure::tddd::baseline_builder::build_baseline
+        %% fn: infrastructure::tddd::baseline_capture::capture_baseline_for_layer
+        %% fn: infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer
+        %% fn: infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer
+        %% fn: infrastructure::tddd::baseline_codec::decode
+        %% fn: infrastructure::tddd::baseline_codec::encode
+        %% fn: infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native
+        %% fn: infrastructure::tddd::catalogue_codec::decode
+        %% fn: infrastructure::tddd::catalogue_codec::encode
+        %% fn: infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer
+        %% fn: infrastructure::tddd::type_graph_cluster::classify_types
+        %% fn: infrastructure::tddd::type_graph_export::execute_type_graph_for_layer
+        %% fn: infrastructure::tddd::type_graph_render::render_type_graph_clustered
+        %% fn: infrastructure::tddd::type_graph_render::render_type_graph_flat
+        %% fn: infrastructure::tddd::type_graph_render::render_type_graph_overview
+        %% fn: infrastructure::tddd::type_graph_render::write_type_graph_dir
+        %% fn: infrastructure::tddd::type_graph_render::write_type_graph_file
+        %% fn: infrastructure::tddd::type_signals_evaluator::evaluate_and_write_signals
+        %% fn: infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer
+        %% fn: infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics
+        %% fn: infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue
+        %% fn: infrastructure::type_catalogue_render::render_type_catalogue_v3
+        %% fn: infrastructure::verify::spec_code_consistency::consistency_report_to_findings
+        %% fn: infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components
+        %% fn: infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str
+        %% fn: infrastructure::verify::spec_states::verify_from_spec_json
     end
 ```

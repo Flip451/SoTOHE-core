@@ -1,14 +1,23 @@
 {
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "InfraAdapter",
-      "kind": "secondary_adapter",
-      "description": "infrastructure-layer adapter",
-      "approved": true,
-      "implements": [],
-      "expected_members": [],
-      "expected_methods": []
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "InfraAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": false
+      },
+      "methods": [],
+      "trait_impls": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
     }
-  ]
+  },
+  "traits": {},
+  "functions": {}
 }

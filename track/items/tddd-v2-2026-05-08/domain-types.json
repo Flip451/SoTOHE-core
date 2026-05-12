@@ -1575,7 +1575,7 @@
           "is_async": false
         }
       ],
-      "docs": "IN-22: modified. Secondary port for loading all catalogues for a track. Return type migrated from BTreeMap<LayerId, TypeCatalogueDocument> to BTreeMap<LayerId, CatalogueDocument> (v3-native). The v3_doc_to_stub conversion path (FsCatalogueLoader) is deleted per IN-21; the infrastructure adapter reads CatalogueDocument directly via CatalogueDocumentCodec.",
+      "docs": "IN-22: modified. Secondary port for loading all catalogues for a track. The return tuple shape (Vec<LayerId>, BTreeMap<LayerId, ...>) is unchanged. T025 changed only the BTreeMap value type: TypeCatalogueDocument -> CatalogueDocument (v3-native). The v3_doc_to_stub conversion path in FsCatalogueLoader was deleted per IN-21; the infrastructure adapter now decodes CatalogueDocument directly via CatalogueDocumentCodec.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
@@ -1685,7 +1685,7 @@
       ],
       "returns": "ContractMapContent",
       "is_async": false,
-      "docs": "T025/IN-24: modified. render_contract_map signature changes from &BTreeMap<LayerId, TypeCatalogueDocument> to &BTreeMap<LayerId, CatalogueDocument> (v3-native migration per IN-22/IN-24). The function is I/O-free and lives in domain (placement rationale: pure transformation, per ADR 2026-04-17-1528 §D1). Post-migration, the renderer reads CatalogueDocument entries directly without v3_doc_to_stub conversion. An OS-07 minimal placeholder (entry name list + deferred note) is implemented as the rendering body. The current (pre-migration) signature takes TypeCatalogueDocument; the declared shape here is the post-migration target.",
+      "docs": "T025/IN-24: modified. render_contract_map signature changed from &BTreeMap<LayerId, TypeCatalogueDocument> to &BTreeMap<LayerId, CatalogueDocument> (v3-native migration per IN-22/IN-24). The function is I/O-free and lives in domain (placement rationale: pure transformation, per ADR 2026-04-17-1528 §D1). The renderer reads CatalogueDocument entries directly without v3_doc_to_stub conversion. The rendering body is an OS-07 minimal placeholder: entry name list per layer plus a deferral note; no node shapes, no edges, no OS-06/T012 references.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-24", "hash": "63c94a4dd073c353ba9a375b2fbdc70a70bfc4e2ea3993babcea28226cf03ef7" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }

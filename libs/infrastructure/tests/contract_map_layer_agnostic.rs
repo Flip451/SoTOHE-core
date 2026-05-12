@@ -27,7 +27,7 @@
 use std::path::PathBuf;
 
 use domain::tddd::{ContractMapRenderOptions, render_contract_map};
-use infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues;
+use infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native;
 
 fn fixtures_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/architecture_rules")
@@ -39,8 +39,8 @@ fn render_for(fixture: &str) -> String {
     let track_dir = fixture_dir.join("track_dir");
     // Trust the fixture directory itself — tests fabricate regular
     // files underneath it, so symlink traversal should never fire.
-    let (order, catalogues) = load_all_catalogues(&track_dir, &rules_path, &fixture_dir)
-        .unwrap_or_else(|e| panic!("load_all_catalogues failed for {fixture}: {e}"));
+    let (order, catalogues) = load_all_catalogues_native(&track_dir, &rules_path, &fixture_dir)
+        .unwrap_or_else(|e| panic!("load_all_catalogues_native failed for {fixture}: {e}"));
     let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
     content.into_string()
 }

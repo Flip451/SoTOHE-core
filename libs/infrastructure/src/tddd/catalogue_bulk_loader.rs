@@ -28,6 +28,7 @@ use std::path::{Path, PathBuf};
 use domain::ValidationError;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue::TypeCatalogueDocument;
+use domain::tddd::catalogue_v2::CatalogueDocument;
 
 use crate::tddd::catalogue_codec::{self, TypeCatalogueCodecError};
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
@@ -426,6 +427,182 @@ fn topological_sort(
 // v3 → v2 stub conversion helpers (implementation in v3_stub module)
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// v3-native errors
+// ---------------------------------------------------------------------------
+
+/// Errors surfaced by [`load_all_catalogues_native`] (v3-native, fail-closed).
+///
+/// Unlike [`LoadAllCataloguesError`], this error type does not carry a
+/// `V3StubConversion` variant and treats any non-v3 catalogue as a
+/// `DecodeNative` hard error (CN-11).
+#[derive(Debug, thiserror::Error)]
+pub enum LoadAllCataloguesNativeError {
+    /// `load_tddd_layers_from_path` failed.
+    #[error("failed to load tddd layer bindings: {0}")]
+    LayerBindings(#[from] LoadTdddLayersError),
+
+    /// Re-parse of `architecture-rules.json` for `may_depend_on` failed.
+    #[error("failed to parse architecture-rules.json at {path}: {reason}")]
+    ArchRulesParse { path: PathBuf, reason: String },
+
+    /// I/O error while reading a catalogue file.
+    #[error("I/O error for catalogue at {path}: {source}")]
+    Io {
+        path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
+    /// Catalogue file is missing on disk (fail-closed).
+    #[error("catalogue file '{}' does not exist for layer '{layer_id}'", .path.display())]
+    CatalogueNotFound { layer_id: String, path: PathBuf },
+
+    /// Catalogue file failed to decode (CN-11: non-v3 is a hard error).
+    #[error("failed to decode catalogue for layer '{layer_id}' at {}: {source}", .path.display())]
+    Decode {
+        layer_id: String,
+        path: PathBuf,
+        #[source]
+        source: CatalogueDocumentCodecError,
+    },
+
+    /// `may_depend_on` forms a cycle among `tddd.enabled` layers.
+    #[error("topological sort failed: cycle detected among layers {cycle:?}")]
+    TopologicalSortFailed { cycle: Vec<String> },
+
+    /// A layer crate name violated [`LayerId`] validation rules.
+    #[error("invalid layer id '{value}': {source}")]
+    InvalidLayerId {
+        value: String,
+        #[source]
+        source: ValidationError,
+    },
+}
+
+/// Load every `tddd.enabled` layer's catalogue from `track_dir` using the
+/// v3-native `CatalogueDocumentCodec` and return `CatalogueDocument` values.
+///
+/// **Fail-closed (CN-11)**: any catalogue that is not `schema_version: 3` is
+/// rejected as a hard decode error — there is no v2 fallback. This function
+/// is the v3-native counterpart to [`load_all_catalogues`] and is used by
+/// `FsCatalogueLoader` (the `CatalogueLoader` port impl) after T025.
+///
+/// # Arguments
+///
+/// * `track_dir` — directory that holds each layer's catalogue file.
+/// * `rules_path` — path to `architecture-rules.json`.
+/// * `trusted_root` — directory below which symlinks are rejected fail-closed.
+///
+/// # Errors
+///
+/// Returns [`LoadAllCataloguesNativeError`] for any I/O, decode, or topology
+/// failure. Non-v3 catalogues surface as `Decode` (CN-11).
+pub fn load_all_catalogues_native(
+    track_dir: &Path,
+    rules_path: &Path,
+    trusted_root: &Path,
+) -> Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), LoadAllCataloguesNativeError> {
+    let bindings = tddd_layers::load_tddd_layers_from_path(rules_path, trusted_root)?;
+    let deps = parse_may_depend_on(rules_path, trusted_root).map_err(|e| match e {
+        LoadAllCataloguesError::LayerBindings(inner) => {
+            LoadAllCataloguesNativeError::LayerBindings(inner)
+        }
+        LoadAllCataloguesError::ArchRulesParse { path, reason } => {
+            LoadAllCataloguesNativeError::ArchRulesParse { path, reason }
+        }
+        LoadAllCataloguesError::Io { path, source } => {
+            LoadAllCataloguesNativeError::Io { path, source }
+        }
+        // parse_may_depend_on only returns these three variants.
+        _ => LoadAllCataloguesNativeError::ArchRulesParse {
+            path: rules_path.to_path_buf(),
+            reason: e.to_string(),
+        },
+    })?;
+
+    let enabled: Vec<&str> = bindings.iter().map(TdddLayerBinding::layer_id).collect();
+
+    let all_known: BTreeSet<&str> = deps.keys().map(String::as_str).collect();
+    for &layer_id in &enabled {
+        let layer_deps = deps.get(layer_id).map_or(&[] as &[String], Vec::as_slice);
+        for dep in layer_deps {
+            if !all_known.contains(dep.as_str()) {
+                return Err(LoadAllCataloguesNativeError::ArchRulesParse {
+                    path: rules_path.to_path_buf(),
+                    reason: format!(
+                        "layer '{layer_id}' lists unknown dependency '{dep}' \
+                         in may_depend_on (not found in architecture-rules.json)"
+                    ),
+                });
+            }
+        }
+    }
+
+    let ordered_names = topological_sort(&enabled, &deps).map_err(|e| match e {
+        LoadAllCataloguesError::TopologicalSortFailed { cycle } => {
+            LoadAllCataloguesNativeError::TopologicalSortFailed { cycle }
+        }
+        _ => LoadAllCataloguesNativeError::ArchRulesParse {
+            path: rules_path.to_path_buf(),
+            reason: e.to_string(),
+        },
+    })?;
+
+    let binding_map: BTreeMap<&str, &TdddLayerBinding> =
+        bindings.iter().map(|b| (b.layer_id(), b)).collect();
+
+    let mut ordered_ids: Vec<LayerId> = Vec::with_capacity(ordered_names.len());
+    let mut catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
+
+    for name in &ordered_names {
+        let Some(binding) = binding_map.get(name.as_str()).copied() else {
+            return Err(LoadAllCataloguesNativeError::ArchRulesParse {
+                path: rules_path.to_path_buf(),
+                reason: format!(
+                    "internal invariant violation: ordered layer '{name}' not found in bindings"
+                ),
+            });
+        };
+
+        let layer_id = LayerId::try_new(name.clone()).map_err(|source| {
+            LoadAllCataloguesNativeError::InvalidLayerId { value: name.clone(), source }
+        })?;
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        match reject_symlinks_below(&catalogue_path, trusted_root) {
+            Ok(true) => {
+                let json = std::fs::read_to_string(&catalogue_path).map_err(|source| {
+                    LoadAllCataloguesNativeError::Io { path: catalogue_path.clone(), source }
+                })?;
+                let stem = derive_filename_stem(&catalogue_path).unwrap_or_else(|| {
+                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()
+                });
+                // CN-11: fail-closed — non-v3 catalogues are a hard error.
+                let doc = CatalogueDocumentCodec::decode(&json, &stem).map_err(|source| {
+                    LoadAllCataloguesNativeError::Decode {
+                        layer_id: layer_id.as_ref().to_owned(),
+                        path: catalogue_path.clone(),
+                        source,
+                    }
+                })?;
+                catalogues.insert(layer_id.clone(), doc);
+                ordered_ids.push(layer_id);
+            }
+            Ok(false) => {
+                return Err(LoadAllCataloguesNativeError::CatalogueNotFound {
+                    layer_id: layer_id.as_ref().to_owned(),
+                    path: catalogue_path,
+                });
+            }
+            Err(source) => {
+                return Err(LoadAllCataloguesNativeError::Io { path: catalogue_path, source });
+            }
+        }
+    }
+
+    Ok((ordered_ids, catalogues))
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
@@ -478,11 +655,103 @@ mod tests {
       "type_definitions": []
     }"#;
 
+    /// Minimal valid v3 catalogues (schema_version=3) for each layer, for use
+    /// with `load_all_catalogues_native`.  The codec validates `crate_name` and
+    /// `layer` against the file stem, so each layer needs its own constant.
+    const V3_DOMAIN_JSON: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "domain",
+      "layer": "domain",
+      "types": {},
+      "traits": {},
+      "functions": {}
+    }"#;
+
+    const V3_USECASE_JSON: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "usecase",
+      "layer": "usecase",
+      "types": {},
+      "traits": {},
+      "functions": {}
+    }"#;
+
+    const V3_INFRASTRUCTURE_JSON: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "infrastructure",
+      "layer": "infrastructure",
+      "types": {},
+      "traits": {},
+      "functions": {}
+    }"#;
+
     fn write(path: &Path, content: &str) {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).unwrap();
         }
         std::fs::write(path, content).unwrap();
+    }
+
+    // -----------------------------------------------------------------------
+    // load_all_catalogues_native tests
+    // -----------------------------------------------------------------------
+
+    /// CN-11 regression: a v2-format catalogue must be a hard error, not a
+    /// silent skip or fallback.  `load_all_catalogues_native` must return
+    /// `LoadAllCataloguesNativeError::Decode` for any non-v3 catalogue.
+    #[test]
+    fn test_load_all_catalogues_native_rejects_v2_catalogue_fail_closed() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let rules = root.join("architecture-rules.json");
+        write(&rules, RULES_REVERSED_ORDER);
+
+        let track_dir = root.join("track-item");
+        // domain and usecase are v3; infrastructure is v2 — must be rejected.
+        write(&track_dir.join("domain-types.json"), V3_DOMAIN_JSON);
+        write(&track_dir.join("usecase-types.json"), V3_USECASE_JSON);
+        // EMPTY_CATALOGUE_JSON is schema_version=2, which must be a hard decode
+        // error under CN-11 (no silent skip / no v2 fallback).
+        write(&track_dir.join("infrastructure-types.json"), EMPTY_CATALOGUE_JSON);
+
+        let err = load_all_catalogues_native(&track_dir, &rules, root).unwrap_err();
+        match err {
+            LoadAllCataloguesNativeError::Decode { layer_id, path, .. } => {
+                assert_eq!(layer_id, "infrastructure", "v2 catalogue must be rejected at decode");
+                assert!(
+                    path.ends_with("infrastructure-types.json"),
+                    "error path must point to the v2 file"
+                );
+            }
+            other => panic!(
+                "expected LoadAllCataloguesNativeError::Decode for v2 catalogue, got {other:?}"
+            ),
+        }
+    }
+
+    /// Happy path: `load_all_catalogues_native` accepts all-v3 catalogues and
+    /// returns them in topological order.
+    #[test]
+    fn test_load_all_catalogues_native_happy_path_sorts_topologically() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let rules = root.join("architecture-rules.json");
+        write(&rules, RULES_REVERSED_ORDER);
+
+        let track_dir = root.join("track-item");
+        write(&track_dir.join("domain-types.json"), V3_DOMAIN_JSON);
+        write(&track_dir.join("usecase-types.json"), V3_USECASE_JSON);
+        write(&track_dir.join("infrastructure-types.json"), V3_INFRASTRUCTURE_JSON);
+
+        let (order, catalogues) = load_all_catalogues_native(&track_dir, &rules, root).unwrap();
+
+        let order_names: Vec<&str> = order.iter().map(LayerId::as_ref).collect();
+        assert_eq!(
+            order_names,
+            ["domain", "usecase", "infrastructure"],
+            "topological order must place dependency-less layers first"
+        );
+        assert_eq!(catalogues.len(), 3);
     }
 
     #[test]

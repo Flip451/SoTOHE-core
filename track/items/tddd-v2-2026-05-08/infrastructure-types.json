@@ -441,6 +441,32 @@
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
       ],
       "informal_grounds": []
+    },
+    "LoadAllCataloguesNativeError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "LayerBindings", "payload": { "kind": "tuple", "fields": ["infrastructure::verify::tddd_layers::LoadTdddLayersError"] } },
+          { "name": "ArchRulesParse", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "std::io::Error" }] } },
+          { "name": "CatalogueNotFound", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "Decode", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "CatalogueDocumentCodecError" }] } },
+          { "name": "TopologicalSortFailed", "payload": { "kind": "struct", "fields": [{ "name": "cycle", "ty": "Vec<String>" }] } },
+          { "name": "InvalidLayerId", "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "String" }, { "name": "source", "ty": "domain::error::ValidationError" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "From", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "T025: added. v3-native counterpart to LoadAllCataloguesError. No V3StubConversion variant (fail-closed per CN-11). thiserror #[from] generates From<LoadTdddLayersError>.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -769,6 +795,39 @@
       "docs": "T008: deleted. Ran check_consistency from component inputs. Removed with TypeGraph/TypeBaseline.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_dir", "ty": "&std::path::Path" },
+        { "name": "rules_path", "ty": "&std::path::Path" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<(Vec<domain::tddd::LayerId>, std::collections::BTreeMap<domain::tddd::LayerId, domain::tddd::catalogue_v2::CatalogueDocument>), LoadAllCataloguesNativeError>",
+      "is_async": false,
+      "docs": "T025: added. v3-native counterpart to load_all_catalogues. Uses CatalogueDocumentCodec::decode directly; rejects non-v3 catalogues fail-closed (CN-11). Used by FsCatalogueLoader after T025.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::type_catalogue_render::render_type_catalogue_v3": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "doc", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" },
+        { "name": "source_file_name", "ty": "&str" },
+        { "name": "type_signals", "ty": "Option<&[domain::TypeSignal]>" },
+        { "name": "catalogue_spec_signals", "ty": "Option<&domain::CatalogueSpecSignalsDocument>" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "docs": "T025: added. v3-native renderer that converts CatalogueDocument into a Markdown table for <layer>-types.md. Groups entries by their v3 role using V3_EXTRA_SECTIONS (Entity, AggregateRoot, Specification, SpecificationPort, UseCaseFunction) in addition to the standard sections. Replaces the v2 render_type_catalogue path for v3 catalogues. Both the Signal column (via type_signals) and the Cat-Spec column (via catalogue_spec_signals, positional with type_name cross-check) are active.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
       ],
       "informal_grounds": []
     }

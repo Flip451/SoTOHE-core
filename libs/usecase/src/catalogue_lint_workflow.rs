@@ -233,11 +233,15 @@ mod tests {
     use std::collections::BTreeMap;
 
     use domain::TrackId;
-    use domain::tddd::catalogue::{TypeAction, TypeCatalogueDocument, TypeCatalogueEntry};
     use domain::tddd::catalogue_linter::{
         CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
     };
     use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
+    use domain::tddd::catalogue_v2::TypeKindV2;
+    use domain::tddd::catalogue_v2::document::CatalogueDocument;
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
+    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
     use domain::tddd::layer_id::LayerId;
     use mockall::{mock, predicate};
 
@@ -254,7 +258,7 @@ mod tests {
                 &self,
                 track_id: &TrackId,
             ) -> Result<
-                (Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>),
+                (Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>),
                 CatalogueLoaderError,
             >;
         }
@@ -266,7 +270,7 @@ mod tests {
             fn run(
                 &self,
                 rules: &[CatalogueLinterRule],
-                catalogue: &TypeCatalogueDocument,
+                catalogue: &CatalogueDocument,
                 layer_id: &str,
             ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>;
         }
@@ -280,41 +284,49 @@ mod tests {
         LayerId::try_new(name.to_owned()).unwrap()
     }
 
-    fn empty_doc() -> TypeCatalogueDocument {
-        TypeCatalogueDocument::new(1, Vec::new())
+    fn empty_doc(crate_name: &str) -> CatalogueDocument {
+        CatalogueDocument::new(3, CrateName::new(crate_name).unwrap(), layer(crate_name))
     }
 
-    fn single_entry_doc(name: &str) -> TypeCatalogueDocument {
-        use domain::tddd::catalogue::TypeDefinitionKind;
-        let entry = TypeCatalogueEntry::new(
-            name,
-            format!("{name} description"),
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
+    fn single_entry_doc(crate_name: &str) -> CatalogueDocument {
+        // T025: v3-native — add one type entry so this document is structurally
+        // distinct from `empty_doc`. Tests use this distinction to verify that
+        // RunCatalogueLint passes the correct layer's catalogue to the linter.
+        let mut doc = empty_doc(crate_name);
+        doc.types.insert(
+            TypeName::new("SentinelType").unwrap(),
+            TypeEntry {
+                action: ItemAction::Add,
+                role: DataRole::ValueObject,
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
+                methods: vec![],
+                trait_impls: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
             },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        TypeCatalogueDocument::new(1, vec![entry])
+        );
+        doc
     }
 
-    fn three_layer_result(
-        target: &str,
-    ) -> (Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>) {
+    fn three_layer_result(target: &str) -> (Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>) {
         let domain = layer("domain");
         let usecase = layer("usecase");
         let infra = layer("infrastructure");
         let order = vec![domain.clone(), usecase.clone(), infra.clone()];
         let mut catalogues = BTreeMap::new();
-        catalogues.insert(domain.clone(), empty_doc());
-        catalogues.insert(usecase.clone(), empty_doc());
-        catalogues.insert(infra.clone(), empty_doc());
+        catalogues.insert(domain.clone(), empty_doc("domain"));
+        catalogues.insert(usecase.clone(), empty_doc("usecase"));
+        catalogues.insert(infra.clone(), empty_doc("infrastructure"));
         // Replace the target layer with a single-entry doc so tests can
         // distinguish whether the correct catalogue was passed.
         let target_layer = layer(target);
-        catalogues.insert(target_layer, single_entry_doc("SomeType"));
+        catalogues.insert(target_layer, single_entry_doc(target));
         (order, catalogues)
     }
 

@@ -1,14 +1,23 @@
 {
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "GatewayAdapter",
-      "kind": "secondary_adapter",
-      "description": "gateway-layer adapter",
-      "approved": true,
-      "implements": [],
-      "expected_members": [],
-      "expected_methods": []
+  "schema_version": 3,
+  "crate_name": "gateway",
+  "layer": "gateway",
+  "types": {
+    "GatewayAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": false
+      },
+      "methods": [],
+      "trait_impls": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
     }
-  ]
+  },
+  "traits": {},
+  "functions": {}
 }

@@ -20,7 +20,7 @@
 //! `knowledge/adr/2026-04-14-1531-…` forbids serde inside `libs/domain`;
 //! codec / serde support lives in the infrastructure codec (T005).
 
-use crate::tddd::catalogue::TypeCatalogueDocument;
+use crate::tddd::catalogue_v2::CatalogueDocument;
 
 // ---------------------------------------------------------------------------
 // CatalogueLinterRuleKind — rule category enum
@@ -247,7 +247,7 @@ pub trait CatalogueLinter: Send + Sync {
     fn run(
         &self,
         rules: &[CatalogueLinterRule],
-        catalogue: &TypeCatalogueDocument,
+        catalogue: &CatalogueDocument,
         layer_id: &str,
     ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError>;
 }

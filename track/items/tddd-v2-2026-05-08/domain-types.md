@@ -4,21 +4,21 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ActionContradictionKind | enum | delete | — | 🔵 | 🔵 |
-| CatalogueLinterRuleKind | enum | reference | — | 🔵 | 🔵 |
-| ContractRole | enum | — | — | 🔵 | 🔵 |
-| DataRole | enum | — | — | 🔵 | 🔵 |
-| FunctionRole | enum | — | — | 🔵 | 🔵 |
-| ItemAction | enum | — | — | 🔵 | 🔵 |
-| MemberDeclaration | enum | reference | — | 🔵 | 🔵 |
-| SelfReceiver | enum | — | — | 🔵 | 🔵 |
-| SignalRegion | enum | — | — | 🔵 | 🔵 |
-| ThreeWaySignalKind | enum | — | — | 🔵 | 🔵 |
-| TypeAction | enum | reference | — | 🔵 | 🔵 |
-| TypeDefinitionKind | enum | modify | — | 🟡 | 🔵 |
-| TypeKindV2 | enum | — | — | 🔵 | 🔵 |
-| TypestateTransitionsSpec | enum | — | — | 🔵 | 🔵 |
-| VariantPayload | enum | — | — | 🔵 | 🔵 |
+| ActionContradictionKind | enum | delete | AddExistingType, DeleteMissingType | 🔵 | 🔵 |
+| CatalogueLinterRuleKind | enum | reference | FieldEmpty, FieldNonEmpty, KindLayerConstraint | 🔵 | 🔵 |
+| ContractRole | enum | — | SpecificationPort, ApplicationService, SecondaryPort | 🔵 | 🔵 |
+| DataRole | enum | — | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter | 🔵 | 🔵 |
+| FunctionRole | enum | — | FreeFunction, UseCaseFunction | 🔵 | 🔵 |
+| ItemAction | enum | — | Add, Modify, Reference, Delete | 🔵 | 🔵 |
+| MemberDeclaration | enum | reference | Variant, Field | 🔵 | 🔵 |
+| SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🔵 | 🔵 |
+| SignalRegion | enum | — | SIntersectC_Match_Add, SIntersectC_Match_Modify, SIntersectC_Match_Reference, SIntersectC_Mismatch_Reference, SIntersectC_Mismatch_Add, SIntersectC_Mismatch_Modify, SMinusC_Reference, SMinusC_Add, SMinusC_Modify, DIntersectC, DMinusC, CMinusSUnionD | 🔵 | 🔵 |
+| ThreeWaySignalKind | enum | — | Skip, Blue, Yellow, Red | 🔵 | 🔵 |
+| TypeAction | enum | reference | Add, Modify, Reference, Delete | 🔵 | 🔵 |
+| TypeDefinitionKind | enum | modify | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, DomainService, FreeFunction | 🟡 | 🔵 |
+| TypeKindV2 | enum | — | UnitStruct, TupleStruct, PlainStruct, Enum, TypeAlias | 🔵 | 🔵 |
+| TypestateTransitionsSpec | enum | — | Terminal, To | 🔵 | 🔵 |
+| VariantPayload | enum | — | Unit, Tuple, Struct | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -75,29 +75,29 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueDocumentError | error_type | — | — | 🔵 | 🔵 |
-| CatalogueDocumentLoaderError | error_type | — | — | 🔵 | 🔵 |
-| CatalogueLinterError | error_type | reference | — | 🔵 | 🔵 |
-| GenericArgsError | error_type | — | — | 🔵 | 🔵 |
-| IdentifierError | error_type | — | — | 🔵 | 🔵 |
-| NewTypeGraphCodecError | error_type | — | — | 🔵 | 🔵 |
-| Phase1Error | error_type | — | — | 🔵 | 🔵 |
-| RustdocCratePortError | error_type | — | — | 🔵 | 🔵 |
-| TdddLayerBindingsError | error_type | — | — | 🔵 | 🔵 |
+| CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🔵 | 🔵 |
+| CatalogueDocumentLoaderError | error_type | — | NotFound, Io, Decode | 🔵 | 🔵 |
+| CatalogueLinterError | error_type | reference | InvalidRuleConfig | 🔵 | 🔵 |
+| GenericArgsError | error_type | — | Empty, StartsWithAngleBracket, UnbalancedAngleBrackets | 🔵 | 🔵 |
+| IdentifierError | error_type | — | Empty, InvalidCharacters, InvalidSegment, InvalidFunctionPath | 🔵 | 🔵 |
+| NewTypeGraphCodecError | error_type | — | InvalidTypeRef, AmbiguousTypeName | 🔵 | 🔵 |
+| Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🔵 | 🔵 |
+| RustdocCratePortError | error_type | — | NotFound, Io, ParseFailed, CaptureFailed | 🔵 | 🔵 |
+| TdddLayerBindingsError | error_type | — | LoadFailed, LayerNotFound, NoLayers | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueDocumentLoaderPort | secondary_port | — | — | 🔵 | 🔵 |
-| CatalogueLinter | secondary_port | modify | — | 🟡 | 🔵 |
-| CatalogueLoader | secondary_port | modify | — | 🟡 | 🔵 |
-| CatalogueToExtendedCratePort | secondary_port | — | — | 🔵 | 🔵 |
-| ContractMapWriter | secondary_port | reference | — | 🔵 | 🔵 |
-| RustdocCratePort | secondary_port | — | — | 🔵 | 🔵 |
-| SchemaExporter | secondary_port | reference | — | 🔵 | 🔵 |
-| SignalEvaluatorPort | secondary_port | — | — | 🔵 | 🔵 |
-| TdddLayerBindingsPort | secondary_port | — | — | 🔵 | 🔵 |
+| CatalogueDocumentLoaderPort | secondary_port | — | fn load(&self, path: &std::path::Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> | 🔵 | 🔵 |
+| CatalogueLinter | secondary_port | modify | fn run(&self, rules: &[CatalogueLinterRule], catalogue: &CatalogueDocument, layer_id: &str) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> | 🔵 | 🔵 |
+| CatalogueLoader | secondary_port | modify | fn load_all(&self, track_id: &TrackId) -> Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError> | 🔵 | 🔵 |
+| CatalogueToExtendedCratePort | secondary_port | — | fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError> | 🔵 | 🔵 |
+| ContractMapWriter | secondary_port | reference | fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError> | 🔵 | 🔵 |
+| RustdocCratePort | secondary_port | — | fn load_from_path(&self, path: &std::path::Path) -> Result<rustdoc_types::Crate, RustdocCratePortError>, fn capture_current(&self, crate_name: &str) -> Result<rustdoc_types::Crate, RustdocCratePortError> | 🔵 | 🔵 |
+| SchemaExporter | secondary_port | reference | fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> | 🔵 | 🔵 |
+| SignalEvaluatorPort | secondary_port | — | fn evaluate(&self, a: ExtendedCrate, b: rustdoc_types::Crate, c: rustdoc_types::Crate) -> Result<ThreeWayEvaluationReport, Phase1Error> | 🔵 | 🔵 |
+| TdddLayerBindingsPort | secondary_port | — | fn load(&self, workspace_root: &std::path::Path, layer_filter: Option<&str>) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> | 🔵 | 🔵 |
 
 ## Domain Services
 
@@ -111,13 +111,13 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity | free_function | reference | — | 🔵 | 🔵 |
-| domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals | free_function | reference | — | 🔵 | 🔵 |
-| domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal | free_function | modify | — | 🔵 | 🔵 |
-| domain::tddd::consistency::check_consistency | free_function | delete | — | 🔵 | 🔵 |
-| domain::tddd::consistency::check_type_signals | free_function | modify | — | 🔵 | 🔵 |
-| domain::tddd::contract_map_render::render_contract_map | free_function | modify | — | 🟡 | 🔵 |
-| domain::tddd::signals::evaluate_type_signals | free_function | delete | — | 🔵 | 🔵 |
-| domain::tddd::signals::undeclared_functions_to_signals | free_function | delete | — | 🔵 | 🔵 |
-| domain::tddd::signals::undeclared_to_signals | free_function | delete | — | 🔵 | 🔵 |
+| domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity | free_function | reference | fn(layer: &LayerId, catalogue: &TypeCatalogueDocument, spec_element_hashes: &BTreeMap<SpecElementId, ContentHash>, current_catalogue_hash: Option<&ContentHash>, signals_opt: Option<&CatalogueSpecSignalsDocument>) -> Vec<SpecRefFinding> | 🔵 | 🔵 |
+| domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals | free_function | reference | fn(layer_id: &str, catalogue: &TypeCatalogueDocument, spec_doc: &SpecDocument) -> CatalogueSpecSignalsDocument | 🔵 | 🔵 |
+| domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal | free_function | modify | fn(action: ItemAction, spec_refs: &[SpecRef], informal_grounds: &[InformalGroundRef]) -> ConfidenceSignal | 🔵 | 🔵 |
+| domain::tddd::consistency::check_consistency | free_function | delete | fn() -> ConsistencyReport | 🔵 | 🔵 |
+| domain::tddd::consistency::check_type_signals | free_function | modify | fn(doc: &TypeSignalsDocument, strict: bool) -> VerifyOutcome | 🔵 | 🔵 |
+| domain::tddd::contract_map_render::render_contract_map | free_function | modify | fn(catalogues: &BTreeMap<LayerId, CatalogueDocument>, layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> ContractMapContent | 🔵 | 🔵 |
+| domain::tddd::signals::evaluate_type_signals | free_function | delete | fn() -> Vec<TypeSignal> | 🔵 | 🔵 |
+| domain::tddd::signals::undeclared_functions_to_signals | free_function | delete | fn() -> Vec<TypeSignal> | 🔵 | 🔵 |
+| domain::tddd::signals::undeclared_to_signals | free_function | delete | fn() -> Vec<TypeSignal> | 🔵 | 🔵 |
 

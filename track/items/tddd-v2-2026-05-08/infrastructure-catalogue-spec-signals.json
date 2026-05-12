@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4b0d9383ce83a350bc6df03389dab19f661889ef5f0fdd9223f7203ccd7dec4c",
+  "catalogue_declaration_hash": "f61196ceeea0c780f8798960ef0245e70eb7cfc61d36d50cb7542d0c4d926f69",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -83,6 +83,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "LoadAllCataloguesNativeError",
+      "signal": "blue"
+    },
+    {
       "type_name": "RustdocCrateAdapter",
       "signal": "blue"
     },
@@ -143,6 +147,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native",
+      "signal": "blue"
+    },
+    {
       "type_name": "infrastructure::tddd::catalogue_codec::decode",
       "signal": "blue"
     },
@@ -196,6 +204,10 @@
     },
     {
       "type_name": "infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::type_catalogue_render::render_type_catalogue_v3",
       "signal": "blue"
     },
     {

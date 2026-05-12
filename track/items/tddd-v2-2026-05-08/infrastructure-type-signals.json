@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-12T12:22:31Z",
-  "declaration_hash": "4b0d9383ce83a350bc6df03389dab19f661889ef5f0fdd9223f7203ccd7dec4c",
+  "generated_at": "2026-05-12T16:43:48Z",
+  "declaration_hash": "f61196ceeea0c780f8798960ef0245e70eb7cfc61d36d50cb7542d0c4d926f69",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
@@ -121,6 +121,17 @@
       ]
     },
     {
+      "type_name": "LoadAllCataloguesNativeError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From",
+        "core::error::Error",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "RustdocCrateAdapter",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
@@ -162,6 +173,12 @@
       "found_type": true
     },
     {
+      "type_name": "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer",
       "kind_tag": "free_function",
       "signal": "blue",
@@ -169,6 +186,12 @@
     },
     {
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::type_catalogue_render::render_type_catalogue_v3",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
