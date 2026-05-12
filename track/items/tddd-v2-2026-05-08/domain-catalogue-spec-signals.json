@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "256f911aa69d64ea43e7350d7766706cb005b818ae38f0eb16ec0d0f2ff84b7f",
+  "catalogue_declaration_hash": "9d974716d6ffe6837a1cf94d84c119c930b0fe29f34f7a3afc98917955789834",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -276,10 +276,6 @@
     },
     {
       "type_name": "TypestateTransitions",
-      "signal": "blue"
-    },
-    {
-      "type_name": "TypestateTransitionsSpec",
       "signal": "blue"
     },
     {

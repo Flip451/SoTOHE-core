@@ -371,7 +371,7 @@
       "informal_grounds": []
     },
     "TypeCatalogueCodecError": {
-      "action": "reference",
+      "action": "delete",
       "role": "ErrorType",
       "kind": {
         "kind": "enum",
@@ -382,7 +382,7 @@
           { "name": "InvalidEntry" }
         ]
       },
-      "docs": "IN-21 (pending deletion): Old v2 codec error for TypeCatalogueDocument (infrastructure::tddd::catalogue_codec). The entire catalogue_codec module (including decode/encode free functions and this error type) will be deleted per IN-21. Replaced by CatalogueDocumentCodecError. Referenced (not delete) pending IN-21 implementation to avoid Phase 1 DanglingId cascade.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy codec error for TypeCatalogueDocument (infrastructure::tddd::catalogue_codec). The entire catalogue_codec module was deleted per IN-21. Replaced by CatalogueDocumentCodecError.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
@@ -416,7 +416,7 @@
       "informal_grounds": []
     },
     "LoadAllCataloguesError": {
-      "action": "modify",
+      "action": "delete",
       "role": "ErrorType",
       "kind": {
         "kind": "enum",
@@ -435,7 +435,7 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "docs": "IN-21/IN-22: errors surfaced by load_all_catalogues. Post-T027 target state: Decode variant source type is CatalogueDocumentCodecError (migrated from TypeCatalogueCodecError in T027, same task that deletes TypeCatalogueCodecError), V3StubConversion variant deleted. thiserror #[from] generates From<LoadTdddLayersError>; declared here without generic args so the signal evaluator covers it via generic-args-stripped fallback.",
+      "docs": "Deleted in T027/IN-21 — the v1/v2 load_all_catalogues path was removed entirely; FsCatalogueLoader now uses load_all_catalogues_native / LoadAllCataloguesNativeError instead. The V3StubConversion variant was never added (deleted before implementation).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
@@ -473,24 +473,24 @@
   },
   "functions": {
     "infrastructure::tddd::catalogue_codec::decode": {
-      "action": "reference",
+      "action": "delete",
       "role": "FreeFunction",
       "params": [{ "name": "json", "ty": "&str" }],
       "returns": "Result<TypeCatalogueDocument, TypeCatalogueCodecError>",
       "is_async": false,
-      "docs": "IN-21 (pending deletion): free function that decodes a JSON string into TypeCatalogueDocument (schema_version=2). The entire infrastructure::tddd::catalogue_codec module will be deleted per IN-21. Replaced by CatalogueDocumentCodec::decode. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy free function decoding a JSON string into TypeCatalogueDocument (schema_version=2). The entire infrastructure::tddd::catalogue_codec module was deleted per IN-21. Replaced by CatalogueDocumentCodec::decode.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
     "infrastructure::tddd::catalogue_codec::encode": {
-      "action": "reference",
+      "action": "delete",
       "role": "FreeFunction",
       "params": [{ "name": "doc", "ty": "&TypeCatalogueDocument" }],
       "returns": "Result<String, TypeCatalogueCodecError>",
       "is_async": false,
-      "docs": "IN-21 (pending deletion): free function that encodes a TypeCatalogueDocument to a JSON string (schema_version=2). The entire infrastructure::tddd::catalogue_codec module will be deleted per IN-21. Replaced by CatalogueDocumentCodec::encode. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy free function encoding a TypeCatalogueDocument to a JSON string (schema_version=2). The entire infrastructure::tddd::catalogue_codec module was deleted per IN-21. Replaced by CatalogueDocumentCodec::encode.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
@@ -798,6 +798,22 @@
       ],
       "informal_grounds": []
     },
+    "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_dir", "ty": "&std::path::Path" },
+        { "name": "rules_path", "ty": "&std::path::Path" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<(Vec<domain::tddd::LayerId>, std::collections::BTreeMap<domain::tddd::LayerId, domain::tddd::TypeCatalogueDocument>), LoadAllCataloguesError>",
+      "is_async": false,
+      "docs": "Deleted in T027/IN-21 — the v1/v2 bulk-loader free function that loaded TypeCatalogueDocument per layer. Replaced by load_all_catalogues_native (v3-native, uses CatalogueDocumentCodec). The LoadAllCataloguesError type was deleted together with this function.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
     "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native": {
       "action": "add",
       "role": "FreeFunction",
@@ -811,6 +827,18 @@
       "docs": "T025: added. v3-native counterpart to load_all_catalogues. Uses CatalogueDocumentCodec::decode directly; rejects non-v3 catalogues fail-closed (CN-11). Used by FsCatalogueLoader after T025.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::type_catalogue_render::render_type_catalogue": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "docs": "Deleted in T027/IN-21 — the v1/v2 render_type_catalogue function was removed when the v2 catalogue path was eliminated. Replaced by render_type_catalogue_v3 for v3 CatalogueDocument rendering.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },

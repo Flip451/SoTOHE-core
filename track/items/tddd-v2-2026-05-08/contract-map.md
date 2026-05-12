@@ -74,7 +74,6 @@ flowchart LR
         %% type: TypeSignal
         %% type: TypestateMarker
         %% type: TypestateTransitions
-        %% type: TypestateTransitionsSpec
         %% type: VariantDecl
         %% type: VariantName
         %% type: VariantPayload
@@ -148,6 +147,7 @@ flowchart LR
         %% fn: infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer
         %% fn: infrastructure::tddd::baseline_codec::decode
         %% fn: infrastructure::tddd::baseline_codec::encode
+        %% fn: infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues
         %% fn: infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native
         %% fn: infrastructure::tddd::catalogue_codec::decode
         %% fn: infrastructure::tddd::catalogue_codec::encode
@@ -163,6 +163,7 @@ flowchart LR
         %% fn: infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer
         %% fn: infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics
         %% fn: infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue
+        %% fn: infrastructure::type_catalogue_render::render_type_catalogue
         %% fn: infrastructure::type_catalogue_render::render_type_catalogue_v3
         %% fn: infrastructure::verify::spec_code_consistency::consistency_report_to_findings
         %% fn: infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components

@@ -1290,30 +1290,8 @@
       ],
       "informal_grounds": []
     },
-    "TypestateTransitionsSpec": {
-      "action": "add",
-      "role": "ValueObject",
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          { "name": "Terminal" },
-          { "name": "To", "payload": { "kind": "tuple", "fields": ["Vec<String>"] } }
-        ]
-      },
-      "trait_impls": [
-        { "trait_name": "Debug", "origin_crate": "core" },
-        { "trait_name": "Clone", "origin_crate": "core" },
-        { "trait_name": "PartialEq", "origin_crate": "core" },
-        { "trait_name": "Eq", "origin_crate": "core" }
-      ],
-      "docs": "Renamed from TypestateTransitions (Blocker 1): v1 catalogue spec representation of typestate transitions. Renamed to avoid short-name collision with catalogue_v2::TypestateTransitions struct.",
-      "spec_refs": [
-        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
-      ],
-      "informal_grounds": []
-    },
     "TypeDefinitionKind": {
-      "action": "modify",
+      "action": "delete",
       "role": "ValueObject",
       "kind": {
         "kind": "enum",
@@ -1339,27 +1317,27 @@
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
-      "docs": "IN-21 (pending deletion): v1 enum classifying type-catalogue entries by structural role (15 variants). Superseded by DataRole/ContractRole/FunctionRole in the v3 CatalogueDocument schema. Declared as modify (not delete) because the type is still present in C and referenced by many other C-items; switching to action:delete before the IN-21 implementation causes Phase 1 DanglingId failures in the signal evaluator. Variant payloads omitted (unit placeholders) — mismatch with C struct-field payloads gives SIntersectC_Mismatch_Modify (Yellow), which is acceptable for a pending-deletion traceability entry. Delete action will be set after the IN-21 implementation removes all references from the codebase.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy enum classifying type-catalogue entries by structural role (15 variants). Superseded by DataRole/ContractRole/FunctionRole in the v3 CatalogueDocument schema. All references removed from the codebase as part of v1/v2 asset cleanup.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
     "TypeCatalogueDocument": {
-      "action": "reference",
+      "action": "delete",
       "role": "ValueObject",
       "kind": { "kind": "plain_struct" },
-      "docs": "IN-21 (pending deletion): v1/v2 aggregate type holding TypeCatalogueEntry entries per layer. Superseded by CatalogueDocument (domain::tddd::catalogue_v2). Declared as reference (not delete) because the type is still present in C and referenced transitively by many C-items (check_catalogue_spec_ref_integrity, check_catalogue_spec_signals, TypeInfo, SchemaExport, etc.); switching to action:delete before IN-21 implementation causes Phase 1 DanglingId cascade in the signal evaluator.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy aggregate type holding TypeCatalogueEntry entries per layer. Superseded by CatalogueDocument (domain::tddd::catalogue_v2). All references (check_catalogue_spec_ref_integrity, check_catalogue_spec_signals, etc.) removed from the codebase as part of v1/v2 asset cleanup.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
     "TypeCatalogueEntry": {
-      "action": "reference",
+      "action": "delete",
       "role": "ValueObject",
       "kind": { "kind": "plain_struct" },
-      "docs": "IN-21 (pending deletion): v1/v2 per-entry type inside TypeCatalogueDocument. Superseded by TypeEntry/TraitEntry/FunctionEntry in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy per-entry type inside TypeCatalogueDocument. Superseded by TypeEntry/TraitEntry/FunctionEntry in v3 CatalogueDocument. Removed as part of v1/v2 asset cleanup.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
@@ -1375,7 +1353,7 @@
           { "name": "Field" }
         ]
       },
-      "docs": "IN-21 (pending deletion): v1 enum for struct-field / enum-variant member declarations inside TypeDefinitionKind variant payloads. Superseded by FieldDecl / VariantDecl in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation — still used by domain::schema::TypeInfo.",
+      "docs": "Existing v1 enum for struct-field / enum-variant member declarations used by domain::schema::TypeInfo. Retained in this track — not modified. Referenced for catalogue grounding.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
@@ -1385,24 +1363,24 @@
       "action": "reference",
       "role": "ValueObject",
       "kind": { "kind": "plain_struct" },
-      "docs": "IN-21 (pending deletion): v1 struct capturing enum variant name and payload_types (Vec<String>). Superseded by VariantDecl + VariantPayload in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Existing v1 struct capturing enum variant name and payload_types (Vec<String>). Retained in this track — not modified. Still used by domain::tddd::signals / domain::tddd::baseline / domain::tddd::schema. Referenced for catalogue grounding.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
     "TraitImplDecl": {
-      "action": "reference",
+      "action": "delete",
       "role": "ValueObject",
       "kind": { "kind": "plain_struct" },
-      "docs": "IN-21 (pending deletion): Old v1-style trait implementation declaration (with expected_methods field) inside TypeDefinitionKind::SecondaryAdapter payload. Superseded by TraitImplDeclV2. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy trait implementation declaration (with expected_methods field) used inside TypeDefinitionKind::SecondaryAdapter payload. Superseded by TraitImplDeclV2. Removed as part of v1/v2 asset cleanup.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
     "TypeAction": {
-      "action": "reference",
+      "action": "delete",
       "role": "ValueObject",
       "kind": {
         "kind": "enum",
@@ -1413,7 +1391,7 @@
           { "name": "Delete" }
         ]
       },
-      "docs": "IN-21 (pending deletion): v1 action enum for TypeCatalogueEntry. Superseded by ItemAction in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy action enum for TypeCatalogueEntry. Superseded by ItemAction in v3 CatalogueDocument. Removed as part of v1/v2 asset cleanup.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
@@ -1423,7 +1401,7 @@
       "action": "reference",
       "role": "ValueObject",
       "kind": { "kind": "plain_struct" },
-      "docs": "IN-21 (pending deletion): v1 signal result struct produced by the old evaluate_type_signals / undeclared_to_signals pipeline (domain::tddd::signals). The new pipeline uses ThreeWaySignal / ThreeWayEvaluationReport. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Existing v3-native signal result struct produced by the type-signals pipeline (domain::tddd::type_signals_doc::TypeSignalsDocument element type). Retained in this track — not modified. Used by the merge/commit gate. Referenced for catalogue grounding.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
@@ -1693,7 +1671,7 @@
       "informal_grounds": []
     },
     "domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity": {
-      "action": "reference",
+      "action": "delete",
       "role": "FreeFunction",
       "params": [
         { "name": "layer", "ty": "&LayerId" },
@@ -1704,14 +1682,14 @@
       ],
       "returns": "Vec<SpecRefFinding>",
       "is_async": false,
-      "docs": "IN-21 (pending deletion): validates spec_refs[] integrity against a TypeCatalogueDocument. Will be deleted as part of IN-21 v1/v2 asset removal. Referenced (not delete) pending IN-21 implementation to avoid Phase 1 DanglingId cascade.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy free function validating spec_refs[] integrity against a TypeCatalogueDocument. Removed as part of v1/v2 asset cleanup.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
     "domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals": {
-      "action": "reference",
+      "action": "delete",
       "role": "FreeFunction",
       "params": [
         { "name": "layer_id", "ty": "&str" },
@@ -1720,7 +1698,7 @@
       ],
       "returns": "CatalogueSpecSignalsDocument",
       "is_async": false,
-      "docs": "IN-21 (pending deletion): evaluates catalogue-spec signals for a TypeCatalogueDocument. Will be deleted as part of IN-21 v1/v2 asset removal — callers migrate to v3-native CatalogueDocument evaluate path. Referenced (not delete) pending IN-21 implementation.",
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy free function evaluating catalogue-spec signals for a TypeCatalogueDocument. Callers migrated to the v3-native CatalogueDocument evaluate path. Removed as part of v1/v2 asset cleanup.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],

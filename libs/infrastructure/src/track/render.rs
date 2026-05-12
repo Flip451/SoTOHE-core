@@ -930,7 +930,7 @@ pub fn sync_rendered_views(
         //     is not loaded for done/archived tracks so a malformed rules file cannot cause
         //     failures on frozen tracks where type-catalogue rendering is a no-op)
         //   - rendered_matches drift check (no-op if content unchanged)
-        //   - TypeCatalogueCodecError::Json warn-and-continue (file may be mid-edit)
+        //   - CatalogueDocumentCodecError::Json (syntax/EOF) warn-and-continue (file may be mid-edit)
         // Legacy fallback: when architecture-rules.json is absent, a synthetic
         // domain-only binding is used so pre-multilayer tracks continue to work.
         if !is_done_or_archived {
@@ -3225,7 +3225,7 @@ mod tests {
 
     #[test]
     fn sync_rendered_views_malformed_layer_json_does_not_block_other_layers() {
-        // D3 guarantee: the per-layer `TypeCatalogueCodecError::Json` warn-and-continue
+        // D3 guarantee: the per-layer `CatalogueDocumentCodecError::Json` (syntax/EOF) warn-and-continue
         // path must be exercised in a multi-layer scenario. A malformed catalogue for
         // one layer (usecase) must not prevent the other layers (domain, infrastructure)
         // from rendering their views. This is the cross-layer error isolation guarantee.
