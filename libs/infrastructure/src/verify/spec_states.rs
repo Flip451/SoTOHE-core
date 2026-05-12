@@ -10,9 +10,7 @@ use domain::check_type_signals;
 use domain::spec::check_spec_doc_signals;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
-use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub;
-use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
-use crate::tddd::{catalogue_codec, type_signals_codec};
+use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard;
 
 use super::frontmatter::parse_yaml_frontmatter;
@@ -186,6 +184,12 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Verify
 /// NotFound on the catalogue file is treated as "TDDD not active for this
 /// layer" and returns a clean outcome (no findings). Other errors return
 /// fail-closed [`VerifyFinding::error`] entries.
+///
+/// T022: Rewired to use `TypeSignalsDocument` directly. The catalogue file
+/// is still read to compute the `declaration_hash` for freshness verification
+/// (ADR 2026-04-18-1400 §D5). All catalogue decoding and `doc.set_signals`
+/// calls are removed — `check_type_signals` now takes `&TypeSignalsDocument`
+/// directly (pure function over the signals document).
 fn evaluate_layer_catalogue(
     binding: &TdddLayerBinding,
     dir: &Path,
@@ -209,70 +213,15 @@ fn evaluate_layer_catalogue(
         }
     }
 
-    // Read declaration bytes once. `declaration_hash` (below) is pinned to the
-    // post-encode on-disk bytes per ADR 2026-04-18-1400 §D5, so the `[u8]` view
-    // feeding the SHA-256 digest must be exactly what went to disk.
+    // Read declaration bytes for the freshness check (SHA-256 comparison).
+    // The `declaration_hash` in the signal file must match the SHA-256 of
+    // these bytes (ADR 2026-04-18-1400 §D5). No catalogue decoding needed.
     let declaration_bytes = match std::fs::read(&catalogue_path) {
         Ok(b) => b,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 catalogue_path.display()
-            ))]);
-        }
-    };
-    let catalogue_str = match std::str::from_utf8(&declaration_bytes) {
-        Ok(s) => s,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: invalid UTF-8: {e}",
-                catalogue_path.display()
-            ))]);
-        }
-    };
-    // Decode the catalogue.  For schema_version=3 (v3) catalogues, fall through
-    // to the `CatalogueDocumentCodec` + `v3_doc_to_stub` path which produces a
-    // v2-compat `TypeCatalogueDocument` stub so that `check_type_signals` can
-    // evaluate the externally-stored signal file against it.
-    let mut doc = match catalogue_codec::decode(catalogue_str) {
-        Ok(d) => d,
-        Err(catalogue_codec::TypeCatalogueCodecError::UnsupportedSchemaVersion(_)) => {
-            // Try the v3 codec path.
-            // Derive the crate-name stem (e.g. `"domain"` from `"domain-types.json"`)
-            // the same way `type_signals_evaluator` does: strip the `-types.json` suffix
-            // from the filename, falling back to `file_stem()` for unexpected names.
-            let stem = catalogue_path
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("")
-                .strip_suffix("-types.json")
-                .unwrap_or_else(|| {
-                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
-                })
-                .to_owned();
-            match CatalogueDocumentCodec::decode(catalogue_str, &stem) {
-                Ok(v3_doc) => match v3_doc_to_stub(&v3_doc) {
-                    Ok(stub) => stub,
-                    Err(e) => {
-                        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                            "{}: failed to convert v3 catalogue to stub: {e}",
-                            catalogue_path.display()
-                        ))]);
-                    }
-                },
-                Err(e) => {
-                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                        "{}: failed to decode as v3 catalogue: {e:?}",
-                        catalogue_path.display()
-                    ))]);
-                }
-            }
-        }
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{}: invalid {}: {e}",
-                catalogue_path.display(),
-                binding.catalogue_file()
             ))]);
         }
     };
@@ -283,12 +232,9 @@ fn evaluate_layer_catalogue(
     // merge gate paths (the `strict` flag does NOT relax these cases).
     let signal_file_name = binding.signal_file();
     let signal_path = dir.join(&signal_file_name);
-    match symlink_guard::reject_symlinks_below(&signal_path, trusted_root) {
+    let signals_doc = match symlink_guard::reject_symlinks_below(&signal_path, trusted_root) {
         Ok(true) => {
-            // Signal file present and not a symlink — decode, compare hash,
-            // and plumb the signals into the declaration document so that
-            // `check_type_signals` evaluates against the externally-stored
-            // evaluation result rather than any legacy inline signals.
+            // Signal file present and not a symlink — decode and compare hash.
             let signal_str = match std::fs::read_to_string(&signal_path) {
                 Ok(s) => s,
                 Err(e) => {
@@ -298,7 +244,7 @@ fn evaluate_layer_catalogue(
                     ))]);
                 }
             };
-            let signals_doc = match type_signals_codec::decode(&signal_str) {
+            let doc = match type_signals_codec::decode(&signal_str) {
                 Ok(d) => d,
                 Err(e) => {
                     return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -309,16 +255,16 @@ fn evaluate_layer_catalogue(
                 }
             };
             let current_hash = type_signals_codec::declaration_hash(&declaration_bytes);
-            if signals_doc.declaration_hash() != current_hash {
+            if doc.declaration_hash() != current_hash {
                 return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "{}: declaration_hash mismatch (recorded={}, current={}) — \
                      re-run `sotp track type-signals` to refresh the evaluation result",
                     signal_path.display(),
-                    signals_doc.declaration_hash(),
+                    doc.declaration_hash(),
                     current_hash
                 ))]);
             }
-            doc.set_signals(signals_doc.signals().to_vec());
+            doc
         }
         Ok(false) => {
             // Signal file is genuinely absent. ADR §D5: fail-closed symmetric
@@ -336,9 +282,9 @@ fn evaluate_layer_catalogue(
                 signal_path.display()
             ))]);
         }
-    }
+    };
 
-    check_type_signals(&doc, strict, binding.catalogue_file())
+    check_type_signals(&signals_doc, strict)
 }
 
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
@@ -1020,17 +966,16 @@ mod tests {
     }
 
     #[test]
-    fn test_verify_from_spec_json_with_custom_catalogue_override_mentions_override_in_findings() {
+    fn test_verify_from_spec_json_with_custom_catalogue_override_red_signal_blocks() {
         // Verify that when `architecture-rules.json` uses a non-default
-        // `tddd.catalogue_file` override (here: "custom-types.json"), the
-        // error message produced by Stage 2 mentions that overridden filename
-        // rather than the layer-id derived default ("domain-types.json").
+        // `tddd.catalogue_file` override (here: "custom-types.json"), Stage 2
+        // still correctly evaluates the overridden file and blocks on a Red signal.
         //
-        // A regression in this code path would silently forward
-        // `binding.catalogue_file()` as the wrong name, producing diagnostics
-        // that point at a file the developer never sees.
+        // T022: check_type_signals no longer receives a filename argument, so the
+        // error message contains the type name ("TrackId") instead of the catalogue
+        // filename. The test asserts that (a) the gate blocks, and (b) the Red
+        // signal type name is present in the finding.
         let dir = tempfile::tempdir().unwrap();
-        // Write arch rules with a custom catalogue_file override.
         let arch_rules_custom = r#"{
   "version": 2,
   "layers": [
@@ -1054,9 +999,18 @@ mod tests {
         write_matching_signal_file(dir.path(), "custom-types.json", "custom-type-signals.json");
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
+        // The error mentions the type name (TrackId) from the Red signal.
         assert!(
-            outcome.findings().iter().any(|f| f.message().contains("custom-types.json")),
-            "finding must mention the override filename 'custom-types.json': {outcome:?}"
+            outcome.findings().iter().any(|f| f.message().contains("Red")),
+            "finding must mention Red signal: {outcome:?}"
+        );
+        // T022: check_type_signals no longer receives a filename argument; the
+        // diagnostic now identifies the offending type by name. Verify that
+        // "TrackId" (the Red-signal type in DOMAIN_TYPES_WITH_RED_SIGNAL) is
+        // present in at least one finding.
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("TrackId")),
+            "finding must mention the Red-signal type name 'TrackId': {outcome:?}"
         );
     }
 

@@ -309,7 +309,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             panic!("FixedReader::read_type_catalogue should not be called by T009 tests")
         }
 
@@ -376,7 +376,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             panic!("should not be called")
         }
 
@@ -416,7 +416,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             panic!("should not be called")
         }
 
@@ -491,7 +491,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             panic!("should not be called")
         }
 
@@ -542,7 +542,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             panic!("should not be called")
         }
 

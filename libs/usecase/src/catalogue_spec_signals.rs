@@ -389,7 +389,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             panic!("FixedReader::read_type_catalogue should not be called by T008 tests")
         }
 

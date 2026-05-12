@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-12T10:35:42Z",
-  "declaration_hash": "cfcf664f904984014c96c90bd50b324685edede1a0aedd0b7ac49f7893e1fa6e",
+  "generated_at": "2026-05-12T11:26:44Z",
+  "declaration_hash": "3d1380bec367eb5ae4397436d07a326d14a15f5227518e98a8cbfee7f0480437",
   "signals": [
     {
       "type_name": "CatalogueDocument",
@@ -634,7 +634,7 @@
     {
       "type_name": "domain::tddd::consistency::check_type_signals",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

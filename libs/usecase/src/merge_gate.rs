@@ -23,6 +23,8 @@ use domain::{
 };
 use domain::{TypeCatalogueDocument, TypeSignalsDocument, check_type_signals};
 
+// Note: TypeCatalogueDocument is still used by read_catalogue_for_spec_ref_check port.
+
 use crate::catalogue_spec_refs::SpecElementHashReader;
 
 /// Result of a port-level blob fetch.
@@ -60,26 +62,34 @@ pub trait TrackBlobReader {
     /// `branch` (e.g. `"track/foo-2026-04-12"`).
     fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>;
 
-    /// Reads and decodes the TDDD catalogue file for a single layer on the
-    /// given branch.
+    /// Reads the raw bytes of the TDDD catalogue file for a single layer on
+    /// the given branch and returns them alongside a pre-computed SHA-256 hex
+    /// digest of those bytes.
     ///
     /// Accepts a `layer_id` so the merge-gate multilayer loop can read each
     /// layer's catalogue (`domain-types.json`, `usecase-types.json`, …).
     /// Returns `NotFound` when the file does not exist on the target ref —
     /// this corresponds to "TDDD not active for this layer" per ADR §D2.1.
     ///
-    /// The `Found` variant returns `(doc, catalogue_file)` where
-    /// `catalogue_file` is the resolved filename the adapter actually read
-    /// (honoring `architecture-rules.json` `tddd.catalogue_file` overrides).
-    /// Downstream diagnostics (e.g. `check_type_signals`) must use this
-    /// resolved name, not a layer-id derived default, so error messages
-    /// point at the real file on disk.
+    /// The `Found` variant returns `(raw_bytes, declaration_hash)` where
+    /// `declaration_hash` is the 64-character lowercase hex SHA-256 digest
+    /// of `raw_bytes` (the same digest stored in `<layer>-type-signals.json`
+    /// under `declaration_hash`). Callers use it for freshness checks against
+    /// `TypeSignalsDocument::declaration_hash()` without re-hashing in the
+    /// usecase layer. The raw bytes are carried for callers that need them;
+    /// Stage 2 (`check_strict_merge_gate`) only uses the hash.
+    ///
+    /// T022: The return type changed from `(TypeCatalogueDocument, String)`
+    /// (decoded document + filename) to `(Vec<u8>, String)` (raw bytes +
+    /// `declaration_hash`). Decoding the catalogue is no longer required for
+    /// Stage 2; the freshness check (`declaration_hash` comparison) is the
+    /// only contract this port fulfills for the type-signal gate.
     fn read_type_catalogue(
         &self,
         branch: &str,
         track_id: &str,
         layer_id: &str,
-    ) -> BlobFetchResult<(TypeCatalogueDocument, String)>;
+    ) -> BlobFetchResult<(Vec<u8>, String)>;
 
     /// Reads and decodes `track/items/<track_id>/impl-plan.json` for the given
     /// `branch`. Returns `NotFound` when the file does not exist on the target
@@ -326,29 +336,75 @@ where
         }
     };
 
+    // Stage 2: multi-layer TDDD type-signal gate (v3-native, T022).
+    //
+    // For each tddd.enabled layer:
+    //   1. Read the catalogue bytes + pre-computed hash (`read_type_catalogue`).
+    //      NotFound → TDDD opt-out for this layer (skip silently).
+    //      FetchError → fail-closed.
+    //   2. Read the type-signals document (`read_type_signals`).
+    //      NotFound → fail-closed (signals file required when catalogue is present).
+    //      FetchError → fail-closed.
+    //   3. Compare `signals_doc.declaration_hash()` to the catalogue hash from
+    //      step 1 — a mismatch means the signals file is stale (fail-closed, CN-11).
+    //   4. Evaluate `check_type_signals(&signals_doc, strict=true)`.
+    //
+    // The catalogue's TDDD opt-out check (step 1 NotFound) preserves the pre-T022
+    // behavior: a layer without a catalogue file is not enrolled in Stage 2.
     let mut outcome = stage1;
     for layer_id in &layer_ids {
-        match reader.read_type_catalogue(branch, track_id, layer_id) {
-            BlobFetchResult::NotFound => {
-                // TDDD opt-out for this layer — skip silently.
-            }
-            BlobFetchResult::FetchError(msg) => {
-                // Diagnostic uses the layer_id rather than a hardcoded
-                // `{layer_id}-types.json` filename: when a layer overrides its
-                // `tddd.catalogue_file` (e.g. `custom-types.json`) the
-                // FetchError variant does not return the resolved filename, so
-                // the adapter's `msg` already carries the actual path. Prefixing
-                // with `{layer_id}-types.json` here would point maintainers at a
-                // file that does not exist. See `knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md`
-                // §D9 TDDD-BUG-02 for the broader catalogue-filename contract.
-                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+        // Step 1: read catalogue bytes + hash (opt-out check and freshness data).
+        let declaration_hash_from_catalogue =
+            match reader.read_type_catalogue(branch, track_id, layer_id) {
+                BlobFetchResult::NotFound => {
+                    // TDDD opt-out for this layer — no catalogue → skip silently.
+                    continue;
+                }
+                BlobFetchResult::FetchError(msg) => {
+                    // Diagnostic uses the layer_id per TDDD-BUG-02 (catalogue-filename contract):
+                    // the adapter's msg already carries the actual resolved path.
+                    outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "failed to read catalogue for layer '{layer_id}' on origin/{branch}: {msg}"
                 ))]));
+                    continue;
+                }
+                BlobFetchResult::Found((_bytes, hash)) => hash,
+            };
+
+        // Step 2: read type-signals document.
+        // Fail-closed: if the catalogue is present but the signals file is absent,
+        // the gate cannot verify the type-signal state (symmetric with CI path per ADR §D5).
+        let signals_doc = match reader.read_type_signals(branch, track_id, layer_id) {
+            BlobFetchResult::Found(doc) => doc,
+            BlobFetchResult::NotFound => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "type-signals file for layer '{layer_id}' not found on origin/{branch} — \
+                     run `sotp track type-signals` and commit the generated file"
+                ))]));
+                continue;
             }
-            BlobFetchResult::Found((dt_doc, catalogue_file)) => {
-                outcome.merge(check_type_signals(&dt_doc, /* strict */ true, &catalogue_file));
+            BlobFetchResult::FetchError(msg) => {
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "failed to read type-signals for layer '{layer_id}' on origin/{branch}: {msg}"
+                ))]));
+                continue;
             }
+        };
+
+        // Step 3: freshness check — declaration_hash must match (CN-11).
+        if signals_doc.declaration_hash() != declaration_hash_from_catalogue {
+            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "layer '{layer_id}': type-signals declaration_hash mismatch \
+                 (recorded={}, current={}) — re-run `sotp track type-signals` \
+                 and commit the refreshed evaluation result",
+                signals_doc.declaration_hash(),
+                declaration_hash_from_catalogue
+            ))]));
+            continue;
         }
+
+        // Step 4: signal gate — strict=true (Yellow blocks in merge gate).
+        outcome.merge(check_type_signals(&signals_doc, /* strict */ true));
     }
 
     // Stage 3 (Chain ② — ADR §D3.6 / IN-14): catalogue-spec integrity binary
@@ -550,25 +606,58 @@ mod tests {
     use std::cell::RefCell;
 
     use domain::spec::SpecScope;
-    use domain::tddd::catalogue::{TypeAction, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal};
     use domain::{ConfidenceSignal, SignalCounts};
 
     use super::*;
 
+    /// Minimal SHA-256 hex of an all-zeroes byte sequence, used as a stable
+    /// "fresh" hash for test signals documents that carry this hash.
+    const ZERO_HASH: &str = "0000000000000000000000000000000000000000000000000000000000000000";
+
+    /// Builds a minimal `TypeSignalsDocument` for use in Stage 2 mock tests.
+    ///
+    /// All signals carry the given `ConfidenceSignal`. The `declaration_hash`
+    /// is set to [`ZERO_HASH`] so the companion catalogue mock (bytes of all
+    /// zeros, or any fixture where the adapter returns `ZERO_HASH`) matches.
+    fn signals_doc_with(entries: &[(&str, ConfidenceSignal)]) -> TypeSignalsDocument {
+        let ts = domain::Timestamp::new("2026-05-08T00:00:00Z").unwrap();
+        let sigs: Vec<domain::tddd::catalogue::TypeSignal> = entries
+            .iter()
+            .map(|(name, sig)| {
+                domain::tddd::catalogue::TypeSignal::new(
+                    *name,
+                    "value_object",
+                    *sig,
+                    true,
+                    vec![],
+                    vec![],
+                    vec![],
+                )
+            })
+            .collect();
+        TypeSignalsDocument::new(ts, ZERO_HASH, sigs)
+    }
+
     /// Mock reader that returns pre-programmed outcomes for the two document types.
+    ///
+    /// T022: `dt` now carries `BlobFetchResult<TypeSignalsDocument>` for
+    /// `read_type_signals`, while `read_type_catalogue` always returns bytes
+    /// whose hash matches `ZERO_HASH` (allowing freshness checks to pass when
+    /// the signals document was built with `ZERO_HASH` via `signals_doc_with`).
     struct MockTrackBlobReader {
         spec: RefCell<Option<BlobFetchResult<SpecDocument>>>,
-        /// `Some(result)` → return result when called; `None` → panic (unreachable assertion).
-        dt: RefCell<Option<BlobFetchResult<TypeCatalogueDocument>>>,
-        /// When `true`, calling `read_type_catalogue` panics with a clear message,
-        /// making the short-circuit contract directly observable in tests.
+        /// Outcome returned by `read_type_signals`. `None` means the call is
+        /// unreachable (Stage 2 short-circuit test).
+        dt: RefCell<Option<BlobFetchResult<TypeSignalsDocument>>>,
+        /// When `true`, calling `read_type_signals` or `read_type_catalogue`
+        /// panics, making the short-circuit contract directly observable in tests.
         dt_unreachable: bool,
     }
 
     impl MockTrackBlobReader {
         fn new(
             spec: BlobFetchResult<SpecDocument>,
-            dt: BlobFetchResult<TypeCatalogueDocument>,
+            dt: BlobFetchResult<TypeSignalsDocument>,
         ) -> Self {
             Self {
                 spec: RefCell::new(Some(spec)),
@@ -579,8 +668,9 @@ mod tests {
 
         /// Shortcut for tests that must assert Stage 2 is never reached.
         ///
-        /// If `read_type_catalogue` is called, the test panics immediately,
-        /// making regressions in the short-circuit logic observable.
+        /// If `read_type_signals` or `read_type_catalogue` is called, the test
+        /// panics immediately, making regressions in the short-circuit logic
+        /// observable.
         fn with_unreachable_dt(spec: BlobFetchResult<SpecDocument>) -> Self {
             Self { spec: RefCell::new(Some(spec)), dt: RefCell::new(None), dt_unreachable: true }
         }
@@ -610,18 +700,43 @@ mod tests {
             &self,
             _branch: &str,
             _track_id: &str,
-            layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            _layer_id: &str,
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             if self.dt_unreachable {
                 panic!("Stage 2 must not be reached: read_type_catalogue was called unexpectedly");
             }
-            match self.dt.borrow_mut().take().expect("dt read called twice") {
-                BlobFetchResult::Found(doc) => {
-                    BlobFetchResult::Found((doc, format!("{layer_id}-types.json")))
+            // Return bytes whose hash equals ZERO_HASH so the freshness check
+            // passes when the signals doc was built with `signals_doc_with`
+            // (which also uses ZERO_HASH). Content of the bytes does not matter
+            // for the gate logic — only the hash is compared.
+            match self.dt.borrow().as_ref().map(|r| r.clone()) {
+                Some(BlobFetchResult::NotFound) => BlobFetchResult::NotFound,
+                Some(BlobFetchResult::FetchError(msg)) => BlobFetchResult::FetchError(msg),
+                Some(BlobFetchResult::Found(_)) => {
+                    // Catalogue present (signals found) → return bytes with ZERO_HASH.
+                    BlobFetchResult::Found((vec![], ZERO_HASH.to_owned()))
                 }
-                BlobFetchResult::NotFound => BlobFetchResult::NotFound,
-                BlobFetchResult::FetchError(msg) => BlobFetchResult::FetchError(msg),
+                None => {
+                    if self.dt_unreachable {
+                        panic!(
+                            "Stage 2 must not be reached: read_type_catalogue was called unexpectedly"
+                        );
+                    }
+                    panic!("read_type_catalogue called but dt is None and not unreachable")
+                }
             }
+        }
+
+        fn read_type_signals(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            _layer_id: &str,
+        ) -> BlobFetchResult<TypeSignalsDocument> {
+            if self.dt_unreachable {
+                panic!("Stage 2 must not be reached: read_type_signals was called unexpectedly");
+            }
+            self.dt.borrow_mut().take().expect("dt read called twice")
         }
 
         fn read_impl_plan(
@@ -684,7 +799,7 @@ mod tests {
             branch: &str,
             track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             *self.recorded_dt_branch.borrow_mut() = Some(branch.to_owned());
             *self.recorded_dt_track_id.borrow_mut() = Some(track_id.to_owned());
             BlobFetchResult::NotFound
@@ -724,40 +839,16 @@ mod tests {
         spec_doc_with_signals(Some(SignalCounts::new(5, 0, 0)))
     }
 
-    fn make_entry(name: &str) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::new(
-            name,
-            "test",
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
-            },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap()
+    fn dt_all_blue() -> TypeSignalsDocument {
+        signals_doc_with(&[("TrackId", ConfidenceSignal::Blue)])
     }
 
-    fn make_signal(name: &str, signal: ConfidenceSignal) -> TypeSignal {
-        TypeSignal::new(name, "value_object", signal, true, Vec::new(), Vec::new(), Vec::new())
+    fn dt_with_yellow() -> TypeSignalsDocument {
+        signals_doc_with(&[("TrackId", ConfidenceSignal::Yellow)])
     }
 
-    fn dt_all_blue() -> TypeCatalogueDocument {
-        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
-        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
-        doc
-    }
-
-    fn dt_with_yellow() -> TypeCatalogueDocument {
-        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
-        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Yellow)]);
-        doc
-    }
-
-    fn dt_with_red() -> TypeCatalogueDocument {
-        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
-        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Red)]);
-        doc
+    fn dt_with_red() -> TypeSignalsDocument {
+        signals_doc_with(&[("TrackId", ConfidenceSignal::Red)])
     }
 
     // --- U1–U18 test matrix ---
@@ -810,61 +901,61 @@ mod tests {
     }
 
     #[test]
-    fn test_u5_spec_blue_dt_empty_entries_passes_per_adr_d64() {
-        // ADR 2026-04-19-1242 §D6.4: empty catalogues (zero type declarations) are
-        // a valid state for tracks that reuse only pre-existing types. Drift
-        // detection remains via reverse SoT Chain ③ (rustdoc ↔ catalogue).
-        // Previously this was U5 BLOCKED; post-D6.4 it passes.
+    fn test_u5_spec_blue_dt_empty_signals_passes_per_adr_d64() {
+        // U5 (T022): spec=all-Blue, type-signals empty → PASS
+        // ADR 2026-04-19-1242 §D6.4: empty signal list corresponds to an empty
+        // catalogue (zero declarations). Valid for tracks that reuse pre-existing types.
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
-            BlobFetchResult::Found(TypeCatalogueDocument::new(1, Vec::new())),
+            BlobFetchResult::Found(signals_doc_with(&[])),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(outcome.findings().is_empty(), "empty catalogue must pass per D6.4");
+        assert!(outcome.findings().is_empty(), "empty signals must pass per D6.4: {outcome:?}");
     }
 
     #[test]
-    fn test_u6_spec_blue_dt_coverage_gap_blocks() {
-        // U6: spec=Blue, dt has entry with no matching signal → BLOCKED
-        let mut doc =
-            TypeCatalogueDocument::new(1, vec![make_entry("TrackId"), make_entry("Other")]);
-        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
+    fn test_u6_spec_blue_dt_not_found_passes_opt_out() {
+        // U6 (T022): spec=Blue, catalogue=NotFound → PASS (TDDD opt-out).
+        // NotFound on read_type_catalogue means this layer has not enrolled in TDDD.
+        // Consistent with the pre-T022 behavior.
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
-            BlobFetchResult::Found(doc),
+            BlobFetchResult::NotFound,
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(outcome.has_errors());
+        // catalogue NotFound → skip → no findings from Stage 2
+        assert!(!outcome.has_errors(), "TDDD opt-out (catalogue NotFound) must pass: {outcome:?}");
+        assert!(outcome.findings().is_empty());
     }
 
     #[test]
-    fn test_u7_spec_blue_dt_signals_none_blocks() {
-        // U7: spec=Blue, dt=None (unevaluated) → BLOCKED
-        let doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
+    fn test_u7_spec_blue_dt_all_blue_passes() {
+        // U7 (T022): catalogue present + all-Blue signals → PASS.
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
-            BlobFetchResult::Found(doc),
+            BlobFetchResult::Found(dt_all_blue()),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(outcome.has_errors());
+        assert!(!outcome.has_errors(), "all-Blue type-signals must pass: {outcome:?}");
     }
 
     #[test]
-    fn test_u8_spec_blue_dt_fetch_error_blocks() {
-        // U8: spec=Blue, dt=FetchError → BLOCKED
+    fn test_u8_spec_blue_dt_catalogue_fetch_error_blocks() {
+        // U8 (T022): spec=Blue, catalogue FetchError → BLOCKED.
+        // FetchError on read_type_catalogue is fail-closed.
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::FetchError("git show failed".to_owned()),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
-        assert!(outcome.has_errors());
-        // FetchError message identifies the layer by id, not a hardcoded filename —
-        // the adapter's msg already carries the resolved path.
+        assert!(outcome.has_errors(), "catalogue FetchError must block: {outcome:?}");
+        // FetchError message identifies the layer by id, not a hardcoded filename.
         assert!(
             outcome
                 .findings()
                 .iter()
-                .any(|f| f.message().contains("failed to read catalogue for layer 'domain'"))
+                .any(|f| f.message().contains("failed to read catalogue for layer 'domain'")),
+            "findings: {outcome:?}"
         );
     }
 
@@ -1078,14 +1169,17 @@ mod tests {
     struct MultiLayerMock {
         spec: BlobFetchResult<SpecDocument>,
         enabled_layers: BlobFetchResult<Vec<String>>,
-        catalogues: std::collections::HashMap<String, BlobFetchResult<TypeCatalogueDocument>>,
+        /// Keyed by layer_id. Values are `TypeSignalsDocument` outcomes returned
+        /// by `read_type_signals`. When a layer is found here, `read_type_catalogue`
+        /// returns `Found((vec![], ZERO_HASH))` so the freshness check passes.
+        catalogues: std::collections::HashMap<String, BlobFetchResult<TypeSignalsDocument>>,
     }
 
     impl MultiLayerMock {
         fn new(
             spec: BlobFetchResult<SpecDocument>,
             enabled_layers: Vec<String>,
-            catalogues: Vec<(&str, BlobFetchResult<TypeCatalogueDocument>)>,
+            catalogues: Vec<(&str, BlobFetchResult<TypeSignalsDocument>)>,
         ) -> Self {
             Self {
                 spec,
@@ -1128,14 +1222,24 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             match self.catalogues.get(layer_id).cloned().unwrap_or(BlobFetchResult::NotFound) {
-                BlobFetchResult::Found(doc) => {
-                    BlobFetchResult::Found((doc, format!("{layer_id}-types.json")))
+                BlobFetchResult::Found(_) => {
+                    // Return bytes with ZERO_HASH so the freshness check passes.
+                    BlobFetchResult::Found((vec![], ZERO_HASH.to_owned()))
                 }
                 BlobFetchResult::NotFound => BlobFetchResult::NotFound,
                 BlobFetchResult::FetchError(msg) => BlobFetchResult::FetchError(msg),
             }
+        }
+
+        fn read_type_signals(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            layer_id: &str,
+        ) -> BlobFetchResult<TypeSignalsDocument> {
+            self.catalogues.get(layer_id).cloned().unwrap_or(BlobFetchResult::NotFound)
         }
 
         fn read_impl_plan(
@@ -1411,12 +1515,14 @@ mod tests {
             BlobFetchResult::Found(all_blue_spec())
         }
 
+        /// T022: Stage 2 opt-out (NotFound) so that Chain ② tests are isolated.
+        /// Returns `(Vec<u8>, String)` as required by the new trait signature.
         fn read_type_catalogue(
             &self,
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
         }
 
@@ -1637,7 +1743,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
         }
 
@@ -1737,7 +1843,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             BlobFetchResult::NotFound // Stage 2 opt-out — isolates Chain ②
         }
 
@@ -1800,6 +1906,226 @@ mod tests {
         );
     }
 
+    // ===============================================================
+    // U40–U41 — Stage 2 fail-closed: signals absent / stale hash.
+    //
+    // Both tests use a single-layer (domain) setup where the catalogue is
+    // Found (layer is enrolled in Stage 2) but the signals file is either
+    // absent (U40) or carries a stale declaration_hash (U41).  These are
+    // the two fail-closed branches that live between Step 1 (opt-out check)
+    // and Step 4 (signal gate) in the Stage 2 loop.
+    // ===============================================================
+
+    #[test]
+    fn test_u40_stage2_catalogue_found_signals_not_found_blocks_fail_closed() {
+        // U40: catalogue=Found, signals=NotFound → BLOCKED (fail-closed).
+        // When the catalogue is present the layer is enrolled; a missing
+        // signals file means `sotp track type-signals` has not been run, so
+        // the gate cannot verify the type-signal state.
+        struct Stage2SignalsNotFoundMock;
+        impl SpecElementHashReader for Stage2SignalsNotFoundMock {
+            fn read_spec_element_hashes(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+            {
+                BlobFetchResult::Found(std::collections::BTreeMap::new())
+            }
+        }
+        impl TrackBlobReader for Stage2SignalsNotFoundMock {
+            fn read_spec_document(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<SpecDocument> {
+                BlobFetchResult::Found(all_blue_spec())
+            }
+            fn read_type_catalogue(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<(Vec<u8>, String)> {
+                // Catalogue is present → layer enrolled in Stage 2.
+                BlobFetchResult::Found((vec![], ZERO_HASH.to_owned()))
+            }
+            fn read_type_signals(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<TypeSignalsDocument> {
+                // Signals file absent → fail-closed.
+                BlobFetchResult::NotFound
+            }
+            fn read_impl_plan(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<domain::ImplPlanDocument> {
+                panic!("read_impl_plan must not be called by U40")
+            }
+            fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+                BlobFetchResult::Found(vec!["domain".to_string()])
+            }
+        }
+        let reader = Stage2SignalsNotFoundMock;
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "catalogue Found + signals NotFound must block (fail-closed): {outcome:?}"
+        );
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("type-signals file for layer 'domain' not found")),
+            "error must mention the missing type-signals file for 'domain': {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u41_stage2_declaration_hash_mismatch_blocks_fail_closed() {
+        // U41: catalogue=Found (returns hash AA*64), signals=Found (carries
+        // ZERO_HASH) → declaration_hash mismatch → BLOCKED (fail-closed, CN-11).
+        // The signals file is stale (not regenerated after the catalogue changed).
+        const STALE_HASH: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        struct Stage2HashMismatchMock;
+        impl SpecElementHashReader for Stage2HashMismatchMock {
+            fn read_spec_element_hashes(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+            {
+                BlobFetchResult::Found(std::collections::BTreeMap::new())
+            }
+        }
+        impl TrackBlobReader for Stage2HashMismatchMock {
+            fn read_spec_document(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<SpecDocument> {
+                BlobFetchResult::Found(all_blue_spec())
+            }
+            fn read_type_catalogue(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<(Vec<u8>, String)> {
+                // Catalogue hash is STALE_HASH (aa*64), not ZERO_HASH.
+                BlobFetchResult::Found((vec![], STALE_HASH.to_owned()))
+            }
+            fn read_type_signals(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<TypeSignalsDocument> {
+                // Signals doc built with ZERO_HASH (via signals_doc_with) —
+                // mismatches STALE_HASH returned by read_type_catalogue.
+                BlobFetchResult::Found(signals_doc_with(&[("TrackId", ConfidenceSignal::Blue)]))
+            }
+            fn read_impl_plan(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<domain::ImplPlanDocument> {
+                panic!("read_impl_plan must not be called by U41")
+            }
+            fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+                BlobFetchResult::Found(vec!["domain".to_string()])
+            }
+        }
+        let reader = Stage2HashMismatchMock;
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "declaration_hash mismatch must block (fail-closed, CN-11): {outcome:?}"
+        );
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("layer 'domain'") && f.message().contains("mismatch")),
+            "error must mention the layer name and 'mismatch': {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u42_stage2_catalogue_found_signals_fetch_error_blocks_fail_closed() {
+        // U42: catalogue=Found, read_type_signals=FetchError → BLOCKED (fail-closed, CN-11).
+        // This exercises the `FetchError` arm of Step 2 in the Stage 2 loop
+        // (distinct from U24 which routes FetchError through read_type_catalogue,
+        // and from U40 which exercises signals=NotFound). A regression that silently
+        // skipped or swallowed the signal-file read error would not be caught by
+        // U24/U40; this test makes the Step 2 FetchError path directly observable.
+        struct Stage2SignalsFetchErrorMock;
+        impl SpecElementHashReader for Stage2SignalsFetchErrorMock {
+            fn read_spec_element_hashes(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+            {
+                BlobFetchResult::Found(std::collections::BTreeMap::new())
+            }
+        }
+        impl TrackBlobReader for Stage2SignalsFetchErrorMock {
+            fn read_spec_document(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<SpecDocument> {
+                BlobFetchResult::Found(all_blue_spec())
+            }
+            fn read_type_catalogue(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<(Vec<u8>, String)> {
+                // Catalogue is present → layer enrolled in Stage 2.
+                BlobFetchResult::Found((vec![], ZERO_HASH.to_owned()))
+            }
+            fn read_type_signals(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<TypeSignalsDocument> {
+                // Signals file I/O error → fail-closed.
+                BlobFetchResult::FetchError("git show failed for type-signals".to_owned())
+            }
+            fn read_impl_plan(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<domain::ImplPlanDocument> {
+                panic!("read_impl_plan must not be called by U42")
+            }
+            fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+                BlobFetchResult::Found(vec!["domain".to_string()])
+            }
+        }
+        let reader = Stage2SignalsFetchErrorMock;
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "catalogue Found + signals FetchError must block (fail-closed): {outcome:?}"
+        );
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("failed to read type-signals for layer 'domain'")),
+            "error must mention the type-signals read failure for 'domain': {outcome:?}"
+        );
+    }
+
     #[test]
     fn test_u35_chain2_does_not_run_when_stage2_fails() {
         // U35: Stage 2 (type catalogue) failure → short-circuits before Chain ②
@@ -1832,9 +2158,18 @@ mod tests {
                 _branch: &str,
                 _track_id: &str,
                 _layer_id: &str,
-            ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
-                // Stage 2: Red → blocks immediately and triggers early return.
-                BlobFetchResult::Found((dt_with_red(), "domain-types.json".to_owned()))
+            ) -> BlobFetchResult<(Vec<u8>, String)> {
+                // Stage 2: catalogue present so Stage 2 proceeds to read signals.
+                BlobFetchResult::Found((vec![], ZERO_HASH.to_owned()))
+            }
+            fn read_type_signals(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<TypeSignalsDocument> {
+                // Stage 2: Red signal → blocks immediately and triggers early return.
+                BlobFetchResult::Found(dt_with_red())
             }
             fn read_impl_plan(
                 &self,

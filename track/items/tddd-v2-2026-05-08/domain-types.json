@@ -1735,7 +1735,7 @@
       ],
       "returns": "VerifyOutcome",
       "is_async": false,
-      "docs": "IN-23: modified. Signature changed from check_type_signals(doc: &TypeCatalogueDocument, strict: bool, catalogue_file: &str) to check_type_signals(doc: &TypeSignalsDocument, strict: bool). The function now operates on a pre-parsed TypeSignalsDocument (from <layer>-type-signals.json) instead of decoding a TypeCatalogueDocument. The catalogue_file parameter is dropped (no longer needed since declaration_hash freshness is checked externally via the stale-detection gate). The existing coverage check and declared-Yellow filter inside the function are deleted per IN-23 (superseded by 3-way 11-region invariant guarantees).",
+      "docs": "T022 DONE (IN-23). Signature changed from check_type_signals(doc: &TypeCatalogueDocument, strict: bool, catalogue_file: &str) to check_type_signals(doc: &TypeSignalsDocument, strict: bool). The function now operates on a pre-parsed TypeSignalsDocument (from <layer>-type-signals.json) instead of decoding a TypeCatalogueDocument. The catalogue_file parameter was dropped (declaration_hash freshness is checked externally in the Stage 2 loop). The coverage check and declared-Yellow filter inside the function were deleted per IN-23 (superseded by 3-way 11-region invariant guarantees).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
       ],

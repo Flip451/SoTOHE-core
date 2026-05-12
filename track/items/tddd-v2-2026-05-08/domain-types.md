@@ -115,7 +115,7 @@
 | domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals | free_function | reference | — | 🔵 | 🔵 |
 | domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal | free_function | modify | — | 🔵 | 🔵 |
 | domain::tddd::consistency::check_consistency | free_function | delete | — | 🔵 | 🔵 |
-| domain::tddd::consistency::check_type_signals | free_function | modify | — | 🟡 | 🔵 |
+| domain::tddd::consistency::check_type_signals | free_function | modify | — | 🔵 | 🔵 |
 | domain::tddd::contract_map_render::render_contract_map | free_function | modify | — | 🟡 | 🔵 |
 | domain::tddd::signals::evaluate_type_signals | free_function | delete | — | 🔵 | 🔵 |
 | domain::tddd::signals::undeclared_functions_to_signals | free_function | delete | — | 🔵 | 🔵 |

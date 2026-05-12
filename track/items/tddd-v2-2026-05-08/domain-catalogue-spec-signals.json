@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cfcf664f904984014c96c90bd50b324685edede1a0aedd0b7ac49f7893e1fa6e",
+  "catalogue_declaration_hash": "3d1380bec367eb5ae4397436d07a326d14a15f5227518e98a8cbfee7f0480437",
   "signals": [
     {
       "type_name": "ActionContradiction",
