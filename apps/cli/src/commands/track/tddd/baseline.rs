@@ -81,6 +81,31 @@ pub fn execute_baseline_capture(
         }
     }
 
+    // Security: confine `items_dir` to `workspace_root` (the current workspace — the
+    // root used for `architecture-rules.json` resolution, not the optional rustdoc
+    // `source_workspace`). Without this, a user/config-supplied `--items-dir ../outside`
+    // would let the derived `<track_dir>/<layer>-types-baseline.json` write target escape
+    // the workspace. Compare canonicalized forms so `..` traversal and symlinked path
+    // components cannot bypass the check. `source_workspace` is intentionally NOT used as
+    // the containment root: in the git-worktree capture flow it points at a different tree
+    // (e.g. a `main` worktree) while `items_dir` still lives under the current workspace.
+    let canonical_items_dir = items_dir.canonicalize().map_err(|e| {
+        CliError::Message(format!("cannot canonicalize items_dir {}: {e}", items_dir.display()))
+    })?;
+    let canonical_workspace_root = workspace_root.canonicalize().map_err(|e| {
+        CliError::Message(format!(
+            "cannot canonicalize workspace_root {}: {e}",
+            workspace_root.display()
+        ))
+    })?;
+    if !canonical_items_dir.starts_with(&canonical_workspace_root) {
+        return Err(CliError::Message(format!(
+            "items_dir {} is outside workspace_root {}; only paths under the workspace are allowed",
+            canonical_items_dir.display(),
+            canonical_workspace_root.display()
+        )));
+    }
+
     // Resolve the rustdoc source workspace (defaults to workspace_root when not supplied).
     let rustdoc_workspace = source_workspace.as_deref().unwrap_or(&workspace_root);
 
@@ -145,6 +170,58 @@ mod tests {
             false,
         );
         assert!(result.is_err(), "path traversal track_id must be rejected");
+    }
+
+    #[test]
+    fn test_baseline_capture_with_items_dir_outside_workspace_root_returns_error() {
+        // Regression for the Codex PR#132 finding: `--items-dir` pointing at a path
+        // outside `workspace_root` must be rejected so the derived baseline write
+        // target cannot escape the workspace.
+        let workspace = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap(); // sibling tree, not under `workspace`
+        let outside_items = outside.path().join("track/items");
+        std::fs::create_dir_all(&outside_items).unwrap();
+
+        let result = execute_baseline_capture(
+            outside_items,
+            "test-track".to_owned(),
+            workspace.path().into(),
+            None,
+            None,
+            false,
+        );
+        let err = result.unwrap_err();
+        assert!(
+            matches!(&err, CliError::Message(m) if m.contains("outside workspace_root")),
+            "items_dir outside workspace_root must be rejected; got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment() {
+        // The `--source-workspace` (git-worktree) flow: `items_dir` lives under
+        // `workspace_root`, but the rustdoc source workspace is a different tree.
+        // The containment check confines `items_dir` to `workspace_root` only — it must
+        // not reject this configuration. The command then fails later on the missing
+        // track directory (proving the containment check passed, not on a containment error).
+        let workspace = tempfile::tempdir().unwrap();
+        let items_dir = workspace.path().join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        let source_workspace = tempfile::tempdir().unwrap(); // different tree
+
+        let result = execute_baseline_capture(
+            items_dir,
+            "test-track".to_owned(),
+            workspace.path().into(),
+            Some(source_workspace.path().into()),
+            None,
+            false,
+        );
+        let err = result.unwrap_err();
+        assert!(
+            matches!(&err, CliError::Message(m) if m.contains("track directory not found")),
+            "worktree flow must not be rejected by the containment check; got: {err:?}"
+        );
     }
 
     #[test]

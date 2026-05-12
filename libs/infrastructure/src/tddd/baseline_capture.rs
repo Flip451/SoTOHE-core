@@ -37,7 +37,8 @@ impl std::fmt::Display for CaptureBaselineError {
 /// `workspace_root` is the Cargo workspace from which rustdoc is invoked.
 /// It may differ from the workspace that contains `items_dir`; this is the
 /// intended use-case when capturing a baseline from a git worktree at `main`
-/// while writing the output into the current branch's track directory.
+/// while writing the output into the current branch's track directory via
+/// `--source-workspace`.
 ///
 /// # Errors
 ///
@@ -251,4 +252,70 @@ fn capture_rustdoc_baseline_for_layer_inner(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use crate::verify::tddd_layers::parse_tddd_layers;
+
+    fn domain_binding() -> TdddLayerBinding {
+        let json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true}}]}"#;
+        parse_tddd_layers(json).unwrap().remove(0)
+    }
+
+    #[test]
+    fn test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected() {
+        // Regression: the `--source-workspace` worktree flow passes `workspace_root`
+        // (the rustdoc source workspace, e.g. a `main` git worktree) while `items_dir`
+        // lives in a different filesystem tree (the current branch). The function must
+        // NOT reject this configuration — it is the documented use-case.
+        //
+        // Expected: the function reaches "track directory not found" (the track dir
+        // does not exist in the tempdir), proving no spurious containment check fires.
+        let source_workspace = tempfile::tempdir().unwrap(); // rustdoc source (different tree)
+        let items_workspace = tempfile::tempdir().unwrap(); // write target (current branch)
+        let items_dir = items_workspace.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        let binding = domain_binding();
+
+        let result = capture_rustdoc_baseline_for_layer(
+            &items_dir,
+            "foo-2026-05-12",
+            source_workspace.path(), // intentionally different from items_dir's root
+            &binding,
+        );
+
+        let err = result.unwrap_err();
+        assert!(
+            err.0.contains("track directory not found"),
+            "worktree flow must reach track-directory check, not fail on path containment; got: {}",
+            err.0
+        );
+    }
+
+    #[test]
+    fn test_capture_standard_flow_fails_on_missing_track_dir() {
+        // Standard flow: items_dir inside workspace_root also fails on the missing
+        // track directory when no baseline exists yet.
+        let workspace_root = tempfile::tempdir().unwrap();
+        let items_dir = workspace_root.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        let binding = domain_binding();
+
+        let result = capture_rustdoc_baseline_for_layer(
+            &items_dir,
+            "foo-2026-05-12",
+            workspace_root.path(),
+            &binding,
+        );
+
+        let err = result.unwrap_err();
+        assert!(
+            err.0.contains("track directory not found"),
+            "expected track-directory error, got: {}",
+            err.0
+        );
+    }
 }
