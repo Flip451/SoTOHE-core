@@ -482,6 +482,18 @@ sibling ADR `2026-05-02-0316-enum-variant-payload-schema.md` が採用した `En
 
 `methods: Option<Vec<MethodDeclaration>>` で declare を任意化する案 (本 ADR の旧 D10)。declare コストは Optional により低減できるが、trait def と impl の signature 整合は Rust コンパイラが保証する範囲であり、TDDD が signature 比較する必要そのものがない。codec が `methods: None` 時に trait def を auto-derive する処理 (旧 ADR 2 D12) は cross-catalogue 解決を必要とし、D6 の crate 単位独立性に反する。`methods` field を持たない identity-only 案 (現 D10) を採用したため却下。
 
+### M: v3→v2 形式変換による既存資産の流用（v2 コーデック・v2 カタログ型・各消費パスを v3→v2 stub 変換で温存する案）
+
+v3 `CatalogueDocument` を v2 形式の `TypeCatalogueDocument` へ変換する `v3_doc_to_stub` 関数（v3 role → 最も近い v2 `TypeDefinitionKind` へマッピング）を各消費パスに挟み込み、v2 コーデック (`infrastructure::tddd::catalogue_codec`)・v2 カタログ型 (`domain::TypeCatalogueDocument` 等)・コミット/マージゲート・レンダラー・`sotp track lint` を v2 のまま温存する案。クロスリファレンスエッジ (`expected_methods` / `implements` / variant payload) はマッピング対象外として落とす。
+
+却下理由:
+
+1. 変換は不可逆であり、クロスリファレンスエッジ（`expected_methods` / `implements` / variant payload）はスタブに復元されない。
+2. タイプシグナル評価器の `kind_tag` 出力と `v3_doc_to_stub` の v2-kind マッピングが「同じ kind マッピング表に暗黙に従う」結合を持つため、片方が独立に変更されるとゲートが静かに fail-open に後退する（ADR `2026-04-12-1200-strict-spec-signal-gate-v2.md` の fail-closed 原則と相反）。
+3. 全消費パスに漏れなく変換を挟む必要があり、適用漏れが起きると即座にゲートやレンダラーの動作不能を生む脆い方式である。
+
+すべての `<crate_name>-types.json` 消費パスは `schema_version: 3` のカタログ（`domain::tddd::catalogue_v2` モジュール、モジュール名は第 2 世代設計の開発名）をネイティブにデコードし、非 v3 はフェイルクローズドエラーとして扱う。`v3_stub` モジュール・v2 コーデック・v2 カタログ型は削除し後方互換は維持しない（完了・アーカイブ済みトラックは凍結されており再検証されないため、削除の影響はない）。各消費パスの移行詳細は `spec.json` / `impl-plan.json` で管理する。
+
 ## Consequences
 
 ### 良い影響
