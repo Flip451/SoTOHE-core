@@ -1,7 +1,7 @@
 //! T008: `sotp track type-graph` is deleted.
 //!
 //! The command depended on `TypeGraph` (now deleted) for its rendering pipeline.
-//! Callers should use `sotp track three-way-signals` for type signal evaluation.
+//! Callers should use `sotp track catalogue-impl-signals` for type signal evaluation.
 //!
 //! This stub keeps the CLI compile surface intact while the command is phased out.
 
@@ -27,7 +27,7 @@ pub fn execute_type_graph(
 ) -> Result<ExitCode, CliError> {
     Err(CliError::Message(
         "sotp track type-graph is removed in T008. \
-         Use `sotp track three-way-signals` instead."
+         Use `sotp track catalogue-impl-signals` instead."
             .to_owned(),
     ))
 }

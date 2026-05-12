@@ -1,10 +1,10 @@
 //! TDDD CLI commands — domain type signal evaluation and baseline capture.
 
 pub(crate) mod baseline;
+pub(crate) mod catalogue_impl_signals;
 pub(crate) mod catalogue_spec_signals;
 pub(crate) mod contract_map;
 pub(crate) mod graph;
 pub(crate) mod lint;
 pub(crate) mod signals;
 pub(crate) mod spec_element_hash;
-pub(crate) mod three_way_signals;

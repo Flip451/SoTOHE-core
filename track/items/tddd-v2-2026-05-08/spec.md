@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 46, yellow: 0, red: 0 }
+signals: { blue: 51, yellow: 0, red: 0 }
 ---
 
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
@@ -32,6 +32,10 @@ signals: { blue: 46, yellow: 0, red: 0 }
 - [IN-14] 既存 4 グループ評価 (TDDD-02: A\B / A∩B / B\A / ∁(A∪B)∩C) の Phase 1 + Phase 2 構造への書き換え: libs/domain/src/tddd/consistency.rs (または後継) の全面 refactor。TDDD-02 / TDDD-03 の意味論を継承しつつ Phase 1 + Phase 2 の 2-phase 構造に再構成する [adr: knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D7, knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D8] [tasks: T006, T007, T008, T015]
 - [IN-15] serde codec の新 schema 専用実装: 旧 catalogue schema (TypeDefinitionKind ベース / payload_types: Vec<String> ベース) を読む経路を持たない新 schema 専用 codec を実装する [adr: knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md#D1] [tasks: T003, T011, T012]
 - [IN-16] catalogue↔spec 信号評価器 (SoT Chain ②) を action-aware に変更する: `evaluate_catalogue_entry_signal` に `action: ItemAction` 引数を追加し、`action: reference` かつ grounding 空 (`spec_refs: []` / `informal_grounds: []`) のエントリを 🔵 Blue と評価する。`action: add / modify / delete` のエントリは従来の informal-priority rule (ADR `2026-04-23-0344` §D1.1) をそのまま適用する。[source: ADR 2026-05-11-1257 D5] [adr: knowledge/adr/2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md#D5] [tasks: T013]
+- [IN-17] 旧 `bin/sotp verify spec-code-consistency` (v1 カタログスキーマ向け双方向整合性チェック) を廃止し、SoT Chain ③ (カタログ ↔ 実装) の診断コマンド `bin/sotp track catalogue-impl-signals` を導入する。このコマンドは signal evaluator ADR §D3 が定義した 11 領域テーブル (S∩C / S\C / D∩C / D\C / C\(S∪D) 等) と v3 カタログスキーマに基づき、各エントリーがどの領域に属するか、その領域の signal (🔵/🟡/🔴/skip) と解釈を stdout に表示する。使い方はオンデマンドである。[source: ADR 2026-05-11-2330 D1] [adr: knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D1] [tasks: T018, T019]
+- [IN-18] `catalogue-impl-signals` のオーケストレーション (各レイヤーの A/B/C TypeGraph 取得、signal evaluator 呼び出し、領域別結果の収集・整形) は `libs/usecase/` のインタラクターとして実装する。`apps/cli/` のコマンドハンドラーはそのインタラクターを呼び出して結果を stdout に書き出す薄いアダプターにとどまる。ADR `2026-04-30-0848` D1 (cli は domain を直接参照せず usecase を経由する) を本機能に適用し、オーケストレーションを型カタログの登録対象かつ SoT Chain 信号評価から参照可能にする。[source: ADR 2026-05-11-2330 D2] [adr: knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D2, knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md#D1] [tasks: T019]
+- [IN-19] `catalogue-impl-signals` のインターフェースは stdout 専用かつオンデマンドとする。永続化された view ファイル (例: `<layer>-catalogue-impl-signals.md`) を生成しない。`--output <path>` ファイル書き出しモードを持たない。`Makefile.toml` のラッパータスクを追加しない。[source: ADR 2026-05-11-2330 D3] [adr: knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D3] [tasks: T018, T019]
+- [IN-20] 旧 `spec-code-consistency` が担っていた chain-③ CI ゲート役割 (C\(S∪D) 「宣言されていない実装」と S\C + Reference/Modify 「宣言済み項目の消失」の自動検出) は、既存の `verify spec-states-current` (コミットゲート) と `check_strict_merge_gate` (マージゲート) が `<layer>-type-signals.json` を読んで `check_type_signals` を適用することで引き継ぐ。新たな `sotp verify` サブコマンドは追加しない。[source: ADR 2026-05-11-2330 D4] [adr: knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D4] [tasks: T020]
 
 ### Out of Scope
 - [OS-01] Linter の詳細設計と実装: Linter は CatalogueDocument の role / pattern × 構造制約を enforcement する別 component として位置づけられる (ADR 3 D6)。本 track では Architecture 全体像における Linter の位置づけを明確にするが、Linter の rule config schema / DSL / CLI 統合の詳細設計と実装は別 ADR / 別 track の対象とする [adr: knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D6]
@@ -64,6 +68,7 @@ signals: { blue: 46, yellow: 0, red: 0 }
 - [ ] [AC-08] Signal evaluator Phase 2 が S / D / C の 3-way 評価で 11 領域 × signal table (skip / 🔵 / 🟡 / 🔴) を正しく判定できる。S ∩ C + 構造不一致 + action=Reference が 🔴 になる。S \ C + action=Modify が 🔴 になる。D ∩ C が 🟡 になる。C \ (S ∪ D) が 🔴 になる [adr: knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D3] [tasks: T007]
 - [ ] [AC-09] 既存 TypeGraph (libs/domain/src/schema.rs の TypeNode / TraitNode / FunctionNode 等) が rustdoc_types::Crate ベースの実装に置換されており、TypeGraph を読む既存コード (consistency / signals / contract_map_render 等) が新 TypeGraph 形式で動作する [adr: knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md#D1] [tasks: T008]
 - [ ] [AC-10] cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass する。新 schema の実装による既存テストへのリグレッションが存在せず、catalogue schema / codec / signal evaluator に対する新規ユニットテストが追加されている [adr: knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md#D1, knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md#D1, knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md#D1] [tasks: T009, T017]
+- [ ] [AC-11] `bin/sotp track catalogue-impl-signals` が実行可能であり、v3 カタログスキーマと signal evaluator の 11 領域テーブルに基づいて各エントリーの領域・signal・解釈を stdout に出力する。オーケストレーションが `libs/usecase/` インタラクターに実装されており `apps/cli/` は stdout 書き出しのみを行う薄いアダプターである。`--output` モードおよび `Makefile.toml` ラッパータスクが存在しない。`bin/sotp verify spec-code-consistency` サブコマンドが削除されており、`verify spec-states-current` が `<layer>-type-signals.json` の 🔴 エントリを検出してコミットをブロックする (chain-③ ゲートの継続)。 [adr: knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D1, knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D2, knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D3, knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md#D4] [tasks: T018, T019, T020]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/hexagonal-architecture.md#Layer Dependencies
@@ -79,5 +84,5 @@ signals: { blue: 46, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 46  🟡 0  🔴 0
+🔵 51  🟡 0  🔴 0
 

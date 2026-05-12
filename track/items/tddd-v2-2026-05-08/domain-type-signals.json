@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-11T16:59:33Z",
-  "declaration_hash": "560d3fbbce5a971ededf9f50a253eef39fdb65132a219cf150bd7e7dfa4f2038",
+  "generated_at": "2026-05-12T01:55:55Z",
+  "declaration_hash": "e9f93cc902a4183b0ab18a0829cb872e86a762deddb80a371bf3c329d4965710",
   "signals": [
     {
       "type_name": "CatalogueDocument",
@@ -24,6 +24,22 @@
         "core::error::Error",
         "core::fmt::Display"
       ]
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogueLoader",
@@ -336,6 +352,22 @@
       ]
     },
     {
+      "type_name": "RustdocCratePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RustdocCratePortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "SelfReceiver",
       "kind_tag": "enum",
       "signal": "blue",
@@ -365,6 +397,28 @@
         "core::cmp::PartialEq",
         "core::hash::Hash"
       ]
+    },
+    {
+      "type_name": "TdddLayerBinding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TdddLayerBindingsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TdddLayerBindingsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ThreeWayEvaluationReport",

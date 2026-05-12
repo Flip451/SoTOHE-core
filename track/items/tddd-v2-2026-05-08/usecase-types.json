@@ -12,6 +12,61 @@
       "spec_refs": [],
       "informal_grounds": []
     },
+    "CatalogueImplSignalsInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "has_stripped_fields": true
+      },
+      "trait_impls": [{ "trait_name": "CatalogueImplSignalsService", "origin_crate": "usecase" }],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            { "name": "catalogue_loader", "ty": "Arc<dyn domain::tddd::catalogue_v2::CatalogueDocumentLoaderPort>" },
+            { "name": "ext_crate_codec", "ty": "Arc<dyn domain::tddd::CatalogueToExtendedCratePort>" },
+            { "name": "evaluator", "ty": "Arc<dyn domain::tddd::signal_evaluator::SignalEvaluatorPort>" },
+            { "name": "rustdoc_crate_port", "ty": "Arc<dyn domain::tddd::catalogue_v2::RustdocCratePort>" },
+            { "name": "layer_bindings_port", "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>" }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "docs": "Interactor implementing CatalogueImplSignalsService. Orchestrates per-layer A/B/C TypeGraph fetch, signal evaluator invocation, and region-by-region result formatting. Injected dependencies: CatalogueDocumentLoaderPort (A-side catalogue file load), CatalogueToExtendedCratePort (A-side CatalogueDocument → ExtendedCrate conversion), SignalEvaluatorPort (Phase 1 + Phase 2 evaluation), RustdocCratePort (B-side baseline load via load_from_path; C-side live capture via capture_current), TdddLayerBindingsPort (architecture-rules.json enumeration). apps/cli constructs the concrete infrastructure adapters (FsCatalogueDocumentLoader, CatalogueToExtendedCrateCodec, SignalEvaluatorV2, RustdocCrateAdapter, FsTdddLayerBindingsAdapter) and injects them at the composition root. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-17", "hash": "f3302fe868e8c61ed23817d97159e9696aa2224a3942e534a4d5e94f62851127" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueImplSignalsError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidTrackId", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "LayerBindingsLoad", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "CatalogueLoad", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "BaselineLoad", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "ExtendedCrateConversion", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "SchemaExport", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "Evaluation", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "SymlinkRejected", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }] } },
+          { "name": "NoLayers" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for CatalogueImplSignalsService::run. Variants: InvalidTrackId (track id format invalid), LayerBindingsLoad (loading TDDD layer bindings from architecture-rules.json failed; covers both file-read/parse failure and requested layer not found or not tddd.enabled), CatalogueLoad (A-side catalogue document read/decode failure), BaselineLoad (B-side baseline rustdoc load failure), ExtendedCrateConversion (A-side CatalogueDocument → ExtendedCrate conversion failure), SchemaExport (C-side live capture failure), Evaluation (signal evaluator failure), SymlinkRejected (path traversal or symlink guard rejection from the security validation in the interactor), NoLayers (no TDDD-enabled layers found or resolved). [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
     "RenderContractMapCommand": {
       "action": "modify",
       "role": "Command",
@@ -59,6 +114,31 @@
     }
   },
   "traits": {
+    "CatalogueImplSignalsService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "returns": "Result<String, CatalogueImplSignalsError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Application service (driving port) for the `bin/sotp track catalogue-impl-signals` use case. Returns a formatted markdown string with per-layer 11-region signal table for stdout output. The layer parameter optionally filters to a single layer; None means all TDDD-enabled layers. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-17", "hash": "f3302fe868e8c61ed23817d97159e9696aa2224a3942e534a4d5e94f62851127" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "AC-11", "hash": "67a07554aab4803297b1891e637f61d97027d86fe18e35cbae086d6458858c79" }
+      ],
+      "informal_grounds": []
+    },
     "CatalogueSpecSignalsWriter": {
       "action": "reference",
       "role": "SecondaryPort",

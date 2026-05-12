@@ -4,6 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CatalogueImplSignalsError | error_type | — | — | 🔵 | 🔵 |
 | RenderContractMapError | error_type | modify | — | 🔵 | 🔵 |
 
 ## Secondary Ports
@@ -17,12 +18,14 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CatalogueImplSignalsService | application_service | — | — | 🔵 | 🔵 |
 | PreCommitTypeSignalsService | application_service | reference | — | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CatalogueImplSignalsInteractor | interactor | — | — | 🔵 | 🔵 |
 | PreCommitTypeSignalsInteractor | interactor | reference | — | 🔵 | 🔵 |
 
 ## Commands

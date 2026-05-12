@@ -32,10 +32,13 @@
 | BaselineRustdocCodec | secondary_adapter | — | — | 🔵 | 🔵 |
 | CatalogueDocumentCodec | secondary_adapter | — | — | 🔵 | 🔵 |
 | CatalogueToExtendedCrateCodec | secondary_adapter | — | — | 🔵 | 🔵 |
+| FsCatalogueDocumentLoader | secondary_adapter | — | — | 🔵 | 🔵 |
 | FsCatalogueLoader | secondary_adapter | modify | — | 🔵 | 🔵 |
 | FsCatalogueSpecSignalsStore | secondary_adapter | reference | — | 🔵 | 🔵 |
 | FsContractMapWriter | secondary_adapter | reference | — | 🔵 | 🔵 |
+| FsTdddLayerBindingsAdapter | secondary_adapter | — | — | 🔵 | 🔵 |
 | InMemoryCatalogueLinter | secondary_adapter | reference | — | 🔵 | 🔵 |
+| RustdocCrateAdapter | secondary_adapter | — | — | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | — | 🔵 | 🔵 |
 | SignalEvaluatorV2 | secondary_adapter | — | — | 🔵 | 🔵 |
 
@@ -62,4 +65,5 @@
 | infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::consistency_report_to_findings | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components | free_function | delete | — | 🔵 | 🔵 |
+| infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str | free_function | delete | — | 🔵 | 🔵 |
 

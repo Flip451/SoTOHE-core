@@ -531,7 +531,7 @@ pub enum TrackCommand {
         workspace_root: PathBuf,
     },
 
-    /// Run the 3-way (A/B/C) signal evaluation for a track and print the report.
+    /// Diagnose SoT Chain ③ (catalogue ↔ implementation) for a track.
     ///
     /// A = ExtendedCrate built from `<layer>-types.json` via `CatalogueToExtendedCrateCodec`.
     /// B = `rustdoc_types::Crate` loaded from `<layer>-types-baseline.json` via
@@ -541,16 +541,18 @@ pub enum TrackCommand {
     /// Processes every `tddd.enabled` layer in `architecture-rules.json`.
     /// Outputs a markdown report to stdout (one table per layer).
     /// Exits with code 1 when any Red signals are found.
-    ThreeWaySignals {
-        /// Path to the track items root directory (e.g., `track/items`).
-        #[arg(long, default_value = "track/items")]
-        items_dir: PathBuf,
-
-        /// Track ID (directory name under items_dir).
+    ///
+    /// On-demand diagnostic only — no output file, no Makefile wrapper
+    /// (ADR 2026-05-11-2330 §D3).
+    CatalogueImplSignals {
+        /// Track ID (directory name under `track/items`).
         track_id: String,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
+        ///
+        /// The track items directory is derived from this path as
+        /// `<workspace_root>/track/items` (canonical layout only).
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
 
@@ -559,11 +561,6 @@ pub enum TrackCommand {
         /// `tddd.enabled=true`.
         #[arg(long)]
         layer: Option<String>,
-
-        /// Optional output file path. When supplied the markdown report is
-        /// written to the file in addition to stdout.
-        #[arg(long)]
-        output: Option<PathBuf>,
     },
 }
 
@@ -743,13 +740,11 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Lint { track_id, layer_id, workspace_root } => {
             tddd::lint::execute_lint(workspace_root, track_id, layer_id)
         }
-        TrackCommand::ThreeWaySignals { items_dir, track_id, workspace_root, layer, output } => {
-            tddd::three_way_signals::execute_three_way_signals(
-                items_dir,
+        TrackCommand::CatalogueImplSignals { track_id, workspace_root, layer } => {
+            tddd::catalogue_impl_signals::execute_catalogue_impl_signals(
                 track_id,
                 workspace_root,
                 layer,
-                output,
             )
         }
     };

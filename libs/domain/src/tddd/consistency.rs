@@ -503,6 +503,56 @@ mod tests {
         assert!(outcome_strict.findings().is_empty());
     }
 
+    /// D4 regression: documents that the existing `check_type_signals(doc, strict=false)`
+    /// blocks on an "undeclared implementation" (`C\(S∪D)` region → 🔴 signal).
+    ///
+    /// ADR `2026-05-11-2330` §D4 states:
+    ///   "reclared implementations that `C\(S∪D)` 領域, which are 🔴 entries in
+    ///   `<layer>-type-signals.json`, are blocked by the existing commit gate
+    ///   (`check_type_signals(doc, strict=false)`) unconditionally."
+    ///
+    /// A `CMinusSUnionD` entry corresponds to a type present in the current code (C)
+    /// but not declared in the catalogue (S) or as a delete target (D).
+    /// In `TypeCatalogueDocument` terms this is a Red reverse-direction signal:
+    /// the catalogue has zero declared entries, but the signals file contains a
+    /// Red entry for an undeclared type. This is the exact scenario the ADR claims
+    /// is already guarded by `check_type_signals`.
+    #[test]
+    fn test_check_type_signals_cminussunion_d_red_blocks_commit_gate_d4_regression() {
+        // Build a catalogue document with zero declared entries (empty catalogue).
+        let doc = TypeCatalogueDocument::new(1, Vec::new());
+
+        // However, the signals file (as loaded by infrastructure) contains a Red
+        // entry for "UndeclaredImpl" — a type present in C but absent from S ∪ D
+        // (i.e., the CMinusSUnionD region from ADR 2026-05-08-0305 §D3).
+        let mut doc_with_signals = doc;
+        doc_with_signals.set_signals(vec![TypeSignal::new(
+            "UndeclaredImpl",
+            "undeclared_type",
+            ConfidenceSignal::Red,
+            /* found_type = */ true,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        )]);
+
+        // Even in non-strict (commit-gate) mode, a Red signal blocks.
+        // This is the ADR §D4 claim: the existing gate covers the old
+        // `spec-code-consistency` role without a new verify subcommand.
+        let outcome =
+            check_type_signals(&doc_with_signals, /* strict = */ false, "domain-types.json");
+        assert!(
+            outcome.has_errors(),
+            "CMinusSUnionD Red signal must block commit gate (has_errors must be true): {outcome:?}"
+        );
+        // Ensure the error message identifies the undeclared type.
+        let msg = outcome.findings()[0].message();
+        assert!(
+            msg.contains("UndeclaredImpl"),
+            "error finding must name the undeclared implementation: {msg}"
+        );
+    }
+
     #[test]
     fn test_check_type_signals_yellow_error_mentions_catalogue_file() {
         let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);

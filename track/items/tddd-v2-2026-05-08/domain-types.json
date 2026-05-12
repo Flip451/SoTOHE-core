@@ -1247,6 +1247,49 @@
       ],
       "informal_grounds": []
     },
+    "CatalogueDocumentLoaderError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NotFound", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "Decode", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for CatalogueDocumentLoaderPort::load. Three variants: NotFound (file absent), Io (non-symlink I/O failure), Decode (JSON or schema-version failure from CatalogueDocumentCodec). [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "RustdocCratePortError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NotFound", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "ParseFailed", "payload": { "kind": "struct", "fields": [{ "name": "crate_name", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "CaptureFailed", "payload": { "kind": "struct", "fields": [{ "name": "crate_name", "ty": "String" }, { "name": "reason", "ty": "String" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for RustdocCratePort methods. NotFound / Io cover baseline file load failures; ParseFailed covers JSON parse failures (from BaselineRustdocCodec::from_json); CaptureFailed covers cargo rustdoc invocation failures (from RustdocSchemaExporter::export_rustdoc_json_path). [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
     "TypestateTransitionsSpec": {
       "action": "add",
       "role": "ValueObject",
@@ -1448,6 +1491,60 @@
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
       ],
       "informal_grounds": []
+    },
+    "TdddLayerBinding": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "layer_id", "ty": "String" },
+          { "name": "catalogue_file", "ty": "String" },
+          { "name": "baseline_file", "ty": "String" },
+          { "name": "targets", "ty": "Vec<String>" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Clone", "origin_crate": "core" }
+      ],
+      "docs": "Binding for a single TDDD-enabled layer resolved from architecture-rules.json. Contains layer_id, catalogue_file path, baseline_file path, and schema_export target crate names. Used by CatalogueImplSignalsInteractor without direct file I/O (hexagonal purity). [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TdddLayerBindingsError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LoadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "reason", "ty": "String" }]
+            }
+          },
+          {
+            "name": "LayerNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "layer_id", "ty": "String" }]
+            }
+          },
+          { "name": "NoLayers" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for TdddLayerBindingsPort::load. LoadFailed: architecture-rules.json unreadable or malformed. LayerNotFound: requested layer not found or not tddd.enabled. NoLayers: no enabled layers found. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -1566,6 +1663,73 @@
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-11", "hash": "d0ea1d981961bf5ada665db6672d594033744de132e7c3ea93d978efa80801f0" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-12", "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocumentLoaderPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "load",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<CatalogueDocument, CatalogueDocumentLoaderError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Secondary port for loading a CatalogueDocument from a filesystem path (A-side for CatalogueImplSignalsInteractor). Placed in domain alongside CatalogueToExtendedCratePort and SignalEvaluatorPort because CatalogueDocument is a domain type. The infrastructure adapter (FsCatalogueDocumentLoader) wraps CatalogueDocumentCodec::load. [source: ADR 2026-05-11-2330 D2 — hexagonal consequence of moving orchestration to usecase]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "RustdocCratePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "load_from_path",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<rustdoc_types::Crate, RustdocCratePortError>",
+          "is_async": false
+        },
+        {
+          "name": "capture_current",
+          "receiver": "&self",
+          "params": [{ "name": "crate_name", "ty": "&str" }],
+          "returns": "Result<rustdoc_types::Crate, RustdocCratePortError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Secondary port for loading or capturing rustdoc_types::Crate instances. load_from_path covers the B-side (baseline file load); capture_current covers the C-side (live rustdoc capture via cargo +nightly rustdoc). Placed in domain alongside SignalEvaluatorPort because rustdoc_types::Crate is already used there (domain depends on rustdoc_types). The infra adapter (RustdocCrateAdapter) wraps BaselineRustdocCodec::load (B) and RustdocSchemaExporter::export_rustdoc_json_path + BaselineRustdocCodec::from_json (C). Replaces the direct infrastructure codec calls that were in apps/cli/three_way_signals.rs. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TdddLayerBindingsPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "load",
+          "receiver": "&self",
+          "params": [
+            { "name": "workspace_root", "ty": "&std::path::Path" },
+            { "name": "layer_filter", "ty": "Option<&str>" }
+          ],
+          "returns": "Result<Vec<TdddLayerBinding>, TdddLayerBindingsError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Secondary port for loading TDDD layer bindings from architecture-rules.json. Injected into CatalogueImplSignalsInteractor to keep architecture-rules.json parsing in the infrastructure layer. The infrastructure adapter (FsTdddLayerBindingsAdapter) wraps load_tddd_layers_from_path. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
       "informal_grounds": []
     }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-11T16:59:35Z",
-  "declaration_hash": "7c95428e0fb5df8c8d7eb97d66127a10425b483c596a6566e8a203eaf8c4b2ff",
+  "generated_at": "2026-05-12T01:55:57Z",
+  "declaration_hash": "a9c48045ef2d6603024e7e2b828d71661934d4bfeb5faf6b135f623586d91605",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
@@ -61,12 +61,32 @@
       ]
     },
     {
+      "type_name": "FsCatalogueDocumentLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueDocumentLoaderPort",
+        "core::default::Default"
+      ]
+    },
+    {
       "type_name": "FsCatalogueLoader",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true,
       "found_items": [
         "CatalogueLoader"
+      ]
+    },
+    {
+      "type_name": "FsTdddLayerBindingsAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TdddLayerBindingsPort",
+        "core::default::Default"
       ]
     },
     {
@@ -78,6 +98,15 @@
         "core::convert::From",
         "core::error::Error",
         "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RustdocCrateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RustdocCratePort"
       ]
     },
     {
@@ -252,6 +281,12 @@
     },
     {
       "type_name": "infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false

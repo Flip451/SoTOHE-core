@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "560d3fbbce5a971ededf9f50a253eef39fdb65132a219cf150bd7e7dfa4f2038",
+  "catalogue_declaration_hash": "e9f93cc902a4183b0ab18a0829cb872e86a762deddb80a371bf3c329d4965710",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -16,6 +16,10 @@
     },
     {
       "type_name": "CatalogueDocumentError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderError",
       "signal": "blue"
     },
     {
@@ -143,11 +147,23 @@
       "signal": "blue"
     },
     {
+      "type_name": "RustdocCratePortError",
+      "signal": "blue"
+    },
+    {
       "type_name": "SelfReceiver",
       "signal": "blue"
     },
     {
       "type_name": "SignalRegion",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TdddLayerBinding",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TdddLayerBindingsError",
       "signal": "blue"
     },
     {
@@ -251,6 +267,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "CatalogueDocumentLoaderPort",
+      "signal": "blue"
+    },
+    {
       "type_name": "CatalogueLinter",
       "signal": "blue"
     },
@@ -267,11 +287,19 @@
       "signal": "blue"
     },
     {
+      "type_name": "RustdocCratePort",
+      "signal": "blue"
+    },
+    {
       "type_name": "SchemaExporter",
       "signal": "blue"
     },
     {
       "type_name": "SignalEvaluatorPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TdddLayerBindingsPort",
       "signal": "blue"
     },
     {

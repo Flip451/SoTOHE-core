@@ -155,7 +155,7 @@
       "methods": [
         { "name": "new", "params": [{ "name": "track_root", "ty": "std::path::PathBuf" }, { "name": "rules_path", "ty": "std::path::PathBuf" }, { "name": "trusted_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
       ],
-      "docs": "Existing FsCatalogueLoader. Modified to load CatalogueDocument instead of TypeCatalogueDocument. Added new() method declaration to resolve SIntersectC_Mismatch_Modify Yellow (A-side inherent method map was empty, C has new()).",
+      "docs": "Existing FsCatalogueLoader. Modified: internal loading switched from reading TypeCatalogueDocument directly to reading v3 CatalogueDocument and converting via v3_doc_to_stub. The CatalogueLoader port return type (BTreeMap<LayerId, TypeCatalogueDocument>) is unchanged — the conversion preserves compatibility with CatalogueLinter. Added new() method declaration to resolve SIntersectC_Mismatch_Modify Yellow (A-side inherent method map was empty, C has new()).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
       ],
@@ -251,6 +251,56 @@
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-11", "hash": "d0ea1d981961bf5ada665db6672d594033744de132e7c3ea93d978efa80801f0" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-12", "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588" }
+      ],
+      "informal_grounds": []
+    },
+    "FsCatalogueDocumentLoader": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "CatalogueDocumentLoaderPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless filesystem adapter implementing CatalogueDocumentLoaderPort. Delegates to CatalogueDocumentCodec::load and maps codec errors to CatalogueDocumentLoaderError variants. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "RustdocCrateAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
+      "trait_impls": [
+        { "trait_name": "RustdocCratePort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [{ "name": "workspace_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
+      ],
+      "docs": "Adapter implementing RustdocCratePort. load_from_path wraps BaselineRustdocCodec::load (B-side baseline). capture_current wraps RustdocSchemaExporter::export_rustdoc_json_path + BaselineRustdocCodec::from_json (C-side live capture). workspace_root is passed to RustdocSchemaExporter::new. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "FsTdddLayerBindingsAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "TdddLayerBindingsPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless filesystem adapter implementing TdddLayerBindingsPort. Wraps load_tddd_layers_from_path (infrastructure::verify::tddd_layers) and maps infra TdddLayerBinding to domain TdddLayerBinding entries. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
       "informal_grounds": []
     },
@@ -550,7 +600,7 @@
       "params": [],
       "returns": "Result<(), EvaluateSignalsError>",
       "is_async": false,
-      "docs": "T008: deleted. Old signal evaluation entry point using TypeBaseline + TypeGraph. Replaced by the new sotp track three-way-signals pipeline via SignalEvaluatorV2.",
+      "docs": "T008: deleted. Old signal evaluation entry point using TypeBaseline + TypeGraph. Replaced by the new bin/sotp track catalogue-impl-signals pipeline via SignalEvaluatorV2.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
       ],
@@ -577,6 +627,22 @@
       "docs": "T008: deleted. Old validation-and-write helper in the TypeBaseline-based evaluator.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "_track_id_str", "ty": "&str" },
+        { "name": "_crate_name", "ty": "&str" },
+        { "name": "_project_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "docs": "IN-17 / D1: retire the stub for `bin/sotp verify spec-code-consistency`. The stub was a T008 placeholder that always returned an error explaining the command was removed. The command itself (and this stub) are deleted as part of the catalogue-impl-signals introduction. The module libs/infrastructure/src/verify/spec_code_consistency.rs will be removed entirely. [source: ADR 2026-05-11-2330 D1]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-17", "hash": "f3302fe868e8c61ed23817d97159e9696aa2224a3942e534a4d5e94f62851127" }
       ],
       "informal_grounds": []
     },

@@ -78,7 +78,7 @@ pub enum BaselineRustdocCodecError {
 /// Codec for loading `rustdoc_types::Crate` from JSON files produced by
 /// `cargo +nightly rustdoc --output-format json`.
 ///
-/// Used by the `three-way-signals` command to load TypeGraph B (Baseline) and
+/// Used by the `catalogue-impl-signals` command to load TypeGraph B (Baseline) and
 /// TypeGraph C (Current) for `SignalEvaluatorV2`.
 #[derive(Debug, Clone)]
 pub struct BaselineRustdocCodec;

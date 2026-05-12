@@ -44,6 +44,7 @@
 | ModulePath | value_object | — | — | 🔵 | 🔵 |
 | ParamDeclaration | value_object | modify | — | 🔵 | 🔵 |
 | ParamName | value_object | — | — | 🔵 | 🔵 |
+| TdddLayerBinding | value_object | — | — | 🔵 | 🔵 |
 | ThreeWayEvaluationReport | value_object | — | — | 🔵 | 🔵 |
 | ThreeWaySignal | value_object | — | — | 🔵 | 🔵 |
 | TraitBaselineEntry | value_object | delete | — | 🔵 | 🔵 |
@@ -68,22 +69,28 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueDocumentError | error_type | — | — | 🔵 | 🔵 |
+| CatalogueDocumentLoaderError | error_type | — | — | 🔵 | 🔵 |
 | CatalogueLinterError | error_type | reference | — | 🔵 | 🔵 |
 | GenericArgsError | error_type | — | — | 🔵 | 🔵 |
 | IdentifierError | error_type | — | — | 🔵 | 🔵 |
 | NewTypeGraphCodecError | error_type | — | — | 🔵 | 🔵 |
 | Phase1Error | error_type | — | — | 🔵 | 🔵 |
+| RustdocCratePortError | error_type | — | — | 🔵 | 🔵 |
+| TdddLayerBindingsError | error_type | — | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CatalogueDocumentLoaderPort | secondary_port | — | — | 🔵 | 🔵 |
 | CatalogueLinter | secondary_port | reference | — | 🔵 | 🔵 |
 | CatalogueLoader | secondary_port | modify | — | 🔵 | 🔵 |
 | CatalogueToExtendedCratePort | secondary_port | — | — | 🔵 | 🔵 |
 | ContractMapWriter | secondary_port | reference | — | 🔵 | 🔵 |
+| RustdocCratePort | secondary_port | — | — | 🔵 | 🔵 |
 | SchemaExporter | secondary_port | reference | — | 🔵 | 🔵 |
 | SignalEvaluatorPort | secondary_port | — | — | 🔵 | 🔵 |
+| TdddLayerBindingsPort | secondary_port | — | — | 🔵 | 🔵 |
 
 ## Domain Services
 

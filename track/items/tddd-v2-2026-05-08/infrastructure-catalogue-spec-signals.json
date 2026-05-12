@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7c95428e0fb5df8c8d7eb97d66127a10425b483c596a6566e8a203eaf8c4b2ff",
+  "catalogue_declaration_hash": "a9c48045ef2d6603024e7e2b828d71661934d4bfeb5faf6b135f623586d91605",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -51,6 +51,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "FsCatalogueDocumentLoader",
+      "signal": "blue"
+    },
+    {
       "type_name": "FsCatalogueLoader",
       "signal": "blue"
     },
@@ -63,11 +67,19 @@
       "signal": "blue"
     },
     {
+      "type_name": "FsTdddLayerBindingsAdapter",
+      "signal": "blue"
+    },
+    {
       "type_name": "InMemoryCatalogueLinter",
       "signal": "blue"
     },
     {
       "type_name": "LoadAllCataloguesError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RustdocCrateAdapter",
       "signal": "blue"
     },
     {
@@ -172,6 +184,10 @@
     },
     {
       "type_name": "infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str",
       "signal": "blue"
     }
   ]

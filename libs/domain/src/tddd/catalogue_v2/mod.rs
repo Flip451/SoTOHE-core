@@ -26,6 +26,7 @@
 //! in `super::catalogue` are left untouched until T008. The V2 types live exclusively
 //! in this `catalogue_v2` module hierarchy.
 
+pub mod catalogue_impl_signals_ports;
 pub mod composite;
 pub mod document;
 pub mod entries;
@@ -57,3 +58,8 @@ pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver};
 pub use traits::{GenericArgsError, TraitImplDeclV2};
 
 pub use variants::{FieldDecl, VariantDecl, VariantPayload};
+
+pub use catalogue_impl_signals_ports::{
+    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort, RustdocCratePort,
+    RustdocCratePortError, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
+};

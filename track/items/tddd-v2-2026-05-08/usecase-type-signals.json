@@ -1,8 +1,33 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-11T16:59:34Z",
-  "declaration_hash": "3a84f07763b136ab59906c23bb7274512dd90610a6fac90c453f4fbbbf0a86a4",
+  "generated_at": "2026-05-12T01:55:55Z",
+  "declaration_hash": "9db38fb7033ce9c620cbd64f45966a8d16919ca8b351849593a303a29547dded",
   "signals": [
+    {
+      "type_name": "CatalogueImplSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CatalogueImplSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueImplSignalsService"
+      ]
+    },
+    {
+      "type_name": "CatalogueImplSignalsService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "RenderContractMapCommand",
       "kind_tag": "command",

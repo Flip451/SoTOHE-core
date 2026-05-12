@@ -1029,6 +1029,7 @@ dependencies = [
  "mockall",
  "regex",
  "rstest",
+ "rustdoc-types",
  "serde",
  "serde_json",
  "tempfile",

@@ -61,8 +61,6 @@ pub enum VerifyCommand {
     SpecSignals(SpecVerifyArgs),
     /// Check spec.md contains a ## Domain States section with table data rows.
     SpecStates(SpecStatesArgs),
-    /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
-    SpecCodeConsistency(SpecCodeConsistencyArgs),
     /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
     /// per ADR 2026-04-19-1242 §D2.3.
     PlanArtifactRefs(PlanArtifactRefsArgs),
@@ -131,20 +129,6 @@ pub struct PlanArtifactRefsArgs {
     /// When omitted, the active track is resolved from the current branch name.
     #[arg(long)]
     track_dir: Option<PathBuf>,
-}
-
-/// Arguments for spec-code-consistency verify subcommand.
-#[derive(Args)]
-pub struct SpecCodeConsistencyArgs {
-    /// Track ID (e.g., `spec-code-consistency-2026-04-08`).
-    #[arg(long)]
-    track_id: String,
-    /// Crate name to export schema from (e.g., `domain`).
-    #[arg(long = "crate", default_value = "domain")]
-    crate_name: String,
-    /// Project root directory.
-    #[arg(long, default_value = ".")]
-    project_root: PathBuf,
 }
 
 /// Common arguments for all verify subcommands.
@@ -232,9 +216,6 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                 };
             ("verify spec states", outcome)
         }
-        VerifyCommand::SpecCodeConsistency(args) => {
-            ("verify spec-code consistency", execute_spec_code_consistency(args))
-        }
         VerifyCommand::PlanArtifactRefs(args) => {
             ("verify plan artifact refs", execute_plan_artifact_refs(args))
         }
@@ -264,15 +245,6 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
     };
 
     print_outcome(label, &outcome)
-}
-
-/// Execute bidirectional spec ↔ code consistency check.
-fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome {
-    infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str(
-        &args.track_id,
-        &args.crate_name,
-        &args.project_root,
-    )
 }
 
 // T008: type re-exports for consistency_report_to_findings / check_consistency / TypeGraph removed.

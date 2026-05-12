@@ -411,19 +411,6 @@ class MakeWrappersTest(unittest.TestCase):
         self.assertIn('bin/sotp make track-set-commit-hash', task_body)
         self.assertIn('"$@"', task_body)
 
-    def test_track_three_way_signals_wrapper_delegates_to_sotp_track(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.track-three-way-signals]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-
-        self.assertIn('script_runner = "@shell"', task_body)
-        self.assertIn('bin/sotp track three-way-signals', task_body)
-        self.assertIn('"$@"', task_body)
-
     def test_conventions_wrappers_smoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)

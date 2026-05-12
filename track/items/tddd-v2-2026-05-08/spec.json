@@ -241,6 +241,50 @@
             "anchor": "D5"
           }
         ]
+      },
+      {
+        "id": "IN-17",
+        "text": "旧 `bin/sotp verify spec-code-consistency` (v1 カタログスキーマ向け双方向整合性チェック) を廃止し、SoT Chain ③ (カタログ ↔ 実装) の診断コマンド `bin/sotp track catalogue-impl-signals` を導入する。このコマンドは signal evaluator ADR §D3 が定義した 11 領域テーブル (S∩C / S\\C / D∩C / D\\C / C\\(S∪D) 等) と v3 カタログスキーマに基づき、各エントリーがどの領域に属するか、その領域の signal (🔵/🟡/🔴/skip) と解釈を stdout に表示する。使い方はオンデマンドである。[source: ADR 2026-05-11-2330 D1]",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-18",
+        "text": "`catalogue-impl-signals` のオーケストレーション (各レイヤーの A/B/C TypeGraph 取得、signal evaluator 呼び出し、領域別結果の収集・整形) は `libs/usecase/` のインタラクターとして実装する。`apps/cli/` のコマンドハンドラーはそのインタラクターを呼び出して結果を stdout に書き出す薄いアダプターにとどまる。ADR `2026-04-30-0848` D1 (cli は domain を直接参照せず usecase を経由する) を本機能に適用し、オーケストレーションを型カタログの登録対象かつ SoT Chain 信号評価から参照可能にする。[source: ADR 2026-05-11-2330 D2]",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-19",
+        "text": "`catalogue-impl-signals` のインターフェースは stdout 専用かつオンデマンドとする。永続化された view ファイル (例: `<layer>-catalogue-impl-signals.md`) を生成しない。`--output <path>` ファイル書き出しモードを持たない。`Makefile.toml` のラッパータスクを追加しない。[source: ADR 2026-05-11-2330 D3]",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-20",
+        "text": "旧 `spec-code-consistency` が担っていた chain-③ CI ゲート役割 (C\\(S∪D) 「宣言されていない実装」と S\\C + Reference/Modify 「宣言済み項目の消失」の自動検出) は、既存の `verify spec-states-current` (コミットゲート) と `check_strict_merge_gate` (マージゲート) が `<layer>-type-signals.json` を読んで `check_type_signals` を適用することで引き継ぐ。新たな `sotp verify` サブコマンドは追加しない。[source: ADR 2026-05-11-2330 D4]",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+            "anchor": "D4"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -540,6 +584,28 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`bin/sotp track catalogue-impl-signals` が実行可能であり、v3 カタログスキーマと signal evaluator の 11 領域テーブルに基づいて各エントリーの領域・signal・解釈を stdout に出力する。オーケストレーションが `libs/usecase/` インタラクターに実装されており `apps/cli/` は stdout 書き出しのみを行う薄いアダプターである。`--output` モードおよび `Makefile.toml` ラッパータスクが存在しない。`bin/sotp verify spec-code-consistency` サブコマンドが削除されており、`verify spec-states-current` が `<layer>-type-signals.json` の 🔴 エントリを検出してコミットをブロックする (chain-③ ゲートの継続)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+          "anchor": "D4"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -581,7 +647,7 @@
     }
   ],
   "signals": {
-    "blue": 46,
+    "blue": 51,
     "yellow": 0,
     "red": 0
   }
