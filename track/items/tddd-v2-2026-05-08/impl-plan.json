@@ -106,17 +106,20 @@
     {
       "id": "T018",
       "description": "WS-B D1: 旧 `spec-code-consistency` stub 全体を削除し、`bin/sotp track three-way-signals` コマンドを `bin/sotp track catalogue-impl-signals` にリネームする。対象変更: (1) `libs/infrastructure/src/verify/spec_code_consistency.rs` を削除し、同モジュールの `mod` 宣言と `pub use` を infrastructure `lib.rs` から除去する。(2) `apps/cli/src/commands/verify.rs` から `SpecCodeConsistency` enum variant / `SpecCodeConsistencyArgs` struct / `execute_spec_code_consistency` 関数呼び出しを削除する。(3) `apps/cli/src/commands/track/tddd/three_way_signals.rs` を `catalogue_impl_signals.rs` にリネームし、`execute_three_way_signals` 関数を `execute_catalogue_impl_signals` に、モジュール doc コメントを `catalogue-impl-signals` 向けに更新する。(4) CLI のサブコマンド登録 (track コマンドの `three-way-signals` → `catalogue-impl-signals`) を更新する。(5) `Makefile.toml` の `track-three-way-signals` タスクを削除する (D3: Makefile ラッパー不追加のため、既存タスクも削除)。この時点では `--output` モードはまだ残す (T019 で除去)。`cargo make ci-rust` が通ることを確認する。Layer: apps/cli + infrastructure。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "c4f8352eec156e62e29d6f02896374725ec5c5e8"
     },
     {
       "id": "T019",
       "description": "WS-B D2 + D3: `CatalogueImplSignalsInteractor` / `CatalogueImplSignalsService` / `CatalogueImplSignalsError` を `libs/usecase/` に実装し、`execute_catalogue_impl_signals` からオーケストレーション (per-layer A/B/C TypeGraph 取得・signal evaluator 呼び出し・領域別結果の収集・整形) をインタラクターの `run` メソッドに移動する。CLI handler は `CatalogueImplSignalsInteractor::new(catalogue_loader, ext_crate_codec, evaluator, rustdoc_crate_port, layer_bindings_port)` を構築して `interactor.run(track_id, workspace_root, layer)` を呼び出し、返ってきた `Result<String, CatalogueImplSignalsError>` を stdout に print するだけの薄いアダプターにする。同時に D3 インターフェース trim を実施: `--output <path>` 引数、`write_output_file` / `normalize_output_path` ヘルパー、`file_buf` 蓄積ロジックを削除する。`CatalogueImplSignalsInteractor` は 5 ポート注入 (`CatalogueDocumentLoaderPort`, `CatalogueToExtendedCratePort`, `SignalEvaluatorPort`, `RustdocCratePort`, `TdddLayerBindingsPort`) で構成し、`apps/cli` の composition root で `FsCatalogueDocumentLoader`, `CatalogueToExtendedCrateCodec`, `SignalEvaluatorV2`, `RustdocCrateAdapter`, `FsTdddLayerBindingsAdapter` を構築して注入する。usecase ユニットテスト: 正常系 (空カタログで空出力が返る) / 無効トラック ID → `CatalogueImplSignalsError::InvalidTrackId` を追加する。`cargo make ci-rust` が通ることを確認する。Layer: usecase + apps/cli。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "c4f8352eec156e62e29d6f02896374725ec5c5e8"
     },
     {
       "id": "T020",
       "description": "WS-B D4 回帰テスト: `C\\(S∪D)` 「宣言されていない実装」シナリオが `verify spec-states-current` を通じて 🔴 を生成し、コミットゲートをブロックすることを regression test で確認する。具体的には、`check_type_signals` の unit test / integration test として、`ThreeWayEvaluationReport` に `C\\(S∪D)` 領域の 🔴 エントリを持つ `<layer>-type-signals.json` fixture を用意し、`check_type_signals(doc, strict=false)` が `has_errors() == true` を返すことをアサートする (D4 の「undeclared-impl は Red チェックで無条件にカウントされる」を実行パスで確認)。新規 test file は `libs/domain/src/tddd/` 以下の適切な test モジュールに追加する。Layer: domain (test only)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "c4f8352eec156e62e29d6f02896374725ec5c5e8"
     }
   ],
   "plan": {
