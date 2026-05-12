@@ -13,6 +13,8 @@
 |------|------|--------|---------|--------|----------|
 | CatalogueSpecSignalsWriter | secondary_port | reference | — | 🔵 | 🔵 |
 | SchemaExporterPort | secondary_port | reference | — | 🔵 | 🔵 |
+| SpecElementHashReader | secondary_port | reference | — | 🔵 | 🔵 |
+| TrackBlobReader | secondary_port | modify | — | 🟡 | 🔵 |
 
 ## Application Services
 
@@ -33,4 +35,10 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | RenderContractMapCommand | command | modify | — | 🔵 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| usecase::merge_gate::check_strict_merge_gate | free_function | modify | — | 🟡 | 🔵 |
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e9f93cc902a4183b0ab18a0829cb872e86a762deddb80a371bf3c329d4965710",
+  "catalogue_declaration_hash": "cfcf664f904984014c96c90bd50b324685edede1a0aedd0b7ac49f7893e1fa6e",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -59,6 +59,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "EnumVariantDeclaration",
+      "signal": "blue"
+    },
+    {
       "type_name": "ExtendedCrate",
       "signal": "blue"
     },
@@ -112,6 +116,10 @@
     },
     {
       "type_name": "LayerId",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MemberDeclaration",
       "signal": "blue"
     },
     {
@@ -191,6 +199,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "TraitImplDecl",
+      "signal": "blue"
+    },
+    {
       "type_name": "TraitImplDeclV2",
       "signal": "blue"
     },
@@ -207,11 +219,23 @@
       "signal": "blue"
     },
     {
+      "type_name": "TypeAction",
+      "signal": "blue"
+    },
+    {
       "type_name": "TypeBaseline",
       "signal": "blue"
     },
     {
       "type_name": "TypeBaselineEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
       "signal": "blue"
     },
     {
@@ -240,6 +264,10 @@
     },
     {
       "type_name": "TypeRef",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignal",
       "signal": "blue"
     },
     {
@@ -303,11 +331,27 @@
       "signal": "blue"
     },
     {
+      "type_name": "domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals",
+      "signal": "blue"
+    },
+    {
       "type_name": "domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal",
       "signal": "blue"
     },
     {
       "type_name": "domain::tddd::consistency::check_consistency",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::consistency::check_type_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::contract_map_render::render_contract_map",
       "signal": "blue"
     },
     {

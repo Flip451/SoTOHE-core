@@ -6,12 +6,12 @@ flowchart LR
     %% v3 schema redesign requires ADR-level design decisions and is tracked separately as T012.
     %% Until then, this renderer outputs only the layer scaffold.
     subgraph domain [domain]
-        %% 80 entries (nodes deferred to T012)
+        %% 91 entries (nodes deferred to T012)
     end
     subgraph usecase [usecase]
-        %% 9 entries (nodes deferred to T012)
+        %% 12 entries (nodes deferred to T012)
     end
     subgraph infrastructure [infrastructure]
-        %% 47 entries (nodes deferred to T012)
+        %% 53 entries (nodes deferred to T012)
     end
 ```

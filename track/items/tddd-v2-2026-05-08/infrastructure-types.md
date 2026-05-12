@@ -20,7 +20,7 @@
 | CatalogueDocumentCodecError | error_type | — | — | 🔵 | 🔵 |
 | CatalogueToExtendedCrateCodecError | error_type | — | — | 🔵 | 🔵 |
 | EvaluateSignalsError | error_type | reference | — | 🔵 | 🔵 |
-| LoadAllCataloguesError | error_type | modify | — | 🔵 | 🔵 |
+| LoadAllCataloguesError | error_type | modify | — | 🟡 | 🔵 |
 | SchemaExportCodecError | error_type | reference | — | 🔵 | 🔵 |
 | TypeCatalogueCodecError | error_type | reference | — | 🔵 | 🔵 |
 | TypeGraphExportError | error_type | delete | — | 🔵 | 🔵 |
@@ -37,7 +37,8 @@
 | FsCatalogueSpecSignalsStore | secondary_adapter | reference | — | 🔵 | 🔵 |
 | FsContractMapWriter | secondary_adapter | reference | — | 🔵 | 🔵 |
 | FsTdddLayerBindingsAdapter | secondary_adapter | — | — | 🔵 | 🔵 |
-| InMemoryCatalogueLinter | secondary_adapter | reference | — | 🔵 | 🔵 |
+| GitShowTrackBlobReader | secondary_adapter | modify | — | 🟡 | 🔵 |
+| InMemoryCatalogueLinter | secondary_adapter | modify | — | 🔵 | 🔵 |
 | RustdocCrateAdapter | secondary_adapter | — | — | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | — | 🔵 | 🔵 |
 | SignalEvaluatorV2 | secondary_adapter | — | — | 🔵 | 🔵 |
@@ -53,6 +54,9 @@
 | infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer | free_function | — | — | 🔵 | 🔵 |
 | infrastructure::tddd::baseline_codec::decode | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::baseline_codec::encode | free_function | delete | — | 🔵 | 🔵 |
+| infrastructure::tddd::catalogue_codec::decode | free_function | reference | — | 🔵 | 🔵 |
+| infrastructure::tddd::catalogue_codec::encode | free_function | reference | — | 🔵 | 🔵 |
+| infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer | free_function | modify | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_graph_cluster::classify_types | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_graph_export::execute_type_graph_for_layer | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_graph_render::render_type_graph_clustered | free_function | delete | — | 🔵 | 🔵 |
@@ -61,9 +65,11 @@
 | infrastructure::tddd::type_graph_render::write_type_graph_dir | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_graph_render::write_type_graph_file | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_signals_evaluator::evaluate_and_write_signals | free_function | delete | — | 🔵 | 🔵 |
+| infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer | free_function | modify | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::consistency_report_to_findings | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components | free_function | delete | — | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str | free_function | delete | — | 🔵 | 🔵 |
+| infrastructure::verify::spec_states::verify_from_spec_json | free_function | modify | — | 🟡 | 🔵 |
 

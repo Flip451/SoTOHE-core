@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9db38fb7033ce9c620cbd64f45966a8d16919ca8b351849593a303a29547dded",
+  "catalogue_declaration_hash": "870ed1b51daa6a029382ae7fd5b8369be318a828c2df9deef18be1341fc381d6",
   "signals": [
     {
       "type_name": "CatalogueImplSignalsError",
@@ -36,6 +36,18 @@
     },
     {
       "type_name": "SchemaExporterPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SpecElementHashReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::merge_gate::check_strict_merge_gate",
       "signal": "blue"
     }
   ]

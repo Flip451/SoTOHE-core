@@ -1,531 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`identifiers.rs` is 854 lines long, which exceeds the repository's 700-line hard limit for a module. The extra size is mostly from co-locating the large test block with the implementation, so this already violates the stated module-size rule and makes future changes harder to keep coherent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 1,
-              "category": "architecture"
-            },
-            {
-              "message": "`ModulePath::from_identifiers` is a new public constructor, but there is no unit test covering its happy path. That leaves a public API path in this module without the required test coverage, so a regression in this constructor would not be caught by the current suite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
-              "line": 263,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:aaf0127f33a1070f6bcfd34341467d85a42693d267741ea654422b8a72eefbb3",
-          "at": "2026-05-09T00:51:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
-          "at": "2026-05-09T00:56:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ItemAction` derives `strum::Display`/`EnumString` without a rename policy, so it accepts/emits `Add`, `Modify`, etc. The inherited TDDD-03 catalogue contract uses lowercase tags (`add`, `modify`, `reference`, `delete`), and the existing codec/fixtures use those values. Unless this enum is renamed with `#[strum(serialize_all = \"snake_case\")]` (and covered by tests), valid catalogue actions will be rejected or re-emitted with the wrong spelling once the v2 codec maps through these domain strings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 145,
-              "category": "correctness"
-            },
-            {
-              "message": "`SelfReceiver` currently parses/displays the Rust variant names (`Owned`, `SharedRef`, `ExclusiveRef`), but ADR D8 defines the catalogue values as the receiver tokens `self`, `&self`, and `&mut self`. This makes the domain `FromStr` reject the receiver strings already used in catalogue data and will force every caller to duplicate a custom mapping instead of using the validated domain enum. Add explicit strum serializations for the three variants and tests for the token forms.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 183,
-              "category": "correctness"
-            },
-            {
-              "message": "`Layer` also derives default strum casing, so `Layer::Domain.to_string()` is `Domain` and parsing `domain` fails. ADR D1 defines the layer axis as the lowercase catalogue values `domain` / `usecase` / `infrastructure`; with the current implementation, valid v2 documents using the specified layer values cannot round-trip through the domain enum. Add the appropriate strum serialization policy and tests for the lowercase spellings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
-              "line": 214,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
-          "at": "2026-05-09T00:59:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96ad85ab07e8bdbc22652769ba2c392e5dadd47c10ef708a2f3b3f91ec71bb86",
-          "at": "2026-05-09T01:06:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
-          "at": "2026-05-09T01:14:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
-          "at": "2026-05-09T01:17:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:37:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:39:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
-          "at": "2026-05-09T01:46:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
-          "at": "2026-05-09T02:19:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
-          "at": "2026-05-09T02:22:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ThreeWaySignal` stores the derived kind as a public field, and `ThreeWayEvaluationReport` exposes its `Vec` publicly. That leaves the documented invariant unenforced: external code can construct or mutate a value with mismatched `region`/`signal` or with `Skip` entries inside a report, and `len()`/`has_violations()`/`is_in_progress()` will then report the wrong state. Make the derived state private or validate on construction so the domain type cannot represent an invalid report.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
-              "line": 182,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e8798a0a0cd123f1d7b186c030e6ee130dabc8ad23a406ae33404d1bbc2de4ec",
-          "at": "2026-05-09T05:31:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ThreeWayEvaluationReport::new` does not enforce the module's own invariant that reports contain only non-skip signals. It stores `Skip` entries verbatim, so any caller can construct a report that contradicts the public contract in `port.rs` and leaks skipped items through `iter()`/`len()`. Consider filtering `Skip` values here or making construction fallible/private.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
-              "line": 269,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1d1da0d760a509d983783c1298ee3f32f1622388ee555738f968d780ab2bbc19",
-          "at": "2026-05-09T05:37:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
-          "at": "2026-05-09T05:39:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
-          "at": "2026-05-09T05:42:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: Re-exporting `catalogue_v2::methods::{MethodDeclaration, ParamDeclaration}` here makes `catalogue::MethodDeclaration` look like the old API path, but it is not API-compatible anymore. The V2 constructor now requires `MethodName` / `ParamName` / `TypeRef` and the accessor methods (`name()`, `params()`, `returns()`, `ty()`, etc.) are gone, so downstream code that was compiling against the documented `catalogue::*` surface will break at source level. A plain `pub use` does not provide the promised compatibility shim.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
-              "line": 26,
-              "category": "compatibility"
-            },
-            {
-              "message": "P1: `MethodDeclaration` now derives `Eq` with a public `docs: Option<String>` field, and baseline structural comparison uses full vector equality (`self.methods == other.methods`). That means doc-only differences between two otherwise identical methods will flip `TypeBaselineEntry::structurally_equal()` / `TraitBaselineEntry::structurally_equal()` to `false`, which creates false consistency failures even though docs are non-structural metadata.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
-              "line": 72,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bb5edcc2a9e53b0ba75f3ef9a8b602828a7cf211db9288bed320ec459497d1e3",
-          "at": "2026-05-09T06:52:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`methods_structurally_equal` still treats `ParamDeclaration` as fully equal (`a.params == b.params`), so a harmless parameter binding rename on an unchanged method will now be reported as structural drift. That diverges from the method/function matching logic in `signals.rs` and `consistency.rs`, which intentionally ignores binding names and compares only parameter types.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/baseline.rs",
-              "line": 40,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8bd7a3f9e6f7fa462799842a29e3f8e717186f90689cf4acd12e3e33e74ece06",
-          "at": "2026-05-09T06:58:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: Re-exporting the V2 `MethodDeclaration`/`ParamDeclaration` here is not source-compatible with the existing `domain::tddd::catalogue::*` callers. The new constructor takes `MethodName`/`ParamName`/`TypeRef` newtypes, so any still-unmigrated call sites that pass `String` arguments will stop compiling. Keep a compatibility shim or finish the downstream rewrites in the same change.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
-              "line": 31,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:00cfaa954f2d02a5567473eab37dada61fcfbb35f4b9e416f37a90f375864658",
-          "at": "2026-05-09T07:04:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
-          "at": "2026-05-09T07:09:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
-          "at": "2026-05-09T07:13:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:61c79bc1bbd569538d189aac82d8e1237b68f6e4923e7dc77e072020fccb885b",
-          "at": "2026-05-09T15:02:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:61c79bc1bbd569538d189aac82d8e1237b68f6e4923e7dc77e072020fccb885b",
-          "at": "2026-05-09T15:04:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b076c4b4ac77667d47b2933bdb9b4da2c390db8a72bc431a2031d8ad7a0f9b3",
-          "at": "2026-05-10T05:15:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f5f4c9af033ff03c8f33e0241cc3d75455df3ebec23e48ec0993b2a0b69149f",
-          "at": "2026-05-10T08:07:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f5f4c9af033ff03c8f33e0241cc3d75455df3ebec23e48ec0993b2a0b69149f",
-          "at": "2026-05-10T08:10:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `kind_filter` from the public `ContractMapRenderOptions` API makes the documented empty-filter behavior unrepresentable and breaks any caller that still constructs the options struct with a kind filter. This is a public contract regression, not just a stub simplification.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_options.rs",
-              "line": 25,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:7e6772336f3b681fb943a9d540c6fa75ff289069585d6fadf438df59421d0d59",
-          "at": "2026-05-10T08:22:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e6772336f3b681fb943a9d540c6fa75ff289069585d6fadf438df59421d0d59",
-          "at": "2026-05-10T08:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`baseline.rs` is no longer declared as a module. The briefing says the TypeBaseline family should remain module-private for this bundle, with only the public re-export removed; in Rust, leaving the file undeclared means it is not compiled and its tests/internal API are dead. Use `mod baseline;` here rather than dropping the module entirely if the intended accepted deviation is private retention.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/mod.rs",
-              "line": 13,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:7e6772336f3b681fb943a9d540c6fa75ff289069585d6fadf438df59421d0d59",
-          "at": "2026-05-10T08:27:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_type_signals` treats every `TypeDefinitionKind::FreeFunction` entry as covered only by signals whose `kind_tag` is exactly `free_function`. In the v3 schema, function catalogue entries can have other function roles such as `UseCaseFunction`; those still arrive at this legacy gate as `FreeFunction` stubs, while their generated `TypeSignal` keeps the role-specific tag (for example `use_case_function`). A valid Blue signal for such an entry is ignored here, so the gate reports “no signal evaluation” and blocks CI/merge. Align the function-role tags used for coverage, or count all function-role signal tags for `FreeFunction` stubs.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 76,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7a8a49685e8803fea276eba226467c69bc90a83d35686b49e962d2ddfb5ff8a6",
-          "at": "2026-05-10T08:33:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_type_signals` documents Yellow handling as declared-entry only, and the non-free-function path enforces that by intersecting signals with `entry_keys`. The free-function path instead counts every Yellow `kind_tag == \"free_function\"` signal, even if no current `FreeFunction` entry exists for that signal name. A stale or otherwise undeclared free-function Yellow signal can therefore block strict verification while equivalent undeclared non-free Yellow signals are ignored. Filter Yellow free-function signals through the current declared FreeFunction entries before treating them as blocking.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 140,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7a8a49685e8803fea276eba226467c69bc90a83d35686b49e962d2ddfb5ff8a6",
-          "at": "2026-05-10T08:36:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d252fd2e29d6f9ad1e9ef5cf6ec109598695903bac6d8f388eb0ea7fffa9383",
-          "at": "2026-05-10T08:38:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c1462347aef6fc704626f1935c07debfce1c16eba6cad8743ea85db98ecc827",
-          "at": "2026-05-10T13:43:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`generic_args` is part of the trait-impl identity used for signal matching, but it is exposed as a raw public `Option<String>` and `new_with_generic_args` accepts any string. This permits illegal catalogue states such as `Some(\"\")` or already-bracketed/malformed values, which then render as keys like `From<>`/`From<<T>>` instead of being rejected. That can turn bad input into false signal mismatches. Make this a validated domain type (or a private field with a fallible constructor) at least enforcing non-empty, unbracketed generic argument content.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/traits.rs",
-              "line": 52,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:2c1462347aef6fc704626f1935c07debfce1c16eba6cad8743ea85db98ecc827",
-          "at": "2026-05-10T13:46:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`new_with_generic_args` only rejects empty strings and values that start with `<`, so malformed raw args like `CatalogueLoaderError>` or `Vec<T>>` are still accepted. That lets the domain store `TraitImplDeclV2` values whose `Display` output becomes a broken identity key (`From<CatalogueLoaderError>>`), which can silently break impl matching and signal evaluation downstream. The constructor should reject unbalanced angle-bracket input at the domain boundary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/traits.rs",
-              "line": 104,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3df52722de7c702bb1e00d330f35b2fc3260788dca2cc1c50545d05d53ab58ab",
-          "at": "2026-05-10T15:07:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`new_with_generic_args` only rejects empty strings, leading `<...>`, and mismatched bracket counts. Strings with balanced but misordered brackets (for example `Vec<T><U>` or `>T<`) still pass and are later rendered into malformed identity keys by the `Display` impl, so the new field does not actually make the invalid state unrepresentable.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/traits.rs",
-              "line": 123,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:a0f7d2872c3121e3a2aacb42c4d1948e0fac6748ab6847376a7a3c19936d07ba",
-          "at": "2026-05-10T15:12:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce470ce11b593ab544ccb926911c92b933c1c492afd62cd4982020bf282a90b2",
-          "at": "2026-05-10T15:21:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce470ce11b593ab544ccb926911c92b933c1c492afd62cd4982020bf282a90b2",
-          "at": "2026-05-10T15:24:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `CompositePattern::Unit` without any validator or smart constructor lets callers build `TypeKindV2::Struct { pattern: Unit, fields: non_empty }`. The codec maps `Unit` straight to `StructKind::Unit` and does not serialize those fields, so a malformed in-memory value silently round-trips as a different shape with data loss. Enforce `fields.is_empty()` for `Unit` or make this state unconstructable.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/composite.rs",
-              "line": 45,
-              "category": "correctness"
-            },
-            {
-              "message": "The new generic/bound payloads are still raw strings with no validation in `MethodGenericParam` here, and the same pattern is repeated in `TraitEntry.supertrait_bounds` in `entries.rs`. Downstream code renders them verbatim into `fn ...<...>` and `GenericBound::TraitBound` data, so empty or malformed names/bounds become representable and can produce invalid Rust/rustdoc output. These fields need validated domain types or fallible constructors.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
-              "line": 34,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:2f140c22a826c2a38846b6b2f7e84f8d09f4dcfcddf55fa1389b58de8c62426f",
-          "at": "2026-05-11T00:46:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CompositePattern::Unit` can still be paired with a non-empty `TypeKindV2::Struct::fields` vector, but the encoder treats `Unit` as a fieldless unit struct and drops any fields. That leaves a silent data-loss path for an illegal state instead of making the unit-struct invariant unrepresentable.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/composite.rs",
-              "line": 45,
-              "category": "correctness"
-            },
-            {
-              "message": "`MethodGenericParam` is introduced as raw `String` fields, so invalid generic parameter names or bound strings can be constructed and serialized without any domain validation. The same gap appears for `TraitEntry.supertrait_bounds` in `entries.rs`, which means malformed generic metadata can cross the domain boundary instead of failing fast.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
-              "line": 34,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:2f140c22a826c2a38846b6b2f7e84f8d09f4dcfcddf55fa1389b58de8c62426f",
-          "at": "2026-05-11T00:49:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:557f9bf8181b6f0cdbd7c83ce3902885dc57e0736806fe27642f1cc3b8b95540",
-          "at": "2026-05-11T06:11:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `TupleStruct` represents positional tuple fields with `FieldDecl`, but `FieldDecl` requires a `FieldName`. Real tuple structs/newtypes have unnamed positional fields, so any codec has to fabricate names or reject valid rustdoc tuple fields, and those names are then not part of the actual Rust shape. This breaks the stated `StructKind::Tuple` mirror and makes the v2 catalogue schema unable to faithfully model tuple structs. Use `Vec<TypeRef>` or a dedicated tuple-field type instead.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/composite.rs",
-              "line": 164,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: `MethodGenericParam` exposes generic parameter names and bounds as raw `String`s with no validated constructor. That allows invalid public domain states such as an empty parameter name or empty bound, and `signature_string` will render them as if valid. This regresses the v2 catalogue pattern of using validated domain types for identifiers and type references; introduce a generic-parameter name newtype and store bounds as validated `TypeRef`s, or make construction fallible.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/methods.rs",
-              "line": 36,
-              "category": "architecture"
-            },
-            {
-              "message": "P1: `supertrait_bounds` is a public `Vec<String>`, so `TraitEntry` can contain empty or malformed bounds outside the JSON codec path. The domain model already has `TypeRef` for non-empty type reference strings, and leaving this as raw strings makes illegal catalogue states representable through the public API. Store validated `TypeRef`s or add a fallible constructor that enforces the invariant in the domain layer.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
-              "line": 82,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:557f9bf8181b6f0cdbd7c83ce3902885dc57e0736806fe27642f1cc3b8b95540",
-          "at": "2026-05-11T06:14:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82bbf55f0f0c518f91601c0586f2ea33b9b24050e5dabba1860af57de2f958ff",
-          "at": "2026-05-11T08:17:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82bbf55f0f0c518f91601c0586f2ea33b9b24050e5dabba1860af57de2f958ff",
-          "at": "2026-05-11T08:20:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d99adf7068d1f5e3f1fb325c2b8ef629888e9246124379ecbd2b022e9fd61c3",
-          "at": "2026-05-11T16:01:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d99adf7068d1f5e3f1fb325c2b8ef629888e9246124379ecbd2b022e9fd61c3",
-          "at": "2026-05-11T16:03:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5067f232efa52fad19fe75555f3297a2d6caee825b55ce8c29ba231a949a3baf",
-          "at": "2026-05-11T23:21:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5067f232efa52fad19fe75555f3297a2d6caee825b55ce8c29ba231a949a3baf",
-          "at": "2026-05-11T23:23:55Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -3989,116 +3464,345 @@
         }
       ]
     },
-    "harness-policy": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The v3 rewrite is internally inconsistent: the intro says `DataRole`/`ContractRole`/`FunctionRole` are now the schema axes, but R2/R3/R6 and the examples still instruct agents to write legacy `kind:` values such as `kind: free_function`, `kind: value_object`, `kind: secondary_adapter`, `kind: use_case`, and `kind: domain_service`. In v3 those are `role` values, and the `kinds` reference at line 39 is also wrong (`TypeEntry` has singular `kind`). As written, this guidance will produce invalid catalogue drafts.",
+              "message": "These updated assertions no longer verify the `kind_filter` contract at all: the first test now only checks the OS-06 scaffold/deferment text, and the second only checks that subgraphs exist. That means regressions in `parse_kind_tag`, the `kind_filter` conversion, or the renderer wiring will now pass this suite, even though `ContractMapRenderOptions::kind_filter` documents that `Some(vec![])` should filter every entry out.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md",
-              "line": 32,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
+              "line": 517,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44459dab70b9ea1117505be0cae84304857a3a5b9d55cce24a3df7829b00a0aa",
+          "at": "2026-05-10T08:06:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44459dab70b9ea1117505be0cae84304857a3a5b9d55cce24a3df7829b00a0aa",
+          "at": "2026-05-10T08:08:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `total_entry_count` is still derived from the legacy flat `entries()` list, so the workflow is not aligned with the v3 `CatalogueDocument` shape described in the briefing. With v3 catalogues, trait and free-function entries live in separate `traits` and `functions` maps, so this metric either cannot compile against the intended port signature or silently undercounts everything outside `types`. The aggregation should sum `types.len() + traits.len() + functions.len()` for each loaded document, with tests using v3 `CatalogueDocument` fixtures to cover all three maps.",
+              "severity": "P1",
+              "file": "libs/usecase/src/contract_map_workflow.rs",
+              "line": 229,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:6315f022f55cfa2ef050fbfa16b2ad5b6ce07aaace14a2bc73af646e53abda8f",
-          "at": "2026-05-10T08:07:23Z"
+          "hash": "rvw1:sha256:44459dab70b9ea1117505be0cae84304857a3a5b9d55cce24a3df7829b00a0aa",
+          "at": "2026-05-10T08:10:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c536dc24f0a8bd26040f15cb7daba5bdafab89477cc62ba39267a7f7781867",
+          "at": "2026-05-10T08:18:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6d5282b41d75ce77dabe63a0dc8654b09fdb2abf99f756d97291c78d2889fa8f",
-          "at": "2026-05-10T08:14:04Z"
+          "hash": "rvw1:sha256:a2383cbcb9abb9ece2279d850027204eb7b2a812b07c7791da5fed2aab12adcf",
+          "at": "2026-05-11T16:01:32Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The v3 rewrite still documents old v1/v2 field names in the checklist. `catalogue_document_codec.rs` accepts `methods[].returns`, `methods[].params[].ty`, `functions[].params[].ty`, and `functions[].returns`; there is no `expected_methods`, `expected_params`, or `expected_returns` in the v3 wire format. Keeping the old names here will cause type-designer/reviewer agents to validate the wrong fields and miss bare-wrapper declarations in real v3 catalogues.",
+              "message": "The new action-threading path is not covered by the usecase tests: the existing refresh test only creates `TypeAction::Add` entries, so a regression in `TypeAction::Reference` mapping or in passing `entry.action()` through to `evaluate_catalogue_entry_signal` would still pass while breaking the D5 rule this change is meant to restore. Add an interactor test with a `Reference` entry with empty `spec_refs` and `informal_grounds`, asserting the persisted signal is `Blue`.",
               "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 238,
-              "category": "schema-correctness"
-            },
-            {
-              "message": "The typestate examples use an invalid v3 wire shape/value: `pattern: TypestateState`. The codec encodes the struct pattern as a nested object like `\"pattern\": { \"pattern\": \"typestate_state\", \"of\": \"...\", \"transition_methods\": [...] }`. As written, agents following the convention will draft schema-invalid typestate entries or omit required `of` metadata.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 206,
-              "category": "schema-correctness"
+              "file": "libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 240,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:6d5282b41d75ce77dabe63a0dc8654b09fdb2abf99f756d97291c78d2889fa8f",
-          "at": "2026-05-10T08:15:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "R6 still names the v2 fields `expected_members` and `expected_methods` as the criteria to check. In the v3 schema documented above, `TypeEntry` stores fields under `kind.fields` and methods under `methods`; `expected_*` is not part of the DTO. A type-designer following this convention can emit or review against fields the codec does not consume, causing DomainService entries to lose their structural members/methods or pass review with the wrong shape.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 141,
-              "category": "schema-mismatch"
-            },
-            {
-              "message": "The typestate examples show a flat `\"pattern\": \"typestate_state\", \"of\": ..., \"transition_methods\": ...` shape, but the v3 codec uses an internally tagged `PatternDto`, so the valid wire shape is `\"pattern\": { \"pattern\": \"typestate_state\", \"of\": ..., \"transition_methods\": [...] }`. Since these examples are in the SSoT convention for drafting catalogues, copying them produces invalid v3 JSON for typestate states.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 206,
-              "category": "schema-mismatch"
-            },
-            {
-              "message": "This section says to record rationale in `informal_grounds[]`, but the v3 entries described in the same document only provide `docs` for rationale/metadata. The codec has no `informal_grounds` field, so following this instruction would put required `△` placement rationale in an unmodeled field that is not preserved by the catalogue schema.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 118,
-              "category": "schema-mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:03b80afa6d93f19681885a0da08172c078a78a1eeb6ef44aa262703715f99252",
-          "at": "2026-05-10T08:18:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The v3 guidance now models typestate states as `role: ValueObject` with a `typestate_state` pattern, but this checklist still requires every `ValueObject` to have empty `methods`. Typestate transitions are declared via `transition_methods` that refer to inherent methods, so following this checklist would cause valid typestate catalogue entries from the new schema to be rejected or stripped of their transition methods. Add an explicit typestate exception here, or require those entries to use a non-ValueObject role consistently.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 233,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:62b07cd8a60fcba69097bd4df1d4e858146873a17ac00e0f39ff06bdfb110c5c",
-          "at": "2026-05-10T08:21:35Z"
+          "hash": "rvw1:sha256:a2383cbcb9abb9ece2279d850027204eb7b2a812b07c7791da5fed2aab12adcf",
+          "at": "2026-05-11T16:04:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:83f21dadbca26a455c6e04b42cb2d11c052dd2c97368549afc0a41dbaac5f0fc",
-          "at": "2026-05-10T08:23:24Z"
+          "hash": "rvw1:sha256:248fee9b816825e9c10bcb50ab69c7031cdfb9b777fe7f02a34a998d5bd67c5e",
+          "at": "2026-05-11T16:05:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The service loads catalogue and baseline files from `track/items/<track_id>` without any symlink or containment guard. A malicious symlinked track directory can escape the workspace and make the loaders read arbitrary files outside the repo. The declared `SymlinkRejected` error variant is never emitted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 241,
+              "category": "security"
+            },
+            {
+              "message": "The public API drops `items_dir` entirely and hard-codes `<workspace_root>/track/items`. Callers that resolve a non-default items root will evaluate the wrong tree and can silently print stale or unrelated signals.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 120,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5724188af1446546b37081c730d179d6f46d181d81b258f661835591dff21b8e",
+          "at": "2026-05-11T23:21:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track_dir.join(&binding.catalogue_file)` / `baseline_file` trusts the binding's path strings directly, and `reject_symlinks_below` only blocks symlinks. A binding containing `../` or an absolute path can still escape `items_dir`, so this service can be made to read arbitrary files outside the workspace.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 241,
+              "category": "security"
+            },
+            {
+              "message": "The new public `CatalogueImplSignalsService::run` orchestration path has no direct happy-path or error-case tests; the module only covers `validate_track_id` and `Display`. That leaves the new path handling and port/error mapping logic unguarded against regressions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 177,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c3729ac87fc79c2c0ba516782c4f1274f9ac10af2401fadf9a77ea48f8ed899b",
+          "at": "2026-05-11T23:27:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run` trusts `workspace_root` before any symlink validation and never checks the derived `items_dir` itself. If a caller passes a symlinked workspace root or `track/items`, `layer_bindings_port.load` and the later path joins can be redirected outside the intended tree. The CLI currently guards this, but the public service is unsafe unless it enforces the same invariant or documents it as a hard precondition.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 207,
+              "category": "security"
+            },
+            {
+              "message": "`TdddLayerBindingsError` is mapped to the wrong use-case errors: `LoadFailed` becomes `BaselineLoad`, and `LayerNotFound` becomes `SchemaExport`. That collapses architecture-rules / layer-lookup failures into unrelated stages, so callers and logs lose the real failure source and the advertised error variants are misleading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 209,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6d41fc7b521d1c52b27390fee0aa1deaeb7d39d817629b0b25d44ea19c6f2790",
+          "at": "2026-05-11T23:48:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guard never checks `trusted_root` itself, so a symlinked `workspace_root/track/items` is accepted. Because `run()` derives `items_dir` from `workspace_root` without a separate symlink check, reads under `catalogue_path` / `baseline_path` can be redirected outside the intended workspace. Add an explicit `items_dir.symlink_metadata()` check or make the helper validate the root component too.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 443,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:fa46af2ed14bd8d5f4555a05bb4418f551745c00c39e212095dc38393a646254",
+          "at": "2026-05-11T23:52:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`workspace_root` is only checked with `symlink_metadata()` on the leaf path. A symlink in any parent component still redirects every later read (`architecture-rules.json`, catalogue, baseline, rustdoc), so this does not actually confine I/O to the intended workspace. Canonicalize the root or reject symlinks in the ancestor chain before trusting it as the anchor.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 229,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8a077c7ad6904fe4d14d3878be2f6881ef122fa95ac29d5489d1fc347d8c51c7",
+          "at": "2026-05-11T23:56:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_binding_filename` still accepts `..` (and `.`): `Path::file_name()` returns `Some(\"..\")` and the separator check passes, so a hostile binding can set `catalogue_file`/`baseline_file` to `..` and escape `track_dir` with `track_dir.join(\"..\")`. That reintroduces arbitrary file reads outside the track tree.",
+              "severity": "P0",
+              "file": "libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 457,
+              "category": "security"
+            },
+            {
+              "message": "The path-symlink defense never checks the intermediate `workspace_root/track` ancestor. `items_dir.symlink_metadata()` resolves through a symlinked `track` directory, and `reject_symlinks_below(..., &items_dir)` stops at `items_dir`, so a symlink at `workspace_root/track` can still redirect every catalogue/baseline read into another tree.",
+              "severity": "P0",
+              "file": "libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 284,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:56d32c2b4a2f6eb879026626c96c9bcc1699c7ab1db8413e93fa7878a64cb426",
+          "at": "2026-05-11T23:59:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Map `Phase1Error` with `to_string()` instead of `{:?}`. The current code turns the nested evaluator error into Rust debug syntax (`ActionContradiction(...)`) rather than the human-readable display string, which makes the CLI output less stable and leaks internal enum details.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 342,
+              "category": "Error handling"
+            },
+            {
+              "message": "The new public orchestrator has no direct happy-path or error-path coverage in this crate, and I couldn't find equivalent coverage elsewhere in the repo. This path is doing layered file loading, symlink guards, and error mapping, so regressions here will be easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 569,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:49b69bf01e6eecbf85a54f40b6076cba397d8ca677b076d57db221cf1f2082dd",
+          "at": "2026-05-12T00:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run()` trusts `TdddLayerBindingsPort::load()` and only fails when the returned list is empty, but the current adapter path has a legacy fallback when `architecture-rules.json` is missing. That means this command can silently proceed on the synthetic `domain` binding instead of failing closed for a missing config file, so a workspace with stale `domain-types.json` artifacts can produce a seemingly valid report under the wrong layer set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 232,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8559ff22bf38dab9c9b2579aa3c17071dcd2e5456582d6abe6fad5a7a71d9806",
+          "at": "2026-05-12T00:10:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueImplSignalsService::run` is a new public usecase API, but this diff only adds helper/unit coverage; there is no test that exercises the successful orchestration path or verifies the port-error mappings for the interactor itself. That leaves the core report assembly/wiring unprotected, so a regression here could ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 122,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:d1b7774d56f89f6d84d08c863917f2f146ab330579c960f03a6abadc45fb842c",
+          "at": "2026-05-12T00:14:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [workspace_root](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs:226) is treated as trusted after only a symlink walk, but the helper never canonicalizes or rejects `..` segments. A caller can pass `../repo` or another dot-dot path and the subsequent `join(\"track/items\")` will resolve outside the intended workspace tree. Reject dot segments or canonicalize before trusting the root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 226,
+              "category": "security"
+            },
+            {
+              "message": "P1: The interactor hard-fails whenever `binding.targets` has anything other than exactly one entry. That makes `catalogue-impl-signals` unusable for a valid `schema_export.targets` array with multiple crate names, even though the binding model preserves `Vec<String>` targets and the parser accepts explicit multi-target arrays. Either iterate the targets or make the single-target contract explicit earlier in parsing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 321,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0eb46b0003ac2da833f263ad77a992f6989f419e0bf72bcc29532986dd8d5eea",
+          "at": "2026-05-12T00:24:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The test module re-imports `ThreeWaySignal` after `use super::*;`, which already pulls the parent module's `ThreeWaySignal` into scope. That duplicate binding will trigger E0252 and prevent this file from compiling.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 598,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:18df2cfda26d85a3e40a53165820e006dea860da33ed24f6a5f632b96cf42563",
+          "at": "2026-05-12T00:30:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run()` silently takes only `binding.targets.first()` and ignores any additional `schema_export.targets` entries. If a layer is configured with more than one target crate, the extra crates are never captured or evaluated, so the report can miss violations for an entire crate set. The previous CLI failed closed on multi-target bindings; this should remain an error until the use case can aggregate all targets.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
+              "line": 338,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4a5304e01018d7239a78f74dbc858a5385d35ffa5194a0323ceb976a0763b4cd",
+          "at": "2026-05-12T00:34:05Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:78be82028a646a98e2b82e6413a76c344e17f91e9d26be8e724c8a520c3c573c",
-          "at": "2026-05-12T01:17:14Z"
+          "hash": "rvw1:sha256:244feef2c0059893a6b9b86db95c770386839c0e99e4cf0658402246af365d06",
+          "at": "2026-05-12T00:50:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e812b1e6e181d2f3672805c3c85ade4d2e3c9747dbf542348c3ce4ff4ce3dfa5",
+          "at": "2026-05-12T01:06:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_binding_filename` is not a correct basename guard: it rejects legitimate filenames that merely contain `..` anywhere (for example `foo..json`), but it still accepts Windows-special names like `foo:bar.json` or `foo.`. Because `architecture-rules.json` can supply these values, the new usecase layer can now reject valid bindings or open an unexpected filesystem target on Windows. The check should mirror the repo’s existing safe-component rules instead of using a substring test here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals/helpers.rs",
+              "line": 77,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ccff8a66b9bb812e440abfc9f6bfb02d6cd6ae23ba05531d3f3db40d50ff8e0f",
+          "at": "2026-05-12T01:22:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fc240a65215641934c3873e211bb6cbf3c83adbf4b4007652665e410b2272aa",
+          "at": "2026-05-12T01:31:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:78be82028a646a98e2b82e6413a76c344e17f91e9d26be8e724c8a520c3c573c",
-          "at": "2026-05-12T01:18:08Z"
+          "hash": "rvw1:sha256:0fc240a65215641934c3873e211bb6cbf3c83adbf4b4007652665e410b2272aa",
+          "at": "2026-05-12T01:52:02Z"
         }
       ]
     },
@@ -6229,6 +5933,735 @@
           "findings": [],
           "hash": "rvw1:sha256:896fb642e8264dc4299c320f73a32c891376cbe0d96ef0c84f9d54ede49ccda9",
           "at": "2026-05-12T04:23:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T022` describes `TrackBlobReader::read_type_signals` as `BlobFetchResult<TypeSignalsDocument>` and rewrites `read_type_catalogue` to a bytes-only reader, but the corresponding usecase catalogue entry still describes the old tuple-shaped API (`BlobFetchResult<(TypeCatalogueDocument, String)>` -> `BlobFetchResult<(TypeSignalsDocument, String)>`). The two artifacts are not describing the same interface shape, so one of them needs to be normalized before this plan is implementable as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 131,
+              "category": "contradiction"
+            },
+            {
+              "message": "The rendered `contract-map.md` is stale relative to `IN-24` / `OS-07`: it still emits only the old scaffold comments and `T012` deferment note, but the spec says this view should read v3 natively and emit a per-layer entry-name placeholder plus a deferment note. As checked in, the markdown does not match the declared renderer output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 2,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:c6c21a93507843157d76b41cb41fc9eba16b54ddd8fcd8c7b2d260f751151e3c",
+          "at": "2026-05-12T05:33:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` is stale relative to the new v3-placeholder design: it still says the renderer is tracked as `T012` and only emits the layer scaffold with entry counts, but `IN-24`/`OS-07` now define the placeholder as a per-layer entry-name list with a defer note and no `T012` reference. That makes the rendered view misleading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 2,
+              "category": "factual error"
+            },
+            {
+              "message": "The modified `CatalogueLinter` entry drops its `run` signature (`methods: []`) but leaves `spec_refs: []`, so this changed port is no longer anchored to any spec element. The plan brief requires modified entries in this round to remain traceable to the governing spec, and this one is not.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/domain-types.json",
+              "line": 1507,
+              "category": "factual error"
+            },
+            {
+              "message": "`IN-22` says `verify::spec_states` and `check_strict_merge_gate` are v3-native catalogue consumers, but `IN-23` says the commit/merge gate Stage-2 is catalogue-independent and reads the catalogue only as bytes for `declaration_hash`. Those requirements conflict for the same gate path, so the scope wording needs to be narrowed or split.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/spec.json",
+              "line": 307,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:10209a680e292616af9a7aea947184f4ae67b2d7135fd20088d795591e7ad8f1",
+          "at": "2026-05-12T05:42:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated contract-map is stale relative to IN-24: it still says the renderer is OS-06 deferred and tracked as T012, and the body only emits scaffold counts. IN-24 requires a v3-native placeholder that lists entries per layer and adds a deferred-note, so this artifact no longer matches the spec/plan contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 2,
+              "category": "factual error"
+            },
+            {
+              "message": "S14 claims T024/T025/T026 are independent and parallelizable, but all three tasks mutate `infrastructure-types.json`. That shared write target makes the stated parallel execution unsafe unless the work is serialized or re-scoped.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 135,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:0fba6c091050d94f8c7e659f55e26ce764b335e4af2a34da9d4f6958317917af",
+          "at": "2026-05-12T05:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff2936ac850d474e20e34f2d601bae1985a859a28e7089f8d26e834c9ea31ffd",
+          "at": "2026-05-12T05:53:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 changes the public `check_type_signals` signature and requires `cargo make ci-rust` to pass, but the same plan defers updating the usecase and infrastructure callers to T022/T023. Since T022 still describes replacing the old `check_type_signals(&TypeCatalogueDocument, ...)` call later, T021 cannot compile as a standalone task unless it also updates callers or preserves a compatibility wrapper. This makes the task order physically unexecutable under the per-task CI requirement.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 126,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The `TrackBlobReader` catalogue entry says `read_type_catalogue` is replaced by `read_type_signals`, but T022/T023 and IN-23 require the gate to keep reading catalogue bytes for the declaration_hash freshness check. If implemented from this type entry, the stale-catalogue fail-closed path can be dropped despite CN-11/IN-23 requiring it. The entry should say `read_type_catalogue` remains as a bytes-only method, not that it is replaced outright.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/usecase-types.json",
+              "line": 145,
+              "category": "contradiction"
+            },
+            {
+              "message": "`contract-map.md` still claims full v3 rendering is tracked as T012, but T012 is the cross-crate function-path codec task, while the new OS-07/IN-24 text says detailed v3 contract-map rendering is deferred to a separate ADR/track and this round only emits a placeholder. This rendered view now points readers at the wrong task for the deferred work.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 2,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ff2936ac850d474e20e34f2d601bae1985a859a28e7089f8d26e834c9ea31ffd",
+          "at": "2026-05-12T05:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 changes the public `check_type_signals` signature and requires `cargo make ci-rust` to pass, but S12 explicitly defers the usecase/infrastructure caller updates to S13 (T022/T023). That leaves T021 unable to compile as a standalone task unless it also updates callers or preserves a compatibility wrapper, so the planned task order is physically unexecutable under the per-task CI requirement.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 126,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The `TrackBlobReader` catalogue entry says `read_type_catalogue` is replaced by `read_type_signals`, but IN-23/T022/T023 require the gate to keep reading catalogue bytes for the `declaration_hash` freshness check. If implemented from this entry, the stale-catalogue fail-closed path can be dropped despite CN-11 requiring it; the entry should state that `read_type_catalogue` remains as a bytes-only method.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/usecase-types.json",
+              "line": 145,
+              "category": "contradiction"
+            },
+            {
+              "message": "`contract-map.md` still points the deferred v3 renderer work at `T012` and emits only scaffold counts, while the new IN-24/OS-07 contract says the placeholder should list entries per layer and defer detailed rendering to a separate ADR/track. Since T012 is the cross-crate function-path codec task, this rendered view now contains a broken task reference and is stale relative to the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 2,
+              "category": "broken reference"
+            },
+            {
+              "message": "IN-22 says the commit gate and merge gate paths decode `schema_version: 3` catalogues natively, but IN-23/T023 say the same gate path reads the catalogue only as bytes and does not use `CatalogueDocumentCodec` in Stage 2. Those requirements conflict for the same gate behavior and leave CN-11's explicit non-v3-catalogue BLOCKED case underspecified.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/spec.json",
+              "line": 307,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ff2936ac850d474e20e34f2d601bae1985a859a28e7089f8d26e834c9ea31ffd",
+          "at": "2026-05-12T06:01:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 changes the public `check_type_signals` signature and requires `cargo make ci-rust` to pass, but T022/T023 are the tasks that update the usecase and infrastructure callers from the old `check_type_signals(&TypeCatalogueDocument, ...)` path. With those callers deferred, T021 cannot compile/pass CI as a standalone task unless it also updates callers or preserves a compatibility wrapper, so the task order is physically unexecutable.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 126,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The regenerated contract map still says the v3 renderer is OS-06-deferred and tracked as T012, and the layer comments defer nodes to T012. The new plan/spec now place this work under IN-24/OS-07/T025, so this rendered artifact contains a stale/broken cross-reference that contradicts the current plan.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 2,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ff2936ac850d474e20e34f2d601bae1985a859a28e7089f8d26e834c9ea31ffd",
+          "at": "2026-05-12T06:08:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-11/AC-12 require non-v3 catalogues to be blocked, but the gate tasks deliberately change the gate path to read the catalogue only as bytes for declaration_hash and to decode only <layer>-type-signals.json. With no remaining CatalogueDocumentCodec/schema-version validation in the gate path, a non-v3 catalogue with matching declaration_hash is not rejected by this plan, contradicting the fail-closed requirement.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 131,
+              "category": "contradiction"
+            },
+            {
+              "message": "T021 changes the public check_type_signals signature and says cargo make ci-rust must pass, while the plan explicitly defers the usecase/infrastructure caller updates to S13/T022-T023. That ordering leaves the workspace uncompilable immediately after T021, so the per-task CI requirement is not executable as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 115,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The rendered contract-map still says v3 rendering is OS-06-deferred and tracked as T012, but this round introduces OS-07/IN-24 for that deferral and T012 is an unrelated completed codec task in the current impl plan. This is a stale/broken narrative reference in the plan artifact view.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 2,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ff2936ac850d474e20e34f2d601bae1985a859a28e7089f8d26e834c9ea31ffd",
+          "at": "2026-05-12T06:14:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This rendered view does not match IN-24: the spec requires a v3-native placeholder that lists entry names per layer and includes a deferred-rendering note, but this file only shows a blank layer scaffold with hardcoded entry counts and no entry-name lists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/contract-map.md",
+              "line": 1,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:61fdd597a4551a6f3d31e0fdc3cd5fdbd8d8ec3fc3f918e6c43fa0e50ae028b6",
+          "at": "2026-05-12T06:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader` is described as if the old `read_type_catalogue` path is replaced by `read_type_signals`, but T022/T023 still keep a bytes-only `read_type_catalogue` for the declaration-hash freshness check. That makes the port contract self-contradictory: the prose says the method is replaced, while the task sequence still depends on it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/usecase-types.json",
+              "line": 145,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-12 requires `cargo make track-pr-merge`, but T028 only exercises `build-sotp`, signal regeneration, `track-sync-views`, and `ci`. The acceptance criterion is therefore only partially covered, so the plan never verifies the merge path it claims to guarantee.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 168,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:61fdd597a4551a6f3d31e0fdc3cd5fdbd8d8ec3fc3f918e6c43fa0e50ae028b6",
+          "at": "2026-05-12T06:48:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5888ae7d90ae698ed5a92ed881365cdf9e485c3a69cf32ce089dd70fc356f0d6",
+          "at": "2026-05-12T06:54:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T025 says this task will update `domain-types.json` for `CatalogueLoader` / `CatalogueLinter` / `render_contract_map`, but the catalogue change set only reflects `CatalogueLoader`. `CatalogueLinter` still remains a blue `reference` row with no methods in the generated domain catalogue, so the plan and catalogue disagree about one of the listed public-API migrations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 149,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6b32f6c85cbe9550bcf6cc2b3868fdad578515d61156a489a33fe25c831baa7d",
+          "at": "2026-05-12T07:11:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T022 and T023 split the same `read_type_catalogue` API migration across two tasks, but T022 already rewires `check_strict_merge_gate`/`verify_from_spec_json` to depend on the bytes-only reader while T023 defers the concrete `GitShowTrackBlobReader::read_type_catalogue` return-type change to a later task. That leaves T022 unable to satisfy its own `cargo make ci-rust` gate if applied literally, so the proposed task order is not self-contained.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 132,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d71f19e4f9e46158ca354da52d712c59ce23d300a323b35a13bbdf91f0c76e8b",
+          "at": "2026-05-12T07:18:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 adds a required `TrackBlobReader::read_type_signals` method but only updates the trait description and one production impl; it does not account for the existing `impl TrackBlobReader` test adapters, and T022 only updates `read_type_catalogue` mocks. As written, the first step is not compile-safe unless the new method has a default body or every impl is updated in the same task.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 126,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:49124f07575b9773b1418428ff0216a42ad1441bc9154c22f00da1756ddba16f",
+          "at": "2026-05-12T07:35:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T025 says `domain-types.json` will be updated for `domain::tddd::contract_map_render::render_contract_map`, but the current domain catalogue has no `render_contract_map` declaration anywhere. As written, the contract-map migration is only described in prose and has no tracked API surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 354,
+              "category": "factual error"
+            },
+            {
+              "message": "T021 says to add `GitShowTrackBlobReader::read_type_signals` and update `infrastructure-types.json`, but the infrastructure catalogue never declares a `GitShowTrackBlobReader` entry. The new read path is therefore untracked in the plan artifacts, so the promised infra-side API change is not actually represented.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 329,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:49124f07575b9773b1418428ff0216a42ad1441bc9154c22f00da1756ddba16f",
+          "at": "2026-05-12T07:40:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several task steps require updating catalogue rows that this scope does not model. T021 asks for a `GitShowTrackBlobReader` row in `infrastructure-types.json`, T023 asks to edit a `verify_from_spec_json` row, and T025 refers to a `render_contract_map` row, but the current SoT JSON here does not contain those targets. As written, the JSON-update portion of the migration is underspecified and not executable.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 126,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:49124f07575b9773b1418428ff0216a42ad1441bc9154c22f00da1756ddba16f",
+          "at": "2026-05-12T07:45:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 is not standalone compile-safe as written. It adds a required `TrackBlobReader::read_type_signals` method, but the step only names the production `GitShowTrackBlobReader` impl; any existing `TrackBlobReader` test adapters would still fail to compile unless they are updated in the same step or the new method has a default body. That contradicts the claim in [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/plan.md#L116) that T021 alone keeps `cargo make ci-rust` green.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 116,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T022 assigns the declaration-hash freshness check to `read_type_signals`, but T021 defines `read_type_signals` as returning a decoded `TypeSignalsDocument`, not a hash-bearing tuple. The plan never introduces where that hash value comes from, so the freshness comparison is underspecified and internally inconsistent as written in [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/plan.md#L124).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 124,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:153607c4ddddcf00fdcdd7e16d7e8e036e44073b28feab4a5d029d3a7ab8bfe3",
+          "at": "2026-05-12T08:07:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:153607c4ddddcf00fdcdd7e16d7e8e036e44073b28feab4a5d029d3a7ab8bfe3",
+          "at": "2026-05-12T08:10:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 is not standalone compile-safe as written. It adds a required `TrackBlobReader::read_type_signals` trait method, but only updates `GitShowTrackBlobReader`; the same plan acknowledges multiple test mocks in the next task and only updates their `read_type_catalogue` return type there. Unless T021 also updates every `TrackBlobReader` impl or defines a default method body, `cargo make ci-rust` cannot pass after T021 alone.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 116,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-12 requires `cargo make track-pr-merge` to work, but T028 explicitly leaves that check until after the task is complete and infers it from gate/CI success. That means no covered task actually observes AC-12(4), so the acceptance criterion can be marked covered without verifying the merge command it requires.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/plan.md",
+              "line": 154,
+              "category": "coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:153607c4ddddcf00fdcdd7e16d7e8e036e44073b28feab4a5d029d3a7ab8bfe3",
+          "at": "2026-05-12T08:19:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T024 is declared as an infrastructure-only task and only schedules infrastructure-types.json updates, but it also permits changing the domain functions `check_catalogue_spec_ref_integrity` / `check_catalogue_spec_signals` to take `CatalogueDocument`. Taking that branch would be a domain public API change without the matching domain layer placement or domain-types.json update in the same task, violating the plan's per-task catalogue/source consistency rule. The task should either require infrastructure-local v3 logic or explicitly include the domain layer and domain-types.json update.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 144,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-12 requires `cargo make track-pr-merge` to work for a v3 catalogue track, but T028 explicitly defers that command's verification until after T028 is complete and treats prior gate checks as sufficient. Since task-coverage maps AC-12 to T021-T028, this leaves AC-12(4) without an in-plan task that actually observes the required command. T028 should include the `track-pr-merge` verification or AC-12/task coverage should be narrowed.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 168,
+              "category": "coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:67a9e4fa6bd4ccb28aa3622cd43c096d3d9c68136b59b9289b87218526ddc267",
+          "at": "2026-05-12T08:26:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T027 deletes `TypeCatalogueCodecError`, but the plan never updates `LoadAllCataloguesError::Decode` away from that type. The catalogue still declares the Decode payload source as `TypeCatalogueCodecError`, and the only T027 instruction for `LoadAllCataloguesError` is to delete the `V3StubConversion` variant. After T027, either the code/catalogue still references a deleted error type, or the implementer deletes too much of `LoadAllCataloguesError`; in both cases the planned standalone `cargo make ci-rust` result is infeasible. Add the Decode source migration to `CatalogueDocumentCodecError` to the same task that deletes `TypeCatalogueCodecError`.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 162,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d1fc23ea66e1c8375104cfd19a057ee839a039054458679d7e6233d9e52c6deb",
+          "at": "2026-05-12T08:35:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 says the catalogue entries will add `read_type_signals` to `usecase-types.json` and `infrastructure-types.json`, but the `TrackBlobReader` entry explicitly omits method signatures instead of declaring the new method. That contradicts the task's requirement that the public API change and its catalogue update land together, leaving the new trait method untracked in the machine-readable plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/usecase-types.json",
+              "line": 145,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:29eed7330fadef43331cfb6994ca22e94a8c57dc6347a7f0bf3793c24aff6c27",
+          "at": "2026-05-12T08:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackBlobReader` is the catalogue entry that should carry the T021/T022 public trait changes, but it explicitly omits all method signatures while `impl-plan.json` says T021 adds `read_type_signals` to `usecase-types.json` and T022 changes `read_type_catalogue`. That makes the plan artifacts disagree about whether the public API change is structurally represented in the catalogue, and would leave chain-③ unable to validate the new/changed trait methods as described.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/usecase-types.json",
+              "line": 145,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:29eed7330fadef43331cfb6994ca22e94a8c57dc6347a7f0bf3793c24aff6c27",
+          "at": "2026-05-12T08:47:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T027 has conflicting instructions for the legacy domain catalogue entries: the S15 section says those entries must be updated to `action: delete` to avoid DanglingId / SMinusC issues, but the task body allows `action: delete` or complete removal. Those are not equivalent traceability states, so the implementer can satisfy T027 while violating the section’s required gate-safe catalogue update.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 162,
+              "category": "contradiction"
+            },
+            {
+              "message": "T021 says to add a `read_type_signals` method to the `infrastructure-types.json` `GitShowTrackBlobReader` entry, but that entry explicitly says trait method signatures are intentionally not declared there and only the inherent `new()` constructor is listed. This leaves two incompatible instructions for the same catalogue update.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 126,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:73e8d15c8ea839a15208e7d230f8bf4bfdb100dc7200f3f0b55a99dc59f17555",
+          "at": "2026-05-12T08:58:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T022 cannot be a standalone `cargo make ci-rust` task as written. It rewires `spec_states` away from `catalogue_codec` and `v3_doc_to_stub`, but T023 is the later task that removes those imports after they become dead. This workspace denies warnings and `ci-rust` runs clippy with `-D warnings`, so T022 alone will fail on unused imports before T023 can run. Fold the import cleanup into T022 or stop claiming T022 passes `ci-rust` independently.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 132,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`InMemoryCatalogueLinter` is still declared as `action: reference` with “No behavioural change”, but T025 changes the domain `CatalogueLinter::run` port from `&TypeCatalogueDocument` to `&CatalogueDocument`. Any adapter implementing that trait must update its method signature and v3 traversal in the same task, otherwise T025 cannot compile and the catalogue will under-declare a required implementation change. Mark this adapter as modified and include it in T025.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/infrastructure-types.json",
+              "line": 183,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6edbcf393b438919d7606b6848165daacf795dc1bd501f5d6a6a5a73025a029d",
+          "at": "2026-05-12T09:07:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S13 still describes T023 as an independent post-task that removes the `spec_states.rs` dead imports after T022, and says the split keeps the diffs separate. That contradicts the task definitions just above: T022 explicitly folds those import removals into the same commit so `ci-rust` passes under clippy `-D warnings`, while T023 says it has no independent implementation steps. Following the section text would recreate the compile-order problem the task text is trying to avoid, and S14 then incorrectly gates later work on that phantom T023 step.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 341,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3b7204ca13017b120a4c3812bebe51a01a0b1c48473a25ce4b56c0fc244a4aa4",
+          "at": "2026-05-12T09:12:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T024 only migrates the standalone infrastructure chain-② verify files and explicitly keeps the change infrastructure-only, while the TrackBlobReader catalogue says the existing merge-gate chain-② methods such as `read_catalogue_for_spec_ref_check` are not being modified. T027 then assumes every TypeCatalogueDocument caller was migrated in T021-T026 and deletes TypeCatalogueDocument plus `check_catalogue_spec_ref_integrity` / `check_catalogue_spec_signals`. That leaves the merge-gate chain-② path unplanned, so the T027 deletion is not compile-executable unless a task also migrates that usecase/adapter port to v3-native CatalogueDocument or removes that dependency before deletion.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 144,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b851f3d3fd3473c3e3abdcc84fadad53119a6a6b2899cca88c6ea57a58c0daf7",
+          "at": "2026-05-12T09:22:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` is declared as only the IN-23/IN-20 Stage-2 change, with spec_refs limited to IN-23 and IN-20. But IN-22 explicitly lists `usecase::merge_gate::check_strict_merge_gate` as a v3-native catalogue consumer, and S14/T024 says Stage 3 must be migrated to `CatalogueDocument` inline logic. This leaves the usecase catalogue inconsistent with the plan for the IN-22 merge-gate chain-② migration; add the IN-22/T024 Stage-3 change to this entry and its spec_refs.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/usecase-types.json",
+              "line": 270,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7bd5aa40dc45743ff3e0ce989c114be0e7f84e0e125c15e46b4324dd51b2bd5b",
+          "at": "2026-05-12T09:37:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_strict_merge_gate` is declared as a modified catalogue entry, but it only describes the IN-23 Stage-2 rewrite and only references IN-23/IN-20. The plan also says T024 must modify this same function's Stage 3 path to consume `CatalogueDocument` for the IN-22 v3-native chain-② migration. As written, the usecase catalogue leaves the IN-22/T024 modification untracked for the function that actually changes, making the plan and type catalogue semantically inconsistent. Add the IN-22 ref and T024 Stage-3 intent to this entry.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/usecase-types.json",
+              "line": 270,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7bd5aa40dc45743ff3e0ce989c114be0e7f84e0e125c15e46b4324dd51b2bd5b",
+          "at": "2026-05-12T09:39:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T024 is not compile-standalone as written. It changes the `TrackBlobReader::read_catalogue_for_spec_ref_check` trait return type to `CatalogueDocument`, but the task only covers `check_strict_merge_gate` plus test mocks; the production usecase Chain-② interactors still consume that method as a v2 `TypeCatalogueDocument` and call `.entries()` / `check_catalogue_spec_ref_integrity`. Those usecase call sites must be migrated in the same task as the trait signature change, otherwise `cargo make ci-rust` cannot pass and T027 cannot safely delete the v2 domain functions.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 144,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T025 changes the `CatalogueLoader` and `render_contract_map` contracts to use v3 `CatalogueDocument`, but scopes the task to domain + infrastructure only. The usecase contract-map workflow depends on those APIs and computes `catalogues.values().map(|d| d.entries().len())`, while v3 `CatalogueDocument` has separate `types` / `traits` / `functions` maps rather than `entries()`. Without including the usecase workflow and its mocks/tests in T025, the claimed standalone `cargo make ci-rust` pass is not executable.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 150,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7bd5aa40dc45743ff3e0ce989c114be0e7f84e0e125c15e46b4324dd51b2bd5b",
+          "at": "2026-05-12T09:39:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bd5aa40dc45743ff3e0ce989c114be0e7f84e0e125c15e46b4324dd51b2bd5b",
+          "at": "2026-05-12T09:40:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bd5aa40dc45743ff3e0ce989c114be0e7f84e0e125c15e46b4324dd51b2bd5b",
+          "at": "2026-05-12T09:40:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T022 preserves the merge-gate `declaration_hash` check by moving it to the usecase caller, but the same task's `spec_states::verify_from_spec_json` rewrite only says to decode `<layer>-type-signals.json` and call `check_type_signals`. IN-23/CN-11 require the commit gate to keep comparing the catalogue bytes against `TypeSignalsDocument.declaration_hash`; after `check_type_signals` becomes catalogue-independent, omitting that comparison would let stale type-signal files pass the commit gate. Add the byte-hash freshness check to the `spec_states` part of T022 and its catalogue entry.",
+              "severity": "P1",
+              "file": "track/items/tddd-v2-2026-05-08/impl-plan.json",
+              "line": 132,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7bd5aa40dc45743ff3e0ce989c114be0e7f84e0e125c15e46b4324dd51b2bd5b",
+          "at": "2026-05-12T09:45:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3ca3a28caf7b2ae2f2a041141f464b3c422d2acc462942f5d9e14c2728389f4",
+          "at": "2026-05-12T09:51:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9948facea4fb4a1b55e9f72091c9779c505d6cad6f9faaf6d9e8c15bcf9fa7ce",
+          "at": "2026-05-12T09:59:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9948facea4fb4a1b55e9f72091c9779c505d6cad6f9faaf6d9e8c15bcf9fa7ce",
+          "at": "2026-05-12T10:07:00Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v3 rewrite is internally inconsistent: the intro says `DataRole`/`ContractRole`/`FunctionRole` are now the schema axes, but R2/R3/R6 and the examples still instruct agents to write legacy `kind:` values such as `kind: free_function`, `kind: value_object`, `kind: secondary_adapter`, `kind: use_case`, and `kind: domain_service`. In v3 those are `role` values, and the `kinds` reference at line 39 is also wrong (`TypeEntry` has singular `kind`). As written, this guidance will produce invalid catalogue drafts.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 32,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6315f022f55cfa2ef050fbfa16b2ad5b6ce07aaace14a2bc73af646e53abda8f",
+          "at": "2026-05-10T08:07:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d5282b41d75ce77dabe63a0dc8654b09fdb2abf99f756d97291c78d2889fa8f",
+          "at": "2026-05-10T08:14:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v3 rewrite still documents old v1/v2 field names in the checklist. `catalogue_document_codec.rs` accepts `methods[].returns`, `methods[].params[].ty`, `functions[].params[].ty`, and `functions[].returns`; there is no `expected_methods`, `expected_params`, or `expected_returns` in the v3 wire format. Keeping the old names here will cause type-designer/reviewer agents to validate the wrong fields and miss bare-wrapper declarations in real v3 catalogues.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 238,
+              "category": "schema-correctness"
+            },
+            {
+              "message": "The typestate examples use an invalid v3 wire shape/value: `pattern: TypestateState`. The codec encodes the struct pattern as a nested object like `\"pattern\": { \"pattern\": \"typestate_state\", \"of\": \"...\", \"transition_methods\": [...] }`. As written, agents following the convention will draft schema-invalid typestate entries or omit required `of` metadata.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 206,
+              "category": "schema-correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6d5282b41d75ce77dabe63a0dc8654b09fdb2abf99f756d97291c78d2889fa8f",
+          "at": "2026-05-10T08:15:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R6 still names the v2 fields `expected_members` and `expected_methods` as the criteria to check. In the v3 schema documented above, `TypeEntry` stores fields under `kind.fields` and methods under `methods`; `expected_*` is not part of the DTO. A type-designer following this convention can emit or review against fields the codec does not consume, causing DomainService entries to lose their structural members/methods or pass review with the wrong shape.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 141,
+              "category": "schema-mismatch"
+            },
+            {
+              "message": "The typestate examples show a flat `\"pattern\": \"typestate_state\", \"of\": ..., \"transition_methods\": ...` shape, but the v3 codec uses an internally tagged `PatternDto`, so the valid wire shape is `\"pattern\": { \"pattern\": \"typestate_state\", \"of\": ..., \"transition_methods\": [...] }`. Since these examples are in the SSoT convention for drafting catalogues, copying them produces invalid v3 JSON for typestate states.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 206,
+              "category": "schema-mismatch"
+            },
+            {
+              "message": "This section says to record rationale in `informal_grounds[]`, but the v3 entries described in the same document only provide `docs` for rationale/metadata. The codec has no `informal_grounds` field, so following this instruction would put required `△` placement rationale in an unmodeled field that is not preserved by the catalogue schema.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 118,
+              "category": "schema-mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:03b80afa6d93f19681885a0da08172c078a78a1eeb6ef44aa262703715f99252",
+          "at": "2026-05-10T08:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v3 guidance now models typestate states as `role: ValueObject` with a `typestate_state` pattern, but this checklist still requires every `ValueObject` to have empty `methods`. Typestate transitions are declared via `transition_methods` that refer to inherent methods, so following this checklist would cause valid typestate catalogue entries from the new schema to be rejected or stripped of their transition methods. Add an explicit typestate exception here, or require those entries to use a non-ValueObject role consistently.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 233,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:62b07cd8a60fcba69097bd4df1d4e858146873a17ac00e0f39ff06bdfb110c5c",
+          "at": "2026-05-10T08:21:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83f21dadbca26a455c6e04b42cb2d11c052dd2c97368549afc0a41dbaac5f0fc",
+          "at": "2026-05-10T08:23:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78be82028a646a98e2b82e6413a76c344e17f91e9d26be8e724c8a520c3c573c",
+          "at": "2026-05-12T01:17:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78be82028a646a98e2b82e6413a76c344e17f91e9d26be8e724c8a520c3c573c",
+          "at": "2026-05-12T01:18:08Z"
         }
       ]
     },
@@ -6551,6 +6984,545 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`identifiers.rs` is 854 lines long, which exceeds the repository's 700-line hard limit for a module. The extra size is mostly from co-locating the large test block with the implementation, so this already violates the stated module-size rule and makes future changes harder to keep coherent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 1,
+              "category": "architecture"
+            },
+            {
+              "message": "`ModulePath::from_identifiers` is a new public constructor, but there is no unit test covering its happy path. That leaves a public API path in this module without the required test coverage, so a regression in this constructor would not be caught by the current suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 263,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:aaf0127f33a1070f6bcfd34341467d85a42693d267741ea654422b8a72eefbb3",
+          "at": "2026-05-09T00:51:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ItemAction` derives `strum::Display`/`EnumString` without a rename policy, so it accepts/emits `Add`, `Modify`, etc. The inherited TDDD-03 catalogue contract uses lowercase tags (`add`, `modify`, `reference`, `delete`), and the existing codec/fixtures use those values. Unless this enum is renamed with `#[strum(serialize_all = \"snake_case\")]` (and covered by tests), valid catalogue actions will be rejected or re-emitted with the wrong spelling once the v2 codec maps through these domain strings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "`SelfReceiver` currently parses/displays the Rust variant names (`Owned`, `SharedRef`, `ExclusiveRef`), but ADR D8 defines the catalogue values as the receiver tokens `self`, `&self`, and `&mut self`. This makes the domain `FromStr` reject the receiver strings already used in catalogue data and will force every caller to duplicate a custom mapping instead of using the validated domain enum. Add explicit strum serializations for the three variants and tests for the token forms.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 183,
+              "category": "correctness"
+            },
+            {
+              "message": "`Layer` also derives default strum casing, so `Layer::Domain.to_string()` is `Domain` and parsing `domain` fails. ADR D1 defines the layer axis as the lowercase catalogue values `domain` / `usecase` / `infrastructure`; with the current implementation, valid v2 documents using the specified layer values cannot round-trip through the domain enum. Add the appropriate strum serialization policy and tests for the lowercase spellings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/roles.rs",
+              "line": 214,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dfbfe4d4f9794e188910e3380086ae23ac291c38590b5116f81adf06ad0af2ce",
+          "at": "2026-05-09T00:59:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96ad85ab07e8bdbc22652769ba2c392e5dadd47c10ef708a2f3b3f91ec71bb86",
+          "at": "2026-05-09T01:06:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79eb2d3a8048e687b6326dedc630a94bc9f0d73475e8223b04992c95b5ba67ad",
+          "at": "2026-05-09T01:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:37:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:39:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045030b22158f65c1f032af2ea12ffbd08c33bb70afe15526a98a1e596e7468f",
+          "at": "2026-05-09T01:46:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
+          "at": "2026-05-09T02:19:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1e8d40ee3efe3dae3575799fb756662d937a966c67351ea423a3c4ab723b83",
+          "at": "2026-05-09T02:22:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ThreeWaySignal` stores the derived kind as a public field, and `ThreeWayEvaluationReport` exposes its `Vec` publicly. That leaves the documented invariant unenforced: external code can construct or mutate a value with mismatched `region`/`signal` or with `Skip` entries inside a report, and `len()`/`has_violations()`/`is_in_progress()` will then report the wrong state. Make the derived state private or validate on construction so the domain type cannot represent an invalid report.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
+              "line": 182,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e8798a0a0cd123f1d7b186c030e6ee130dabc8ad23a406ae33404d1bbc2de4ec",
+          "at": "2026-05-09T05:31:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ThreeWayEvaluationReport::new` does not enforce the module's own invariant that reports contain only non-skip signals. It stores `Skip` entries verbatim, so any caller can construct a report that contradicts the public contract in `port.rs` and leaks skipped items through `iter()`/`len()`. Consider filtering `Skip` values here or making construction fallible/private.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signal_evaluator/region.rs",
+              "line": 269,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1d1da0d760a509d983783c1298ee3f32f1622388ee555738f968d780ab2bbc19",
+          "at": "2026-05-09T05:37:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
+          "at": "2026-05-09T05:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99eba3aaff364e883370f2870c064c05c7ae02ef4bbfb30ed34d01931af93e6f",
+          "at": "2026-05-09T05:42:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Re-exporting `catalogue_v2::methods::{MethodDeclaration, ParamDeclaration}` here makes `catalogue::MethodDeclaration` look like the old API path, but it is not API-compatible anymore. The V2 constructor now requires `MethodName` / `ParamName` / `TypeRef` and the accessor methods (`name()`, `params()`, `returns()`, `ty()`, etc.) are gone, so downstream code that was compiling against the documented `catalogue::*` surface will break at source level. A plain `pub use` does not provide the promised compatibility shim.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "line": 26,
+              "category": "compatibility"
+            },
+            {
+              "message": "P1: `MethodDeclaration` now derives `Eq` with a public `docs: Option<String>` field, and baseline structural comparison uses full vector equality (`self.methods == other.methods`). That means doc-only differences between two otherwise identical methods will flip `TypeBaselineEntry::structurally_equal()` / `TraitBaselineEntry::structurally_equal()` to `false`, which creates false consistency failures even though docs are non-structural metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 72,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bb5edcc2a9e53b0ba75f3ef9a8b602828a7cf211db9288bed320ec459497d1e3",
+          "at": "2026-05-09T06:52:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`methods_structurally_equal` still treats `ParamDeclaration` as fully equal (`a.params == b.params`), so a harmless parameter binding rename on an unchanged method will now be reported as structural drift. That diverges from the method/function matching logic in `signals.rs` and `consistency.rs`, which intentionally ignores binding names and compares only parameter types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/baseline.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8bd7a3f9e6f7fa462799842a29e3f8e717186f90689cf4acd12e3e33e74ece06",
+          "at": "2026-05-09T06:58:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Re-exporting the V2 `MethodDeclaration`/`ParamDeclaration` here is not source-compatible with the existing `domain::tddd::catalogue::*` callers. The new constructor takes `MethodName`/`ParamName`/`TypeRef` newtypes, so any still-unmigrated call sites that pass `String` arguments will stop compiling. Keep a compatibility shim or finish the downstream rewrites in the same change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "line": 31,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:00cfaa954f2d02a5567473eab37dada61fcfbb35f4b9e416f37a90f375864658",
+          "at": "2026-05-09T07:04:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
+          "at": "2026-05-09T07:09:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ec024726bbe0ebdc3a8212755011e341b643f0e8e39e1545f03b334ee2ea71",
+          "at": "2026-05-09T07:13:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61c79bc1bbd569538d189aac82d8e1237b68f6e4923e7dc77e072020fccb885b",
+          "at": "2026-05-09T15:02:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61c79bc1bbd569538d189aac82d8e1237b68f6e4923e7dc77e072020fccb885b",
+          "at": "2026-05-09T15:04:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b076c4b4ac77667d47b2933bdb9b4da2c390db8a72bc431a2031d8ad7a0f9b3",
+          "at": "2026-05-10T05:15:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5f4c9af033ff03c8f33e0241cc3d75455df3ebec23e48ec0993b2a0b69149f",
+          "at": "2026-05-10T08:07:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5f4c9af033ff03c8f33e0241cc3d75455df3ebec23e48ec0993b2a0b69149f",
+          "at": "2026-05-10T08:10:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `kind_filter` from the public `ContractMapRenderOptions` API makes the documented empty-filter behavior unrepresentable and breaks any caller that still constructs the options struct with a kind filter. This is a public contract regression, not just a stub simplification.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_options.rs",
+              "line": 25,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7e6772336f3b681fb943a9d540c6fa75ff289069585d6fadf438df59421d0d59",
+          "at": "2026-05-10T08:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e6772336f3b681fb943a9d540c6fa75ff289069585d6fadf438df59421d0d59",
+          "at": "2026-05-10T08:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`baseline.rs` is no longer declared as a module. The briefing says the TypeBaseline family should remain module-private for this bundle, with only the public re-export removed; in Rust, leaving the file undeclared means it is not compiled and its tests/internal API are dead. Use `mod baseline;` here rather than dropping the module entirely if the intended accepted deviation is private retention.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/mod.rs",
+              "line": 13,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:7e6772336f3b681fb943a9d540c6fa75ff289069585d6fadf438df59421d0d59",
+          "at": "2026-05-10T08:27:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_type_signals` treats every `TypeDefinitionKind::FreeFunction` entry as covered only by signals whose `kind_tag` is exactly `free_function`. In the v3 schema, function catalogue entries can have other function roles such as `UseCaseFunction`; those still arrive at this legacy gate as `FreeFunction` stubs, while their generated `TypeSignal` keeps the role-specific tag (for example `use_case_function`). A valid Blue signal for such an entry is ignored here, so the gate reports “no signal evaluation” and blocks CI/merge. Align the function-role tags used for coverage, or count all function-role signal tags for `FreeFunction` stubs.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 76,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7a8a49685e8803fea276eba226467c69bc90a83d35686b49e962d2ddfb5ff8a6",
+          "at": "2026-05-10T08:33:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_type_signals` documents Yellow handling as declared-entry only, and the non-free-function path enforces that by intersecting signals with `entry_keys`. The free-function path instead counts every Yellow `kind_tag == \"free_function\"` signal, even if no current `FreeFunction` entry exists for that signal name. A stale or otherwise undeclared free-function Yellow signal can therefore block strict verification while equivalent undeclared non-free Yellow signals are ignored. Filter Yellow free-function signals through the current declared FreeFunction entries before treating them as blocking.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 140,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7a8a49685e8803fea276eba226467c69bc90a83d35686b49e962d2ddfb5ff8a6",
+          "at": "2026-05-10T08:36:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d252fd2e29d6f9ad1e9ef5cf6ec109598695903bac6d8f388eb0ea7fffa9383",
+          "at": "2026-05-10T08:38:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c1462347aef6fc704626f1935c07debfce1c16eba6cad8743ea85db98ecc827",
+          "at": "2026-05-10T13:43:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`generic_args` is part of the trait-impl identity used for signal matching, but it is exposed as a raw public `Option<String>` and `new_with_generic_args` accepts any string. This permits illegal catalogue states such as `Some(\"\")` or already-bracketed/malformed values, which then render as keys like `From<>`/`From<<T>>` instead of being rejected. That can turn bad input into false signal mismatches. Make this a validated domain type (or a private field with a fallible constructor) at least enforcing non-empty, unbracketed generic argument content.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/traits.rs",
+              "line": 52,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:2c1462347aef6fc704626f1935c07debfce1c16eba6cad8743ea85db98ecc827",
+          "at": "2026-05-10T13:46:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`new_with_generic_args` only rejects empty strings and values that start with `<`, so malformed raw args like `CatalogueLoaderError>` or `Vec<T>>` are still accepted. That lets the domain store `TraitImplDeclV2` values whose `Display` output becomes a broken identity key (`From<CatalogueLoaderError>>`), which can silently break impl matching and signal evaluation downstream. The constructor should reject unbalanced angle-bracket input at the domain boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/traits.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3df52722de7c702bb1e00d330f35b2fc3260788dca2cc1c50545d05d53ab58ab",
+          "at": "2026-05-10T15:07:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`new_with_generic_args` only rejects empty strings, leading `<...>`, and mismatched bracket counts. Strings with balanced but misordered brackets (for example `Vec<T><U>` or `>T<`) still pass and are later rendered into malformed identity keys by the `Display` impl, so the new field does not actually make the invalid state unrepresentable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/traits.rs",
+              "line": 123,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:a0f7d2872c3121e3a2aacb42c4d1948e0fac6748ab6847376a7a3c19936d07ba",
+          "at": "2026-05-10T15:12:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce470ce11b593ab544ccb926911c92b933c1c492afd62cd4982020bf282a90b2",
+          "at": "2026-05-10T15:21:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce470ce11b593ab544ccb926911c92b933c1c492afd62cd4982020bf282a90b2",
+          "at": "2026-05-10T15:24:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `CompositePattern::Unit` without any validator or smart constructor lets callers build `TypeKindV2::Struct { pattern: Unit, fields: non_empty }`. The codec maps `Unit` straight to `StructKind::Unit` and does not serialize those fields, so a malformed in-memory value silently round-trips as a different shape with data loss. Enforce `fields.is_empty()` for `Unit` or make this state unconstructable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/composite.rs",
+              "line": 45,
+              "category": "correctness"
+            },
+            {
+              "message": "The new generic/bound payloads are still raw strings with no validation in `MethodGenericParam` here, and the same pattern is repeated in `TraitEntry.supertrait_bounds` in `entries.rs`. Downstream code renders them verbatim into `fn ...<...>` and `GenericBound::TraitBound` data, so empty or malformed names/bounds become representable and can produce invalid Rust/rustdoc output. These fields need validated domain types or fallible constructors.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 34,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2f140c22a826c2a38846b6b2f7e84f8d09f4dcfcddf55fa1389b58de8c62426f",
+          "at": "2026-05-11T00:46:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CompositePattern::Unit` can still be paired with a non-empty `TypeKindV2::Struct::fields` vector, but the encoder treats `Unit` as a fieldless unit struct and drops any fields. That leaves a silent data-loss path for an illegal state instead of making the unit-struct invariant unrepresentable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/composite.rs",
+              "line": 45,
+              "category": "correctness"
+            },
+            {
+              "message": "`MethodGenericParam` is introduced as raw `String` fields, so invalid generic parameter names or bound strings can be constructed and serialized without any domain validation. The same gap appears for `TraitEntry.supertrait_bounds` in `entries.rs`, which means malformed generic metadata can cross the domain boundary instead of failing fast.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 34,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:2f140c22a826c2a38846b6b2f7e84f8d09f4dcfcddf55fa1389b58de8c62426f",
+          "at": "2026-05-11T00:49:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:557f9bf8181b6f0cdbd7c83ce3902885dc57e0736806fe27642f1cc3b8b95540",
+          "at": "2026-05-11T06:11:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `TupleStruct` represents positional tuple fields with `FieldDecl`, but `FieldDecl` requires a `FieldName`. Real tuple structs/newtypes have unnamed positional fields, so any codec has to fabricate names or reject valid rustdoc tuple fields, and those names are then not part of the actual Rust shape. This breaks the stated `StructKind::Tuple` mirror and makes the v2 catalogue schema unable to faithfully model tuple structs. Use `Vec<TypeRef>` or a dedicated tuple-field type instead.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/composite.rs",
+              "line": 164,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `MethodGenericParam` exposes generic parameter names and bounds as raw `String`s with no validated constructor. That allows invalid public domain states such as an empty parameter name or empty bound, and `signature_string` will render them as if valid. This regresses the v2 catalogue pattern of using validated domain types for identifiers and type references; introduce a generic-parameter name newtype and store bounds as validated `TypeRef`s, or make construction fallible.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 36,
+              "category": "architecture"
+            },
+            {
+              "message": "P1: `supertrait_bounds` is a public `Vec<String>`, so `TraitEntry` can contain empty or malformed bounds outside the JSON codec path. The domain model already has `TypeRef` for non-empty type reference strings, and leaving this as raw strings makes illegal catalogue states representable through the public API. Store validated `TypeRef`s or add a fallible constructor that enforces the invariant in the domain layer.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "line": 82,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:557f9bf8181b6f0cdbd7c83ce3902885dc57e0736806fe27642f1cc3b8b95540",
+          "at": "2026-05-11T06:14:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82bbf55f0f0c518f91601c0586f2ea33b9b24050e5dabba1860af57de2f958ff",
+          "at": "2026-05-11T08:17:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82bbf55f0f0c518f91601c0586f2ea33b9b24050e5dabba1860af57de2f958ff",
+          "at": "2026-05-11T08:20:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d99adf7068d1f5e3f1fb325c2b8ef629888e9246124379ecbd2b022e9fd61c3",
+          "at": "2026-05-11T16:01:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d99adf7068d1f5e3f1fb325c2b8ef629888e9246124379ecbd2b022e9fd61c3",
+          "at": "2026-05-11T16:03:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5067f232efa52fad19fe75555f3297a2d6caee825b55ce8c29ba231a949a3baf",
+          "at": "2026-05-11T23:21:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5067f232efa52fad19fe75555f3297a2d6caee825b55ce8c29ba231a949a3baf",
+          "at": "2026-05-11T23:23:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a47b96f7e0d983ceabf1009475c87b7b4b927c8fed46eb598420113b60403775",
+          "at": "2026-05-12T06:36:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a47b96f7e0d983ceabf1009475c87b7b4b927c8fed46eb598420113b60403775",
+          "at": "2026-05-12T06:37:26Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -6644,348 +7616,64 @@
           "findings": [],
           "hash": "rvw1:sha256:c3126be0be48f01d2fbd0f4c1cd0bdd065937b27f6de663aff640f2ba76a15a4",
           "at": "2026-05-12T01:18:38Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "These updated assertions no longer verify the `kind_filter` contract at all: the first test now only checks the OS-06 scaffold/deferment text, and the second only checks that subgraphs exist. That means regressions in `parse_kind_tag`, the `kind_filter` conversion, or the renderer wiring will now pass this suite, even though `ContractMapRenderOptions::kind_filter` documents that `Some(vec![])` should filter every entry out.",
+              "message": "`TDDD-Q05` の「`bin/sotp track three-way-signals` は `bfa6c85` で `catalogue-impl-signals` にリネーム済み」という記述が不正確です。実際の rename は `c4f8352` で行われており、`bfa6c85` は別内容のコミットです。",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
-              "line": 517,
-              "category": "test coverage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
+              "line": 1006,
+              "category": "factual error"
             }
           ],
-          "hash": "rvw1:sha256:44459dab70b9ea1117505be0cae84304857a3a5b9d55cce24a3df7829b00a0aa",
-          "at": "2026-05-10T08:06:47Z"
+          "hash": "rvw1:sha256:ccd7c7e2f1b0ea385db13cb24198d84d2418fb1e63bb109ef7ca496e6eb67952",
+          "at": "2026-05-12T05:31:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "TDDD-Q05 の「`bin/sotp track three-way-signals` も `bfa6c85` で `catalogue-impl-signals` にリネーム済み」という部分が誤りです。`bfa6c85` は baseline-capture の修正で、rename を行ったのは `c4f8352` です。",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 1006,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:ccd7c7e2f1b0ea385db13cb24198d84d2418fb1e63bb109ef7ca496e6eb67952",
+          "at": "2026-05-12T05:32:33Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:44459dab70b9ea1117505be0cae84304857a3a5b9d55cce24a3df7829b00a0aa",
-          "at": "2026-05-10T08:08:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `total_entry_count` is still derived from the legacy flat `entries()` list, so the workflow is not aligned with the v3 `CatalogueDocument` shape described in the briefing. With v3 catalogues, trait and free-function entries live in separate `traits` and `functions` maps, so this metric either cannot compile against the intended port signature or silently undercounts everything outside `types`. The aggregation should sum `types.len() + traits.len() + functions.len()` for each loaded document, with tests using v3 `CatalogueDocument` fixtures to cover all three maps.",
-              "severity": "P1",
-              "file": "libs/usecase/src/contract_map_workflow.rs",
-              "line": 229,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:44459dab70b9ea1117505be0cae84304857a3a5b9d55cce24a3df7829b00a0aa",
-          "at": "2026-05-10T08:10:57Z"
+          "hash": "rvw1:sha256:f4604b79d78b640768eef1daa72c6f7a03c27f623153921f0605d9ecdf41b682",
+          "at": "2026-05-12T05:33:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a9c536dc24f0a8bd26040f15cb7daba5bdafab89477cc62ba39267a7f7781867",
-          "at": "2026-05-10T08:18:09Z"
+          "hash": "rvw1:sha256:f4604b79d78b640768eef1daa72c6f7a03c27f623153921f0605d9ecdf41b682",
+          "at": "2026-05-12T05:36:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a2383cbcb9abb9ece2279d850027204eb7b2a812b07c7791da5fed2aab12adcf",
-          "at": "2026-05-11T16:01:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new action-threading path is not covered by the usecase tests: the existing refresh test only creates `TypeAction::Add` entries, so a regression in `TypeAction::Reference` mapping or in passing `entry.action()` through to `evaluate_catalogue_entry_signal` would still pass while breaking the D5 rule this change is meant to restore. Add an interactor test with a `Reference` entry with empty `spec_refs` and `informal_grounds`, asserting the persisted signal is `Blue`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_spec_signals.rs",
-              "line": 240,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:a2383cbcb9abb9ece2279d850027204eb7b2a812b07c7791da5fed2aab12adcf",
-          "at": "2026-05-11T16:04:10Z"
+          "hash": "rvw1:sha256:bb49df81a5534f8e501c29e0157c6ea4d845f686e5c53afc95998155b886c6b4",
+          "at": "2026-05-12T06:37:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:248fee9b816825e9c10bcb50ab69c7031cdfb9b777fe7f02a34a998d5bd67c5e",
-          "at": "2026-05-11T16:05:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The service loads catalogue and baseline files from `track/items/<track_id>` without any symlink or containment guard. A malicious symlinked track directory can escape the workspace and make the loaders read arbitrary files outside the repo. The declared `SymlinkRejected` error variant is never emitted.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 241,
-              "category": "security"
-            },
-            {
-              "message": "The public API drops `items_dir` entirely and hard-codes `<workspace_root>/track/items`. Callers that resolve a non-default items root will evaluate the wrong tree and can silently print stale or unrelated signals.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 120,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5724188af1446546b37081c730d179d6f46d181d81b258f661835591dff21b8e",
-          "at": "2026-05-11T23:21:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track_dir.join(&binding.catalogue_file)` / `baseline_file` trusts the binding's path strings directly, and `reject_symlinks_below` only blocks symlinks. A binding containing `../` or an absolute path can still escape `items_dir`, so this service can be made to read arbitrary files outside the workspace.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 241,
-              "category": "security"
-            },
-            {
-              "message": "The new public `CatalogueImplSignalsService::run` orchestration path has no direct happy-path or error-case tests; the module only covers `validate_track_id` and `Display`. That leaves the new path handling and port/error mapping logic unguarded against regressions.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 177,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:c3729ac87fc79c2c0ba516782c4f1274f9ac10af2401fadf9a77ea48f8ed899b",
-          "at": "2026-05-11T23:27:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run` trusts `workspace_root` before any symlink validation and never checks the derived `items_dir` itself. If a caller passes a symlinked workspace root or `track/items`, `layer_bindings_port.load` and the later path joins can be redirected outside the intended tree. The CLI currently guards this, but the public service is unsafe unless it enforces the same invariant or documents it as a hard precondition.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 207,
-              "category": "security"
-            },
-            {
-              "message": "`TdddLayerBindingsError` is mapped to the wrong use-case errors: `LoadFailed` becomes `BaselineLoad`, and `LayerNotFound` becomes `SchemaExport`. That collapses architecture-rules / layer-lookup failures into unrelated stages, so callers and logs lose the real failure source and the advertised error variants are misleading.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 209,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:6d41fc7b521d1c52b27390fee0aa1deaeb7d39d817629b0b25d44ea19c6f2790",
-          "at": "2026-05-11T23:48:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This guard never checks `trusted_root` itself, so a symlinked `workspace_root/track/items` is accepted. Because `run()` derives `items_dir` from `workspace_root` without a separate symlink check, reads under `catalogue_path` / `baseline_path` can be redirected outside the intended workspace. Add an explicit `items_dir.symlink_metadata()` check or make the helper validate the root component too.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 443,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:fa46af2ed14bd8d5f4555a05bb4418f551745c00c39e212095dc38393a646254",
-          "at": "2026-05-11T23:52:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`workspace_root` is only checked with `symlink_metadata()` on the leaf path. A symlink in any parent component still redirects every later read (`architecture-rules.json`, catalogue, baseline, rustdoc), so this does not actually confine I/O to the intended workspace. Canonicalize the root or reject symlinks in the ancestor chain before trusting it as the anchor.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 229,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:8a077c7ad6904fe4d14d3878be2f6881ef122fa95ac29d5489d1fc347d8c51c7",
-          "at": "2026-05-11T23:56:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`validate_binding_filename` still accepts `..` (and `.`): `Path::file_name()` returns `Some(\"..\")` and the separator check passes, so a hostile binding can set `catalogue_file`/`baseline_file` to `..` and escape `track_dir` with `track_dir.join(\"..\")`. That reintroduces arbitrary file reads outside the track tree.",
-              "severity": "P0",
-              "file": "libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 457,
-              "category": "security"
-            },
-            {
-              "message": "The path-symlink defense never checks the intermediate `workspace_root/track` ancestor. `items_dir.symlink_metadata()` resolves through a symlinked `track` directory, and `reject_symlinks_below(..., &items_dir)` stops at `items_dir`, so a symlink at `workspace_root/track` can still redirect every catalogue/baseline read into another tree.",
-              "severity": "P0",
-              "file": "libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 284,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:56d32c2b4a2f6eb879026626c96c9bcc1699c7ab1db8413e93fa7878a64cb426",
-          "at": "2026-05-11T23:59:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Map `Phase1Error` with `to_string()` instead of `{:?}`. The current code turns the nested evaluator error into Rust debug syntax (`ActionContradiction(...)`) rather than the human-readable display string, which makes the CLI output less stable and leaks internal enum details.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 342,
-              "category": "Error handling"
-            },
-            {
-              "message": "The new public orchestrator has no direct happy-path or error-path coverage in this crate, and I couldn't find equivalent coverage elsewhere in the repo. This path is doing layered file loading, symlink guards, and error mapping, so regressions here will be easy to miss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 569,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:49b69bf01e6eecbf85a54f40b6076cba397d8ca677b076d57db221cf1f2082dd",
-          "at": "2026-05-12T00:04:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run()` trusts `TdddLayerBindingsPort::load()` and only fails when the returned list is empty, but the current adapter path has a legacy fallback when `architecture-rules.json` is missing. That means this command can silently proceed on the synthetic `domain` binding instead of failing closed for a missing config file, so a workspace with stale `domain-types.json` artifacts can produce a seemingly valid report under the wrong layer set.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 232,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8559ff22bf38dab9c9b2579aa3c17071dcd2e5456582d6abe6fad5a7a71d9806",
-          "at": "2026-05-12T00:10:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueImplSignalsService::run` is a new public usecase API, but this diff only adds helper/unit coverage; there is no test that exercises the successful orchestration path or verifies the port-error mappings for the interactor itself. That leaves the core report assembly/wiring unprotected, so a regression here could ship unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 122,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:d1b7774d56f89f6d84d08c863917f2f146ab330579c960f03a6abadc45fb842c",
-          "at": "2026-05-12T00:14:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: [workspace_root](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs:226) is treated as trusted after only a symlink walk, but the helper never canonicalizes or rejects `..` segments. A caller can pass `../repo` or another dot-dot path and the subsequent `join(\"track/items\")` will resolve outside the intended workspace tree. Reject dot segments or canonicalize before trusting the root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 226,
-              "category": "security"
-            },
-            {
-              "message": "P1: The interactor hard-fails whenever `binding.targets` has anything other than exactly one entry. That makes `catalogue-impl-signals` unusable for a valid `schema_export.targets` array with multiple crate names, even though the binding model preserves `Vec<String>` targets and the parser accepts explicit multi-target arrays. Either iterate the targets or make the single-target contract explicit earlier in parsing.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 321,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0eb46b0003ac2da833f263ad77a992f6989f419e0bf72bcc29532986dd8d5eea",
-          "at": "2026-05-12T00:24:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The test module re-imports `ThreeWaySignal` after `use super::*;`, which already pulls the parent module's `ThreeWaySignal` into scope. That duplicate binding will trigger E0252 and prevent this file from compiling.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 598,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:18df2cfda26d85a3e40a53165820e006dea860da33ed24f6a5f632b96cf42563",
-          "at": "2026-05-12T00:30:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run()` silently takes only `binding.targets.first()` and ignores any additional `schema_export.targets` entries. If a layer is configured with more than one target crate, the extra crates are never captured or evaluated, so the report can miss violations for an entire crate set. The previous CLI failed closed on multi-target bindings; this should remain an error until the use case can aggregate all targets.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals.rs",
-              "line": 338,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4a5304e01018d7239a78f74dbc858a5385d35ffa5194a0323ceb976a0763b4cd",
-          "at": "2026-05-12T00:34:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:244feef2c0059893a6b9b86db95c770386839c0e99e4cf0658402246af365d06",
-          "at": "2026-05-12T00:50:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e812b1e6e181d2f3672805c3c85ade4d2e3c9747dbf542348c3ce4ff4ce3dfa5",
-          "at": "2026-05-12T01:06:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`validate_binding_filename` is not a correct basename guard: it rejects legitimate filenames that merely contain `..` anywhere (for example `foo..json`), but it still accepts Windows-special names like `foo:bar.json` or `foo.`. Because `architecture-rules.json` can supply these values, the new usecase layer can now reject valid bindings or open an unexpected filesystem target on Windows. The check should mirror the repo’s existing safe-component rules instead of using a substring test here.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_impl_signals/helpers.rs",
-              "line": 77,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ccff8a66b9bb812e440abfc9f6bfb02d6cd6ae23ba05531d3f3db40d50ff8e0f",
-          "at": "2026-05-12T01:22:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fc240a65215641934c3873e211bb6cbf3c83adbf4b4007652665e410b2272aa",
-          "at": "2026-05-12T01:31:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fc240a65215641934c3873e211bb6cbf3c83adbf4b4007652665e410b2272aa",
-          "at": "2026-05-12T01:52:02Z"
+          "hash": "rvw1:sha256:bb49df81a5534f8e501c29e0157c6ea4d845f686e5c53afc95998155b886c6b4",
+          "at": "2026-05-12T06:39:24Z"
         }
       ]
     }

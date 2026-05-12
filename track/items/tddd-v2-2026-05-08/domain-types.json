@@ -1318,177 +1318,114 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          {
-            "name": "Typestate",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "transitions", "ty": "TypestateTransitionsSpec" },
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "Enum",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_variants", "ty": "Vec<EnumVariantDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "ValueObject",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "ErrorType",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_variants", "ty": "Vec<EnumVariantDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "SecondaryPort",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "ApplicationService",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "UseCase",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "Interactor",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "declares_application_service", "ty": "Vec<String>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "Dto",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "Command",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "Query",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "Factory",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "SecondaryAdapter",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "implements", "ty": "Vec<TraitImplDecl>" },
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "DomainService",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "expected_members", "ty": "Vec<MemberDeclaration>" },
-                { "name": "expected_methods", "ty": "Vec<MethodDeclaration>" }
-              ]
-            }
-          },
-          {
-            "name": "FreeFunction",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "module_path", "ty": "Option<String>" },
-                { "name": "expected_params", "ty": "Vec<ParamDeclaration>" },
-                { "name": "expected_returns", "ty": "Vec<String>" },
-                { "name": "expected_is_async", "ty": "bool" }
-              ]
-            }
-          }
+          { "name": "Typestate" },
+          { "name": "Enum" },
+          { "name": "ValueObject" },
+          { "name": "ErrorType" },
+          { "name": "SecondaryPort" },
+          { "name": "ApplicationService" },
+          { "name": "UseCase" },
+          { "name": "Interactor" },
+          { "name": "Dto" },
+          { "name": "Command" },
+          { "name": "Query" },
+          { "name": "Factory" },
+          { "name": "SecondaryAdapter" },
+          { "name": "DomainService" },
+          { "name": "FreeFunction" }
         ]
       },
       "trait_impls": [
-        { "trait_name": "Debug", "origin_crate": "core" },
-        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
-      "methods": [
-        {
-          "name": "kind_tag",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&str",
-          "is_async": false
-        }
-      ],
-      "docs": "v1 enum classifying type-catalogue entries by structural role (15 variants). Being phased out by IN-01 (TypeDefinitionKind 廃止). Modified: DomainService and FreeFunction variants added in this track as part of the v1→v2 migration; MethodDeclaration/ParamDeclaration migrated to v2 newtypes.",
+      "docs": "IN-21 (pending deletion): v1 enum classifying type-catalogue entries by structural role (15 variants). Superseded by DataRole/ContractRole/FunctionRole in the v3 CatalogueDocument schema. Declared as modify (not delete) because the type is still present in C and referenced by many other C-items; switching to action:delete before the IN-21 implementation causes Phase 1 DanglingId failures in the signal evaluator. Variant payloads omitted (unit placeholders) — mismatch with C struct-field payloads gives SIntersectC_Mismatch_Modify (Yellow), which is acceptable for a pending-deletion traceability entry. Delete action will be set after the IN-21 implementation removes all references from the codebase.",
       "spec_refs": [
-        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeCatalogueDocument": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "IN-21 (pending deletion): v1/v2 aggregate type holding TypeCatalogueEntry entries per layer. Superseded by CatalogueDocument (domain::tddd::catalogue_v2). Declared as reference (not delete) because the type is still present in C and referenced transitively by many C-items (check_catalogue_spec_ref_integrity, check_catalogue_spec_signals, TypeInfo, SchemaExport, etc.); switching to action:delete before IN-21 implementation causes Phase 1 DanglingId cascade in the signal evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeCatalogueEntry": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "IN-21 (pending deletion): v1/v2 per-entry type inside TypeCatalogueDocument. Superseded by TypeEntry/TraitEntry/FunctionEntry in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "MemberDeclaration": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Variant" },
+          { "name": "Field" }
+        ]
+      },
+      "docs": "IN-21 (pending deletion): v1 enum for struct-field / enum-variant member declarations inside TypeDefinitionKind variant payloads. Superseded by FieldDecl / VariantDecl in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation — still used by domain::schema::TypeInfo.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "EnumVariantDeclaration": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "IN-21 (pending deletion): v1 struct capturing enum variant name and payload_types (Vec<String>). Superseded by VariantDecl + VariantPayload in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "TraitImplDecl": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "IN-21 (pending deletion): Old v1-style trait implementation declaration (with expected_methods field) inside TypeDefinitionKind::SecondaryAdapter payload. Superseded by TraitImplDeclV2. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeAction": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Add" },
+          { "name": "Modify" },
+          { "name": "Reference" },
+          { "name": "Delete" }
+        ]
+      },
+      "docs": "IN-21 (pending deletion): v1 action enum for TypeCatalogueEntry. Superseded by ItemAction in v3 CatalogueDocument. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignal": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "IN-21 (pending deletion): v1 signal result struct produced by the old evaluate_type_signals / undeclared_to_signals pipeline (domain::tddd::signals). The new pipeline uses ThreeWaySignal / ThreeWayEvaluationReport. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
@@ -1568,7 +1505,7 @@
       "informal_grounds": []
     },
     "CatalogueLinter": {
-      "action": "reference",
+      "action": "modify",
       "role": "SecondaryPort",
       "supertrait_bounds": ["Send", "Sync"],
       "methods": [
@@ -1577,15 +1514,17 @@
           "receiver": "&self",
           "params": [
             { "name": "rules", "ty": "&[CatalogueLinterRule]" },
-            { "name": "catalogue", "ty": "&TypeCatalogueDocument" },
+            { "name": "catalogue", "ty": "&CatalogueDocument" },
             { "name": "layer_id", "ty": "&str" }
           ],
           "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
           "is_async": false
         }
       ],
-      "docs": "Existing secondary port for running catalogue lint rules. Currently uses TypeCatalogueDocument; referenced for contract-map edge completeness.",
-      "spec_refs": [],
+      "docs": "IN-22: modified. Secondary port for running catalogue lint rules. The run() method signature is migrated from &TypeCatalogueDocument to &CatalogueDocument (v3-native) as part of the IN-22 consumer migration (T025). Prior to T025, the source still accepts &TypeCatalogueDocument; T025 atomically updates both the source and this catalogue entry.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
       "informal_grounds": []
     },
     "ContractMapWriter": {
@@ -1632,13 +1571,14 @@
           "name": "load_all",
           "receiver": "&self",
           "params": [{ "name": "track_id", "ty": "&TrackId" }],
-          "returns": "Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>",
+          "returns": "Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError>",
           "is_async": false
         }
       ],
-      "docs": "Existing secondary_port CatalogueLoader. Return type unchanged from v2 (TypeCatalogueDocument). The infrastructure adapter reads v3 CatalogueDocument files and converts them to TypeCatalogueDocument stubs via v3_doc_to_stub before returning; the V3StubConversion error variant surfaces when that conversion fails. Full v2-to-v3 port upgrade is deferred to a follow-up track.",
+      "docs": "IN-22: modified. Secondary port for loading all catalogues for a track. Return type migrated from BTreeMap<LayerId, TypeCatalogueDocument> to BTreeMap<LayerId, CatalogueDocument> (v3-native). The v3_doc_to_stub conversion path (FsCatalogueLoader) is deleted per IN-21; the infrastructure adapter reads CatalogueDocument directly via CatalogueDocumentCodec.",
       "spec_refs": [
-        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
@@ -1735,6 +1675,72 @@
     }
   },
   "functions": {
+    "domain::tddd::contract_map_render::render_contract_map": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "catalogues", "ty": "&BTreeMap<LayerId, CatalogueDocument>" },
+        { "name": "layer_order", "ty": "&[LayerId]" },
+        { "name": "opts", "ty": "&ContractMapRenderOptions" }
+      ],
+      "returns": "ContractMapContent",
+      "is_async": false,
+      "docs": "T025/IN-24: modified. render_contract_map signature changes from &BTreeMap<LayerId, TypeCatalogueDocument> to &BTreeMap<LayerId, CatalogueDocument> (v3-native migration per IN-22/IN-24). The function is I/O-free and lives in domain (placement rationale: pure transformation, per ADR 2026-04-17-1528 §D1). Post-migration, the renderer reads CatalogueDocument entries directly without v3_doc_to_stub conversion. An OS-07 minimal placeholder (entry name list + deferred note) is implemented as the rendering body. The current (pre-migration) signature takes TypeCatalogueDocument; the declared shape here is the post-migration target.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-24", "hash": "63c94a4dd073c353ba9a375b2fbdc70a70bfc4e2ea3993babcea28226cf03ef7" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "layer", "ty": "&LayerId" },
+        { "name": "catalogue", "ty": "&TypeCatalogueDocument" },
+        { "name": "spec_element_hashes", "ty": "&BTreeMap<SpecElementId, ContentHash>" },
+        { "name": "current_catalogue_hash", "ty": "Option<&ContentHash>" },
+        { "name": "signals_opt", "ty": "Option<&CatalogueSpecSignalsDocument>" }
+      ],
+      "returns": "Vec<SpecRefFinding>",
+      "is_async": false,
+      "docs": "IN-21 (pending deletion): validates spec_refs[] integrity against a TypeCatalogueDocument. Will be deleted as part of IN-21 v1/v2 asset removal. Referenced (not delete) pending IN-21 implementation to avoid Phase 1 DanglingId cascade.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "layer_id", "ty": "&str" },
+        { "name": "catalogue", "ty": "&TypeCatalogueDocument" },
+        { "name": "spec_doc", "ty": "&SpecDocument" }
+      ],
+      "returns": "CatalogueSpecSignalsDocument",
+      "is_async": false,
+      "docs": "IN-21 (pending deletion): evaluates catalogue-spec signals for a TypeCatalogueDocument. Will be deleted as part of IN-21 v1/v2 asset removal — callers migrate to v3-native CatalogueDocument evaluate path. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "domain::tddd::consistency::check_type_signals": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "doc", "ty": "&TypeSignalsDocument" },
+        { "name": "strict", "ty": "bool" }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "docs": "IN-23: modified. Signature changed from check_type_signals(doc: &TypeCatalogueDocument, strict: bool, catalogue_file: &str) to check_type_signals(doc: &TypeSignalsDocument, strict: bool). The function now operates on a pre-parsed TypeSignalsDocument (from <layer>-type-signals.json) instead of decoding a TypeCatalogueDocument. The catalogue_file parameter is dropped (no longer needed since declaration_hash freshness is checked externally via the stale-detection gate). The existing coverage check and declared-Yellow filter inside the function are deleted per IN-23 (superseded by 3-way 11-region invariant guarantees).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
+      ],
+      "informal_grounds": []
+    },
     "domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal": {
       "action": "modify",
       "role": "FreeFunction",

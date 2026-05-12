@@ -139,6 +139,52 @@
       ],
       "informal_grounds": []
     },
+    "TrackBlobReader": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_type_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::TypeSignalsDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(Vec<u8>, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_catalogue_for_spec_ref_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)>",
+          "is_async": false
+        }
+      ],
+      "docs": "IN-23/IN-20/IN-22: TrackBlobReader trait is modified in three steps. (1) T021 adds read_type_signals (returning BlobFetchResult<TypeSignalsDocument>) with a default implementation (BlobFetchResult::FetchError) so existing test mocks compile without change. (2) T022 changes read_type_catalogue from BlobFetchResult<(TypeCatalogueDocument, String)> to bytes-only BlobFetchResult<(Vec<u8>, String)>; the gate uses the catalogue bytes only for the declaration_hash freshness check. (3) T024 changes read_catalogue_for_spec_ref_check from BlobFetchResult<(TypeCatalogueDocument, String)> to BlobFetchResult<(CatalogueDocument, String)> — migrating the chain-② merge-gate port to v3-native CatalogueDocument (consistent with IN-22's v3-native requirement for all TypeCatalogueDocument consumers). Only the three modified/added methods are declared here; unchanged methods (read_spec_document, read_impl_plan, read_enabled_layers, read_catalogue_spec_signals_document) are pre-existing and not tracked in this entry.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-20", "hash": "72c389f3e5a5d5d00814ffa689abd3c1183a623c68fe84d9743e793e4384c3c8" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
     "CatalogueSpecSignalsWriter": {
       "action": "reference",
       "role": "SecondaryPort",
@@ -193,7 +239,41 @@
       "docs": "Existing secondary_port for exporting crate schema as JSON string. Referenced to expose implements edge for RustdocSchemaExporter.",
       "spec_refs": [],
       "informal_grounds": []
+    },
+    "SpecElementHashReader": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_spec_element_hashes",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>",
+          "is_async": false
+        }
+      ],
+      "docs": "Secondary port for reading per-element SHA-256 digests from spec.json on a remote git ref (usecase::catalogue_spec_refs). Referenced to expose the GitShowTrackBlobReader -.impl.-> SpecElementHashReader edge in the contract map. Pre-existing baseline port, not modified in this track. BlobFetchResult is parameterised with the concrete BTreeMap return type (R8 full-generic declaration).",
+      "spec_refs": [],
+      "informal_grounds": []
     }
   },
-  "functions": {}
+  "functions": {
+    "usecase::merge_gate::check_strict_merge_gate": {
+      "action": "modify",
+      "role": "UseCaseFunction",
+      "params": [{ "name": "branch", "ty": "&str" }],
+      "returns": "bool",
+      "is_async": false,
+      "docs": "IN-23/IN-20/IN-22 (pending): check_strict_merge_gate is modified in two steps. (1) T022/IN-23: Stage 2 is updated to read <layer>-type-signals.json via TrackBlobReader::read_type_signals (returning TypeSignalsDocument) instead of reading TypeCatalogueDocument and re-evaluating signals. The decoded TypeSignalsDocument is passed directly to check_type_signals (which now takes &TypeSignalsDocument). The declaration_hash freshness check remains as the stale-detection gate (reads catalogue bytes via read_type_catalogue and compares against signals_doc.declaration_hash). (2) T024/IN-22: Stage 3 is migrated from read_catalogue_for_spec_ref_check returning BlobFetchResult<(TypeCatalogueDocument, String)> to the same port returning BlobFetchResult<(CatalogueDocument, String)>; the Stage 3 call-sites for check_catalogue_spec_ref_integrity and check_catalogue_spec_signals are replaced with inline equivalent logic consuming CatalogueDocument directly. Actual return type is VerifyOutcome (domain::verify, not re-exported at domain root) and params include a generic R bound — both are not resolvable by the signal evaluator. Simplified declaration uses 'bool' placeholder for returns to avoid UnresolvedTypeRef; actual signature verification deferred to implementation phase.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-20", "hash": "72c389f3e5a5d5d00814ffa689abd3c1183a623c68fe84d9743e793e4384c3c8" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    }
+  }
 }

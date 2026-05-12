@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a9c48045ef2d6603024e7e2b828d71661934d4bfeb5faf6b135f623586d91605",
+  "catalogue_declaration_hash": "1e9adf9d51df5d371d56ce822397cd8d8c7eb13369d4d26f585a9402d8b67ba7",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -68,6 +68,10 @@
     },
     {
       "type_name": "FsTdddLayerBindingsAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GitShowTrackBlobReader",
       "signal": "blue"
     },
     {
@@ -139,6 +143,18 @@
       "signal": "blue"
     },
     {
+      "type_name": "infrastructure::tddd::catalogue_codec::decode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_codec::encode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer",
+      "signal": "blue"
+    },
+    {
       "type_name": "infrastructure::tddd::type_graph_cluster::classify_types",
       "signal": "blue"
     },
@@ -171,6 +187,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "signal": "blue"
+    },
+    {
       "type_name": "infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics",
       "signal": "blue"
     },
@@ -188,6 +208,10 @@
     },
     {
       "type_name": "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
       "signal": "blue"
     }
   ]

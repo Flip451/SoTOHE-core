@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-12T01:55:55Z",
-  "declaration_hash": "9db38fb7033ce9c620cbd64f45966a8d16919ca8b351849593a303a29547dded",
+  "generated_at": "2026-05-12T10:09:26Z",
+  "declaration_hash": "870ed1b51daa6a029382ae7fd5b8369be318a828c2df9deef18be1341fc381d6",
   "signals": [
     {
       "type_name": "CatalogueImplSignalsError",
@@ -51,6 +51,18 @@
       ]
     },
     {
+      "type_name": "TrackBlobReader",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::merge_gate::check_strict_merge_gate",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
       "type_name": "CatalogueSpecSignalsWriter",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -70,6 +82,12 @@
     },
     {
       "type_name": "SchemaExporterPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecElementHashReader",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true

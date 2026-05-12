@@ -155,9 +155,10 @@
       "methods": [
         { "name": "new", "params": [{ "name": "track_root", "ty": "std::path::PathBuf" }, { "name": "rules_path", "ty": "std::path::PathBuf" }, { "name": "trusted_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
       ],
-      "docs": "Existing FsCatalogueLoader. Modified: internal loading switched from reading TypeCatalogueDocument directly to reading v3 CatalogueDocument and converting via v3_doc_to_stub. The CatalogueLoader port return type (BTreeMap<LayerId, TypeCatalogueDocument>) is unchanged — the conversion preserves compatibility with CatalogueLinter. Added new() method declaration to resolve SIntersectC_Mismatch_Modify Yellow (A-side inherent method map was empty, C has new()).",
+      "docs": "IN-21/IN-22: modified. FsCatalogueLoader now loads v3 CatalogueDocument natively via CatalogueDocumentCodec (v3-native). The previous v3_doc_to_stub conversion step (infrastructure::tddd::v3_stub) is deleted per IN-21. The CatalogueLoader port return type is updated to BTreeMap<LayerId, CatalogueDocument> per IN-22. Non-v3 catalogues are treated as fail-closed errors.",
       "spec_refs": [
-        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
       ],
       "informal_grounds": []
     },
@@ -180,7 +181,7 @@
       "informal_grounds": []
     },
     "InMemoryCatalogueLinter": {
-      "action": "reference",
+      "action": "modify",
       "role": "SecondaryAdapter",
       "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [
@@ -191,8 +192,10 @@
         { "name": "new", "params": [], "returns": "Self" },
         { "name": "with_disabled_rules", "params": [{ "name": "disabled_rules", "ty": "Vec<String>" }], "returns": "Self" }
       ],
-      "docs": "Pre-existing InMemoryCatalogueLinter. Referenced: the only change in this track was replacing a hand-written `impl Default` with `#[derive(Default)]`, which is structurally equivalent per ADR D9. No behavioural change; spec_refs and informal_grounds are intentionally empty for a reference entry.",
-      "spec_refs": [],
+      "docs": "IN-22 (T025): modified. T025 changes the domain CatalogueLinter::run port signature from catalogue: &TypeCatalogueDocument to catalogue: &CatalogueDocument (v3-native). This adapter's run() implementation must be updated in the same T025 commit to accept &CatalogueDocument and traverse v3 CatalogueDocument entries instead of TypeCatalogueDocument entries. The inherent new() and with_disabled_rules() constructors are unchanged.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
       "informal_grounds": []
     },
     "EdgeSet": {
@@ -379,9 +382,36 @@
           { "name": "InvalidEntry" }
         ]
       },
-      "docs": "Old codec error for TypeCatalogueDocument (schema_version=2). No new v2 files are created (v2 format retired per CN-09), but existing track directories may still contain v2 catalogue files. load_all_catalogues tries v3 first and falls back to v2; this error surfaces only when both codecs fail. Scheduled for deletion in a follow-up track when all v2 catalogue files are migrated.",
+      "docs": "IN-21 (pending deletion): Old v2 codec error for TypeCatalogueDocument (infrastructure::tddd::catalogue_codec). The entire catalogue_codec module (including decode/encode free functions and this error type) will be deleted per IN-21. Replaced by CatalogueDocumentCodecError. Referenced (not delete) pending IN-21 implementation to avoid Phase 1 DanglingId cascade.",
       "spec_refs": [
-        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "CN-09", "hash": "38dec6dd7399bdbb5094c70ef73f7d542f0c9612b3b9261fa10a7ba9ec92f962" }
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "GitShowTrackBlobReader": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "repo_root", "ty": "std::path::PathBuf" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "TrackBlobReader", "origin_crate": "usecase" },
+        { "trait_name": "SpecElementHashReader", "origin_crate": "usecase" }
+      ],
+      "methods": [
+        {
+          "name": "new",
+          "params": [{ "name": "repo_root", "ty": "std::path::PathBuf" }],
+          "returns": "Self"
+        }
+      ],
+      "docs": "T021/T022: modified. Adapter implementing TrackBlobReader and SpecElementHashReader via git-show on the local repository. T021 adds read_type_signals (reads <layer>-type-signals.json from git blob and decodes via type_signals_codec, returning BlobFetchResult<TypeSignalsDocument>). T022 changes read_type_catalogue from BlobFetchResult<(TypeCatalogueDocument, String)> to BlobFetchResult<(Vec<u8>, String)> (bytes-only — declaration_hash freshness check only; no catalogue_codec decode in the adapter). Trait method signatures are not declared in this infrastructure entry because BlobFetchResult (defined in usecase::merge_gate) is not resolvable in the infrastructure type universe — existence-only declaration per the UnresolvedTypeRef fallback rule. Only the inherent new() constructor is listed here.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
       ],
       "informal_grounds": []
     },
@@ -395,10 +425,9 @@
           { "name": "ArchRulesParse", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
           { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "std::io::Error" }] } },
           { "name": "CatalogueNotFound", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }] } },
-          { "name": "Decode", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "infrastructure::tddd::catalogue_codec::TypeCatalogueCodecError" }] } },
+          { "name": "Decode", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "CatalogueDocumentCodecError" }] } },
           { "name": "TopologicalSortFailed", "payload": { "kind": "struct", "fields": [{ "name": "cycle", "ty": "Vec<String>" }] } },
-          { "name": "InvalidLayerId", "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "String" }, { "name": "source", "ty": "domain::error::ValidationError" }] } },
-          { "name": "V3StubConversion", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } }
+          { "name": "InvalidLayerId", "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "String" }, { "name": "source", "ty": "domain::error::ValidationError" }] } }
         ]
       },
       "trait_impls": [
@@ -406,9 +435,10 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
-      "docs": "Errors surfaced by load_all_catalogues. Modified: added V3StubConversion variant (new in this track for v3→v2-stub conversion). Decode variant uses TypeCatalogueCodecError because load_all_catalogues tries v3 first and falls back to the v2 codec when v3 decode fails — existing pre-migration track directories may still have v2 catalogue files. No new v2 files are created (v2 format retired per CN-09). thiserror #[from] generates From<LoadTdddLayersError>; declared here without generic args so the signal evaluator covers it via generic-args-stripped fallback.",
+      "docs": "IN-21/IN-22: errors surfaced by load_all_catalogues. Post-T027 target state: Decode variant source type is CatalogueDocumentCodecError (migrated from TypeCatalogueCodecError in T027, same task that deletes TypeCatalogueCodecError), V3StubConversion variant deleted. thiserror #[from] generates From<LoadTdddLayersError>; declared here without generic args so the signal evaluator covers it via generic-args-stripped fallback.",
       "spec_refs": [
-        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
       ],
       "informal_grounds": []
     }
@@ -416,6 +446,48 @@
   "traits": {
   },
   "functions": {
+    "infrastructure::tddd::catalogue_codec::decode": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [{ "name": "json", "ty": "&str" }],
+      "returns": "Result<TypeCatalogueDocument, TypeCatalogueCodecError>",
+      "is_async": false,
+      "docs": "IN-21 (pending deletion): free function that decodes a JSON string into TypeCatalogueDocument (schema_version=2). The entire infrastructure::tddd::catalogue_codec module will be deleted per IN-21. Replaced by CatalogueDocumentCodec::decode. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalogue_codec::encode": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [{ "name": "doc", "ty": "&TypeCatalogueDocument" }],
+      "returns": "Result<String, TypeCatalogueCodecError>",
+      "is_async": false,
+      "docs": "IN-21 (pending deletion): free function that encodes a TypeCatalogueDocument to a JSON string (schema_version=2). The entire infrastructure::tddd::catalogue_codec module will be deleted per IN-21. Replaced by CatalogueDocumentCodec::encode. Referenced (not delete) pending IN-21 implementation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "binding", "ty": "&TdddLayerBinding" },
+        { "name": "writer", "ty": "&FsCatalogueSpecSignalsStore" }
+      ],
+      "returns": "Result<(), String>",
+      "is_async": false,
+      "docs": "IN-26: modified. Removes the v2 fallback branch from refresh_one_layer. Previously the function tried v3 decode first and fell back to the v2 catalogue_codec when schema_version was not 3. After IN-26 the function is v3-only: if CatalogueDocumentCodec::load fails (including schema_version mismatch), the function returns a fail-closed error string immediately without attempting v2 fallback.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-26", "hash": "040819b93eea9b179e432488b41d6bf7f94fd1a55e2a28776cb4ece1dfebb425" }
+      ],
+      "informal_grounds": []
+    },
     "infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer": {
       "action": "add",
       "role": "FreeFunction",
@@ -627,6 +699,36 @@
       "docs": "T008: deleted. Old validation-and-write helper in the TypeBaseline-based evaluator.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::verify_from_spec_json": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "bool",
+      "is_async": false,
+      "docs": "T022/T023: modified. Stage 2 of verify_from_spec_json is rewired from catalogue_codec::decode + v3_doc_to_stub (TypeCatalogueDocument path) to type_signals_codec::decode + check_type_signals(&TypeSignalsDocument, strict) + catalogue byte-hash freshness check (T022). The declaration_hash freshness check reads the catalogue file as raw bytes, computes the SHA-256 hash, and compares it against TypeSignalsDocument.declaration_hash; a mismatch blocks the gate (CN-11). This check is preserved even though check_type_signals no longer takes the catalogue. T023 removes the now-dead use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub and use crate::tddd::catalogue_codec imports. Actual signature: fn verify_from_spec_json(spec_json_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutcome. Params and return type omitted from catalogue declaration because VerifyOutcome (domain::verify::VerifyOutcome) is not resolvable from the infrastructure layer's type universe without an UnresolvedTypeRef; existence-only declaration per the type-designer fallback rule.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "binding", "ty": "&TdddLayerBinding" }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "is_async": false,
+      "docs": "T026/IN-25: modified. The kind_tag derivation logic inside execute_type_signals_for_layer is updated from v2-kind mapping (via v3_doc_to_stub) to direct derivation from v3 entry kind/role fields (CatalogueDocument-native). This removes the dependency on v3_doc_to_stub for kind_tag derivation. Function signature is unchanged; the modification is internal to the kind_tag match arms in the type_signals evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-25", "hash": "12ea9c3fde06c5f4eba226173e3e86159d2258fe40fe93766db73280c9c47404" }
       ],
       "informal_grounds": []
     },

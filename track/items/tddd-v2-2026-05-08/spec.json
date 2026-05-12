@@ -285,6 +285,88 @@
             "anchor": "D4"
           }
         ]
+      },
+      {
+        "id": "IN-21",
+        "text": "レガシー v1/v2 カタログ資産の削除: `infrastructure::tddd::catalogue_codec` (v2 専用カタログコーデック)、`domain::TypeCatalogueDocument` およびその v2 形状のコンパニオン型 (`TypeCatalogueEntry`、v2 の `TypeDefinitionKind` 等)、`infrastructure::tddd::v3_stub` (`v3_doc_to_stub` 関数) を削除する。コードベース全体で `use domain::TypeCatalogueDocument` / `use ...catalogue_codec` を参照するサイトをすべて移行し、v1/v2 カタログのデコードパスをゼロにする。完了・アーカイブ済みトラックは凍結されており再処理されないため、v2 コーデック削除による影響はない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/no-backward-compat.md",
+            "anchor": "Rules"
+          }
+        ]
+      },
+      {
+        "id": "IN-22",
+        "text": "すべての `<crate_name>-types.json` 消費パスが `schema_version: 3` のカタログ (`domain::tddd::catalogue_v2::CatalogueDocument`) をネイティブにデコードする。対象消費パス: コミットゲート (`infrastructure::verify::spec_states`)、マージゲートアダプター (`infrastructure::verify::merge_gate_adapter`) + `usecase::merge_gate::check_strict_merge_gate`、chain-② 検証パス群 (`infrastructure::verify::{catalogue_spec_signals, catalogue_spec_refs, plan_artifact_refs}`)、`<layer>-types.md` レンダラー (`infrastructure::track::render`)、`sotp track lint` (`apps/cli` → `FsCatalogueLoader` → `infrastructure::tddd::catalogue_bulk_loader`)。非 v3 カタログはフェイルクローズドエラーとして扱い、malformed カタログと同等に処理する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-23",
+        "text": "マージゲート / コミットゲートの Stage-2 タイプシグナルチェックをカタログ非依存化する: `domain::check_type_signals` を `TypeSignalsDocument` (`<layer>-type-signals.json` の内容) に対する純粋関数に変更し、カタログドキュメントを直接デコードしない。ゲートはカタログを `declaration_hash` 鮮度チェックのためにバイト列としてのみ読む。`check_type_signals` 内にあった既存のカバレッジチェックおよび「宣言エントリのみの Yellow フィルタ」は、`declaration_hash` の完全性保証と 3-way 11 領域不変条件 (すべての Yellow シグナルは宣言済みカタログエントリに対応する) を根拠として削除する。ADR `2026-05-11-2330` §D4 の実現。CN-11 のフェイルクローズドは次の 2 経路で維持される: (1) ゲートの `declaration_hash` バイト比較 — シグナルドキュメントは (v3) カタログのバイト列から生成されるため、改ざん / 差替え / 非 v3 カタログはバイト列が異なり `declaration_hash` 不一致でブロックされる。(2) chain-② 検証パス群 (`catalogue_spec_signals` / `catalogue_spec_refs` / `plan_artifact_refs`) は `CatalogueDocumentCodec` で v3 ネイティブデコードを行い、非 v3 カタログはデコードエラーとしてブロックされる。IN-22 の「非 v3 = フェイルクローズドエラー」は chain-② 消費パスに適用され、ゲートの Stage-2 (本 IN) は意図的にカタログをデコードしない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-24",
+        "text": "`contract-map.md` レンダリングを v3 ネイティブデコードに移行し、最小限のプレースホルダーを出力する: `v3_doc_to_stub` 経由の変換を廃止し、v3 `CatalogueDocument` を直接読んでエントリ名のリストを層ごとに出力し、詳細な v3 contract-map レンダリング (ノード形状、エッジ) は別 track に繰り延べする旨の 1 行注記を含む。クロスリファレンスエッジの再構築は行わない (OS-07 に対応)。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-25",
+        "text": "`type_signals_evaluator` の `kind_tag` 導出を v3 エントリの kind/role のみから決定するよう変更する。`v3_doc_to_stub` の v2-kind マッピング表への依存を取り除き、削除される `v3_doc_to_stub` と独立した `kind_tag` ロジックとする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+            "anchor": "2026-04-12-1200-strict-spec-signal-gate-v2_grandfathered"
+          }
+        ]
+      },
+      {
+        "id": "IN-26",
+        "text": "`catalogue_spec_signals_refresher` から v2 フォールバックブランチを削除し、v3 専用にする。v3 以外のカタログが渡された場合はフェイルクローズドエラーとして扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+            "anchor": "2026-04-12-1200-strict-spec-signal-gate-v2_grandfathered"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -344,6 +426,16 @@
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "v3 contract-map の詳細レンダリング (ノード形状 / エッジ): v3 の role / kind からノード形状・エッジを導出するレンダリング設計は、本 track では決定しない。本 track の IN-24 はエントリ名リスト + 繰り延べ注記の最小プレースホルダーのみ出力する。詳細なレンダリング設計は別 ADR・別 track で扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
             "anchor": "D1"
           }
         ]
@@ -456,6 +548,20 @@
         {
           "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
           "anchor": "D11"
+        }
+      ]
+    },
+    {
+      "id": "CN-11",
+      "text": "v3 カタログ移行においてすべてのゲートはフェイルクローズドを維持する: `<layer>-type-signals.json` の不在または読み取り不能 → BLOCKED、`declaration_hash` の不一致 → BLOCKED、非 v3 またはカタログ malformed → BLOCKED、🔴 シグナル → BLOCKED、strict=true の場合 🟡 シグナル → BLOCKED。ゲートを「わからない」状態で通過させない。IN-23 によりゲートの Stage-2 はカタログをデコードしないが、この制約は 2 経路で維持される: `declaration_hash` バイト比較がカタログ差替え / 改ざん / 非 v3 をブロックし (ゲート側)、chain-② の v3 ネイティブデコードが非 v3 カタログをデコードエラーとしてブロックする (検証パス側)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+          "anchor": "2026-04-12-1200-strict-spec-signal-gate-v2_grandfathered"
+        },
+        {
+          "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+          "anchor": "D5"
         }
       ]
     }
@@ -606,6 +712,28 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "AC-12",
+      "text": "v3 ネイティブ移行の完全性: (1) コードベース内に `catalogue_codec` / `TypeCatalogueDocument` / `v3_doc_to_stub` への参照が残っていない。(2) `check_type_signals` が `TypeSignalsDocument` を引数とする純粋関数であり、カタログを直接デコードしない。(3) コミットゲート (`verify spec-states-current`) とマージゲート (`check_strict_merge_gate`) が v3 カタログを持つ track に対して正しく評価し、フェイルクローズドを維持する: 不在 → BLOCKED、`declaration_hash` 不一致 → BLOCKED、非 v3 → BLOCKED、🔴 → BLOCKED、strict=true かつ 🟡 → BLOCKED。(4) `cargo make track-pr-merge` が v3 カタログの track で正常に動作する。(5) `cargo make ci` が pass する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-11-2330-catalogue-impl-signals-command-layering.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+          "anchor": "2026-04-12-1200-strict-spec-signal-gate-v2_grandfathered"
+        },
+        {
+          "file": "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md",
+          "anchor": "D5"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -647,7 +775,7 @@
     }
   ],
   "signals": {
-    "blue": 51,
+    "blue": 60,
     "yellow": 0,
     "red": 0
   }

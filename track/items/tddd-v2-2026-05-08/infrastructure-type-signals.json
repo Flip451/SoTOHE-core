@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-12T01:55:57Z",
-  "declaration_hash": "a9c48045ef2d6603024e7e2b828d71661934d4bfeb5faf6b135f623586d91605",
+  "generated_at": "2026-05-12T10:09:27Z",
+  "declaration_hash": "1e9adf9d51df5d371d56ce822397cd8d8c7eb13369d4d26f585a9402d8b67ba7",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
@@ -90,9 +90,29 @@
       ]
     },
     {
+      "type_name": "GitShowTrackBlobReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "SpecElementHashReader",
+        "TrackBlobReader"
+      ]
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLinter",
+        "core::default::Default"
+      ]
+    },
+    {
       "type_name": "LoadAllCataloguesError",
       "kind_tag": "error_type",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "core::convert::From",
@@ -139,6 +159,24 @@
       "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
       "kind_tag": "free_function",
       "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "yellow",
       "found_type": true
     },
     {
@@ -316,12 +354,6 @@
       "found_type": true
     },
     {
-      "type_name": "InMemoryCatalogueLinter",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
       "type_name": "SchemaExportCodecError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -330,6 +362,18 @@
     {
       "type_name": "TypeCatalogueCodecError",
       "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_codec::decode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_codec::encode",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     }

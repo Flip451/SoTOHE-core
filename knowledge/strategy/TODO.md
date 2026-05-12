@@ -1003,3 +1003,19 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
   - **追加日**: 2026-04-25
   - **由来**: `type-designer-tuning-2026-04-25` 投資調査の OS-04
 
+- [ ] **TDDD-Q05** (LOW): type-designer agent の内部 reconnaissance pipeline (`/track:type-design` skill 内の手順 2-3) が削除済みコマンド `bin/sotp track type-graph` を参照している — このコマンドは `tddd-v2-2026-05-08` の T008 (IN-13) で削除された。代替候補の `bin/sotp track three-way-signals` も `c4f8352` で `catalogue-impl-signals` にリネーム済み。type-designer の reconnaissance 手順を v3 アーキテクチャ (`catalogue-impl-signals` / 3-way evaluator) ベースに更新する。TDDD-Q03 / TDDD-Q04 は `type-graph` 前提の項目なのでこの更新で見直し対象
+  - **追加日**: 2026-05-12
+  - **由来**: `tddd-v2-2026-05-08` M5 (/track:type-design v3-native 移行) で type-designer agent が報告 (OQ-1)
+
+- [ ] **TDDD-BUG-04** (MEDIUM): `action: reference` が過剰に厳しい構造宣言を要求する — `reference` は「このトラックで変更しない型を baseline で監視する guard entry」、`modify` は「このトラックで変更する型」で意味が異なる (この 2 つを混同しない)。問題は `reference` 側: enum を `reference` で書くとカタログ検証が variant 名の列挙を求めるが、評価器は宣言した variant を C 側と構造的に厳密照合するため、variant 名だけ書いて payload を省くと「宣言と C 側が不一致」扱いで 🔴 (`SIntersectC_Mismatch_Reference`) になる → 「存在だけ確認したい / 将来削除予定で暫定的に置いておきたい」型でも payload まで全部書かされる (構造を宣言しない `plain_struct` 型 — `TypeCatalogueDocument` 等 — は `reference` のままで問題なし。影響を受けるのは構造を一部宣言せざるを得ない型のみ)。`tddd-v2-2026-05-08` の v3-native 移行で 15 variant の v1/v2 `TypeDefinitionKind` (削除予定) でこれに詰まり、やむなく `action: modify` + unit-payload placeholder (mismatch を 🟡 `SIntersectC_Mismatch_Modify` に落とす) で回避した — `modify` の意味 (変更する) と合わず意味論的に誤り、かつ削除実装時に `action: delete` 化を忘れると `SMinusC_Modify` → 🔴 になる脆さも残る。**優先修正案**: `reference` entry の構造宣言を部分宣言 (partial assertion) として扱う — 宣言した部分 (variant 名、struct field 名など) は C 側に存在し一致することを要求するが、宣言しなかった部分 (variant payload など) は照合しない (enum の `variants` 省略 ⇒ 存在のみ照合 / variant 名だけ ⇒ 存在 + 名前 / payload まで ⇒ 厳密、というスペクトルにする)。これで暫定 entry も無理なく書け、`modify` を本来の意味から外して流用する必要もなくなる。`modify` 側には逆向きの問題 (struct の `modify` が宣言 field を照合せず存在のみで Blue → TDDD-BUG-03) があり、方向は逆だが「宣言の詳細度に応じて照合の厳密さが決まるべき」点で関連する
+  - **追加日**: 2026-05-12
+  - **由来**: `tddd-v2-2026-05-08` M5 (/track:type-design v3-native 移行) で type-designer agent が報告 (OQ-2) + orchestrator の当初記述が reference/modify の意味論を混同との指摘 (2026-05-12)
+
+- [ ] **TDDD-Q06** (LOW): クロスクレート context で crate root に re-export されていない sub-module 型を関数 entry の `returns` / `params` に書くと signal evaluator が `UnresolvedTypeRef` でエラーになる — 例: usecase の関数 entry に `domain::verify::VerifyOutcome` (domain root では re-export されていない) を書くとエラー。crate root に re-export 済みの型 (`RepositoryError` 等) や対象 crate の pub API で実際に use されている型は OK。この制約はどこにも明文化されていない。修正案: (a) evaluator が `action: modify` 関数の declared-but-missing 型解決を警告 (エラーではなく) に格下げする、または (b) どの型が解決可能か明文化する (crate root re-export 済みは安全、sub-module 型は対象 crate での明示的 use が必要)
+  - **追加日**: 2026-05-12
+  - **由来**: `tddd-v2-2026-05-08` M5 (/track:type-design v3-native 移行) で type-designer agent が報告 (OQ-3)
+
+- [ ] **TDDD-Q07** (LOW): カタログ宣言を正しく書くには (特に複雑な enum payload を持つ `action: reference` / `action: modify` entry) ソースコードの読解・rustdoc 評価ロジックの理解・クロスクレート型解決ルールの知識が必要だが、convention にも type-designer agent guide にも明文化されていない — `knowledge/conventions/type-designer-kind-selection.md` か type-designer agent 定義に以下を追記する: (1) `action: reference` (このトラックで変更しない型を baseline で監視する) と `action: modify` (このトラックで変更する型) の意味の違い、および `reference` entry の構造宣言の粒度 (現状の厳密照合の制約と、`modify` を本来の意味から外して流用しないこと → TDDD-BUG-04 参照)、(2) クロスクレート宣言で解決可能にするには型を crate root に re-export する (または対象 crate の pub API で use する) 必要があること (→ TDDD-Q06)、(3) 関数 entry の generic 型パラメータは解決不可なので `params` / `returns` から省くこと
+  - **追加日**: 2026-05-12
+  - **由来**: `tddd-v2-2026-05-08` M5 (/track:type-design v3-native 移行) で type-designer agent が報告 (OQ-4)
+

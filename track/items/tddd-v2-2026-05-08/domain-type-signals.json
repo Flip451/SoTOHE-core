@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-12T01:55:55Z",
-  "declaration_hash": "e9f93cc902a4183b0ab18a0829cb872e86a762deddb80a371bf3c329d4965710",
+  "generated_at": "2026-05-12T10:09:26Z",
+  "declaration_hash": "cfcf664f904984014c96c90bd50b324685edede1a0aedd0b7ac49f7893e1fa6e",
   "signals": [
     {
       "type_name": "CatalogueDocument",
@@ -42,9 +42,15 @@
       "found_type": true
     },
     {
+      "type_name": "CatalogueLinter",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
       "type_name": "CatalogueLoader",
       "kind_tag": "secondary_port",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true
     },
     {
@@ -491,7 +497,7 @@
     {
       "type_name": "TypeDefinitionKind",
       "kind_tag": "enum",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "core::cmp::Eq",
@@ -626,6 +632,18 @@
       "found_type": true
     },
     {
+      "type_name": "domain::tddd::consistency::check_type_signals",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "domain::tddd::contract_map_render::render_contract_map",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
       "type_name": "ActionContradiction",
       "kind_tag": "value_object",
       "signal": "blue",
@@ -734,12 +752,6 @@
       "found_type": true
     },
     {
-      "type_name": "CatalogueLinter",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
       "type_name": "CatalogueLinterError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -764,14 +776,68 @@
       "found_type": true
     },
     {
+      "type_name": "EnumVariantDeclaration",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "LayerId",
       "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
     },
     {
+      "type_name": "MemberDeclaration",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "SchemaExporter",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitImplDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeAction",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignal",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     }
