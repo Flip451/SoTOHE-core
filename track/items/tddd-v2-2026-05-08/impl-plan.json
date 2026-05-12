@@ -148,12 +148,13 @@
     {
       "id": "T025",
       "description": "IN-22 + IN-24 (infrastructure/domain 層 — レンダリングパス): `infrastructure::track::render` の `<layer>-types.md` レンダラーを v3-native に移行: `v3_doc_to_stub` 経由の変換を廃止し `CatalogueDocument` を直接読んで `render_type_catalogue` に渡す (または v3 用の新しい render 関数を使う)。`domain::tddd::contract_map_render::render_contract_map` のシグネチャを `&BTreeMap<LayerId, TypeCatalogueDocument>` から `&BTreeMap<LayerId, CatalogueDocument>` に変更し (IN-24)、最小限プレースホルダー出力 (エントリ名リスト + OS-07 繰り延べ注記) を実装し、v3-native 化に伴い renderer 内の `OS-06` / `T012` 等の旧 v2 deferral 参照も削除する。`domain::tddd::catalogue_ports::CatalogueLoader::load_all` の戻り値型は `Result<(Vec<LayerId>, BTreeMap<LayerId, …>), CatalogueLoaderError>` のタプル形状を維持したまま、`BTreeMap` の値型を `TypeCatalogueDocument` から `CatalogueDocument` (v3-native) に変更する (IN-22)。`domain::tddd::catalogue_linter::CatalogueLinter::run` の `catalogue` 引数を `&CatalogueDocument` に変更する。**`infrastructure::tddd::InMemoryCatalogueLinter::run` の実装も同一コミット内で `catalogue: &CatalogueDocument` に変更し、v3 CatalogueDocument エントリの走査に対応する** (`CatalogueLinter` トレイトシグネチャ変更の全実装を atomic に更新するため)。`FsCatalogueLoader` の `v3_doc_to_stub` 変換ステップを削除し、`Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError>` のタプルをそのまま返す形に変更する。`domain-types.json` の `CatalogueLoader` / `CatalogueLinter` / `render_contract_map` エントリを修正済み状態に更新する。`infrastructure-types.json` の `FsCatalogueLoader` / `InMemoryCatalogueLinter` エントリを修正済み状態に更新する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "b31437ff42b7c6d1a08e9e2d9c9aed1bb79d3b94"
     },
     {
       "id": "T026",
       "description": "IN-25 + IN-26: (1) `infrastructure::tddd::type_signals_evaluator` の `kind_tag` 導出ロジックを v3 エントリの kind/role から直接決定するよう変更する — `v3_doc_to_stub` の v2-kind マッピングへの依存を取り除く (IN-25)。(2) `infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer` から v2 フォールバックブランチ (schema_version ≠ 3 の場合に `catalogue_codec` にフォールバックする分岐) を削除し v3-only にする — v3 以外のカタログは `CatalogueDocumentCodec::decode` の fail-closed エラーとして即座にエラーリターンする (IN-26, CN-11)。`infrastructure-types.json` の `type_signals_evaluator` / `catalogue_spec_signals_refresher::refresh_one_layer` エントリを修正済み状態に更新する。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T027",

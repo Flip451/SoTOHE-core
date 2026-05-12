@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f61196ceeea0c780f8798960ef0245e70eb7cfc61d36d50cb7542d0c4d926f69",
+  "catalogue_declaration_hash": "0cdf9e0d43ac654e28515013dc21b7fddc37ca0b385baf6898a1884c14e29a3d",
   "signals": [
     {
       "type_name": "BaselineCodecError",

@@ -206,8 +206,9 @@ pub fn execute_type_signals_for_layer(
 
     // Build item_name → kind_tag(s) map from the catalogue before `doc` is
     // consumed by `CatalogueToExtendedCrateCodec::encode`.  The signal converter
-    // uses this map so that each `TypeSignal.kind_tag` matches the v2-compat
-    // kind tag used by `check_type_signals`.
+    // uses this map so that each `TypeSignal.kind_tag` is derived directly from
+    // the v3 entry's role and kind fields (see `data_role_kind_tag`,
+    // `contract_role_kind_tag`, `function_role_kind_tag`).
     //
     // ## Multi-kind_tag support (name collision)
     //
@@ -235,7 +236,7 @@ pub fn execute_type_signals_for_layer(
         for (name, entry) in &doc.types {
             m.entry(name.as_str().to_owned())
                 .or_default()
-                .push(data_role_kind_tag_v2(entry.role, &entry.kind));
+                .push(data_role_kind_tag(entry.role, &entry.kind));
         }
         for (name, entry) in &doc.traits {
             m.entry(name.as_str().to_owned()).or_default().push(contract_role_kind_tag(entry.role));
@@ -663,24 +664,24 @@ fn worse_signal(a: ConfidenceSignal, b: ConfidenceSignal) -> ConfidenceSignal {
 // Role → kind_tag mapping helpers
 // ---------------------------------------------------------------------------
 
-/// Maps a v3 `DataRole` + `TypeKindV2` pair to the v2-compat kind_tag string
-/// used by `TypeSignal` and expected by `check_type_signals`.
+/// Maps a v3 `DataRole` + `TypeKindV2` pair to the kind_tag string written into
+/// `<layer>-type-signals.json` and consumed by `check_type_signals`.
 ///
-/// `check_type_signals` evaluates coverage against a `TypeCatalogueDocument`
-/// produced by `v3_doc_to_stub` (in `catalogue_bulk_loader`), which maps v3
-/// roles to v2 `TypeDefinitionKind` variants. The kind_tag string written in
-/// `<layer>-type-signals.json` must match what `v3_doc_to_stub` would produce
-/// for the same entry, or the coverage check will flag every v3 entry as
-/// uncovered.
+/// This function is the **authoritative definition** of the kind_tag value scheme
+/// for v3 `DataRole` entries. The kind_tag values are the historically-established
+/// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`:
 ///
-/// The mapping mirrors `data_role_to_kind` in `catalogue_bulk_loader.rs`:
-/// - `TypeKindV2::Struct { pattern: TypestateState, .. }` → `"typestate"`
+/// - `TypeKindV2::PlainStruct { typestate: Some(_), .. }` → `"typestate"`
 /// - `TypeKindV2::Enum { .. }` + `DataRole::ErrorType` → `"error_type"`
 /// - `TypeKindV2::Enum { .. }` otherwise → `"enum"`
-/// - Struct/TypeAlias: `Entity | AggregateRoot | Specification | ValueObject`
-///   → `"value_object"` (v3 does not distinguish at the v2 shape level)
-/// - All other struct/alias roles → their canonical v2 snake_case name.
-fn data_role_kind_tag_v2(role: DataRole, kind: &TypeKindV2) -> &'static str {
+/// - Struct/TypeAlias with `Entity | AggregateRoot | Specification | ValueObject`
+///   → `"value_object"` (these four roles share the same kind_tag)
+/// - All other struct/alias roles → their canonical snake_case name:
+///   `DomainService` → `"domain_service"`, `Factory` → `"factory"`,
+///   `UseCase` → `"use_case"`, `Interactor` → `"interactor"`,
+///   `Command` → `"command"`, `Query` → `"query"`, `Dto` → `"dto"`,
+///   `ErrorType` (non-enum) → `"error_type"`, `SecondaryAdapter` → `"secondary_adapter"`
+fn data_role_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
     // Typestate detection: PlainStruct with a typestate marker.
     if let TypeKindV2::PlainStruct { typestate: Some(_), .. } = kind {
         return "typestate";
@@ -707,36 +708,34 @@ fn data_role_kind_tag_v2(role: DataRole, kind: &TypeKindV2) -> &'static str {
     }
 }
 
-/// Maps a `ContractRole` (v3 catalogue trait entry role) to the v2-compat kind_tag
-/// string used in `TypeSignal` and `check_type_signals`.
+/// Maps a `ContractRole` (v3 catalogue trait entry role) to the kind_tag string
+/// written into `<layer>-type-signals.json` and consumed by `check_type_signals`.
 ///
-/// The mapping mirrors `contract_role_to_kind` in `catalogue_bulk_loader.rs`:
-/// - `SecondaryPort | SpecificationPort` → `TypeDefinitionKind::SecondaryPort`
-///   → kind_tag `"secondary_port"` (v3 has no `SpecificationPort` v2 equivalent;
-///   both collapse to `SecondaryPort` at the v2 shape level).
-/// - `ApplicationService` → `TypeDefinitionKind::ApplicationService`
-///   → kind_tag `"application_service"`.
+/// This function is the **authoritative definition** of the kind_tag value scheme
+/// for v3 `ContractRole` entries. The kind_tag values are the historically-established
+/// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`:
+///
+/// - `SpecificationPort | SecondaryPort` → `"secondary_port"`
+///   (both v3 `ContractRole` variants map to the same kind_tag; `SpecificationPort`
+///   has no distinct kind_tag at this level)
+/// - `ApplicationService` → `"application_service"`
 const fn contract_role_kind_tag(role: ContractRole) -> &'static str {
     match role {
-        // Both SpecificationPort and SecondaryPort collapse to SecondaryPort
-        // at the v2 shape level (mirrors `contract_role_to_kind` in
-        // `catalogue_bulk_loader.rs`). Using "secondary_port" here ensures
-        // `check_type_signals` coverage comparison succeeds for both roles.
         ContractRole::SpecificationPort | ContractRole::SecondaryPort => "secondary_port",
         ContractRole::ApplicationService => "application_service",
     }
 }
 
-/// Maps a `FunctionRole` (v3 catalogue function entry role) to the v2-compat kind_tag
-/// string used in `TypeSignal` and `check_type_signals`.
+/// Maps a `FunctionRole` (v3 catalogue function entry role) to the kind_tag string
+/// written into `<layer>-type-signals.json` and consumed by `check_type_signals`.
 ///
-/// The mapping mirrors `function_role_to_kind` in `catalogue_bulk_loader.rs`:
-/// all v3 `FunctionRole` variants collapse to `TypeDefinitionKind::FreeFunction`
-/// → kind_tag `"free_function"`. Using the v3 semantic name ("use_case_function")
-/// would produce a coverage mismatch against the v2 stub.
+/// This function is the **authoritative definition** of the kind_tag value scheme
+/// for v3 `FunctionRole` entries. The kind_tag value is the historically-established
+/// value grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`:
+///
+/// - All `FunctionRole` variants (`FreeFunction`, `UseCaseFunction`) → `"free_function"`
+///   (both v3 function roles share the same kind_tag)
 const fn function_role_kind_tag(_role: FunctionRole) -> &'static str {
-    // All v3 FunctionRole variants collapse to FreeFunction at the v2 shape level
-    // (mirrors `function_role_to_kind` in `catalogue_bulk_loader.rs`).
     "free_function"
 }
 

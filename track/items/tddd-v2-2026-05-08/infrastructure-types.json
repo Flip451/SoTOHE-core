@@ -508,7 +508,7 @@
       ],
       "returns": "Result<(), String>",
       "is_async": false,
-      "docs": "IN-26: modified. Removes the v2 fallback branch from refresh_one_layer. Previously the function tried v3 decode first and fell back to the v2 catalogue_codec when schema_version was not 3. After IN-26 the function is v3-only: if CatalogueDocumentCodec::load fails (including schema_version mismatch), the function returns a fail-closed error string immediately without attempting v2 fallback.",
+      "docs": "T026/IN-26: modified. v3-only, fail-closed (CN-11): the UnsupportedSchemaVersion arm and v2 catalogue_codec fallback are removed. Any CatalogueDocumentCodec decode error — including a non-v3 schema_version — propagates immediately as an error string. No v2 fallback attempted.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-26", "hash": "040819b93eea9b179e432488b41d6bf7f94fd1a55e2a28776cb4ece1dfebb425" }
       ],
@@ -752,7 +752,7 @@
       ],
       "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
       "is_async": false,
-      "docs": "T026/IN-25: modified. The kind_tag derivation logic inside execute_type_signals_for_layer is updated from v2-kind mapping (via v3_doc_to_stub) to direct derivation from v3 entry kind/role fields (CatalogueDocument-native). This removes the dependency on v3_doc_to_stub for kind_tag derivation. Function signature is unchanged; the modification is internal to the kind_tag match arms in the type_signals evaluator.",
+      "docs": "T026/IN-25: modified. The kind_tag derivation is now self-contained: data_role_kind_tag / contract_role_kind_tag / function_role_kind_tag derive kind_tag strings directly from v3 entry role and kind fields. No reference to v3_doc_to_stub remains. Function signature is unchanged.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-25", "hash": "12ea9c3fde06c5f4eba226173e3e86159d2258fe40fe93766db73280c9c47404" }
       ],

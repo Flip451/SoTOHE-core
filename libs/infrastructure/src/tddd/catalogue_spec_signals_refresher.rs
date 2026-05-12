@@ -5,9 +5,9 @@
 //! `domain::ConfidenceSignal`, `domain::ContentHash`, or
 //! `domain::evaluate_catalogue_entry_signal` directly (CN-01 / AC-03).
 //!
-//! Supports both v2 (`TypeCatalogueDocument`) and v3 (`CatalogueDocument`)
-//! catalogue formats. For both v2 and v3, per-entry signals are computed from
-//! `spec_refs[]` and `informal_grounds[]` via `evaluate_catalogue_entry_signal`.
+//! Supports v3 (`CatalogueDocument`) catalogue format only. Per-entry signals
+//! are computed from `spec_refs[]` and `informal_grounds[]` via
+//! `evaluate_catalogue_entry_signal`.
 //! The informal-priority rule (ADR `2026-04-23-0344` §D1.1) applies, with the
 //! `action: "reference"` exemption from ADR `2026-05-11-1257` D5:
 //! - `action == Reference` + both empty → Blue (baseline-implicit grounding)
@@ -15,19 +15,22 @@
 //! - `informal_grounds` empty + `spec_refs` non-empty → Blue
 //! - both empty (non-reference action) → Red
 //!
+//! Non-v3 catalogues (schema_version ≠ 3) are treated as
+//! `CatalogueDocumentCodecError::UnsupportedSchemaVersion` and returned as a
+//! fail-closed error (CN-11). No v2 fallback is attempted.
+//!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
-//! §D2 / §D3.1 / IN-09; `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5.
+//! §D2 / §D3.1 / IN-09; `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5;
+//! `2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md` D1 (CN-11).
 
 use std::path::Path;
 
-use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::{
     CatalogueSpecSignal, CatalogueSpecSignalsDocument, ConfidenceSignal, ContentHash, TrackId,
-    TypeAction, evaluate_catalogue_entry_signal,
+    evaluate_catalogue_entry_signal,
 };
 
-use crate::tddd::catalogue_codec;
-use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -139,71 +142,37 @@ pub fn refresh_one_layer(
             catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()
         });
 
-    // Try v3 codec first (CatalogueDocument); fall back to v2 (TypeCatalogueDocument)
-    // ONLY when the catalogue is confirmed to be a pre-v3 format (schema_version ≠ 3).
-    // Both formats compute per-entry signals from spec_refs[] and informal_grounds[]
-    // via evaluate_catalogue_entry_signal (informal-priority rule).
-    let signals: Vec<CatalogueSpecSignal> =
-        match CatalogueDocumentCodec::decode(text, &filename_stem) {
-            Ok(v3_doc) => {
-                // v3: enumerate all entries across the three BTreeMaps, compute
-                // per-entry signal from spec_refs / informal_grounds.
-                let mut sigs: Vec<CatalogueSpecSignal> = Vec::new();
-                for (type_name, entry) in &v3_doc.types {
-                    let signal = evaluate_catalogue_entry_signal(
-                        entry.action,
-                        &entry.spec_refs,
-                        &entry.informal_grounds,
-                    );
-                    sigs.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
-                }
-                for (trait_name, entry) in &v3_doc.traits {
-                    let signal = evaluate_catalogue_entry_signal(
-                        entry.action,
-                        &entry.spec_refs,
-                        &entry.informal_grounds,
-                    );
-                    sigs.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
-                }
-                for (fn_path, entry) in &v3_doc.functions {
-                    let signal = evaluate_catalogue_entry_signal(
-                        entry.action,
-                        &entry.spec_refs,
-                        &entry.informal_grounds,
-                    );
-                    sigs.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
-                }
-                sigs
-            }
-            // UnsupportedSchemaVersion means the file is not v3 (e.g. schema_version=2);
-            // fall back to the v2 codec to handle tracks authored before the v3 migration.
-            Err(CatalogueDocumentCodecError::UnsupportedSchemaVersion { .. }) => {
-                let catalogue = catalogue_codec::decode(text).map_err(|e| {
-                    format!("cannot decode catalogue '{}': {e}", catalogue_path.display())
-                })?;
-                catalogue
-                    .entries()
-                    .iter()
-                    .map(|entry| {
-                        let action = type_action_to_item_action(entry.action());
-                        let signal = evaluate_catalogue_entry_signal(
-                            action,
-                            entry.spec_refs(),
-                            entry.informal_grounds(),
-                        );
-                        CatalogueSpecSignal::new(entry.name(), signal)
-                    })
-                    .collect()
-            }
-            // All other v3 decode errors (InvalidEntry, CrossCrateFunctionPath,
-            // CrateNameMismatch, Json) are propagated directly so that the operator
-            // sees the actual validation failure rather than a misleading v2 schema
-            // mismatch.  Swallowing these errors (via a catch-all `Err(_)`) would
-            // obscure the root cause and make malformed v3 catalogues harder to diagnose.
-            Err(e) => {
-                return Err(format!("cannot decode catalogue '{}': {e}", catalogue_path.display()));
-            }
-        };
+    // v3-only: decode via CatalogueDocumentCodec. Any error — including
+    // UnsupportedSchemaVersion for non-v3 catalogues — is propagated directly
+    // as a fail-closed error (CN-11). No v2 fallback is attempted.
+    let v3_doc = CatalogueDocumentCodec::decode(text, &filename_stem)
+        .map_err(|e| format!("cannot decode catalogue '{}': {e}", catalogue_path.display()))?;
+
+    let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
+    for (type_name, entry) in &v3_doc.types {
+        let signal = evaluate_catalogue_entry_signal(
+            entry.action,
+            &entry.spec_refs,
+            &entry.informal_grounds,
+        );
+        signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
+    }
+    for (trait_name, entry) in &v3_doc.traits {
+        let signal = evaluate_catalogue_entry_signal(
+            entry.action,
+            &entry.spec_refs,
+            &entry.informal_grounds,
+        );
+        signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
+    }
+    for (fn_path, entry) in &v3_doc.functions {
+        let signal = evaluate_catalogue_entry_signal(
+            entry.action,
+            &entry.spec_refs,
+            &entry.informal_grounds,
+        );
+        signals.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
+    }
 
     // Compute raw-bytes SHA-256 (same canonical-hash helper as merge_gate_adapter).
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
@@ -227,20 +196,6 @@ pub fn refresh_one_layer(
         blue + yellow + red
     );
     Ok(())
-}
-
-/// Convert a v2 [`TypeAction`] to the corresponding v3 [`ItemAction`].
-///
-/// Used when computing catalogue-spec signals for a v2 `TypeCatalogueEntry` so
-/// that `evaluate_catalogue_entry_signal` (which uses the v3 `ItemAction` enum)
-/// can apply the D5 reference-action exemption correctly.
-fn type_action_to_item_action(action: TypeAction) -> ItemAction {
-    match action {
-        TypeAction::Add => ItemAction::Add,
-        TypeAction::Modify => ItemAction::Modify,
-        TypeAction::Reference => ItemAction::Reference,
-        TypeAction::Delete => ItemAction::Delete,
-    }
 }
 
 fn count_signals(signals: &[CatalogueSpecSignal]) -> (usize, usize, usize) {
