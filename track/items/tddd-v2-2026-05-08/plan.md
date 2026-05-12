@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
 
-## Tasks (20/28 resolved)
+## Tasks (21/28 resolved)
 
 ### S1 — 新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)
 
@@ -113,7 +113,7 @@
 > T021 は `TrackBlobReader` トレイトへの `read_type_signals` メソッド追加と `GitShowTrackBlobReader` への実装のみを行う。`check_type_signals` のシグネチャはまだ変更しないため、既存呼び出し元は変更せずにコンパイルが通る。
 > この先行ステップを設けることで、T022 の原子的シグネチャ切り替えが `read_type_signals` を前提として安全に行えるようになる。S11 (T020 を含む WS-B) の完了後に着手する。
 
-- [ ] **T021**: IN-22/IN-23 (usecase + infrastructure — 先行ステップ): `usecase::merge_gate::TrackBlobReader` トレイトに `read_type_signals` メソッドを追加する (`BlobFetchResult<TypeSignalsDocument>` を返す)。このトレイトメソッドにはデフォルト実装 (`BlobFetchResult::FetchError("read_type_signals not implemented".to_owned())` を返す) を付与することで、既存のテストモック (`MockTrackBlobReader` / `RecordingTrackBlobReader` / `MultiLayerMock` / `ChainTwoMock` 等 merge_gate.rs・catalogue_spec_refs.rs・catalogue_spec_signals.rs・task_completion.rs 内の全 `impl TrackBlobReader`) が本タスク単体でコンパイルを通し続けられるようにする (既存パターン: `read_enabled_layers` / `read_catalogue_for_spec_ref_check` / `read_catalogue_spec_signals_document` と同様)。`infrastructure::verify::merge_gate_adapter::GitShowTrackBlobReader` に `read_type_signals` の本実装を追加する (`<layer>-type-signals.json` を git blob から取得し `type_signals_codec` でデコードして返す)。この時点では `check_type_signals` のシグネチャは変更しない — トレイトメソッドの追加のみで `cargo make ci-rust` が通ることを確認する。`usecase-types.json` の `TrackBlobReader` エントリに `read_type_signals` メソッドを追加する (`BlobFetchResult<domain::TypeSignalsDocument>` を returns に記載)。`infrastructure-types.json` の `GitShowTrackBlobReader` エントリの `docs` を更新して T021 の追加実装を記録する (トレイトメソッドのシグネチャは `BlobFetchResult` が infrastructure 型ユニバース外のため existence-only 宣言のまま)。Layer: usecase + infrastructure。
+- [x] **T021**: IN-22/IN-23 (usecase + infrastructure — 先行ステップ): `usecase::merge_gate::TrackBlobReader` トレイトに `read_type_signals` メソッドを追加する (`BlobFetchResult<TypeSignalsDocument>` を返す)。このトレイトメソッドにはデフォルト実装 (`BlobFetchResult::FetchError("read_type_signals not implemented".to_owned())` を返す) を付与することで、既存のテストモック (`MockTrackBlobReader` / `RecordingTrackBlobReader` / `MultiLayerMock` / `ChainTwoMock` 等 merge_gate.rs・catalogue_spec_refs.rs・catalogue_spec_signals.rs・task_completion.rs 内の全 `impl TrackBlobReader`) が本タスク単体でコンパイルを通し続けられるようにする (既存パターン: `read_enabled_layers` / `read_catalogue_for_spec_ref_check` / `read_catalogue_spec_signals_document` と同様)。`infrastructure::verify::merge_gate_adapter::GitShowTrackBlobReader` に `read_type_signals` の本実装を追加する (`<layer>-type-signals.json` を git blob から取得し `type_signals_codec` でデコードして返す)。この時点では `check_type_signals` のシグネチャは変更しない — トレイトメソッドの追加のみで `cargo make ci-rust` が通ることを確認する。`usecase-types.json` の `TrackBlobReader` エントリに `read_type_signals` メソッドを追加する (`BlobFetchResult<domain::TypeSignalsDocument>` を returns に記載)。`infrastructure-types.json` の `GitShowTrackBlobReader` エントリの `docs` を更新して T021 の追加実装を記録する (トレイトメソッドのシグネチャは `BlobFetchResult` が infrastructure 型ユニバース外のため existence-only 宣言のまま)。Layer: usecase + infrastructure。
 
 ### S13 — IN-23: check_type_signals 純粋関数化 — 全呼び出し元・全実装の原子的切り替え (spec_states dead import 除去を含む)
 

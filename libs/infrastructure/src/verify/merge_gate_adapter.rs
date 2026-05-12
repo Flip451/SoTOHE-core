@@ -20,6 +20,7 @@ use std::path::PathBuf;
 
 use domain::ImplPlanDocument;
 use domain::TypeCatalogueDocument;
+use domain::TypeSignalsDocument;
 use domain::spec::SpecDocument;
 use domain::{CatalogueSpecSignalsDocument, ContentHash, SpecElementId};
 use usecase::catalogue_spec_refs::SpecElementHashReader;
@@ -342,6 +343,43 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         match crate::tddd::catalogue_spec_signals_codec::decode(&text) {
             Ok(doc) => BlobFetchResult::Found(doc),
             Err(e) => BlobFetchResult::FetchError(format!("{path}: {filename} decode error: {e}")),
+        }
+    }
+
+    /// Reads `<layer>-type-signals.json` (chain-③ signals document,
+    /// schema_version 1) from the git blob and decodes it via
+    /// `type_signals_codec`.
+    ///
+    /// The filename is derived from the layer's catalogue filename (resolved
+    /// from `architecture-rules.json`) via the same `signal_file_name_for`
+    /// rule used by `read_type_catalogue`, so that layers with a
+    /// `tddd.catalogue_file` override produce the correct signal path.
+    ///
+    /// Returns:
+    /// - `Found(doc)` when the signals file exists and decodes successfully.
+    /// - `NotFound` when the signals file is absent on the target ref.
+    /// - `FetchError(msg)` on I/O, UTF-8, or JSON decode failure.
+    fn read_type_signals(
+        &self,
+        branch: &str,
+        track_id: &str,
+        layer_id: &str,
+    ) -> BlobFetchResult<TypeSignalsDocument> {
+        let catalogue_filename = match self.resolve_catalogue_filename(branch, layer_id) {
+            Ok(name) => name,
+            Err(msg) => return BlobFetchResult::FetchError(msg),
+        };
+        let signal_filename = signal_file_name_for(&catalogue_filename);
+        let path = Self::blob_path(track_id, &signal_filename);
+        let text = match self.fetch_string::<TypeSignalsDocument>(branch, &path) {
+            Ok(s) => s,
+            Err(result) => return result,
+        };
+        match crate::tddd::type_signals_codec::decode(&text) {
+            Ok(doc) => BlobFetchResult::Found(doc),
+            Err(e) => {
+                BlobFetchResult::FetchError(format!("{path}: {signal_filename} decode error: {e}"))
+            }
         }
     }
 }
@@ -1051,6 +1089,69 @@ mod tests {
         match reader.read_spec_element_hashes("main", "foo") {
             BlobFetchResult::FetchError(_) => {}
             other => panic!("expected FetchError for non-JSON spec.json, got {other:?}"),
+        }
+    }
+
+    // --- read_type_signals ---
+
+    /// A minimal valid `<layer>-type-signals.json` payload (schema_version 1).
+    ///
+    /// `declaration_hash` is all-zeroes — valid per the codec (any 64-char
+    /// lowercase hex string is accepted; freshness checking lives in the
+    /// caller, not the codec). Used by `read_type_signals` tests that only
+    /// need successful decoding.
+    const TYPE_SIGNALS_MINIMAL: &str = r#"{
+  "schema_version": 1,
+  "generated_at": "2026-04-18T12:00:00Z",
+  "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "signals": [
+    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
+  ]
+}"#;
+
+    #[test]
+    fn test_read_type_signals_found_decodes_document() {
+        // Happy path: signals file exists and decodes correctly.
+        // `domain-types.json` → signal file name = `domain-type-signals.json`.
+        let dir = setup_repo_with_track(
+            "foo",
+            &[("domain-type-signals.json", TYPE_SIGNALS_MINIMAL.as_bytes())],
+        );
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_signals("main", "foo", "domain") {
+            BlobFetchResult::Found(doc) => {
+                assert_eq!(doc.signals().len(), 1);
+                assert_eq!(doc.signals()[0].type_name(), "TrackId");
+                assert_eq!(
+                    doc.declaration_hash(),
+                    "0000000000000000000000000000000000000000000000000000000000000000"
+                );
+            }
+            other => panic!("expected Found, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_type_signals_not_found_when_absent() {
+        // File absent on the branch → NotFound (not FetchError).
+        let dir = setup_repo_with_track("foo", &[]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(
+            matches!(reader.read_type_signals("main", "foo", "domain"), BlobFetchResult::NotFound),
+            "absent signals file must produce NotFound"
+        );
+    }
+
+    #[test]
+    fn test_read_type_signals_fetch_error_on_decode_failure() {
+        // File exists but contains invalid JSON → FetchError with decode error.
+        let dir = setup_repo_with_track("foo", &[("domain-type-signals.json", b"not valid json")]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_signals("main", "foo", "domain") {
+            BlobFetchResult::FetchError(msg) => {
+                assert!(msg.contains("decode error"), "expected decode error, got: {msg}");
+            }
+            other => panic!("expected FetchError, got {other:?}"),
         }
     }
 }

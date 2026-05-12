@@ -21,7 +21,7 @@ use domain::{
     CatalogueSpecSignalsDocument, ContentHash, ImplPlanDocument, TrackId,
     check_catalogue_spec_ref_integrity, check_catalogue_spec_signals,
 };
-use domain::{TypeCatalogueDocument, check_type_signals};
+use domain::{TypeCatalogueDocument, TypeSignalsDocument, check_type_signals};
 
 use crate::catalogue_spec_refs::SpecElementHashReader;
 
@@ -177,6 +177,33 @@ pub trait TrackBlobReader {
         _branch: &str,
     ) -> BlobFetchResult<Vec<String>> {
         BlobFetchResult::Found(Vec::new())
+    }
+
+    /// Reads and decodes `<layer>-type-signals.json` (chain-③ signals document,
+    /// schema_version 1) for the given layer on the target branch.
+    ///
+    /// Returns the decoded [`TypeSignalsDocument`] directly — the document
+    /// already carries its `declaration_hash` as a field, so no tuple is
+    /// needed. Callers (T022's Stage 2 replacement) use the `declaration_hash`
+    /// for freshness checks and the signal entries for `check_type_signals`.
+    ///
+    /// Returns:
+    /// - `Found(doc)` when the signals file exists and decodes successfully.
+    /// - `NotFound` when the signals file has not been generated yet (the layer
+    ///   has TDDD enabled but `sotp track type-signals` has not run yet, or the
+    ///   file was deleted).
+    /// - `FetchError(msg)` on I/O, UTF-8, or JSON decode failure.
+    ///
+    /// A default implementation returns `FetchError` so mocks that have not
+    /// been updated surface the gap explicitly. Infrastructure adapters
+    /// override this method. Implemented in `GitShowTrackBlobReader` in T021.
+    fn read_type_signals(
+        &self,
+        _branch: &str,
+        _track_id: &str,
+        _layer_id: &str,
+    ) -> BlobFetchResult<TypeSignalsDocument> {
+        BlobFetchResult::FetchError("read_type_signals not implemented".to_owned())
     }
 }
 
