@@ -24,6 +24,7 @@ use domain::tddd::signal_evaluator::port::SignalEvaluatorPort;
 // ThreeWaySignal is not pub-re-exported from the parent module, so it cannot be
 // reached via `use super::*` and must be imported explicitly here.
 use domain::tddd::signal_evaluator::region::{ThreeWayEvaluationReport, ThreeWaySignal};
+use domain::{SymlinkGuardError, SymlinkGuardPort};
 use rustdoc_types::{Crate, FORMAT_VERSION};
 
 use super::super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
@@ -238,6 +239,44 @@ impl TdddLayerBindingsPort for LayerNotFoundLayerBindings {
     }
 }
 
+/// No-op `SymlinkGuardPort` that always reports "no symlink found".
+///
+/// Used as the default in tests that don't exercise the symlink guard path.
+pub(super) struct NoopSymlinkGuard;
+
+impl SymlinkGuardPort for NoopSymlinkGuard {
+    fn reject_symlinks_from_root(&self, _path: &Path) -> Result<(), SymlinkGuardError> {
+        Ok(())
+    }
+
+    fn reject_symlinks_below(
+        &self,
+        _path: &Path,
+        _trusted_root: &Path,
+    ) -> Result<(), SymlinkGuardError> {
+        Ok(())
+    }
+}
+
+/// `SymlinkGuardPort` that always rejects with `SymlinkFound`.
+///
+/// Used to test that the interactor correctly propagates symlink rejection.
+pub(super) struct AlwaysRejectSymlinkGuard;
+
+impl SymlinkGuardPort for AlwaysRejectSymlinkGuard {
+    fn reject_symlinks_from_root(&self, path: &Path) -> Result<(), SymlinkGuardError> {
+        Err(SymlinkGuardError::SymlinkFound { path: path.display().to_string() })
+    }
+
+    fn reject_symlinks_below(
+        &self,
+        path: &Path,
+        _trusted_root: &Path,
+    ) -> Result<(), SymlinkGuardError> {
+        Err(SymlinkGuardError::SymlinkFound { path: path.display().to_string() })
+    }
+}
+
 // -------------------------------------------------------------------------
 // Interactor builder helper — also re-used by `happy_tests`
 // -------------------------------------------------------------------------
@@ -249,7 +288,25 @@ pub(super) fn build_interactor(
     rustdoc: Arc<dyn RustdocCratePort>,
     bindings: Arc<dyn TdddLayerBindingsPort>,
 ) -> CatalogueImplSignalsInteractor {
-    CatalogueImplSignalsInteractor::new(loader, codec, evaluator, rustdoc, bindings)
+    build_interactor_with_guard(
+        loader,
+        codec,
+        evaluator,
+        rustdoc,
+        bindings,
+        Arc::new(NoopSymlinkGuard),
+    )
+}
+
+pub(super) fn build_interactor_with_guard(
+    loader: Arc<dyn CatalogueDocumentLoaderPort>,
+    codec: Arc<dyn domain::tddd::CatalogueToExtendedCratePort>,
+    evaluator: Arc<dyn SignalEvaluatorPort>,
+    rustdoc: Arc<dyn RustdocCratePort>,
+    bindings: Arc<dyn TdddLayerBindingsPort>,
+    symlink_guard: Arc<dyn SymlinkGuardPort>,
+) -> CatalogueImplSignalsInteractor {
+    CatalogueImplSignalsInteractor::new(loader, codec, evaluator, rustdoc, bindings, symlink_guard)
 }
 
 // -------------------------------------------------------------------------
@@ -391,6 +448,25 @@ fn test_run_layer_not_found_with_layer_filter_returns_layer_bindings_load_error(
     assert!(
         matches!(err, CatalogueImplSignalsError::LayerBindingsLoad { .. }),
         "LayerNotFound must map to LayerBindingsLoad, got: {err:?}"
+    );
+}
+
+#[test]
+fn test_run_symlink_guard_rejection_returns_symlink_rejected_error() {
+    // When the injected SymlinkGuardPort always rejects, run() must return SymlinkRejected.
+    let interactor = build_interactor_with_guard(
+        Arc::new(FailingLoader),
+        Arc::new(FailingCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![] }),
+        Arc::new(AlwaysRejectSymlinkGuard),
+    );
+    let err =
+        interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
+    assert!(
+        matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }),
+        "expected SymlinkRejected from guard port, got: {err:?}"
     );
 }
 

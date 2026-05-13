@@ -168,6 +168,12 @@
       "description": "AC-12 統合確認 (end-to-end): `cargo make build-sotp` で bin/sotp を rebuild する。全 3 layer の type-signals (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3) と catalogue-spec-signals (`bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3) を再生成する。`cargo make track-sync-views` で rendered view (plan.md / domain-types.md 等) を再生成する。`cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。コードベース全体に `catalogue_codec` / `TypeCatalogueDocument` / `v3_doc_to_stub` への参照が残っていないこと (`grep` で確認)。（このステップの付随クリーンアップ: (a) `libs/` / `apps/` の doc コメントに残っていた `catalogue_codec` / `v3_stub` / `v3_doc_to_stub` / `TypeCatalogueDocument` への言及（および `// T008: ... 削除` 等の墓標コメント）を現状記述に書き換える。(b) `libs/domain/src/tddd/signals.rs`（T008 以降 `mod` 宣言が外れたまま残っていた約 3700 行の孤立 dead ファイル — 削除済みの v2 カタログ型を import していたため AC-12.1 の grep で検出された）を削除する。いずれも gate-safe — `signals.rs` はコンパイル対象外だったため削除しても挙動に影響なし。）コミットゲート (`verify spec-states-current`) とマージゲート (`check_strict_merge_gate`) が v3 catalogue の本トラックに対して正しくフェイルクローズド動作すること: 不在 → BLOCKED / declaration_hash 不一致 → BLOCKED / 非 v3 → BLOCKED / 🔴 → BLOCKED / strict=true かつ 🟡 → BLOCKED。AC-12 (4) の確認として `cargo make track-pr-merge` が v3 カタログの本トラックで正常動作すること: 本タスク (T028) の一環として `/track:review` → `/track:commit` → `/track:pr` → `cargo make track-pr-merge` の通常マージフローを実行し、マージゲートが v3 カタログに対して正しく評価してマージが完了することを確認する (T028 完了をもって AC-12 全項目が充足される)。Layer: integration。",
       "status": "done",
       "commit_hash": "4523ab0105139908044d2a3efbe47759dad669b0"
+    },
+    {
+      "id": "T029",
+      "description": "`catalogue-impl-signals` の symlink チェック I/O を domain port + infra adapter の背後に移し、usecase 層を raw filesystem I/O から解放する。具体的には: (1) 新規 `domain::SymlinkGuardPort` (secondary port — `reject_symlinks_from_root` / `reject_symlinks_below` の 2 メソッド) と `domain::SymlinkGuardError` (`SymlinkFound` / `Io` の enum) を `libs/domain/src/symlink_guard_port.rs` に追加し、`libs/domain/src/lib.rs` から `pub use` する。(2) 新規 `infrastructure::FsSymlinkGuard` adapter (`libs/infrastructure/src/track/fs_symlink_guard.rs`) を追加する — `reject_symlinks_below` は既存 `infrastructure::track::symlink_guard::reject_symlinks_below` に委譲し、`reject_symlinks_from_root` は path の全 ancestor を `symlink_metadata` でチェックする。(3) `usecase::catalogue_impl_signals::CatalogueImplSignalsInteractor::new` に 6 番目のポート `symlink_guard: Arc<dyn domain::SymlinkGuardPort>` を追加し、`helpers.rs` の `Path::symlink_metadata()` 直接呼び出しを port 経由に置き換える。(4) `apps/cli` の composition root で `FsSymlinkGuard::new()` を構築して注入し、`apps/cli` 側に残っていた standalone symlink チェックを削除する。(5) ユニットテストを追加する (`FsSymlinkGuard` の symlink 検出 / 通常パス通過; usecase 側の symlink 拒否経路; apps/cli 側の \"symlink guard\" エラーメッセージ確認)。`cargo make ci-rust` が通ることを確認する。背景: Codex PR #132 レビュー finding — T019 が `apps/cli` から `libs/usecase` へオーケストレーションを移した際に symlink チェックの fs I/O も一緒に持ち込まれた; IN-18 のレイヤリング (cli→usecase→domain, usecase に infra/fs I/O を持ち込まない) を正しく実現するための後追い修正。残る `infrastructure::track::symlink_guard` 本体の TOCTOU hardening (metadata-walk → `O_NOFOLLOW` open + inode 検証) と重複ガードの統合は別フォローアップ (`knowledge/strategy/TODO.md` の `TDDD-BUG-06`)。Layer: domain + infrastructure + usecase + apps/cli。",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -381,10 +387,12 @@
         "description": [
           "T028 は bin/sotp rebuild + signals 再生成 + `cargo make ci` 全通過でトラック全体の整合を確認する (AC-12 充足)。",
           "マージゲートとコミットゲートが v3 catalogue 環境でフェイルクローズド動作することを確認する。",
+          "T029 は Codex PR #132 レビュー finding に対処する後追い修正: T019 が usecase 層に持ち込んだ symlink チェックの raw fs I/O を domain port + infra adapter の背後に移し、IN-18 が求める cli→usecase→domain のレイヤー純粋性を正しく実現する。",
           "S15 (T027 削除タスク) 完了後に着手する。"
         ],
         "task_ids": [
-          "T028"
+          "T028",
+          "T029"
         ]
       }
     ]

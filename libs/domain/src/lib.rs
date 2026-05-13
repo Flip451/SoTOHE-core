@@ -18,6 +18,7 @@ pub mod schema;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
+pub mod symlink_guard_port;
 pub mod task_coverage;
 pub mod tddd;
 mod timestamp;
@@ -55,6 +56,7 @@ pub use spec::{
     SpecRequirement, SpecScope, SpecSection, SpecValidationError, check_spec_doc_signals,
     evaluate_requirement_signal,
 };
+pub use symlink_guard_port::{SymlinkGuardError, SymlinkGuardPort};
 pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
 pub use tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeSignal,

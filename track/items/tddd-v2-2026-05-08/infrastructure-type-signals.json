@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-13T00:08:59Z",
-  "declaration_hash": "055bafe259e7756226f4984d9ed9202522be785ced7eafb044ee7626de72a198",
+  "generated_at": "2026-05-13T04:31:29Z",
+  "declaration_hash": "e6df4eee2d35e40c4eeb9a86869e3f955172cfdf5861d5bf9a5e819e2cdaeefc",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
@@ -77,6 +77,16 @@
       "found_type": true,
       "found_items": [
         "CatalogueLoader"
+      ]
+    },
+    {
+      "type_name": "FsSymlinkGuard",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SymlinkGuardPort",
+        "core::default::Default"
       ]
     },
     {

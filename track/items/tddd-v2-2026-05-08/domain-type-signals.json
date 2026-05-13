@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-13T00:08:57Z",
-  "declaration_hash": "9d974716d6ffe6837a1cf94d84c119c930b0fe29f34f7a3afc98917955789834",
+  "generated_at": "2026-05-13T04:31:27Z",
+  "declaration_hash": "ff31171fb507d89fd008d73f89ffb3d4d65f1889bf1efe856d2529ea4c9bad9d",
   "signals": [
     {
       "type_name": "CatalogueDocument",
@@ -403,6 +403,22 @@
         "core::cmp::PartialEq",
         "core::hash::Hash"
       ]
+    },
+    {
+      "type_name": "SymlinkGuardError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SymlinkGuardPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TdddLayerBinding",

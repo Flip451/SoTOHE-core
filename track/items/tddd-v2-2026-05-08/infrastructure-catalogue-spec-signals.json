@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "055bafe259e7756226f4984d9ed9202522be785ced7eafb044ee7626de72a198",
+  "catalogue_declaration_hash": "e6df4eee2d35e40c4eeb9a86869e3f955172cfdf5861d5bf9a5e819e2cdaeefc",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -64,6 +64,10 @@
     },
     {
       "type_name": "FsContractMapWriter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsSymlinkGuard",
       "signal": "blue"
     },
     {

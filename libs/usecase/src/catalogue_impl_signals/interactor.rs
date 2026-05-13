@@ -9,15 +9,14 @@ use std::fmt::Write as FmtWrite;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use domain::SymlinkGuardPort;
 use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::catalogue_v2::{
     CatalogueDocumentLoaderPort, RustdocCratePort, TdddLayerBindingsPort,
 };
 use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeWaySignalKind};
 
-use super::helpers::{
-    reject_path_symlinks_from_root, reject_symlinks_below, validate_binding_filename,
-};
+use super::helpers::validate_binding_filename;
 use super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
 use super::validate_track_id;
 
@@ -37,6 +36,8 @@ use super::validate_track_id;
 ///   C-side live capture via `capture_current`)
 /// - `TdddLayerBindingsPort` (reads `architecture-rules.json` to enumerate layers;
 ///   keeps usecase free of `std::fs` per hexagonal-purity rule)
+/// - `SymlinkGuardPort` (symlink stat checks; keeps usecase free of direct
+///   `std::fs` I/O per hexagonal-purity rule)
 ///
 /// `apps/cli` constructs the concrete infrastructure adapters at the composition
 /// root and injects them.
@@ -48,6 +49,7 @@ pub struct CatalogueImplSignalsInteractor {
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc_crate_port: Arc<dyn RustdocCratePort>,
     layer_bindings_port: Arc<dyn TdddLayerBindingsPort>,
+    symlink_guard: Arc<dyn SymlinkGuardPort>,
 }
 
 impl CatalogueImplSignalsInteractor {
@@ -59,6 +61,7 @@ impl CatalogueImplSignalsInteractor {
         evaluator: Arc<dyn SignalEvaluatorPort>,
         rustdoc_crate_port: Arc<dyn RustdocCratePort>,
         layer_bindings_port: Arc<dyn TdddLayerBindingsPort>,
+        symlink_guard: Arc<dyn SymlinkGuardPort>,
     ) -> Self {
         Self {
             catalogue_loader,
@@ -66,6 +69,7 @@ impl CatalogueImplSignalsInteractor {
             evaluator,
             rustdoc_crate_port,
             layer_bindings_port,
+            symlink_guard,
         }
     }
 }
@@ -119,11 +123,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         // (2) Symlink walk: checking only the leaf component is insufficient because a
         //     symlink in an ancestor (e.g. `/home/user/proj` where `user` is a symlink)
         //     would redirect all I/O.  We walk every ancestor from the filesystem root
-        //     and reject any that is a symlink.
-        //
-        // Note: `std::fs` is used directly here because the symlink check cannot be
-        // delegated through a port (ports are constructed after this guard runs) and
-        // `std::fs` is part of `std`, not `infrastructure`.
+        //     and reject any that is a symlink via the injected `SymlinkGuardPort`.
         for component in workspace_root.components() {
             use std::path::Component;
             if matches!(component, Component::ParentDir) {
@@ -135,9 +135,24 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                 });
             }
         }
-        reject_path_symlinks_from_root(&workspace_root)?;
+        self.symlink_guard
+            .reject_symlinks_from_root(&workspace_root)
+            .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
 
-        // Resolve layer bindings via injected port (no std::fs in usecase beyond the guard above).
+        // Derive items directory from workspace root (convention: workspace_root/track/items).
+        // Security: check the full path from the filesystem root down to items_dir
+        // (inclusive) before any port I/O.  This catches symlinks in the intermediate
+        // `workspace_root/track` directory as well as `items_dir` itself.
+        // `reject_symlinks_from_root` already checked workspace_root above,
+        // but the components added by `.join("track").join("items")` are new and
+        // must also be free of symlinks before items_dir becomes the trusted anchor.
+        let items_dir = workspace_root.join("track").join("items");
+        self.symlink_guard
+            .reject_symlinks_from_root(&items_dir)
+            .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
+        let track_dir = items_dir.join(&track_id);
+
+        // Resolve layer bindings via injected port (no std::fs in usecase).
         let bindings = self.layer_bindings_port.load(&workspace_root, layer.as_deref()).map_err(
             |e| match e {
                 domain::tddd::catalogue_v2::TdddLayerBindingsError::LoadFailed { reason } => {
@@ -161,17 +176,6 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             return Err(CatalogueImplSignalsError::NoLayers);
         }
 
-        // Derive items directory from workspace root (convention: workspace_root/track/items).
-        let items_dir = workspace_root.join("track").join("items");
-        // Security: check the full path from the filesystem root down to items_dir
-        // (inclusive).  This catches symlinks in the intermediate
-        // `workspace_root/track` directory as well as `items_dir` itself.
-        // `reject_path_symlinks_from_root` already checked workspace_root above,
-        // but the components added by `.join("track").join("items")` are new and
-        // must also be free of symlinks before items_dir becomes the trusted anchor.
-        reject_path_symlinks_from_root(&items_dir)?;
-        let track_dir = items_dir.join(&track_id);
-
         let mut report = String::new();
 
         for binding in &bindings {
@@ -185,7 +189,9 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             let catalogue_path = track_dir.join(&binding.catalogue_file);
             // Guard: reject symlinks in any component below items_dir to prevent
             // path traversal via a malicious symlinked track directory.
-            reject_symlinks_below(&catalogue_path, &items_dir)?;
+            self.symlink_guard
+                .reject_symlinks_below(&catalogue_path, &items_dir)
+                .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
             let doc = self.catalogue_loader.load(&catalogue_path).map_err(|e| {
                 CatalogueImplSignalsError::CatalogueLoad {
                     layer_id: layer_id.clone(),
@@ -207,7 +213,9 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             validate_binding_filename(&binding.baseline_file, "baseline_file")?;
             let baseline_path = track_dir.join(&binding.baseline_file);
             // Guard: same symlink rejection for the baseline path.
-            reject_symlinks_below(&baseline_path, &items_dir)?;
+            self.symlink_guard
+                .reject_symlinks_below(&baseline_path, &items_dir)
+                .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
             let baseline_b =
                 self.rustdoc_crate_port.load_from_path(&baseline_path).map_err(|e| {
                     CatalogueImplSignalsError::BaselineLoad {

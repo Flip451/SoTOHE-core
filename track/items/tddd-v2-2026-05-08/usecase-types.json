@@ -28,12 +28,13 @@
             { "name": "ext_crate_codec", "ty": "Arc<dyn domain::tddd::CatalogueToExtendedCratePort>" },
             { "name": "evaluator", "ty": "Arc<dyn domain::tddd::signal_evaluator::SignalEvaluatorPort>" },
             { "name": "rustdoc_crate_port", "ty": "Arc<dyn domain::tddd::catalogue_v2::RustdocCratePort>" },
-            { "name": "layer_bindings_port", "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>" }
+            { "name": "layer_bindings_port", "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>" },
+            { "name": "symlink_guard", "ty": "Arc<dyn domain::SymlinkGuardPort>" }
           ],
           "returns": "Self"
         }
       ],
-      "docs": "Interactor implementing CatalogueImplSignalsService. Orchestrates per-layer A/B/C TypeGraph fetch, signal evaluator invocation, and region-by-region result formatting. Injected dependencies: CatalogueDocumentLoaderPort (A-side catalogue file load), CatalogueToExtendedCratePort (A-side CatalogueDocument → ExtendedCrate conversion), SignalEvaluatorPort (Phase 1 + Phase 2 evaluation), RustdocCratePort (B-side baseline load via load_from_path; C-side live capture via capture_current), TdddLayerBindingsPort (architecture-rules.json enumeration). apps/cli constructs the concrete infrastructure adapters (FsCatalogueDocumentLoader, CatalogueToExtendedCrateCodec, SignalEvaluatorV2, RustdocCrateAdapter, FsTdddLayerBindingsAdapter) and injects them at the composition root. [source: ADR 2026-05-11-2330 D2]",
+      "docs": "Interactor implementing CatalogueImplSignalsService. Orchestrates per-layer A/B/C TypeGraph fetch, signal evaluator invocation, and region-by-region result formatting. Injected dependencies: CatalogueDocumentLoaderPort (A-side catalogue file load), CatalogueToExtendedCratePort (A-side CatalogueDocument → ExtendedCrate conversion), SignalEvaluatorPort (Phase 1 + Phase 2 evaluation), RustdocCratePort (B-side baseline load via load_from_path; C-side live capture via capture_current), TdddLayerBindingsPort (architecture-rules.json enumeration), SymlinkGuardPort (symlink stat checks — keeps usecase free of direct std::fs I/O per hexagonal-purity rule). apps/cli constructs the concrete infrastructure adapters (FsCatalogueDocumentLoader, CatalogueToExtendedCrateCodec, SignalEvaluatorV2, RustdocCrateAdapter, FsTdddLayerBindingsAdapter, FsSymlinkGuard) and injects them at the composition root. The 6th port (SymlinkGuardPort) is the proper-layering realization that IN-18 mandates (hexagonal purity: no raw std::fs I/O in the usecase layer); surfaced by a Codex PR-review finding. [source: ADR 2026-05-11-2330 D2]",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-17", "hash": "f3302fe868e8c61ed23817d97159e9696aa2224a3942e534a4d5e94f62851127" }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9d974716d6ffe6837a1cf94d84c119c930b0fe29f34f7a3afc98917955789834",
+  "catalogue_declaration_hash": "ff31171fb507d89fd008d73f89ffb3d4d65f1889bf1efe856d2529ea4c9bad9d",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -167,6 +167,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "SymlinkGuardError",
+      "signal": "blue"
+    },
+    {
       "type_name": "TdddLayerBinding",
       "signal": "blue"
     },
@@ -320,6 +324,10 @@
     },
     {
       "type_name": "SignalEvaluatorPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SymlinkGuardPort",
       "signal": "blue"
     },
     {

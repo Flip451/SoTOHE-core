@@ -46,6 +46,7 @@ flowchart LR
         %% type: RustdocCratePortError
         %% type: SelfReceiver
         %% type: SignalRegion
+        %% type: SymlinkGuardError
         %% type: TdddLayerBinding
         %% type: TdddLayerBindingsError
         %% type: ThreeWayEvaluationReport
@@ -85,6 +86,7 @@ flowchart LR
         %% trait: RustdocCratePort
         %% trait: SchemaExporter
         %% trait: SignalEvaluatorPort
+        %% trait: SymlinkGuardPort
         %% trait: TdddLayerBindingsPort
         %% fn: domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity
         %% fn: domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals
@@ -127,6 +129,7 @@ flowchart LR
         %% type: FsCatalogueLoader
         %% type: FsCatalogueSpecSignalsStore
         %% type: FsContractMapWriter
+        %% type: FsSymlinkGuard
         %% type: FsTdddLayerBindingsAdapter
         %% type: GitShowTrackBlobReader
         %% type: InMemoryCatalogueLinter

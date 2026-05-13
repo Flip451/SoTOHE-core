@@ -15,6 +15,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
 
+use infrastructure::FsSymlinkGuard;
 use infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
 use infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter;
 use infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2;
@@ -33,9 +34,9 @@ use crate::CliError;
 /// usecase layer. Prints the returned report to stdout.
 ///
 /// The track items directory is derived from `workspace_root` as
-/// `<workspace_root>/track/items` (canonical layout). A symlink guard is
-/// applied to `workspace_root` before any I/O so that a symlinked workspace
-/// cannot redirect the architecture-rules.json load or the rustdoc build.
+/// `<workspace_root>/track/items` (canonical layout). Symlink guards are
+/// applied inside the interactor via the injected [`domain::SymlinkGuardPort`]
+/// (`FsSymlinkGuard`), keeping filesystem I/O out of the usecase layer.
 ///
 /// Exits with code 1 if any Red signals are found across all layers. Red
 /// detection is done by scanning the returned report string for the "🔴 Red"
@@ -50,58 +51,24 @@ pub fn execute_catalogue_impl_signals(
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Security: verify workspace_root is not a symlink before passing it to
-    // the interactor (which reads architecture-rules.json from workspace_root)
-    // and to RustdocCrateAdapter. A symlinked workspace root would redirect
-    // the rules load and the rustdoc build to an unintended tree. Must be
-    // checked before any I/O so the guard cannot be bypassed by a forged
-    // architecture-rules.json. Mirrors the guard formerly in three_way_signals.rs
-    // (composition-root responsibility per ADR 2026-05-11-2330 §D2).
-    match workspace_root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(CliError::Message(format!(
-                "symlink guard: refusing to follow symlink at workspace_root: {}",
-                workspace_root.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(CliError::Message(format!(
-                "symlink guard: cannot stat workspace_root {}: {e}",
-                workspace_root.display()
-            )));
-        }
-    }
-
-    // Security: also verify the derived items_dir root is not a symlink.
-    // The usecase interactor uses `workspace_root/track/items` as the trusted
-    // anchor for catalogue and baseline reads. If `track/items` is itself a
-    // symlink, all path guards anchored at items_dir would be bypassed. Check
-    // at the composition root before handing workspace_root to the interactor.
-    let derived_items_dir = workspace_root.join("track").join("items");
-    if let Ok(meta) = derived_items_dir.symlink_metadata() {
-        if meta.file_type().is_symlink() {
-            return Err(CliError::Message(format!(
-                "symlink guard: refusing to follow symlink at items_dir: {}",
-                derived_items_dir.display()
-            )));
-        }
-    }
-
     // Build the concrete adapters at the composition root (apps/cli).
     let catalogue_loader = Arc::new(FsCatalogueDocumentLoader::new());
     let ext_crate_codec = Arc::new(CatalogueToExtendedCrateCodec::new());
     let evaluator = Arc::new(SignalEvaluatorV2::new());
     let rustdoc_crate_port = Arc::new(RustdocCrateAdapter::new(workspace_root.clone()));
     let layer_bindings_port = Arc::new(FsTdddLayerBindingsAdapter::new());
+    let symlink_guard = Arc::new(FsSymlinkGuard::new());
 
     // Wire up the interactor via the usecase layer.
+    // Symlink guards are now applied inside the interactor via the injected
+    // SymlinkGuardPort (FsSymlinkGuard), keeping I/O out of the usecase layer.
     let interactor = CatalogueImplSignalsInteractor::new(
         catalogue_loader,
         ext_crate_codec,
         evaluator,
         rustdoc_crate_port,
         layer_bindings_port,
+        symlink_guard,
     );
 
     // Delegate all orchestration to the usecase interactor.

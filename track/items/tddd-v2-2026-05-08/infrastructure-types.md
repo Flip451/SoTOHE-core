@@ -37,6 +37,7 @@
 | FsCatalogueLoader | secondary_adapter | modify | impl CatalogueLoader | 🔵 | 🔵 |
 | FsCatalogueSpecSignalsStore | secondary_adapter | reference | impl CatalogueSpecSignalsWriter | 🔵 | 🔵 |
 | FsContractMapWriter | secondary_adapter | reference | impl ContractMapWriter | 🔵 | 🔵 |
+| FsSymlinkGuard | secondary_adapter | — | impl SymlinkGuardPort, impl Default | 🔵 | 🔵 |
 | FsTdddLayerBindingsAdapter | secondary_adapter | — | impl TdddLayerBindingsPort, impl Default | 🔵 | 🔵 |
 | GitShowTrackBlobReader | secondary_adapter | modify | impl TrackBlobReader, impl SpecElementHashReader | 🟡 | 🔵 |
 | InMemoryCatalogueLinter | secondary_adapter | modify | impl CatalogueLinter, impl Default | 🔵 | 🔵 |

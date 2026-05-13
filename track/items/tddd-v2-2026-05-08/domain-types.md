@@ -82,6 +82,7 @@
 | NewTypeGraphCodecError | error_type | — | InvalidTypeRef, AmbiguousTypeName | 🔵 | 🔵 |
 | Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🔵 | 🔵 |
 | RustdocCratePortError | error_type | — | NotFound, Io, ParseFailed, CaptureFailed | 🔵 | 🔵 |
+| SymlinkGuardError | error_type | — | SymlinkFound, Io | 🔵 | 🔵 |
 | TdddLayerBindingsError | error_type | — | LoadFailed, LayerNotFound, NoLayers | 🔵 | 🔵 |
 
 ## Secondary Ports
@@ -96,6 +97,7 @@
 | RustdocCratePort | secondary_port | — | fn load_from_path(&self, path: &std::path::Path) -> Result<rustdoc_types::Crate, RustdocCratePortError>, fn capture_current(&self, crate_name: &str) -> Result<rustdoc_types::Crate, RustdocCratePortError> | 🔵 | 🔵 |
 | SchemaExporter | secondary_port | reference | fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> | 🔵 | 🔵 |
 | SignalEvaluatorPort | secondary_port | — | fn evaluate(&self, a: ExtendedCrate, b: rustdoc_types::Crate, c: rustdoc_types::Crate) -> Result<ThreeWayEvaluationReport, Phase1Error> | 🔵 | 🔵 |
+| SymlinkGuardPort | secondary_port | — | fn reject_symlinks_from_root(&self, path: &std::path::Path) -> Result<(), SymlinkGuardError>, fn reject_symlinks_below(&self, path: &std::path::Path, trusted_root: &std::path::Path) -> Result<(), SymlinkGuardError> | 🔵 | 🔵 |
 | TdddLayerBindingsPort | secondary_port | — | fn load(&self, workspace_root: &std::path::Path, layer_filter: Option<&str>) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> | 🔵 | 🔵 |
 
 ## Domain Services

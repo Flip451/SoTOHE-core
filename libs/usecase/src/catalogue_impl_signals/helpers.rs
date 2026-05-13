@@ -1,52 +1,14 @@
-//! Private security helpers for path validation and symlink rejection.
+//! Pure path-validation helpers for the `catalogue-impl-signals` interactor.
 //!
-//! These helpers enforce the path-safety invariants required before any
-//! filesystem I/O in the `catalogue-impl-signals` interactor.
+//! This module contains only pure (no I/O) path-string validation. Symlink
+//! rejection has been moved behind [`domain::SymlinkGuardPort`] and is
+//! performed by the interactor via the injected port.
 
 use super::service::CatalogueImplSignalsError;
 
 // ---------------------------------------------------------------------------
 // Path security helpers
 // ---------------------------------------------------------------------------
-
-/// Rejects any symlink component in the full path from the filesystem root
-/// down to (and including) `path`.
-///
-/// This is stricter than checking only the leaf component: a symlink in any
-/// ancestor directory would redirect all I/O beneath it.  Used to validate
-/// `workspace_root` before it becomes the trusted anchor for all subsequent
-/// path derivations.
-///
-/// # Errors
-///
-/// Returns `CatalogueImplSignalsError::SymlinkRejected` if any component of
-/// `path` is a symlink.  Components that cannot be stat'd (e.g. not yet
-/// created) are skipped — only confirmed symlinks are rejected.
-pub(super) fn reject_path_symlinks_from_root(
-    path: &std::path::Path,
-) -> Result<(), CatalogueImplSignalsError> {
-    // Collect all ancestors from the root down to `path` (inclusive).
-    let mut components: Vec<&std::path::Path> = path.ancestors().collect();
-    // `ancestors()` yields leaf → root; reverse to root → leaf.
-    components.reverse();
-
-    for component in &components {
-        if component.as_os_str().is_empty() {
-            continue;
-        }
-        // Only act on successful metadata reads: if the path does not exist
-        // yet or cannot be stat'd for any reason, skip the component (it
-        // cannot be a symlink if metadata is unavailable).
-        if let Ok(meta) = component.symlink_metadata() {
-            if meta.file_type().is_symlink() {
-                return Err(CatalogueImplSignalsError::SymlinkRejected {
-                    path: component.display().to_string(),
-                });
-            }
-        }
-    }
-    Ok(())
-}
 
 /// Validates that a binding-supplied filename is a simple basename with no
 /// directory separators or `..` path-traversal components, preventing path
@@ -98,47 +60,6 @@ pub(super) fn validate_binding_filename(
             ),
         });
     }
-    Ok(())
-}
-
-/// Rejects symlinks at the leaf path and every ancestor between it and
-/// `trusted_root` (exclusive).
-///
-/// Returns `Ok(())` if no symlinks are detected.
-///
-/// # Errors
-///
-/// Returns `CatalogueImplSignalsError::SymlinkRejected` if any component of
-/// `path` below `trusted_root` is a symlink.  Components that cannot be
-/// stat'd (e.g. not yet created) are skipped — only confirmed symlinks are
-/// rejected.
-pub(super) fn reject_symlinks_below(
-    path: &std::path::Path,
-    trusted_root: &std::path::Path,
-) -> Result<(), CatalogueImplSignalsError> {
-    let mut components: Vec<&std::path::Path> = Vec::new();
-    for ancestor in path.ancestors() {
-        if ancestor == trusted_root || ancestor.as_os_str().is_empty() {
-            break;
-        }
-        components.push(ancestor);
-    }
-    // Walk root → leaf (parents first)
-    components.reverse();
-
-    for component in &components {
-        // Only act on successful metadata reads: if the path does not exist
-        // yet or cannot be stat'd for any reason, skip the component (it
-        // cannot be a symlink if metadata is unavailable).
-        if let Ok(meta) = component.symlink_metadata() {
-            if meta.file_type().is_symlink() {
-                return Err(CatalogueImplSignalsError::SymlinkRejected {
-                    path: component.display().to_string(),
-                });
-            }
-        }
-    }
-
     Ok(())
 }
 

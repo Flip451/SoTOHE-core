@@ -467,6 +467,25 @@
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
       ],
       "informal_grounds": []
+    },
+    "FsSymlinkGuard": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "unit_struct"
+      },
+      "trait_impls": [
+        { "trait_name": "SymlinkGuardPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Filesystem-backed implementation of SymlinkGuardPort. reject_symlinks_from_root walks all ancestors (root to leaf) checking each with symlink_metadata. reject_symlinks_below delegates to infrastructure::track::symlink_guard::reject_symlinks_below and maps the result to SymlinkGuardError variants. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. The proper-layering realization that IN-18 mandates (hexagonal purity: no raw std::fs I/O in the usecase layer); surfaced by a Codex PR-review finding. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {

@@ -1460,6 +1460,41 @@
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
       "informal_grounds": []
+    },
+    "SymlinkGuardError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SymlinkFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "path", "ty": "String" }]
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error returned by SymlinkGuardPort methods. SymlinkFound: a symlink component was detected at the given path. Io: a stat call failed with an unexpected I/O error. Domain-level error; placed in domain alongside SymlinkGuardPort — the proper-layering realization that IN-18 mandates (hexagonal purity: no raw std::fs I/O in the usecase layer); surfaced by a Codex PR-review finding. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -1646,6 +1681,35 @@
         }
       ],
       "docs": "Secondary port for loading TDDD layer bindings from architecture-rules.json. Injected into CatalogueImplSignalsInteractor to keep architecture-rules.json parsing in the infrastructure layer. The infrastructure adapter (FsTdddLayerBindingsAdapter) wraps load_tddd_layers_from_path. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "SymlinkGuardPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "reject_symlinks_from_root",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<(), SymlinkGuardError>",
+          "is_async": false
+        },
+        {
+          "name": "reject_symlinks_below",
+          "receiver": "&self",
+          "params": [
+            { "name": "path", "ty": "&std::path::Path" },
+            { "name": "trusted_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<(), SymlinkGuardError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Secondary port for symlink rejection checks. Abstracts filesystem symlink_metadata stat calls behind a domain port so the usecase layer (CatalogueImplSignalsInteractor) can guard paths against symlinks without importing any infrastructure crate. reject_symlinks_from_root walks the full path from root to leaf; reject_symlinks_below walks only the portion below a trusted root. Both use skip-on-not-found semantics. The proper-layering realization that IN-18 mandates (hexagonal purity: no raw std::fs I/O in the usecase layer); surfaced by a Codex PR-review finding. [source: ADR 2026-05-11-2330 D2]",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
