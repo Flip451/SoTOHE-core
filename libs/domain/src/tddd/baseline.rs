@@ -43,9 +43,7 @@ use crate::timestamp::Timestamp;
 /// Two fields are intentionally **excluded**:
 /// - `docs` — doc comments are metadata; a doc-only edit is not a structural change.
 /// - `ParamDeclaration.name` (binding name) — renaming a parameter (e.g. `id` → `user_id`)
-///   does not change the structural contract.  Only the parameter *type* is compared,
-///   consistent with the parameter-type-only matching used in `consistency::check_consistency`
-///   for free functions and in `signals.rs` forward checks.
+///   does not change the structural contract.  Only the parameter *type* is compared.
 fn methods_structurally_equal(a: &MethodDeclaration, b: &MethodDeclaration) -> bool {
     let params_match = a.params.len() == b.params.len()
         && a.params.iter().zip(b.params.iter()).all(|(pa, pb)| pa.ty == pb.ty);

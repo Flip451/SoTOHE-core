@@ -8,10 +8,10 @@
 //!
 //! ## T025: v3-native migration
 //!
-//! As of T025 the linter accepts `&CatalogueDocument` (v3 schema) instead of
-//! `&TypeCatalogueDocument`. The v3 `DataRole` / `ContractRole` / `TypeKindV2`
-//! values are converted to **v2-compatible** kind-tag strings that match the
-//! signal evaluator's storage keys (mirroring `v3_stub::data_role_to_kind`):
+//! As of T025 the linter accepts `&CatalogueDocument` (v3 schema). The v3
+//! `DataRole` / `ContractRole` / `TypeKindV2` values are converted to
+//! **v2-compatible** kind-tag strings (the grandfathered scheme) that match
+//! the signal evaluator's storage keys:
 //!
 //! Type entries (`types` BTreeMap) — kind derived from both `TypeKindV2` and
 //! `DataRole` (structural shape takes priority):
@@ -101,8 +101,8 @@ use domain::tddd::catalogue_v2::{
 
 /// Derives the v2-compatible kind tag for a v3 `TypeEntry`.
 ///
-/// Mirrors `v3_stub::data_role_to_kind` (the canonical reference) so that lint
-/// rules targeting v2 kind tags fire for v3 entries equivalently:
+/// This is a self-contained definition of the grandfathered kind-tag mapping.
+/// Lint rules targeting v2 kind tags fire for v3 entries equivalently:
 ///
 /// 1. `PlainStruct { typestate: Some(_) }` → `"typestate"`
 /// 2. `Enum { .. }` with `ErrorType` role → `"error_type"`
@@ -124,7 +124,7 @@ fn type_entry_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
 /// Maps a v3 `DataRole` to its v2-compatible kind tag string.
 ///
 /// `Entity`, `AggregateRoot`, and `Specification` collapse to `"value_object"`
-/// (matching `v3_stub::data_role_to_kind`). All other roles map 1-to-1.
+/// (v2-compatible kind-tag scheme, grandfathered). All other roles map 1-to-1.
 fn data_role_kind_tag_v2compat(role: DataRole) -> &'static str {
     match role {
         DataRole::ValueObject
@@ -146,11 +146,10 @@ fn data_role_kind_tag_v2compat(role: DataRole) -> &'static str {
 fn contract_role_kind_tag(role: ContractRole) -> &'static str {
     match role {
         // SpecificationPort collapses to "secondary_port" for lint-rule compatibility:
-        // the v2 stub (`v3_stub::contract_role_to_kind`) mapped both SecondaryPort and
-        // SpecificationPort to `TypeDefinitionKind::SecondaryPort` → kind_tag
-        // "secondary_port". Existing lint rules configured for "secondary_port" must
-        // continue to fire for SpecificationPort entries so rule behaviour is equivalent
-        // to the v2 implementation (briefing checklist requirement).
+        // both SecondaryPort and SpecificationPort map to kind_tag "secondary_port"
+        // under the v2-compatible (grandfathered) scheme. Existing lint rules
+        // configured for "secondary_port" must continue to fire for SpecificationPort
+        // entries so rule behaviour is equivalent to the v2 mapping.
         ContractRole::SpecificationPort | ContractRole::SecondaryPort => "secondary_port",
         ContractRole::ApplicationService => "application_service",
     }
@@ -159,9 +158,9 @@ fn contract_role_kind_tag(role: ContractRole) -> &'static str {
 fn function_role_kind_tag(role: FunctionRole) -> &'static str {
     match role {
         // All FunctionRole variants collapse to "free_function" for lint-rule
-        // compatibility: `v3_stub::function_role_to_kind` and `type_signals_evaluator`
-        // both map all function roles to FreeFunction → "free_function". Lint rules
-        // targeting "free_function" must continue to fire for UseCaseFunction entries.
+        // compatibility (v2-compatible grandfathered scheme): both `FreeFunction` and
+        // `UseCaseFunction` map to `"free_function"`, matching the `type_signals_evaluator`
+        // storage key. Lint rules targeting "free_function" fire for UseCaseFunction entries.
         FunctionRole::FreeFunction | FunctionRole::UseCaseFunction => "free_function",
     }
 }
@@ -390,7 +389,7 @@ impl CatalogueLinter for InMemoryCatalogueLinter {
                 // This ensures typestate structs fire `typestate` rules, enums
                 // fire `enum` or `error_type` rules (not `value_object`/role rules),
                 // and Entity/AggregateRoot/Specification entries fire `value_object`
-                // rules — mirroring the v3_stub kind mapping.
+                // rules — per the v2-compatible kind-tag scheme.
                 let kind_tag = type_entry_kind_tag(type_entry.role, &type_entry.kind);
                 // Derive members_len and variants_len from TypeKindV2 so that
                 // `expected_members` and `expected_variants` rules can fire on v3

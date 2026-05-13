@@ -1,10 +1,11 @@
 //! Shared DTO types and encode/decode helpers for `spec_refs[]` and
 //! `informal_grounds[]` grounding fields in catalogue entry types.
 //!
-//! These DTOs and helpers are shared between the v2 catalogue codec
-//! (`catalogue_codec.rs`) and the v3 catalogue codec
-//! (`catalogue_document_codec.rs`) so that the same wire format is used for
-//! both schema versions.
+//! These DTOs and helpers are used by the v3 catalogue codec
+//! (`catalogue_document_codec`): its type / trait / function entry DTOs all
+//! carry these grounding fields, and the `decode` / `encode` submodules use
+//! the conversion helpers. They are factored into this module so the same wire
+//! format is reused across the codec's entry-DTO submodules.
 //!
 //! The encode helpers produce `Vec<SpecRefDto>` / `Vec<InformalGroundRefDto>`
 //! from domain types; the decode helpers invert the transformation with error

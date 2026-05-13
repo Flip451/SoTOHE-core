@@ -13,9 +13,6 @@
 //! `knowledge/conventions/security.md`): a missing catalogue is reported as
 //! `CatalogueNotFound` rather than being silently skipped.
 //!
-//! T027: The v2 `TypeCatalogueDocument`-based `load_all_catalogues` function and
-//! its `LoadAllCataloguesError` are removed. Only `load_all_catalogues_native`
-//! (v3-native, fail-closed) and its `LoadAllCataloguesNativeError` remain.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};

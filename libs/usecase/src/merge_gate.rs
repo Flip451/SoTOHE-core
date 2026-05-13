@@ -49,7 +49,7 @@ pub enum BlobFetchResult<T> {
 /// - Mapping their native I/O errors to [`BlobFetchResult::FetchError`]
 /// - Distinguishing path-not-found from other errors (NotFound vs FetchError)
 /// - Decoding raw bytes into domain aggregates (`SpecDocument`,
-///   `TypeCatalogueDocument`)
+///   `CatalogueDocument`)
 /// - Any locale / stderr-parsing / symlink-rejection concerns that are
 ///   specific to the adapter implementation
 ///
@@ -77,10 +77,9 @@ pub trait TrackBlobReader {
     /// usecase layer. The raw bytes are carried for callers that need them;
     /// Stage 2 (`check_strict_merge_gate`) only uses the hash.
     ///
-    /// T022: The return type changed from `(TypeCatalogueDocument, String)`
-    /// (decoded document + filename) to `(Vec<u8>, String)` (raw bytes +
-    /// `declaration_hash`). Decoding the catalogue is no longer required for
-    /// Stage 2; the freshness check (`declaration_hash` comparison) is the
+    /// Returns `(raw_bytes, declaration_hash)`: the raw catalogue bytes and
+    /// their pre-computed 64-character lowercase hex SHA-256. The freshness
+    /// check (`declaration_hash` comparison against the signal file) is the
     /// only contract this port fulfills for the type-signal gate.
     fn read_type_catalogue(
         &self,
@@ -114,10 +113,9 @@ pub trait TrackBlobReader {
     /// the purpose of catalogue-spec ref integrity checking (ADR
     /// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D2.2).
     ///
-    /// T024: the return type changed from `BlobFetchResult<(TypeCatalogueDocument, String)>`
-    /// to `BlobFetchResult<(CatalogueDocument, String)>`. Infrastructure adapters
-    /// now decode via `CatalogueDocumentCodec::decode` (v3-native). Non-v3
-    /// catalogues surface as `BlobFetchResult::FetchError` (CN-11 fail-closed).
+    /// Returns the v3 `CatalogueDocument` decoded via `CatalogueDocumentCodec::decode`
+    /// alongside the 64-character lowercase hex SHA-256 of the on-disk bytes.
+    /// Non-v3 catalogues surface as `BlobFetchResult::FetchError` (CN-11 fail-closed).
     ///
     /// The `Found` variant returns `(doc, raw_bytes_sha256_hex)` where the
     /// 64-character lowercase hex SHA-256 is computed over the canonical

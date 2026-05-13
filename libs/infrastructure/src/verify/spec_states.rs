@@ -489,11 +489,9 @@ mod tests {
     // Helper: write a `<layer>-type-signals.json` (schema_version 1) whose
     // `declaration_hash` matches the on-disk bytes of the companion
     // `<layer>-types.json` file. The `signals` field is copied verbatim from
-    // the declaration file's legacy `signals` array (raw JSON) — this is
-    // independent of `catalogue_codec::decode`, which silently drops legacy
-    // inline signals. Tests that write fixture declaration files with inline
-    // signals still exercise the intended Blue/Yellow/Red paths in
-    // `check_type_signals` via the signal file.
+    // the declaration file's legacy `signals` array (raw JSON) so that fixture
+    // declaration files with inline signals still exercise the intended
+    // Blue/Yellow/Red paths in `check_type_signals` via the signal file.
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();

@@ -102,7 +102,7 @@ pub trait RefreshCatalogueSpecSignals: Send + Sync {
     ///
     /// 1. Read `<layer>-types.json` via
     ///    [`TrackBlobReader::read_catalogue_for_spec_ref_check`] to obtain
-    ///    `(TypeCatalogueDocument, String)` where the `String` is the
+    ///    `(CatalogueDocument, String)` where the `String` is the
     ///    raw-bytes SHA-256 hex used as `catalogue_declaration_hash`.
     /// 2. Evaluate per-entry signals with
     ///    [`evaluate_catalogue_entry_signal`].

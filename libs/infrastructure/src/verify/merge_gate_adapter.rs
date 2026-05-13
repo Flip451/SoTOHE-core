@@ -10,7 +10,7 @@
 //! 2. Applies strict UTF-8 decode (`String::from_utf8`) — non-UTF-8 bytes
 //!    produce `BlobFetchResult::FetchError` (fail-closed, ADR §D4).
 //! 3. Decodes the JSON into a domain aggregate via the existing
-//!    `spec::codec` / `tddd::catalogue_codec` / `track::codec` modules.
+//!    `spec::codec` / `tddd::catalogue_document_codec` / `track::codec` modules.
 //!
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D5.3.

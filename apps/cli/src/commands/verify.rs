@@ -714,8 +714,8 @@ mod tests {
     /// Writes `<dir>/<signal_name>` with a matching `declaration_hash` so the
     /// ADR 2026-04-18-1400 §D5 signal-file evaluation path accepts it.
     /// `signals` is copied verbatim from the declaration file's legacy
-    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`,
-    /// which drops inline signals during decode.
+    /// inline `signals` array (raw JSON), bypassing the catalogue decode path
+    /// that ignores that field.
     fn write_matching_signal_file(dir: &std::path::Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();

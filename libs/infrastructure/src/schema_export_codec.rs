@@ -94,9 +94,9 @@ pub enum MemberDeclarationDto {
 /// DTO mirror of `domain::tddd::catalogue::ParamDeclaration` in the
 /// schema-export context.
 ///
-/// The `Schema` prefix distinguishes this from `catalogue_codec::ParamDto`
-/// which carries L1 `::` enforcement for catalogue decode validation.
-/// `schema_export_codec` is encode-only and does not need that constraint.
+/// The `Schema` prefix avoids name collisions with the `ParamDto` types in
+/// other codecs. `schema_export_codec` is encode-only and does not apply the
+/// L1 `::` name-format enforcement used by catalogue decode paths.
 #[derive(Debug, Serialize)]
 pub struct SchemaParamDto {
     pub name: String,

@@ -1,5 +1,5 @@
 //! Renderer for the per-layer type catalogue markdown view (e.g.
-//! `domain-types.md`, a read-only view of `TypeCatalogueDocument`).
+//! `domain-types.md`, a read-only view of the v3 `CatalogueDocument`).
 //!
 //! Produces a markdown file with:
 //! - A generated-view header comment
@@ -369,8 +369,8 @@ fn v3_function_entry_details(entry: &FunctionEntry) -> String {
 
 /// Renders a v3 `CatalogueDocument` as a `<layer>-types.md` markdown view.
 ///
-/// T025: v3-native renderer — accepts `CatalogueDocument` directly without
-/// going through the v2 `TypeCatalogueDocument` stub. Entries from `types`,
+/// T025: v3-native renderer — accepts `CatalogueDocument` directly (no
+/// intermediate stub conversion). Entries from `types`,
 /// `traits`, and `functions` are merged and grouped into sections by kind tag
 /// (derived from `DataRole` / `ContractRole` / `FunctionRole`). Sections with
 /// no entries are omitted.

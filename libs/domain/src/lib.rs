@@ -56,10 +56,6 @@ pub use spec::{
     evaluate_requirement_signal,
 };
 pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
-// T008: TypeBaseline, TypeBaselineEntry, TraitBaselineEntry, FunctionBaselineEntry,
-//        TraitImplBaselineEntry removed (baseline.rs deleted).
-// T027: TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
-//        TypestateTransitionsSpec removed (v1/v2 legacy types deleted).
 pub use tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeSignal,
 };
@@ -67,17 +63,11 @@ pub use tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
     CatalogueLinterRuleError, CatalogueLinterRuleKind,
 };
-// T027: check_catalogue_spec_ref_integrity, check_catalogue_spec_signals removed
-//        (v1/v2 functions that operated on TypeCatalogueDocument deleted).
 pub use tddd::catalogue_spec_signal::{
     CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION, CatalogueSpecSignal, CatalogueSpecSignalsDocument,
     SpecRefFinding, SpecRefFindingKind, evaluate_catalogue_entry_signal,
 };
-// T008: check_consistency, ConsistencyReport, ActionContradiction removed.
-// check_type_signals is now exported from tddd::type_signals_gate.
 pub use tddd::consistency::check_type_signals;
-// T008: evaluate_type_signals, undeclared_functions_to_signals, undeclared_to_signals removed
-//        (signals.rs deleted).
 pub use tddd::type_signals_doc::{
     TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
 };

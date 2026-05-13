@@ -1,12 +1,8 @@
 //! Type catalogue — declared type entries for the per-track TDDD catalogue.
 //!
-//! This module owns the **type definitions** that remain after T027 cleanup:
-//! `EnumVariantDeclaration`, `MemberDeclaration`, and `TypeSignal`.
-//!
-//! T027: v1/v2 legacy types deleted — `TypeAction`, `TypestateTransitionsSpec`,
-//! `TypeDefinitionKind`, `TypeCatalogueEntry`, `TypeCatalogueDocument`, and
-//! `TraitImplDecl` are removed. All callers migrated to v3-native types in
-//! T021–T026.
+//! This module owns the core building-block types shared across the TDDD
+//! catalogue framework: `TypeSignal`, `MemberDeclaration`, `MethodDeclaration`,
+//! `ParamDeclaration`, and `EnumVariantDeclaration`.
 //!
 //! Historical note (T001): this file used to hold all three responsibilities in
 //! a single 2088-line module under the name `DomainType*`. The split and the
@@ -150,7 +146,7 @@ impl EnumVariantDeclaration {
     ///
     /// **Prefer `try_new` in new call sites.** This infallible variant exists
     /// for codec and render paths that have already validated the name upstream
-    /// (e.g. `catalogue_codec` rejects empty names at the JSON boundary).
+    /// (e.g. `catalogue_document_codec` rejects empty names at the JSON boundary).
     /// Passing an empty or whitespace-only name produces a value that violates
     /// the domain invariant.
     #[must_use]
@@ -238,10 +234,9 @@ impl MemberDeclaration {
 // TypeSignal
 // ---------------------------------------------------------------------------
 
-/// Per-type signal evaluation result produced by comparing a
-/// `TypeCatalogueEntry` against scanned code output.
-///
-/// Layer-neutral naming (T001, formerly `DomainTypeSignal`).
+/// Per-type signal evaluation result: the confidence signal for one catalogue
+/// entry, derived from the 3-way diff (catalogue declaration / merged baseline /
+/// live scanned code). Element type of [`crate::tddd::type_signals_doc::TypeSignalsDocument`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeSignal {
     type_name: String,

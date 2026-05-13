@@ -1,8 +1,8 @@
 //! Serde codec for the per-layer TDDD evaluation-result file
 //! (`<layer>-type-signals.json`, schema_version 1).
 //!
-//! Companion to `catalogue_codec.rs`. The declaration file (`<layer>-types.json`)
-//! stores authored type declarations; this module handles the generated
+//! The declaration file (`<layer>-types.json`) stores authored type declarations
+//! (decoded by `catalogue_document_codec`); this module handles the generated
 //! evaluation-result file introduced by
 //! `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` §D1.
 //!
@@ -12,8 +12,8 @@
 //!   for writing to `<layer>-type-signals.json`.
 //! - `decode(&str) -> Result<TypeSignalsDocument, _>` parses the same file back
 //!   and rejects unknown schema versions / unknown fields / unparseable
-//!   timestamps. Unknown `signal` strings are normalised to `Red` (consistent
-//!   with `catalogue_codec`).
+//!   timestamps. Unknown `signal` strings are normalised to `Red` (fail-safe
+//!   default for unrecognised signal values).
 //! - `declaration_hash(bytes: &[u8]) -> String` computes the SHA-256 hex
 //!   digest of the declaration file bytes *as written to disk* (post-encode).
 //!   The algorithm is pinned at schema_version 1 per
