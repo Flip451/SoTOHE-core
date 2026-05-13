@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-13T10:26:48Z",
-  "declaration_hash": "a377d33d3fa96dade5acdb2bcc4986f89e0d6733156dcf61ee8c064239de7794",
+  "generated_at": "2026-05-13T13:20:09Z",
+  "declaration_hash": "2d440af1d945bf5f3103096b6345a26d5f12ed267b35be930ce5aef2ac9a63c8",
   "signals": [
     {
       "type_name": "CatalogueImplSignalsError",
@@ -53,7 +53,7 @@
     {
       "type_name": "TrackBlobReader",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

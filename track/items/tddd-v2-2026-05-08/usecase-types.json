@@ -182,7 +182,8 @@
             { "name": "_branch", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<Vec<String>>",
-          "is_async": false
+          "is_async": false,
+          "has_default_impl": true
         },
         {
           "name": "read_catalogue_for_spec_ref_check",
@@ -193,7 +194,8 @@
             { "name": "_layer_id", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)>",
-          "is_async": false
+          "is_async": false,
+          "has_default_impl": true
         },
         {
           "name": "read_catalogue_spec_signals_document",
@@ -204,7 +206,8 @@
             { "name": "_layer_id", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>",
-          "is_async": false
+          "is_async": false,
+          "has_default_impl": true
         },
         {
           "name": "read_catalogue_spec_signal_opted_in_layers",
@@ -213,7 +216,8 @@
             { "name": "_branch", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<Vec<String>>",
-          "is_async": false
+          "is_async": false,
+          "has_default_impl": true
         },
         {
           "name": "read_type_signals",
@@ -224,10 +228,11 @@
             { "name": "_layer_id", "ty": "&str" }
           ],
           "returns": "BlobFetchResult<domain::TypeSignalsDocument>",
-          "is_async": false
+          "is_async": false,
+          "has_default_impl": true
         }
       ],
-      "docs": "Secondary port for reading track-level domain documents from an external source (git ref, filesystem). All 8 trait methods are declared here for full structural equality. Modified in T021 (read_type_signals added), T022 (read_type_catalogue return type changed to BlobFetchResult<(Vec<u8>, String)>), T024 (read_catalogue_for_spec_ref_check changed to BlobFetchResult<(CatalogueDocument, String)>). Methods with default implementations (read_enabled_layers, read_catalogue_for_spec_ref_check, read_catalogue_spec_signals_document, read_catalogue_spec_signal_opted_in_layers, read_type_signals) are declared with underscore-prefixed param names matching the trait default impl signatures. BlobFetchResult type parameters use last-segment names per L1 short-name reduction: SpecDocument, ImplPlanDocument, TypeSignalsDocument, CatalogueSpecSignalsDocument are all resolvable in usecase scope. CatalogueDocument is cross-crate and declared with its qualified path. IN-27: resolves the method count/name mismatch (partial-declaration issue) for this trait — all 8 methods are now declared. Structural equality (🔵) still requires T033 to add MethodDeclaration.has_default_impl schema/codec support, followed by T031 finalization to fill in per-method has_default_impl values. Until T033+T031 complete, this entry remains yellow due to has_body asymmetry between A-side and C-side.",
+      "docs": "Secondary port for reading track-level domain documents from an external source (git ref, filesystem). All 8 trait methods are declared here for full structural equality. Modified in T021 (read_type_signals added), T022 (read_type_catalogue return type changed to BlobFetchResult<(Vec<u8>, String)>), T024 (read_catalogue_for_spec_ref_check changed to BlobFetchResult<(CatalogueDocument, String)>). Methods with default implementations (read_enabled_layers, read_catalogue_for_spec_ref_check, read_catalogue_spec_signals_document, read_catalogue_spec_signal_opted_in_layers, read_type_signals) are declared with has_default_impl: true and underscore-prefixed param names matching the trait default impl signatures (T033 done, has_body asymmetry resolved for this entry). BlobFetchResult type parameters use last-segment names per L1 short-name reduction: SpecDocument, ImplPlanDocument, TypeSignalsDocument, CatalogueSpecSignalsDocument are all resolvable in usecase scope. CatalogueDocument is cross-crate and declared with its qualified path. IN-27: resolves the method count/name mismatch (partial-declaration issue) for this trait — all 8 methods are now declared. This entry is 🔵-equivalent pending T031 finalization (which re-verifies post-T033 changes). The remaining AC-13 blocker is check_strict_merge_gate (where_predicates gap, see Gap 3 / T035).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-20", "hash": "72c389f3e5a5d5d00814ffa689abd3c1183a623c68fe84d9743e793e4384c3c8" },
@@ -316,11 +321,18 @@
       "action": "modify",
       "role": "UseCaseFunction",
       "params": [
-        { "name": "branch", "ty": "&str" }
+        { "name": "branch", "ty": "&str" },
+        { "name": "reader", "ty": "&R" }
       ],
       "returns": "domain::verify::VerifyOutcome",
       "is_async": false,
-      "docs": "IN-23/IN-20/IN-22: Strict merge gate orchestration. Actual Rust signature: pub fn check_strict_merge_gate<R>(branch: &str, reader: &R) -> VerifyOutcome where R: TrackBlobReader + SpecElementHashReader. Modified in T022 (Stage 2 rewired to read_type_signals returning TypeSignalsDocument) and T024 (Stage 3 migrated to read_catalogue_for_spec_ref_check returning BlobFetchResult<(CatalogueDocument, String)>). The return type is domain::verify::VerifyOutcome (FQN path; L1 reduces to 'VerifyOutcome' matching C-side rustdoc). Currently yellow: A-side omits the reader param (writing 'reader: &R' causes UnresolvedTypeRef('R')) and uses empty_generics(), while C-side has 2 params and one generic param R. T034 (IN-29) adds FunctionEntry.generics, enabling the generic param R to be declared; T031 finalization then re-declares the full signature including reader param and generics. After T034+T031, this entry is expected to reach 🔵 (AC-13).",
+      "generics": [
+        {
+          "name": "R",
+          "bounds": ["TrackBlobReader", "SpecElementHashReader"]
+        }
+      ],
+      "docs": "IN-23/IN-20/IN-22: Strict merge gate orchestration. Actual Rust signature: pub fn check_strict_merge_gate<R>(branch: &str, reader: &R) -> VerifyOutcome where R: TrackBlobReader + SpecElementHashReader. Modified in T022 (Stage 2 rewired to read_type_signals returning TypeSignalsDocument) and T024 (Stage 3 migrated to read_catalogue_for_spec_ref_check returning BlobFetchResult<(CatalogueDocument, String)>). The return type is domain::verify::VerifyOutcome (FQN path; L1 reduces to 'VerifyOutcome' matching C-side rustdoc). Generics structural equality requires T035 (where-form normalization) to land first: C-side rustdoc emits `where R: TrackBlobReader + SpecElementHashReader` in where-predicate form, while A-codec emits inline bounds before T035. After T035 normalizes A-codec output to where form, post-T035+T031 re-finalization will achieve structural equality for this entry.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-20", "hash": "72c389f3e5a5d5d00814ffa689abd3c1183a623c68fe84d9743e793e4384c3c8" },
