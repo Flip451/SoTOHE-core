@@ -112,6 +112,19 @@ pub struct MethodDeclaration {
     pub returns: TypeRef,
     /// Whether this method is `async`.
     pub is_async: bool,
+    /// Whether this trait method declaration carries a default implementation
+    /// (rustdoc-flavor `provided_trait_methods`).
+    ///
+    /// `true` — the method has a default implementation provided by the trait
+    /// itself (rustdoc emits `Function.has_body = true`).
+    /// `false` — the method is required / abstract (rustdoc emits
+    /// `Function.has_body = false`).
+    ///
+    /// For struct inherent method declarations this field is conceptually not
+    /// meaningful and is always treated as `false` by the catalogue codec; the
+    /// codec forces `Function.has_body = true` for inherent methods regardless.
+    /// (ADR `2026-05-08-0248` D13)
+    pub has_default_impl: bool,
     /// Generic type parameters on this method.
     ///
     /// Populated when the method is declared with APIT (`impl Into<String>`) or
@@ -124,7 +137,8 @@ pub struct MethodDeclaration {
 }
 
 impl MethodDeclaration {
-    /// Creates a new `MethodDeclaration` with no generic parameters.
+    /// Creates a new `MethodDeclaration` with no generic parameters and
+    /// `has_default_impl: false` (default — required / abstract method).
     #[must_use]
     pub fn new(
         name: MethodName,
@@ -134,7 +148,16 @@ impl MethodDeclaration {
         is_async: bool,
         docs: Option<String>,
     ) -> Self {
-        Self { name, receiver, params, returns, is_async, generics: vec![], docs }
+        Self {
+            name,
+            receiver,
+            params,
+            returns,
+            is_async,
+            has_default_impl: false,
+            generics: vec![],
+            docs,
+        }
     }
 
     /// Creates a `MethodDeclaration` for an associated function (no `self` receiver).
@@ -150,6 +173,7 @@ impl MethodDeclaration {
             params,
             returns,
             is_async: false,
+            has_default_impl: false,
             generics: vec![],
             docs: None,
         }
@@ -450,6 +474,66 @@ mod tests {
         let returns = TypeRef::new("()").unwrap();
         let decl = MethodDeclaration::new(name, None, vec![], returns, false, None);
         assert!(decl.generics.is_empty());
+    }
+
+    #[test]
+    fn test_method_declaration_new_defaults_has_default_impl_to_false() {
+        let name = MethodName::new("op").unwrap();
+        let returns = TypeRef::new("()").unwrap();
+        let decl = MethodDeclaration::new(name, None, vec![], returns, false, None);
+        assert!(
+            !decl.has_default_impl,
+            "MethodDeclaration::new must default has_default_impl to false"
+        );
+    }
+
+    #[test]
+    fn test_method_declaration_associated_function_defaults_has_default_impl_to_false() {
+        let name = MethodName::new("new").unwrap();
+        let returns = TypeRef::new("Self").unwrap();
+        let decl = MethodDeclaration::associated_function(name, vec![], returns);
+        assert!(
+            !decl.has_default_impl,
+            "MethodDeclaration::associated_function must default has_default_impl to false"
+        );
+    }
+
+    #[test]
+    fn test_method_declaration_can_set_has_default_impl_true_for_provided_trait_method() {
+        // Per ADR 2026-05-08-0248 D13: traits with provided default impls must be
+        // expressible at the catalogue level so the A-codec can emit has_body=true.
+        let name = MethodName::new("describe").unwrap();
+        let returns = TypeRef::new("String").unwrap();
+        let mut decl = MethodDeclaration::new(
+            name,
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            returns,
+            false,
+            None,
+        );
+        decl.has_default_impl = true;
+        assert!(decl.has_default_impl);
+    }
+
+    #[test]
+    fn test_method_declaration_has_default_impl_distinguishes_otherwise_equal_methods() {
+        let name = MethodName::new("op").unwrap();
+        let returns = TypeRef::new("()").unwrap();
+        let abstract_method = MethodDeclaration::new(
+            name.clone(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            returns.clone(),
+            false,
+            None,
+        );
+        let mut provided_method = abstract_method.clone();
+        provided_method.has_default_impl = true;
+        assert_ne!(
+            abstract_method, provided_method,
+            "has_default_impl participates in MethodDeclaration equality"
+        );
     }
 
     #[test]

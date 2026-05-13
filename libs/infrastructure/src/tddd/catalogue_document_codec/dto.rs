@@ -353,6 +353,11 @@ pub(super) struct MethodDeclarationDto {
     pub(super) returns: String,
     #[serde(default)]
     pub(super) is_async: bool,
+    /// Whether this trait method declaration carries a default implementation
+    /// (`provided_trait_methods` in rustdoc). Default false for backward compatibility
+    /// with catalogues that predate this field. (ADR `2026-05-08-0248` D13)
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub(super) has_default_impl: bool,
     /// Generic type parameters on this method.
     /// Default empty for backward compatibility with catalogues that predate this field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]

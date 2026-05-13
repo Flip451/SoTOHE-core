@@ -1199,8 +1199,16 @@ impl EncoderState {
 
     /// Encodes `MethodDeclaration`s as `Function` items; returns their Ids.
     ///
-    /// `has_body` should be `true` for inherent methods (concrete implementations)
-    /// and `false` for trait method declarations (signatures only).
+    /// `force_has_body` selects how each method's `rustdoc_types::Function.has_body`
+    /// is determined:
+    /// - `true` — every method gets `has_body: true` regardless of its
+    ///   `MethodDeclaration.has_default_impl` value. Used for inherent method
+    ///   declarations (concrete implementations always have a body).
+    /// - `false` — each method's `has_body` is taken from its
+    ///   `MethodDeclaration.has_default_impl` field. Used for trait method
+    ///   declarations where required (`has_default_impl: false` → `has_body: false`)
+    ///   and provided (`has_default_impl: true` → `has_body: true`) differ per
+    ///   method. (ADR `2026-05-08-0248` D13)
     ///
     /// `parent_name` is the short name of the containing type or trait (used to build
     /// `Crate::paths` entries with path `[crate, ...module, ParentName, method_name]`).
@@ -1208,7 +1216,7 @@ impl EncoderState {
     fn encode_method_items(
         &mut self,
         methods: &[MethodDeclaration],
-        has_body: bool,
+        force_has_body: bool,
         parent_name: &str,
         parent_module_path: &ModulePath,
     ) -> Result<Vec<Id>, CatalogueToExtendedCrateCodecError> {
@@ -1328,6 +1336,9 @@ impl EncoderState {
                 Generics { params: method_generic_params, where_predicates: vec![] }
             };
 
+            // Per-method has_body: inherent methods always get true via
+            // `force_has_body`; trait methods read from `has_default_impl`.
+            let method_has_body = force_has_body || method.has_default_impl;
             let fn_item = make_item(
                 method_id,
                 Some(name.clone()),
@@ -1335,7 +1346,7 @@ impl EncoderState {
                 ItemEnum::Function(rustdoc_types::Function {
                     sig: FunctionSignature { inputs, output, is_c_variadic: false },
                     generics: method_generics,
-                    has_body,
+                    has_body: method_has_body,
                     header: FunctionHeader {
                         is_async,
                         is_const: false,
@@ -1987,6 +1998,7 @@ mod tests {
                     // TypeRef::new accepts any non-empty string; the codec rejects it at syn parse time.
                     returns: TypeRef::new("42invalid").unwrap(),
                     is_async: false,
+                    has_default_impl: false,
                     generics: vec![],
                     docs: None,
                 }],
@@ -2678,6 +2690,156 @@ mod tests {
         assert!(
             matches!(ty, Type::Generic(g) if g == "T"),
             "expected Type::Generic(\"T\") for generic param type, got: {ty:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 0248 D13: per-method `has_body` from `has_default_impl` (Gap 1)
+    // -----------------------------------------------------------------------
+
+    /// A trait method declared with `has_default_impl: true` (provided default impl)
+    /// must encode to `rustdoc_types::Function.has_body = true` so that A-side and
+    /// C-side fingerprints both emit `;body` and `structurally_equal` returns true.
+    #[test]
+    fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() {
+        let mut doc = make_doc("usecase");
+        let mut method = MethodDeclaration::new(
+            MethodName::new("describe").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("String").unwrap(),
+            false,
+            None,
+        );
+        method.has_default_impl = true;
+        doc.traits.insert(
+            TraitName::new("Describable").unwrap(),
+            TraitEntry {
+                action: ItemAction::Add,
+                role: ContractRole::SpecificationPort,
+                methods: vec![method],
+                supertrait_bounds: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            },
+        );
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let fn_item = ec
+            .krate()
+            .index
+            .values()
+            .find(|item| {
+                item.name.as_deref() == Some("describe")
+                    && matches!(item.inner, ItemEnum::Function(_))
+            })
+            .expect("expected Function item for describe");
+        let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+        assert!(
+            f.has_body,
+            "trait method with has_default_impl=true must encode has_body=true (ADR 0248 D13)"
+        );
+    }
+
+    /// A trait method declared with `has_default_impl: false` (required / abstract)
+    /// must encode to `rustdoc_types::Function.has_body = false` so that A-side and
+    /// C-side fingerprints both emit `;abstract`.
+    #[test]
+    fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false() {
+        let mut doc = make_doc("usecase");
+        let method = MethodDeclaration::new(
+            MethodName::new("required_op").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            None,
+        );
+        // has_default_impl defaults to false via MethodDeclaration::new.
+        assert!(!method.has_default_impl);
+        doc.traits.insert(
+            TraitName::new("RequiredOps").unwrap(),
+            TraitEntry {
+                action: ItemAction::Add,
+                role: ContractRole::SpecificationPort,
+                methods: vec![method],
+                supertrait_bounds: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            },
+        );
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let fn_item = ec
+            .krate()
+            .index
+            .values()
+            .find(|item| {
+                item.name.as_deref() == Some("required_op")
+                    && matches!(item.inner, ItemEnum::Function(_))
+            })
+            .expect("expected Function item for required_op");
+        let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+        assert!(
+            !f.has_body,
+            "trait method with has_default_impl=false must encode has_body=false (ADR 0248 D13)"
+        );
+    }
+
+    /// Inherent method `has_body` is forced to `true` regardless of the
+    /// `has_default_impl` field (which is not semantically meaningful for inherent
+    /// methods). This preserves the pre-D13 invariant for struct inherent impls.
+    #[test]
+    fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_impl() {
+        let mut doc = make_doc("domain");
+        // Even if the catalogue accidentally sets has_default_impl=false on an
+        // inherent method, the encoder must still emit has_body=true.
+        let method = MethodDeclaration::new(
+            MethodName::new("compute").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("u32").unwrap(),
+            false,
+            None,
+        );
+        assert!(!method.has_default_impl);
+        doc.types.insert(
+            TypeName::new("Calculator").unwrap(),
+            TypeEntry {
+                action: ItemAction::Add,
+                role: DataRole::ValueObject,
+                kind: TypeKindV2::PlainStruct {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                    typestate: None,
+                },
+                methods: vec![method],
+                trait_impls: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            },
+        );
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let fn_item = ec
+            .krate()
+            .index
+            .values()
+            .find(|item| {
+                item.name.as_deref() == Some("compute")
+                    && matches!(item.inner, ItemEnum::Function(_))
+            })
+            .expect("expected Function item for compute");
+        let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+        assert!(
+            f.has_body,
+            "inherent method must always encode has_body=true (force_has_body invariant)"
         );
     }
 }

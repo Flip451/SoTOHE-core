@@ -122,6 +122,7 @@ pub(super) fn method_decl_to_dto(m: &MethodDeclaration) -> MethodDeclarationDto 
         params: m.params.iter().map(param_decl_to_dto).collect(),
         returns: m.returns.as_str().to_owned(),
         is_async: m.is_async,
+        has_default_impl: m.has_default_impl,
         generics: m
             .generics
             .iter()

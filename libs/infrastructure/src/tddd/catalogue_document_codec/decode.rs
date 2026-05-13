@@ -375,6 +375,7 @@ pub(super) fn method_decl_from_dto(
     }
 
     let mut decl = MethodDeclaration::new(name, receiver, params, returns, dto.is_async, dto.docs);
+    decl.has_default_impl = dto.has_default_impl;
     decl.generics = generics;
     Ok(decl)
 }

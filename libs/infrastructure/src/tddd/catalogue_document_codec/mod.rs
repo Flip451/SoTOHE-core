@@ -989,6 +989,183 @@ mod tests {
         );
     }
 
+    // -----------------------------------------------------------------------
+    // ADR 0248 D13: MethodDeclaration.has_default_impl JSON round-trip (Gap 1)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_trait_method_with_has_default_impl_true_preserves_field() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "Describable": {
+      "action": "add",
+      "role": "SpecificationPort",
+      "methods": [
+        {
+          "name": "describe",
+          "receiver": "&self",
+          "params": [],
+          "returns": "String",
+          "is_async": false,
+          "has_default_impl": true
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let trait_entry = doc.traits.values().next().unwrap();
+        assert_eq!(trait_entry.methods.len(), 1);
+        assert!(
+            trait_entry.methods[0].has_default_impl,
+            "has_default_impl=true must round-trip through decode"
+        );
+    }
+
+    #[test]
+    fn test_decode_trait_method_without_has_default_impl_field_defaults_to_false() {
+        // Older catalogues that predate ADR 0248 D13 omit the field; default to false
+        // so existing required-method declarations remain correctly classified.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "RequiredOps": {
+      "action": "add",
+      "role": "SpecificationPort",
+      "methods": [
+        {
+          "name": "do_op",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "is_async": false
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let trait_entry = doc.traits.values().next().unwrap();
+        assert!(
+            !trait_entry.methods[0].has_default_impl,
+            "omitted has_default_impl must default to false"
+        );
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_has_default_impl() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "MixedTrait": {
+      "action": "add",
+      "role": "SpecificationPort",
+      "methods": [
+        {
+          "name": "required",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "provided",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "is_async": false,
+          "has_default_impl": true
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, doc2);
+        let trait_entry = doc2.traits.values().next().unwrap();
+        let required = trait_entry.methods.iter().find(|m| m.name.as_str() == "required").unwrap();
+        let provided = trait_entry.methods.iter().find(|m| m.name.as_str() == "provided").unwrap();
+        assert!(!required.has_default_impl);
+        assert!(provided.has_default_impl);
+    }
+
+    #[test]
+    fn test_decode_trait_method_with_has_default_impl_true_omits_default_false_on_encode() {
+        // `has_default_impl: false` is the JSON default and must be omitted on encode
+        // (skip_serializing_if). Only `true` should appear in the rendered JSON.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "MixedTrait": {
+      "action": "add",
+      "role": "SpecificationPort",
+      "methods": [
+        {
+          "name": "required",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "provided",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "is_async": false,
+          "has_default_impl": true
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        // The required method must NOT carry has_default_impl in the rendered JSON.
+        // The provided method MUST carry it.
+        assert!(
+            encoded.contains("\"name\": \"provided\""),
+            "expected 'provided' method in encoded JSON: {encoded}"
+        );
+        let provided_idx = encoded.find("\"name\": \"provided\"").unwrap();
+        let provided_slice = &encoded[provided_idx..];
+        let next_method_idx =
+            provided_slice[1..].find("\"name\":").map_or(provided_slice.len(), |i| i + 1);
+        let provided_block = &provided_slice[..next_method_idx];
+        assert!(
+            provided_block.contains("\"has_default_impl\": true"),
+            "provided method block must contain has_default_impl=true: {provided_block}"
+        );
+        let required_idx = encoded.find("\"name\": \"required\"").unwrap();
+        let required_slice = &encoded[required_idx..];
+        let next_after_required =
+            required_slice[1..].find("\"name\":").map_or(required_slice.len(), |i| i + 1);
+        let required_block = &required_slice[..next_after_required];
+        assert!(
+            !required_block.contains("has_default_impl"),
+            "required method block must omit has_default_impl when false: {required_block}"
+        );
+    }
+
     #[test]
     fn test_decode_function_with_no_crate_prefix_returns_cross_crate_error() {
         let json = r#"{

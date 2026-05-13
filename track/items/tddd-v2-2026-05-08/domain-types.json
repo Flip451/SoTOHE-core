@@ -452,6 +452,7 @@
           { "name": "params", "ty": "Vec<ParamDeclaration>" },
           { "name": "returns", "ty": "TypeRef" },
           { "name": "is_async", "ty": "bool" },
+          { "name": "has_default_impl", "ty": "bool" },
           { "name": "generics", "ty": "Vec<MethodGenericParam>" },
           { "name": "docs", "ty": "Option<String>" }
         ]
