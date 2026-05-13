@@ -2,7 +2,7 @@
 
 > **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
 > **作成日**: 2026-03-11
-> **最終更新**: 2026-04-25
+> **最終更新**: 2026-05-13
 > **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
 > **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
 > **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
@@ -1018,4 +1018,8 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **TDDD-Q07** (LOW): カタログ宣言を正しく書くには (特に複雑な enum payload を持つ `action: reference` / `action: modify` entry) ソースコードの読解・rustdoc 評価ロジックの理解・クロスクレート型解決ルールの知識が必要だが、convention にも type-designer agent guide にも明文化されていない — `knowledge/conventions/type-designer-kind-selection.md` か type-designer agent 定義に以下を追記する: (1) `action: reference` (このトラックで変更しない型を baseline で監視する) と `action: modify` (このトラックで変更する型) の意味の違い、および `reference` entry の構造宣言の粒度 (現状の厳密照合の制約と、`modify` を本来の意味から外して流用しないこと → TDDD-BUG-04 参照)、(2) クロスクレート宣言で解決可能にするには型を crate root に re-export する (または対象 crate の pub API で use する) 必要があること (→ TDDD-Q06)、(3) 関数 entry の generic 型パラメータは解決不可なので `params` / `returns` から省くこと
   - **追加日**: 2026-05-12
   - **由来**: `tddd-v2-2026-05-08` M5 (/track:type-design v3-native 移行) で type-designer agent が報告 (OQ-4)
+
+- [ ] **TDDD-BUG-05** (MEDIUM): `<layer>-type-signals.json` の `signals` 配列に完全性ガードが無く、手で書き換えればコミット/マージゲートの Red/Yellow をすり抜けられる — `declaration_hash` はカタログ (`<layer>-types.json`) のバイト列の SHA-256 のみを対象とするため、カタログを変えずに `<layer>-type-signals.json` の `signals` 配列だけ書き換える (Red/Yellow エントリを削除 or Blue に変える) と `declaration_hash` 照合は通り、ゲート (`verify spec-states-current` / `check_strict_merge_gate`) が改竄後の signals を読んで素通しする。T022 で `check_type_signals` を `(&TypeSignalsDocument, bool)` に純粋化した際、pre-T022 にあったカタログ ↔ signals のカバレッジ・クロスチェック (宣言済みエントリに対応 signal が無ければ検出) も同時に消えており、これがあれば少なくとも「エントリ削除」は捕捉できた (色の付け替えは元々素通り)。`consistency.rs` のモジュール doc は「`declaration_hash` 鮮度チェックが coverage gap を不可能にする」と書いているが、これは「signals ファイルは `sotp track type-signals` 以外が絶対に書かない」という暗黙前提に乗っている。**脅威モデル**: 突くには `track-commit-message` (step 1 で signals を再生成して改竄を上書きする) を迂回する必要がある — `block-direct-git-ops` フックは Claude Code ツール経由の生 `git commit` を弾くが、人間が端末で commit すれば通る。CI も `verify spec-states-current` で committed signals を読むだけ (再生成しない)、マージゲートも committed blob を読むだけなので、一度コミットされた改竄 signals は再検証されない。**修正案 (B 推奨)**: CI で `sotp track type-signals` を in-memory 再生成し、committed `<layer>-type-signals.json` の `signals` + `declaration_hash` と突き合わせ (`generated_at` は無視)、不一致なら FAIL する新コマンド (`sotp track verify-type-signals-fresh` 等) を追加して `cargo make ci` に組み込む — これが「signals 配列が evaluator の正規出力か」を検証する唯一の手段 (再計算なしには検証不能。鍵なし checksum は攻撃者が再計算できるので無効、三重ハッシュも入力を固定するだけで出力対応は検証できない)。注意: rustdoc バージョン依存で false positive が出ないよう CI と `track-commit-message` が同一 toolchain (Docker tools コンテナ) を使うこと + evaluator が rustdoc の `id` 採番等に依存しない (構造比較である) ことを再確認。**修正案 (A 部分対策)**: ゲート呼び出し側にカバレッジ・クロスチェックを復活 (カタログ + signals の両方を持って「全カタログエントリに対応 signal あり / orphan signal なし」を検証) — エントリ削除は捕捉、色の付け替えは素通り。安いが部分的。`check_type_signals` の純粋性は維持できるが、マージゲートが「カタログをバイト列としてのみ読む」(T024 の簡素化) を一部巻き戻す。同種の問題に TDDD-BUG-03 (struct `modify` が存在チェックのみで Blue) があり、方向は違うが「signals がコードの実態と一致しているか」の保証が弱い点で関連
+  - **追加日**: 2026-05-13
+  - **由来**: `tddd-v2-2026-05-08` M10 (/track:pr-review) の Codex finding (`consistency.rs` の coverage validation 復元要求) + ユーザーとの議論で valid と確認 (2026-05-13)。本トラック (`tddd-v2-2026-05-08`) はカタログ*スキーマ*移行 (v1/v2 → v3 `CatalogueDocument`) が範囲で、トラックとブランチが密結合のため新トラックの予約はこのブランチからできない → 後続トラックで案 B の方針で処理する
 
