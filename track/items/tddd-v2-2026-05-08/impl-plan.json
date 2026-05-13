@@ -166,7 +166,8 @@
     {
       "id": "T028",
       "description": "AC-12 統合確認 (end-to-end): `cargo make build-sotp` で bin/sotp を rebuild する。全 3 layer の type-signals (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3) と catalogue-spec-signals (`bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3) を再生成する。`cargo make track-sync-views` で rendered view (plan.md / domain-types.md 等) を再生成する。`cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。コードベース全体に `catalogue_codec` / `TypeCatalogueDocument` / `v3_doc_to_stub` への参照が残っていないこと (`grep` で確認)。（このステップの付随クリーンアップ: (a) `libs/` / `apps/` の doc コメントに残っていた `catalogue_codec` / `v3_stub` / `v3_doc_to_stub` / `TypeCatalogueDocument` への言及（および `// T008: ... 削除` 等の墓標コメント）を現状記述に書き換える。(b) `libs/domain/src/tddd/signals.rs`（T008 以降 `mod` 宣言が外れたまま残っていた約 3700 行の孤立 dead ファイル — 削除済みの v2 カタログ型を import していたため AC-12.1 の grep で検出された）を削除する。いずれも gate-safe — `signals.rs` はコンパイル対象外だったため削除しても挙動に影響なし。）コミットゲート (`verify spec-states-current`) とマージゲート (`check_strict_merge_gate`) が v3 catalogue の本トラックに対して正しくフェイルクローズド動作すること: 不在 → BLOCKED / declaration_hash 不一致 → BLOCKED / 非 v3 → BLOCKED / 🔴 → BLOCKED / strict=true かつ 🟡 → BLOCKED。AC-12 (4) の確認として `cargo make track-pr-merge` が v3 カタログの本トラックで正常動作すること: 本タスク (T028) の一環として `/track:review` → `/track:commit` → `/track:pr` → `cargo make track-pr-merge` の通常マージフローを実行し、マージゲートが v3 カタログに対して正しく評価してマージが完了することを確認する (T028 完了をもって AC-12 全項目が充足される)。Layer: integration。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "4523ab0105139908044d2a3efbe47759dad669b0"
     }
   ],
   "plan": {
