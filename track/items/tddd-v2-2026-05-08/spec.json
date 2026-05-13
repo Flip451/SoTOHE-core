@@ -367,6 +367,20 @@
             "anchor": "2026-04-12-1200-strict-spec-signal-gate-v2_grandfathered"
           }
         ]
+      },
+      {
+        "id": "IN-27",
+        "text": "signal_evaluator_v2 がカタログ由来の外部クレート修飾 TypeRef を突合する際に、A (`ExtendedCrate`) および/または S を C (`rustdoc_types::Crate`) が foreign 参照を表現する shape に合わせる (`Crate::external_crates` / `Crate::paths` の `crate_id != 0` エントリ / `Type::ResolvedPath { id, .. }` の foreign item 参照形)。これにより、catalogue がクロスクレート参照型 (例: `BlobFetchResult<domain::tddd::type_signals_doc::TypeSignalsDocument>` 戻り型のメソッド) を FQN で宣言したエントリが `action: modify` でも 🔵 と評価される。別レイヤーの rustdoc は読み込まず、`SignalEvaluatorPort::evaluate(a, b, c)` の 3 入力シグネチャ (ADR `2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md` D5) は変えない。具体的な alignment 機構 (A/S の構築時に完結させるか、C 側に正規化ステップを設けるか) は ADR `2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md` D9 の先例に従い実装段階で決定する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D13"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D5"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -734,6 +748,16 @@
           "anchor": "D5"
         }
       ]
+    },
+    {
+      "id": "AC-13",
+      "text": "IN-27 の実現により、catalogue がクロスクレート参照型を含むメソッド/関数を FQN で宣言した legitimate なエントリが strict merge gate で 🔵 と評価され、`cargo make track-pr-merge` がブロックされずに通過する。具体的には現在 🟡 となっている `TrackBlobReader` / `check_strict_merge_gate` / `GitShowTrackBlobReader` / `verify_from_spec_json` の 4 エントリが 🔵 となる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+          "anchor": "D13"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -775,7 +799,7 @@
     }
   ],
   "signals": {
-    "blue": 60,
+    "blue": 62,
     "yellow": 0,
     "red": 0
   }

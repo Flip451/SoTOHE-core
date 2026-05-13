@@ -174,6 +174,18 @@
       "description": "`catalogue-impl-signals` の symlink チェック I/O を domain port + infra adapter の背後に移し、usecase 層を raw filesystem I/O から解放する。具体的には: (1) 新規 `domain::SymlinkGuardPort` (secondary port — `reject_symlinks_from_root` / `reject_symlinks_below` の 2 メソッド) と `domain::SymlinkGuardError` (`SymlinkFound` / `Io` の enum) を `libs/domain/src/symlink_guard_port.rs` に追加し、`libs/domain/src/lib.rs` から `pub use` する。(2) 新規 `infrastructure::FsSymlinkGuard` adapter (`libs/infrastructure/src/track/fs_symlink_guard.rs`) を追加する — `reject_symlinks_below` は既存 `infrastructure::track::symlink_guard::reject_symlinks_below` に委譲し、`reject_symlinks_from_root` は path の全 ancestor を `symlink_metadata` でチェックする。(3) `usecase::catalogue_impl_signals::CatalogueImplSignalsInteractor::new` に 6 番目のポート `symlink_guard: Arc<dyn domain::SymlinkGuardPort>` を追加し、`helpers.rs` の `Path::symlink_metadata()` 直接呼び出しを port 経由に置き換える。(4) `apps/cli` の composition root で `FsSymlinkGuard::new()` を構築して注入し、`apps/cli` 側に残っていた standalone symlink チェックを削除する。(5) ユニットテストを追加する (`FsSymlinkGuard` の symlink 検出 / 通常パス通過; usecase 側の symlink 拒否経路; apps/cli 側の \"symlink guard\" エラーメッセージ確認)。`cargo make ci-rust` が通ることを確認する。背景: Codex PR #132 レビュー finding — T019 が `apps/cli` から `libs/usecase` へオーケストレーションを移した際に symlink チェックの fs I/O も一緒に持ち込まれた; IN-18 のレイヤリング (cli→usecase→domain, usecase に infra/fs I/O を持ち込まない) を正しく実現するための後追い修正。残る `infrastructure::track::symlink_guard` 本体の TOCTOU hardening (metadata-walk → `O_NOFOLLOW` open + inode 検証) と重複ガードの統合は別フォローアップ (`knowledge/strategy/TODO.md` の `TDDD-BUG-06`)。Layer: domain + infrastructure + usecase + apps/cli。",
       "status": "done",
       "commit_hash": "76cc334"
+    },
+    {
+      "id": "T030",
+      "description": "`signal_evaluator_v2` の Phase 1.5 リゾルバ + A-codec 周辺が catalogue 内の外部クレート修飾 TypeRef(例: `usecase` レイヤーカタログの `domain::tddd::type_signals_doc::TypeSignalsDocument`)を C 側(`rustdoc_types::Crate`)の foreign 参照表現と shape 一致する形に正規化していない実装ギャップを埋める。具体的な手順: (1) `rustdoc_types::Crate` が現在の rust ソース由来でどう foreign 参照を表現しているか調査する(`Crate::external_crates: HashMap<Id, ExternalCrate>`、`Crate::paths: HashMap<Id, ItemSummary>` の `crate_id != 0` エントリ、`Type::ResolvedPath { id, path, … }` の id が `paths` の foreign item を指す形 — の理解で間違いなければ)。(2) その表現を踏まえ、`infrastructure::tddd::type_ref_parser::convert_crate_prefixed_path`(現状は `Id(u32::MAX)` センチネルを置くだけ)と `signal_evaluator_v2::resolve_type` / `resolution::is_local_unresolved_path` の挙動を修正し、外部クレート修飾 TypeRef が A(`ExtendedCrate`)および/または S の集合内で C と同じ shape(同じ `paths` エントリ形、同じ `external_crates` 参照形)を取るようにする。別レイヤーの rustdoc は読み込まない。`SignalEvaluatorPort::evaluate(a, b, c)` の signature(ADR `2026-05-08-0305` D5)は変更しない(A+B+C 3 入力を維持)。(3) `infrastructure::tddd::catalogue_to_extended_crate_codec` 側で必要な追加処理(catalogue 由来の外部クレート参照を C と同形に encode する処理)を入れる。要検討: もし C が「外部クレート情報を C 構築時に build してから利用時に参照する」モデルで、A 側だけで合わせるのが不可能なら、C 側を生の `rustdoc_types::Crate` から所定の正規形に変換するステップを `RustdocCratePort` 周辺に 1 箇所追加する。ただし、まず A 側だけで合わせる方針を試し、ダメな場合のみ C 側正規化を導入する(D13 の \"実装段階で決定\" 範囲)。A-codec が外部クレート修飾 TypeRef を encode する際は、必ず `external_crates` エントリを発番し(`crate_id != 0`)、`paths` に `crate_id != 0` の `ItemSummary` を登録し、`Type::ResolvedPath { id, … }` の id がその `paths` エントリを指す — D13 の triple-structure が A/S 上で実現されていることを確認した上で Phase 1.5 リゾルバ修正を完了すること(`UNRESOLVED_CRATE_ID` センチネルを最終状態として残してはならない)。(4) ユニットテスト: `usecase` レイヤーで `BlobFetchResult<domain::tddd::type_signals_doc::TypeSignalsDocument>` 戻り型のメソッドを宣言したカタログエントリが、対応する rust 実装と結合した際に 🔵 と評価されることを確認するテストを `signal_evaluator_v2` 配下に追加する。`cargo make ci-rust` が通ることを確認する。ADR `2026-05-08-0258` D13 の正しい実現(D5 の `external_crates` 自動 build / D10 の S 構築時 closed-world 解決 / D11 の crate prefix 解釈はすべて維持)。multi-crate rustdoc 読み込みは採らない(D13 の明示的な方針)。Layer: domain + infrastructure。注: domain 側の port 表面 (`SignalEvaluatorPort::evaluate`) のシグネチャは変更しないため `domain-types.json` への変更は基本的に発生しない。infrastructure 側でも `SignalEvaluatorV2` / `CatalogueToExtendedCrateCodec` の public API は不変で、内部実装のみ変更する想定。catalog エントリ修正が発生する場合は T031 と区別して同コミット内で扱う。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T031",
+      "description": "T030 のリゾルバ修正後、現在 \"existence-only\" / `bool` プレースホルダーで宣言されている 4 つのカタログエントリを実シグネチャ(クロスクレート参照は FQN — 例 `domain::tddd::type_signals_doc::TypeSignalsDocument`)で再認証する: (1) `usecase-types.json` の `TrackBlobReader`(secondary_port、`action: modify`)— 実トレイトの全メソッド(`read_enabled_layers` / `read_catalogue_for_spec_ref_check` / `read_catalogue_spec_signals_document` / `read_type_signals` / `read_type_catalogue` 等)を `BlobFetchResult<…>` 戻り型まで FQN で宣言。(2) `usecase-types.json` の `usecase::merge_gate::check_strict_merge_gate`(free_function、`action: modify`)— プレースホルダー `bool` 戻り型を実戻り型に書き換え。(3) `infrastructure-types.json` の `GitShowTrackBlobReader`(secondary_adapter、`action: modify`)— トレイトメソッド shape を FQN で宣言(`BlobFetchResult` 等を含む)。(4) `infrastructure-types.json` の `infrastructure::verify::spec_states::verify_from_spec_json`(free_function、`action: modify`)— params/戻り型(`domain::…::VerifyOutcome` 等)を FQN で宣言。各エントリの `docs` から \"existence-only / unresolvable\" 記述を削除して現状の正確な記述に更新。全 3 レイヤーの `*-type-signals.json` / `*-catalogue-spec-signals.json` を再生成し 4 件が 🔵、その他の既存 🔵 が回帰していないことを確認、`*-types.md` / `contract-map.md` を再レンダー。`cargo make ci` が通ることを確認(strict merge gate も green になるはず)。AC-13 の達成基準を満たす。Layer: domain + infrastructure + usecase。注: 本タスクは type-designer scope。libs/** のコード変更は含まれない — catalogue 宣言 + 信号 + rendered view のみ。T030 の実装ランディング前に着手しないこと(pre-T030 状態で FQN 宣言すると 🔴 になる)。",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -383,16 +395,19 @@
       },
       {
         "id": "S16",
-        "title": "AC-12 統合確認 — v3-native 移行完了 + CI pass",
+        "title": "AC-12 統合確認 — v3-native 移行完了 + CI pass / クロスクレート TypeRef 解決修正",
         "description": [
           "T028 は bin/sotp rebuild + signals 再生成 + `cargo make ci` 全通過でトラック全体の整合を確認する (AC-12 充足)。",
           "マージゲートとコミットゲートが v3 catalogue 環境でフェイルクローズド動作することを確認する。",
           "T029 は Codex PR #132 レビュー finding に対処する後追い修正: T019 が usecase 層に持ち込んだ symlink チェックの raw fs I/O を domain port + infra adapter の背後に移し、IN-18 が求める cli→usecase→domain のレイヤー純粋性を正しく実現する。",
-          "S15 (T027 削除タスク) 完了後に着手する。"
+          "T030 は ADR D13 の実装: signal_evaluator_v2 の Phase 1.5 リゾルバ + A-codec が catalogue 内の外部クレート修飾 TypeRef を C 側の foreign 参照表現と shape 一致する形に正規化していない実装ギャップを埋める (IN-27 の実装)。T031 は T030 のリゾルバ修正後に 4 つの catalogue エントリを実シグネチャ (FQN) で再認証し、signals を再生成して AC-13 を達成する (type-designer scope)。",
+          "S15 (T027 削除タスク) 完了後に着手する。T031 は T030 の実装ランディング後に着手すること。"
         ],
         "task_ids": [
           "T028",
-          "T029"
+          "T029",
+          "T030",
+          "T031"
         ]
       }
     ]
