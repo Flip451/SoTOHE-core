@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-13T07:41:48Z",
-  "declaration_hash": "e6df4eee2d35e40c4eeb9a86869e3f955172cfdf5861d5bf9a5e819e2cdaeefc",
+  "generated_at": "2026-05-13T09:17:59Z",
+  "declaration_hash": "367590e548fe9dd57f9a6aeffe9b7120c647e807b94439a5a610a53bc4a16148",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
@@ -102,7 +102,7 @@
     {
       "type_name": "GitShowTrackBlobReader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "SpecElementHashReader",
@@ -198,7 +198,7 @@
     {
       "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

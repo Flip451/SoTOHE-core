@@ -44,6 +44,13 @@ decisions:
     user_decision_ref: "chat_segment:tddd-v2-axis-separation-design:2026-05-08"
     candidate_selection: "from:[payload_types-flat,VariantPayload-3-variants] chose:VariantPayload-3-variants"
     status: proposed
+  - id: D13
+    user_decision_ref: "chat_segment:tddd-v2-gap1-gap2-schema-codec:2026-05-13"
+    candidate_selection: "from:[option-α-has_default_impl-field,option-β-required-provided-arrays,option-γ-provided-methods-array-additive] chose:option-α-has_default_impl-field"
+    status: proposed
+  - id: D14
+    user_decision_ref: "chat_segment:tddd-v2-gap1-gap2-schema-codec:2026-05-13"
+    status: proposed
 ---
 # TDDD 型カタログ: kind / role / pattern / action 軸分離と厳密 payload-encoded schema
 
@@ -407,6 +414,28 @@ pub enum VariantPayload {
 `VariantPayload::Struct` の field は `FieldDecl` を再利用する (DRY)。serde の `#[serde(default)]` により payload 省略時は `Unit` として解釈する。
 
 この決定により Q4.1 厳密 payload-encoded 原則の適用範囲が enum variant に拡張される。sibling ADR `2026-05-02-0316-enum-variant-payload-schema.md` の `EnumVariantDeclaration { name, payload_types: Vec<String> }` は本決定で **supersede** される。
+
+### D13: MethodDeclaration に has_default_impl フィールドを追加する
+
+`MethodDeclaration` に `has_default_impl: bool` フィールドを追加する。`serde default = false` (forward-compat extension — 既存 catalogue は全 method を required として無修正でロード可能)。
+
+意味論: trait method 宣言において `true` のとき該当 method は default 実装を持つ (rustdoc 流の `provided_trait_methods` に対応)。`false` のとき required (abstract)。struct inherent method 宣言では default 実装の概念が当てはまらないため常に `false` 扱いとする。
+
+v3 schema の codec は A-codec が `MethodDeclaration.has_default_impl` 値に応じて `rustdoc_types::Function.has_body` を `true` / `false` として encode する。これにより `signal_evaluator_v2` の trait method signature 比較 (`build_trait_method_map` で `;abstract` vs `;body` token を含む key を作る挙動) が A side / C side で対称になり、default 実装付き trait method を持つ entry が `action: modify` で正しく Match_Modify と評価される。
+
+検討した別案 (option-β: `TraitEntry.methods` を required / provided の 2 配列に分割、option-γ: `TraitEntry` に `provided_methods` 配列を additive 追加) は backward-compat 性および schema 対称性のトレードオフで option-α を選択した。candidate_selection は frontmatter に記載。
+
+Schema version bump は不要 (`schema_version: 3` のまま forward-compat extension)。
+
+### D14: FunctionEntry に generics フィールドを追加する
+
+`FunctionEntry` (および対応する `FunctionEntryDto`) に `generics: Vec<MethodGenericParam>` フィールドを追加する。既存の `MethodGenericParam` / `MethodGenericParamDto` 型をそのまま再利用し、新規型は追加しない。`serde default = vec![]` (forward-compat extension — 既存 catalogue の generic-less free function は無修正でロード可能)。
+
+意味論: 当該 free function の generic type parameters と bounds を表現する。`MethodDeclaration.generics` と同じ semantics を持つ。
+
+v3 schema の codec は A-codec の `encode_function` が `empty_generics()` 固定だった挙動を改め、`FunctionEntry.generics` を `rustdoc_types::Generics` に変換して使う。これにより generic type parameter を持つ free function (例: `fn f<T: SomeTrait>(...)`) の `action: modify` declaration が A side / C side で正しく Match_Modify と評価される。
+
+Schema version bump は不要 (`schema_version: 3` のまま forward-compat extension)。
 
 ## Rejected Alternatives
 

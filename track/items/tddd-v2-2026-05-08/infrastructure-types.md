@@ -39,7 +39,7 @@
 | FsContractMapWriter | secondary_adapter | reference | impl ContractMapWriter | 🔵 | 🔵 |
 | FsSymlinkGuard | secondary_adapter | — | impl SymlinkGuardPort, impl Default | 🔵 | 🔵 |
 | FsTdddLayerBindingsAdapter | secondary_adapter | — | impl TdddLayerBindingsPort, impl Default | 🔵 | 🔵 |
-| GitShowTrackBlobReader | secondary_adapter | modify | impl TrackBlobReader, impl SpecElementHashReader | 🟡 | 🔵 |
+| GitShowTrackBlobReader | secondary_adapter | modify | impl TrackBlobReader, impl SpecElementHashReader | 🔵 | 🔵 |
 | InMemoryCatalogueLinter | secondary_adapter | modify | impl CatalogueLinter, impl Default | 🔵 | 🔵 |
 | RustdocCrateAdapter | secondary_adapter | — | impl RustdocCratePort | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🔵 | 🔵 |
@@ -77,5 +77,5 @@
 | infrastructure::verify::spec_code_consistency::consistency_report_to_findings | free_function | delete | fn() -> Vec<VerifyFinding> | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components | free_function | delete | fn() -> ConsistencyReport | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str | free_function | delete | fn(_track_id_str: &str, _crate_name: &str, _project_root: &std::path::Path) -> VerifyOutcome | 🔵 | 🔵 |
-| infrastructure::verify::spec_states::verify_from_spec_json | free_function | modify | fn() -> bool | 🟡 | 🔵 |
+| infrastructure::verify::spec_states::verify_from_spec_json | free_function | modify | fn(spec_json_path: &std::path::Path, strict: bool, trusted_root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 

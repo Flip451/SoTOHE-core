@@ -381,6 +381,26 @@
             "anchor": "D5"
           }
         ]
+      },
+      {
+        "id": "IN-28",
+        "text": "catalogue の `MethodDeclaration` schema が `has_default_impl: bool` field を持ち、trait method 宣言に対し default 実装の有無を表現できるようにする (rustdoc 流の `provided_trait_methods` 概念に対応)。A-codec の `encode_trait` は `MethodDeclaration.has_default_impl` 値に従って `rustdoc_types::Function.has_body` を `true` (default 実装あり) / `false` (abstract) として encode する。これにより `signal_evaluator_v2` の trait method signature 比較が A side と C side で対称になり、default 実装付き trait method を持つ `action: modify` の entry が正しく 🔵 評価される。`serde default = false` の forward-compat extension とし `schema_version` は 3 のまま維持。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D13"
+          }
+        ]
+      },
+      {
+        "id": "IN-29",
+        "text": "catalogue の `FunctionEntry` schema が `generics: Vec<MethodGenericParam>` field を持ち、free function 宣言に対し generic type parameters と bounds を表現できるようにする (`MethodDeclaration.generics` と同じ semantics)。A-codec の `encode_function` は `empty_generics()` 固定から `FunctionEntry.generics` を `rustdoc_types::Generics` に変換して使う挙動に改める。これにより generic type parameter を持つ free function (例: `fn f<T: SomeTrait>(...)`) の `action: modify` declaration が `signal_evaluator_v2` で正しく 🔵 評価される。`serde default = vec![]` の forward-compat extension とし `schema_version` は 3 のまま維持。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D14"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -751,11 +771,19 @@
     },
     {
       "id": "AC-13",
-      "text": "IN-27 の実現により、catalogue がクロスクレート参照型を含むメソッド/関数を FQN で宣言した legitimate なエントリが strict merge gate で 🔵 と評価され、`cargo make track-pr-merge` がブロックされずに通過する。具体的には現在 🟡 となっている `TrackBlobReader` / `check_strict_merge_gate` / `GitShowTrackBlobReader` / `verify_from_spec_json` の 4 エントリが 🔵 となる。",
+      "text": "IN-27 / IN-28 / IN-29 の実現により、catalogue がクロスクレート参照型を含むメソッド/関数を FQN で宣言し、かつ default 実装の有無 (`has_default_impl`) および generic type parameters (`generics`) を正しく宣言した legitimate なエントリが strict merge gate で 🔵 と評価され、`cargo make track-pr-merge` がブロックされずに通過する。具体的には T033 (Gap 1: `MethodDeclaration.has_default_impl` schema/codec 追加) および T034 (Gap 2: `FunctionEntry.generics` schema/codec 追加) の完了後に T031 finalization を行い、`TrackBlobReader` / `check_strict_merge_gate` / `GitShowTrackBlobReader` / `verify_from_spec_json` の 4 エントリが 🔵 となる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
           "anchor": "D13"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D13"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+          "anchor": "D14"
         }
       ]
     }
@@ -799,7 +827,7 @@
     }
   ],
   "signals": {
-    "blue": 62,
+    "blue": 64,
     "yellow": 0,
     "red": 0
   }

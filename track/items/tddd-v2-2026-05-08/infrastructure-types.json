@@ -393,9 +393,7 @@
       "role": "SecondaryAdapter",
       "kind": {
         "kind": "plain_struct",
-        "fields": [
-          { "name": "repo_root", "ty": "std::path::PathBuf" }
-        ]
+        "has_stripped_fields": true
       },
       "trait_impls": [
         { "trait_name": "TrackBlobReader", "origin_crate": "usecase" },
@@ -408,7 +406,7 @@
           "returns": "Self"
         }
       ],
-      "docs": "T021 DONE / T022 DONE / T024 DONE. Adapter implementing TrackBlobReader and SpecElementHashReader via git-show on the local repository. T021 DONE: read_type_signals implemented — reads <layer>-type-signals.json from git blob using resolve_catalogue_filename + signal_file_name_for, decodes via type_signals_codec, returns BlobFetchResult<TypeSignalsDocument>. T022 DONE: read_type_catalogue changed from BlobFetchResult<(TypeCatalogueDocument, String)> to BlobFetchResult<(Vec<u8>, String)> (returns raw catalogue bytes + pre-computed SHA-256 hex; no catalogue_codec decode in the adapter). T024 DONE: read_catalogue_for_spec_ref_check changed from BlobFetchResult<(TypeCatalogueDocument, String)> to BlobFetchResult<(CatalogueDocument, String)>; internal catalogue_codec + v3_doc_to_stub conversion replaced with CatalogueDocumentCodec::decode (v3-native, CN-11 fail-closed). Trait method signatures are not declared in this infrastructure entry because BlobFetchResult (defined in usecase::merge_gate) is not resolvable in the infrastructure type universe — existence-only declaration per the UnresolvedTypeRef fallback rule. Only the inherent new() constructor is listed here.",
+      "docs": "T021 DONE / T022 DONE / T024 DONE. Adapter implementing TrackBlobReader and SpecElementHashReader via git-show on the local repository. Only the inherent new() constructor is declared in methods; TrackBlobReader and SpecElementHashReader trait methods are not listed here because the structural equality check for impl blocks (ItemEnum::Impl) only compares the for_, trait_, and generics fields — not the method bodies. The signal evaluator's items_structurally_equal for Impl items intentionally omits method comparison per ADR D9. Adding trait impl methods here would be treated as inherent methods and cause structural mismatches against the C-side. T021: read_type_signals implemented. T022: read_type_catalogue returns (Vec<u8>, String). T024: read_catalogue_for_spec_ref_check returns (CatalogueDocument, String) via CatalogueDocumentCodec::decode.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
@@ -750,10 +748,14 @@
     "infrastructure::verify::spec_states::verify_from_spec_json": {
       "action": "modify",
       "role": "FreeFunction",
-      "params": [],
-      "returns": "bool",
+      "params": [
+        { "name": "spec_json_path", "ty": "&std::path::Path" },
+        { "name": "strict", "ty": "bool" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
       "is_async": false,
-      "docs": "T022 DONE / T023 DONE: modified. Stage 2 of verify_from_spec_json was rewired from catalogue_codec::decode + v3_doc_to_stub (TypeCatalogueDocument path) to type_signals_codec::decode + check_type_signals(&TypeSignalsDocument, strict) + catalogue byte-hash freshness check. The declaration_hash freshness check reads the catalogue file as raw bytes, computes the SHA-256 hash, and compares it against TypeSignalsDocument.declaration_hash; a mismatch blocks the gate (CN-11). The now-dead use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub and use crate::tddd::catalogue_codec imports were removed. Actual signature: fn verify_from_spec_json(spec_json_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutcome. Params and return type omitted from catalogue declaration because VerifyOutcome (domain::verify::VerifyOutcome) is not resolvable from the infrastructure layer's type universe without an UnresolvedTypeRef; existence-only declaration per the type-designer fallback rule.",
+      "docs": "T022 DONE / T023 DONE: modified. Verifies spec.json Stage 1 signals and per-layer Stage 2 domain type signals. Actual signature: pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutcome. Stage 2 was rewired from catalogue_codec::decode + v3_doc_to_stub (TypeCatalogueDocument path) to type_signals_codec::decode + check_type_signals(&TypeSignalsDocument, strict) + catalogue byte-hash freshness check. Path is std::path::Path (L1 short-name: Path). VerifyOutcome is domain::verify::VerifyOutcome (L1 short-name: VerifyOutcome). Both are external types; the signal evaluator uses format_type_with_canon (rsplit on '::' → last segment) so 'Path' and 'VerifyOutcome' will match the C-side rustdoc representation directly.",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
