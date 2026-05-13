@@ -231,6 +231,7 @@
           { "name": "returns", "ty": "TypeRef" },
           { "name": "is_async", "ty": "bool" },
           { "name": "generics", "ty": "Vec<MethodGenericParam>" },
+          { "name": "where_predicates", "ty": "Vec<WherePredicateDecl>" },
           { "name": "docs", "ty": "Option<String>" },
           { "name": "spec_refs", "ty": "Vec<SpecRef>" },
           { "name": "informal_grounds", "ty": "Vec<InformalGroundRef>" }
@@ -455,6 +456,7 @@
           { "name": "is_async", "ty": "bool" },
           { "name": "has_default_impl", "ty": "bool" },
           { "name": "generics", "ty": "Vec<MethodGenericParam>" },
+          { "name": "where_predicates", "ty": "Vec<WherePredicateDecl>" },
           { "name": "docs", "ty": "Option<String>" }
         ]
       },
@@ -1027,6 +1029,26 @@
       "docs": "Payload for VariantDecl. 3 variants (ADR 1 D12).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-04", "hash": "c30752c82807d15e127b6f8888aa2167d9e2ac296ca9d72517077e14f30fdae4" }
+      ],
+      "informal_grounds": []
+    },
+    "WherePredicateDecl": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "type_", "ty": "TypeRef" },
+          { "name": "bounds", "ty": "Vec<TypeRef>" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "docs": "A single `where` clause bound predicate (`type_: bound1 + bound2`). Mirrors rustdoc `WherePredicate::BoundPredicate`. Used in `MethodDeclaration.where_predicates` and `FunctionEntry.where_predicates`; supports arbitrary type-expression LHS (`Vec<T>`, `T::Item`, etc.) that the identifier-only `MethodGenericParam.bounds` cannot represent. (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-30", "hash": "36500513e1031fa4afc666ba2da007bc64608941e5f95a2a2113bad64bdd64de" }
       ],
       "informal_grounds": []
     },

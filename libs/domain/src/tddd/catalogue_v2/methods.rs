@@ -49,6 +49,46 @@ pub struct MethodGenericParam {
 }
 
 // ---------------------------------------------------------------------------
+// WherePredicateDecl — generic where-clause predicate (BoundPredicate scope)
+// ---------------------------------------------------------------------------
+
+/// A single `where` clause bound predicate (`type_: bound1 + bound2 + ...`).
+///
+/// Mirrors rustdoc `WherePredicate::BoundPredicate` for the catalogue side.
+/// Unlike [`MethodGenericParam`] (whose `name` is a single identifier), the
+/// `type_` here is an arbitrary type expression and can describe predicates
+/// that inline `<>` bounds cannot — for example `where Vec<T>: Clone`,
+/// `where T::Item: Send`, or `where Hoge<Fuga>: Piyo`.
+///
+/// Used in [`MethodDeclaration::where_predicates`] and
+/// [`crate::tddd::catalogue_v2::entries::FunctionEntry::where_predicates`].
+/// `TraitEntry` does not yet carry a `where_predicates` field — trait-level
+/// generic parameter declarations are out of scope for this ADR (D3 / IN-30 scope).
+///
+/// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
+///
+/// Scope is `BoundPredicate` only — rustdoc's `LifetimePredicate` and
+/// `EqPredicate` are intentionally out of scope (ADR D3). Bound encoding rejects
+/// `?Sized`-style relaxations, HRTB on `TraitBound`, and `Use` variants
+/// fail-closed at the codec boundary.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WherePredicateDecl {
+    /// The left-hand side type expression of the where predicate.
+    ///
+    /// May be a bare identifier (`R`), a parameterised type (`Vec<T>`,
+    /// `Hoge<Fuga>`), or a projection (`T::Item`). The codec validates this
+    /// as a non-empty `TypeRef`; full Rust type-expression syntax checking
+    /// happens during A-codec encoding (`parse_type_ref_str`).
+    pub type_: TypeRef,
+    /// The trait bounds imposed on `type_` (e.g. `[Clone]`, `[Send + Sync]`).
+    ///
+    /// Each entry is a non-empty trait reference validated via
+    /// `syn::TypeParamBound` at the codec boundary, identical to
+    /// [`MethodGenericParam::bounds`].
+    pub bounds: Vec<TypeRef>,
+}
+
+// ---------------------------------------------------------------------------
 // ParamDeclaration — single parameter in a method/function signature (V2)
 // ---------------------------------------------------------------------------
 
@@ -132,6 +172,21 @@ pub struct MethodDeclaration {
     /// The A-codec encodes these as `GenericParamDef::Type` entries in the function's
     /// `Generics`, mirroring the rustdoc C-side APIT desugaring.
     pub generics: Vec<MethodGenericParam>,
+    /// `where`-clause bound predicates on this method's generics.
+    ///
+    /// Used to express bounds whose LHS is an arbitrary type expression — patterns
+    /// `MethodGenericParam.bounds` (whose LHS is a single identifier) cannot represent,
+    /// such as `where Vec<T>: Clone` or `where T::Item: Send`. Default empty Vec for
+    /// backward compatibility. The A-codec emits every bound (from either
+    /// `generics[].bounds` or `where_predicates`) into rustdoc
+    /// `Function.generics.where_predicates`, leaving inline `GenericParamDef.bounds`
+    /// always empty. The signal evaluator normalizes C-side inline bounds into the
+    /// same where-form before fingerprinting so that `<T: Bound>` (APIT or inline-form
+    /// source) compares structurally equal to `<T> where T: Bound` (explicit where-form
+    /// source).
+    ///
+    /// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1, D2)
+    pub where_predicates: Vec<WherePredicateDecl>,
     /// Optional documentation string.
     pub docs: Option<String>,
 }
@@ -156,6 +211,7 @@ impl MethodDeclaration {
             is_async,
             has_default_impl: false,
             generics: vec![],
+            where_predicates: vec![],
             docs,
         }
     }
@@ -175,6 +231,7 @@ impl MethodDeclaration {
             is_async: false,
             has_default_impl: false,
             generics: vec![],
+            where_predicates: vec![],
             docs: None,
         }
     }
@@ -185,11 +242,14 @@ impl MethodDeclaration {
     /// Layout:
     ///
     /// ```text
-    /// [async ]fn name[<T0: Bound0>](receiver[, param1: ty1, param2: ty2]) -> returns
+    /// [async ]fn name[<T0: Bound0>](receiver[, param1: ty1, param2: ty2]) -> returns[ where Pred1, Pred2]
     /// ```
     ///
     /// The unit return type is rendered as `"()"` when the returns field is `"()"`.
     /// Generic parameters are rendered as `<T0: Bound0, T1: Bound1>` when present.
+    /// `where_predicates` (when non-empty) are appended as
+    /// `where lhs1: bound1a + bound1b, lhs2: bound2a` so methods that differ only by
+    /// their where-clauses stringify distinctly.
     #[must_use]
     pub fn signature_string(&self) -> String {
         let async_prefix = if self.is_async { "async " } else { "" };
@@ -225,12 +285,27 @@ impl MethodDeclaration {
             (false, true) => receiver_str.to_string(),
             (false, false) => format!("{receiver_str}, {params_str}"),
         };
+        let where_str = if self.where_predicates.is_empty() {
+            String::new()
+        } else {
+            let preds: Vec<String> = self
+                .where_predicates
+                .iter()
+                .map(|w| {
+                    let bounds_str =
+                        w.bounds.iter().map(|b| b.as_str()).collect::<Vec<_>>().join(" + ");
+                    format!("{}: {}", w.type_.as_str(), bounds_str)
+                })
+                .collect();
+            format!(" where {}", preds.join(", "))
+        };
         format!(
-            "{async_prefix}fn {}{}({}) -> {}",
+            "{async_prefix}fn {}{}({}) -> {}{}",
             self.name.as_str(),
             generics_str,
             args,
-            self.returns.as_str()
+            self.returns.as_str(),
+            where_str
         )
     }
 }
@@ -545,5 +620,75 @@ mod tests {
         let owned =
             MethodDeclaration::new(name, Some(SelfReceiver::Owned), vec![], returns, false, None);
         assert_ne!(associated, owned);
+    }
+
+    // -----------------------------------------------------------------------
+    // WherePredicateDecl / MethodDeclaration.where_predicates (ADR 2026-05-13-1153)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_where_predicate_decl_stores_type_and_bounds() {
+        let w = WherePredicateDecl {
+            type_: TypeRef::new("Vec<T>").unwrap(),
+            bounds: vec![TypeRef::new("Send").unwrap(), TypeRef::new("Sync").unwrap()],
+        };
+        assert_eq!(w.type_.as_str(), "Vec<T>");
+        assert_eq!(w.bounds.len(), 2);
+        assert_eq!(w.bounds[0].as_str(), "Send");
+        assert_eq!(w.bounds[1].as_str(), "Sync");
+    }
+
+    #[test]
+    fn test_method_declaration_new_defaults_where_predicates_to_empty() {
+        let name = MethodName::new("save").unwrap();
+        let returns = TypeRef::new("()").unwrap();
+        let decl = MethodDeclaration::new(name, None, vec![], returns, false, None);
+        assert!(decl.where_predicates.is_empty());
+    }
+
+    #[test]
+    fn test_method_declaration_associated_function_defaults_where_predicates_to_empty() {
+        let name = MethodName::new("new").unwrap();
+        let returns = TypeRef::new("Self").unwrap();
+        let decl = MethodDeclaration::associated_function(name, vec![], returns);
+        assert!(decl.where_predicates.is_empty());
+    }
+
+    #[test]
+    fn test_method_declaration_where_predicates_render_in_signature_string() {
+        let name = MethodName::new("collect").unwrap();
+        let returns = TypeRef::new("Vec<T>").unwrap();
+        let mut decl = MethodDeclaration::associated_function(name, vec![], returns);
+        decl.generics =
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        decl.where_predicates = vec![WherePredicateDecl {
+            type_: TypeRef::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap()],
+        }];
+        let sig = decl.signature_string();
+        assert!(sig.contains(" where T: Clone"), "sig={sig}");
+    }
+
+    #[test]
+    fn test_method_declaration_where_predicates_distinguish_otherwise_equal_methods() {
+        let name = MethodName::new("op").unwrap();
+        let returns = TypeRef::new("()").unwrap();
+        let unconstrained = MethodDeclaration::new(
+            name.clone(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            returns.clone(),
+            false,
+            None,
+        );
+        let mut constrained = unconstrained.clone();
+        constrained.where_predicates = vec![WherePredicateDecl {
+            type_: TypeRef::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Send").unwrap()],
+        }];
+        assert_ne!(
+            unconstrained, constrained,
+            "where_predicates participates in MethodDeclaration equality"
+        );
     }
 }

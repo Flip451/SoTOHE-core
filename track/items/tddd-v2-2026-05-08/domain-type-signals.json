@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-13T13:20:08Z",
-  "declaration_hash": "5e1cccddad73609e5f2d2550449efe4ece97ff062db01ed6932ead678e121941",
+  "generated_at": "2026-05-13T17:41:59Z",
+  "declaration_hash": "205c445164c224eb8778d34255f547b9b5a81a8c76d8589342bfa9abd6a5f792",
   "signals": [
     {
       "type_name": "CatalogueDocument",
@@ -619,6 +619,16 @@
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "WherePredicateDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
       ]
     },
     {

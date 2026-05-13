@@ -78,6 +78,7 @@ flowchart LR
         %% type: VariantDecl
         %% type: VariantName
         %% type: VariantPayload
+        %% type: WherePredicateDecl
         %% trait: CatalogueDocumentLoaderPort
         %% trait: CatalogueLinter
         %% trait: CatalogueLoader

@@ -40,5 +40,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| usecase::merge_gate::check_strict_merge_gate | use_case_function | modify | fn(branch: &str, reader: &R) -> domain::verify::VerifyOutcome | 🟡 | 🔵 |
+| usecase::merge_gate::check_strict_merge_gate | use_case_function | modify | fn(branch: &str, reader: &R) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 

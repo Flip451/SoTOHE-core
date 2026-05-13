@@ -203,6 +203,7 @@ mod tests {
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
             generics: vec![],
+            where_predicates: vec![],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],

@@ -89,12 +89,38 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
             }
         }
         Type::ResolvedPath(p) => {
-            let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
+            // For projection paths like `T::Item` (where `T` is a generic parameter),
+            // preserve the full `<canon(T)>::Item` form so that `T::Item` and `U::Item`
+            // produce distinct strings when `T` and `U` map to different positional indices.
+            // For ordinary resolved paths like `std::vec::Vec` or `Clone`, take only the
+            // last segment (current behaviour) because the prefix is a module path, not a
+            // generic, and comparing short names is what the rest of the evaluator expects.
+            let path_str: &str = &p.path;
+            let display_base = if let Some(sep_pos) = path_str.find("::") {
+                let prefix = &path_str[..sep_pos];
+                let rest = &path_str[sep_pos..]; // starts with "::"
+                if !canon.is_empty() && canon.contains_key(prefix) {
+                    // The prefix is a generic parameter name — preserve qualified form and
+                    // apply the canon map so `T::Item` and `U::Item` produce distinct keys.
+                    let canon_prefix = canon.get(prefix).map(|s| s.as_str()).unwrap_or(prefix);
+                    format!("{canon_prefix}{rest}")
+                } else {
+                    // Ordinary qualified path (e.g. `std::vec::Vec`) — use the last segment.
+                    p.path.rsplit("::").next().unwrap_or(path_str).to_string()
+                }
+            } else {
+                // No `::` — single-segment name (e.g. `Clone`, `String`).
+                p.path.clone()
+            };
             if let Some(args) = &p.args {
                 let rendered = format_generic_args_with_canon(args, canon);
-                if rendered.is_empty() { short } else { format!("{short}<{rendered}>") }
+                if rendered.is_empty() {
+                    display_base
+                } else {
+                    format!("{display_base}<{rendered}>")
+                }
             } else {
-                short
+                display_base
             }
         }
         Type::Primitive(name) => name.clone(),
@@ -117,6 +143,23 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
             format!("*{kw} {}", format_type_with_canon(inner, canon))
         }
         Type::ImplTrait(bounds) => {
+            // D3 fail-closed: Outlives, Use, and HRTB binders inside ImplTrait are outside ADR
+            // `2026-05-13-1153` D3 scope.  Return a sentinel string so that ImplTrait
+            // types carrying such bounds produce a unique, non-matching string rather
+            // than silently comparing equal when both sides happen to be identical text.
+            let has_unsupported = bounds.iter().any(|b| match b {
+                rustdoc_types::GenericBound::Outlives(_) | rustdoc_types::GenericBound::Use(_) => {
+                    true
+                }
+                // A TraitBound with a non-empty HRTB binder (`for<'a>`) is also
+                // outside D3 scope.
+                rustdoc_types::GenericBound::TraitBound { generic_params, .. } => {
+                    !generic_params.is_empty()
+                }
+            });
+            if has_unsupported {
+                return "<UNSUPPORTED:ImplTrait>".to_string();
+            }
             let mut parts: Vec<String> = bounds
                 .iter()
                 .filter_map(|b| match b {
@@ -141,24 +184,15 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
                             TraitBoundModifier::Maybe => "?",
                             TraitBoundModifier::MaybeConst => "~const ",
                         };
-                        let hrtb_str = format_hrtb_type_params(generic_params);
-                        Some(format!("{modifier_str}{short}{args_str}{hrtb_str}"))
+                        // generic_params is empty here because the HRTB guard above already
+                        // returned early.
+                        let _ = generic_params;
+                        Some(format!("{modifier_str}{short}{args_str}"))
                     }
-                    rustdoc_types::GenericBound::Outlives(lt) => Some(lt.clone()),
-                    rustdoc_types::GenericBound::Use(use_bounds) => {
-                        if use_bounds.is_empty() {
-                            None
-                        } else {
-                            let parts: Vec<String> = use_bounds
-                                .iter()
-                                .map(|b| match b {
-                                    rustdoc_types::PreciseCapturingArg::Lifetime(lt) => lt.clone(),
-                                    rustdoc_types::PreciseCapturingArg::Param(name) => name.clone(),
-                                })
-                                .collect();
-                            Some(format!("use<{}>", parts.join(",")))
-                        }
-                    }
+                    // Outlives and Use are handled by the fail-closed guard above; this
+                    // branch is unreachable when `has_unsupported` is true.
+                    rustdoc_types::GenericBound::Outlives(_)
+                    | rustdoc_types::GenericBound::Use(_) => None,
                 })
                 .collect();
             parts.sort_unstable();
@@ -166,6 +200,14 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
             if rendered.is_empty() { "impl _".to_string() } else { format!("impl {rendered}") }
         }
         Type::DynTrait(dyn_trait) => {
+            // D3 fail-closed: a `dyn Trait` whose `PolyTrait` entries carry a
+            // non-empty HRTB binder (`for<'a> Trait<'a>`) is outside ADR
+            // `2026-05-13-1153` D3 scope.  Return a sentinel so it never
+            // compares equal to another type.
+            let has_hrtb = dyn_trait.traits.iter().any(|pt| !pt.generic_params.is_empty());
+            if has_hrtb {
+                return "<UNSUPPORTED:DynTrait>".to_string();
+            }
             let mut parts: Vec<String> = dyn_trait
                 .traits
                 .iter()
@@ -180,8 +222,7 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
                             if s.is_empty() { String::new() } else { format!("<{s}>") }
                         })
                         .unwrap_or_default();
-                    let hrtb_str = format_hrtb_type_params(&pt.generic_params);
-                    format!("{hrtb_str}{short}{args_str}")
+                    format!("{short}{args_str}")
                 })
                 .collect();
             parts.sort_unstable();
@@ -195,6 +236,12 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
             }
         }
         Type::FunctionPointer(fp) => {
+            // D3 fail-closed: a function pointer with a HRTB binder (`for<'a> fn(...)`)
+            // is outside ADR `2026-05-13-1153` D3 scope.  Return a sentinel so it never
+            // compares equal to another type.
+            if !fp.generic_params.is_empty() {
+                return "<UNSUPPORTED:FunctionPointer>".to_string();
+            }
             let params: Vec<String> =
                 fp.sig.inputs.iter().map(|(_, t)| format_type_with_canon(t, canon)).collect();
             let ret = fp
@@ -206,28 +253,7 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
             let constness = if fp.header.is_const { "const " } else { "" };
             let unsafety = if fp.header.is_unsafe { "unsafe " } else { "" };
             let abi = format_abi(&fp.header.abi);
-            let hrtb = if fp.generic_params.is_empty() {
-                String::new()
-            } else {
-                let lt_strs: Vec<String> = fp
-                    .generic_params
-                    .iter()
-                    .filter_map(|p| {
-                        if matches!(p.kind, GenericParamDefKind::Lifetime { .. }) {
-                            Some(format!("'{}", p.name))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                let type_str = format_hrtb_type_params(&fp.generic_params);
-                if lt_strs.is_empty() {
-                    type_str
-                } else {
-                    format!("for<{}>{type_str}", lt_strs.join(","))
-                }
-            };
-            format!("{hrtb}{abi}{constness}{unsafety}fn({}{})->{ret}", params.join(","), variadic)
+            format!("{abi}{constness}{unsafety}fn({}{})->{ret}", params.join(","), variadic)
         }
         Type::Pat { type_: inner, .. } => format_type_with_canon(inner, canon),
         Type::QualifiedPath { name, self_type, trait_, args } => {
@@ -289,7 +315,10 @@ fn format_generic_args_with_canon(args: &GenericArgs, canon: &HashMap<String, St
                         if rhs.is_empty() { c.name.clone() } else { format!("{}={}", c.name, rhs) }
                     }
                     AssocItemConstraintKind::Constraint(bounds) => {
-                        let rhs = format_generic_bounds(bounds);
+                        // Use the canon-aware variant so that generic names inside the
+                        // constraint bounds (e.g. `Iterator<Item: Into<T>>`) are also
+                        // canonicalized.
+                        let rhs = format_generic_bounds_with_canon(bounds, canon);
                         if rhs.is_empty() { c.name.clone() } else { format!("{}:{}", c.name, rhs) }
                     }
                 })
@@ -684,26 +713,107 @@ pub(super) fn format_generic_bounds(bounds: &[GenericBound]) -> String {
     strs.join("+")
 }
 
-/// Formats a `WherePredicate` as a canonical string for structural comparison.
-pub(super) fn format_where_predicate(pred: &WherePredicate) -> String {
+/// Canon-aware formatter for a `WherePredicate`. Applies `canon` to the
+/// predicate LHS (`Type::Generic` names) and to any inner `Type::Generic`
+/// occurrences inside trait-bound args so that renaming a type parameter
+/// (`T → U`) does not change the formatted string. Pass an empty `HashMap`
+/// when canonicalization is not desired.
+///
+/// Used by `build_where_form_view` (ADR `2026-05-13-1153` D1) so that A-side
+/// (where-form, name = catalogue-author choice) and C-side (where-form virtual
+/// view, name = source `T0`/`T1` for APIT) produce the same string when their
+/// constraints are positionally identical.
+pub(super) fn format_where_predicate_with_canon(
+    pred: &WherePredicate,
+    canon: &HashMap<String, String>,
+) -> String {
     match pred {
         WherePredicate::BoundPredicate { type_: ty, bounds, generic_params } => {
-            let ty_str = format_type(ty);
-            let bounds_str = format_generic_bounds(bounds);
+            let ty_str = format_type_with_canon(ty, canon);
+            let bounds_str = format_generic_bounds_with_canon(bounds, canon);
             // Include HRTB type params from the predicate's own binder (e.g. `for<T: Foo>
             // Fn(T): Bar`) so that predicates differing only by their HRTB binder produce
             // distinct strings.
             let hrtb_str = format_hrtb_type_params(generic_params);
             format!("{hrtb_str}{ty_str}:{bounds_str}")
         }
-        WherePredicate::LifetimePredicate { .. } => String::new(),
+        // Both `LifetimePredicate` and `EqPredicate` are outside ADR `2026-05-13-1153`
+        // D3 scope. `build_where_form_view` flags them via `has_unsupported`, but the
+        // formatted string is still consumed by `build_generics_fingerprint` which keys
+        // `build_trait_method_map`. To preserve distinctness across two methods whose
+        // only difference is an unsupported clause, the prefix marker is followed by the
+        // predicate's actual content. The `[UNSUPPORTED:` prefix never collides with a
+        // well-formed `BoundPredicate` string (which starts with the formatted LHS type).
+        WherePredicate::LifetimePredicate { lifetime, outlives } => {
+            let bounds_str = outlives.join("+");
+            format!("[UNSUPPORTED:Lifetime]{lifetime}:{bounds_str}")
+        }
         WherePredicate::EqPredicate { lhs, rhs } => {
-            let lhs_str = format_type(lhs);
+            let lhs_str = format_type_with_canon(lhs, canon);
             let rhs_str = match rhs {
-                Term::Type(ty) => format_type(ty),
+                Term::Type(ty) => format_type_with_canon(ty, canon),
                 Term::Constant(c) => c.expr.replace("::", "."),
             };
-            format!("{lhs_str}={rhs_str}")
+            format!("[UNSUPPORTED:Eq]{lhs_str}={rhs_str}")
         }
     }
+}
+
+/// Canon-aware variant of [`format_generic_bounds`]. Applies `canon` to inner
+/// `Type::Generic` occurrences inside trait-bound generic args so that bounds
+/// like `Into<T>` and `Into<U>` (with `canon["T"] = "#0"`, `canon["U"] = "#0"`)
+/// produce the same string.
+///
+/// D3 fail-closed: `Outlives`, `Use`, and `TraitBound { generic_params: non_empty }`
+/// (HRTB binder) variants are outside ADR `2026-05-13-1153` D3 scope.  They are
+/// rendered as sentinel strings (`<UNSUPPORTED:Outlives>` / `<UNSUPPORTED:Use>` /
+/// `<UNSUPPORTED:HRTB>`) so that bound-sets containing them produce a unique,
+/// non-matching string rather than silently comparing equal when both sides
+/// happen to be identical text.  This includes HRTB bounds nested inside
+/// associated-type constraints (e.g. `Iterator<Item: for<'a> Foo<&'a str>>`),
+/// where `format_hrtb_type_params` would otherwise silently drop lifetime params.
+pub(super) fn format_generic_bounds_with_canon(
+    bounds: &[GenericBound],
+    canon: &HashMap<String, String>,
+) -> String {
+    let mut strs: Vec<String> = bounds
+        .iter()
+        .map(|b| match b {
+            GenericBound::TraitBound { trait_, modifier, generic_params } => {
+                // D3 fail-closed: `TraitBound` with a non-empty HRTB binder
+                // (`for<'a>` / `for<T: Foo>`) is outside ADR `2026-05-13-1153` D3 scope.
+                // Return a sentinel so bounds containing HRTB binders produce a unique
+                // non-matching string (including when they appear inside associated-type
+                // constraints such as `Iterator<Item: for<'a> Foo<&'a str>>`).  Without
+                // this check, `format_hrtb_type_params` silently drops lifetime params,
+                // causing `for<'a> Foo<&'a str>` to compare equal to `Foo<&str>`.
+                if !generic_params.is_empty() {
+                    return "<UNSUPPORTED:HRTB>".to_owned();
+                }
+                let short = trait_.path.rsplit("::").next().unwrap_or(&trait_.path).to_string();
+                let args_str = trait_
+                    .args
+                    .as_deref()
+                    .map(|a| {
+                        let s = format_generic_args_with_canon(a, canon);
+                        if s.is_empty() { String::new() } else { format!("<{s}>") }
+                    })
+                    .unwrap_or_default();
+                use rustdoc_types::TraitBoundModifier;
+                let modifier_str = match modifier {
+                    TraitBoundModifier::None => "",
+                    TraitBoundModifier::Maybe => "?",
+                    TraitBoundModifier::MaybeConst => "~const ",
+                };
+                format!("{modifier_str}{short}{args_str}")
+            }
+            // D3 fail-closed: Outlives and Use are outside ADR `2026-05-13-1153` D3 scope.
+            // Return sentinels so bound-sets containing them produce unique non-matching
+            // strings instead of silently comparing equal on both sides.
+            GenericBound::Outlives(_) => "<UNSUPPORTED:Outlives>".to_owned(),
+            GenericBound::Use(_) => "<UNSUPPORTED:Use>".to_owned(),
+        })
+        .collect();
+    strs.sort();
+    strs.join("+")
 }

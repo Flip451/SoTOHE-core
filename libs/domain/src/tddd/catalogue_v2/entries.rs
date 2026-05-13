@@ -15,7 +15,13 @@
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
 use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeRef};
-use crate::tddd::catalogue_v2::methods::{MethodDeclaration, MethodGenericParam, ParamDeclaration};
+use crate::tddd::catalogue_v2::methods::{
+    MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
+};
+// Note: `WherePredicateDecl` is used by `FunctionEntry.where_predicates` and
+// `MethodDeclaration.where_predicates`. `TraitEntry` does not currently carry
+// where-predicates (ADR `2026-05-13-1153` IN-30 scope: trait-level generic
+// parameter declarations are not yet schematized).
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 
@@ -129,6 +135,14 @@ pub struct FunctionEntry {
     ///
     /// (ADR `2026-05-08-0248` D14)
     pub generics: Vec<MethodGenericParam>,
+    /// `where`-clause bound predicates on this function's generics.
+    ///
+    /// Captures `BoundPredicate` entries whose LHS is an arbitrary type
+    /// expression — patterns `generics[].bounds` (single-identifier LHS)
+    /// cannot represent (e.g. `where Vec<T>: Clone`). Default empty Vec.
+    ///
+    /// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1, D2)
+    pub where_predicates: Vec<WherePredicateDecl>,
     /// Optional documentation string.
     pub docs: Option<String>,
     /// SoT Chain ② references to spec.json elements.
@@ -421,6 +435,7 @@ mod tests {
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
             generics: vec![],
+            where_predicates: vec![],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -441,6 +456,7 @@ mod tests {
             returns: TypeRef::new("Result<UserId, ApplicationError>").unwrap(),
             is_async: true,
             generics: vec![],
+            where_predicates: vec![],
             docs: Some("Register a new user.".to_string()),
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -461,6 +477,7 @@ mod tests {
                 returns: TypeRef::new("()").unwrap(),
                 is_async: false,
                 generics: vec![],
+                where_predicates: vec![],
                 docs: None,
                 spec_refs: vec![],
                 informal_grounds: vec![],
@@ -484,6 +501,7 @@ mod tests {
                 name: ParamName::new("T").unwrap(),
                 bounds: vec![TypeRef::new("Clone").unwrap()],
             }],
+            where_predicates: vec![],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -502,6 +520,7 @@ mod tests {
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
             generics: vec![],
+            where_predicates: vec![],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -519,6 +538,7 @@ mod tests {
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
             generics: vec![],
+            where_predicates: vec![],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -527,6 +547,53 @@ mod tests {
         with_generic.generics =
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
         assert_ne!(base, with_generic, "generics field participates in equality");
+    }
+
+    #[test]
+    fn test_function_entry_with_where_predicates_stores_them() {
+        // ADR 2026-05-13-1153 D2: FunctionEntry carries explicit where_predicates so
+        // catalogue authors can express constraints whose LHS is a type expression
+        // (e.g. `where Vec<T>: Bound`) that the inline form cannot represent.
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![WherePredicateDecl {
+                type_: TypeRef::new("Vec<T>").unwrap(),
+                bounds: vec![TypeRef::new("Send").unwrap()],
+            }],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert_eq!(entry.where_predicates.len(), 1);
+        assert_eq!(entry.where_predicates[0].type_.as_str(), "Vec<T>");
+        assert_eq!(entry.where_predicates[0].bounds[0].as_str(), "Send");
+    }
+
+    #[test]
+    fn test_function_entry_where_predicates_distinguish_otherwise_equal_entries() {
+        let base = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let mut with_where = base.clone();
+        with_where.where_predicates = vec![WherePredicateDecl {
+            type_: TypeRef::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap()],
+        }];
+        assert_ne!(base, with_where, "where_predicates field participates in equality");
     }
 
     // -----------------------------------------------------------------------
@@ -606,6 +673,7 @@ mod tests {
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
             generics: vec![],
+            where_predicates: vec![],
             docs: None,
             spec_refs: vec![spec_ref.clone()],
             informal_grounds: vec![ground.clone()],

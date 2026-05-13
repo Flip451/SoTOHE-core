@@ -324,6 +324,10 @@ pub(super) struct FunctionEntryDto {
     /// that predate this field. (ADR `2026-05-08-0248` D14)
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(super) generics: Vec<MethodGenericParamDto>,
+    /// `where`-clause bound predicates on this function's generics. Default empty.
+    /// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) where_predicates: Vec<WherePredicateDeclDto>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(super) docs: Option<String>,
     /// SoT Chain ② references to spec.json elements. Always emitted (even empty).
@@ -342,6 +346,20 @@ pub(super) struct FunctionEntryDto {
 #[serde(deny_unknown_fields)]
 pub(super) struct MethodGenericParamDto {
     pub(super) name: String,
+    #[serde(default)]
+    pub(super) bounds: Vec<String>,
+}
+
+/// JSON-shape mirror of `domain::tddd::catalogue_v2::WherePredicateDecl`.
+///
+/// On the wire the field is named `"type"` (a reserved Rust keyword), so the
+/// struct field is `type_` with `#[serde(rename = "type")]`.
+/// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct WherePredicateDeclDto {
+    #[serde(rename = "type")]
+    pub(super) type_: String,
     #[serde(default)]
     pub(super) bounds: Vec<String>,
 }
@@ -366,6 +384,11 @@ pub(super) struct MethodDeclarationDto {
     /// Default empty for backward compatibility with catalogues that predate this field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(super) generics: Vec<MethodGenericParamDto>,
+    /// `where`-clause bound predicates on this method's generics.
+    /// Default empty for backward compatibility.
+    /// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) where_predicates: Vec<WherePredicateDeclDto>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(super) docs: Option<String>,
 }

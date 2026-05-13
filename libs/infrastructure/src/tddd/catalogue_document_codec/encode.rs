@@ -4,60 +4,69 @@ use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker};
 use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2,
+    CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
 
+use super::CatalogueDocumentCodecError;
 use super::dto::{
     CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto,
     MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto,
-    TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
+    TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
 };
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
 // ---------------------------------------------------------------------------
 
-pub(super) fn domain_to_dto(doc: &CatalogueDocument) -> CatalogueDocumentDto {
-    CatalogueDocumentDto {
+pub(super) fn domain_to_dto(
+    doc: &CatalogueDocument,
+) -> Result<CatalogueDocumentDto, CatalogueDocumentCodecError> {
+    let types = doc
+        .types
+        .iter()
+        .map(|(k, v)| type_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), dto)))
+        .collect::<Result<_, _>>()?;
+    let traits = doc
+        .traits
+        .iter()
+        .map(|(k, v)| trait_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), dto)))
+        .collect::<Result<_, _>>()?;
+    let functions = doc
+        .functions
+        .iter()
+        .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), dto)))
+        .collect::<Result<_, _>>()?;
+    Ok(CatalogueDocumentDto {
         schema_version: doc.schema_version,
         crate_name: doc.crate_name.as_str().to_owned(),
         layer: doc.layer.as_ref().to_owned(),
-        types: doc
-            .types
-            .iter()
-            .map(|(k, v)| (k.as_str().to_owned(), type_entry_to_dto(v)))
-            .collect(),
-        traits: doc
-            .traits
-            .iter()
-            .map(|(k, v)| (k.as_str().to_owned(), trait_entry_to_dto(v)))
-            .collect(),
-        functions: doc
-            .functions
-            .iter()
-            .map(|(k, v)| (k.to_string(), function_entry_to_dto(v)))
-            .collect(),
-    }
+        types,
+        traits,
+        functions,
+    })
 }
 
 // ---------------------------------------------------------------------------
 // Entry converters
 // ---------------------------------------------------------------------------
 
-pub(super) fn type_entry_to_dto(entry: &TypeEntry) -> TypeEntryDto {
-    TypeEntryDto {
+pub(super) fn type_entry_to_dto(
+    entry: &TypeEntry,
+) -> Result<TypeEntryDto, CatalogueDocumentCodecError> {
+    let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    Ok(TypeEntryDto {
         action: entry.action.to_string(),
         role: entry.role.to_string(),
         kind: type_kind_to_dto(&entry.kind),
-        methods: entry.methods.iter().map(method_decl_to_dto).collect(),
+        methods,
         trait_impls: entry.trait_impls.iter().map(trait_impl_to_dto).collect(),
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
-    }
+    })
 }
 
 fn type_kind_to_dto(kind: &TypeKindV2) -> TypeKindDto {
@@ -115,8 +124,12 @@ fn variant_payload_to_dto(payload: &VariantPayload) -> VariantPayloadDto {
     }
 }
 
-pub(super) fn method_decl_to_dto(m: &MethodDeclaration) -> MethodDeclarationDto {
-    MethodDeclarationDto {
+pub(super) fn method_decl_to_dto(
+    m: &MethodDeclaration,
+) -> Result<MethodDeclarationDto, CatalogueDocumentCodecError> {
+    let where_predicates =
+        m.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
+    Ok(MethodDeclarationDto {
         name: m.name.as_str().to_owned(),
         receiver: m.receiver.map(|r| r.to_string()),
         params: m.params.iter().map(param_decl_to_dto).collect(),
@@ -131,8 +144,34 @@ pub(super) fn method_decl_to_dto(m: &MethodDeclaration) -> MethodDeclarationDto 
                 bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
             })
             .collect(),
+        where_predicates,
         docs: m.docs.clone(),
+    })
+}
+
+/// Encodes a single [`WherePredicateDecl`] to its DTO form.
+///
+/// # Errors
+///
+/// Returns `CatalogueDocumentCodecError::InvalidEntry` when `w.bounds` is
+/// empty. An empty bound list cannot round-trip through the codec because the
+/// decoder rejects `where T:` (a bare where-predicate with no RHS is invalid
+/// Rust and is rejected by `where_predicates_from_dtos`).
+fn where_predicate_decl_to_dto(
+    w: &WherePredicateDecl,
+) -> Result<WherePredicateDeclDto, CatalogueDocumentCodecError> {
+    if w.bounds.is_empty() {
+        return Err(CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: w.type_.as_str().to_owned(),
+            reason: "where predicate has no bounds — empty bounds cannot round-trip through \
+                     the catalogue JSON codec (decoder rejects bare `where T:` predicates)"
+                .to_owned(),
+        });
     }
+    Ok(WherePredicateDeclDto {
+        type_: w.type_.as_str().to_owned(),
+        bounds: w.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+    })
 }
 
 fn param_decl_to_dto(p: &ParamDeclaration) -> ParamDto {
@@ -147,21 +186,28 @@ fn trait_impl_to_dto(t: &TraitImplDeclV2) -> TraitImplDto {
     }
 }
 
-pub(super) fn trait_entry_to_dto(entry: &TraitEntry) -> TraitEntryDto {
-    TraitEntryDto {
+pub(super) fn trait_entry_to_dto(
+    entry: &TraitEntry,
+) -> Result<TraitEntryDto, CatalogueDocumentCodecError> {
+    let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    Ok(TraitEntryDto {
         action: entry.action.to_string(),
         role: entry.role.to_string(),
-        methods: entry.methods.iter().map(method_decl_to_dto).collect(),
+        methods,
         supertrait_bounds: entry.supertrait_bounds.iter().map(|b| b.as_str().to_owned()).collect(),
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
-    }
+    })
 }
 
-pub(super) fn function_entry_to_dto(entry: &FunctionEntry) -> FunctionEntryDto {
-    FunctionEntryDto {
+pub(super) fn function_entry_to_dto(
+    entry: &FunctionEntry,
+) -> Result<FunctionEntryDto, CatalogueDocumentCodecError> {
+    let where_predicates =
+        entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
+    Ok(FunctionEntryDto {
         action: entry.action.to_string(),
         role: entry.role.to_string(),
         params: entry.params.iter().map(param_decl_to_dto).collect(),
@@ -175,8 +221,9 @@ pub(super) fn function_entry_to_dto(entry: &FunctionEntry) -> FunctionEntryDto {
                 bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
             })
             .collect(),
+        where_predicates,
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
-    }
+    })
 }

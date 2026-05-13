@@ -126,8 +126,9 @@ pub(super) fn items_structurally_equal(
 fn build_inherent_method_map(
     impl_ids: &[Id],
     index: &HashMap<Id, Item>,
-) -> BTreeMap<String, String> {
+) -> (BTreeMap<String, String>, bool) {
     let mut merged = BTreeMap::new();
+    let mut any_unsupported = false;
     for impl_id in impl_ids {
         if let Some(impl_item) = index.get(impl_id) {
             if let ItemEnum::Impl(impl_) = &impl_item.inner {
@@ -135,14 +136,18 @@ fn build_inherent_method_map(
                 if impl_.trait_.is_some() {
                     continue;
                 }
-                let methods = build_trait_method_map(&impl_.items, index, Some(&impl_.generics));
+                let (methods, has_unsupported) =
+                    build_trait_method_map(&impl_.items, index, Some(&impl_.generics));
+                if has_unsupported {
+                    any_unsupported = true;
+                }
                 for (name, sig) in methods {
                     merged.insert(name, sig);
                 }
             }
         }
     }
-    merged
+    (merged, any_unsupported)
 }
 
 fn structs_structurally_equal(
@@ -156,8 +161,12 @@ fn structs_structurally_equal(
     }
     // Compare inherent method signatures so that adding, removing, or changing an
     // inherent method (TypeEntry.methods in the catalogue) registers as a mismatch.
-    let a_methods = build_inherent_method_map(&a.impls, a_index);
-    let b_methods = build_inherent_method_map(&b.impls, b_index);
+    let (a_methods, a_methods_unsupported) = build_inherent_method_map(&a.impls, a_index);
+    let (b_methods, b_methods_unsupported) = build_inherent_method_map(&b.impls, b_index);
+    // D3 fail-closed: any method with unsupported generics on either side.
+    if a_methods_unsupported || b_methods_unsupported {
+        return false;
+    }
     if a_methods != b_methods {
         return false;
     }
@@ -273,8 +282,12 @@ fn enums_structurally_equal(
     }
     // Compare inherent method signatures so that adding, removing, or changing an
     // inherent method (TypeEntry.methods in the catalogue) registers as a mismatch.
-    let a_methods = build_inherent_method_map(&a.impls, a_index);
-    let b_methods = build_inherent_method_map(&b.impls, b_index);
+    let (a_methods, a_methods_unsupported) = build_inherent_method_map(&a.impls, a_index);
+    let (b_methods, b_methods_unsupported) = build_inherent_method_map(&b.impls, b_index);
+    // D3 fail-closed: any method with unsupported generics on either side.
+    if a_methods_unsupported || b_methods_unsupported {
+        return false;
+    }
     a_methods == b_methods
 }
 

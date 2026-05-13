@@ -247,11 +247,15 @@ impl CatalogueDocumentCodec {
     ///
     /// # Errors
     ///
+    /// Returns `CatalogueDocumentCodecError::InvalidEntry` if any
+    /// `WherePredicateDecl` has an empty `bounds` vec (empty bounds cannot
+    /// round-trip through the JSON codec — the decoder rejects them).
+    ///
     /// Returns `CatalogueDocumentCodecError::Json` if serialization fails
     /// (this is extremely unlikely for valid domain types, but the error variant
     /// is kept for API completeness).
     pub fn encode(doc: &CatalogueDocument) -> Result<String, CatalogueDocumentCodecError> {
-        let dto = domain_to_dto(doc);
+        let dto = domain_to_dto(doc)?;
         let json = serde_json::to_string_pretty(&dto)?;
         Ok(json)
     }
@@ -1308,6 +1312,246 @@ mod tests {
         assert!(
             matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
             "duplicate function generic param names must be rejected, got: {result:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-13-1153 D2: WherePredicateDecl JSON round-trip (T035 codec)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_trait_method_with_where_predicates_round_trips() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "GenericRepo": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "save",
+          "receiver": "&self",
+          "params": [{ "name": "item", "ty": "T" }],
+          "returns": "Result",
+          "generics": [{ "name": "T", "bounds": [] }],
+          "where_predicates": [
+            { "type": "T", "bounds": ["Clone", "Send"] }
+          ]
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.traits.values().next().unwrap();
+        let method = &entry.methods[0];
+        assert_eq!(method.where_predicates.len(), 1);
+        assert_eq!(method.where_predicates[0].type_.as_str(), "T");
+        assert_eq!(method.where_predicates[0].bounds.len(), 2);
+        assert_eq!(method.where_predicates[0].bounds[0].as_str(), "Clone");
+        assert_eq!(method.where_predicates[0].bounds[1].as_str(), "Send");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_function_with_where_predicates_round_trips() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::generic_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "x", "ty": "T" }],
+      "returns": "T",
+      "generics": [{ "name": "T", "bounds": [] }],
+      "where_predicates": [
+        { "type": "T", "bounds": ["Clone"] }
+      ]
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.functions.values().next().unwrap();
+        assert_eq!(entry.where_predicates.len(), 1);
+        assert_eq!(entry.where_predicates[0].type_.as_str(), "T");
+        assert_eq!(entry.where_predicates[0].bounds[0].as_str(), "Clone");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_decode_without_where_predicates_field_defaults_to_empty() {
+        // Legacy catalogues that predate T035 omit where_predicates; it must default to
+        // empty for forward-compat (serde default + skip_serializing_if = Vec::is_empty).
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "SimplePort": {
+      "action": "add",
+      "role": "SpecificationPort",
+      "methods": [
+        { "name": "do_it", "receiver": "&self", "params": [], "returns": "()" }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let method = &doc.traits.values().next().unwrap().methods[0];
+        assert!(
+            method.where_predicates.is_empty(),
+            "omitted where_predicates must default to empty Vec"
+        );
+    }
+
+    #[test]
+    fn test_encode_with_empty_where_predicates_omits_field() {
+        // `skip_serializing_if = "Vec::is_empty"` must suppress the field
+        // so legacy catalogues (no where_predicates) stay byte-stable.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "SimplePort": {
+      "action": "add",
+      "role": "SpecificationPort",
+      "methods": [
+        { "name": "do_it", "receiver": "&self", "params": [], "returns": "()" }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(
+            !encoded.contains("\"where_predicates\""),
+            "where_predicates field must be omitted when empty: {encoded}"
+        );
+    }
+
+    #[test]
+    fn test_decode_where_predicate_with_empty_bounds_returns_invalid_entry_error() {
+        // A where predicate with no bounds (`where T:`) is invalid Rust and
+        // must be rejected by the decoder at the codec boundary.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "BadPort": {
+      "action": "add",
+      "role": "SpecificationPort",
+      "methods": [
+        {
+          "name": "do_it",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "generics": [{ "name": "T", "bounds": [] }],
+          "where_predicates": [
+            { "type": "T", "bounds": [] }
+          ]
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "usecase");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry for empty where_predicate bounds, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_where_predicate_with_empty_bounds_returns_invalid_entry_error() {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::entries::FunctionEntry;
+        use domain::tddd::catalogue_v2::identifiers::{CrateName, FunctionName, FunctionPath};
+        use domain::tddd::catalogue_v2::roles::FunctionRole;
+        use domain::tddd::catalogue_v2::{CatalogueDocument, TypeRef, WherePredicateDecl};
+
+        // Construct a FunctionEntry with a WherePredicateDecl that has empty bounds.
+        // The encoder must return an error in release builds (not just fire a debug_assert).
+        let bad_predicate = WherePredicateDecl {
+            type_: TypeRef::new("T".to_string()).unwrap(),
+            bounds: vec![], // empty — violates the codec invariant
+        };
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()".to_string()).unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![bad_predicate],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let crate_name = CrateName::new("usecase".to_string()).unwrap();
+        let layer = LayerId::try_new("usecase").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
+        let fn_name = FunctionName::new("bad_fn").unwrap();
+        let path = FunctionPath::at_root(crate_name, fn_name);
+        doc.functions.insert(path, entry);
+
+        let result = CatalogueDocumentCodec::encode(&doc);
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry when encoding WherePredicateDecl with empty bounds, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_where_predicate_with_empty_type_returns_invalid_entry_error() {
+        // T035 / ADR 2026-05-13-1153 D2: `WherePredicateDecl.type_` must be a non-empty
+        // TypeRef. `where_predicates_from_dtos` rejects empty strings at decode time so
+        // the validation rule does not silently regress.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::bad_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "generics": [{ "name": "T", "bounds": [] }],
+      "where_predicates": [
+        { "type": "", "bounds": ["Clone"] }
+      ]
+    }
+  }
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "usecase");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry for empty WherePredicateDecl.type_, got: {result:?}"
         );
     }
 

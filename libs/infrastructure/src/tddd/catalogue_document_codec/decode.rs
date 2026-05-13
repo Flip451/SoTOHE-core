@@ -15,7 +15,7 @@ use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayloa
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CrateName, FunctionPath, FunctionRole, GenericArgsError, ItemAction,
     MethodDeclaration, MethodGenericParam, MethodName, ModulePath, ParamDeclaration, ParamName,
-    SelfReceiver, TraitImplDeclV2, TraitName, TypeName, TypeRef,
+    SelfReceiver, TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
@@ -299,6 +299,25 @@ fn validate_bound_str(bound_str: &str) -> Result<(), String> {
         .map_err(|e| format!("invalid bound syntax '{}': {e}", bound_str))
 }
 
+/// Validates that `type_str` is syntactically well-formed as a Rust type expression
+/// using `syn::parse_str::<syn::Type>`.
+///
+/// Used to validate `WherePredicateDecl.type_` at the codec boundary so that malformed
+/// type syntax (e.g. `"Vec<"`, `"T U"`, `"<invalid>"`) is rejected at decode time
+/// rather than failing later inside `CatalogueToExtendedCrateCodec`.
+/// `TypeRef::new` only rejects empty strings and does not validate syntax; this
+/// function provides the stronger structural check for where-predicate LHS values.
+///
+/// # Errors
+///
+/// Returns an error string with the `syn` parse error message if `type_str` is not
+/// a valid Rust type expression.
+fn validate_type_ref_str(type_str: &str) -> Result<(), String> {
+    syn::parse_str::<syn::Type>(type_str)
+        .map(|_| ())
+        .map_err(|e| format!("invalid type syntax '{}': {e}", type_str))
+}
+
 /// Convert a Vec of `MethodGenericParamDto` (shared by Method and Function entries)
 /// into validated `MethodGenericParam` values, rejecting duplicate names.
 fn method_generics_from_dtos(
@@ -351,6 +370,53 @@ fn method_generics_from_dtos(
     Ok(generics)
 }
 
+/// Convert a Vec of `WherePredicateDeclDto` (shared by Method, Function, and Trait entries)
+/// into validated `WherePredicateDecl` values, rejecting empty `type_` or bound entries.
+///
+/// A `WherePredicateDeclDto` with an empty `bounds` vector is rejected because `where T:`
+/// (no bound after the colon) is syntactically invalid in Rust and would produce a
+/// `WherePredicate::BoundPredicate { bounds: vec![] }` in the extended crate representation.
+fn where_predicates_from_dtos(
+    entry_name: &str,
+    dtos: Vec<crate::tddd::catalogue_document_codec::dto::WherePredicateDeclDto>,
+) -> Result<Vec<WherePredicateDecl>, CatalogueDocumentCodecError> {
+    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: entry_name.to_owned(),
+        reason,
+    };
+    dtos.into_iter()
+        .map(|w| {
+            // Validate non-empty first (TypeRef::new check), then validate Rust type syntax.
+            let type_ = TypeRef::new(w.type_.clone())
+                .map_err(|e| err(format!("invalid where predicate type '{}': {e}", w.type_)))?;
+            validate_type_ref_str(w.type_.as_str())
+                .map_err(|e| err(format!("invalid where predicate type syntax: {e}")))?;
+            if w.bounds.is_empty() {
+                return Err(err(format!(
+                    "where predicate for '{}' has no bounds (expected at least one bound \
+                     after the colon; `where T:` is not valid Rust)",
+                    w.type_
+                )));
+            }
+            let bounds = w
+                .bounds
+                .into_iter()
+                .enumerate()
+                .map(|(idx, bound)| {
+                    validate_bound_str(&bound)
+                        .map_err(|e| err(format!("invalid where predicate bound[{idx}]: {e}")))?;
+                    TypeRef::new(bound.clone())
+                        .map_err(|e| err(format!("invalid bound type ref '{bound}': {e}")))
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok::<WherePredicateDecl, CatalogueDocumentCodecError>(WherePredicateDecl {
+                type_,
+                bounds,
+            })
+        })
+        .collect()
+}
+
 pub(super) fn method_decl_from_dto(
     entry_name: &str,
     dto: MethodDeclarationDto,
@@ -382,10 +448,12 @@ pub(super) fn method_decl_from_dto(
         .map_err(|e| err(format!("invalid returns type '{}': {e}", dto.returns)))?;
 
     let generics = method_generics_from_dtos(entry_name, dto.generics)?;
+    let where_predicates = where_predicates_from_dtos(entry_name, dto.where_predicates)?;
 
     let mut decl = MethodDeclaration::new(name, receiver, params, returns, dto.is_async, dto.docs);
     decl.has_default_impl = dto.has_default_impl;
     decl.generics = generics;
+    decl.where_predicates = where_predicates;
     Ok(decl)
 }
 
@@ -518,6 +586,7 @@ pub(super) fn function_entry_from_dto(
         .map_err(|e| err(format!("invalid returns type '{}': {e}", dto.returns)))?;
 
     let generics = method_generics_from_dtos(name, dto.generics)?;
+    let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
 
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
@@ -539,6 +608,7 @@ pub(super) fn function_entry_from_dto(
         returns,
         is_async: dto.is_async,
         generics,
+        where_predicates,
         docs: dto.docs,
         spec_refs,
         informal_grounds,

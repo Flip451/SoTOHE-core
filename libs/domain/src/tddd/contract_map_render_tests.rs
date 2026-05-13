@@ -97,6 +97,7 @@ fn doc_with_function(crate_name: &str, fn_name: &str) -> CatalogueDocument {
         returns: TypeRef::new("()").unwrap(),
         is_async: false,
         generics: vec![],
+        where_predicates: vec![],
         docs: None,
         spec_refs: vec![],
         informal_grounds: vec![],

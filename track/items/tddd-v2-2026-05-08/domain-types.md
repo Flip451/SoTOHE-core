@@ -69,6 +69,7 @@
 | TypestateTransitions | value_object | modify | — | 🔵 | 🔵 |
 | VariantDecl | value_object | — | — | 🔵 | 🔵 |
 | VariantName | value_object | — | — | 🔵 | 🔵 |
+| WherePredicateDecl | value_object | — | — | 🔵 | 🔵 |
 
 ## Error Types
 

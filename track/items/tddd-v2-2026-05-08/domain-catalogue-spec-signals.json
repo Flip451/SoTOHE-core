@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5e1cccddad73609e5f2d2550449efe4ece97ff062db01ed6932ead678e121941",
+  "catalogue_declaration_hash": "205c445164c224eb8778d34255f547b9b5a81a8c76d8589342bfa9abd6a5f792",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -292,6 +292,10 @@
     },
     {
       "type_name": "VariantPayload",
+      "signal": "blue"
+    },
+    {
+      "type_name": "WherePredicateDecl",
       "signal": "blue"
     },
     {
