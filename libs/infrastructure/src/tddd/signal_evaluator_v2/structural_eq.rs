@@ -460,6 +460,73 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
+    // ADR D13 / IN-27: cross-crate ref structural equality (shape-based,
+    // L1 short-name reduction independent of full path length / id values)
+    // -----------------------------------------------------------------------
+
+    /// Helper: build a StructField item whose type is a `Type::ResolvedPath` with
+    /// the given full path and per-graph id. Mirrors what `parse_type_ref` +
+    /// `resolve_external_type_ids` produces for crate-prefixed TypeRefs.
+    fn make_struct_field_resolved_path(id: Id, full_path: &str, item_id: Id) -> Item {
+        Item {
+            id,
+            crate_id: 0,
+            name: None,
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::StructField(Type::ResolvedPath(Path {
+                path: full_path.to_string(),
+                id: item_id,
+                args: None,
+            })),
+        }
+    }
+
+    /// Per D13: A-side may render a cross-crate ref with a short path (e.g.
+    /// `"domain::TypeSignalsDocument"`) while C-side (rustdoc) renders the same
+    /// item with the canonical module path (`"domain::tddd::type_signals_doc::TypeSignalsDocument"`).
+    /// Per-graph `id` values differ between A and C (A's id is allocated by the
+    /// codec, C's by rustdoc). Structural equality must succeed regardless,
+    /// because `format_type` reduces to the L1 short name and ignores ids.
+    #[test]
+    fn test_cross_crate_ref_with_different_path_lengths_and_ids_matches() {
+        // A-side (catalogue-derived): "domain::TypeSignalsDocument" with synthetic id 99
+        let a_fields: Vec<Option<Id>> = vec![Some(Id(1))];
+        let mut a_index: HashMap<Id, Item> = HashMap::new();
+        a_index.insert(
+            Id(1),
+            make_struct_field_resolved_path(Id(1), "domain::TypeSignalsDocument", Id(99)),
+        );
+        let a_struct = make_tuple_struct(a_fields);
+
+        // C-side (rustdoc): full module path with a different per-graph id
+        let c_fields: Vec<Option<Id>> = vec![Some(Id(10))];
+        let c_index = {
+            let mut idx: HashMap<Id, Item> = HashMap::new();
+            idx.insert(
+                Id(10),
+                make_struct_field_resolved_path(
+                    Id(10),
+                    "domain::tddd::type_signals_doc::TypeSignalsDocument",
+                    Id(7531),
+                ),
+            );
+            idx
+        };
+        let c_struct = make_tuple_struct(c_fields);
+
+        assert!(
+            structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
+            "cross-crate refs with different path lengths and differing per-graph ids \
+             must still compare equal at L1 short-name (D13 shape-based matching)"
+        );
+    }
+
+    // -----------------------------------------------------------------------
     // ADR D9: provenance-agnostic trait-impl comparison
     // -----------------------------------------------------------------------
 
