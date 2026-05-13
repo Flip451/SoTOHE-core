@@ -319,6 +319,7 @@ mod tests {
                 )
                 .unwrap(),
                 is_async: false,
+                generics: vec![],
                 docs: None,
                 spec_refs: vec![],
                 informal_grounds: vec![],

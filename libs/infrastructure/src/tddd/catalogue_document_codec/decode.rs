@@ -299,38 +299,17 @@ fn validate_bound_str(bound_str: &str) -> Result<(), String> {
         .map_err(|e| format!("invalid bound syntax '{}': {e}", bound_str))
 }
 
-pub(super) fn method_decl_from_dto(
+/// Convert a Vec of `MethodGenericParamDto` (shared by Method and Function entries)
+/// into validated `MethodGenericParam` values, rejecting duplicate names.
+fn method_generics_from_dtos(
     entry_name: &str,
-    dto: MethodDeclarationDto,
-) -> Result<MethodDeclaration, CatalogueDocumentCodecError> {
+    dtos: Vec<crate::tddd::catalogue_document_codec::dto::MethodGenericParamDto>,
+) -> Result<Vec<MethodGenericParam>, CatalogueDocumentCodecError> {
     let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
         entry_name: entry_name.to_owned(),
         reason,
     };
-
-    let name = MethodName::new(&dto.name)
-        .map_err(|e| err(format!("invalid method name '{}': {e}", dto.name)))?;
-
-    let receiver = match dto.receiver.as_deref() {
-        None | Some("") => None,
-        Some(r) => {
-            let recv = SelfReceiver::from_str(r)
-                .map_err(|e| err(format!("invalid self receiver '{}': {e}", r)))?;
-            Some(recv)
-        }
-    };
-
-    let params = dto
-        .params
-        .into_iter()
-        .map(|p| param_decl_from_dto(entry_name, p))
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let returns = TypeRef::new(dto.returns.clone())
-        .map_err(|e| err(format!("invalid returns type '{}': {e}", dto.returns)))?;
-
-    let generics: Vec<MethodGenericParam> = dto
-        .generics
+    let generics: Vec<MethodGenericParam> = dtos
         .into_iter()
         .map(|g| {
             let name = ParamName::new(&g.name).map_err(|_| {
@@ -363,16 +342,46 @@ pub(super) fn method_decl_from_dto(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    // Reject duplicate generic param names — duplicate names produce an impossible Rust
-    // signature and must be caught at the codec boundary rather than propagated downstream.
-    {
-        let mut seen = HashSet::new();
-        for g in &generics {
-            if !seen.insert(g.name.as_str()) {
-                return Err(err(format!("duplicate generic param name '{}'", g.name.as_str())));
-            }
+    let mut seen = HashSet::new();
+    for g in &generics {
+        if !seen.insert(g.name.as_str()) {
+            return Err(err(format!("duplicate generic param name '{}'", g.name.as_str())));
         }
     }
+    Ok(generics)
+}
+
+pub(super) fn method_decl_from_dto(
+    entry_name: &str,
+    dto: MethodDeclarationDto,
+) -> Result<MethodDeclaration, CatalogueDocumentCodecError> {
+    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: entry_name.to_owned(),
+        reason,
+    };
+
+    let name = MethodName::new(&dto.name)
+        .map_err(|e| err(format!("invalid method name '{}': {e}", dto.name)))?;
+
+    let receiver = match dto.receiver.as_deref() {
+        None | Some("") => None,
+        Some(r) => {
+            let recv = SelfReceiver::from_str(r)
+                .map_err(|e| err(format!("invalid self receiver '{}': {e}", r)))?;
+            Some(recv)
+        }
+    };
+
+    let params = dto
+        .params
+        .into_iter()
+        .map(|p| param_decl_from_dto(entry_name, p))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let returns = TypeRef::new(dto.returns.clone())
+        .map_err(|e| err(format!("invalid returns type '{}': {e}", dto.returns)))?;
+
+    let generics = method_generics_from_dtos(entry_name, dto.generics)?;
 
     let mut decl = MethodDeclaration::new(name, receiver, params, returns, dto.is_async, dto.docs);
     decl.has_default_impl = dto.has_default_impl;
@@ -508,6 +517,8 @@ pub(super) fn function_entry_from_dto(
     let returns = TypeRef::new(dto.returns.clone())
         .map_err(|e| err(format!("invalid returns type '{}': {e}", dto.returns)))?;
 
+    let generics = method_generics_from_dtos(name, dto.generics)?;
+
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: name.to_owned(),
@@ -527,6 +538,7 @@ pub(super) fn function_entry_from_dto(
         params,
         returns,
         is_async: dto.is_async,
+        generics,
         docs: dto.docs,
         spec_refs,
         informal_grounds,

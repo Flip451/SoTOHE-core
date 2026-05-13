@@ -1166,6 +1166,151 @@ mod tests {
         );
     }
 
+    // -----------------------------------------------------------------------
+    // ADR 0248 D14: FunctionEntry.generics JSON round-trip (Gap 2)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_function_with_generics_preserves_field() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::check_strict_merge_gate": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "reader", "ty": "R" }],
+      "returns": "Result<(), CheckStrictMergeGateError<E>>",
+      "is_async": false,
+      "generics": [
+        { "name": "R", "bounds": ["TrackBlobReader<Error = E>"] },
+        { "name": "E", "bounds": ["std::error::Error"] }
+      ]
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.functions.values().next().unwrap();
+        assert_eq!(entry.generics.len(), 2);
+        assert_eq!(entry.generics[0].name.as_str(), "R");
+        assert_eq!(entry.generics[0].bounds[0].as_str(), "TrackBlobReader<Error = E>");
+        assert_eq!(entry.generics[1].name.as_str(), "E");
+        assert_eq!(entry.generics[1].bounds[0].as_str(), "std::error::Error");
+    }
+
+    #[test]
+    fn test_decode_function_without_generics_field_defaults_to_empty() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "domain::do_thing": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()"
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.functions.values().next().unwrap();
+        assert!(
+            entry.generics.is_empty(),
+            "omitted generics must default to empty Vec for backward compatibility"
+        );
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_function_generics() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::generic_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "x", "ty": "T" }],
+      "returns": "T",
+      "is_async": false,
+      "generics": [
+        { "name": "T", "bounds": ["Clone"] }
+      ]
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, doc2);
+        let entry = doc2.functions.values().next().unwrap();
+        assert_eq!(entry.generics.len(), 1);
+        assert_eq!(entry.generics[0].name.as_str(), "T");
+    }
+
+    #[test]
+    fn test_encode_function_with_empty_generics_omits_field() {
+        // Vec::is_empty must skip the generics field on encode so legacy
+        // catalogues (no generics) stay byte-stable.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "domain::simple": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()"
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(
+            !encoded.contains("\"generics\""),
+            "generics field must be omitted from encoded JSON when empty: {encoded}"
+        );
+    }
+
+    #[test]
+    fn test_decode_function_with_duplicate_generic_param_names_returns_error() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "domain::bad": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "generics": [
+        { "name": "T", "bounds": [] },
+        { "name": "T", "bounds": [] }
+      ]
+    }
+  }
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "duplicate function generic param names must be rejected, got: {result:?}"
+        );
+    }
+
     #[test]
     fn test_decode_function_with_no_crate_prefix_returns_cross_crate_error() {
         let json = r#"{

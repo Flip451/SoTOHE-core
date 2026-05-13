@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-13T09:39:33Z",
-  "declaration_hash": "a97f9684b802753082762211afb0ad8f8fddb2bd51e74bf863b8072990140dca",
+  "generated_at": "2026-05-13T10:26:48Z",
+  "declaration_hash": "5e1cccddad73609e5f2d2550449efe4ece97ff062db01ed6932ead678e121941",
   "signals": [
     {
       "type_name": "CatalogueDocument",

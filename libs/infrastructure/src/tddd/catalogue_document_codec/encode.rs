@@ -167,6 +167,14 @@ pub(super) fn function_entry_to_dto(entry: &FunctionEntry) -> FunctionEntryDto {
         params: entry.params.iter().map(param_decl_to_dto).collect(),
         returns: entry.returns.as_str().to_owned(),
         is_async: entry.is_async,
+        generics: entry
+            .generics
+            .iter()
+            .map(|g| MethodGenericParamDto {
+                name: g.name.as_str().to_owned(),
+                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+            })
+            .collect(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),

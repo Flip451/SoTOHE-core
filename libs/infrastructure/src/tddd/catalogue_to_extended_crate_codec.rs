@@ -1145,6 +1145,12 @@ impl EncoderState {
         let docs = entry.docs.clone();
         let is_async = entry.is_async;
 
+        // Collect function-level generic parameter names so that occurrences of
+        // those names in param/return type strings are encoded as `Type::Generic`
+        // rather than as unresolved path markers. Mirrors `encode_method_items`.
+        // (ADR `2026-05-08-0248` D14)
+        let generic_names: Vec<&str> = entry.generics.iter().map(|g| g.name.as_str()).collect();
+
         let params: Vec<_> = entry
             .params
             .iter()
@@ -1153,12 +1159,58 @@ impl EncoderState {
         let returns_str = entry.returns.as_str().to_string();
 
         let mut inputs: Vec<(String, Type)> = vec![];
-        for (name, ty_str) in params {
-            let ty = self.parse_type_ref_str(&ty_str)?;
-            inputs.push((name, ty));
+        for (pname, pty_str) in params {
+            let pty = if !generic_names.is_empty() && is_bare_generic_name(&pty_str, &generic_names)
+            {
+                Type::Generic(pty_str.trim().to_string())
+            } else {
+                let raw = self.parse_type_ref_str(&pty_str)?;
+                if generic_names.is_empty() {
+                    raw
+                } else {
+                    rewrite_generic_types(raw, &generic_names)
+                }
+            };
+            inputs.push((pname, pty));
         }
-        let output =
-            if returns_str == "()" { None } else { Some(self.parse_type_ref_str(&returns_str)?) };
+        let output = if returns_str == "()" {
+            None
+        } else if !generic_names.is_empty() && is_bare_generic_name(&returns_str, &generic_names) {
+            Some(Type::Generic(returns_str.trim().to_string()))
+        } else {
+            let raw = self.parse_type_ref_str(&returns_str)?;
+            Some(if generic_names.is_empty() {
+                raw
+            } else {
+                rewrite_generic_types(raw, &generic_names)
+            })
+        };
+
+        // Encode function-level generic type parameters. Each entry becomes a
+        // `GenericParamDef::Type` with `is_synthetic: true` to mirror the rustdoc
+        // C-side representation (matches `encode_method_items`).
+        let mut fn_generic_params: Vec<GenericParamDef> = Vec::with_capacity(entry.generics.len());
+        for g in &entry.generics {
+            let mut bounds: Vec<GenericBound> = Vec::with_capacity(g.bounds.len());
+            for b in &g.bounds {
+                let raw_bound = self.encode_bound_str(b.as_str())?;
+                let bound = if generic_names.is_empty() {
+                    raw_bound
+                } else {
+                    rewrite_generic_types_in_bound(raw_bound, &generic_names)
+                };
+                bounds.push(bound);
+            }
+            fn_generic_params.push(GenericParamDef {
+                name: g.name.as_str().to_owned(),
+                kind: GenericParamDefKind::Type { bounds, default: None, is_synthetic: true },
+            });
+        }
+        let fn_generics = if fn_generic_params.is_empty() {
+            empty_generics()
+        } else {
+            Generics { params: fn_generic_params, where_predicates: vec![] }
+        };
 
         // Determine the effective crate_id for this function. Local functions use
         // crate_id 0; cross-workspace functions are assigned an external crate id.
@@ -1174,7 +1226,7 @@ impl EncoderState {
             docs,
             ItemEnum::Function(rustdoc_types::Function {
                 sig: FunctionSignature { inputs, output, is_c_variadic: false },
-                generics: empty_generics(),
+                generics: fn_generics,
                 has_body: true,
                 header: FunctionHeader {
                     is_async,
@@ -2840,6 +2892,123 @@ mod tests {
         assert!(
             f.has_body,
             "inherent method must always encode has_body=true (force_has_body invariant)"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 0248 D14: FunctionEntry.generics → Function.generics (Gap 2)
+    // -----------------------------------------------------------------------
+
+    /// A free function with generic parameters must encode `entry.generics` as
+    /// `Function.generics`, and any param/return type that names one of those
+    /// generics must be emitted as `Type::Generic(_)` rather than as an
+    /// unresolved path. Mirrors `MethodDeclaration.generics` handling.
+    #[test]
+    fn test_encode_function_with_generics_emits_type_generic_in_signature() {
+        use domain::tddd::catalogue_v2::FunctionName;
+        use domain::tddd::catalogue_v2::entries::FunctionEntry;
+        use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+        use domain::tddd::catalogue_v2::roles::FunctionRole;
+
+        let mut doc = make_doc("domain");
+        let crate_n = CrateName::new("domain").unwrap();
+        let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("generic_fn").unwrap());
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![ParamDeclaration::new(
+                ParamName::new("value").unwrap(),
+                TypeRef::new("T").unwrap(),
+            )],
+            returns: TypeRef::new("T").unwrap(),
+            is_async: false,
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("Clone").unwrap()],
+            }],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.functions.insert(fn_path, entry);
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let fn_item = ec
+            .krate()
+            .index
+            .values()
+            .find(|item| {
+                item.name.as_deref() == Some("generic_fn")
+                    && matches!(item.inner, ItemEnum::Function(_))
+            })
+            .expect("expected Function item for generic_fn");
+        let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+
+        // generics participates: 1 type-param `T` with bound `Clone`.
+        assert_eq!(
+            f.generics.params.len(),
+            1,
+            "expected 1 generic param, got {:?}",
+            f.generics.params
+        );
+        assert_eq!(f.generics.params[0].name, "T");
+
+        // The first input is `value: T` — must be Type::Generic("T").
+        let (pname, pty) = &f.sig.inputs[0];
+        assert_eq!(pname, "value");
+        assert!(
+            matches!(pty, Type::Generic(g) if g == "T"),
+            "expected Type::Generic(\"T\") for `value` param, got {pty:?}"
+        );
+
+        // Return type is `T` — must be Type::Generic("T").
+        let output = f.sig.output.as_ref().expect("expected Some output");
+        assert!(
+            matches!(output, Type::Generic(g) if g == "T"),
+            "expected Type::Generic(\"T\") for return, got {output:?}"
+        );
+    }
+
+    /// A free function with no generics emits `empty_generics()` (no params,
+    /// no where_predicates). This preserves the pre-D14 baseline for the vast
+    /// majority of free functions in the workspace.
+    #[test]
+    fn test_encode_function_without_generics_emits_empty_generics() {
+        use domain::tddd::catalogue_v2::FunctionName;
+        use domain::tddd::catalogue_v2::entries::FunctionEntry;
+        use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+        use domain::tddd::catalogue_v2::roles::FunctionRole;
+
+        let mut doc = make_doc("domain");
+        let crate_n = CrateName::new("domain").unwrap();
+        let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("simple").unwrap());
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.functions.insert(fn_path, entry);
+
+        let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+        let fn_item = ec
+            .krate()
+            .index
+            .values()
+            .find(|item| {
+                item.name.as_deref() == Some("simple")
+                    && matches!(item.inner, ItemEnum::Function(_))
+            })
+            .expect("expected Function item for simple");
+        let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+        assert!(
+            f.generics.params.is_empty() && f.generics.where_predicates.is_empty(),
+            "function without generics must emit empty Generics"
         );
     }
 }

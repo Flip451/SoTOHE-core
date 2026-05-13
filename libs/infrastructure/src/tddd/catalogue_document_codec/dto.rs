@@ -320,6 +320,10 @@ pub(super) struct FunctionEntryDto {
     pub(super) returns: String,
     #[serde(default)]
     pub(super) is_async: bool,
+    /// Generic type parameters on this function. Default empty for catalogues
+    /// that predate this field. (ADR `2026-05-08-0248` D14)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) generics: Vec<MethodGenericParamDto>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(super) docs: Option<String>,
     /// SoT Chain ② references to spec.json elements. Always emitted (even empty).

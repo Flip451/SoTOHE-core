@@ -15,7 +15,7 @@
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
 use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeRef};
-use crate::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
+use crate::tddd::catalogue_v2::methods::{MethodDeclaration, MethodGenericParam, ParamDeclaration};
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 
@@ -120,6 +120,15 @@ pub struct FunctionEntry {
     pub returns: TypeRef,
     /// Whether this function is `async`.
     pub is_async: bool,
+    /// Generic type parameters on this function.
+    ///
+    /// Populated when the function is declared with APIT (`impl Trait`) or an
+    /// explicit generic parameter (`fn f<T: Bound>(...)`). Default empty Vec for
+    /// backward compatibility. The A-codec encodes these as `GenericParamDef::Type`
+    /// entries in the function's `Generics`, mirroring `MethodDeclaration.generics`.
+    ///
+    /// (ADR `2026-05-08-0248` D14)
+    pub generics: Vec<MethodGenericParam>,
     /// Optional documentation string.
     pub docs: Option<String>,
     /// SoT Chain ② references to spec.json elements.
@@ -411,6 +420,7 @@ mod tests {
             params: vec![],
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
+            generics: vec![],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -430,6 +440,7 @@ mod tests {
             )],
             returns: TypeRef::new("Result<UserId, ApplicationError>").unwrap(),
             is_async: true,
+            generics: vec![],
             docs: Some("Register a new user.".to_string()),
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -449,12 +460,73 @@ mod tests {
                 params: vec![],
                 returns: TypeRef::new("()").unwrap(),
                 is_async: false,
+                generics: vec![],
                 docs: None,
                 spec_refs: vec![],
                 informal_grounds: vec![],
             };
             assert_eq!(entry.role, role);
         }
+    }
+
+    #[test]
+    fn test_function_entry_with_generics_stores_them() {
+        // ADR 2026-05-08-0248 D14: FunctionEntry carries explicit generic params
+        // so the A-codec can mirror rustdoc's `Function.generics`.
+        use crate::tddd::catalogue_v2::methods::MethodGenericParam;
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("T").unwrap(),
+            is_async: false,
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("Clone").unwrap()],
+            }],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert_eq!(entry.generics.len(), 1);
+        assert_eq!(entry.generics[0].name.as_str(), "T");
+        assert_eq!(entry.generics[0].bounds[0].as_str(), "Clone");
+    }
+
+    #[test]
+    fn test_function_entry_default_generics_is_empty() {
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert!(entry.generics.is_empty());
+    }
+
+    #[test]
+    fn test_function_entry_generics_distinguishes_otherwise_equal_entries() {
+        use crate::tddd::catalogue_v2::methods::MethodGenericParam;
+        let base = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let mut with_generic = base.clone();
+        with_generic.generics =
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        assert_ne!(base, with_generic, "generics field participates in equality");
     }
 
     // -----------------------------------------------------------------------
@@ -533,6 +605,7 @@ mod tests {
             params: vec![],
             returns: TypeRef::new("()").unwrap(),
             is_async: false,
+            generics: vec![],
             docs: None,
             spec_refs: vec![spec_ref.clone()],
             informal_grounds: vec![ground.clone()],
