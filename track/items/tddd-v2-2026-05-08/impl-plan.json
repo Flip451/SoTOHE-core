@@ -224,7 +224,7 @@
     {
       "id": "T039",
       "description": "Symptom C 修正 (AC-14): `DERIVE_TRAIT_NAMES` 定数 (libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs) と `is_derive_trait` ヘルパー関数を削除する。これらの定数・関数を参照している `build_impl_identity_map` / Phase 2 の構造一致比較コードから provenance-based フィルタ呼び出しをすべて除去する。削除に伴い関連するテスト (「derive trait は除外される」ことを確認していた test) も削除する。同一コミット内で `StructuralPartialEq` / `StructuralEq` 除外機構を導入する: これらは rustdoc が `is_synthetic: false` で出力するコンパイラ内部トレイトであり、`DERIVE_TRAIT_NAMES` 削除後も catalogue が宣言しないため `CMinusSUnionD` (🔴) を生成する。除外機構として `COMPILER_INTERNAL_TRAIT_NAMES: &[&str]` 定数 (値: `[\"StructuralPartialEq\", \"StructuralEq\"]`) を追加し、`build_impl_identity_map` 内で identity map 構築時に compiler-internal trait の Impl アイテムをスキップする (catalogue 由来フィルタではなく、コンパイラ実装詳細として明示的に文書化する)。ユニットテスト: (a) `Debug` / `Clone` / `Copy` / `IntoStaticStr` の derive 由来 TraitImplDecl を catalogue が宣言した場合に Phase 2 で 🔵 が生成されることをアサート (catalogue-declared derive traits evaluate as Blue)。(b) `StructuralPartialEq` / `StructuralEq` の Impl が C 側のみに存在する場合に `CMinusSUnionD` が生成されないことをアサート (compiler-internal は除外される)。(c) `DERIVE_TRAIT_NAMES` に相当するフィルタが存在しないことを確認する (コンパイルテスト相当: `DERIVE_TRAIT_NAMES` / `is_derive_trait` identifier がコードに存在しない)。Layer: infrastructure。",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
