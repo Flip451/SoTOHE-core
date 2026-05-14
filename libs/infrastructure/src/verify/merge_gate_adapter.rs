@@ -175,6 +175,42 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             BlobResult::NotFound => return BlobFetchResult::NotFound,
             BlobResult::CommandFailed(msg) => return BlobFetchResult::FetchError(msg),
         };
+        // Validate that the catalogue blob is well-formed before treating it as
+        // present.  Without this guard, a malformed or non-UTF-8 `<layer>-types.json`
+        // could pass Stage 2 as long as the committed type-signals file carries a
+        // matching hash — the freshness check alone does not detect structural
+        // corruption (parent ADR 2026-05-08-0258 requires the catalogue to be a
+        // decodable v3 `TypeCatalogueDocument` before the gate may rely on it).
+        let text = match std::str::from_utf8(&bytes) {
+            Ok(s) => s,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "{path}: {filename} is not valid UTF-8: {e}"
+                ));
+            }
+        };
+        // Derive the filename stem for CatalogueDocumentCodec::decode validation
+        // (crate_name field must match the stem). Mirror the same derivation used
+        // by `read_catalogue_for_spec_ref_check` so both paths are consistent.
+        let filename_stem_owned = std::path::Path::new(&filename)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("")
+            .strip_suffix("-types.json")
+            .map(str::to_owned)
+            .unwrap_or_else(|| {
+                std::path::Path::new(&filename)
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .unwrap_or("unknown")
+                    .to_owned()
+            });
+        if let Err(e) = crate::tddd::catalogue_document_codec::CatalogueDocumentCodec::decode(
+            text,
+            &filename_stem_owned,
+        ) {
+            return BlobFetchResult::FetchError(format!("{path}: {filename} decode error: {e}"));
+        }
         let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&bytes);
         BlobFetchResult::Found((bytes, hash_hex))
     }
@@ -503,11 +539,29 @@ mod tests {
   ]
 }"#;
 
-    /// v3-native catalogue fixture required by `CatalogueDocumentCodec::decode`
-    /// (used only by `read_catalogue_for_spec_ref_check` tests).
+    /// v3-native catalogue fixture required by `CatalogueDocumentCodec::decode`.
+    /// Used by `read_type_catalogue` tests and `read_catalogue_for_spec_ref_check` tests.
     const DOMAIN_TYPES_V3_MINIMAL: &str = r#"{
   "schema_version": 3,
   "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "TrackId": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+    /// v3-native catalogue fixture with `crate_name: "domain_ext"`, used by
+    /// `test_read_type_catalogue_found_with_custom_catalogue_file_override` where
+    /// the file is committed as `domain_ext-types.json` (a valid Rust crate name).
+    const CUSTOM_DOMAIN_TYPES_V3_MINIMAL: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain_ext",
   "layer": "domain",
   "types": {
     "TrackId": {
@@ -604,16 +658,20 @@ mod tests {
     fn test_read_type_catalogue_found_returns_bytes_and_hash() {
         // Happy path: catalogue file exists → returns raw bytes + matching SHA-256.
         // No signal file is needed because read_type_catalogue no longer fetches it.
-        let dir =
-            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        // Uses v3 fixture because CatalogueDocumentCodec::decode (called during validation)
+        // rejects non-v3 catalogues.
+        let dir = setup_repo_with_track(
+            "foo",
+            &[("domain-types.json", DOMAIN_TYPES_V3_MINIMAL.as_bytes())],
+        );
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         match reader.read_type_catalogue("main", "foo", "domain") {
             BlobFetchResult::Found((bytes, hash_hex)) => {
                 // Bytes must match the raw catalogue content.
-                assert_eq!(bytes, DOMAIN_TYPES_MINIMAL.as_bytes());
+                assert_eq!(bytes, DOMAIN_TYPES_V3_MINIMAL.as_bytes());
                 // Hash must be the SHA-256 of those bytes.
                 let expected = crate::tddd::type_signals_codec::declaration_hash(
-                    DOMAIN_TYPES_MINIMAL.as_bytes(),
+                    DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
                 );
                 assert_eq!(hash_hex, expected, "hash must be SHA-256 of raw catalogue bytes");
                 assert_eq!(hash_hex.len(), 64, "hash must be 64-char hex");
@@ -627,8 +685,11 @@ mod tests {
         // T022: read_type_catalogue must succeed even when no companion signal
         // file exists. Previously it fetched and checked the signal file here;
         // that responsibility moved to the usecase caller.
-        let dir =
-            setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
+        // Uses v3 fixture because decode validation now runs inside read_type_catalogue.
+        let dir = setup_repo_with_track(
+            "foo",
+            &[("domain-types.json", DOMAIN_TYPES_V3_MINIMAL.as_bytes())],
+        );
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         assert!(
             matches!(
@@ -645,6 +706,8 @@ mod tests {
         // with an explicit `tddd.catalogue_file` override is honoured: the
         // adapter must return `Found((bytes, hash))` for the overridden file,
         // not the default `domain-types.json`.
+        // The custom filename `domain_ext-types.json` has stem `domain_ext`, a valid
+        // Rust crate name (underscores are permitted).
         const ARCH_RULES_CUSTOM: &str = r#"{
   "version": 2,
   "layers": [
@@ -655,7 +718,7 @@ mod tests {
       "deny_reason": "",
       "tddd": {
         "enabled": true,
-        "catalogue_file": "custom-domain-types.json"
+        "catalogue_file": "domain_ext-types.json"
       }
     }
   ]
@@ -666,9 +729,13 @@ mod tests {
         // Write architecture-rules.json at repo root.
         std::fs::write(repo.join("architecture-rules.json"), ARCH_RULES_CUSTOM).unwrap();
         // Write the custom-named catalogue in the track directory.
+        // Uses CUSTOM_DOMAIN_TYPES_V3_MINIMAL (crate_name = "domain_ext") because
+        // CatalogueDocumentCodec::decode now runs during read_type_catalogue; the
+        // fixture must be v3 and its crate_name must match the filename stem "domain_ext".
         let track_dir = repo.join("track/items/foo");
         std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("custom-domain-types.json"), DOMAIN_TYPES_MINIMAL).unwrap();
+        std::fs::write(track_dir.join("domain_ext-types.json"), CUSTOM_DOMAIN_TYPES_V3_MINIMAL)
+            .unwrap();
         git(repo, &["add", "."]);
         git(repo, &["commit", "--quiet", "-m", "initial"]);
         git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
@@ -678,9 +745,9 @@ mod tests {
         match reader.read_type_catalogue("main", "foo", "domain") {
             BlobFetchResult::Found((bytes, hash_hex)) => {
                 // Must have read the overridden file, not domain-types.json.
-                assert_eq!(bytes, DOMAIN_TYPES_MINIMAL.as_bytes());
+                assert_eq!(bytes, CUSTOM_DOMAIN_TYPES_V3_MINIMAL.as_bytes());
                 let expected = crate::tddd::type_signals_codec::declaration_hash(
-                    DOMAIN_TYPES_MINIMAL.as_bytes(),
+                    CUSTOM_DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
                 );
                 assert_eq!(
                     hash_hex, expected,
