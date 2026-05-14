@@ -215,7 +215,21 @@ fn evaluate_layer_catalogue(
 
     // Read declaration bytes for the freshness check (SHA-256 comparison).
     // The `declaration_hash` in the signal file must match the SHA-256 of
-    // these bytes (ADR 2026-04-18-1400 §D5). No catalogue decoding needed.
+    // these bytes (ADR 2026-04-18-1400 §D5). No catalogue decoding needed
+    // along this CI path.
+    //
+    // ## Codex r3 accepted deviation (PR #132)
+    //
+    // Codex round 3 flagged that the merge-gate adapter
+    // (`merge_gate_adapter::read_type_catalogue`) decodes the catalogue with
+    // `CatalogueDocumentCodec` while this CI path only computes a hash,
+    // creating a structural-validation asymmetry for malformed catalogues
+    // with a matching committed signal hash.  Adding the same decode step
+    // here would break dozens of pre-T039 fixtures still authored at
+    // `schema_version=2`, so symmetry is deferred to a follow-up task that
+    // bulk-converts the v2 fixtures to v3 alongside the decode validation.
+    // Until then the merge-gate adapter remains the authoritative structural
+    // check before a branch can merge.
     let declaration_bytes = match std::fs::read(&catalogue_path) {
         Ok(b) => b,
         Err(e) => {
